@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spacegame</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div id="hud" class="hud"></div>
+    <div id="dock-panel" class="dock-panel hidden">
+      <h1 id="dock-station-name">Station</h1>
+      <p class="muted">Docked. Services will appear here in later versions.</p>
+      <button id="undock-button" type="button">Undock [F]</button>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

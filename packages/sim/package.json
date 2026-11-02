@@ -1,0 +1,22 @@
+{
+  "name": "@spacegame/sim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Headless game simulation. No DOM, no canvas, no timers. Pure functions over plain data.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}
