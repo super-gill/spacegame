@@ -1,11 +1,11 @@
 import { ASSIST_LINEAR_STRENGTH, ASSIST_ROTATION_STRENGTH, BRAKE_STRENGTH } from './constants.js';
-import type { FlightMode, HullSpec, PlayerInput, Ship, Thrusters } from './types.js';
+import type { FlightMode, HullSpec, ShipInput, Ship, Thrusters } from './types.js';
 import { fromAngle, rotate, type Vec2 } from './vec2.js';
 
 /**
  * Flight computer.
  *
- * Turns pilot intent (a PlayerInput) plus the ship's flight mode into
+ * Turns pilot intent (a ShipInput) plus the ship's flight mode into
  * thruster throttles. It never touches velocity or position itself; the
  * physics in ship.ts applies whatever it decides. So an assist can only do
  * what the hull's real thrusters can do: a heavy hull with weak thrusters
@@ -77,7 +77,7 @@ function cancelAxis(
 const on = (held: boolean): number => (held ? 1 : 0);
 
 /** Decide this tick's thruster throttles. Pure. */
-export function computeThrusters(ship: Ship, hull: HullSpec, input: PlayerInput, dt: number): Thrusters {
+export function computeThrusters(ship: Ship, hull: HullSpec, input: ShipInput, dt: number): Thrusters {
   const { forward, right } = shipAxes(ship.heading);
   const forwardSpeed = dot(ship.velocity, forward);
   const rightSpeed = dot(ship.velocity, right);

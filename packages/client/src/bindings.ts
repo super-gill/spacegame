@@ -8,7 +8,7 @@
  * main.ts (interface actions), and update docs/controls.md.
  */
 
-/** Actions handed to the sim each tick via PlayerInput. */
+/** Actions handed to the sim each tick via ShipInput. */
 export type SimAction =
   | 'thrustForward'
   | 'thrustReverse'

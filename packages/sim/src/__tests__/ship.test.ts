@@ -3,7 +3,7 @@ import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
-import type { FlightMode, PlayerInput, Ship } from '../types.js';
+import type { FlightMode, ShipInput, Ship } from '../types.js';
 import { emptyInput } from '../world.js';
 import { length } from '../vec2.js';
 
@@ -27,17 +27,18 @@ function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship 
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    ownerId: null,
     flightMode: mode,
     thrusters: idleThrusters(),
     ...overrides,
   };
 }
 
-function input(overrides: Partial<PlayerInput> = {}): PlayerInput {
+function input(overrides: Partial<ShipInput> = {}): ShipInput {
   return { ...emptyInput(), ...overrides };
 }
 
-function run(s: Ship, i: PlayerInput = emptyInput(), ticks = 1): Ship {
+function run(s: Ship, i: ShipInput = emptyInput(), ticks = 1): Ship {
   for (let n = 0; n < ticks; n++) s = stepShip(s, hull, i, FIXED_DT);
   return s;
 }

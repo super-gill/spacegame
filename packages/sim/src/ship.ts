@@ -1,7 +1,7 @@
 import { REST_EPSILON } from './constants.js';
 import { wrapAngle } from './angle.js';
 import { computeThrusters, idleThrusters, shipAxes } from './flight.js';
-import type { HullSpec, PlayerInput, Ship, Thrusters } from './types.js';
+import type { HullSpec, ShipInput, Ship, Thrusters } from './types.js';
 import { add, length, scale, type Vec2 } from './vec2.js';
 
 /**
@@ -49,7 +49,7 @@ export function angularAcceleration(hull: HullSpec, t: Thrusters): number {
 }
 
 /** Advance one ship by `dt` seconds under `input`. Returns a new Ship. */
-export function stepShip(ship: Ship, hull: HullSpec, input: PlayerInput, dt: number): Ship {
+export function stepShip(ship: Ship, hull: HullSpec, input: ShipInput, dt: number): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
   const thrusters = computeThrusters(ship, hull, input, dt);

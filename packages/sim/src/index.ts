@@ -11,7 +11,15 @@ export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
 export { HULLS } from './hulls.js';
-export { createStarterWorld, emptyInput, playerShip } from './world.js';
+export {
+  createStarterWorld,
+  emptyInput,
+  joinPilot,
+  pilotShip,
+  starterShipId,
+  STARTER_STATION_ID,
+  STARTER_HULL_ID,
+} from './world.js';
 export { stepWorld } from './step.js';
 export { stepShip, linearAcceleration, angularAcceleration } from './ship.js';
 export {

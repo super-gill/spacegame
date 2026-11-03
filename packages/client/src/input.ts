@@ -1,8 +1,8 @@
-import type { PlayerInput } from '@spacegame/sim';
+import type { ShipInput } from '@spacegame/sim';
 import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bindings.js';
 
 /**
- * Keyboard state, sampled once per sim tick into a PlayerInput.
+ * Keyboard state, sampled once per sim tick into a ShipInput.
  *
  * Flight is keyboard only so the mouse stays free for targeting,
  * interacting with objects and UI in later versions.
@@ -36,9 +36,9 @@ export class InputController {
     this.latched.add('toggleDock');
   }
 
-  /** Build this tick's PlayerInput. Consumes latched press actions. */
-  sample(): PlayerInput {
-    const input: PlayerInput = {
+  /** Build this tick's ShipInput. Consumes latched press actions. */
+  sample(): ShipInput {
+    const input: ShipInput = {
       thrustForward: this.held.has('thrustForward'),
       thrustReverse: this.held.has('thrustReverse'),
       strafeLeft: this.held.has('strafeLeft'),

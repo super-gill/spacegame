@@ -6,7 +6,7 @@ import type { Vec2 } from './vec2.js';
  * Everything in the world is plain data with no methods, so a save game is
  * `JSON.stringify(world)` and nothing else. The sim never holds references
  * to DOM, canvas, timers or input devices; it only ever sees a
- * `PlayerInput` snapshot per tick.
+ * `ShipInput` snapshot per tick.
  */
 
 /**
@@ -71,6 +71,8 @@ export interface Thrusters {
 export interface Ship {
   id: string;
   hullId: string;
+  /** Pilot who owns this ship, or null for NPC and unowned ships. */
+  ownerId: string | null;
   position: Vec2;
   velocity: Vec2;
   /** Facing direction in radians. */
@@ -95,10 +97,27 @@ export interface Station {
 }
 
 /**
- * Per-tick control intent from whoever is flying the player ship.
- * This is the only way the outside world influences the sim.
+ * A person in the world. Pilots are what make the game multiplayer-ready:
+ * the sim has no single "player", only pilots who each own ships and,
+ * later, credits, cargo, reputation and a criminal record. Everything a
+ * person earns hangs off their pilot record, so it stays theirs between
+ * sessions and never mixes with another pilot's.
+ *
+ * Single-player is simply a world with one pilot.
  */
-export interface PlayerInput {
+export interface Pilot {
+  /** Stable identity, chosen by the client and kept between sessions. */
+  id: string;
+  name: string;
+  /** The ship this pilot is currently flying, or null if they have none. */
+  shipId: string | null;
+}
+
+/**
+ * Per-tick control intent for one ship, from a person or (later) an NPC.
+ * This is the only way the outside world influences a ship.
+ */
+export interface ShipInput {
   /** Fire rotation thrusters to add anticlockwise spin. */
   turnLeft: boolean;
   /** Fire rotation thrusters to add clockwise spin. */
@@ -120,11 +139,14 @@ export interface World {
   tick: number;
   /** Fixed seconds per tick. */
   dt: number;
-  playerShipId: string;
+  pilots: Record<string, Pilot>;
   ships: Record<string, Ship>;
   stations: Record<string, Station>;
   hulls: Record<string, HullSpec>;
-  /** One-shot messages produced this tick for the UI to show. Cleared each tick. */
+  /**
+   * One-shot facts produced this tick. Cleared each tick. Every event
+   * names the ship it concerns, so each client shows only its own.
+   */
   events: WorldEvent[];
 }
 

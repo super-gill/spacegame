@@ -1,13 +1,16 @@
 import {
   createStarterWorld,
+  joinPilot,
   nearestDockableStation,
-  playerShip,
+  pilotShip,
   stepWorld,
   wrapAngle,
+  type Ship,
   type World,
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
+import { loadLocalPilot } from './identity.js';
 import { InputController } from './input.js';
 import { drawShip, drawStation, drawVelocityVector } from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
@@ -20,6 +23,12 @@ import { Ui } from './ui.js';
  * runs on requestAnimationFrame and interpolates between the previous and
  * current sim states so motion is smooth on 120 Hz screens and stable on
  * slow ones. This is the only file that knows about both sim and DOM.
+ *
+ * The sim has no "player". This client is one pilot in the world: it
+ * joins with its local identity, sends input for that pilot's ship only,
+ * and shows events about that ship only. Today the world runs here in the
+ * browser; for a shared world it will run on the host's server instead and
+ * this loop will send inputs and receive states over the network.
  */
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
@@ -36,9 +45,19 @@ const input = new InputController((action) => {
 });
 const ui = new Ui(() => input.requestToggleDock());
 
-let previous: World = createStarterWorld();
+const me = loadLocalPilot();
+
+let previous: World = joinPilot(createStarterWorld(), me.id, me.name);
 let current: World = previous;
-camera.snapTo(playerShip(current).position);
+
+/** The ship this client is flying. Throws if the pilot has lost it, which cannot happen yet. */
+function myShip(world: World): Ship {
+  const ship = pilotShip(world, me.id);
+  if (!ship) throw new Error(`Pilot "${me.id}" has no ship`);
+  return ship;
+}
+
+camera.snapTo(myShip(current).position);
 
 function resize(): void {
   const dpr = window.devicePixelRatio || 1;
@@ -68,8 +87,9 @@ function frame(nowMs: number): void {
 
   while (accumulator >= current.dt) {
     previous = current;
-    current = stepWorld(current, input.sample());
-    ui.handleEvents(current.events);
+    const shipId = myShip(current).id;
+    current = stepWorld(current, { [shipId]: input.sample() });
+    ui.handleEvents(current.events.filter((e) => e.shipId === shipId));
     accumulator -= current.dt;
   }
 
@@ -78,19 +98,21 @@ function frame(nowMs: number): void {
   requestAnimationFrame(frame);
 }
 
-function render(alpha: number, frameSeconds: number): void {
-  const shipNow = playerShip(current);
-  const shipPrev = playerShip(previous);
-  const hull = current.hulls[shipNow.hullId]!;
-
-  // Interpolated view of the ship for drawing only; the sim is untouched.
-  const view = {
+/** Interpolated position and heading of a ship, for drawing only; the sim is untouched. */
+function interpolate(now: Ship, prev: Ship | undefined, alpha: number) {
+  if (!prev) return { position: now.position, heading: now.heading };
+  return {
     position: {
-      x: shipPrev.position.x + (shipNow.position.x - shipPrev.position.x) * alpha,
-      y: shipPrev.position.y + (shipNow.position.y - shipPrev.position.y) * alpha,
+      x: prev.position.x + (now.position.x - prev.position.x) * alpha,
+      y: prev.position.y + (now.position.y - prev.position.y) * alpha,
     },
-    heading: shipPrev.heading + wrapAngle(shipNow.heading - shipPrev.heading) * alpha,
+    heading: prev.heading + wrapAngle(now.heading - prev.heading) * alpha,
   };
+}
+
+function render(alpha: number, frameSeconds: number): void {
+  const shipNow = myShip(current);
+  const view = interpolate(shipNow, previous.ships[shipNow.id], alpha);
 
   camera.follow(view.position, frameSeconds);
 
@@ -107,7 +129,11 @@ function render(alpha: number, frameSeconds: number): void {
   }
 
   drawVelocityVector(ctx!, camera, shipNow, view);
-  drawShip(ctx!, camera, view, hull, shipNow.thrusters, shipNow.state === 'docked');
+  for (const ship of Object.values(current.ships)) {
+    const hull = current.hulls[ship.hullId]!;
+    const shipView = ship.id === shipNow.id ? view : interpolate(ship, previous.ships[ship.id], alpha);
+    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked');
+  }
 
   ui.update(current, shipNow, fpsSmoothed);
 }

@@ -2,6 +2,29 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.1.4] - 2026-11-03
+
+Groundwork for the private-server model: a few friends on one shared world, each with their own progress. No networking yet.
+
+### Changed
+- The sim no longer has a single player. `World.playerShipId` is replaced by `World.pilots`; each pilot owns and flies their own ship.
+- `stepWorld` takes a map of ship id to input and steps every ship in the world, not just one.
+- `PlayerInput` renamed to `ShipInput`.
+- The starter world starts empty; pilots are added with `joinPilot`.
+- The client joins as a local pilot and only shows events about its own ship.
+- Every ship in the world is drawn, not only your own.
+
+### Added
+- `Pilot` type, `Ship.ownerId`, `joinPilot`, `pilotShip`.
+- Stable local pilot identity kept in browser storage (`identity.ts`).
+- Spawn points spread round the starter station so pilots joining together do not overlap.
+- Design doc section on the multiplayer model and the rules every milestone must keep.
+- Roadmap milestone 11, shared world.
+- Tests for pilots: joining, returning pilots keeping their ship, renaming, inputs only moving their own ship, whole-world save round trip.
+
+### Removed
+- `playerShip`.
+
 ## [0.1.3] - 2026-11-03
 
 ### Changed

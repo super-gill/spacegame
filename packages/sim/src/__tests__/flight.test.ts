@@ -4,8 +4,8 @@ import { FLIGHT_MODES, idleThrusters, nextFlightMode } from '../flight.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
-import type { FlightMode, HullSpec, PlayerInput, Ship } from '../types.js';
-import { createStarterWorld, emptyInput, playerShip } from '../world.js';
+import type { FlightMode, HullSpec, ShipInput, Ship } from '../types.js';
+import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
 import { length } from '../vec2.js';
 
 /** Flight computer tests: what each assist mode does on the pilot's behalf. */
@@ -23,17 +23,18 @@ function ship(mode: FlightMode, overrides: Partial<Ship> = {}): Ship {
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    ownerId: null,
     flightMode: mode,
     thrusters: idleThrusters(),
     ...overrides,
   };
 }
 
-function input(overrides: Partial<PlayerInput> = {}): PlayerInput {
+function input(overrides: Partial<ShipInput> = {}): ShipInput {
   return { ...emptyInput(), ...overrides };
 }
 
-function run(s: Ship, i: PlayerInput = emptyInput(), ticks = 1, h: HullSpec = hull): Ship {
+function run(s: Ship, i: ShipInput = emptyInput(), ticks = 1, h: HullSpec = hull): Ship {
   for (let n = 0; n < ticks; n++) s = stepShip(s, h, i, FIXED_DT);
   return s;
 }
@@ -46,14 +47,17 @@ describe('mode cycling', () => {
     expect(nextFlightMode('manual')).toBe('assisted');
   });
 
-  it('new player ships start in full assist', () => {
-    expect(playerShip(createStarterWorld()).flightMode).toBe('assisted');
+  it('new pilots start in full assist', () => {
+    const w = joinPilot(createStarterWorld(), 'p1', 'Tester');
+    expect(pilotShip(w, 'p1')!.flightMode).toBe('assisted');
   });
 
   it('the cycle input switches mode and emits an event', () => {
-    const next = stepWorld(createStarterWorld(), input({ cycleFlightMode: true }));
-    expect(playerShip(next).flightMode).toBe('rotation');
-    expect(next.events).toEqual([{ type: 'flightModeChanged', shipId: 'player', mode: 'rotation' }]);
+    const w = joinPilot(createStarterWorld(), 'p1', 'Tester');
+    const shipId = pilotShip(w, 'p1')!.id;
+    const next = stepWorld(w, { [shipId]: input({ cycleFlightMode: true }) });
+    expect(pilotShip(next, 'p1')!.flightMode).toBe('rotation');
+    expect(next.events).toEqual([{ type: 'flightModeChanged', shipId, mode: 'rotation' }]);
   });
 });
 

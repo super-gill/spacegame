@@ -14,8 +14,11 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic | |
 | 9 Industry | Mining, salvage, drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
+| 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names | |
 
-Version 1.0 is milestone 8 polished. Everything after that is content.
+Version 1.0 is milestone 8 polished. Everything after that is content, plus the shared world.
+
+The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
 ## Known gaps in 0.1.0
 
