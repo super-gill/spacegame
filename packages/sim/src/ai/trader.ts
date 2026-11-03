@@ -1,8 +1,6 @@
-import { angleDelta } from '../angle.js';
-import { leadPoint } from '../combat.js';
 import { DOCK_MAX_SPEED } from '../constants.js';
 import type { HullSpec, Ship, ShipInput, TraderBrain, World } from '../types.js';
-import { add, distance, length, normalise, scale, sub, toAngle } from '../vec2.js';
+import { add, distance, length, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
 
@@ -15,8 +13,8 @@ import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
  * just means trying again next tick.
  *
  * Defence: while a pirate is hunting it, the trader keeps flying its
- * route and fires its turrets at the pirate whenever it is in range and
- * the turret has slewed on to the lead point. It never chases.
+ * route, targets the pirate and switches weapons hot, so its turrets
+ * engage on their own. It never chases.
  *
  * Later this is where cargo is bought and sold; for now the trader is
  * traffic, and a target.
@@ -31,8 +29,6 @@ export const TRADER_TUNING = {
   approachStandoff: 50,
   /** Only request docking below this fraction of the docking speed limit. */
   dockSpeedFraction: 0.7,
-  /** Fire a turret when it is within this angle of its lead point, radians. */
-  turretTolerance: 0.1,
 };
 
 /** The nearest pirate currently hunting this ship, or null. */
@@ -52,18 +48,20 @@ function hunter(world: World, ship: Ship): Ship | null {
   return best;
 }
 
-/** Aim turrets at whoever is hunting us and fire when on target and in range. */
+/**
+ * Defence uses the same targeting a pilot does: select the hunter as the
+ * target and switch weapons hot, and the turrets engage on their own.
+ * When nobody is hunting it, the trader goes cold and clears its target.
+ */
 function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
   const threat = hunter(world, ship);
-  if (!threat) return input;
-  const turret = ship.weapons.find((w) => world.weapons[w.weaponId]?.kind === 'turret');
-  const spec = turret ? world.weapons[turret.weaponId] : undefined;
-  if (!turret || !spec) return input;
-
-  const aimAt = leadPoint(ship, threat, spec.projectileSpeed);
-  const onTarget = Math.abs(angleDelta(turret.aim, toAngle(sub(aimAt, ship.position)))) <= TRADER_TUNING.turretTolerance;
-  const inRange = distance(ship.position, threat.position) <= spec.range;
-  return { ...input, aimAt, fireTurret: onTarget && inRange };
+  const wantHot = threat !== null;
+  const wantTarget = threat?.id ?? null;
+  return {
+    ...input,
+    selectTarget: ship.targetId !== wantTarget ? { id: wantTarget } : null,
+    toggleWeaponsHot: ship.weaponsHot !== wantHot,
+  };
 }
 
 export interface TraderThought {

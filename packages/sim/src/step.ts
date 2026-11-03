@@ -74,7 +74,18 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     events.push(...moved.events);
     damage.push(...moved.damage);
 
-    const fired = fireWeapons(moved.ship, hull, world.weapons, input, world.dt, nextEntityId);
+    // Targeting: apply any change, then drop a target that is gone, docked or ourselves.
+    let targeted = moved.ship;
+    if (input.selectTarget) targeted = { ...targeted, targetId: input.selectTarget.id };
+    if (input.toggleWeaponsHot) {
+      targeted = { ...targeted, weaponsHot: !targeted.weaponsHot };
+      events.push({ type: 'weaponsHotChanged', shipId: id, hot: targeted.weaponsHot });
+    }
+    const target = targeted.targetId ? world.ships[targeted.targetId] : undefined;
+    const validTarget = target && target.state === 'flying' && target.id !== id ? target : null;
+    if (targeted.targetId && !validTarget) targeted = { ...targeted, targetId: null };
+
+    const fired = fireWeapons(targeted, hull, world.weapons, input, validTarget, world.dt, nextEntityId);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
 

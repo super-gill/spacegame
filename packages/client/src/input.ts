@@ -4,18 +4,18 @@ import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bi
 /**
  * Keyboard and mouse state, sampled once per sim tick into a ShipInput.
  *
- * Flight is keyboard only. The mouse aims the turret and fires: mouse
- * buttons appear in bindings.ts as the codes `Mouse0` (left) and `Mouse2`
- * (right) so they work exactly like keys. Buttons only count when pressed
- * over the game canvas, so clicking UI buttons never fires a weapon. The
- * pointer is never captured or hidden.
+ * Flying and shooting are keyboard only. The mouse is for choosing: a
+ * left click on the game canvas is passed to `onCanvasClick` (main.ts uses
+ * it to select a target), and clicks on UI buttons never reach it. The
+ * pointer is never captured or hidden. Mouse buttons can still be bound in
+ * bindings.ts as the codes `Mouse0` (left) and `Mouse2` (right).
  *
  * `press` actions are latched between samples so a quick tap between two
  * ticks is never lost. Interface actions are not sent to the sim; they go
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls']);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'cycleTarget', 'clearTarget']);
 
 /** Which action, if any, a code triggers. Built once from the table. */
 const ACTION_BY_CODE = new Map<string, (typeof KEY_BINDINGS)[number]>();
@@ -30,9 +30,13 @@ export class InputController {
   /** Pointer position in CSS pixels relative to the canvas, or null if it has not moved yet. */
   pointer: { x: number; y: number } | null = null;
 
+  /** Target change to send with the next sample, or null for no change. */
+  private pendingTarget: { id: string | null } | null = null;
+
   constructor(
     private readonly canvas: HTMLCanvasElement,
     private readonly onUiAction: (action: UiAction) => void,
+    private readonly onCanvasClick: (point: { x: number; y: number }) => void,
   ) {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
@@ -40,7 +44,7 @@ export class InputController {
     window.addEventListener('mousemove', this.onMouseMove);
     canvas.addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mouseup', this.onMouseUp);
-    // Right click fires the turret, so the browser menu must not open over the game.
+    // Keep the browser menu off the game so right click is free for later use.
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 
@@ -49,11 +53,12 @@ export class InputController {
     this.latched.add('toggleDock');
   }
 
-  /**
-   * Build this tick's ShipInput. Consumes latched press actions. `aimAt`
-   * is left null; the caller fills it in, because turning a screen point
-   * into a world point needs the camera.
-   */
+  /** Select a target (or clear it with null) on the next tick. */
+  requestTarget(id: string | null): void {
+    this.pendingTarget = { id };
+  }
+
+  /** Build this tick's ShipInput. Consumes latched press actions and any pending target change. */
   sample(): ShipInput {
     const input: ShipInput = {
       thrustForward: this.held.has('thrustForward'),
@@ -66,11 +71,12 @@ export class InputController {
       cycleFlightMode: this.latched.has('cycleFlightMode'),
       toggleDock: this.latched.has('toggleDock'),
       fireFixed: this.held.has('fireFixed'),
-      fireTurret: this.held.has('fireTurret'),
+      toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
+      selectTarget: this.pendingTarget,
       tractor: this.held.has('tractor'),
-      aimAt: null,
     };
     this.latched.clear();
+    this.pendingTarget = null;
     return input;
   }
 
@@ -110,6 +116,10 @@ export class InputController {
 
   private onMouseDown = (e: MouseEvent): void => {
     this.press(`Mouse${e.button}`);
+    if (e.button === 0) {
+      const rect = this.canvas.getBoundingClientRect();
+      this.onCanvasClick({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
   };
 
   private onMouseUp = (e: MouseEvent): void => this.release(`Mouse${e.button}`);

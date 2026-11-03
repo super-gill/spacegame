@@ -2,11 +2,11 @@
 
 A 2D free-roam space sim in the spirit of Flatspace, built for the browser. Play solo, or (later) with a few friends on a world one of you hosts, Minecraft style.
 
-Version 0.3.0. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.4.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 3, "fight": one sector with two stations, an armed trader running between them and a pirate that hunts lone ships outside station security. Fixed guns and mouse-aimed turrets, shields, ramming, wrecks, scrap and a tractor beam. Pure Newtonian flight with three flight-assist modes. No trade yet. See [docs/roadmap.md](docs/roadmap.md).
+Milestone 3, "fight": one sector with two stations, an armed trader running between them and a pirate that hunts lone ships outside station security. Click or Tab to target; fixed guns on Space with a lead marker, and turrets that engage your target on their own while weapons are hot. Shields, ramming, wrecks, scrap and a tractor beam. Pure Newtonian flight with three flight-assist modes. No trade yet. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Quick start
 
@@ -27,9 +27,10 @@ Open the URL Vite prints (normally http://localhost:5173).
 | Main engine | W or Up |
 | Reverse thrust | S or Down |
 | Strafe | A / D |
-| Brake | Space or X |
-| Fire fixed guns | Left click |
-| Fire turret (aims at the mouse) | Right click |
+| Brake | X |
+| Target a ship | Left click it, or Tab to cycle; Esc clears |
+| Fire fixed guns | Space |
+| Weapons hot / cold (turrets engage target) | H |
 | Tractor beam | R |
 | Cycle flight mode | Z |
 | Dock / undock | F (when the station name shows in the HUD) |

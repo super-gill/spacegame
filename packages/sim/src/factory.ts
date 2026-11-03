@@ -41,5 +41,7 @@ export function buildShip(o: NewShipOptions): Ship {
       .map((weaponId) => ({ weaponId, cooldownTicks: 0, aim: o.heading })),
     tractorActive: false,
     hold: {},
+    targetId: null,
+    weaponsHot: false,
   };
 }

@@ -368,13 +368,42 @@ export function drawExplosion(ctx: CanvasRenderingContext2D, camera: Camera, at:
   ctx.globalAlpha = 1;
 }
 
-/** Small ring where the turret is being aimed. */
-export function drawReticle(ctx: CanvasRenderingContext2D, at: { x: number; y: number }): void {
-  ctx.strokeStyle = COLOUR.ink;
-  ctx.globalAlpha = 0.6;
+/** Corner brackets round the selected target. Red when weapons are hot. */
+export function drawTargetBracket(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, radius: number, hot: boolean): void {
+  const c = camera.worldToScreen(at);
+  const r = radius * camera.zoom + 8;
+  const leg = Math.max(5, r * 0.4);
+  ctx.strokeStyle = hot ? COLOUR.hostile : COLOUR.inkBright;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+    ctx.moveTo(c.x + sx * r, c.y + sy * (r - leg));
+    ctx.lineTo(c.x + sx * r, c.y + sy * r);
+    ctx.lineTo(c.x + sx * (r - leg), c.y + sy * r);
+  }
+  ctx.stroke();
+}
+
+/**
+ * Lead marker for fixed guns: where to put the nose so shots meet the
+ * target. A small circle with a dot, joined to the target by a faint line.
+ */
+export function drawLeadMarker(ctx: CanvasRenderingContext2D, camera: Camera, lead: { x: number; y: number }, target: { x: number; y: number }): void {
+  const l = camera.worldToScreen(lead);
+  const t = camera.worldToScreen(target);
+  ctx.strokeStyle = COLOUR.warn;
+  ctx.fillStyle = COLOUR.warn;
+  ctx.globalAlpha = 0.35;
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(at.x, at.y, 7, 0, Math.PI * 2);
+  ctx.moveTo(t.x, t.y);
+  ctx.lineTo(l.x, l.y);
   ctx.stroke();
   ctx.globalAlpha = 1;
+  ctx.beginPath();
+  ctx.arc(l.x, l.y, 6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(l.x, l.y, 1.5, 0, Math.PI * 2);
+  ctx.fill();
 }

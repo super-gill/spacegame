@@ -1,4 +1,5 @@
 import { angleDelta, wrapAngle } from './angle.js';
+import { TURRET_FIRE_TOLERANCE } from './constants.js';
 import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, Station, WeaponSpec } from './types.js';
 import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
@@ -35,14 +36,23 @@ export interface FireResult {
 }
 
 /**
- * Turn turrets, count down cooldowns, and fire whatever the input asks
- * for. New projectiles start at the hull edge along the weapon's bearing.
+ * Turn turrets, count down cooldowns, and fire.
+ *
+ * - Fixed weapons fire along the heading when the input asks.
+ * - Turrets, while weapons are hot and there is a target, slew towards
+ *   the point their shots need to lead to, no faster than their turn
+ *   rate, and fire by themselves once within TURRET_FIRE_TOLERANCE of it
+ *   and in range. A fast target crossing close by can outrun the slew:
+ *   that is turret tracking.
+ *
+ * New projectiles start at the hull edge along the weapon's bearing.
  */
 export function fireWeapons(
   ship: Ship,
   hull: HullSpec,
   catalogue: Record<string, WeaponSpec>,
   input: ShipInput,
+  target: Ship | null,
   dt: number,
   nextId: number,
 ): FireResult {
@@ -56,18 +66,20 @@ export function fireWeapons(
     if (!spec) return w;
 
     let aim = ship.heading;
+    let turretReady = false;
     if (spec.kind === 'turret') {
       aim = w.aim;
-      if (input.aimAt) {
-        const wanted = toAngle(sub(input.aimAt, ship.position));
-        const error = angleDelta(aim, wanted);
+      if (ship.weaponsHot && target) {
+        const wanted = toAngle(sub(leadPoint(ship, target, spec.projectileSpeed), ship.position));
         const step = spec.turretTurnRate * dt;
-        aim = wrapAngle(aim + Math.max(-step, Math.min(step, error)));
+        aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
+        const onTarget = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE;
+        turretReady = onTarget && distance(ship.position, target.position) <= spec.range;
       }
     }
 
     let cooldownTicks = Math.max(0, w.cooldownTicks - 1);
-    const trigger = spec.kind === 'fixed' ? input.fireFixed : input.fireTurret;
+    const trigger = spec.kind === 'fixed' ? input.fireFixed : turretReady;
     if (trigger && cooldownTicks === 0) {
       const dir = fromAngle(aim);
       projectiles.push({

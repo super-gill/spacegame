@@ -42,6 +42,13 @@ canvas#game {
   color: var(--ink-dim);
 }
 
+.target-panel {
+  left: auto;
+  right: 12px;
+  text-align: left;
+  color: var(--ink);
+}
+
 .dock-panel {
   position: fixed;
   top: 50%;

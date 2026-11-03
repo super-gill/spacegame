@@ -2,6 +2,7 @@ import {
   createStarterWorld,
   distance,
   joinPilot,
+  leadPoint,
   nearestDockableStation,
   pilotShip,
   respawnPilot,
@@ -23,10 +24,11 @@ import {
   drawHealthBars,
   drawLoot,
   drawOffscreenMarker,
+  drawLeadMarker,
   drawProjectile,
-  drawReticle,
   drawShip,
   drawStation,
+  drawTargetBracket,
   drawTractor,
   drawTurret,
   drawVelocityVector,
@@ -58,9 +60,15 @@ if (!ctx) throw new Error('Canvas 2D not supported');
 
 const camera = new Camera();
 const controlsPanel = new ControlsPanel(document.body, document.getElementById('controls-button') as HTMLButtonElement);
-const input = new InputController(canvas, (action) => {
-  if (action === 'toggleControls') controlsPanel.toggle();
-});
+const input = new InputController(
+  canvas,
+  (action) => {
+    if (action === 'toggleControls') controlsPanel.toggle();
+    else if (action === 'cycleTarget') cycleTarget();
+    else if (action === 'clearTarget') input.requestTarget(null);
+  },
+  (point) => clickTarget(point),
+);
 const ui = new Ui(
   () => input.requestToggleDock(),
   () => respawn(),
@@ -86,6 +94,42 @@ function respawn(): void {
   previous = current;
   const ship = myShip(current);
   if (ship) camera.snapTo(ship.position);
+}
+
+/** Ships that can be targeted from this ship, nearest first. */
+function targetable(world: World, mine: Ship): Ship[] {
+  return Object.values(world.ships)
+    .filter((s) => s.id !== mine.id && s.state === 'flying')
+    .sort((a, b) => distance(mine.position, a.position) - distance(mine.position, b.position) || (a.id < b.id ? -1 : 1));
+}
+
+/** Tab: the next target outward from the current one, wrapping back to the nearest. */
+function cycleTarget(): void {
+  const mine = myShip(current);
+  if (!mine) return;
+  const list = targetable(current, mine);
+  if (list.length === 0) return;
+  const at = list.findIndex((s) => s.id === mine.targetId);
+  input.requestTarget(list[(at + 1) % list.length]!.id);
+}
+
+/** Left click: target the ship under the pointer, if any. Clicking empty space leaves the target alone. */
+const CLICK_SLOP_PX = 10;
+function clickTarget(point: { x: number; y: number }): void {
+  const mine = myShip(current);
+  if (!mine) return;
+  let best: Ship | null = null;
+  let bestDist = Infinity;
+  for (const s of targetable(current, mine)) {
+    const p = camera.worldToScreen(s.position);
+    const d = Math.hypot(p.x - point.x, p.y - point.y);
+    const reach = (current.hulls[s.hullId]?.radius ?? 0) * camera.zoom + CLICK_SLOP_PX;
+    if (d <= reach && d < bestDist) {
+      best = s;
+      bestDist = d;
+    }
+  }
+  if (best) input.requestTarget(best.id);
 }
 
 /** Explosions are a client-side effect, started from `destroyed` events. */
@@ -122,9 +166,7 @@ function tick(nowMs: number): void {
   const ship = myShip(current);
   const inputs: Record<string, ShipInput> = {};
   if (ship) {
-    const sampled = input.sample();
-    sampled.aimAt = input.pointer ? camera.screenToWorld(input.pointer) : null;
-    inputs[ship.id] = sampled;
+    inputs[ship.id] = input.sample();
   } else {
     input.sample(); // drain latched presses so they do not fire on respawn
   }
@@ -237,9 +279,16 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     drawOffscreenMarker(ctx!, camera, ship.position, style.label ?? 'SHIP', distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 
-  // Where the turret is being aimed.
-  const hasTurret = mine?.weapons.some((w) => current.weapons[w.weaponId]?.kind === 'turret');
-  if (hasTurret && mine?.state === 'flying' && input.pointer) drawReticle(ctx!, input.pointer);
+  // Target bracket and, for fixed guns, the lead marker.
+  const target = mine?.targetId ? current.ships[mine.targetId] : undefined;
+  if (mine && target && view) {
+    const targetView = interpolate(target, previous.ships[target.id], alpha);
+    drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
+    const gun = mine.weapons.map((w) => current.weapons[w.weaponId]).find((w) => w?.kind === 'fixed');
+    if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
+      drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
+    }
+  }
 
   ui.update(current, mine, fpsSmoothed);
 }

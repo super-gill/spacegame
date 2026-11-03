@@ -16,21 +16,31 @@ Flight is keyboard only. The mouse is reserved for targeting, interacting with o
 | Reverse thrust | S | Down arrow | Weaker than main; useful for fine approach |
 | Strafe left | A | | Lateral thrust, does not change heading |
 | Strafe right | D | | |
-| Brake | Space | X | Fires thrusters against your velocity and spin until both stop. Works in every mode and overrides other flight keys |
+| Brake | X | | Fires thrusters against your velocity and spin until both stop. Works in every mode and overrides other flight keys |
 
 Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast. Rotating never changes your velocity.
 
-## Weapons
+## Targeting
 
-The mouse aims and fires. It is never captured or hidden; buttons only count when pressed over the game, so clicking on-screen buttons never fires.
+The mouse is for choosing. It is never captured or hidden, and clicks on on-screen buttons never reach the game.
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Fire fixed guns | Left click (hold) | Fires where the nose points. Aim by flying |
-| Fire turret | Right click (hold) | The turret slews towards the mouse pointer and fires along its own bearing; a small ring marks where you are aiming |
+| Target a ship | Left click on it | Clicking empty space leaves your target alone |
+| Next target | Tab | Nearest first, then outward; wraps round |
+| Clear target | Esc | |
+
+The target gets corner brackets (white when cold, red when hot) and a readout bottom right: who it is, hull, range, closing speed, shields and structure. A target that docks or is destroyed is cleared.
+
+## Weapons
+
+| Action | Key | Notes |
+| --- | --- | --- |
+| Fire fixed guns | Space (hold) | Fires where the nose points. With a target, put the nose on the orange lead marker |
+| Weapons hot / cold | H | Hot: turrets engage your target on their own when on aim and in range. Cold: they hold fire |
 | Tractor beam | R (hold) | Pulls nearby loot in and scoops it into your hold |
 
-Fixed guns hit harder than turrets. Turrets let you shoot while flying any direction.
+Fixed guns hit harder than turrets. Turrets let you fight while flying any direction, but a fast target close in can outrun them.
 
 ## Flight computer
 
@@ -76,6 +86,7 @@ Bottom left, top to bottom:
 - `HDG` heading in degrees
 - `ROT` spin in degrees per second (positive is clockwise)
 - `FLT` current flight mode
+- `WPN` weapons hot or cold
 - `DOCK <station> [F]` when docking is available
 - frame rate and sim tick
 

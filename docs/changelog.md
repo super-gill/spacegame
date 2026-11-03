@@ -2,6 +2,25 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.4.0] - 2026-11-03
+
+Combat controls rework: the mouse chooses, the keyboard flies and fires.
+
+### Added
+- Target selection: left click a ship, Tab cycles nearest first, Esc clears. Corner brackets on the target and a target readout (hull, range, closing speed, shields, structure).
+- Weapons hot / cold (H). While hot, turrets engage the selected target on their own: they slew to its lead point at their turn rate and fire when on aim and in range.
+- Lead marker for fixed guns: where to put the nose so shots meet the target.
+- `WPN` line on the HUD; toasts for weapons hot and cold.
+- `Ship.targetId`, `Ship.weaponsHot`, `ShipInput.selectTarget`, `ShipInput.toggleWeaponsHot`, `weaponsHotChanged` event.
+- Tests for target selection, hot and cold turrets, range limits and turret tracking.
+
+### Changed
+- Space fires fixed guns. Brake is X only.
+- Traders defend themselves through the same targeting as pilots.
+
+### Removed
+- Mouse firing (left and right click) and mouse turret aiming; `ShipInput.fireTurret` and `ShipInput.aimAt`.
+
 ## [0.3.0] - 2026-11-03
 
 Milestone 3: fight.

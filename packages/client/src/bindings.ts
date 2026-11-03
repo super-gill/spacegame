@@ -20,11 +20,15 @@ export type SimAction =
   | 'cycleFlightMode'
   | 'toggleDock'
   | 'fireFixed'
-  | 'fireTurret'
+  | 'toggleWeaponsHot'
   | 'tractor';
 
-/** Actions the client handles itself; the sim never sees them. */
-export type UiAction = 'toggleControls';
+/**
+ * Actions the client handles itself. Target selection is worked out in
+ * the client (it needs the camera and the pointer) and reaches the sim as
+ * a `selectTarget` input.
+ */
+export type UiAction = 'toggleControls' | 'cycleTarget' | 'clearTarget';
 
 export type Action = SimAction | UiAction;
 
@@ -59,9 +63,11 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'strafeRight', codes: ['KeyD'], group: 'Flight', label: 'Lateral thrust right', kind: 'hold' },
   { action: 'turnLeft', codes: ['KeyQ', 'ArrowLeft'], group: 'Flight', label: 'Spin left', kind: 'hold' },
   { action: 'turnRight', codes: ['KeyE', 'ArrowRight'], group: 'Flight', label: 'Spin right', kind: 'hold' },
-  { action: 'brake', codes: ['Space', 'KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
-  { action: 'fireFixed', codes: ['Mouse0'], group: 'Weapons', label: 'Fire fixed guns', kind: 'hold', note: 'Fire where the nose points' },
-  { action: 'fireTurret', codes: ['Mouse2'], group: 'Weapons', label: 'Fire turret', kind: 'hold', note: 'Turret tracks the mouse pointer' },
+  { action: 'brake', codes: ['KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
+  { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire fixed guns', kind: 'hold', note: 'Fire where the nose points; follow the lead marker' },
+  { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
+  { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next target', kind: 'press', note: 'Nearest first' },
+  { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Clear target', kind: 'press' },
   { action: 'tractor', codes: ['KeyR'], group: 'Weapons', label: 'Tractor beam', kind: 'hold', note: 'Pulls in nearby loot' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
@@ -69,7 +75,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 ];
 
 export const POINTER_CONTROLS: readonly PointerControl[] = [
-  { input: 'Move', group: 'Weapons', label: 'Aim the turret' },
+  { input: 'Left click', group: 'Targeting', label: 'Click a ship to target it' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
   { input: 'Click', group: 'Interface', label: 'Controls button, top right' },
 ];
@@ -107,4 +113,5 @@ export const SUPPRESS_DEFAULT: ReadonlySet<string> = new Set([
   'ArrowLeft',
   'ArrowRight',
   'F1',
+  'Tab',
 ]);

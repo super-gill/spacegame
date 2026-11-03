@@ -56,7 +56,7 @@ describe('weapon catalogue', () => {
 describe('firing', () => {
   it('fixed guns fire along the heading and inherit the ship velocity', () => {
     const s = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
-    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, FIXED_DT, 1);
+    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, 1);
     expect(r.projectiles).toHaveLength(1);
     const p = r.projectiles[0]!;
     expect(p.velocity.x).toBeCloseTo(50, 9);
@@ -67,7 +67,7 @@ describe('firing', () => {
     let s = ship('s');
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, FIXED_DT, i);
+      const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, i);
       s = r.ship;
       shots += r.projectiles.length;
     }
@@ -76,11 +76,60 @@ describe('firing', () => {
     expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
   });
 
-  it('turrets slew towards the aim point no faster than their turn rate', () => {
-    const s = ship('s');
-    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), aimAt: { x: 0, y: 500 } }, FIXED_DT, 1);
-    const turret = r.ship.weapons.find((w) => WEAPONS[w.weaponId]!.kind === 'turret')!;
-    expect(turret.aim).toBeCloseTo(WEAPONS['light-turret']!.turretTurnRate * FIXED_DT, 9);
+  const turretAim = (s: Ship) => s.weapons.find((w) => WEAPONS[w.weaponId]!.kind === 'turret')!.aim;
+
+  it('hot turrets slew towards the target no faster than their turn rate', () => {
+    const s = ship('s', 'sparrow', { weaponsHot: true, targetId: 't' });
+    const t = ship('t', 'sparrow', { position: { x: 0, y: 500 } });
+    const r = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, 1);
+    expect(turretAim(r.ship)).toBeCloseTo(WEAPONS['light-turret']!.turretTurnRate * FIXED_DT, 9);
+    expect(r.projectiles).toEqual([]); // not on target yet
+  });
+
+  it('hot turrets fire by themselves once on target and in range', () => {
+    let s = ship('s', 'sparrow', { weaponsHot: true, targetId: 't' });
+    const t = ship('t', 'sparrow', { position: { x: 0, y: 400 } });
+    let shots = 0;
+    for (let i = 0; i < SECOND; i++) {
+      const r = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i);
+      s = r.ship;
+      shots += r.projectiles.length;
+    }
+    expect(shots).toBeGreaterThan(2);
+  });
+
+  it('cold turrets never fire, and turrets never fire out of range', () => {
+    const t = ship('t', 'sparrow', { position: { x: 400, y: 0 } });
+    const far = ship('far', 'sparrow', { position: { x: 5000, y: 0 } });
+    let cold = ship('s', 'sparrow', { weaponsHot: false, targetId: 't' });
+    let outOfRange = ship('s', 'sparrow', { weaponsHot: true, targetId: 'far' });
+    let shots = 0;
+    for (let i = 0; i < SECOND; i++) {
+      const a = fireWeapons(cold, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i);
+      const b = fireWeapons(outOfRange, sparrow, WEAPONS, emptyInput(), far, FIXED_DT, i);
+      cold = a.ship;
+      outOfRange = b.ship;
+      shots += a.projectiles.length + b.projectiles.length;
+    }
+    expect(shots).toBe(0);
+  });
+
+  it('a fast target crossing close by can outrun a turret (tracking)', () => {
+    // Target circling 60 units away at 300 u/s needs 5 rad/s of slew; the light turret has 4.
+    const orbitRadius = 60;
+    const speed = 300;
+    let s = ship('s', 'sparrow', { weaponsHot: true, targetId: 't' });
+    let worst = 0;
+    for (let i = 0; i < SECOND * 2; i++) {
+      const a = (i * FIXED_DT * speed) / orbitRadius;
+      const t = ship('t', 'sparrow', {
+        position: { x: Math.cos(a) * orbitRadius, y: Math.sin(a) * orbitRadius },
+        velocity: { x: -Math.sin(a) * speed, y: Math.cos(a) * speed },
+      });
+      s = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i).ship;
+      if (i > SECOND) worst = Math.max(worst, Math.abs(Math.atan2(Math.sin(a - turretAim(s)), Math.cos(a - turretAim(s)))));
+    }
+    expect(worst).toBeGreaterThan(0.3);
   });
 });
 
@@ -249,6 +298,28 @@ describe('destruction, loot and respawn', () => {
   });
 });
 
+describe('targeting', () => {
+  it('selects, switches hot, and clears through ship inputs', () => {
+    let { w, me } = quietWorld();
+    w = { ...w, ships: { ...w.ships, other: ship('other', 'sparrow', { position: { x: 1000, y: 0 } }) } };
+    w = stepWorld(w, { [me]: { ...emptyInput(), selectTarget: { id: 'other' }, toggleWeaponsHot: true } });
+    expect(w.ships[me]!.targetId).toBe('other');
+    expect(w.ships[me]!.weaponsHot).toBe(true);
+    expect(w.events).toContainEqual({ type: 'weaponsHotChanged', shipId: me, hot: true });
+    w = stepWorld(w, { [me]: { ...emptyInput(), selectTarget: { id: null } } });
+    expect(w.ships[me]!.targetId).toBeNull();
+  });
+
+  it('drops a target that docks or is destroyed', () => {
+    let { w, me } = quietWorld();
+    w = { ...w, ships: { ...w.ships, other: ship('other', 'sparrow', { position: { x: 1000, y: 0 } }) } };
+    w = stepWorld(w, { [me]: { ...emptyInput(), selectTarget: { id: 'other' } } });
+    w = { ...w, ships: { ...w.ships, other: { ...w.ships['other']!, state: 'docked' } } };
+    w = stepWorld(w, {});
+    expect(w.ships[me]!.targetId).toBeNull();
+  });
+});
+
 describe('NPC combat', () => {
   it('a hunting pirate shoots its target', () => {
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
@@ -275,7 +346,7 @@ describe('NPC combat', () => {
     };
     let hunted = false;
     for (let i = 0; i < SECOND * 3 && !hunted; i++) {
-      w = stepWorld(w, { [me]: { ...emptyInput(), fireTurret: true, aimAt: w.ships['npc-pirate-1']!.position } });
+      w = stepWorld(w, { [me]: { ...emptyInput(), fireFixed: true } }); // nose is on the pirate
       hunted = w.events.some((e) => e.type === 'huntStarted' && e.shipId === me);
     }
     expect(hunted).toBe(true);

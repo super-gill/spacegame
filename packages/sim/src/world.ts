@@ -19,8 +19,8 @@ export function emptyInput(): ShipInput {
     toggleDock: false,
     cycleFlightMode: false,
     fireFixed: false,
-    fireTurret: false,
-    aimAt: null,
+    selectTarget: null,
+    toggleWeaponsHot: false,
     tractor: false,
   };
 }

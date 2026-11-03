@@ -66,6 +66,9 @@ export const SHIP_RESTITUTION = 0.4;
 /** Structure repaired per second while docked at a station. Shields refill at once. */
 export const DOCK_REPAIR_PER_SECOND = 25;
 
+/** A turret fires only when within this angle of its lead point, radians. About 5 degrees. */
+export const TURRET_FIRE_TOLERANCE = 0.08;
+
 /** Tractor beam reach from the ship centre, units. */
 export const TRACTOR_RANGE = 260;
 /** Speed loot is pulled towards the ship, relative to it, units/s. */

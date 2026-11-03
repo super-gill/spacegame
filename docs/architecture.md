@@ -36,7 +36,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `world.ts` | World construction, pilots joining (`joinPilot`) and respawning (`respawnPilot`), lookups (`pilotShip`), starter sector content and spawners |
 | `step.ts` | The tick, in a fixed order: NPCs decide; ships dock, move, bounce, fire, recharge, repair; rams; projectiles; damage; destruction and departures; loot, wrecks, spawners |
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
-| `combat.ts` | Weapons firing and turret slew, projectiles and hits, shields and damage, target leading |
+| `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
 | `weapons.ts` | Weapon catalogue (data) |
 | `factory.ts` | `buildShip`: the one place a ship is made from its hull spec |
 | `lifecycle.ts` | Destruction into wrecks and loot, NPCs leaving, wreck drift, loot and tractor beam, spawners |
@@ -73,7 +73,7 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `main.ts` | Loop, wiring, interpolation. Joins as the local pilot and sends input for that pilot's ship only. The only file that knows both sim and DOM |
 | `identity.ts` | The local pilot's stable id and name, kept in browser storage |
 | `bindings.ts` | Every control in the game, in one table. Single source of truth for input and the controls panel |
-| `input.ts` | Keyboard and mouse state sampled into a `ShipInput`; mouse buttons are codes `Mouse0`/`Mouse2` in the bindings table; interface actions sent to a callback |
+| `input.ts` | Keyboard state sampled into a `ShipInput`; left clicks on the canvas go to a callback (target selection); interface actions go to another; pending target changes ride along with the next sample |
 | `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |

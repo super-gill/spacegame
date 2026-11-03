@@ -15,6 +15,7 @@ function must<T extends HTMLElement>(id: string): T {
 
 export class Ui {
   private readonly hud = must<HTMLDivElement>('hud');
+  private readonly targetPanel = must<HTMLDivElement>('target-panel');
   private readonly dockPanel = must<HTMLDivElement>('dock-panel');
   private readonly dockStationName = must<HTMLHeadingElement>('dock-station-name');
   private readonly undockButton = must<HTMLButtonElement>('undock-button');
@@ -31,6 +32,7 @@ export class Ui {
   /** Refresh the HUD. `ship` is null while the pilot has no ship (destroyed). */
   update(world: World, ship: Ship | null, fps: number): void {
     this.deathPanel.classList.toggle('hidden', ship !== null);
+    this.updateTarget(world, ship);
     if (!ship) {
       this.dockPanel.classList.add('hidden');
       this.hud.textContent = `NO SHIP\n${fps.toFixed(0)} fps  tick ${world.tick}`;
@@ -55,6 +57,7 @@ export class Ui {
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
       `ROT ${((ship.angularVelocity * 180) / Math.PI).toFixed(0).padStart(4)}°/s`,
       `FLT ${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()}  [Z]`,
+      `WPN ${ship.weaponsHot ? 'HOT' : 'COLD'}  [H]`,
       near && ship.state === 'flying' ? `DOCK ${near.name.toUpperCase()}  [F]` : '',
       `${fps.toFixed(0)} fps  tick ${world.tick}`,
     ];
@@ -66,6 +69,35 @@ export class Ui {
       const station: Station | undefined = world.stations[ship.dockedAt];
       this.dockStationName.textContent = station?.name ?? 'Station';
     }
+  }
+
+  /** Bottom-right readout for the selected target: who, how far, closing speed, shields and structure. */
+  private updateTarget(world: World, ship: Ship | null): void {
+    const target = ship?.targetId ? world.ships[ship.targetId] : undefined;
+    const hull = target ? world.hulls[target.hullId] : undefined;
+    if (!ship || !target || !hull) {
+      this.targetPanel.classList.add('hidden');
+      return;
+    }
+    const brain = world.npcs[target.id];
+    const owner = target.ownerId ? world.pilots[target.ownerId] : undefined;
+    const who = brain ? brain.kind.toUpperCase() : (owner?.name.toUpperCase() ?? 'UNKNOWN');
+    const range = distance(ship.position, target.position);
+    // Closing speed: positive when the gap is shrinking.
+    const dx = target.position.x - ship.position.x;
+    const dy = target.position.y - ship.position.y;
+    const rvx = target.velocity.x - ship.velocity.x;
+    const rvy = target.velocity.y - ship.velocity.y;
+    const closing = range > 0 ? -(dx * rvx + dy * rvy) / range : 0;
+    this.targetPanel.textContent = [
+      `TARGET ${who}`,
+      `HULL   ${hull.name.toUpperCase()}`,
+      `RANGE  ${range.toFixed(0).padStart(5)}`,
+      `CLOSE  ${closing.toFixed(0).padStart(5)} u/s`,
+      `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${hull.shield}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${hull.structure}`,
+      `[Tab] next  [Esc] clear`,
+    ].join('\n');
+    this.targetPanel.classList.remove('hidden');
   }
 
   /**
@@ -93,6 +125,8 @@ export class Ui {
         this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'rammed') {
         this.showToast(`Collision at ${Math.round(e.speed)} u/s`, 1200);
+      } else if (e.type === 'weaponsHotChanged') {
+        this.showToast(e.hot ? 'Weapons hot' : 'Weapons cold', 1000, e.hot ? 'warn' : 'info');
       } else if (e.type === 'lootCollected') {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
       }

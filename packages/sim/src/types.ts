@@ -53,8 +53,9 @@ export interface HullSpec {
 /**
  * How a weapon aims.
  * - `fixed`: fires along the ship's heading. The pilot aims by flying.
- * - `turret`: turns on its own towards the pilot's aim point and fires
- *   along its own bearing.
+ * - `turret`: turns on its own towards the ship's selected target, at a
+ *   limited slew rate (its tracking), and fires by itself while weapons
+ *   are hot and it is on target and in range.
  *
  * Rule: for weapons of the same size, fixed always does more damage per
  * second than turret. Aiming with the hull is a skill and pays for it.
@@ -201,6 +202,10 @@ export interface Ship {
   tractorActive: boolean;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
+  /** Ship currently selected as the target, or null. Turrets engage it while weapons are hot. */
+  targetId: string | null;
+  /** Turrets fire on their own at the target only while this is true. Fixed guns ignore it. */
+  weaponsHot: boolean;
 }
 
 export interface Station {
@@ -258,10 +263,13 @@ export interface ShipInput {
   cycleFlightMode: boolean;
   /** Fire every fixed weapon. */
   fireFixed: boolean;
-  /** Fire every turret. */
-  fireTurret: boolean;
-  /** World point turrets aim at, or null to leave them where they are. */
-  aimAt: Vec2 | null;
+  /**
+   * Edge-triggered target change: `{ id }` selects that ship (or clears
+   * the target when `id` is null); null leaves the target as it is.
+   */
+  selectTarget: { id: string | null } | null;
+  /** Edge-triggered: switch weapons between hot and cold. */
+  toggleWeaponsHot: boolean;
   /** Run the tractor beam to pull in nearby loot. */
   tractor: boolean;
 }
@@ -336,6 +344,7 @@ export type WorldEvent =
   | { type: 'undocked'; shipId: string; stationId: string }
   | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' }
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
+  | { type: 'weaponsHotChanged'; shipId: string; hot: boolean }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
   | { type: 'collided'; shipId: string; stationId: string; speed: number }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */

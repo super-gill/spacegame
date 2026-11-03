@@ -64,12 +64,16 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 ### Weapons
 
-- **Fixed** weapons fire along the ship's heading. You aim by flying.
-- **Turrets** slew on their own (at a limited turn rate) towards the mouse pointer and fire along their own bearing.
+- The mouse is for choosing, not shooting: click a ship (or press Tab) to select it as your target. Flying and firing stay on the keyboard, so on bigger ships the pointer is free for other systems mid-fight.
+- **Fixed** weapons fire along the ship's heading when you press Space. You aim by flying; with a target selected, a lead marker shows where to put the nose so shots meet it.
+- **Turrets** engage your selected target on their own while weapons are **hot** (H toggles hot and cold). They slew towards the target's lead point at a limited rate and fire once on aim and in range. A small, fast ship crossing close can outrun a turret's slew: that is tracking, and it is what stops big turret ships automatically beating small ones.
+- Weapons hot or cold exists so that selecting a ship never means shooting it. That matters once crime exists (milestone 7).
+- Targeting is ship state (`Ship.targetId`, `Ship.weaponsHot`), set through ship inputs, so NPCs use it the same way: a trader under attack targets the pirate and goes hot.
 - **The rule:** at the same size, a fixed weapon always does more damage per second than a turret. Aiming with the hull is a skill and pays for it. A test enforces this across the whole weapon catalogue.
 - Weapons are data (`weapons.ts`). Each hull has a default fit (`defaultWeapons`) until fitting arrives in milestone 6. Today: Sparrow has a pulse cannon (fixed) and a light turret; Jackal a pulse cannon; Mule a light turret.
 - Projectiles are real objects with travel time and range. They inherit the firing ship's velocity, so leading a moving target matters. Hits are tested along each shot's whole path through a tick, so fast shots cannot skip through small hulls. Stations block shots.
-- Missiles, torpedoes and mines are planned as further weapon kinds.
+- Missiles, torpedoes and mines are planned as further weapon kinds. With more than one kind fitted, number keys will select a fire group and Space will fire the selected group.
+- Turrets have full 360 degree coverage for now. Firing arcs and blind spots come with fitting (milestone 6): mounts become slots with a position on the hull, and more turrets means more coverage at the cost of mass, power and ammunition. Those are ship build decisions.
 
 ### Damage
 
