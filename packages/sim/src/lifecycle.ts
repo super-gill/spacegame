@@ -1,4 +1,5 @@
 import {
+  CARGO_SURVIVAL_FRACTION,
   LOOT_LIFETIME,
   MAX_LOOT_CANISTERS,
   SCOOP_DISTANCE,
@@ -8,6 +9,7 @@ import {
   WRECK_LIFETIME,
 } from './constants.js';
 import { buildShip } from './factory.js';
+import { cargoFree } from './trade.js';
 import type { Loot, Ship, Spawner, World, WorldEvent, Wreck } from './types.js';
 import { add, distance, fromAngle, normalise, scale, sub } from './vec2.js';
 
@@ -27,8 +29,9 @@ export interface Destruction {
 }
 
 /**
- * Remove every ship whose structure has reached zero. Each leaves a wreck
- * and scrap canisters. A pilot who loses their ship is left without one
+ * Remove every ship whose structure has reached zero. Each leaves a wreck,
+ * scrap from its hull, and part of its cargo (CARGO_SURVIVAL_FRACTION of
+ * each good, rounded down), in canisters. A pilot who loses their ship is left without one
  * until they respawn; an NPC's spawner starts its respawn countdown.
  * `killers` names who last damaged each ship, for the event.
  */
@@ -66,23 +69,34 @@ export function destroyShips(world: World, killers: Record<string, string | null
     };
     wrecks.push(wreck);
 
-    // Scrap from the hull, plus whatever was in the hold, split into canisters.
+    // What spills: scrap from the hull, plus the surviving part of each good aboard.
     const hull = world.hulls[ship.hullId];
-    const scrap = Math.round((hull?.mass ?? 0) * SCRAP_PER_MASS) + (ship.hold['scrap'] ?? 0);
-    const canisters = Math.min(MAX_LOOT_CANISTERS, scrap);
-    for (let i = 0; i < canisters; i++) {
-      const amount = Math.floor(scrap / canisters) + (i < scrap % canisters ? 1 : 0);
-      const dir = fromAngle(ship.heading + (i / canisters) * Math.PI * 2 + 0.3);
-      const item: Loot = {
-        id: `l${nextId++}`,
-        item: 'scrap',
-        amount,
-        position: add(ship.position, scale(dir, 10)),
-        velocity: add(scale(ship.velocity, 0.6), scale(dir, LOOT_SCATTER_SPEED)),
-        ticksLeft: Math.round(LOOT_LIFETIME / world.dt),
-      };
-      loot.push(item);
+    const spill: Record<string, number> = {};
+    for (const [good, qty] of Object.entries(ship.hold)) {
+      const kept = Math.floor(qty * CARGO_SURVIVAL_FRACTION);
+      if (kept > 0) spill[good] = kept;
     }
+    spill['scrap'] = (spill['scrap'] ?? 0) + Math.round((hull?.mass ?? 0) * SCRAP_PER_MASS);
+
+    // Each good in up to MAX_LOOT_CANISTERS canisters, fanned out round the wreck.
+    const goodsSpilled = Object.keys(spill).sort();
+    goodsSpilled.forEach((good, g) => {
+      const total = spill[good]!;
+      const canisters = Math.min(MAX_LOOT_CANISTERS, total);
+      for (let i = 0; i < canisters; i++) {
+        const amount = Math.floor(total / canisters) + (i < total % canisters ? 1 : 0);
+        const dir = fromAngle(ship.heading + ((i + g * 0.5) / canisters) * Math.PI * 2 + 0.3);
+        const item: Loot = {
+          id: `l${nextId++}`,
+          item: good,
+          amount,
+          position: add(ship.position, scale(dir, 10)),
+          velocity: add(scale(ship.velocity, 0.6), scale(dir, LOOT_SCATTER_SPEED * (1 + g * 0.3))),
+          ticksLeft: Math.round(LOOT_LIFETIME / world.dt),
+        };
+        loot.push(item);
+      }
+    });
   }
 
   const spawners = world.spawners.map((sp) =>
@@ -139,14 +153,16 @@ export interface LootStep {
 /**
  * Drift loot, pull it towards ships running a tractor beam, and scoop
  * anything that reaches a hull into that ship's hold. When two beams
- * reach the same canister, the nearer ship wins it.
+ * reach the same canister, the nearer ship wins it. A ship with a full
+ * hold does not pull; one with some space takes what fits and leaves the
+ * rest of the canister floating.
  */
 export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
   const out: Loot[] = [];
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
   const beams = Object.values(ships)
-    .filter((s) => s.tractorActive && s.state === 'flying')
+    .filter((s) => s.tractorActive && s.state === 'flying' && world.hulls[s.hullId] && cargoFree(s, world.hulls[s.hullId]!) > 0)
     .sort((a, b) => (a.id < b.id ? -1 : 1));
 
   for (const item of world.loot) {
@@ -155,6 +171,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
     let puller: Ship | null = null;
     let best = TRACTOR_RANGE;
     for (const s of beams) {
+      if (cargoFree(updated[s.id]!, world.hulls[s.hullId]!) <= 0) continue; // filled up this tick
       const d = distance(s.position, item.position);
       if (d <= best) {
         best = d;
@@ -167,9 +184,13 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
       const radius = world.hulls[puller.hullId]?.radius ?? 0;
       if (best <= radius + SCOOP_DISTANCE) {
         const current = updated[puller.id]!;
-        const hold = { ...current.hold, [item.item]: (current.hold[item.item] ?? 0) + item.amount };
+        const taken = Math.min(item.amount, cargoFree(current, world.hulls[current.hullId]!));
+        const hold = { ...current.hold, [item.item]: (current.hold[item.item] ?? 0) + taken };
         updated[puller.id] = { ...current, hold };
-        events.push({ type: 'lootCollected', shipId: puller.id, item: item.item, amount: item.amount });
+        events.push({ type: 'lootCollected', shipId: puller.id, item: item.item, amount: taken });
+        if (taken === item.amount) continue;
+        // Hold is now full: the rest stays where it is.
+        out.push({ ...item, amount: item.amount - taken, velocity: puller.velocity, ticksLeft: item.ticksLeft - 1 });
         continue;
       }
       const towards = normalise(sub(puller.position, item.position));
@@ -200,6 +221,7 @@ function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
     heading: sp.heading,
     flightMode: 'rotation', // NPC steering handles drift itself; see ai/steer.ts
     dockedAt: sp.dockedAt,
+    hold: sp.hold,
   });
   return {
     world: { ...world, ships: { ...world.ships, [id]: ship }, npcs: { ...world.npcs, [id]: sp.brain } },

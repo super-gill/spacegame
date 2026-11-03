@@ -23,6 +23,7 @@ export const HULLS: Record<string, HullSpec> = {
     shieldRegenDelay: 3,
     structure: 100,
     defaultWeapons: ['pulse-cannon', 'light-turret'],
+    cargoCapacity: 20,
   },
   mule: {
     // Slow bulk hauler: heavy, modest engines, ponderous to turn.
@@ -41,6 +42,7 @@ export const HULLS: Record<string, HullSpec> = {
     shieldRegenDelay: 4,
     structure: 300,
     defaultWeapons: ['light-turret'],
+    cargoCapacity: 120,
   },
   jackal: {
     // Raider: quicker off the mark and nimbler than a Sparrow, but a
@@ -60,5 +62,6 @@ export const HULLS: Record<string, HullSpec> = {
     shieldRegenDelay: 3,
     structure: 90,
     defaultWeapons: ['pulse-cannon'],
+    cargoCapacity: 15,
   },
 };

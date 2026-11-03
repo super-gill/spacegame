@@ -2,6 +2,25 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.5.0] - 2026-11-03
+
+Milestone 4: trade.
+
+### Added
+- Goods catalogue: scrap, food, ore, machinery, medicine.
+- Station markets with scripted buy and sell prices, read through a swappable `PriceSource`. Harbour and Ridge Outpost trade complementary goods, so there is a profitable run each way.
+- Pilot credits (1,000 to start), kept when a ship is lost.
+- Cargo capacity per hull (Sparrow 20, Mule 120, Jackal 15) and cargo mass: a loaded ship is slower to accelerate, turn and stop, and rams harder.
+- Buy and sell commands while docked, all or nothing, with a reason when refused.
+- Market screen in the docked panel; credits and cargo on the HUD; trade toasts.
+- The NPC trader carries food and machinery.
+- Tests for trade, economy data, cargo mass, cargo spill and capacity-aware scooping.
+
+### Changed
+- Destroyed ships spill 60% of each good aboard as loot (previously only scrap).
+- The tractor beam only pulls when there is space in the hold, and takes only what fits.
+- `collideShips` takes a function giving each ship's loaded hull.
+
 ## [0.4.0] - 2026-11-03
 
 Combat controls rework: the mouse chooses, the keyboard flies and fires.

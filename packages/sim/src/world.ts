@@ -1,4 +1,5 @@
-import { FIXED_DT } from './constants.js';
+import { FIXED_DT, STARTING_CREDITS } from './constants.js';
+import { GOODS } from './goods.js';
 import { buildShip } from './factory.js';
 import { HULLS } from './hulls.js';
 import { runSpawners } from './lifecycle.js';
@@ -52,6 +53,14 @@ export function createStarterWorld(): World {
     radius: 90,
     dockRange: 220,
     securityRadius: 900,
+    // A busy farming and manufacturing hub: food, machinery and medicine are cheap here, ore is wanted.
+    market: {
+      food: { ask: 14, bid: 11 },
+      ore: { ask: 46, bid: 38 },
+      machinery: { ask: 70, bid: 60 },
+      medicine: { ask: 55, bid: 47 },
+      scrap: { ask: null, bid: 7 },
+    },
   };
   const outpost: Station = {
     id: 'station-ridge',
@@ -60,6 +69,14 @@ export function createStarterWorld(): World {
     radius: 70,
     dockRange: 190,
     securityRadius: 700,
+    // A mining outpost: ore is cheap, everything else has to be shipped in.
+    market: {
+      food: { ask: 32, bid: 27 },
+      ore: { ask: 18, bid: 14 },
+      machinery: { ask: 112, bid: 98 },
+      medicine: { ask: 86, bid: 75 },
+      scrap: { ask: null, bid: 9 },
+    },
   };
 
   // The trader starts docked at Harbour and leaves after a short wait.
@@ -70,6 +87,7 @@ export function createStarterWorld(): World {
     heading: -0.34,
     dockedAt: harbour.id,
     brain: { kind: 'trader', route: [harbour.id, outpost.id], leg: 0, waitTicks: 3 * 60 },
+    hold: { food: 40, machinery: 15 }, // a prize worth a pirate's time
     respawnSeconds: 30,
     shipId: null,
     timerTicks: 0,
@@ -94,6 +112,7 @@ export function createStarterWorld(): World {
       patrolIndex: 0,
       provokedBy: null,
     },
+    hold: {},
     respawnSeconds: 45,
     shipId: null,
     timerTicks: 0,
@@ -113,6 +132,7 @@ export function createStarterWorld(): World {
     stations: { [harbour.id]: harbour, [outpost.id]: outpost },
     hulls: { ...HULLS },
     weapons: { ...WEAPONS },
+    goods: { ...GOODS },
     nextEntityId: 1,
     events: [],
   };
@@ -175,7 +195,7 @@ export function joinPilot(world: World, pilotId: string, name: string): World {
     if (existing.name === name) return world;
     return { ...world, pilots: { ...world.pilots, [pilotId]: { ...existing, name } } };
   }
-  const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0 };
+  const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS };
   return issueStarterShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilot);
 }
 

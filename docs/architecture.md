@@ -38,6 +38,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
 | `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
 | `weapons.ts` | Weapon catalogue (data) |
+| `goods.ts` | Goods catalogue (data) |
+| `trade.ts` | Price source interface and scripted prices, cargo space and mass (`loadedHull`), buy and sell commands |
 | `factory.ts` | `buildShip`: the one place a ship is made from its hull spec |
 | `lifecycle.ts` | Destruction into wrecks and loot, NPCs leaving, wreck drift, loot and tractor beam, spawners |
 | `ai/steer.ts` | NPC piloting: turn to a heading, steer to a velocity, arrive at a point, route round stations. Produces a `ShipInput` |
@@ -78,6 +80,7 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
 | `render/draw.ts` | Vector drawing of ships (outline per hull), turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, security zones and off-screen markers |
+| `market-panel.ts` | Station market table in the docked panel; reports trade clicks to `main.ts` |
 | `ui.ts` | HUD text, docked panel, toasts (DOM, not canvas) |
 | `style.css` | Theme variables and overlay layout |
 
@@ -95,7 +98,7 @@ Today the world runs inside the browser in `main.ts`. For the private-server mod
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover trade (economy data sanity, buying and selling, refusals leaving the world untouched, buy limits, swappable prices, cargo mass slowing ships, cargo spill on death, credits surviving death, tractor respecting hold space), combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 

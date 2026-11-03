@@ -69,6 +69,62 @@ canvas#game {
   color: var(--ink-bright);
 }
 
+/* Station market, inside the docked panel. */
+.market {
+  margin: 4px 0 16px;
+}
+
+.market-summary {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 10px;
+  color: var(--ink-bright);
+}
+
+.market table {
+  border-collapse: collapse;
+}
+
+.market th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 14px 6px 0;
+  border-bottom: 1px solid rgba(79, 122, 114, 0.4);
+}
+
+.market td {
+  padding: 5px 14px 5px 0;
+}
+
+.market td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.market td.actions {
+  display: flex;
+  gap: 4px;
+  padding-right: 0;
+}
+
+.market td.actions button {
+  font-size: 12px;
+  padding: 2px 7px;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+button:disabled:hover {
+  background: transparent;
+}
+
 .muted {
   color: var(--ink-dim);
   margin: 0 0 16px;

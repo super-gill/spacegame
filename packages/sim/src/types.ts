@@ -48,6 +48,32 @@ export interface HullSpec {
    * becomes the hull's slots and the fit becomes the owner's choice.
    */
   defaultWeapons: string[];
+  /** Units of cargo the hold carries. Every unit of every good takes one. */
+  cargoCapacity: number;
+}
+
+/**
+ * A tradeable good. Data only. Cargo adds `unitMass` per unit to the
+ * ship's mass, so a loaded ship accelerates, turns and stops more slowly,
+ * and rams harder.
+ */
+export interface GoodSpec {
+  id: string;
+  name: string;
+  unitMass: number;
+  /** Reference price; station prices are set around it. */
+  basePrice: number;
+}
+
+/**
+ * One good's prices at one station, in credits per unit, from the pilot's
+ * point of view:
+ * - `ask`: what the station charges you to buy from it (null: it does not sell this).
+ * - `bid`: what the station pays you to sell to it (null: it does not buy this).
+ */
+export interface MarketEntry {
+  ask: number | null;
+  bid: number | null;
 }
 
 /**
@@ -135,6 +161,8 @@ export interface Spawner {
   /** Station to start docked at, or null to start in space. */
   dockedAt: string | null;
   brain: NpcBrain;
+  /** Cargo the NPC carries when it spawns. */
+  hold: Record<string, number>;
   /** Seconds after the ship is destroyed before a replacement appears. */
   respawnSeconds: number;
   /** The ship this spawner currently has in the world, or null. */
@@ -221,6 +249,8 @@ export interface Station {
    * witnessed inside it bring a security response.
    */
   securityRadius: number;
+  /** What the station trades and at what prices, by good id. Read through a PriceSource. */
+  market: Record<string, MarketEntry>;
 }
 
 /**
@@ -240,6 +270,8 @@ export interface Pilot {
   shipId: string | null;
   /** How many ships this pilot has been issued, for unique ship ids. */
   shipsIssued: number;
+  /** The pilot's money. Belongs to the pilot, not the ship, so it survives losing a ship. */
+  credits: number;
 }
 
 /**
@@ -325,6 +357,7 @@ export interface World {
   wrecks: Wreck[];
   loot: Loot[];
   weapons: Record<string, WeaponSpec>;
+  goods: Record<string, GoodSpec>;
   /** Counter for unique ids of projectiles, wrecks and loot. */
   nextEntityId: number;
   stations: Record<string, Station>;
@@ -354,6 +387,8 @@ export type WorldEvent =
   /** A ship was destroyed. `by` is the ship responsible, or null. */
   | { type: 'destroyed'; shipId: string; by: string | null }
   | { type: 'lootCollected'; shipId: string; item: string; amount: number }
+  /** A trade completed while docked. `unitPrice` is per unit, in credits. */
+  | { type: 'traded'; shipId: string; good: string; quantity: number; unitPrice: number; side: 'buy' | 'sell' }
   /** An NPC left the sector (no wreck). Its spawner will replace it later. */
   | { type: 'departed'; shipId: string }
   /** A pirate has picked `shipId` as its target. */

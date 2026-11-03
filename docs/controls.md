@@ -64,8 +64,11 @@ Assists fire the ship's real thrusters, so you will see the flames, and a heavie
 | --- | --- | --- |
 | Dock | F | Only when the HUD shows `DOCK <station>`; you must be inside the dashed range ring and slower than the docking speed limit |
 | Undock | F or the Undock button | Places you just outside the station facing the way you were |
+| Trade | Buttons in the docked panel | Buy 1, Buy max (as many as your credits and hold allow), Sell 1, Sell all |
 
 If docking is refused a message says why: too far, or too fast.
+
+The docked panel is the station market: each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
 
 ## Interface
 
@@ -80,7 +83,8 @@ Bottom left, top to bottom:
 - `!! PIRATE ON YOUR TAIL` while a pirate is hunting you
 - `ZONE` the station security zone you are in, or `OPEN SPACE`
 - `SHD` shields and `HUL` structure, current and maximum
-- `HOLD` what is in your hold, when it is not empty
+- `CR` your credits
+- `CARGO` space used and capacity, then what is aboard
 - `VEL` speed in units per second
 - `POS` world position
 - `HDG` heading in degrees

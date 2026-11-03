@@ -1,5 +1,5 @@
 import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { FLIGHT_MODE_LABELS, distance, nearestDockableStation } from '@spacegame/sim';
+import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation } from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel, death panel and transient toasts.
@@ -51,7 +51,8 @@ export class Ui {
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
       hull ? `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${hull.shield}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${hull.structure}` : '',
-      hold ? `HOLD ${hold}` : '',
+      `CR  ${(ship.ownerId ? (world.pilots[ship.ownerId]?.credits ?? 0) : 0).toLocaleString('en-GB')}`,
+      `CARGO ${cargoUsed(ship)}/${hull?.cargoCapacity ?? 0}${hold ? `  ${hold}` : ''}`,
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
@@ -131,6 +132,11 @@ export class Ui {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
       }
     }
+  }
+
+  /** Show a message from outside the sim's events, e.g. the result of a trade. */
+  notify(text: string, tone: 'warn' | 'info' = 'info'): void {
+    this.showToast(text, 1600, tone);
   }
 
   private showToast(text: string, ms = 1800, tone: 'warn' | 'info' = 'warn'): void {

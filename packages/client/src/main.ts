@@ -1,6 +1,9 @@
 import {
+  buyGood,
   createStarterWorld,
   distance,
+  sellGood,
+  type TradeRefusal,
   joinPilot,
   leadPoint,
   nearestDockableStation,
@@ -18,6 +21,7 @@ import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { loadLocalPilot } from './identity.js';
 import { InputController } from './input.js';
+import { MarketPanel, type TradeRequest } from './market-panel.js';
 import {
   COLOUR,
   drawExplosion,
@@ -75,6 +79,35 @@ const ui = new Ui(
 );
 
 const me = loadLocalPilot();
+
+const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
+
+const REFUSALS: Record<TradeRefusal, string> = {
+  noShip: 'You have no ship.',
+  notDocked: 'Dock first.',
+  notTraded: 'This station does not trade that.',
+  badQuantity: 'Nothing to trade.',
+  credits: 'Not enough credits.',
+  space: 'Not enough cargo space.',
+  notHeld: 'You do not have that many.',
+};
+
+/** Pilot command: buy or sell at the station we are docked at. */
+function trade(request: TradeRequest): void {
+  const r = request.side === 'buy'
+    ? buyGood(current, me.id, request.good, request.quantity)
+    : sellGood(current, me.id, request.good, request.quantity);
+  if (!r.ok) {
+    ui.notify(REFUSALS[r.reason], 'warn');
+    return;
+  }
+  current = r.world;
+  if (r.event.type === 'traded') {
+    const name = current.goods[r.event.good]?.name ?? r.event.good;
+    const total = r.event.quantity * r.event.unitPrice;
+    ui.notify(`${r.event.side === 'buy' ? 'Bought' : 'Sold'} ${r.event.quantity} ${name} for ${total.toLocaleString('en-GB')} cr`);
+  }
+}
 
 let previous: World = joinPilot(createStarterWorld(), me.id, me.name);
 let current: World = previous;
@@ -290,6 +323,8 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     }
   }
 
+  if (mine?.state === 'docked') market.update(current, me.id);
+  else market.invalidate();
   ui.update(current, mine, fpsSmoothed);
 }
 

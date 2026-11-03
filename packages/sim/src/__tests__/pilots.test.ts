@@ -21,7 +21,7 @@ describe('joining', () => {
   it('gives a new pilot their own starter ship', () => {
     const w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const ship = pilotShip(w, 'ana')!;
-    expect(w.pilots['ana']).toEqual({ id: 'ana', name: 'Ana', shipId: starterShipId('ana'), shipsIssued: 1 });
+    expect(w.pilots['ana']).toEqual({ id: 'ana', name: 'Ana', shipId: starterShipId('ana'), shipsIssued: 1, credits: 1000 });
     expect(ship.ownerId).toBe('ana');
     expect(ship.state).toBe('flying');
   });

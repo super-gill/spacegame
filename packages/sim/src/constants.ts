@@ -80,6 +80,15 @@ export const SCOOP_DISTANCE = 14;
 export const WRECK_LIFETIME = 45;
 /** Seconds loot floats before it is gone. */
 export const LOOT_LIFETIME = 90;
+/**
+ * Fraction of each good in the hold that survives a ship's destruction
+ * as loot. The rest is lost. Piracy pays, but not everything.
+ */
+export const CARGO_SURVIVAL_FRACTION = 0.6;
+
+/** Credits a new pilot starts with. */
+export const STARTING_CREDITS = 1000;
+
 /** Scrap dropped per unit of hull mass when a ship is destroyed. */
 export const SCRAP_PER_MASS = 0.5;
 /** Scrap canisters per destroyed ship, at most. */

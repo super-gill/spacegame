@@ -1,3 +1,4 @@
+import { loadedHull } from '../trade.js';
 import type { Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { thinkPirate } from './pirate.js';
 import { thinkTrader } from './trader.js';
@@ -28,7 +29,9 @@ export function thinkNpcs(world: World): NpcDecisions {
   for (const shipId of Object.keys(world.npcs).sort()) {
     const brain = world.npcs[shipId]!;
     const ship: Ship | undefined = world.ships[shipId];
-    const hull = ship ? world.hulls[ship.hullId] : undefined;
+    // Brains plan with the hull as it actually flies, cargo mass included.
+    const baseHull = ship ? world.hulls[ship.hullId] : undefined;
+    const hull = ship && baseHull ? loadedHull(baseHull, ship, world.goods) : undefined;
     if (!ship || !hull) {
       npcs[shipId] = brain; // ship gone (later: destroyed); keep the brain inert
       continue;

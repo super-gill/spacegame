@@ -12,6 +12,20 @@ export * from './angle.js';
 export * from './constants.js';
 export { HULLS } from './hulls.js';
 export { WEAPONS, weaponDps } from './weapons.js';
+export { GOODS } from './goods.js';
+export {
+  buyGood,
+  sellGood,
+  maxBuyable,
+  cargoUsed,
+  cargoFree,
+  cargoMass,
+  loadedHull,
+  scriptedPrices,
+  type PriceSource,
+  type TradeRefusal,
+  type TradeResult,
+} from './trade.js';
 export { buildShip } from './factory.js';
 export { applyDamage, fireWeapons, leadPoint, stepProjectiles, regenerateShield } from './combat.js';
 export { collideShips } from './collision.js';

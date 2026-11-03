@@ -6,7 +6,8 @@ import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
 import { stepShip } from './ship.js';
-import type { Projectile, Ship, ShipInput, World, WorldEvent } from './types.js';
+import { loadedHull } from './trade.js';
+import type { HullSpec, Projectile, Ship, ShipInput, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /**
@@ -45,8 +46,10 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   for (const id of Object.keys(world.ships).sort()) {
     let ship = world.ships[id]!;
     const input = inputs[id] ?? npc.inputs[id] ?? emptyInput();
-    const hull = world.hulls[ship.hullId];
-    if (!hull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${id}"`);
+    const baseHull = world.hulls[ship.hullId];
+    if (!baseHull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${id}"`);
+    // Cargo adds mass, so the ship flies as its loaded hull.
+    const hull = loadedHull(baseHull, ship, world.goods);
 
     // Docking is handled before movement so a docked ship does not drift.
     if (input.toggleDock) {
@@ -99,7 +102,11 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   }
 
   // 3. Rams.
-  const rams = collideShips(ships, world.hulls);
+  const hullFor = (s: Ship): HullSpec | undefined => {
+    const h = world.hulls[s.hullId];
+    return h ? loadedHull(h, s, world.goods) : undefined;
+  };
+  const rams = collideShips(ships, hullFor);
   ships = rams.ships;
   events.push(...rams.events);
   damage.push(...rams.damage);

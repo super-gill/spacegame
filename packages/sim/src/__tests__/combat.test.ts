@@ -159,7 +159,7 @@ describe('projectiles', () => {
   });
 
   it('is absorbed by a station in the way', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0 };
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {} };
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
     expect(r.damage).toEqual([]);
     expect(r.projectiles).toEqual([]);
@@ -201,7 +201,7 @@ describe('ramming', () => {
   it('a heavy ship ramming a light one comes off far better', () => {
     const heavy = ship('a-heavy', 'mule', { position: { x: 0, y: 0 }, velocity: { x: 150, y: 0 } });
     const light = ship('b-light', 'sparrow', { position: { x: mule.radius + sparrow.radius - 2, y: 0 } });
-    const r = collideShips({ [heavy.id]: heavy, [light.id]: light }, HULLS);
+    const r = collideShips({ [heavy.id]: heavy, [light.id]: light }, (s) => HULLS[s.hullId]);
     const dmg = (id: string) => r.damage.filter((d) => d.shipId === id).reduce((n, d) => n + d.amount, 0);
     expect(dmg('b-light')).toBeGreaterThan(dmg('a-heavy') * 3);
     expect(r.damage.every((d) => d.cause === 'ram')).toBe(true);
@@ -211,7 +211,7 @@ describe('ramming', () => {
     const a = ship('a', 'mule', { velocity: { x: 120, y: 10 } });
     const b = ship('b', 'sparrow', { position: { x: 40, y: 5 }, velocity: { x: -60, y: 0 } });
     const before = { x: a.velocity.x * mule.mass + b.velocity.x * sparrow.mass, y: a.velocity.y * mule.mass + b.velocity.y * sparrow.mass };
-    const r = collideShips({ a, b }, HULLS);
+    const r = collideShips({ a, b }, (s) => HULLS[s.hullId]);
     const a2 = r.ships['a']!;
     const b2 = r.ships['b']!;
     expect(a2.velocity.x * mule.mass + b2.velocity.x * sparrow.mass).toBeCloseTo(before.x, 6);
@@ -221,11 +221,11 @@ describe('ramming', () => {
   it('a gentle bump does no damage', () => {
     const a = ship('a', 'sparrow', { velocity: { x: 20, y: 0 } });
     const b = ship('b', 'sparrow', { position: { x: 30, y: 0 } });
-    expect(collideShips({ a, b }, HULLS).damage).toEqual([]);
+    expect(collideShips({ a, b }, (s) => HULLS[s.hullId]).damage).toEqual([]);
   });
 
   it('hitting a station hard hurts; touching it does not', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0 };
+    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {} };
     const hard = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -200, y: 0 } }), sparrow, { st });
     const soft = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -IMPACT_SAFE_DELTA_V / 2, y: 0 } }), sparrow, { st });
     expect(hard.damage[0]!.amount).toBeGreaterThan(0);

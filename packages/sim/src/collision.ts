@@ -74,10 +74,12 @@ export interface ShipCollisionResult {
 
 /**
  * Resolve every overlapping pair of flying ships. Pairs are visited in
- * sorted id order so the result is deterministic. Fine for the handful of
+ * sorted id order so the result is deterministic. `hullFor` gives each
+ * ship's hull as it flies, cargo mass included, so a laden ship rams
+ * harder. Fine for the handful of
  * ships in a sector; a spatial grid can come when sectors get busy.
  */
-export function collideShips(ships: Record<string, Ship>, hulls: Record<string, HullSpec>): ShipCollisionResult {
+export function collideShips(ships: Record<string, Ship>, hullFor: (ship: Ship) => HullSpec | undefined): ShipCollisionResult {
   const out: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
   const damage: Damage[] = [];
@@ -89,8 +91,8 @@ export function collideShips(ships: Record<string, Ship>, hulls: Record<string, 
     for (let j = i + 1; j < ids.length; j++) {
       const a = out[ids[i]!]!;
       const b = out[ids[j]!]!;
-      const ha = hulls[a.hullId];
-      const hb = hulls[b.hullId];
+      const ha = hullFor(a);
+      const hb = hullFor(b);
       if (!ha || !hb) continue;
 
       const minDist = ha.radius + hb.radius;

@@ -17,6 +17,8 @@ export interface NewShipOptions {
   heading: number;
   flightMode: FlightMode;
   dockedAt?: string | null;
+  /** Cargo aboard at build time. */
+  hold?: Record<string, number>;
 }
 
 export function buildShip(o: NewShipOptions): Ship {
@@ -40,7 +42,7 @@ export function buildShip(o: NewShipOptions): Ship {
       .filter((id) => o.weapons[id])
       .map((weaponId) => ({ weaponId, cooldownTicks: 0, aim: o.heading })),
     tractorActive: false,
-    hold: {},
+    hold: { ...(o.hold ?? {}) },
     targetId: null,
     weaponsHot: false,
   };

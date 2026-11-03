@@ -95,7 +95,7 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 ### Losing your ship
 
 - The pilot is left without a ship and can respawn in a new starter Sparrow at Harbour Station. Respawn is a pilot command, not a ship input, so it will work the same over a network.
-- Nothing else is lost yet, because nothing else exists yet. What a death costs (cargo, credits, insurance) is a decision for when there is something to lose.
+- The ship's cargo is lost (part of it spills as loot, see Trade). Credits are kept. Insurance and other costs are open questions.
 
 ## Stations and security
 
@@ -125,9 +125,16 @@ Map modelled on EVE's security bands: busy, well-policed core; unregulated low-s
 - Core resource stats borrowed from EVE: power grid, CPU, capacitor and recharge.
 - Drones are a module class, not a separate system.
 
-## Economy (planned)
+## Trade and economy
 
-Scripted price tables per station in early versions, with a pluggable interface so a real supply-and-demand sim can replace them later without touching the trade UI.
+- **Goods** are data (`goods.ts`): scrap, food, ore, machinery, medicine. Each unit takes one unit of cargo space and adds its `unitMass` to the ship.
+- **Cargo has mass.** A full hold makes a ship slower to accelerate, turn and stop, and makes it ram harder. A Sparrow with 20 ore is about 60% heavier. NPCs plan with their loaded mass too.
+- **Prices** are per station, from the pilot's point of view: `ask` is what the station charges you, `bid` what it pays you. A station may not trade a good in one or both directions. Prices are read through a `PriceSource`, so the scripted tables can be swapped for a supply and demand sim (milestone 10) without touching trade rules or the market screen. Stock is unlimited for now.
+- Today's stations: Harbour (farming and manufacturing) sells food, machinery and medicine cheaply and wants ore; Ridge Outpost (mining) sells ore cheaply and pays well for everything else. Both buy scrap. Tests enforce that no station pays more for a good than it charges, and that each direction between them has a profitable run.
+- **Credits belong to the pilot**, so they survive losing a ship. **Cargo belongs to the ship.** New pilots start with 1,000 credits.
+- **Buying and selling** happen while docked, as pilot commands (like respawning): all or nothing, refused with a reason if it cannot be done (not docked, not traded here, not enough credits or space, not enough aboard).
+- **Losing your ship costs your cargo.** On destruction 60% of each good aboard (`CARGO_SURVIVAL_FRACTION`) spills as loot and the rest is lost. That is what makes piracy pay: the NPC trader carries food and machinery, and a pilot who kills it can scoop what spills. Whether that is a crime is milestone 7.
+- The tractor beam takes only what fits: a full hold does not pull, and a nearly full one takes what it can and leaves the rest of the canister floating.
 
 ## Out of scope
 
