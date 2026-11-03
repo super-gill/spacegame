@@ -4,16 +4,35 @@ import {
   joinPilot,
   nearestDockableStation,
   pilotShip,
+  respawnPilot,
   stepWorld,
+  TRACTOR_RANGE,
   wrapAngle,
   type Ship,
+  type ShipInput,
+  type Vec2,
   type World,
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { loadLocalPilot } from './identity.js';
 import { InputController } from './input.js';
-import { COLOUR, drawOffscreenMarker, drawShip, drawStation, drawVelocityVector, type ShipStyle } from './render/draw.js';
+import {
+  COLOUR,
+  drawExplosion,
+  drawHealthBars,
+  drawLoot,
+  drawOffscreenMarker,
+  drawProjectile,
+  drawReticle,
+  drawShip,
+  drawStation,
+  drawTractor,
+  drawTurret,
+  drawVelocityVector,
+  drawWreck,
+  type ShipStyle,
+} from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
 import { Ui } from './ui.js';
 
@@ -27,9 +46,10 @@ import { Ui } from './ui.js';
  *
  * The sim has no "player". This client is one pilot in the world: it
  * joins with its local identity, sends input for that pilot's ship only,
- * and shows events about that ship only. Today the world runs here in the
- * browser; for a shared world it will run on the host's server instead and
- * this loop will send inputs and receive states over the network.
+ * and shows events involving that ship only. Today the world runs here in
+ * the browser; for a shared world it will run on the host's server instead
+ * and this loop will send inputs and pilot commands (like respawn) and
+ * receive states over the network.
  */
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
@@ -37,28 +57,46 @@ const ctx = canvas.getContext('2d');
 if (!ctx) throw new Error('Canvas 2D not supported');
 
 const camera = new Camera();
-const controlsPanel = new ControlsPanel(
-  document.body,
-  document.getElementById('controls-button') as HTMLButtonElement,
-);
-const input = new InputController((action) => {
+const controlsPanel = new ControlsPanel(document.body, document.getElementById('controls-button') as HTMLButtonElement);
+const input = new InputController(canvas, (action) => {
   if (action === 'toggleControls') controlsPanel.toggle();
 });
-const ui = new Ui(() => input.requestToggleDock());
+const ui = new Ui(
+  () => input.requestToggleDock(),
+  () => respawn(),
+);
 
 const me = loadLocalPilot();
 
 let previous: World = joinPilot(createStarterWorld(), me.id, me.name);
 let current: World = previous;
 
-/** The ship this client is flying. Throws if the pilot has lost it, which cannot happen yet. */
-function myShip(world: World): Ship {
-  const ship = pilotShip(world, me.id);
-  if (!ship) throw new Error(`Pilot "${me.id}" has no ship`);
-  return ship;
+/** The ship this client is flying, or null while the pilot has none (destroyed). */
+function myShip(world: World): Ship | null {
+  return pilotShip(world, me.id);
 }
 
-camera.snapTo(myShip(current).position);
+/** Where the camera looks while there is no ship to follow. */
+let lastSeen: Vec2 = myShip(current)!.position;
+camera.snapTo(lastSeen);
+
+/** Pilot command: take a new ship after losing one. */
+function respawn(): void {
+  current = respawnPilot(current, me.id);
+  previous = current;
+  const ship = myShip(current);
+  if (ship) camera.snapTo(ship.position);
+}
+
+/** Explosions are a client-side effect, started from `destroyed` events. */
+interface Explosion {
+  at: Vec2;
+  radius: number;
+  startMs: number;
+}
+const EXPLOSION_MS = 700;
+const WRECK_FADE_SECONDS = 10;
+let explosions: Explosion[] = [];
 
 function resize(): void {
   const dpr = window.devicePixelRatio || 1;
@@ -80,6 +118,30 @@ const MAX_FRAME_SECONDS = 0.25; // clamp so a background tab does not spiral
 // FPS smoothing for the HUD.
 let fpsSmoothed = 60;
 
+function tick(nowMs: number): void {
+  const ship = myShip(current);
+  const inputs: Record<string, ShipInput> = {};
+  if (ship) {
+    const sampled = input.sample();
+    sampled.aimAt = input.pointer ? camera.screenToWorld(input.pointer) : null;
+    inputs[ship.id] = sampled;
+  } else {
+    input.sample(); // drain latched presses so they do not fire on respawn
+  }
+
+  // Note where ships are before they can be destroyed this tick, for explosions.
+  const before = current.ships;
+  previous = current;
+  current = stepWorld(current, inputs);
+
+  for (const e of current.events) {
+    if (e.type !== 'destroyed') continue;
+    const gone = before[e.shipId];
+    if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+  }
+  if (ship) ui.handleEvents(current.events, ship.id);
+}
+
 function frame(nowMs: number): void {
   const frameSeconds = Math.min((nowMs - lastFrameMs) / 1000, MAX_FRAME_SECONDS);
   lastFrameMs = nowMs;
@@ -87,15 +149,11 @@ function frame(nowMs: number): void {
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 
   while (accumulator >= current.dt) {
-    previous = current;
-    const shipId = myShip(current).id;
-    current = stepWorld(current, { [shipId]: input.sample() });
-    ui.handleEvents(current.events.filter((e) => e.shipId === shipId));
+    tick(nowMs);
     accumulator -= current.dt;
   }
 
-  const alpha = accumulator / current.dt;
-  render(alpha, frameSeconds);
+  render(accumulator / current.dt, frameSeconds, nowMs);
   requestAnimationFrame(frame);
 }
 
@@ -112,11 +170,11 @@ function interpolate(now: Ship, prev: Ship | undefined, alpha: number) {
 }
 
 /** Colour and label for a ship, from who flies it. Labels are a dev aid for now. */
-function shipStyle(world: World, ship: Ship, mine: Ship): ShipStyle {
-  if (ship.id === mine.id) return { colour: COLOUR.inkBright };
+function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
+  if (mine && ship.id === mine.id) return { colour: COLOUR.inkBright };
   const brain = world.npcs[ship.id];
   if (brain?.kind === 'pirate') {
-    const hunting = brain.mode === 'hunt' ? (brain.targetId === mine.id ? ' · HUNTING YOU' : ' · HUNTING') : '';
+    const hunting = brain.mode === 'hunt' ? (mine && brain.targetId === mine.id ? ' · HUNTING YOU' : ' · HUNTING') : '';
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
@@ -124,42 +182,66 @@ function shipStyle(world: World, ship: Ship, mine: Ship): ShipStyle {
   return owner ? { colour: COLOUR.ink, label: owner.name.toUpperCase() } : { colour: COLOUR.ink };
 }
 
-function render(alpha: number, frameSeconds: number): void {
-  const shipNow = myShip(current);
-  const view = interpolate(shipNow, previous.ships[shipNow.id], alpha);
+function render(alpha: number, frameSeconds: number, nowMs: number): void {
+  const mine = myShip(current);
+  const view = mine ? interpolate(mine, previous.ships[mine.id], alpha) : null;
+  if (view) lastSeen = view.position;
+  const eye = view?.position ?? lastSeen;
 
-  camera.follow(view.position, frameSeconds);
+  camera.follow(eye, frameSeconds);
 
-  const w = camera.viewportWidth;
-  const h = camera.viewportHeight;
   ctx!.fillStyle = '#05070a';
-  ctx!.fillRect(0, 0, w, h);
-
+  ctx!.fillRect(0, 0, camera.viewportWidth, camera.viewportHeight);
   drawStarfield(ctx!, camera);
 
-  const near = nearestDockableStation(shipNow, current.stations);
-  for (const station of Object.values(current.stations)) {
-    drawStation(ctx!, camera, station, near?.id === station.id);
-  }
+  const near = mine ? nearestDockableStation(mine, current.stations) : null;
+  for (const station of Object.values(current.stations)) drawStation(ctx!, camera, station, near?.id === station.id);
 
-  drawVelocityVector(ctx!, camera, shipNow, view);
+  // Wrecks fade over their last WRECK_FADE_SECONDS.
+  for (const w of current.wrecks) {
+    const hull = current.hulls[w.hullId];
+    if (hull) drawWreck(ctx!, camera, w, hull, Math.min(1, (w.ticksLeft * current.dt) / WRECK_FADE_SECONDS));
+  }
+  for (const l of current.loot) drawLoot(ctx!, camera, l);
+  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, TRACTOR_RANGE, current.loot);
+
+  if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
   for (const ship of Object.values(current.ships)) {
     const hull = current.hulls[ship.hullId]!;
-    const shipView = ship.id === shipNow.id ? view : interpolate(ship, previous.ships[ship.id], alpha);
-    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', shipStyle(current, ship, shipNow));
+    const style = shipStyle(current, ship, mine);
+    const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
+    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', style);
+    if (ship.state !== 'flying') continue;
+    for (const w of ship.weapons) {
+      if (current.weapons[w.weaponId]?.kind === 'turret') drawTurret(ctx!, camera, shipView.position, w.aim, hull, style.colour);
+    }
+    if (!mine || ship.id !== mine.id) drawHealthBars(ctx!, camera, ship, hull, shipView.position);
   }
+
+  for (const p of current.projectiles) {
+    const isMine = mine && p.ownerShipId === mine.id;
+    const shooterBrain = current.npcs[p.ownerShipId];
+    drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' ? COLOUR.hostile : COLOUR.neutral);
+  }
+
+  explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
+  for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
   // Edge markers for anything off screen, so the sector is navigable.
   for (const station of Object.values(current.stations)) {
-    drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(view.position, station.position), COLOUR.ink, station.radius);
+    drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(eye, station.position), COLOUR.ink, station.radius);
   }
   for (const ship of Object.values(current.ships)) {
-    if (ship.id === shipNow.id || ship.state !== 'flying') continue;
-    const style = shipStyle(current, ship, shipNow);
-    drawOffscreenMarker(ctx!, camera, ship.position, style.label ?? 'SHIP', distance(view.position, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
+    if ((mine && ship.id === mine.id) || ship.state !== 'flying') continue;
+    const style = shipStyle(current, ship, mine);
+    drawOffscreenMarker(ctx!, camera, ship.position, style.label ?? 'SHIP', distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 
-  ui.update(current, shipNow, fpsSmoothed);
+  // Where the turret is being aimed.
+  const hasTurret = mine?.weapons.some((w) => current.weapons[w.weaponId]?.kind === 'turret');
+  if (hasTurret && mine?.state === 'flying' && input.pointer) drawReticle(ctx!, input.pointer);
+
+  ui.update(current, mine, fpsSmoothed);
 }
 
 requestAnimationFrame(frame);

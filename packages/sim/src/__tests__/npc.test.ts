@@ -3,6 +3,7 @@ import { PIRATE_TUNING } from '../ai/pirate.js';
 import { arriveVelocity, steerToVelocity, turnTowards } from '../ai/steer.js';
 import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
+import { TEST_SHIP_COMBAT } from './fixtures.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
@@ -40,6 +41,7 @@ function freeShip(hullId: string, overrides: Partial<Ship> = {}): Ship {
     dockedAt: null,
     flightMode: 'rotation',
     thrusters: idleThrusters(),
+    ...TEST_SHIP_COMBAT,
     ...overrides,
   };
 }
@@ -68,7 +70,10 @@ describe('steering', () => {
 describe('trader', () => {
   it('flies its loop: undocks, docks at the outpost, and comes back', () => {
     const docks: string[] = [];
-    run(createStarterWorld(), 120, (w) => {
+    // No pirate, so this is purely about flying the route.
+    const quiet = { ...createStarterWorld(), spawners: [] };
+    const noPirate = { ...quiet, ships: { [TRADER]: quiet.ships[TRADER]! }, npcs: { [TRADER]: quiet.npcs[TRADER]! } };
+    run(noPirate, 120, (w) => {
       for (const e of w.events) if (e.type === 'docked' && e.shipId === TRADER) docks.push(e.stationId);
     });
     expect(docks.slice(0, 2)).toEqual(['station-ridge', 'station-harbour']);
@@ -91,7 +96,8 @@ describe('pirate', () => {
       ...w,
       ships: {
         ...w.ships,
-        [shipId]: { ...w.ships[shipId]!, position: { x: 2600, y: 400 }, flightMode: 'manual' },
+        // Very tough, so the test is about the pirate's flying, not about who wins.
+        [shipId]: { ...w.ships[shipId]!, position: { x: 2600, y: 400 }, flightMode: 'manual', shield: 1e6 },
         [TRADER]: { ...w.ships[TRADER]!, state: 'docked', dockedAt: 'station-harbour' },
       },
       npcs: { ...w.npcs, [TRADER]: { kind: 'trader', route: ['station-harbour'], leg: 0, waitTicks: 1e9 } },
@@ -134,8 +140,12 @@ describe('pirate', () => {
   it('never enters a station security zone over ten minutes of normal play', () => {
     let deepest = -Infinity;
     run(createStarterWorld(), 600, (w) => {
-      const p = w.ships[PIRATE]!;
-      for (const s of Object.values(w.stations)) deepest = Math.max(deepest, s.securityRadius - distance(p.position, s.position));
+      // Pirates come and go, so check whichever are present.
+      for (const [id, brain] of Object.entries(w.npcs)) {
+        const p = w.ships[id];
+        if (brain.kind !== 'pirate' || !p) continue;
+        for (const s of Object.values(w.stations)) deepest = Math.max(deepest, s.securityRadius - distance(p.position, s.position));
+      }
     });
     expect(deepest).toBeLessThan(0);
   });

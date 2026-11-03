@@ -11,11 +11,17 @@ export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
 export { HULLS } from './hulls.js';
+export { WEAPONS, weaponDps } from './weapons.js';
+export { buildShip } from './factory.js';
+export { applyDamage, fireWeapons, leadPoint, stepProjectiles, regenerateShield } from './combat.js';
+export { collideShips } from './collision.js';
 export {
   createStarterWorld,
   emptyInput,
   joinPilot,
+  respawnPilot,
   pilotShip,
+  pilotShipId,
   starterShipId,
   STARTER_STATION_ID,
   STARTER_HULL_ID,

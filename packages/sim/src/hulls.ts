@@ -18,6 +18,11 @@ export const HULLS: Record<string, HullSpec> = {
     rotationThrust: 60, // 6 rad/s^2: full spin in about 0.4 s
     maxTurnRate: 2.4, // about 140 degrees per second
     radius: 18,
+    shield: 60,
+    shieldRegen: 8,
+    shieldRegenDelay: 3,
+    structure: 100,
+    defaultWeapons: ['pulse-cannon', 'light-turret'],
   },
   mule: {
     // Slow bulk hauler: heavy, modest engines, ponderous to turn.
@@ -31,6 +36,11 @@ export const HULLS: Record<string, HullSpec> = {
     rotationThrust: 90, // 3 rad/s^2
     maxTurnRate: 1.2, // about 70 degrees per second
     radius: 26,
+    shield: 80,
+    shieldRegen: 6,
+    shieldRegenDelay: 4,
+    structure: 300,
+    defaultWeapons: ['light-turret'],
   },
   jackal: {
     // Raider: quicker off the mark and nimbler than a Sparrow, but a
@@ -45,5 +55,10 @@ export const HULLS: Record<string, HullSpec> = {
     rotationThrust: 84, // 7 rad/s^2
     maxTurnRate: 2.8, // about 160 degrees per second
     radius: 16,
+    shield: 50,
+    shieldRegen: 6,
+    shieldRegenDelay: 3,
+    structure: 90,
+    defaultWeapons: ['pulse-cannon'],
   },
 };

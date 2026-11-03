@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
+import { TEST_SHIP_COMBAT } from './fixtures.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
 import type { FlightMode, ShipInput, Ship } from '../types.js';
@@ -30,6 +31,7 @@ function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship 
     ownerId: null,
     flightMode: mode,
     thrusters: idleThrusters(),
+    ...TEST_SHIP_COMBAT,
     ...overrides,
   };
 }

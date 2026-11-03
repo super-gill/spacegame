@@ -2,6 +2,29 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.3.0] - 2026-11-03
+
+Milestone 3: fight.
+
+### Added
+- Weapons: fixed guns that fire along the heading (left click) and turrets that track the mouse pointer (right click). At the same size, fixed weapons always out-damage turrets; a test enforces it.
+- Weapon catalogue (`weapons.ts`): pulse cannon (fixed) and light turret. Hulls gain shields, structure and a default fit.
+- Projectiles with travel time, inherited velocity and range, hit-tested along their whole path.
+- Shields that recharge after a delay, structure that does not, and repairs while docked.
+- Ship to ship collision with momentum shared by mass: heavy ships can ram light ones safely. Hard station impacts now cause damage.
+- Destruction: wrecks that drift and fade, scrap canisters, and a tractor beam (hold R) to scoop them into your hold.
+- Respawn in a new Sparrow at Harbour after losing your ship.
+- NPC spawners that replace destroyed or departed NPCs.
+- Armed pirates that lead their target and fire when on aim, turn on whoever attacks them, break off when badly hurt, and leave the sector to repair.
+- Armed traders that shoot back at a hunting pirate.
+- HUD shield, structure and hold readouts; health bars on damaged ships; turret barrels and aim reticle; explosions; death panel.
+- Tests for weapons, projectiles, damage, ramming, destruction, loot, respawn and NPC combat.
+
+### Changed
+- Pilot ship ids are now `ship-<pilot>-<n>`; `Pilot.shipsIssued` counts them.
+- NPCs are created by spawners instead of directly in the starter world.
+- Mule hull now carries a light turret.
+
 ## [0.2.0] - 2026-11-03
 
 Milestone 2: company. The sector now has traffic and a threat.

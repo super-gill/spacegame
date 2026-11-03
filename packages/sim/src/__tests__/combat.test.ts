@@ -1,0 +1,310 @@
+import { describe, expect, it } from 'vitest';
+import { PIRATE_TUNING } from '../ai/pirate.js';
+import { applyDamage, fireWeapons, regenerateShield, stepProjectiles } from '../combat.js';
+import { collideShips, collideWithStations } from '../collision.js';
+import { FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME, TRACTOR_RANGE } from '../constants.js';
+import { buildShip } from '../factory.js';
+import { HULLS } from '../hulls.js';
+import { stepWorld } from '../step.js';
+import type { PirateBrain, Projectile, Ship, Station, World, WorldEvent } from '../types.js';
+import { distance, length } from '../vec2.js';
+import { WEAPONS, weaponDps } from '../weapons.js';
+import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
+
+const SECOND = 60;
+const sparrow = HULLS['sparrow']!;
+const mule = HULLS['mule']!;
+
+function ship(id: string, hullId = 'sparrow', overrides: Partial<Ship> = {}): Ship {
+  return {
+    ...buildShip({
+      id,
+      hull: HULLS[hullId]!,
+      weapons: WEAPONS,
+      ownerId: null,
+      position: { x: 0, y: 0 },
+      heading: 0,
+      flightMode: 'manual',
+    }),
+    ...overrides,
+  };
+}
+
+/** A world with no NPCs or spawners and one pilot, for controlled combat tests. */
+function quietWorld(): { w: World; me: string } {
+  const base = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+  const w = joinPilot(base, 'ana', 'Ana');
+  return { w, me: pilotShip(w, 'ana')!.id };
+}
+
+describe('weapon catalogue', () => {
+  it('fixed weapons always out-damage turrets of the same size', () => {
+    const all = Object.values(WEAPONS);
+    for (const fixed of all.filter((w) => w.kind === 'fixed')) {
+      for (const turret of all.filter((w) => w.kind === 'turret' && w.size === fixed.size)) {
+        expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turret));
+      }
+    }
+  });
+
+  it('the Sparrow carries one fixed gun and one turret', () => {
+    const s = ship('s');
+    expect(s.weapons.map((w) => WEAPONS[w.weaponId]!.kind).sort()).toEqual(['fixed', 'turret']);
+  });
+});
+
+describe('firing', () => {
+  it('fixed guns fire along the heading and inherit the ship velocity', () => {
+    const s = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
+    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, FIXED_DT, 1);
+    expect(r.projectiles).toHaveLength(1);
+    const p = r.projectiles[0]!;
+    expect(p.velocity.x).toBeCloseTo(50, 9);
+    expect(p.velocity.y).toBeCloseTo(WEAPONS['pulse-cannon']!.projectileSpeed, 9);
+  });
+
+  it('respects the fire interval', () => {
+    let s = ship('s');
+    let shots = 0;
+    for (let i = 0; i < SECOND; i++) {
+      const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, FIXED_DT, i);
+      s = r.ship;
+      shots += r.projectiles.length;
+    }
+    const interval = WEAPONS['pulse-cannon']!.fireInterval;
+    expect(shots).toBeGreaterThanOrEqual(Math.floor(1 / interval) - 1);
+    expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
+  });
+
+  it('turrets slew towards the aim point no faster than their turn rate', () => {
+    const s = ship('s');
+    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), aimAt: { x: 0, y: 500 } }, FIXED_DT, 1);
+    const turret = r.ship.weapons.find((w) => WEAPONS[w.weaponId]!.kind === 'turret')!;
+    expect(turret.aim).toBeCloseTo(WEAPONS['light-turret']!.turretTurnRate * FIXED_DT, 9);
+  });
+});
+
+describe('projectiles', () => {
+  const target = ship('t', 'sparrow', { position: { x: 300, y: 0 } });
+  const shot = (overrides: Partial<Projectile> = {}): Projectile => ({
+    id: 'p1',
+    ownerShipId: 'shooter',
+    position: { x: 290, y: -200 },
+    velocity: { x: 0, y: 900 },
+    damage: 6,
+    ticksLeft: 100,
+    ...overrides,
+  });
+
+  it('hits a ship in its path even if it would skip past it in one tick', () => {
+    // 900 u/s covers 15 units per tick; start just before the hull edge so the path crosses it.
+    const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, {}, FIXED_DT);
+    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon' }]);
+    expect(r.projectiles).toEqual([]);
+  });
+
+  it('never hits the ship that fired it', () => {
+    const own = ship('shooter', 'sparrow', { position: { x: 300, y: 0 } });
+    const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { shooter: own }, HULLS, {}, FIXED_DT);
+    expect(r.damage).toEqual([]);
+  });
+
+  it('is absorbed by a station in the way', () => {
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0 };
+    const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
+    expect(r.damage).toEqual([]);
+    expect(r.projectiles).toEqual([]);
+  });
+
+  it('fizzles when out of range', () => {
+    const r = stepProjectiles([shot({ ticksLeft: 1 })], {}, HULLS, {}, FIXED_DT);
+    expect(r.projectiles).toEqual([]);
+  });
+});
+
+describe('damage and shields', () => {
+  it('takes damage on shields first, then structure', () => {
+    const s = applyDamage(ship('s'), sparrow, sparrow.shield + 10, FIXED_DT);
+    expect(s.shield).toBe(0);
+    expect(s.structure).toBe(sparrow.structure - 10);
+  });
+
+  it('recharges shields only after the delay, and never structure', () => {
+    let s = applyDamage(ship('s'), sparrow, sparrow.shield + 10, FIXED_DT);
+    for (let i = 0; i < SECOND * (sparrow.shieldRegenDelay - 0.5); i++) s = regenerateShield(s, sparrow, FIXED_DT);
+    expect(s.shield).toBe(0);
+    for (let i = 0; i < SECOND * 20; i++) s = regenerateShield(s, sparrow, FIXED_DT);
+    expect(s.shield).toBe(sparrow.shield);
+    expect(s.structure).toBe(sparrow.structure - 10);
+  });
+
+  it('docked ships are repaired', () => {
+    let { w, me } = quietWorld();
+    const st = w.stations['station-harbour']!;
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'docked', dockedAt: st.id, structure: 10, shield: 0 } } };
+    for (let i = 0; i < SECOND * 10; i++) w = stepWorld(w, {});
+    expect(w.ships[me]!.structure).toBe(sparrow.structure);
+    expect(w.ships[me]!.shield).toBe(sparrow.shield);
+  });
+});
+
+describe('ramming', () => {
+  it('a heavy ship ramming a light one comes off far better', () => {
+    const heavy = ship('a-heavy', 'mule', { position: { x: 0, y: 0 }, velocity: { x: 150, y: 0 } });
+    const light = ship('b-light', 'sparrow', { position: { x: mule.radius + sparrow.radius - 2, y: 0 } });
+    const r = collideShips({ [heavy.id]: heavy, [light.id]: light }, HULLS);
+    const dmg = (id: string) => r.damage.filter((d) => d.shipId === id).reduce((n, d) => n + d.amount, 0);
+    expect(dmg('b-light')).toBeGreaterThan(dmg('a-heavy') * 3);
+    expect(r.damage.every((d) => d.cause === 'ram')).toBe(true);
+  });
+
+  it('conserves momentum', () => {
+    const a = ship('a', 'mule', { velocity: { x: 120, y: 10 } });
+    const b = ship('b', 'sparrow', { position: { x: 40, y: 5 }, velocity: { x: -60, y: 0 } });
+    const before = { x: a.velocity.x * mule.mass + b.velocity.x * sparrow.mass, y: a.velocity.y * mule.mass + b.velocity.y * sparrow.mass };
+    const r = collideShips({ a, b }, HULLS);
+    const a2 = r.ships['a']!;
+    const b2 = r.ships['b']!;
+    expect(a2.velocity.x * mule.mass + b2.velocity.x * sparrow.mass).toBeCloseTo(before.x, 6);
+    expect(a2.velocity.y * mule.mass + b2.velocity.y * sparrow.mass).toBeCloseTo(before.y, 6);
+  });
+
+  it('a gentle bump does no damage', () => {
+    const a = ship('a', 'sparrow', { velocity: { x: 20, y: 0 } });
+    const b = ship('b', 'sparrow', { position: { x: 30, y: 0 } });
+    expect(collideShips({ a, b }, HULLS).damage).toEqual([]);
+  });
+
+  it('hitting a station hard hurts; touching it does not', () => {
+    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0 };
+    const hard = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -200, y: 0 } }), sparrow, { st });
+    const soft = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -IMPACT_SAFE_DELTA_V / 2, y: 0 } }), sparrow, { st });
+    expect(hard.damage[0]!.amount).toBeGreaterThan(0);
+    expect(soft.damage).toEqual([]);
+  });
+});
+
+describe('destruction, loot and respawn', () => {
+  function destroyMe(w: World, me: string): World {
+    return stepWorld({ ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, shield: 0, structure: 0.01 } }, projectiles: [
+      { id: 'px', ownerShipId: 'nobody', position: { x: w.ships[me]!.position.x, y: w.ships[me]!.position.y - 30 }, velocity: { x: 0, y: 900 }, damage: 50, ticksLeft: 10 },
+    ] }, {});
+  }
+
+  it('a destroyed ship leaves a wreck and scrap, and its pilot is left shipless', () => {
+    const { w, me } = quietWorld();
+    const next = destroyMe(w, me);
+    expect(next.ships[me]).toBeUndefined();
+    expect(next.pilots['ana']!.shipId).toBeNull();
+    expect(next.wrecks).toHaveLength(1);
+    expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(sparrow.mass * 0.5));
+    expect(next.events).toContainEqual({ type: 'destroyed', shipId: me, by: 'nobody' });
+  });
+
+  it('respawning gives the pilot a fresh ship with a new id', () => {
+    const { w, me } = quietWorld();
+    const dead = destroyMe(w, me);
+    const back = respawnPilot(dead, 'ana');
+    const s = pilotShip(back, 'ana')!;
+    expect(s.id).not.toBe(me);
+    expect(s.structure).toBe(sparrow.structure);
+    expect(respawnPilot(back, 'ana')).toBe(back); // already has a ship: no change
+  });
+
+  it('the tractor beam pulls loot in and scoops it into the hold', () => {
+    let { w, me } = quietWorld();
+    const pos = w.ships[me]!.position;
+    w = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 3, position: { x: pos.x + TRACTOR_RANGE - 20, y: pos.y }, velocity: { x: 0, y: 0 }, ticksLeft: 1000 }] };
+    const events: WorldEvent[] = [];
+    for (let i = 0; i < SECOND * 5; i++) {
+      w = stepWorld(w, { [me]: { ...emptyInput(), tractor: true } });
+      events.push(...w.events);
+    }
+    expect(w.loot).toEqual([]);
+    expect(w.ships[me]!.hold['scrap']).toBe(3);
+    expect(events).toContainEqual({ type: 'lootCollected', shipId: me, item: 'scrap', amount: 3 });
+  });
+
+  it('loot out of tractor range stays put, and eventually drifts away for good', () => {
+    let { w, me } = quietWorld();
+    const pos = w.ships[me]!.position;
+    w = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 3, position: { x: pos.x + TRACTOR_RANGE + 100, y: pos.y }, velocity: { x: 0, y: 0 }, ticksLeft: 120 }] };
+    w = stepWorld(w, { [me]: { ...emptyInput(), tractor: true } });
+    expect(length(w.loot[0]!.velocity)).toBe(0);
+    for (let i = 0; i < 200; i++) w = stepWorld(w, {});
+    expect(w.loot).toEqual([]);
+    expect(LOOT_LIFETIME).toBeGreaterThan(0);
+  });
+
+  it('a destroyed NPC is replaced by its spawner after the respawn time', () => {
+    let w = createStarterWorld();
+    const pirateId = 'npc-pirate-1';
+    const spawner = w.spawners.find((s) => s.id === 'pirate')!;
+    w = { ...w, ships: { ...w.ships, [pirateId]: { ...w.ships[pirateId]!, structure: 0 } } };
+    w = stepWorld(w, {});
+    expect(w.ships[pirateId]).toBeUndefined();
+    for (let i = 0; i < SECOND * spawner.respawnSeconds + 5; i++) w = stepWorld(w, {});
+    expect(w.ships['npc-pirate-2']).toBeDefined();
+    expect(w.npcs['npc-pirate-2']?.kind).toBe('pirate');
+  });
+});
+
+describe('NPC combat', () => {
+  it('a hunting pirate shoots its target', () => {
+    let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
+    const me = pilotShip(w, 'ana')!.id;
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: 2600, y: 400 }, shield: 1e6 } } };
+    let hits = 0;
+    for (let i = 0; i < SECOND * 15; i++) {
+      w = stepWorld(w, {});
+      hits += w.events.filter((e) => e.type === 'damaged' && e.shipId === me && e.by === 'npc-pirate-1').length;
+    }
+    expect(hits).toBeGreaterThan(10);
+  });
+
+  it('a pirate turns on whoever shoots it', () => {
+    let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
+    const me = pilotShip(w, 'ana')!.id;
+    // Put the pirate on cooldown so only provocation can start a hunt, and park the pilot nearby in the open.
+    const brain = { ...(w.npcs['npc-pirate-1'] as PirateBrain), cooldownTicks: 1e6 };
+    const pirate = w.ships['npc-pirate-1']!;
+    w = {
+      ...w,
+      npcs: { ...w.npcs, 'npc-pirate-1': brain },
+      ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: pirate.position.x - 300, y: pirate.position.y }, heading: 0, shield: 1e6 } },
+    };
+    let hunted = false;
+    for (let i = 0; i < SECOND * 3 && !hunted; i++) {
+      w = stepWorld(w, { [me]: { ...emptyInput(), fireTurret: true, aimAt: w.ships['npc-pirate-1']!.position } });
+      hunted = w.events.some((e) => e.type === 'huntStarted' && e.shipId === me);
+    }
+    expect(hunted).toBe(true);
+  });
+
+  it('a trader shoots back at a pirate hunting it', () => {
+    let w = createStarterWorld();
+    let traderHits = 0;
+    for (let i = 0; i < SECOND * 60; i++) {
+      w = stepWorld(w, {});
+      traderHits += w.events.filter((e) => e.type === 'damaged' && e.by?.startsWith('npc-trader')).length;
+    }
+    expect(traderHits).toBeGreaterThan(5);
+  });
+
+  it('a badly damaged pirate goes home and leaves the sector, then a new one arrives', () => {
+    let w = createStarterWorld();
+    const id = 'npc-pirate-1';
+    const brain = w.npcs[id] as PirateBrain;
+    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, structure: HULLS['jackal']!.structure * 0.3, position: brain.home } } };
+    let departed = false;
+    for (let i = 0; i < SECOND * 5 && !departed; i++) {
+      w = stepWorld(w, {});
+      departed = w.events.some((e) => e.type === 'departed' && e.shipId === id);
+    }
+    expect(departed).toBe(true);
+    expect(w.wrecks).toEqual([]); // leaving is not dying
+    for (let i = 0; i < SECOND * 50; i++) w = stepWorld(w, {});
+    expect(w.ships['npc-pirate-2']).toBeDefined();
+    expect(distance(w.ships['npc-pirate-2']!.position, brain.home)).toBeLessThan(PIRATE_TUNING.patrolRadius + 200);
+  });
+});

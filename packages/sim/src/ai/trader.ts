@@ -1,6 +1,8 @@
+import { angleDelta } from '../angle.js';
+import { leadPoint } from '../combat.js';
 import { DOCK_MAX_SPEED } from '../constants.js';
 import type { HullSpec, Ship, ShipInput, TraderBrain, World } from '../types.js';
-import { add, distance, length, normalise, scale, sub } from '../vec2.js';
+import { add, distance, length, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
 
@@ -11,6 +13,10 @@ import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
  * Flying: approach the destination's near side, slow down, and dock once
  * inside dock range and below the docking speed limit. A refused dock
  * just means trying again next tick.
+ *
+ * Defence: while a pirate is hunting it, the trader keeps flying its
+ * route and fires its turrets at the pirate whenever it is in range and
+ * the turret has slewed on to the lead point. It never chases.
  *
  * Later this is where cargo is bought and sold; for now the trader is
  * traffic, and a target.
@@ -25,7 +31,40 @@ export const TRADER_TUNING = {
   approachStandoff: 50,
   /** Only request docking below this fraction of the docking speed limit. */
   dockSpeedFraction: 0.7,
+  /** Fire a turret when it is within this angle of its lead point, radians. */
+  turretTolerance: 0.1,
 };
+
+/** The nearest pirate currently hunting this ship, or null. */
+function hunter(world: World, ship: Ship): Ship | null {
+  let best: Ship | null = null;
+  let bestDist = Infinity;
+  for (const [id, brain] of Object.entries(world.npcs)) {
+    if (brain.kind !== 'pirate' || brain.mode !== 'hunt' || brain.targetId !== ship.id) continue;
+    const pirate = world.ships[id];
+    if (!pirate) continue;
+    const d = distance(ship.position, pirate.position);
+    if (d < bestDist) {
+      best = pirate;
+      bestDist = d;
+    }
+  }
+  return best;
+}
+
+/** Aim turrets at whoever is hunting us and fire when on target and in range. */
+function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
+  const threat = hunter(world, ship);
+  if (!threat) return input;
+  const turret = ship.weapons.find((w) => world.weapons[w.weaponId]?.kind === 'turret');
+  const spec = turret ? world.weapons[turret.weaponId] : undefined;
+  if (!turret || !spec) return input;
+
+  const aimAt = leadPoint(ship, threat, spec.projectileSpeed);
+  const onTarget = Math.abs(angleDelta(turret.aim, toAngle(sub(aimAt, ship.position)))) <= TRADER_TUNING.turretTolerance;
+  const inRange = distance(ship.position, threat.position) <= spec.range;
+  return { ...input, aimAt, fireTurret: onTarget && inRange };
+}
 
 export interface TraderThought {
   input: ShipInput;
@@ -60,5 +99,5 @@ export function thinkTrader(world: World, ship: Ship, hull: HullSpec, brain: Tra
   const waypoint = routeAround(ship, hull, approach, world.stations);
   const cruise = hull.maxSpeed * TRADER_TUNING.cruiseFraction;
   const desired = arriveVelocity(ship, hull, waypoint, cruise);
-  return { input: steerToVelocity(ship, hull, desired), brain };
+  return { input: defend(world, ship, steerToVelocity(ship, hull, desired)), brain };
 }

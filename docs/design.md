@@ -28,7 +28,7 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
   - **Manual**: fires only what the pilot asks for.
 - Brake overrides everything: it fires the relevant thrusters at full strength against velocity and spin on every axis, in every mode.
 - NPC ships use the same flight computer, so they fly by the same rules as the player.
-- Weapon handling is undecided (fixed with assist, turrets, missiles and mines are all candidates). The mode system is meant to support all of them: fixed guns favour assisted flight, turrets and missiles free a pilot to fight while drifting in manual.
+- Weapons come in two kinds (see Combat); the flight modes suit both. Fixed guns favour assisted flight; turrets free a pilot to fight while drifting in manual.
 - The mouse is deliberately not used for flight. It is reserved for targeting, interacting with objects (scooping, hailing, selecting) and turret aim.
 - Thrust is relative to heading: main engine forward, retro reverse, lateral strafe.
 
@@ -60,9 +60,42 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 - Docked ships do not move and cannot be damaged (later: unless the station is under attack).
 - Undocking places the ship just outside the station hull in the direction it is facing, with a small push.
 
+## Combat
+
+### Weapons
+
+- **Fixed** weapons fire along the ship's heading. You aim by flying.
+- **Turrets** slew on their own (at a limited turn rate) towards the mouse pointer and fire along their own bearing.
+- **The rule:** at the same size, a fixed weapon always does more damage per second than a turret. Aiming with the hull is a skill and pays for it. A test enforces this across the whole weapon catalogue.
+- Weapons are data (`weapons.ts`). Each hull has a default fit (`defaultWeapons`) until fitting arrives in milestone 6. Today: Sparrow has a pulse cannon (fixed) and a light turret; Jackal a pulse cannon; Mule a light turret.
+- Projectiles are real objects with travel time and range. They inherit the firing ship's velocity, so leading a moving target matters. Hits are tested along each shot's whole path through a tick, so fast shots cannot skip through small hulls. Stations block shots.
+- Missiles, torpedoes and mines are planned as further weapon kinds.
+
+### Damage
+
+- Damage hits shields first, then structure. Shields recharge after a few seconds without damage. Structure does not recharge in space.
+- Docked at a station, a ship's shields refill at once and its structure is repaired over time (free for now).
+- At zero structure a ship is destroyed. It leaves a drifting wreck (salvage comes in milestone 9) and scrap canisters: half the hull's mass in scrap, plus whatever scrap was in its hold.
+
+### Collisions and ramming
+
+- Damage from any impact comes from the ship's own change in velocity (delta-v), above a safe threshold. Gentle bumps do nothing.
+- Ship to ship collisions conserve momentum and share it by mass. In a ram the heavy ship's velocity barely changes and the light ship's changes a lot, so a big hull can ram a small one and walk away. A Mule ramming a Sparrow takes a fraction of the damage it deals.
+- Station hulls are immovable, so a ship that hits one takes the whole bounce.
+
+### Loot
+
+- Scrap canisters drift and disappear after 90 seconds. Hold the tractor beam (R) to pull canisters within range towards you; they are scooped into your hold when they reach the hull. Two beams on one canister: the nearer ship wins it.
+- Scrap has no use until trade arrives in milestone 4.
+
+### Losing your ship
+
+- The pilot is left without a ship and can respawn in a new starter Sparrow at Harbour Station. Respawn is a pilot command, not a ship input, so it will work the same over a network.
+- Nothing else is lost yet, because nothing else exists yet. What a death costs (cargo, credits, insurance) is a decision for when there is something to lose.
+
 ## Stations and security
 
-- Station hulls are solid. A ship that hits one is pushed back out and bounces: the inward part of its velocity is reflected at 40% (`HULL_RESTITUTION`) and sliding along the hull loses 10% (`HULL_FRICTION`). Impacts over 8 u/s raise a `collided` event carrying the speed, ready for damage in milestone 3. Ship to ship collision is not modelled yet.
+- Station hulls are solid. A ship that hits one is pushed back out and bounces: the inward part of its velocity is reflected at 40% (`HULL_RESTITUTION`) and sliding along the hull loses 10% (`HULL_FRICTION`). Hard impacts cause damage (see Combat).
 - Every station has a security zone (`securityRadius`), drawn as a faint dashed ring. Inside it, pirates will not hunt you. Later, crimes witnessed inside it bring a security response. Outside every zone is open space.
 - New pilots spawn inside the starter station's security zone.
 
@@ -70,9 +103,12 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 - NPCs fly through exactly the same flight computer and physics as pilots. Their brains produce a `ShipInput` each tick, the same keys a person would press, so they have no extra thrust and can be outflown. They fly in rotation-assist mode and steer their own drift.
 - Brains are plain data on the world (`World.npcs`), so NPC state saves with everything else. Every brain decides from the start-of-tick world, so the order they think in never changes the outcome, and the whole sim stays deterministic.
-- **Trader**: flies a loop of stations, docking at each for a while. Routes round station hulls rather than through them. For now it is traffic and a target; it will carry cargo once trade exists.
-- **Pirate**: prowls a loop near a home point off the trade lane. It hunts the nearest flying ship in detection range (1400) that is well outside every security zone, closes in and holds about 160 units off it, nose on. It breaks off if the target docks, gets close to a security zone, gets more than 2200 away, or after 45 seconds, then goes home and waits 20 seconds before hunting again. It treats each security zone as 300 units bigger than it is, so it turns away before crossing the edge.
-- The pirate hull (Jackal) accelerates and turns faster than a Sparrow but has a lower top speed (320 against 350), so a pilot who sees it coming can run for security. With no weapons until milestone 3, a hunt is a pirate on your tail and nothing more.
+- NPCs come from **spawners** (`World.spawners`). A spawner keeps one NPC in the world and replaces it a while after it is destroyed or leaves (trader 30 s, pirate 45 s).
+- **Trader**: flies a loop of stations, docking at each for a while. Routes round station hulls rather than through them. If a pirate hunts it, it keeps to its route and fires its turret at the pirate when in range. It never chases. It will carry cargo once trade exists.
+- **Pirate**: prowls a loop near a home point off the trade lane. It hunts the nearest flying ship in detection range (1400) that is well outside every security zone, closes in and holds about 160 units off it, leads the target and fires its fixed gun when its nose is on the lead point. It breaks off if the target docks, gets close to a security zone, gets more than 2200 away, after 45 seconds, or when its own structure drops below 25%; then it goes home and waits 20 seconds before hunting again. It treats each security zone as 300 units bigger than it is, so it turns away before crossing the edge.
+- A pirate that is shot or rammed turns on whoever did it (outside security), even while cooling down.
+- A pirate below 60% structure will not start a hunt. When it gets home in that state it leaves the sector (no wreck) and its spawner sends a fresh one later. This is how pirates "repair" without a pirate base.
+- The pirate hull (Jackal) accelerates and turns faster than a Sparrow but has a lower top speed (320 against 350), so a pilot who sees it coming can run for security.
 - All behaviour numbers are named in `PIRATE_TUNING` and `TRADER_TUNING`.
 ## World structure (planned)
 

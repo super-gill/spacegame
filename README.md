@@ -2,11 +2,11 @@
 
 A 2D free-roam space sim in the spirit of Flatspace, built for the browser. Play solo, or (later) with a few friends on a world one of you hosts, Minecraft style.
 
-Version 0.2.0. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.3.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 2, "company": one sector with two stations, a trader running between them and a pirate that hunts lone ships outside station security. Pure Newtonian flight with three flight-assist modes, docking, and solid station hulls. No combat or trade yet. See [docs/roadmap.md](docs/roadmap.md).
+Milestone 3, "fight": one sector with two stations, an armed trader running between them and a pirate that hunts lone ships outside station security. Fixed guns and mouse-aimed turrets, shields, ramming, wrecks, scrap and a tractor beam. Pure Newtonian flight with three flight-assist modes. No trade yet. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Quick start
 
@@ -28,6 +28,9 @@ Open the URL Vite prints (normally http://localhost:5173).
 | Reverse thrust | S or Down |
 | Strafe | A / D |
 | Brake | Space or X |
+| Fire fixed guns | Left click |
+| Fire turret (aims at the mouse) | Right click |
+| Tractor beam | R |
 | Cycle flight mode | Z |
 | Dock / undock | F (when the station name shows in the HUD) |
 | Controls panel | F1 or ` |

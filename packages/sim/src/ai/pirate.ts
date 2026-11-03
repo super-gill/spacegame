@@ -1,5 +1,7 @@
+import { angleDelta } from '../angle.js';
+import { leadPoint } from '../combat.js';
 import type { HullSpec, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
-import { add, distance, fromAngle, normalise, scale, sub, type Vec2 } from '../vec2.js';
+import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
 
 /**
@@ -9,10 +11,14 @@ import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
  *   nearest flying ship in detection range that is outside every
  *   station's security zone, and start hunting it.
  * - hunt: close in and hold station a short way off the target, nose on
- *   it. With no weapons yet (milestone 3) this is the whole threat: a
- *   pirate sitting on your tail. Give up if the target docks, reaches
- *   station security, gets too far away, or the hunt runs too long.
+ *   the point its shots need to lead to, and fire its fixed guns when the
+ *   nose is on that point and the target is in range. Give up if the
+ *   target docks, reaches station security, gets too far away, the hunt
+ *   runs too long, or the pirate's own structure gets low.
  * - withdraw: go home, then prowl again after a cooldown.
+ *
+ * A pirate that is shot or rammed remembers who did it and turns on them
+ * (outside security), even while cooling down.
  *
  * Pirates stay out of station security zones: they treat each zone as
  * `zoneCaution` bigger than it is and break off before reaching it. If
@@ -44,6 +50,18 @@ export const PIRATE_TUNING = {
    * brake and turn away before crossing its edge.
    */
   zoneCaution: 300,
+  /** Fire when the nose is within this angle of the lead point, radians. About 3 degrees. */
+  aimTolerance: 0.05,
+  /** Fire only when the target is within this fraction of weapon range. */
+  rangeFraction: 0.9,
+  /** Break off when structure falls below this fraction of the hull's maximum. */
+  fleeStructureFraction: 0.25,
+  /**
+   * Only start a hunt with at least this fraction of structure. A pirate
+   * below it that is home leaves the sector to repair, and its spawner
+   * sends a fresh one later.
+   */
+  engageStructureFraction: 0.6,
   /** Distance from a patrol point at which the next one is chosen, units. */
   patrolPointReached: 120,
 };
@@ -52,6 +70,8 @@ export interface PirateThought {
   input: ShipInput;
   brain: PirateBrain;
   events: WorldEvent[];
+  /** True when the pirate leaves the sector this tick. */
+  depart?: boolean;
 }
 
 /** True if the point is inside any station's security zone, optionally widened by `margin`. */
@@ -81,8 +101,16 @@ function findTarget(world: World, self: Ship): Ship | null {
   return best;
 }
 
+/** True if a ship is a fair target to start or keep hunting. */
+function huntable(world: World, self: Ship, target: Ship | undefined): target is Ship {
+  if (!target || target.state !== 'flying' || target.id === self.id) return false;
+  if (inSecurityZone(world, target.position, PIRATE_TUNING.zoneCaution)) return false;
+  return distance(self.position, target.position) <= PIRATE_TUNING.loseRange;
+}
+
 /** Why a hunt should stop, or null to carry on. */
-function huntOver(world: World, self: Ship, target: Ship | undefined, brain: PirateBrain): boolean {
+function huntOver(world: World, self: Ship, hull: HullSpec, target: Ship | undefined, brain: PirateBrain): boolean {
+  if (self.structure < hull.structure * PIRATE_TUNING.fleeStructureFraction) return true;
   if (!target || target.state !== 'flying') return true;
   if (inSecurityZone(world, target.position, PIRATE_TUNING.zoneCaution)) return true;
   if (distance(self.position, target.position) > PIRATE_TUNING.loseRange) return true;
@@ -105,7 +133,7 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
 
   if (b.mode === 'hunt') {
     const target = b.targetId ? world.ships[b.targetId] : undefined;
-    if (huntOver(world, ship, target, b)) {
+    if (huntOver(world, ship, hull, target, b)) {
       if (b.targetId) events.push({ type: 'huntEnded', shipId: b.targetId, pirateId: ship.id });
       const cooldownTicks = Math.round(PIRATE_TUNING.cooldownSeconds / world.dt);
       b = switchMode(b, 'withdraw', { targetId: null, cooldownTicks });
@@ -117,8 +145,32 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
       const holdPoint = add(t.position, scale(back, PIRATE_TUNING.standoff));
       const closing = arriveVelocity(ship, hull, holdPoint, hull.maxSpeed);
       const desired = add(t.velocity, closing);
-      return { input: steerToVelocity(ship, hull, desired, t.position), brain: b, events };
+
+      // Point the nose where the shots need to go, and fire when it is there.
+      const gun = ship.weapons.map((w) => world.weapons[w.weaponId]).find((w) => w?.kind === 'fixed');
+      const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
+      const input = steerToVelocity(ship, hull, desired, aimPoint);
+      if (gun) {
+        const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
+        const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
+        input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange;
+      }
+      return { input, brain: b, events };
     }
+  }
+
+  const fitToFight = ship.structure >= hull.structure * PIRATE_TUNING.engageStructureFraction;
+
+  // Retaliate against whoever attacked us, cooldown or not, unless badly hurt.
+  if (b.provokedBy) {
+    const attacker = world.ships[b.provokedBy];
+    const strongEnough = ship.structure >= hull.structure * PIRATE_TUNING.fleeStructureFraction;
+    if (strongEnough && huntable(world, ship, attacker)) {
+      events.push({ type: 'huntStarted', shipId: attacker.id, pirateId: ship.id });
+      b = switchMode(b, 'hunt', { targetId: attacker.id, provokedBy: null });
+      return { input: steerToVelocity(ship, hull, attacker.velocity, attacker.position), brain: b, events };
+    }
+    b = { ...b, provokedBy: null };
   }
 
   if (b.mode === 'withdraw') {
@@ -131,7 +183,14 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
     }
   }
 
-  // Prowl.
+  // Prowl. Too damaged to hunt and home: leave the sector to repair.
+  if (!fitToFight && distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
+    return { input: steerToVelocity(ship, hull, { x: 0, y: 0 }), brain: b, events, depart: true };
+  }
+  if (!fitToFight) {
+    const desired = arriveVelocity(ship, hull, routeAround(ship, hull, b.home, world.stations), hull.maxSpeed * 0.7);
+    return { input: steerToVelocity(ship, hull, desired), brain: b, events };
+  }
   if (b.cooldownTicks === 0) {
     const target = findTarget(world, ship);
     if (target) {

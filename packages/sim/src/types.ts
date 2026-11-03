@@ -35,6 +35,113 @@ export interface HullSpec {
   maxTurnRate: number;
   /** Approximate hull radius for collision and docking checks. */
   radius: number;
+  /** Shield capacity. Shields take damage first and recharge. */
+  shield: number;
+  /** Shield recharge, points per second, once recharging. */
+  shieldRegen: number;
+  /** Seconds after taking damage before shields start recharging. */
+  shieldRegenDelay: number;
+  /** Structure points. The ship is destroyed when this reaches zero. Does not recharge. */
+  structure: number;
+  /**
+   * Weapons fitted when the hull is built, by weapon id. Later this
+   * becomes the hull's slots and the fit becomes the owner's choice.
+   */
+  defaultWeapons: string[];
+}
+
+/**
+ * How a weapon aims.
+ * - `fixed`: fires along the ship's heading. The pilot aims by flying.
+ * - `turret`: turns on its own towards the pilot's aim point and fires
+ *   along its own bearing.
+ *
+ * Rule: for weapons of the same size, fixed always does more damage per
+ * second than turret. Aiming with the hull is a skill and pays for it.
+ * A test enforces this across the whole catalogue.
+ */
+export type WeaponKind = 'fixed' | 'turret';
+
+export type WeaponSize = 'light' | 'medium' | 'heavy';
+
+export interface WeaponSpec {
+  id: string;
+  name: string;
+  kind: WeaponKind;
+  size: WeaponSize;
+  /** Damage per projectile. */
+  damage: number;
+  /** Seconds between shots. */
+  fireInterval: number;
+  /** Projectile speed relative to the firing ship, units/s. */
+  projectileSpeed: number;
+  /** Distance a projectile travels before it fizzles, units. */
+  range: number;
+  /** Turrets only: how fast the turret slews, rad/s. */
+  turretTurnRate: number;
+}
+
+/** A fitted weapon's live state. */
+export interface WeaponState {
+  weaponId: string;
+  /** Ticks until it can fire again. */
+  cooldownTicks: number;
+  /** World bearing the weapon points along, radians. Fixed weapons follow the heading. */
+  aim: number;
+}
+
+/** A shot in flight. */
+export interface Projectile {
+  id: string;
+  /** Ship that fired it; it cannot hit its own ship. */
+  ownerShipId: string;
+  position: Vec2;
+  velocity: Vec2;
+  damage: number;
+  ticksLeft: number;
+}
+
+/** What is left of a destroyed ship. Drifts and fades. Salvage comes later. */
+export interface Wreck {
+  id: string;
+  hullId: string;
+  position: Vec2;
+  velocity: Vec2;
+  heading: number;
+  angularVelocity: number;
+  ticksLeft: number;
+}
+
+/** A canister of goods floating in space, scooped with a tractor beam. */
+export interface Loot {
+  id: string;
+  item: string;
+  amount: number;
+  position: Vec2;
+  velocity: Vec2;
+  ticksLeft: number;
+}
+
+/**
+ * Keeps an NPC in the world: spawns it, and respawns it a while after it
+ * is destroyed. Plain data, so NPC population saves with the world.
+ */
+export interface Spawner {
+  id: string;
+  hullId: string;
+  position: Vec2;
+  heading: number;
+  /** Station to start docked at, or null to start in space. */
+  dockedAt: string | null;
+  brain: NpcBrain;
+  /** Seconds after the ship is destroyed before a replacement appears. */
+  respawnSeconds: number;
+  /** The ship this spawner currently has in the world, or null. */
+  shipId: string | null;
+  /** Ticks until the next spawn, while `shipId` is null. */
+  timerTicks: number;
+  /** How many ships this spawner has made, for unique ids. */
+  spawned: number;
 }
 
 export type ShipState = 'flying' | 'docked';
@@ -85,6 +192,15 @@ export interface Ship {
   flightMode: FlightMode;
   /** What the thrusters did on the last tick. All zero when idle or docked. */
   thrusters: Thrusters;
+  shield: number;
+  structure: number;
+  /** Ticks until shields start recharging after the last hit. */
+  shieldDelayTicks: number;
+  weapons: WeaponState[];
+  /** True on ticks the tractor beam is running. */
+  tractorActive: boolean;
+  /** Goods aboard, item id to amount. */
+  hold: Record<string, number>;
 }
 
 export interface Station {
@@ -115,8 +231,10 @@ export interface Pilot {
   /** Stable identity, chosen by the client and kept between sessions. */
   id: string;
   name: string;
-  /** The ship this pilot is currently flying, or null if they have none. */
+  /** The ship this pilot is currently flying, or null if they have none (destroyed). */
   shipId: string | null;
+  /** How many ships this pilot has been issued, for unique ship ids. */
+  shipsIssued: number;
 }
 
 /**
@@ -138,6 +256,14 @@ export interface ShipInput {
   toggleDock: boolean;
   /** Edge-triggered: switch to the next flight mode. */
   cycleFlightMode: boolean;
+  /** Fire every fixed weapon. */
+  fireFixed: boolean;
+  /** Fire every turret. */
+  fireTurret: boolean;
+  /** World point turrets aim at, or null to leave them where they are. */
+  aimAt: Vec2 | null;
+  /** Run the tractor beam to pull in nearby loot. */
+  tractor: boolean;
 }
 
 /**
@@ -173,6 +299,8 @@ export interface PirateBrain {
   cooldownTicks: number;
   /** Which patrol point round `home` it is flying to. */
   patrolIndex: number;
+  /** Ship that last shot or rammed this pirate. It will turn on them. */
+  provokedBy: string | null;
 }
 
 export interface World {
@@ -184,14 +312,24 @@ export interface World {
   ships: Record<string, Ship>;
   /** NPC brains keyed by the id of the ship they fly. */
   npcs: Record<string, NpcBrain>;
+  spawners: Spawner[];
+  projectiles: Projectile[];
+  wrecks: Wreck[];
+  loot: Loot[];
+  weapons: Record<string, WeaponSpec>;
+  /** Counter for unique ids of projectiles, wrecks and loot. */
+  nextEntityId: number;
   stations: Record<string, Station>;
   hulls: Record<string, HullSpec>;
   /**
    * One-shot facts produced this tick. Cleared each tick. Every event
-   * names the ship it concerns, so each client shows only its own.
+   * names the ship it concerns (and, where there is one, the ship that
+   * caused it in `by`), so each client shows only what involves it.
    */
   events: WorldEvent[];
 }
+
+export type DamageCause = 'weapon' | 'ram' | 'station';
 
 export type WorldEvent =
   | { type: 'docked'; shipId: string; stationId: string }
@@ -200,6 +338,15 @@ export type WorldEvent =
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
   | { type: 'collided'; shipId: string; stationId: string; speed: number }
+  /** Two ships collided. `speed` is the closing speed at impact, units/s. */
+  | { type: 'rammed'; shipId: string; by: string; speed: number }
+  /** A ship took damage. `by` is the ship responsible, or null for a station hull. */
+  | { type: 'damaged'; shipId: string; by: string | null; amount: number; cause: DamageCause }
+  /** A ship was destroyed. `by` is the ship responsible, or null. */
+  | { type: 'destroyed'; shipId: string; by: string | null }
+  | { type: 'lootCollected'; shipId: string; item: string; amount: number }
+  /** An NPC left the sector (no wreck). Its spawner will replace it later. */
+  | { type: 'departed'; shipId: string }
   /** A pirate has picked `shipId` as its target. */
   | { type: 'huntStarted'; shipId: string; pirateId: string }
   /** A pirate has given up on `shipId`. */

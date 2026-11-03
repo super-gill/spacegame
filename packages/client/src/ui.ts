@@ -2,8 +2,9 @@ import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
 import { FLIGHT_MODE_LABELS, distance, nearestDockableStation } from '@spacegame/sim';
 
 /**
- * DOM overlay: HUD text, docked panel and transient toasts.
- * Pure presentation; reads the world and never changes it.
+ * DOM overlay: HUD text, docked panel, death panel and transient toasts.
+ * Pure presentation; reads the world and never changes it. Buttons call
+ * back into main.ts, which owns the world.
  */
 
 function must<T extends HTMLElement>(id: string): T {
@@ -17,14 +18,29 @@ export class Ui {
   private readonly dockPanel = must<HTMLDivElement>('dock-panel');
   private readonly dockStationName = must<HTMLHeadingElement>('dock-station-name');
   private readonly undockButton = must<HTMLButtonElement>('undock-button');
+  private readonly deathPanel = must<HTMLDivElement>('death-panel');
+  private readonly respawnButton = must<HTMLButtonElement>('respawn-button');
   private readonly toast = must<HTMLDivElement>('toast');
   private toastTimer: number | null = null;
 
-  constructor(onUndock: () => void) {
+  constructor(onUndock: () => void, onRespawn: () => void) {
     this.undockButton.addEventListener('click', onUndock);
+    this.respawnButton.addEventListener('click', onRespawn);
   }
 
-  update(world: World, ship: Ship, fps: number): void {
+  /** Refresh the HUD. `ship` is null while the pilot has no ship (destroyed). */
+  update(world: World, ship: Ship | null, fps: number): void {
+    this.deathPanel.classList.toggle('hidden', ship !== null);
+    if (!ship) {
+      this.dockPanel.classList.add('hidden');
+      this.hud.textContent = `NO SHIP\n${fps.toFixed(0)} fps  tick ${world.tick}`;
+      return;
+    }
+    const hull = world.hulls[ship.hullId];
+    const hold = Object.entries(ship.hold)
+      .filter(([, n]) => n > 0)
+      .map(([item, n]) => `${item} ${n}`)
+      .join(', ');
     const speed = Math.hypot(ship.velocity.x, ship.velocity.y);
     const near = nearestDockableStation(ship, world.stations);
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
@@ -32,6 +48,8 @@ export class Ui {
     const lines = [
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
+      hull ? `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${hull.shield}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${hull.structure}` : '',
+      hold ? `HOLD ${hold}` : '',
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
@@ -50,8 +68,19 @@ export class Ui {
     }
   }
 
-  handleEvents(events: WorldEvent[]): void {
+  /**
+   * Toasts for events involving this pilot's ship: things that happened to
+   * it (`shipId`) or that it caused (`by`).
+   */
+  handleEvents(events: WorldEvent[], myShipId: string): void {
     for (const e of events) {
+      const mine = e.shipId === myShipId;
+      if (e.type === 'destroyed') {
+        if (mine) this.showToast('Your ship was destroyed.', 3000);
+        else if (e.by === myShipId) this.showToast('Target destroyed.', 2000, 'info');
+        continue;
+      }
+      if (!mine) continue;
       if (e.type === 'dockRefused') {
         this.showToast(e.reason === 'tooFast' ? 'Too fast to dock. Slow down.' : 'No station in range.');
       } else if (e.type === 'flightModeChanged') {
@@ -62,6 +91,10 @@ export class Ui {
         this.showToast('The pirate has broken off.', 2000, 'info');
       } else if (e.type === 'collided') {
         this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
+      } else if (e.type === 'rammed') {
+        this.showToast(`Collision at ${Math.round(e.speed)} u/s`, 1200);
+      } else if (e.type === 'lootCollected') {
+        this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
       }
     }
   }

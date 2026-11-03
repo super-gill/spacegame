@@ -48,6 +48,40 @@ export const HULL_FRICTION = 0.1;
 /** Impacts slower than this (units/s) are contact, not collision, and raise no event. */
 export const COLLISION_EVENT_MIN_SPEED = 8;
 
+/**
+ * Collision damage. A ship takes damage from how sharply its own velocity
+ * changes in an impact (delta-v), not from closing speed. Momentum is
+ * shared by mass, so in a ram the heavy ship's velocity barely changes and
+ * the light ship's changes a lot: a big hull can ram a small one safely.
+ * Station hulls are immovable, so the ship takes the whole change.
+ *
+ * Damage = (delta-v - safe delta-v) * damage per unit, when positive.
+ */
+export const IMPACT_SAFE_DELTA_V = 40;
+export const IMPACT_DAMAGE_PER_DELTA_V = 0.5;
+
+/** Ship to ship bounce: fraction of closing speed kept after impact. */
+export const SHIP_RESTITUTION = 0.4;
+
+/** Structure repaired per second while docked at a station. Shields refill at once. */
+export const DOCK_REPAIR_PER_SECOND = 25;
+
+/** Tractor beam reach from the ship centre, units. */
+export const TRACTOR_RANGE = 260;
+/** Speed loot is pulled towards the ship, relative to it, units/s. */
+export const TRACTOR_PULL_SPEED = 140;
+/** Loot this close to the hull edge is scooped into the hold, units. */
+export const SCOOP_DISTANCE = 14;
+
+/** Seconds a wreck drifts before it is gone. */
+export const WRECK_LIFETIME = 45;
+/** Seconds loot floats before it is gone. */
+export const LOOT_LIFETIME = 90;
+/** Scrap dropped per unit of hull mass when a ship is destroyed. */
+export const SCRAP_PER_MASS = 0.5;
+/** Scrap canisters per destroyed ship, at most. */
+export const MAX_LOOT_CANISTERS = 4;
+
 /** When undocking, ships are placed this far outside the station and given this push. */
 export const UNDOCK_CLEARANCE = 40;
 export const UNDOCK_PUSH_SPEED = 30;

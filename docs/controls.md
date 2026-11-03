@@ -20,6 +20,18 @@ Flight is keyboard only. The mouse is reserved for targeting, interacting with o
 
 Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast. Rotating never changes your velocity.
 
+## Weapons
+
+The mouse aims and fires. It is never captured or hidden; buttons only count when pressed over the game, so clicking on-screen buttons never fires.
+
+| Action | Input | Notes |
+| --- | --- | --- |
+| Fire fixed guns | Left click (hold) | Fires where the nose points. Aim by flying |
+| Fire turret | Right click (hold) | The turret slews towards the mouse pointer and fires along its own bearing; a small ring marks where you are aiming |
+| Tractor beam | R (hold) | Pulls nearby loot in and scoops it into your hold |
+
+Fixed guns hit harder than turrets. Turrets let you shoot while flying any direction.
+
 ## Flight computer
 
 | Action | Key | Notes |
@@ -57,6 +69,8 @@ Bottom left, top to bottom:
 
 - `!! PIRATE ON YOUR TAIL` while a pirate is hunting you
 - `ZONE` the station security zone you are in, or `OPEN SPACE`
+- `SHD` shields and `HUL` structure, current and maximum
+- `HOLD` what is in your hold, when it is not empty
 - `VEL` speed in units per second
 - `POS` world position
 - `HDG` heading in degrees
@@ -70,3 +84,6 @@ Bottom left, top to bottom:
 - Edge markers point at stations and ships that are off screen, with their distance.
 - Your ship is white. Traders are blue-grey, pirates red. NPC labels (`TRADER`, `PIRATE · HUNTING YOU`) are a development aid and may go later.
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
+- Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.
+- Loot canisters are small orange diamonds. Wrecks are dashed outlines that fade.
+- When your ship is destroyed a panel offers **Respawn** in a new Sparrow at Harbour Station.

@@ -1,5 +1,5 @@
 import { FLIGHT_MODES, FLIGHT_MODE_LABELS, type FlightMode } from '@spacegame/sim';
-import { KEY_BINDINGS, POINTER_CONTROLS, keyName } from './bindings.js';
+import { KEY_BINDINGS, POINTER_CONTROLS, isMouseCode, keyName } from './bindings.js';
 
 /**
  * Developer controls panel: lists every control in the game, generated
@@ -25,7 +25,7 @@ function keyChips(codes: readonly string[]): HTMLElement {
   const cell = el('td', 'keys');
   codes.forEach((code, i) => {
     if (i > 0) cell.append(el('span', 'or', ' or '));
-    cell.append(el('kbd', undefined, keyName(code)));
+    cell.append(el('kbd', isMouseCode(code) ? 'mouse' : undefined, keyName(code)));
   });
   return cell;
 }

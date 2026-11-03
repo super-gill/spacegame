@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ASSIST_LINEAR_STRENGTH, FIXED_DT } from '../constants.js';
 import { FLIGHT_MODES, idleThrusters, nextFlightMode } from '../flight.js';
+import { TEST_SHIP_COMBAT } from './fixtures.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
@@ -26,6 +27,7 @@ function ship(mode: FlightMode, overrides: Partial<Ship> = {}): Ship {
     ownerId: null,
     flightMode: mode,
     thrusters: idleThrusters(),
+    ...TEST_SHIP_COMBAT,
     ...overrides,
   };
 }

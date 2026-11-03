@@ -1,9 +1,12 @@
 import { thinkNpcs } from './ai/index.js';
-import { collideWithStations } from './collision.js';
+import { applyDamage, fireWeapons, regenerateShield, stepProjectiles, type Damage } from './combat.js';
+import { collideShips, collideWithStations } from './collision.js';
 import { tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
+import { DOCK_REPAIR_PER_SECOND } from './constants.js';
+import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
 import { stepShip } from './ship.js';
-import type { Ship, ShipInput, World, WorldEvent } from './types.js';
+import type { Projectile, Ship, ShipInput, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /**
@@ -16,9 +19,16 @@ import { emptyInput } from './world.js';
  * Any other ship gets an empty input and keeps drifting under whatever
  * its flight computer does on its own.
  *
- * Order within a tick: NPCs decide (from the start-of-tick world), then
- * each ship docks or undocks, changes mode, moves, and is pushed out of
- * any station it hit.
+ * Order within a tick:
+ *   1. NPCs decide, all from the start-of-tick world.
+ *   2. Each ship docks or undocks, changes flight mode, moves, bounces off
+ *      stations, fires, and recharges shields; docked ships are repaired.
+ *   3. Ships collide with each other (rams).
+ *   4. Projectiles fly and hit.
+ *   5. All damage from this tick is applied; destroyed ships become
+ *      wrecks and loot; NPCs that chose to leave the sector go.
+ *   6. Loot is pulled in and scooped, wrecks drift, spawners replace
+ *      lost NPCs.
  *
  * Pure: returns a new World and never mutates the one passed in. The client
  * calls this from a fixed-timestep accumulator; tests call it directly.
@@ -26,9 +36,12 @@ import { emptyInput } from './world.js';
 export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInput>>): World {
   const npc = thinkNpcs(world);
   const events: WorldEvent[] = [...npc.events];
-  const ships: Record<string, Ship> = {};
+  const damage: Damage[] = [];
+  const newProjectiles: Projectile[] = [];
+  let nextEntityId = world.nextEntityId;
+  let ships: Record<string, Ship> = {};
 
-  // Sorted so results never depend on object insertion order.
+  // 2. Per-ship. Sorted so results never depend on object insertion order.
   for (const id of Object.keys(world.ships).sort()) {
     let ship = world.ships[id]!;
     const input = inputs[id] ?? npc.inputs[id] ?? emptyInput();
@@ -58,15 +71,71 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     }
 
     const moved = collideWithStations(stepShip(ship, hull, input, world.dt), hull, world.stations);
-    ships[id] = moved.ship;
     events.push(...moved.events);
+    damage.push(...moved.damage);
+
+    const fired = fireWeapons(moved.ship, hull, world.weapons, input, world.dt, nextEntityId);
+    nextEntityId += fired.idsUsed;
+    newProjectiles.push(...fired.projectiles);
+
+    ship = regenerateShield(fired.ship, hull, world.dt);
+    if (ship.state === 'docked') {
+      // Stations repair docked ships: shields at once, structure over time.
+      const structure = Math.min(hull.structure, ship.structure + DOCK_REPAIR_PER_SECOND * world.dt);
+      ship = { ...ship, shield: hull.shield, structure };
+    }
+    ships[id] = { ...ship, tractorActive: input.tractor && ship.state === 'flying' };
   }
 
-  return {
+  // 3. Rams.
+  const rams = collideShips(ships, world.hulls);
+  ships = rams.ships;
+  events.push(...rams.events);
+  damage.push(...rams.damage);
+
+  // 4. Projectiles already in flight move and hit; new ones start moving next tick.
+  const shots = stepProjectiles(world.projectiles, ships, world.hulls, world.stations, world.dt);
+  damage.push(...shots.damage);
+
+  // 5. Apply damage in a fixed order and note who last hurt each ship.
+  const killers: Record<string, string | null> = {};
+  const npcs = { ...npc.npcs };
+  for (const d of damage) {
+    const target = ships[d.shipId];
+    const hull = target ? world.hulls[target.hullId] : undefined;
+    if (!target || !hull || target.structure <= 0) continue;
+    ships[d.shipId] = applyDamage(target, hull, d.amount, world.dt);
+    killers[d.shipId] = d.by;
+    events.push({ type: 'damaged', shipId: d.shipId, by: d.by, amount: d.amount, cause: d.cause });
+
+    // A pirate remembers who attacked it.
+    const brain = npcs[d.shipId];
+    if (brain?.kind === 'pirate' && d.by && d.by !== d.shipId) npcs[d.shipId] = { ...brain, provokedBy: d.by };
+  }
+
+  let next: World = {
     ...world,
     tick: world.tick + 1,
     ships,
-    npcs: npc.npcs,
+    npcs,
+    projectiles: [...shots.projectiles, ...newProjectiles],
+    nextEntityId,
     events,
   };
+
+  const destruction = destroyShips(next, killers);
+  next = destruction.world;
+  events.push(...destruction.events);
+
+  const departure = departShips(next, npc.departures);
+  next = departure.world;
+  events.push(...departure.events);
+
+  // 6. Loot, wrecks, spawners.
+  const loot = stepLoot(next, next.ships);
+  events.push(...loot.events);
+  next = { ...next, ships: loot.ships, loot: loot.loot, wrecks: stepWrecks(next.wrecks, world.dt) };
+  next = runSpawners(next);
+
+  return { ...next, events };
 }

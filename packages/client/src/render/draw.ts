@@ -1,4 +1,4 @@
-import type { HullSpec, Ship, Station, Thrusters } from '@spacegame/sim';
+import type { HullSpec, Loot, Projectile, Ship, Station, Thrusters, Wreck } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 
 /**
@@ -253,4 +253,128 @@ export function drawOffscreenMarker(
   const tx = mx + (mx > cx ? -14 : 14);
   const ty = my + (my > cy ? -10 : 18);
   ctx.fillText(`${label} ${Math.round(distance)}`, tx, ty);
+}
+
+/** A projectile: a short streak behind it along its velocity. */
+export function drawProjectile(ctx: CanvasRenderingContext2D, camera: Camera, p: Projectile, colour: string): void {
+  const head = camera.worldToScreen(p.position);
+  const speed = Math.hypot(p.velocity.x, p.velocity.y) || 1;
+  const tail = 10 * camera.zoom;
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(head.x, head.y);
+  ctx.lineTo(head.x - (p.velocity.x / speed) * tail, head.y - (p.velocity.y / speed) * tail);
+  ctx.stroke();
+}
+
+/** A wreck: the hull outline broken into pieces, fading out over its lifetime. */
+export function drawWreck(ctx: CanvasRenderingContext2D, camera: Camera, w: Wreck, hull: HullSpec, fade: number): void {
+  const c = camera.worldToScreen(w.position);
+  const s = hull.radius * camera.zoom;
+  const outline = HULL_OUTLINES[hull.id] ?? HULL_OUTLINES['sparrow']!;
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(w.heading);
+  ctx.strokeStyle = COLOUR.inkDim;
+  ctx.globalAlpha = 0.25 + 0.5 * fade;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 5]);
+  ctx.beginPath();
+  outline.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x * s, y * s) : ctx.lineTo(x * s, y * s)));
+  ctx.closePath();
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+/** A loot canister: a small diamond. */
+export function drawLoot(ctx: CanvasRenderingContext2D, camera: Camera, l: Loot): void {
+  const c = camera.worldToScreen(l.position);
+  const r = 5 * camera.zoom;
+  ctx.strokeStyle = COLOUR.warn;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(c.x, c.y - r);
+  ctx.lineTo(c.x + r, c.y);
+  ctx.lineTo(c.x, c.y + r);
+  ctx.lineTo(c.x - r, c.y);
+  ctx.closePath();
+  ctx.stroke();
+}
+
+/** Tractor beam: the range ring, and a line to each canister in reach. */
+export function drawTractor(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, range: number, loot: readonly Loot[]): void {
+  const c = camera.worldToScreen(at);
+  ctx.strokeStyle = COLOUR.warn;
+  ctx.globalAlpha = 0.25;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 6]);
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, range * camera.zoom, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 0.6;
+  for (const l of loot) {
+    if (Math.hypot(l.position.x - at.x, l.position.y - at.y) > range) continue;
+    const p = camera.worldToScreen(l.position);
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/** A turret's bearing: a short barrel line out from the hull. */
+export function drawTurret(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, aim: number, hull: HullSpec, colour: string): void {
+  const c = camera.worldToScreen(at);
+  const inner = hull.radius * 0.2 * camera.zoom;
+  const outer = hull.radius * 0.95 * camera.zoom;
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(c.x + Math.cos(aim) * inner, c.y + Math.sin(aim) * inner);
+  ctx.lineTo(c.x + Math.cos(aim) * outer, c.y + Math.sin(aim) * outer);
+  ctx.stroke();
+}
+
+/** Shield and structure bars over a ship, shown once it has taken damage. */
+export function drawHealthBars(ctx: CanvasRenderingContext2D, camera: Camera, ship: Ship, hull: HullSpec, at: { x: number; y: number }): void {
+  if (ship.shield >= hull.shield && ship.structure >= hull.structure) return;
+  const c = camera.worldToScreen(at);
+  const w = 36;
+  const y = c.y - hull.radius * camera.zoom - 14;
+  const bar = (row: number, fraction: number, colour: string): void => {
+    ctx.fillStyle = 'rgba(79, 122, 114, 0.35)';
+    ctx.fillRect(c.x - w / 2, y + row * 5, w, 3);
+    ctx.fillStyle = colour;
+    ctx.fillRect(c.x - w / 2, y + row * 5, w * Math.max(0, Math.min(1, fraction)), 3);
+  };
+  bar(0, ship.shield / hull.shield, COLOUR.neutral);
+  bar(1, ship.structure / hull.structure, ship.structure / hull.structure < 0.3 ? COLOUR.hostile : COLOUR.ink);
+}
+
+/** An expanding ring where a ship blew up. `t` runs 0 to 1. */
+export function drawExplosion(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, radius: number, t: number): void {
+  const c = camera.worldToScreen(at);
+  ctx.strokeStyle = COLOUR.flame;
+  ctx.globalAlpha = 1 - t;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, radius * (0.5 + 2.5 * t) * camera.zoom, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+/** Small ring where the turret is being aimed. */
+export function drawReticle(ctx: CanvasRenderingContext2D, at: { x: number; y: number }): void {
+  ctx.strokeStyle = COLOUR.ink;
+  ctx.globalAlpha = 0.6;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(at.x, at.y, 7, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
 }

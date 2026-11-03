@@ -15,12 +15,15 @@ export interface NpcDecisions {
   inputs: Record<string, ShipInput>;
   npcs: World['npcs'];
   events: WorldEvent[];
+  /** NPC ships leaving the sector this tick. */
+  departures: string[];
 }
 
 export function thinkNpcs(world: World): NpcDecisions {
   const inputs: Record<string, ShipInput> = {};
   const npcs: World['npcs'] = {};
   const events: WorldEvent[] = [];
+  const departures: string[] = [];
 
   for (const shipId of Object.keys(world.npcs).sort()) {
     const brain = world.npcs[shipId]!;
@@ -40,9 +43,10 @@ export function thinkNpcs(world: World): NpcDecisions {
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
       events.push(...t.events);
+      if (t.depart) departures.push(shipId);
     }
   }
-  return { inputs, npcs, events };
+  return { inputs, npcs, events, departures };
 }
 
 export { PIRATE_TUNING, inSecurityZone } from './pirate.js';

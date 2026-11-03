@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { collideWithStations } from '../collision.js';
 import { HULL_RESTITUTION } from '../constants.js';
 import { idleThrusters } from '../flight.js';
+import { TEST_SHIP_COMBAT } from './fixtures.js';
 import { HULLS } from '../hulls.js';
 import type { Ship, Station } from '../types.js';
 import { distance } from '../vec2.js';
@@ -23,6 +24,7 @@ function ship(overrides: Partial<Ship>): Ship {
     dockedAt: null,
     flightMode: 'manual',
     thrusters: idleThrusters(),
+    ...TEST_SHIP_COMBAT,
     ...overrides,
   };
 }
@@ -30,7 +32,7 @@ function ship(overrides: Partial<Ship>): Ship {
 describe('station collision', () => {
   it('leaves a ship clear of the hull alone', () => {
     const s = ship({ velocity: { x: -100, y: 0 } });
-    expect(collideWithStations(s, hull, stations)).toEqual({ ship: s, events: [] });
+    expect(collideWithStations(s, hull, stations)).toEqual({ ship: s, events: [], damage: [] });
   });
 
   it('pushes an overlapping ship out to the hull surface', () => {

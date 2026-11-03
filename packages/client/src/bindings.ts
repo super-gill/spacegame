@@ -18,7 +18,10 @@ export type SimAction =
   | 'turnRight'
   | 'brake'
   | 'cycleFlightMode'
-  | 'toggleDock';
+  | 'toggleDock'
+  | 'fireFixed'
+  | 'fireTurret'
+  | 'tractor';
 
 /** Actions the client handles itself; the sim never sees them. */
 export type UiAction = 'toggleControls';
@@ -27,7 +30,10 @@ export type Action = SimAction | UiAction;
 
 export interface KeyBinding {
   action: Action;
-  /** `KeyboardEvent.code` values. The first is the one shown first in the panel. */
+  /**
+   * `KeyboardEvent.code` values, or `Mouse0` / `Mouse2` for the left and
+   * right mouse buttons. The first is shown first in the panel.
+   */
   codes: readonly string[];
   group: string;
   label: string;
@@ -54,12 +60,16 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'turnLeft', codes: ['KeyQ', 'ArrowLeft'], group: 'Flight', label: 'Spin left', kind: 'hold' },
   { action: 'turnRight', codes: ['KeyE', 'ArrowRight'], group: 'Flight', label: 'Spin right', kind: 'hold' },
   { action: 'brake', codes: ['Space', 'KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
+  { action: 'fireFixed', codes: ['Mouse0'], group: 'Weapons', label: 'Fire fixed guns', kind: 'hold', note: 'Fire where the nose points' },
+  { action: 'fireTurret', codes: ['Mouse2'], group: 'Weapons', label: 'Fire turret', kind: 'hold', note: 'Turret tracks the mouse pointer' },
+  { action: 'tractor', codes: ['KeyR'], group: 'Weapons', label: 'Tractor beam', kind: 'hold', note: 'Pulls in nearby loot' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },
 ];
 
 export const POINTER_CONTROLS: readonly PointerControl[] = [
+  { input: 'Move', group: 'Weapons', label: 'Aim the turret' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
   { input: 'Click', group: 'Interface', label: 'Controls button, top right' },
 ];
@@ -72,7 +82,14 @@ const KEY_NAMES: Record<string, string> = {
   Space: 'Space',
   Backquote: '`',
   Escape: 'Esc',
+  Mouse0: 'Left click',
+  Mouse2: 'Right click',
 };
+
+/** True for the pseudo-codes used for mouse buttons. */
+export function isMouseCode(code: string): boolean {
+  return code.startsWith('Mouse');
+}
 
 /** Human name for a `KeyboardEvent.code`, e.g. KeyW -> W. */
 export function keyName(code: string): string {
