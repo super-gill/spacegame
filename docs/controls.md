@@ -4,16 +4,19 @@ Bindings are defined in `packages/client/src/input.ts` in the `KEYS` table. Rema
 
 ## Flight
 
+Flight is keyboard only. The mouse is reserved for targeting, interacting with objects and UI in later versions.
+
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |
-| Aim | Mouse | | The ship turns towards the cursor at its hull's turn rate |
+| Rotate left | Q | Left arrow | Anticlockwise, at the hull's turn rate |
+| Rotate right | E | Right arrow | Clockwise |
 | Main engine | W | Up arrow | Accelerates along the heading |
 | Reverse thrust | S | Down arrow | Weaker than main; useful for fine approach |
-| Strafe left | A | Left arrow | Lateral thrust, does not change heading |
-| Strafe right | D | Right arrow | |
+| Strafe left | A | | Lateral thrust, does not change heading |
+| Strafe right | D | | |
 | Brake | Space | X | Fires thrusters against your velocity until you stop |
 
-Thrust is relative to where the ship points, not where it is moving. Pointing away from your velocity and hitting W is how you slow down fast.
+Rotating does not change your velocity. Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast.
 
 ## Station
 

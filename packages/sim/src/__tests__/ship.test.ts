@@ -59,18 +59,32 @@ describe('ship flight model', () => {
     expect(stopped.velocity).toEqual({ x: 0, y: 0 });
   });
 
-  it('turns towards the aim heading at a bounded rate', () => {
-    const s = run(ship(), { ...emptyInput(), aimHeading: Math.PI / 2 }, 1);
-    expect(s.heading).toBeCloseTo(hull.turnRate * FIXED_DT, 6);
-    const settled = run(ship(), { ...emptyInput(), aimHeading: Math.PI / 2 }, 60 * 2);
-    expect(settled.heading).toBeCloseTo(Math.PI / 2, 6);
+  it('turns right (clockwise on screen) at the hull turn rate', () => {
+    const s = run(ship(), { ...emptyInput(), turnRight: true }, 1);
+    expect(s.heading).toBeCloseTo(hull.turnRate * FIXED_DT, 9);
   });
 
-  it('turns the short way round', () => {
-    const start = { ...ship(), heading: Math.PI * 0.9 };
-    const s = run(start, { ...emptyInput(), aimHeading: -Math.PI * 0.9 }, 1);
-    // Should go through PI, not back through 0.
-    expect(s.heading).toBeGreaterThan(Math.PI * 0.9);
+  it('turns left (anticlockwise on screen) at the hull turn rate', () => {
+    const s = run(ship(), { ...emptyInput(), turnLeft: true }, 1);
+    expect(s.heading).toBeCloseTo(-hull.turnRate * FIXED_DT, 9);
+  });
+
+  it('holds heading when both or neither turn keys are held', () => {
+    expect(run(ship(), { ...emptyInput(), turnLeft: true, turnRight: true }, 60).heading).toBe(0);
+    expect(run(ship(), emptyInput(), 60).heading).toBe(0);
+  });
+
+  it('keeps heading wrapped into (-PI, PI] through a full rotation', () => {
+    const s = run(ship(), { ...emptyInput(), turnRight: true }, 60 * 5);
+    expect(s.heading).toBeGreaterThan(-Math.PI);
+    expect(s.heading).toBeLessThanOrEqual(Math.PI);
+  });
+
+  it('turning does not change velocity (thrust is separate)', () => {
+    const moving = run(ship(), { ...emptyInput(), thrustForward: true }, 30);
+    const turned = stepShip(moving, hull, { ...emptyInput(), turnRight: true }, FIXED_DT);
+    const coasted = stepShip(moving, hull, emptyInput(), FIXED_DT);
+    expect(turned.velocity).toEqual(coasted.velocity);
   });
 
   it('does not move while docked', () => {

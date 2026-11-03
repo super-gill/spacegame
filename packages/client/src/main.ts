@@ -28,7 +28,7 @@ const ctx = canvas.getContext('2d');
 if (!ctx) throw new Error('Canvas 2D not supported');
 
 const camera = new Camera();
-const input = new InputController(canvas);
+const input = new InputController();
 const ui = new Ui(() => input.requestToggleDock());
 
 let previous: World = createStarterWorld();
@@ -63,7 +63,7 @@ function frame(nowMs: number): void {
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 
   while (accumulator >= current.dt) {
-    lastInput = input.sample(camera, playerShip(current).position);
+    lastInput = input.sample();
     previous = current;
     current = stepWorld(current, lastInput);
     ui.handleEvents(current.events);

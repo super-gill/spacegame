@@ -1,5 +1,5 @@
 import { DRAG_PER_SECOND } from './constants.js';
-import { turnTowards } from './angle.js';
+import { wrapAngle } from './angle.js';
 import type { HullSpec, PlayerInput, Ship } from './types.js';
 import { add, fromAngle, length, normalise, rotate, scale, type Vec2 } from './vec2.js';
 
@@ -36,8 +36,10 @@ export function thrustFromInput(hull: HullSpec, heading: number, input: PlayerIn
 export function stepShip(ship: Ship, hull: HullSpec, input: PlayerInput, dt: number): Ship {
   if (ship.state === 'docked') return ship;
 
-  const heading =
-    input.aimHeading === null ? ship.heading : turnTowards(ship.heading, input.aimHeading, hull.turnRate * dt);
+  // Screen y points down, so increasing the angle turns clockwise on screen.
+  // Both keys held cancel out.
+  const turn = (input.turnRight ? 1 : 0) - (input.turnLeft ? 1 : 0);
+  const heading = wrapAngle(ship.heading + turn * hull.turnRate * dt);
 
   const force = thrustFromInput(hull, heading, input, ship.velocity);
   const acceleration = scale(force, 1 / hull.mass);

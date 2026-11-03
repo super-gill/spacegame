@@ -58,8 +58,10 @@ export interface Station {
  * This is the only way the outside world influences the sim.
  */
 export interface PlayerInput {
-  /** Desired heading in world radians (where the cursor is). Null means hold heading. */
-  aimHeading: number | null;
+  /** Rotate anticlockwise on screen at the hull's turn rate. */
+  turnLeft: boolean;
+  /** Rotate clockwise on screen at the hull's turn rate. */
+  turnRight: boolean;
   thrustForward: boolean;
   thrustReverse: boolean;
   strafeLeft: boolean;

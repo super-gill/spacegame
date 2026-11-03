@@ -41,7 +41,7 @@ Each tick produces a fresh `events` array on the world (`docked`, `dockRefused`,
 
 ### Input contract
 
-The client hands the sim one `PlayerInput` per tick. It contains the desired heading (from the cursor), the thrust booleans, and edge-triggered actions such as `toggleDock`. The sim never reads keys or the mouse. This is what keeps replays, tests and AI-controlled ships possible: anything that can produce a `PlayerInput` can fly a ship.
+The client hands the sim one `PlayerInput` per tick. It contains the rotate and thrust booleans and edge-triggered actions such as `toggleDock`. The sim never reads keys or the mouse. This is what keeps replays, tests and AI-controlled ships possible: anything that can produce a `PlayerInput` can fly a ship.
 
 ## The client
 
@@ -56,7 +56,7 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | File | Responsibility |
 | --- | --- |
 | `main.ts` | Loop, wiring, interpolation. The only file that knows both sim and DOM |
-| `input.ts` | Keyboard and mouse state sampled into a `PlayerInput`. Key bindings in one table |
+| `input.ts` | Keyboard state sampled into a `PlayerInput`. Key bindings in one table |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
 | `render/draw.ts` | Vector drawing of ships and stations |
@@ -73,7 +73,7 @@ Canvas 2D, vector line art, device-pixel-ratio aware. Colours are defined once a
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover the flight model (acceleration, drift, terminal velocity, braking, turn rate, short-way-round turning), docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover the flight model (acceleration, drift, terminal velocity, braking, rotation rate and direction, heading wrap), angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 

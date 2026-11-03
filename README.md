@@ -2,11 +2,11 @@
 
 A single-player 2D free-roam space sim in the spirit of Flatspace, built for the browser.
 
-Version 0.1.0. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.1.1. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 1, "fly and dock": one sector, one station, one ship. Newtonian flight with mouse aim, docking and undocking. No combat, trade or NPCs yet. See [docs/roadmap.md](docs/roadmap.md).
+Milestone 1, "fly and dock": one sector, one station, one ship. Newtonian flight on the keyboard, docking and undocking. No combat, trade or NPCs yet. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Quick start
 
@@ -23,10 +23,10 @@ Open the URL Vite prints (normally http://localhost:5173).
 
 | Action | Keys |
 | --- | --- |
-| Aim | Mouse: the ship turns to face the cursor |
+| Rotate | Q / E or Left / Right |
 | Main engine | W or Up |
 | Reverse thrust | S or Down |
-| Strafe | A / D or Left / Right |
+| Strafe | A / D |
 | Brake | Space or X |
 | Dock / undock | F (when the station name shows in the HUD) |
 

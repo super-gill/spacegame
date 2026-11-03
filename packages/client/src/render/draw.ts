@@ -105,6 +105,17 @@ export function drawShip(
     ctx.stroke();
   }
 
+  if (input.turnLeft !== input.turnRight) {
+    // Rotation thrusters: a puff at the nose on the side opposite the turn.
+    const side = input.turnRight ? -1 : 1;
+    ctx.strokeStyle = COLOUR.flame;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(s * 0.55, side * s * 0.2);
+    ctx.lineTo(s * 0.55, side * s * 0.6);
+    ctx.stroke();
+  }
+
   // Hull: arrowhead with a notched tail.
   ctx.strokeStyle = COLOUR.inkBright;
   ctx.lineWidth = 1.5;

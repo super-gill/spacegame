@@ -1,9 +1,10 @@
 import type { PlayerInput } from '@spacegame/sim';
-import { toAngle } from '@spacegame/sim';
-import type { Camera } from './camera.js';
 
 /**
- * Keyboard and mouse state, sampled once per sim tick into a PlayerInput.
+ * Keyboard state, sampled once per sim tick into a PlayerInput.
+ *
+ * Flight is keyboard only so the mouse stays free for targeting,
+ * interacting with objects and UI in later versions.
  *
  * Bindings live in KEYS so they can be remapped from one place later.
  * Edge-triggered actions (dock) are latched between samples so a quick
@@ -11,10 +12,12 @@ import type { Camera } from './camera.js';
  */
 
 const KEYS = {
+  turnLeft: ['KeyQ', 'ArrowLeft'],
+  turnRight: ['KeyE', 'ArrowRight'],
   thrustForward: ['KeyW', 'ArrowUp'],
   thrustReverse: ['KeyS', 'ArrowDown'],
-  strafeLeft: ['KeyA', 'ArrowLeft'],
-  strafeRight: ['KeyD', 'ArrowRight'],
+  strafeLeft: ['KeyA'],
+  strafeRight: ['KeyD'],
   brake: ['Space', 'KeyX'],
   toggleDock: ['KeyF'],
 } as const;
@@ -22,15 +25,11 @@ const KEYS = {
 export class InputController {
   private readonly down = new Set<string>();
   private dockLatched = false;
-  private mouseScreen = { x: 0, y: 0 };
-  private hasMouse = false;
 
-  constructor(private readonly target: HTMLElement) {
+  constructor() {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     window.addEventListener('blur', this.onBlur);
-    target.addEventListener('mousemove', this.onMouseMove);
-    target.addEventListener('mouseleave', () => (this.hasMouse = false));
   }
 
   /** Allow UI buttons (e.g. Undock) to trigger the same latch as the key. */
@@ -39,15 +38,10 @@ export class InputController {
   }
 
   /** Build this tick's PlayerInput. Consumes latched edge actions. */
-  sample(camera: Camera, shipWorldPos: { x: number; y: number }): PlayerInput {
-    let aimHeading: number | null = null;
-    if (this.hasMouse) {
-      const world = camera.screenToWorld(this.mouseScreen);
-      aimHeading = toAngle({ x: world.x - shipWorldPos.x, y: world.y - shipWorldPos.y });
-    }
-
+  sample(): PlayerInput {
     const input: PlayerInput = {
-      aimHeading,
+      turnLeft: this.any(KEYS.turnLeft),
+      turnRight: this.any(KEYS.turnRight),
       thrustForward: this.any(KEYS.thrustForward),
       thrustReverse: this.any(KEYS.thrustReverse),
       strafeLeft: this.any(KEYS.strafeLeft),
@@ -77,11 +71,5 @@ export class InputController {
 
   private onBlur = (): void => {
     this.down.clear();
-  };
-
-  private onMouseMove = (e: MouseEvent): void => {
-    const rect = this.target.getBoundingClientRect();
-    this.mouseScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    this.hasMouse = true;
   };
 }

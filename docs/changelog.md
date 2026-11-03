@@ -2,6 +2,20 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.1.1] - 2026-11-03
+
+### Changed
+- Flight is now keyboard only: Q/E (or Left/Right arrows) rotate the ship at the hull's turn rate. The mouse no longer steers, freeing it for targeting and interaction later.
+- Strafe is now A/D only; the Left/Right arrows rotate instead.
+- `PlayerInput.aimHeading` replaced by `turnLeft` and `turnRight`.
+
+### Added
+- Rotation thruster puffs at the nose while turning.
+- Tests for rotation and the angle helpers.
+
+### Removed
+- Crosshair cursor over the game canvas.
+
 ## [0.1.0] - 2026-11-02
 
 Milestone 1: fly and dock.

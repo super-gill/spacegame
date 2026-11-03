@@ -5,7 +5,8 @@ import type { PlayerInput, Ship, Station, World } from './types.js';
 /** A blank input: nothing pressed, hold heading. */
 export function emptyInput(): PlayerInput {
   return {
-    aimHeading: null,
+    turnLeft: false,
+    turnRight: false,
     thrustForward: false,
     thrustReverse: false,
     strafeLeft: false,
