@@ -1,6 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { leadPoint } from '../combat.js';
-import type { HullSpec, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
+import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
 
@@ -109,15 +109,15 @@ function huntable(world: World, self: Ship, target: Ship | undefined): target is
 }
 
 /** Why a hunt should stop, or null to carry on. */
-function huntOver(world: World, self: Ship, hull: HullSpec, target: Ship | undefined, brain: PirateBrain): boolean {
-  if (self.structure < hull.structure * PIRATE_TUNING.fleeStructureFraction) return true;
+function huntOver(world: World, self: Ship, stats: ShipStats, target: Ship | undefined, brain: PirateBrain): boolean {
+  if (self.structure < stats.structure * PIRATE_TUNING.fleeStructureFraction) return true;
   if (!target || target.state !== 'flying') return true;
   if (inSecurityZone(world, target.position, PIRATE_TUNING.zoneCaution)) return true;
   if (distance(self.position, target.position) > PIRATE_TUNING.loseRange) return true;
   return brain.modeTicks * world.dt > PIRATE_TUNING.maxHuntSeconds;
 }
 
-export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: PirateBrain): PirateThought {
+export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: PirateBrain): PirateThought {
   const events: WorldEvent[] = [];
   let b: PirateBrain = {
     ...brain,
@@ -133,7 +133,7 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
 
   if (b.mode === 'hunt') {
     const target = b.targetId ? world.ships[b.targetId] : undefined;
-    if (huntOver(world, ship, hull, target, b)) {
+    if (huntOver(world, ship, stats, target, b)) {
       if (b.targetId) events.push({ type: 'huntEnded', shipId: b.targetId, pirateId: ship.id });
       const cooldownTicks = Math.round(PIRATE_TUNING.cooldownSeconds / world.dt);
       b = switchMode(b, 'withdraw', { targetId: null, cooldownTicks });
@@ -143,13 +143,13 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
       const t = target!;
       const back = normalise(sub(ship.position, t.position));
       const holdPoint = add(t.position, scale(back, PIRATE_TUNING.standoff));
-      const closing = arriveVelocity(ship, hull, holdPoint, hull.maxSpeed);
+      const closing = arriveVelocity(ship, stats, holdPoint, stats.maxSpeed);
       const desired = add(t.velocity, closing);
 
       // Point the nose where the shots need to go, and fire when it is there.
-      const gun = ship.weapons.map((w) => world.weapons[w.weaponId]).find((w) => w?.kind === 'fixed');
+      const gun = Object.values(stats.weapons).find((w) => w.kind === 'fixed');
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
-      const input = steerToVelocity(ship, hull, desired, aimPoint);
+      const input = steerToVelocity(ship, stats, desired, aimPoint);
       if (gun) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
@@ -159,16 +159,16 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
     }
   }
 
-  const fitToFight = ship.structure >= hull.structure * PIRATE_TUNING.engageStructureFraction;
+  const fitToFight = ship.structure >= stats.structure * PIRATE_TUNING.engageStructureFraction;
 
   // Retaliate against whoever attacked us, cooldown or not, unless badly hurt.
   if (b.provokedBy) {
     const attacker = world.ships[b.provokedBy];
-    const strongEnough = ship.structure >= hull.structure * PIRATE_TUNING.fleeStructureFraction;
+    const strongEnough = ship.structure >= stats.structure * PIRATE_TUNING.fleeStructureFraction;
     if (strongEnough && huntable(world, ship, attacker)) {
       events.push({ type: 'huntStarted', shipId: attacker.id, pirateId: ship.id });
       b = switchMode(b, 'hunt', { targetId: attacker.id, provokedBy: null });
-      return { input: steerToVelocity(ship, hull, attacker.velocity, attacker.position), brain: b, events };
+      return { input: steerToVelocity(ship, stats, attacker.velocity, attacker.position), brain: b, events };
     }
     b = { ...b, provokedBy: null };
   }
@@ -177,26 +177,26 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
     if (distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
       b = switchMode(b, 'prowl');
     } else {
-      const waypoint = routeAround(ship, hull, b.home, world.stations);
-      const desired = arriveVelocity(ship, hull, waypoint, hull.maxSpeed * 0.7);
-      return { input: steerToVelocity(ship, hull, desired), brain: b, events };
+      const waypoint = routeAround(ship, stats, b.home, world.stations);
+      const desired = arriveVelocity(ship, stats, waypoint, stats.maxSpeed * 0.7);
+      return { input: steerToVelocity(ship, stats, desired), brain: b, events };
     }
   }
 
   // Prowl. Too damaged to hunt and home: leave the sector to repair.
   if (!fitToFight && distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
-    return { input: steerToVelocity(ship, hull, { x: 0, y: 0 }), brain: b, events, depart: true };
+    return { input: steerToVelocity(ship, stats, { x: 0, y: 0 }), brain: b, events, depart: true };
   }
   if (!fitToFight) {
-    const desired = arriveVelocity(ship, hull, routeAround(ship, hull, b.home, world.stations), hull.maxSpeed * 0.7);
-    return { input: steerToVelocity(ship, hull, desired), brain: b, events };
+    const desired = arriveVelocity(ship, stats, routeAround(ship, stats, b.home, world.stations), stats.maxSpeed * 0.7);
+    return { input: steerToVelocity(ship, stats, desired), brain: b, events };
   }
   if (b.cooldownTicks === 0) {
     const target = findTarget(world, ship);
     if (target) {
       events.push({ type: 'huntStarted', shipId: target.id, pirateId: ship.id });
       b = switchMode(b, 'hunt', { targetId: target.id });
-      return { input: steerToVelocity(ship, hull, target.velocity, target.position), brain: b, events };
+      return { input: steerToVelocity(ship, stats, target.velocity, target.position), brain: b, events };
     }
   }
 
@@ -205,6 +205,6 @@ export function thinkPirate(world: World, ship: Ship, hull: HullSpec, brain: Pir
   if (distance(ship.position, patrolPoint) < PIRATE_TUNING.patrolPointReached) {
     b = { ...b, patrolIndex: (b.patrolIndex + 1) % PIRATE_TUNING.patrolPoints };
   }
-  const desired = arriveVelocity(ship, hull, patrolPoint, hull.maxSpeed * PIRATE_TUNING.prowlFraction);
-  return { input: steerToVelocity(ship, hull, desired), brain: b, events };
+  const desired = arriveVelocity(ship, stats, patrolPoint, stats.maxSpeed * PIRATE_TUNING.prowlFraction);
+  return { input: steerToVelocity(ship, stats, desired), brain: b, events };
 }

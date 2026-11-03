@@ -1,7 +1,7 @@
 import { REST_EPSILON } from './constants.js';
 import { wrapAngle } from './angle.js';
 import { computeThrusters, idleThrusters, shipAxes } from './flight.js';
-import type { HullSpec, ShipInput, Ship, Thrusters } from './types.js';
+import type { ShipStats, ShipInput, Ship, Thrusters } from './types.js';
 import { add, length, scale, type Vec2 } from './vec2.js';
 
 /**
@@ -36,29 +36,29 @@ function settle(v: Vec2): Vec2 {
 }
 
 /** Linear acceleration (units/s^2, world space) produced by the given throttles. */
-export function linearAcceleration(hull: HullSpec, heading: number, t: Thrusters): Vec2 {
+export function linearAcceleration(stats: ShipStats, heading: number, t: Thrusters): Vec2 {
   const { forward, right } = shipAxes(heading);
-  const along = (t.main * hull.mainThrust - t.reverse * hull.reverseThrust) / hull.mass;
-  const across = ((t.strafeRight - t.strafeLeft) * hull.lateralThrust) / hull.mass;
+  const along = (t.main * stats.mainThrust - t.reverse * stats.reverseThrust) / stats.mass;
+  const across = ((t.strafeRight - t.strafeLeft) * stats.lateralThrust) / stats.mass;
   return add(scale(forward, along), scale(right, across));
 }
 
 /** Angular acceleration (rad/s^2, positive clockwise) produced by the given throttles. */
-export function angularAcceleration(hull: HullSpec, t: Thrusters): number {
-  return ((t.rotateRight - t.rotateLeft) * hull.rotationThrust) / hull.mass;
+export function angularAcceleration(stats: ShipStats, t: Thrusters): number {
+  return ((t.rotateRight - t.rotateLeft) * stats.rotationThrust) / stats.mass;
 }
 
 /** Advance one ship by `dt` seconds under `input`. Returns a new Ship. */
-export function stepShip(ship: Ship, hull: HullSpec, input: ShipInput, dt: number): Ship {
+export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput, dt: number): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
-  const thrusters = computeThrusters(ship, hull, input, dt);
+  const thrusters = computeThrusters(ship, stats, input, dt);
 
-  let velocity = add(ship.velocity, scale(linearAcceleration(hull, ship.heading, thrusters), dt));
-  velocity = settle(clampLength(velocity, hull.maxSpeed));
+  let velocity = add(ship.velocity, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
+  velocity = settle(clampLength(velocity, stats.maxSpeed));
 
-  let angularVelocity = ship.angularVelocity + angularAcceleration(hull, thrusters) * dt;
-  angularVelocity = clamp(angularVelocity, hull.maxTurnRate);
+  let angularVelocity = ship.angularVelocity + angularAcceleration(stats, thrusters) * dt;
+  angularVelocity = clamp(angularVelocity, stats.maxTurnRate);
   if (Math.abs(angularVelocity) < REST_EPSILON) angularVelocity = 0;
 
   const position = add(ship.position, scale(velocity, dt));

@@ -1,6 +1,8 @@
 import {
   buyGood,
   createStarterWorld,
+  fitModule,
+  unfitModule,
   distance,
   sellGood,
   type TradeRefusal,
@@ -9,6 +11,7 @@ import {
   nearestDockableStation,
   pilotShip,
   respawnPilot,
+  shipStats,
   stepWorld,
   TRACTOR_RANGE,
   wrapAngle,
@@ -25,6 +28,7 @@ import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWo
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
 import { MarketPanel, type TradeRequest } from './market-panel.js';
+import { FIT_REFUSALS, OutfittingPanel, type RefitRequest } from './outfitting-panel.js';
 import {
   COLOUR,
   drawExplosion,
@@ -37,7 +41,6 @@ import {
   drawStation,
   drawTargetBracket,
   drawTractor,
-  drawTurret,
   drawVelocityVector,
   drawWreck,
   type ShipStyle,
@@ -86,6 +89,7 @@ let me = loadLocalPilot();
 const settings = loadSettings();
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
+const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
 
 const REFUSALS: Record<TradeRefusal, string> = {
   noShip: 'You have no ship.',
@@ -114,6 +118,27 @@ function trade(request: TradeRequest): void {
   }
 }
 
+/** Pilot command: fit or remove a module at the station we are docked at. */
+function refit(request: RefitRequest): void {
+  const r = request.moduleId
+    ? fitModule(current, me.id, request.mountId, request.moduleId)
+    : unfitModule(current, me.id, request.mountId);
+  if (!r.ok) {
+    ui.notify(FIT_REFUSALS[r.reason], 'warn');
+    return;
+  }
+  current = r.world;
+  const e = r.event;
+  if (e.type === 'fitted') {
+    const name = current.modules[e.moduleId]?.name ?? e.moduleId;
+    const paid = e.cost >= 0 ? `for ${e.cost.toLocaleString('en-GB')} cr` : `and got ${(-e.cost).toLocaleString('en-GB')} cr back`;
+    ui.notify(`Fitted ${name} ${paid}`);
+  } else if (e.type === 'unfitted') {
+    const name = current.modules[e.moduleId]?.name ?? e.moduleId;
+    ui.notify(`Removed ${name}, +${e.refund.toLocaleString('en-GB')} cr`);
+  }
+}
+
 // Start from the saved world if there is one. joinPilot leaves a returning
 // pilot exactly as they were, and gives a new one a starter ship.
 const stored = loadStoredWorld();
@@ -130,6 +155,7 @@ function replaceWorld(world: World): void {
   const ship = myShip(current);
   if (ship) camera.snapTo(ship.position);
   market.invalidate();
+  outfitting.invalidate();
 }
 
 // Saving: autosave every few seconds and whenever the tab is hidden or closed.
@@ -355,15 +381,14 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
   for (const ship of Object.values(current.ships)) {
+    if (ship.state !== 'flying') continue;
     const hull = current.hulls[ship.hullId]!;
+    const stats = shipStats(current, ship);
     const style = shipStyle(current, ship, mine);
     const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
-    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', settings.showLabels ? style : { colour: style.colour });
-    if (ship.state !== 'flying') continue;
-    for (const w of ship.weapons) {
-      if (current.weapons[w.weaponId]?.kind === 'turret') drawTurret(ctx!, camera, shipView.position, w.aim, hull, style.colour);
-    }
-    if (!mine || ship.id !== mine.id) drawHealthBars(ctx!, camera, ship, hull, shipView.position);
+    const art = { hull, fit: ship.fit, modules: current.modules, manufacturers: current.manufacturers, weapons: ship.weapons, thrusters: ship.thrusters, stats };
+    drawShip(ctx!, camera, shipView, art, false, settings.showLabels ? style : { colour: style.colour });
+    if (!mine || ship.id !== mine.id) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
   }
 
   for (const p of current.projectiles) {
@@ -390,14 +415,19 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
-    const gun = mine.weapons.map((w) => current.weapons[w.weaponId]).find((w) => w?.kind === 'fixed');
+    const gun = Object.values(shipStats(current, mine).weapons).find((w) => w.kind === 'fixed');
     if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
       drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
     }
   }
 
-  if (mine?.state === 'docked') market.update(current, me.id);
-  else market.invalidate();
+  if (mine?.state === 'docked') {
+    if (ui.dockTab === 'market') market.update(current, me.id);
+    else outfitting.update(current, me.id);
+  } else {
+    market.invalidate();
+    outfitting.invalidate();
+  }
   ui.update(current, mine, fpsSmoothed);
 }
 

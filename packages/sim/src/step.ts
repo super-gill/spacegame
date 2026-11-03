@@ -6,8 +6,8 @@ import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
 import { stepShip } from './ship.js';
-import { loadedHull } from './trade.js';
-import type { HullSpec, Projectile, Ship, ShipInput, World, WorldEvent } from './types.js';
+import { shipStats } from './stats.js';
+import type { Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /**
@@ -46,10 +46,9 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   for (const id of Object.keys(world.ships).sort()) {
     let ship = world.ships[id]!;
     const input = inputs[id] ?? npc.inputs[id] ?? emptyInput();
-    const baseHull = world.hulls[ship.hullId];
-    if (!baseHull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${id}"`);
-    // Cargo adds mass, so the ship flies as its loaded hull.
-    const hull = loadedHull(baseHull, ship, world.goods);
+    // The ship flies as its fit and cargo make it. Fits only change while
+    // docked, so these hold for the whole tick.
+    const stats = shipStats(world, ship);
 
     // Docking is handled before movement so a docked ship does not drift.
     if (input.toggleDock) {
@@ -73,7 +72,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       events.push({ type: 'flightModeChanged', shipId: ship.id, mode });
     }
 
-    const moved = collideWithStations(stepShip(ship, hull, input, world.dt), hull, world.stations);
+    const moved = collideWithStations(stepShip(ship, stats, input, world.dt), stats, world.stations);
     events.push(...moved.events);
     damage.push(...moved.damage);
 
@@ -88,25 +87,22 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const validTarget = target && target.state === 'flying' && target.id !== id ? target : null;
     if (targeted.targetId && !validTarget) targeted = { ...targeted, targetId: null };
 
-    const fired = fireWeapons(targeted, hull, world.weapons, input, validTarget, world.dt, nextEntityId);
+    const fired = fireWeapons(targeted, stats, input, validTarget, world.dt, nextEntityId);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
 
-    ship = regenerateShield(fired.ship, hull, world.dt);
+    ship = regenerateShield(fired.ship, stats, world.dt);
     if (ship.state === 'docked') {
       // Stations repair docked ships: shields at once, structure over time.
-      const structure = Math.min(hull.structure, ship.structure + DOCK_REPAIR_PER_SECOND * world.dt);
-      ship = { ...ship, shield: hull.shield, structure };
+      const structure = Math.min(stats.structure, ship.structure + DOCK_REPAIR_PER_SECOND * world.dt);
+      ship = { ...ship, shield: stats.shield, structure };
     }
     ships[id] = { ...ship, tractorActive: input.tractor && ship.state === 'flying' };
   }
 
   // 3. Rams.
-  const hullFor = (s: Ship): HullSpec | undefined => {
-    const h = world.hulls[s.hullId];
-    return h ? loadedHull(h, s, world.goods) : undefined;
-  };
-  const rams = collideShips(ships, hullFor);
+  const statsFor = (s: Ship): ShipStats | undefined => (world.hulls[s.hullId] ? shipStats(world, s) : undefined);
+  const rams = collideShips(ships, statsFor);
   ships = rams.ships;
   events.push(...rams.events);
   damage.push(...rams.damage);
@@ -120,9 +116,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const npcs = { ...npc.npcs };
   for (const d of damage) {
     const target = ships[d.shipId];
-    const hull = target ? world.hulls[target.hullId] : undefined;
-    if (!target || !hull || target.structure <= 0) continue;
-    ships[d.shipId] = applyDamage(target, hull, d.amount, world.dt);
+    if (!target || target.structure <= 0) continue;
+    ships[d.shipId] = applyDamage(target, shipStats(world, target), d.amount, world.dt);
     killers[d.shipId] = d.by;
     events.push({ type: 'damaged', shipId: d.shipId, by: d.by, amount: d.amount, cause: d.cause });
 

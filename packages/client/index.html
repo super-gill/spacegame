@@ -13,12 +13,17 @@
     <div id="target-panel" class="hud target-panel hidden"></div>
     <div id="dock-panel" class="dock-panel hidden">
       <h1 id="dock-station-name">Station</h1>
+      <div class="dock-tabs" role="tablist" aria-label="Station services">
+        <button id="tab-market" class="dock-tab" type="button" role="tab" aria-selected="true">Market</button>
+        <button id="tab-outfitting" class="dock-tab" type="button" role="tab" aria-selected="false">Outfitting</button>
+      </div>
       <div id="market-container"></div>
+      <div id="outfitting-container" class="hidden"></div>
       <button id="undock-button" type="button">Undock [F]</button>
     </div>
     <div id="death-panel" class="dock-panel hidden">
       <h1>Ship destroyed</h1>
-      <p class="muted">You can take a new Sparrow at Harbour Station.</p>
+      <p class="muted">You can take a new Meridian Courier at Harbour Station.</p>
       <button id="respawn-button" type="button">Respawn</button>
     </div>
     <div id="toast" class="toast hidden"></div>

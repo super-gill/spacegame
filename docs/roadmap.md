@@ -10,8 +10,8 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 3a Targeting | Click and Tab targeting, weapons hot/cold, self-engaging turrets, Space fires fixed guns, lead marker | Done, 0.4.0 |
 | 4 Trade | Cargo hold, two stations with scripted prices, buy and sell UI | Done, 0.5.0 |
 | 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
-| 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Next |
-| 6b Ship mart | Station pads, docking to a pad, ships for sale parked on pads, buying and switching owned ships | |
+| 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Done, 0.7.0 |
+| 6b Ship mart | Station pads, docking to a pad, ships for sale parked on pads, buying and switching owned ships | Next |
 | 6c Fit, continued | Oversized modules across two mounts, turret arcs, fire groups, ammunition, power management | |
 | 7 Law | Witnessed crime, reputation record, security response, bounties | |
 | 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic | |
@@ -23,7 +23,7 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Known gaps in 0.6.0
+## Known gaps in 0.7.0
 
 - One world per browser. Several save slots would need a picker; export and import cover it for now.
 - Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ship stays, flown by nobody). A way to carry your pilot over comes before the shared world.
@@ -36,6 +36,10 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 - Wrecks cannot be salvaged yet (milestone 9).
 - Pressing the same one-shot key twice within one sim tick (1/60 s) counts once.
 - No sound.
-- No save; refreshing resets the sector.
+- Removed modules vanish (half their price is refunded); there is nowhere to store them until ship storage arrives.
+- No keyboard way to select mounts in the outfitting screen.
+- On screens 720 pixels tall the docked panel scrolls to reach the Undock button (F still undocks).
+- The new hulls, modules and fights are balanced on paper and by test, not yet by hand.
+- Module and hull names are placeholders.
 - Fixed zoom.
 - Key bindings are not remappable.

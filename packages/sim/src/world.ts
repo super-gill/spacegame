@@ -3,6 +3,9 @@ import { GOODS } from './goods.js';
 import { buildShip } from './factory.js';
 import { HULLS } from './hulls.js';
 import { runSpawners } from './lifecycle.js';
+import { LOADOUTS } from './loadouts.js';
+import { MANUFACTURERS } from './manufacturers.js';
+import { MODULES } from './modules.js';
 import type { Pilot, Ship, ShipInput, Spawner, Station, World } from './types.js';
 import { WEAPONS } from './weapons.js';
 import { add, fromAngle, scale } from './vec2.js';
@@ -29,8 +32,8 @@ export function emptyInput(): ShipInput {
 /** The station new pilots start next to. */
 export const STARTER_STATION_ID = 'station-harbour';
 
-/** Hull every new pilot is given. */
-export const STARTER_HULL_ID = 'sparrow';
+/** Loadout every new pilot is given: a Meridian civilian starter. */
+export const STARTER_LOADOUT_ID = 'meridian-starter';
 
 /** How far from the starter station a new pilot's ship appears. */
 const SPAWN_DISTANCE = 650;
@@ -43,7 +46,8 @@ const SPAWN_DISTANCE = 650;
  * files.
  *
  * New pilots spawn inside Harbour Station's security zone, so they are
- * never hunted the moment they arrive.
+ * never hunted the moment they arrive. Harbour has outfitting; Ridge
+ * Outpost does not, so refitting means a trip home.
  */
 export function createStarterWorld(): World {
   const harbour: Station = {
@@ -61,6 +65,7 @@ export function createStarterWorld(): World {
       medicine: { ask: 55, bid: 47 },
       scrap: { ask: null, bid: 7 },
     },
+    outfitting: true,
   };
   const outpost: Station = {
     id: 'station-ridge',
@@ -77,12 +82,13 @@ export function createStarterWorld(): World {
       medicine: { ask: 86, bid: 75 },
       scrap: { ask: null, bid: 9 },
     },
+    outfitting: false,
   };
 
   // The trader starts docked at Harbour and leaves after a short wait.
   const trader: Spawner = {
     id: 'trader',
-    hullId: 'mule',
+    loadoutId: 'tessaract-trader',
     position: { ...harbour.position },
     heading: -0.34,
     dockedAt: harbour.id,
@@ -98,7 +104,7 @@ export function createStarterWorld(): World {
   const pirateHome = { x: 2600, y: -300 };
   const pirate: Spawner = {
     id: 'pirate',
-    hullId: 'jackal',
+    loadoutId: 'kessari-raider',
     position: pirateHome,
     heading: Math.PI,
     dockedAt: null,
@@ -131,6 +137,9 @@ export function createStarterWorld(): World {
     loot: [],
     stations: { [harbour.id]: harbour, [outpost.id]: outpost },
     hulls: { ...HULLS },
+    modules: { ...MODULES },
+    loadouts: { ...LOADOUTS },
+    manufacturers: { ...MANUFACTURERS },
     weapons: { ...WEAPONS },
     goods: { ...GOODS },
     nextEntityId: 1,
@@ -157,17 +166,16 @@ export function starterShipId(pilotId: string): string {
  */
 function issueStarterShip(world: World, pilot: Pilot): World {
   const station = world.stations[STARTER_STATION_ID];
-  const hull = world.hulls[STARTER_HULL_ID];
+  const loadout = world.loadouts[STARTER_LOADOUT_ID];
   if (!station) throw new Error(`Starter station "${STARTER_STATION_ID}" missing from world`);
-  if (!hull) throw new Error(`Starter hull "${STARTER_HULL_ID}" missing from world`);
+  if (!loadout) throw new Error(`Starter loadout "${STARTER_LOADOUT_ID}" missing from world`);
 
   const index = Object.keys(world.pilots).sort().indexOf(pilot.id);
   const angle = Math.max(0, index) * (Math.PI / 3);
   const n = pilot.shipsIssued + 1;
-  const ship = buildShip({
+  const ship = buildShip(world, {
     id: pilotShipId(pilot.id, n),
-    hull,
-    weapons: world.weapons,
+    loadout,
     ownerId: pilot.id,
     position: add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE)),
     heading: angle + Math.PI, // facing the station

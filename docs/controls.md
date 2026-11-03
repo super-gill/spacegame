@@ -64,11 +64,18 @@ Assists fire the ship's real thrusters, so you will see the flames, and a heavie
 | --- | --- | --- |
 | Dock | F | Only when the HUD shows `DOCK <station>`; you must be inside the dashed range ring and slower than the docking speed limit |
 | Undock | F or the Undock button | Places you just outside the station facing the way you were |
-| Trade | Buttons in the docked panel | Buy 1, Buy max (as many as your credits and hold allow), Sell 1, Sell all |
+| Trade | Buttons in the Market tab | Buy 1, Buy max (as many as your credits and hold allow), Sell 1, Sell all |
+| Select a mount | Click it in the Outfitting tab, on the drawing or in the mount list | Lists the modules that fit it |
+| Preview a module | Hover it | Shows stats after the change beside stats now, even for a change that would be refused |
+| Fit or remove | Buttons in the Outfitting tab | Fit pays the module's price less half the price of what it replaces; Remove pays back half |
 
 If docking is refused a message says why: too far, or too fast.
 
-The docked panel is the station market: each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
+The docked panel has two tabs.
+
+**Market** lists each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
+
+**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). There is no keyboard way to select mounts yet.
 
 ## Interface
 
@@ -104,4 +111,4 @@ Bottom left, top to bottom:
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
 - Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.
 - Loot canisters are small orange diamonds. Wrecks are dashed outlines that fade.
-- When your ship is destroyed a panel offers **Respawn** in a new Sparrow at Harbour Station.
+- When your ship is destroyed a panel offers **Respawn** in a new Meridian Courier at Harbour Station.

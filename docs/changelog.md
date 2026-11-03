@@ -4,10 +4,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-03
+
+Milestone 6a: modular ships.
+
 ### Added
-- `docs/ships.md`: modular ship design, fitting rules, and the first build slice.
-- `docs/races.md`: races, manufacturers and the decisions behind them.
-- Roadmap milestone 6 split into 6a modular ships, 6b ship mart, 6c the rest of fitting.
+- Hulls with mount points (type, size, position, facing, services), modules, manufacturers, loadouts and hull bonuses, all as catalogue data.
+- Derived ship stats (`shipStats`, `fitStats`): mass, thrusts, shields, structure, cargo, power and weapons worked out from hull, fit and cargo whenever needed.
+- Fitting rules and refits: mount type, size and services, power within reactor output, cargo still fits, credits. Refused changes leave the world untouched and say why.
+- Hulls: Meridian Courier (civilian starter), Kessari Wedge (frigate), Tessaract Spine (hauler, six bays). The Sparrow stays as a sealed development hull.
+- 17 modules across engines, thruster packages, reactors, shield generators, armour, cargo pods and containers, and small and medium fixed weapons and turrets, including a medium autocannon and a medium turret.
+- Role and race bonuses on the three new hulls, applying only to full-size modules.
+- Outfitting tab in the docked panel at Harbour Station: ship drawing with selectable mounts, stats now and after on hover, fit and remove with prices.
+- Ships drawn from their fit: hull outline plus each module's silhouette at its mount, tinted by its maker's race; engine plumes from each fitted engine.
+- `docs/ships.md`, `docs/races.md` and `docs/coordination.md`, with contributing rules for parallel chats.
+- Tests for catalogue integrity, derived stats, bonuses, fitting rules and prices, refits, weapon state across refits, and the starter outlasting the pirate raider.
+
+### Changed
+- `HullSpec` is a frame only. Flight, physics, combat, cargo, collisions, NPC steering, loot and scrap all read derived stats.
+- Weapons fire per mount, with hull damage bonuses applied; weapon sizes are S, M, L and XL.
+- New pilots and respawns start in a Meridian Courier with the starter fit, including light armour.
+- The NPC trader flies a Tessaract Spine and the pirate a Kessari Wedge in a raider fit; the Mule and Jackal are gone.
+- Scrap on destruction comes from built mass (hull plus modules), so ships drop more scrap than before.
+- Removing or replacing a module pays back half its price.
+- The docked panel sits clear of the flight HUD and menu buttons on screens 900 pixels wide or more.
+
+### Breaking
+- Save format version 2. Saves from 0.6 and earlier are refused with a clear message and kept aside, and a new world starts.
 
 ## [0.6.0] - 2026-11-03
 

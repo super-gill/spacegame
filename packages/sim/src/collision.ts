@@ -7,7 +7,7 @@ import {
   IMPACT_SAFE_DELTA_V,
   SHIP_RESTITUTION,
 } from './constants.js';
-import type { HullSpec, Ship, Station, WorldEvent } from './types.js';
+import type { ShipStats, Ship, Station, WorldEvent } from './types.js';
 import { add, distance, scale, sub, type Vec2 } from './vec2.js';
 
 /**
@@ -32,7 +32,7 @@ export interface CollisionResult {
   damage: Damage[];
 }
 
-export function collideWithStations(ship: Ship, hull: HullSpec, stations: Record<string, Station>): CollisionResult {
+export function collideWithStations(ship: Ship, stats: ShipStats, stations: Record<string, Station>): CollisionResult {
   if (ship.state !== 'flying') return { ship, events: [], damage: [] };
 
   let s = ship;
@@ -40,7 +40,7 @@ export function collideWithStations(ship: Ship, hull: HullSpec, stations: Record
   const damage: Damage[] = [];
 
   for (const station of Object.values(stations)) {
-    const minDist = station.radius + hull.radius;
+    const minDist = station.radius + stats.radius;
     const d = distance(s.position, station.position);
     if (d >= minDist) continue;
 
@@ -74,12 +74,11 @@ export interface ShipCollisionResult {
 
 /**
  * Resolve every overlapping pair of flying ships. Pairs are visited in
- * sorted id order so the result is deterministic. `hullFor` gives each
- * ship's hull as it flies, cargo mass included, so a laden ship rams
- * harder. Fine for the handful of
- * ships in a sector; a spatial grid can come when sectors get busy.
+ * sorted id order so the result is deterministic. `statsFor` gives each
+ * ship's stats as it flies, cargo mass included, so a laden ship rams
+ * harder. Fine for the handful of ships in a sector; a spatial grid can come when sectors get busy.
  */
-export function collideShips(ships: Record<string, Ship>, hullFor: (ship: Ship) => HullSpec | undefined): ShipCollisionResult {
+export function collideShips(ships: Record<string, Ship>, statsFor: (ship: Ship) => ShipStats | undefined): ShipCollisionResult {
   const out: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
   const damage: Damage[] = [];
@@ -91,8 +90,8 @@ export function collideShips(ships: Record<string, Ship>, hullFor: (ship: Ship) 
     for (let j = i + 1; j < ids.length; j++) {
       const a = out[ids[i]!]!;
       const b = out[ids[j]!]!;
-      const ha = hullFor(a);
-      const hb = hullFor(b);
+      const ha = statsFor(a);
+      const hb = statsFor(b);
       if (!ha || !hb) continue;
 
       const minDist = ha.radius + hb.radius;

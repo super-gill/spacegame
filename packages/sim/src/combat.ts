@@ -1,6 +1,6 @@
 import { angleDelta, wrapAngle } from './angle.js';
 import { TURRET_FIRE_TOLERANCE } from './constants.js';
-import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, Station, WeaponSpec } from './types.js';
+import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, ShipStats, Station } from './types.js';
 import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
@@ -45,12 +45,13 @@ export interface FireResult {
  *   and in range. A fast target crossing close by can outrun the slew:
  *   that is turret tracking.
  *
- * New projectiles start at the hull edge along the weapon's bearing.
+ * Each weapon fires as its mount's effective spec in `stats.weapons`, so
+ * hull damage bonuses apply. New projectiles start at the hull edge along
+ * the weapon's bearing.
  */
 export function fireWeapons(
   ship: Ship,
-  hull: HullSpec,
-  catalogue: Record<string, WeaponSpec>,
+  stats: ShipStats,
   input: ShipInput,
   target: Ship | null,
   dt: number,
@@ -62,7 +63,7 @@ export function fireWeapons(
   let idsUsed = 0;
 
   const weapons = ship.weapons.map((w) => {
-    const spec = catalogue[w.weaponId];
+    const spec = stats.weapons[w.mountId];
     if (!spec) return w;
 
     let aim = ship.heading;
@@ -85,7 +86,7 @@ export function fireWeapons(
       projectiles.push({
         id: `p${nextId + idsUsed}`,
         ownerShipId: ship.id,
-        position: add(ship.position, scale(dir, hull.radius + 2)),
+        position: add(ship.position, scale(dir, stats.radius + 2)),
         velocity: add(ship.velocity, scale(dir, spec.projectileSpeed)),
         damage: spec.damage,
         ticksLeft: Math.round(spec.range / spec.projectileSpeed / dt),
@@ -172,22 +173,22 @@ export function stepProjectiles(
 }
 
 /** Apply damage to shields first, then structure. Resets the shield recharge delay. */
-export function applyDamage(ship: Ship, hull: HullSpec, amount: number, dt: number): Ship {
+export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: number): Ship {
   const toShield = Math.min(ship.shield, amount);
   const toStructure = amount - toShield;
   return {
     ...ship,
     shield: ship.shield - toShield,
     structure: Math.max(0, ship.structure - toStructure),
-    shieldDelayTicks: Math.round(hull.shieldRegenDelay / dt),
+    shieldDelayTicks: Math.round(stats.shieldRegenDelay / dt),
   };
 }
 
 /** Count down the recharge delay, then recharge shields towards full. */
-export function regenerateShield(ship: Ship, hull: HullSpec, dt: number): Ship {
+export function regenerateShield(ship: Ship, stats: ShipStats, dt: number): Ship {
   if (ship.shieldDelayTicks > 0) return { ...ship, shieldDelayTicks: ship.shieldDelayTicks - 1 };
-  if (ship.shield >= hull.shield) return ship;
-  return { ...ship, shield: Math.min(hull.shield, ship.shield + hull.shieldRegen * dt) };
+  if (ship.shield >= stats.shield) return ship;
+  return { ...ship, shield: Math.min(stats.shield, ship.shield + stats.shieldRegen * dt) };
 }
 
 /** Damage from a change in velocity in an impact. Zero below the safe delta-v. */

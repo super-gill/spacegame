@@ -9,6 +9,7 @@ import {
   WRECK_LIFETIME,
 } from './constants.js';
 import { buildShip } from './factory.js';
+import { fitStats, shipStats } from './stats.js';
 import { cargoFree } from './trade.js';
 import type { Loot, Ship, Spawner, World, WorldEvent, Wreck } from './types.js';
 import { add, distance, fromAngle, normalise, scale, sub } from './vec2.js';
@@ -69,14 +70,15 @@ export function destroyShips(world: World, killers: Record<string, string | null
     };
     wrecks.push(wreck);
 
-    // What spills: scrap from the hull, plus the surviving part of each good aboard.
+    // What spills: scrap from the hull and its modules, plus the surviving part of each good aboard.
     const hull = world.hulls[ship.hullId];
+    const builtMass = hull ? fitStats(world, hull, ship.fit).mass : 0;
     const spill: Record<string, number> = {};
     for (const [good, qty] of Object.entries(ship.hold)) {
       const kept = Math.floor(qty * CARGO_SURVIVAL_FRACTION);
       if (kept > 0) spill[good] = kept;
     }
-    spill['scrap'] = (spill['scrap'] ?? 0) + Math.round((hull?.mass ?? 0) * SCRAP_PER_MASS);
+    spill['scrap'] = (spill['scrap'] ?? 0) + Math.round(builtMass * SCRAP_PER_MASS);
 
     // Each good in up to MAX_LOOT_CANISTERS canisters, fanned out round the wreck.
     const goodsSpilled = Object.keys(spill).sort();
@@ -161,8 +163,11 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
   const out: Loot[] = [];
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
+  // Cargo capacity and hull radius do not change mid-tick, so look them up once.
+  const stats: Record<string, { cargoCapacity: number; radius: number }> = {};
+  for (const s of Object.values(ships)) if (world.hulls[s.hullId]) stats[s.id] = shipStats(world, s);
   const beams = Object.values(ships)
-    .filter((s) => s.tractorActive && s.state === 'flying' && world.hulls[s.hullId] && cargoFree(s, world.hulls[s.hullId]!) > 0)
+    .filter((s) => s.tractorActive && s.state === 'flying' && stats[s.id] && cargoFree(s, stats[s.id]!) > 0)
     .sort((a, b) => (a.id < b.id ? -1 : 1));
 
   for (const item of world.loot) {
@@ -171,7 +176,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
     let puller: Ship | null = null;
     let best = TRACTOR_RANGE;
     for (const s of beams) {
-      if (cargoFree(updated[s.id]!, world.hulls[s.hullId]!) <= 0) continue; // filled up this tick
+      if (cargoFree(updated[s.id]!, stats[s.id]!) <= 0) continue; // filled up this tick
       const d = distance(s.position, item.position);
       if (d <= best) {
         best = d;
@@ -181,10 +186,10 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
 
     let velocity = item.velocity;
     if (puller) {
-      const radius = world.hulls[puller.hullId]?.radius ?? 0;
+      const radius = stats[puller.id]!.radius;
       if (best <= radius + SCOOP_DISTANCE) {
         const current = updated[puller.id]!;
-        const taken = Math.min(item.amount, cargoFree(current, world.hulls[current.hullId]!));
+        const taken = Math.min(item.amount, cargoFree(current, stats[current.id]!));
         const hold = { ...current.hold, [item.item]: (current.hold[item.item] ?? 0) + taken };
         updated[puller.id] = { ...current, hold };
         events.push({ type: 'lootCollected', shipId: puller.id, item: item.item, amount: taken });
@@ -209,13 +214,12 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
 
 /** Spawn an NPC ship and brain from a spawner. */
 function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
-  const hull = world.hulls[sp.hullId];
-  if (!hull) return { world, spawner: sp };
+  const loadout = world.loadouts[sp.loadoutId];
+  if (!loadout || !world.hulls[loadout.hullId]) return { world, spawner: sp };
   const id = `npc-${sp.id}-${sp.spawned + 1}`;
-  const ship: Ship = buildShip({
+  const ship: Ship = buildShip(world, {
     id,
-    hull,
-    weapons: world.weapons,
+    loadout,
     ownerId: null,
     position: sp.position,
     heading: sp.heading,

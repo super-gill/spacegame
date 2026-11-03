@@ -11,7 +11,22 @@ export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
 export { HULLS } from './hulls.js';
+export { MODULES } from './modules.js';
+export { LOADOUTS } from './loadouts.js';
+export { MANUFACTURERS } from './manufacturers.js';
 export { WEAPONS, weaponDps } from './weapons.js';
+export { fitStats, shipStats, cargoMass, bonusApplies, type Catalogues } from './stats.js';
+export {
+  fitModule,
+  unfitModule,
+  planRefit,
+  mountRefusal,
+  resaleValue,
+  weaponStatesFor,
+  type FitRefusal,
+  type FitResult,
+  type RefitPlan,
+} from './fitting.js';
 export { GOODS } from './goods.js';
 export {
   buyGood,
@@ -19,8 +34,6 @@ export {
   maxBuyable,
   cargoUsed,
   cargoFree,
-  cargoMass,
-  loadedHull,
   scriptedPrices,
   type PriceSource,
   type TradeRefusal,
@@ -38,7 +51,7 @@ export {
   pilotShipId,
   starterShipId,
   STARTER_STATION_ID,
-  STARTER_HULL_ID,
+  STARTER_LOADOUT_ID,
 } from './world.js';
 export { stepWorld } from './step.js';
 export {

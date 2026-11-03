@@ -1,4 +1,5 @@
-import type { GoodSpec, HullSpec, MarketEntry, Ship, World, WorldEvent } from './types.js';
+import { shipStats } from './stats.js';
+import type { MarketEntry, Ship, ShipStats, World, WorldEvent } from './types.js';
 
 /**
  * Trade: cargo, prices, and buying and selling while docked.
@@ -31,24 +32,9 @@ export function cargoUsed(ship: Ship): number {
   return Object.values(ship.hold).reduce((n, q) => n + q, 0);
 }
 
-/** Free cargo space. */
-export function cargoFree(ship: Ship, hull: HullSpec): number {
-  return Math.max(0, hull.cargoCapacity - cargoUsed(ship));
-}
-
-/** Mass the cargo adds to the ship. */
-export function cargoMass(ship: Ship, goods: Record<string, GoodSpec>): number {
-  return Object.entries(ship.hold).reduce((m, [id, q]) => m + (goods[id]?.unitMass ?? 0) * q, 0);
-}
-
-/**
- * The hull as this ship actually flies it: the same spec with the cargo's
- * mass added. Flight, NPC steering and collisions use this, so a full
- * hold makes a ship slower to accelerate, turn and stop, and hit harder.
- */
-export function loadedHull(hull: HullSpec, ship: Ship, goods: Record<string, GoodSpec>): HullSpec {
-  const extra = cargoMass(ship, goods);
-  return extra > 0 ? { ...hull, mass: hull.mass + extra } : hull;
+/** Free cargo space, given the ship's stats (its cargo pods decide capacity). */
+export function cargoFree(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity'>): number {
+  return Math.max(0, stats.cargoCapacity - cargoUsed(ship));
 }
 
 export type TradeRefusal =
@@ -78,10 +64,9 @@ export function maxBuyable(world: World, pilotId: string, goodId: string, prices
   const d = dockedShip(world, pilotId);
   if (typeof d === 'string') return 0;
   const ask = prices.quote(world, d.stationId, goodId)?.ask;
-  const hull = world.hulls[d.ship.hullId];
   const pilot = world.pilots[pilotId];
-  if (ask == null || ask <= 0 || !hull || !pilot) return 0;
-  return Math.min(Math.floor(pilot.credits / ask), cargoFree(d.ship, hull));
+  if (ask == null || ask <= 0 || !pilot) return 0;
+  return Math.min(Math.floor(pilot.credits / ask), cargoFree(d.ship, shipStats(world, d.ship)));
 }
 
 /** Buy `quantity` units of a good from the station the pilot is docked at. All or nothing. */
@@ -93,10 +78,9 @@ export function buyGood(world: World, pilotId: string, goodId: string, quantity:
   if (ask == null) return { ok: false, world, reason: 'notTraded' };
 
   const pilot = world.pilots[pilotId]!;
-  const hull = world.hulls[d.ship.hullId]!;
   const cost = ask * quantity;
   if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
-  if (quantity > cargoFree(d.ship, hull)) return { ok: false, world, reason: 'space' };
+  if (quantity > cargoFree(d.ship, shipStats(world, d.ship))) return { ok: false, world, reason: 'space' };
 
   const hold = { ...d.ship.hold, [goodId]: (d.ship.hold[goodId] ?? 0) + quantity };
   return {

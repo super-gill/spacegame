@@ -5,6 +5,9 @@ import { collideShips, collideWithStations } from '../collision.js';
 import { FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME, TRACTOR_RANGE } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { HULLS } from '../hulls.js';
+import { LOADOUTS } from '../loadouts.js';
+import { shipStats } from '../stats.js';
+import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { stepWorld } from '../step.js';
 import type { PirateBrain, Projectile, Ship, Station, World, WorldEvent } from '../types.js';
 import { distance, length } from '../vec2.js';
@@ -12,15 +15,18 @@ import { WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
 
 const SECOND = 60;
-const sparrow = HULLS['sparrow']!;
-const mule = HULLS['mule']!;
+/** Short names for the loadouts these tests build ships from. */
+const FITS = { sparrow: 'sparrow-dev', hauler: 'tessaract-trader', starter: 'meridian-starter', raider: 'kessari-raider' } as const;
+const sparrow = loadoutStats(FITS.sparrow);
+const hauler = loadoutStats(FITS.hauler);
+const starter = loadoutStats(FITS.starter);
+const statsOf = (s: Ship) => shipStats(TEST_CATALOGUES, s);
 
-function ship(id: string, hullId = 'sparrow', overrides: Partial<Ship> = {}): Ship {
+function ship(id: string, fit: keyof typeof FITS = 'sparrow', overrides: Partial<Ship> = {}): Ship {
   return {
-    ...buildShip({
+    ...buildShip(TEST_CATALOGUES, {
       id,
-      hull: HULLS[hullId]!,
-      weapons: WEAPONS,
+      loadout: LOADOUTS[FITS[fit]]!,
       ownerId: null,
       position: { x: 0, y: 0 },
       heading: 0,
@@ -49,14 +55,14 @@ describe('weapon catalogue', () => {
 
   it('the Sparrow carries one fixed gun and one turret', () => {
     const s = ship('s');
-    expect(s.weapons.map((w) => WEAPONS[w.weaponId]!.kind).sort()).toEqual(['fixed', 'turret']);
+    expect(s.weapons.map((w) => sparrow.weapons[w.mountId]!.kind).sort()).toEqual(['fixed', 'turret']);
   });
 });
 
 describe('firing', () => {
   it('fixed guns fire along the heading and inherit the ship velocity', () => {
     const s = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
-    const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, 1);
+    const r = fireWeapons(s, sparrow, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, 1);
     expect(r.projectiles).toHaveLength(1);
     const p = r.projectiles[0]!;
     expect(p.velocity.x).toBeCloseTo(50, 9);
@@ -67,7 +73,7 @@ describe('firing', () => {
     let s = ship('s');
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const r = fireWeapons(s, sparrow, WEAPONS, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, i);
+      const r = fireWeapons(s, sparrow, { ...emptyInput(), fireFixed: true }, null, FIXED_DT, i);
       s = r.ship;
       shots += r.projectiles.length;
     }
@@ -76,12 +82,12 @@ describe('firing', () => {
     expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
   });
 
-  const turretAim = (s: Ship) => s.weapons.find((w) => WEAPONS[w.weaponId]!.kind === 'turret')!.aim;
+  const turretAim = (s: Ship) => s.weapons.find((w) => sparrow.weapons[w.mountId]!.kind === 'turret')!.aim;
 
   it('hot turrets slew towards the target no faster than their turn rate', () => {
     const s = ship('s', 'sparrow', { weaponsHot: true, targetId: 't' });
     const t = ship('t', 'sparrow', { position: { x: 0, y: 500 } });
-    const r = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, 1);
+    const r = fireWeapons(s, sparrow, emptyInput(), t, FIXED_DT, 1);
     expect(turretAim(r.ship)).toBeCloseTo(WEAPONS['light-turret']!.turretTurnRate * FIXED_DT, 9);
     expect(r.projectiles).toEqual([]); // not on target yet
   });
@@ -91,7 +97,7 @@ describe('firing', () => {
     const t = ship('t', 'sparrow', { position: { x: 0, y: 400 } });
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const r = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i);
+      const r = fireWeapons(s, sparrow, emptyInput(), t, FIXED_DT, i);
       s = r.ship;
       shots += r.projectiles.length;
     }
@@ -105,8 +111,8 @@ describe('firing', () => {
     let outOfRange = ship('s', 'sparrow', { weaponsHot: true, targetId: 'far' });
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const a = fireWeapons(cold, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i);
-      const b = fireWeapons(outOfRange, sparrow, WEAPONS, emptyInput(), far, FIXED_DT, i);
+      const a = fireWeapons(cold, sparrow, emptyInput(), t, FIXED_DT, i);
+      const b = fireWeapons(outOfRange, sparrow, emptyInput(), far, FIXED_DT, i);
       cold = a.ship;
       outOfRange = b.ship;
       shots += a.projectiles.length + b.projectiles.length;
@@ -126,7 +132,7 @@ describe('firing', () => {
         position: { x: Math.cos(a) * orbitRadius, y: Math.sin(a) * orbitRadius },
         velocity: { x: -Math.sin(a) * speed, y: Math.cos(a) * speed },
       });
-      s = fireWeapons(s, sparrow, WEAPONS, emptyInput(), t, FIXED_DT, i).ship;
+      s = fireWeapons(s, sparrow, emptyInput(), t, FIXED_DT, i).ship;
       if (i > SECOND) worst = Math.max(worst, Math.abs(Math.atan2(Math.sin(a - turretAim(s)), Math.cos(a - turretAim(s)))));
     }
     expect(worst).toBeGreaterThan(0.3);
@@ -159,7 +165,7 @@ describe('projectiles', () => {
   });
 
   it('is absorbed by a station in the way', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {} };
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false };
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
     expect(r.damage).toEqual([]);
     expect(r.projectiles).toEqual([]);
@@ -192,40 +198,40 @@ describe('damage and shields', () => {
     const st = w.stations['station-harbour']!;
     w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'docked', dockedAt: st.id, structure: 10, shield: 0 } } };
     for (let i = 0; i < SECOND * 10; i++) w = stepWorld(w, {});
-    expect(w.ships[me]!.structure).toBe(sparrow.structure);
-    expect(w.ships[me]!.shield).toBe(sparrow.shield);
+    expect(w.ships[me]!.structure).toBe(starter.structure);
+    expect(w.ships[me]!.shield).toBe(starter.shield);
   });
 });
 
 describe('ramming', () => {
   it('a heavy ship ramming a light one comes off far better', () => {
-    const heavy = ship('a-heavy', 'mule', { position: { x: 0, y: 0 }, velocity: { x: 150, y: 0 } });
-    const light = ship('b-light', 'sparrow', { position: { x: mule.radius + sparrow.radius - 2, y: 0 } });
-    const r = collideShips({ [heavy.id]: heavy, [light.id]: light }, (s) => HULLS[s.hullId]);
+    const heavy = ship('a-heavy', 'hauler', { position: { x: 0, y: 0 }, velocity: { x: 150, y: 0 } });
+    const light = ship('b-light', 'sparrow', { position: { x: hauler.radius + sparrow.radius - 2, y: 0 } });
+    const r = collideShips({ [heavy.id]: heavy, [light.id]: light }, statsOf);
     const dmg = (id: string) => r.damage.filter((d) => d.shipId === id).reduce((n, d) => n + d.amount, 0);
     expect(dmg('b-light')).toBeGreaterThan(dmg('a-heavy') * 3);
     expect(r.damage.every((d) => d.cause === 'ram')).toBe(true);
   });
 
   it('conserves momentum', () => {
-    const a = ship('a', 'mule', { velocity: { x: 120, y: 10 } });
+    const a = ship('a', 'hauler', { velocity: { x: 120, y: 10 } });
     const b = ship('b', 'sparrow', { position: { x: 40, y: 5 }, velocity: { x: -60, y: 0 } });
-    const before = { x: a.velocity.x * mule.mass + b.velocity.x * sparrow.mass, y: a.velocity.y * mule.mass + b.velocity.y * sparrow.mass };
-    const r = collideShips({ a, b }, (s) => HULLS[s.hullId]);
+    const before = { x: a.velocity.x * hauler.mass + b.velocity.x * sparrow.mass, y: a.velocity.y * hauler.mass + b.velocity.y * sparrow.mass };
+    const r = collideShips({ a, b }, statsOf);
     const a2 = r.ships['a']!;
     const b2 = r.ships['b']!;
-    expect(a2.velocity.x * mule.mass + b2.velocity.x * sparrow.mass).toBeCloseTo(before.x, 6);
-    expect(a2.velocity.y * mule.mass + b2.velocity.y * sparrow.mass).toBeCloseTo(before.y, 6);
+    expect(a2.velocity.x * hauler.mass + b2.velocity.x * sparrow.mass).toBeCloseTo(before.x, 6);
+    expect(a2.velocity.y * hauler.mass + b2.velocity.y * sparrow.mass).toBeCloseTo(before.y, 6);
   });
 
   it('a gentle bump does no damage', () => {
     const a = ship('a', 'sparrow', { velocity: { x: 20, y: 0 } });
     const b = ship('b', 'sparrow', { position: { x: 30, y: 0 } });
-    expect(collideShips({ a, b }, (s) => HULLS[s.hullId]).damage).toEqual([]);
+    expect(collideShips({ a, b }, statsOf).damage).toEqual([]);
   });
 
   it('hitting a station hard hurts; touching it does not', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {} };
+    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {}, outfitting: false };
     const hard = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -200, y: 0 } }), sparrow, { st });
     const soft = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -IMPACT_SAFE_DELTA_V / 2, y: 0 } }), sparrow, { st });
     expect(hard.damage[0]!.amount).toBeGreaterThan(0);
@@ -246,7 +252,7 @@ describe('destruction, loot and respawn', () => {
     expect(next.ships[me]).toBeUndefined();
     expect(next.pilots['ana']!.shipId).toBeNull();
     expect(next.wrecks).toHaveLength(1);
-    expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(sparrow.mass * 0.5));
+    expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(starter.mass * 0.5));
     expect(next.events).toContainEqual({ type: 'destroyed', shipId: me, by: 'nobody' });
   });
 
@@ -256,7 +262,7 @@ describe('destruction, loot and respawn', () => {
     const back = respawnPilot(dead, 'ana');
     const s = pilotShip(back, 'ana')!;
     expect(s.id).not.toBe(me);
-    expect(s.structure).toBe(sparrow.structure);
+    expect(s.structure).toBe(starter.structure);
     expect(respawnPilot(back, 'ana')).toBe(back); // already has a ship: no change
   });
 
@@ -366,7 +372,7 @@ describe('NPC combat', () => {
     let w = createStarterWorld();
     const id = 'npc-pirate-1';
     const brain = w.npcs[id] as PirateBrain;
-    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, structure: HULLS['jackal']!.structure * 0.3, position: brain.home } } };
+    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, structure: loadoutStats(FITS.raider).structure * 0.3, position: brain.home } } };
     let departed = false;
     for (let i = 0; i < SECOND * 5 && !departed; i++) {
       w = stepWorld(w, {});

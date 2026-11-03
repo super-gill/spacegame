@@ -14,7 +14,7 @@ Chats cannot message each other. This file, the branches and their commits are t
 
 ## Phases
 
-1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. Current foundation: the 6a hull and module data model, fitting rules and derived stats in `packages/sim`.
+1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The next foundation is 6b's pads and owned ships.
 2. **Fan-out.** The lead opens workstreams for parts with clean boundaries, writes their briefs below, and Jason starts a chat for each one.
 3. **Integrate.** The lead merges branches, resolves conflicts, runs the full test suite and a headless play check, then releases.
 
@@ -83,20 +83,27 @@ The lead merges the branch, moves its log entries and changelog lines onto `main
 
 Interfaces that more than one workstream depends on. Owned by the lead.
 
-_None yet. The first contracts (hull, mount, module and derived stats types in `packages/sim`) are written when the foundation lands._
+Changing any of these needs the lead. All live in `packages/sim/src` and are exported from `index.ts`.
+
+- **Catalogue types** (`types.ts`): `HullSpec`, `MountPoint`, `ModuleSpec`, `Loadout`, `HullBonus`, `Manufacturer`. Hulls, modules and loadouts are data; adding entries is fine, changing the shape is a contract change.
+- **Derived stats** (`stats.ts`): `ShipStats`, `shipStats(world, ship)`, `fitStats(cat, hull, fit, cargoMass)`. Nothing stores performance; everything calls these.
+- **Fitting** (`fitting.ts`): `FitRefusal`, `mountRefusal`, `planRefit`, `fitModule`, `unfitModule`. The client never applies fitting rules itself; it asks `planRefit`.
+- **Ship fit** (`types.ts`): `Ship.fit` maps mount id to module id; `WeaponState` is keyed by `mountId`.
+- **Save format** (`save.ts`): `SAVE_VERSION`. Only the lead bumps it.
 
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
 | --- | --- | --- | --- | --- |
-| Foundation | `main` (lead) | `packages/sim` hull, module, fitting and derived stats | In progress | `docs/ships.md`, "First build slice" |
+| 6a foundation | `main` (lead) | Everything in milestone 6a | Closed, 0.7.0 | `docs/ships.md`, "First build slice" |
 
-Candidates once the foundation lands (not open yet):
+6a was built whole by one chat before this process existed, so its planned workstreams (ship rendering, outfitting screen, catalogue) never opened.
 
-- **Ship rendering:** draw ships from their fit, module silhouettes at mounts. Client render code only.
-- **Outfitting screen:** docked outfitting panel, fit and remove, stats preview. Client UI only, using the sim's fitting functions.
-- **Catalogue and balance:** the three hulls and about a dozen modules as data, bonuses, tuning against play. Sim catalogue files and balance tests.
-- **Lore and design docs:** races, manufacturers, open lore questions. Docs only.
+Candidates (not open yet):
+
+- **Lore:** races, manufacturers, open lore questions, names for hulls and modules. Docs only. Can open any time.
+- **Catalogue and balance:** hull and module data, tuning against play. Opens once Jason has played 0.7.0 and has views.
+- **6b workstreams:** decided when the lead plans 6b.
 
 ## Questions for Jason
 
@@ -105,6 +112,7 @@ Open design questions any chat needs answered. Jason answers in the lead chat or
 - Lore contradictions: Hive Ossk growing every station's shell vs race-specific stations; whether a living Aurel ship can appear for sale; whether the Oru are a playable starting race.
 - Player organisations and what to call them ("clan" is the Drifters' word).
 - Navy duties.
+- 0.7.0 design calls made by the 6a chat, to confirm or change: removing a module refunds half and the module vanishes; only Harbour has outfitting; the Mule and Jackal are gone (trader in a Tessaract Spine, pirate in a Kessari Wedge); the Spine has six bays; bonus values (Courier +25% cargo, Wedge +15% damage, Kessari +20% shield, Spine +25% cargo); all hull and module names are placeholders.
 
 ## Ideas inbox
 
@@ -129,5 +137,6 @@ _None._
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-03, lead: released 0.7.0 from the 6a chat's `ws/6a-handoff` branch. Added light armour to the starter so it outlasts the raider (a test now enforces it), stopped "power spare" showing as worse unless negative, moved the docked panel clear of the HUD, did the docs pass and version bump. Play checked: docking, outfitting, the Wedge and Spine in flight, a pirate fight, the old-save refusal.
 - 2026-11-03, lead: added "When to split work" with split rules, limits and the opener for new chats. No code change.
 - 2026-11-03, lead: added this file and the coordination rules. No code change.

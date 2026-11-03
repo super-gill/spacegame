@@ -20,7 +20,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 3. There is no "player". The world holds pilots (`World.pilots`), each owning ships (`Ship.ownerId`) and flying one (`Pilot.shipId`). See the multiplayer section of `docs/design.md`.
 4. `stepWorld(world, inputs)` is pure. It returns a new `World` and never mutates its argument. There is a test for this.
 5. The sim advances by a fixed tick (`FIXED_DT`, 1/60 s). Callers never pass a variable `dt`.
-6. Anything that affects feel is a named constant in `constants.ts` or a field on a `HullSpec`. No magic numbers inside functions.
+6. Anything that affects feel is a named constant in `constants.ts` or catalogue data (hulls, modules, weapons). No magic numbers inside functions.
+7. Ship performance is never stored. Anything that needs it calls `shipStats(world, ship)`, which derives it from hull, fit and cargo.
 
 ### Modules
 
@@ -29,7 +30,12 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `types.ts` | All world state types and the `ShipInput` contract |
 | `vec2.ts`, `angle.ts` | Maths helpers, immutable |
 | `constants.ts` | Tuning constants |
-| `hulls.ts` | Hull catalogue (data): Sparrow, Mule, Jackal, with combat stats and default weapons |
+| `hulls.ts` | Hull catalogue (data): frame mass, structure, outline, flight limits, mount points and bonuses. Meridian Courier, Kessari Wedge, Tessaract Spine, Sparrow (sealed dev hull) |
+| `modules.ts` | Module catalogue (data): type, size, mounts it fits, services it needs, mass, power, price, maker, stats |
+| `loadouts.ts` | Named fits (data): the starter, NPC fits, the dev fit |
+| `manufacturers.ts` | Manufacturer catalogue (data): name and race |
+| `stats.ts` | Derived stats: `fitStats` for any hull and fit, `shipStats` for a ship as it flies, bonus rules |
+| `fitting.ts` | Fitting rules and refits: `mountRefusal`, `planRefit` (previews), `fitModule`, `unfitModule`, weapon states across refits |
 | `flight.ts` | Flight computer: input and flight mode to thruster throttles. Assist and brake logic |
 | `ship.ts` | Physics: applies throttles as acceleration, enforces hull speed and spin limits |
 | `docking.ts` | Dock range check, dock and undock transitions |
@@ -40,8 +46,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `weapons.ts` | Weapon catalogue (data) |
 | `goods.ts` | Goods catalogue (data) |
 | `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |
-| `trade.ts` | Price source interface and scripted prices, cargo space and mass (`loadedHull`), buy and sell commands |
-| `factory.ts` | `buildShip`: the one place a ship is made from its hull spec |
+| `trade.ts` | Price source interface and scripted prices, cargo space used, buy and sell commands |
+| `factory.ts` | `buildShip`: the one place a ship is made from a hull and a fit (usually a loadout) |
 | `lifecycle.ts` | Destruction into wrecks and loot, NPCs leaving, wreck drift, loot and tractor beam, spawners |
 | `ai/steer.ts` | NPC piloting: turn to a heading, steer to a velocity, arrive at a point, route round stations. Produces a `ShipInput` |
 | `ai/trader.ts` | Trader brain: station loop, docking and dwell |
@@ -83,8 +89,10 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
-| `render/draw.ts` | Vector drawing of ships (outline per hull), turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, security zones and off-screen markers |
+| `render/ship-art.ts` | Ships drawn from their fit: hull outline, empty sockets (outfitting only), and each module's silhouette at its mount, tinted by its maker's race |
+| `render/draw.ts` | Vector drawing of ships (via `ship-art.ts`), turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, security zones and off-screen markers |
 | `market-panel.ts` | Station market table in the docked panel; reports trade clicks to `main.ts` |
+| `outfitting-panel.ts` | Outfitting tab in the docked panel: ship drawing with selectable mounts, now and after stats from `planRefit`, fit and remove; reports clicks to `main.ts` |
 | `ui.ts` | HUD text, docked panel, toasts (DOM, not canvas) |
 | `style.css` | Theme variables and overlay layout |
 
@@ -102,11 +110,12 @@ Today the world runs inside the browser in `main.ts`. For the private-server mod
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover saves (round trip, a loaded world carrying on identically to the original, pilots' credits and cargo kept, current catalogues applied on load, bad files refused with a reason, migrations), trade (economy data sanity, buying and selling, refusals leaving the world untouched, buy limits, swappable prices, cargo mass slowing ships, cargo spill on death, credits surviving death, tractor respecting hold space), combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover modular ships (catalogue integrity, every loadout legal and within power, derived stat sums, bonuses only on full-size modules, mount type, size and service rules, fit and replace pricing, refusals leaving the world untouched, previews, weapon state across refits, refits changing how a ship flies, the starter outlasting the pirate raider), saves (round trip, a loaded world carrying on identically to the original, pilots' credits and cargo kept, current catalogues applied on load, bad files refused with a reason, migrations), trade (economy data sanity, buying and selling, refusals leaving the world untouched, buy limits, swappable prices, cargo mass slowing ships, cargo spill on death, credits surviving death, tractor respecting hold space), combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 
-- **A new hull**: add an entry to `hulls.ts`. Nothing else.
+- **A new hull**: add an entry to `hulls.ts` with its outline and mounts. Nothing else.
+- **A new module**: add an entry to `modules.ts`, and a silhouette in `render/ship-art.ts` only if it is a new kind. The catalogue tests check every loadout still fits.
 - **A new station in the starter sector**: add it in `createStarterWorld`. When sectors become data files this moves there.
 - **A new flight control**: add a field to `ShipInput`, a row in `bindings.ts`, map it in `InputController.sample`, and handle it in the sim. The controls panel updates itself. Update `docs/controls.md`.
 - **A new interface control**: add a `UiAction`, a row in `bindings.ts`, and handle it in the callback in `main.ts`.

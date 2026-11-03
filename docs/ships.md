@@ -1,6 +1,6 @@
 # Ships and modules
 
-How ships are built. Status: agreed design, 3 November 2026. Not yet implemented; see "First build slice" for what comes first.
+How ships are built. Status: agreed design, 3 November 2026. Slice 6a is in play from 0.7.0; 6b and the rest of milestone 6 are not built yet. See "First build slice".
 
 Related: [races.md](races.md) for races and manufacturers. Concept art lives on the "Spacegame ship concepts" design canvas; the full race and manufacturer design and the lore are in the "Spacegame: Races and Manufacturers" and "Spacegame: Lore of the Known Universe" docs.
 

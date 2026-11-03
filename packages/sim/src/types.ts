@@ -9,47 +9,181 @@ import type { Vec2 } from './vec2.js';
  * `ShipInput` snapshot per tick.
  */
 
+/** Size class of hulls, mounts and modules. */
+export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
+
+/** What kind of module a mount point takes. */
+export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal';
+
 /**
- * Static description of a hull. Instances of ships reference a spec by id
- * so stats live in one place and can be tuned without touching saves.
+ * What a mount point provides to the module on it. A module lists the
+ * services it needs and fits only where they are all provided.
+ * - `power`: a power feed. Anything that draws power needs it.
+ * - `fireControl`: a fire control link. Turrets need it to track.
+ * - `heavyLoad`: a hardpoint rated for heavy, dense loads.
+ */
+export type MountService = 'power' | 'fireControl' | 'heavyLoad';
+
+/**
+ * A place on a hull a module can be fitted. Position and facing are in
+ * hull space: world units from the hull centre, nose along +x, +y to the
+ * ship's right (clockwise on screen). Drawing, and later turret arcs and
+ * damage locality, come from these.
+ */
+export interface MountPoint {
+  /** Unique within the hull, e.g. `w1`. Fits are keyed by it. */
+  id: string;
+  type: MountType;
+  size: ModuleSize;
+  position: Vec2;
+  /** Bearing the mount points along, radians, relative to the nose. */
+  facing: number;
+  services: MountService[];
+}
+
+export type RaceId = 'halcyon' | 'kessari' | 'freeBelt' | 'vael' | 'oru' | 'drifter' | 'aurel';
+
+/** A ship or module maker. `race` is null for multi-race firms. */
+export interface ManufacturerSpec {
+  id: string;
+  name: string;
+  race: RaceId | null;
+}
+
+/** The industry a hull is built for. Grows as industries arrive. */
+export type HullRole = 'civilian' | 'combat' | 'transport' | 'development';
+
+/**
+ * The module stats that add up across a fit. Each module contributes some
+ * of these; the ship's total is the sum, after hull bonuses.
+ */
+export type ModuleStat =
+  | 'mainThrust'
+  | 'reverseThrust'
+  | 'lateralThrust'
+  | 'rotationThrust'
+  | 'powerOutput'
+  | 'shield'
+  | 'shieldRegen'
+  | 'structure'
+  | 'cargoCapacity';
+
+/** What a module does. Decides its silhouette and which stats it carries. */
+export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon';
+
+/**
+ * A module: anything fitted to a mount. Data only.
+ *
+ * Brands differ only in trade-offs (mass, power, price, output), never in
+ * what they fit. `tags` name the technology, which race bonuses look for
+ * (a Kessari hull rewards `shield` tech, a Free Belt hull `projectile`).
+ */
+export interface ModuleSpec {
+  id: string;
+  name: string;
+  kind: ModuleKind;
+  size: ModuleSize;
+  /** Mount types it may go on. */
+  mounts: MountType[];
+  /** Services the mount must provide. */
+  needs: MountService[];
+  mass: number;
+  /** Power drawn while fitted. Reactors draw nothing and produce `powerOutput`. */
+  power: number;
+  /** Price at outfitting, credits. */
+  price: number;
+  manufacturer: string;
+  tags: string[];
+  stats: Partial<Record<ModuleStat, number>>;
+  /** Weapon modules only: the ballistic profile it fires, by weapon id. */
+  weaponId?: string;
+}
+
+/**
+ * A hull bonus. Multiplies what matching modules contribute to `stat` (or,
+ * for `damage`, the damage of matching weapons) by `1 + amount`.
+ *
+ * A module matches when its kind and tag match the bonus (an absent
+ * kind or tag matches anything) AND it is exactly the size of the mount
+ * it sits on: a smaller module works but loses the hull's bonus.
+ */
+export interface HullBonus {
+  source: 'role' | 'race';
+  /** Shown in outfitting, e.g. "+25% cargo from full-size pods". */
+  label: string;
+  stat: ModuleStat | 'damage';
+  amount: number;
+  kind?: ModuleKind;
+  tag?: string;
+}
+
+/**
+ * A hull: the frame a ship is built on. It has no performance of its own
+ * beyond its mass, structure and hard flight limits; thrust, shields,
+ * power, cargo and weapons all come from the modules fitted to it.
  */
 export interface HullSpec {
   id: string;
   name: string;
-  /** Mass in arbitrary units. Thrust / mass = acceleration. */
+  /** Race whose look and bonuses it carries; null for multi-race makers. */
+  race: RaceId | null;
+  manufacturer: string;
+  role: HullRole;
+  sizeClass: ModuleSize;
+  /** Mass of the empty frame. Modules and cargo add to it. */
   mass: number;
-  /** Main engine force (units/s^2 once divided by mass). */
-  mainThrust: number;
-  /** Reverse / retro engine force. Usually weaker than main. */
-  reverseThrust: number;
-  /** Lateral thruster force (strafe). */
-  lateralThrust: number;
-  /**
-   * Hard speed limit in units/s, enforced by the physics in every flight
-   * mode. Thrust can still change direction at the limit, not magnitude.
-   */
-  maxSpeed: number;
-  /** Rotation thruster force. rotationThrust / mass = angular acceleration (rad/s^2). */
-  rotationThrust: number;
-  /** Hard spin limit in rad/s, enforced by the physics in every flight mode. */
-  maxTurnRate: number;
-  /** Approximate hull radius for collision and docking checks. */
+  /** Structure of the bare frame. Armour adds to it. */
+  structure: number;
+  /** Approximate hull radius for collision, docking and hit checks. */
   radius: number;
-  /** Shield capacity. Shields take damage first and recharge. */
+  /** Outline polygon in hull space (world units, nose along +x). */
+  outline: Vec2[];
+  /** Hard speed limit, units/s, enforced in every flight mode. */
+  maxSpeed: number;
+  /** Hard spin limit, rad/s, enforced in every flight mode. */
+  maxTurnRate: number;
+  mounts: MountPoint[];
+  bonuses: HullBonus[];
+  /** A sealed hull cannot be refitted (the Sparrow dev ship). */
+  sealed?: boolean;
+}
+
+/** A named fit for a hull. NPC spawners and new pilots are built from these. */
+export interface Loadout {
+  id: string;
+  name: string;
+  hullId: string;
+  /** Mount id to module id. Mounts left out are empty. */
+  fit: Record<string, string>;
+}
+
+/**
+ * A ship's performance, computed from its hull, its fit and its cargo.
+ * Never stored: always derived, so a refit or a tuning change applies at
+ * once. Flight, physics, combat, cargo and NPC steering all read this.
+ */
+export interface ShipStats {
+  /** Hull + modules + cargo. Thrust / mass = acceleration. */
+  mass: number;
+  mainThrust: number;
+  reverseThrust: number;
+  lateralThrust: number;
+  /** rotationThrust / mass = angular acceleration (rad/s^2). */
+  rotationThrust: number;
+  maxSpeed: number;
+  maxTurnRate: number;
+  radius: number;
   shield: number;
   /** Shield recharge, points per second, once recharging. */
   shieldRegen: number;
   /** Seconds after taking damage before shields start recharging. */
   shieldRegenDelay: number;
-  /** Structure points. The ship is destroyed when this reaches zero. Does not recharge. */
   structure: number;
-  /**
-   * Weapons fitted when the hull is built, by weapon id. Later this
-   * becomes the hull's slots and the fit becomes the owner's choice.
-   */
-  defaultWeapons: string[];
-  /** Units of cargo the hold carries. Every unit of every good takes one. */
   cargoCapacity: number;
+  powerOutput: number;
+  powerDraw: number;
+  /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
+  weapons: Record<string, WeaponSpec>;
 }
 
 /**
@@ -89,13 +223,11 @@ export interface MarketEntry {
  */
 export type WeaponKind = 'fixed' | 'turret';
 
-export type WeaponSize = 'light' | 'medium' | 'heavy';
-
 export interface WeaponSpec {
   id: string;
   name: string;
   kind: WeaponKind;
-  size: WeaponSize;
+  size: ModuleSize;
   /** Damage per projectile. */
   damage: number;
   /** Seconds between shots. */
@@ -108,9 +240,10 @@ export interface WeaponSpec {
   turretTurnRate: number;
 }
 
-/** A fitted weapon's live state. */
+/** A fitted weapon's live state, one per weapon module in the fit. */
 export interface WeaponState {
-  weaponId: string;
+  /** Mount the weapon sits on. Its spec is `ShipStats.weapons[mountId]`. */
+  mountId: string;
   /** Ticks until it can fire again. */
   cooldownTicks: number;
   /** World bearing the weapon points along, radians. Fixed weapons follow the heading. */
@@ -155,7 +288,8 @@ export interface Loot {
  */
 export interface Spawner {
   id: string;
-  hullId: string;
+  /** What the NPC flies: a loadout id. */
+  loadoutId: string;
   position: Vec2;
   heading: number;
   /** Station to start docked at, or null to start in space. */
@@ -207,6 +341,11 @@ export interface Thrusters {
 export interface Ship {
   id: string;
   hullId: string;
+  /**
+   * What is fitted: mount id to module id. Belongs to the ship, like its
+   * cargo. Changed only while docked at outfitting.
+   */
+  fit: Record<string, string>;
   /** Pilot who owns this ship, or null for NPC and unowned ships. */
   ownerId: string | null;
   position: Vec2;
@@ -251,6 +390,8 @@ export interface Station {
   securityRadius: number;
   /** What the station trades and at what prices, by good id. Read through a PriceSource. */
   market: Record<string, MarketEntry>;
+  /** Ships docked here can be refitted. */
+  outfitting: boolean;
 }
 
 /**
@@ -362,6 +503,9 @@ export interface World {
   nextEntityId: number;
   stations: Record<string, Station>;
   hulls: Record<string, HullSpec>;
+  modules: Record<string, ModuleSpec>;
+  loadouts: Record<string, Loadout>;
+  manufacturers: Record<string, ManufacturerSpec>;
   /**
    * One-shot facts produced this tick. Cleared each tick. Every event
    * names the ship it concerns (and, where there is one, the ship that
@@ -394,4 +538,11 @@ export type WorldEvent =
   /** A pirate has picked `shipId` as its target. */
   | { type: 'huntStarted'; shipId: string; pirateId: string }
   /** A pirate has given up on `shipId`. */
-  | { type: 'huntEnded'; shipId: string; pirateId: string };
+  | { type: 'huntEnded'; shipId: string; pirateId: string }
+  /**
+   * A module was fitted, replacing `replaced` if the mount was full. `cost`
+   * is credits paid after any refund (negative: the pilot was paid).
+   */
+  | { type: 'fitted'; shipId: string; mountId: string; moduleId: string; replaced: string | null; cost: number }
+  /** A module was taken off. `refund` is credits paid back. */
+  | { type: 'unfitted'; shipId: string; mountId: string; moduleId: string; refund: number };
