@@ -63,6 +63,8 @@ The split matters: `sim` is compiled against the ES2022 library only, so any att
 ## Documentation
 
 - [Design](docs/design.md): what the game is and the rules that define it
+- [Ships and modules](docs/ships.md): how ships are built from hulls and modules
+- [Races and manufacturers](docs/races.md): who builds what, and the decisions behind it
 - [Architecture](docs/architecture.md): how the code is organised and why
 - [Controls](docs/controls.md)
 - [Roadmap](docs/roadmap.md)

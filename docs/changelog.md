@@ -2,6 +2,13 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [Unreleased]
+
+### Added
+- `docs/ships.md`: modular ship design, fitting rules, and the first build slice.
+- `docs/races.md`: races, manufacturers and the decisions behind them.
+- Roadmap milestone 6 split into 6a modular ships, 6b ship mart, 6c the rest of fitting.
+
 ## [0.6.0] - 2026-11-03
 
 Milestone 5: persist.

@@ -10,7 +10,9 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 3a Targeting | Click and Tab targeting, weapons hot/cold, self-engaging turrets, Space fires fixed guns, lead marker | Done, 0.4.0 |
 | 4 Trade | Cargo hold, two stations with scripted prices, buy and sell UI | Done, 0.5.0 |
 | 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
-| 6 Fit | Module slots with positions (turret arcs and blind spots), power grid and CPU, ammunition, fire groups, outfitting at stations, second hull | Next |
+| 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Next |
+| 6b Ship mart | Station pads, docking to a pad, ships for sale parked on pads, buying and switching owned ships | |
+| 6c Fit, continued | Oversized modules across two mounts, turret arcs, fire groups, ammunition, power management | |
 | 7 Law | Witnessed crime, reputation record, security response, bounties | |
 | 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic | |
 | 9 Industry | Mining, salvage, drones, manufacturing | |
