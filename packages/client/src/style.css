@@ -50,18 +50,20 @@ canvas#game {
 }
 
 /*
- * The docked panel is centred in the space the flight HUD leaves free:
- * right of the readout in the bottom left and below the menu buttons in
- * the top right, so the HUD stays readable while docked (the world keeps
+ * The docked panel sits in the space the flight HUD leaves free: right of
+ * the readout in the bottom left and below the menu buttons in the top
+ * right, so the HUD stays readable while docked (the world keeps
  * running). On narrow screens there is no room to spare and it overlaps.
+ * It is anchored at the top, not centred, so content changing height
+ * never moves what is above it under the pointer.
  */
 .dock-panel {
   --clear-left: 260px;
   --clear-top: 48px;
   position: fixed;
-  top: calc(var(--clear-top) + (100vh - var(--clear-top) - 12px) / 2);
+  top: var(--clear-top);
   left: calc(var(--clear-left) + (100vw - var(--clear-left) - 12px) / 2);
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   min-width: 320px;
   max-width: calc(100vw - var(--clear-left) - 24px);
   max-height: calc(100vh - var(--clear-top) - 24px);
@@ -115,11 +117,33 @@ canvas#game {
   margin: 4px 0 16px;
 }
 
+/*
+ * Drawing and stats side by side. Whether they stack is decided by the
+ * screen width alone, never by content: if previewing a module could tip
+ * the row into wrapping, the buttons below would jump out from under the
+ * pointer mid-click.
+ */
 .outfitting-top {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 20px;
   align-items: flex-start;
+}
+
+.outfitting-preview {
+  flex: 0 0 auto;
+}
+
+/* Takes the rest of the row, so long warnings wrap inside the panel. */
+.outfitting-stats {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .outfitting-top {
+    flex-wrap: wrap;
+  }
 }
 
 .outfitting-preview {
@@ -137,6 +161,22 @@ canvas#game {
   margin: 16px 0 6px;
 }
 
+.outfitting .module-type {
+  color: var(--ink-dim);
+}
+
+.outfitting .fit-warnings {
+  /* Room for both flight warnings, so previews never reflow the panel. */
+  min-height: 3.2em;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.outfitting .fit-warning {
+  margin: 0;
+  color: var(--warn);
+}
+
 .outfitting .bonuses {
   margin: 0 0 8px;
   color: var(--warn);
@@ -149,6 +189,13 @@ canvas#game {
 
 .outfitting-stats table {
   width: auto;
+}
+
+/* Fixed-width value columns: previews fill the After column without reflowing. */
+.outfitting-stats td.num,
+.outfitting-stats th.num {
+  min-width: 7.5em;
+  white-space: nowrap;
 }
 
 .outfitting th {

@@ -12,6 +12,7 @@ import {
   nearestDockableStation,
   pilotShip,
   respawnPilot,
+  flightWarnings,
   shipStats,
   stepWorld,
   TRACTOR_RANGE,
@@ -29,7 +30,7 @@ import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWo
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
 import { MarketPanel, type TradeRequest } from './market-panel.js';
-import { FIT_REFUSALS, OutfittingPanel, type RefitRequest } from './outfitting-panel.js';
+import { FIT_REFUSALS, FLIGHT_WARNINGS, OutfittingPanel, type RefitRequest } from './outfitting-panel.js';
 import {
   COLOUR,
   drawExplosion,
@@ -316,7 +317,15 @@ function tick(nowMs: number): void {
     const gone = before[e.shipId];
     if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
   }
-  if (ship) ui.handleEvents(current.events, ship.id);
+  if (ship) {
+    ui.handleEvents(current.events, ship.id);
+    // Undocking in a ship that cannot fly is allowed, but never silent.
+    if (current.events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
+      for (const w of flightWarnings(shipStats(current, ship))) {
+        if (w !== 'noWeapons') ui.notify(FLIGHT_WARNINGS[w], 'warn');
+      }
+    }
+  }
 }
 
 function frame(nowMs: number): void {

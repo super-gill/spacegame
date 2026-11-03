@@ -4,6 +4,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-03
+
+### Added
+- Outfitting says what each module is (engine, thruster package, reactor, shield generator, armour, cargo, fixed gun, turret) beside its brand name.
+- Outfitting warns when the fit shown cannot thrust forward or cannot turn, and undocking in such a ship shows the same warning.
+- `flightWarnings` in the sim, with a test.
+- The lore workstream: `docs/coordination.md` has its brief.
+
+### Fixed
+- Clicks in outfitting were sometimes lost. Previewing a module could make the panel reflow, moving the button out from under the pointer between press and release. The panel is now anchored at the top and previews never change its layout.
+
 ## [0.7.1] - 2026-11-03
 
 ### Added

@@ -122,3 +122,19 @@ export function shipStats(cat: Catalogues, ship: Ship): ShipStats {
   if (!hull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${ship.id}"`);
   return fitStats(cat, hull, ship.fit, cargoMass(ship, cat.goods));
 }
+
+/** Something a fit leaves the ship unable to do. */
+export type FlightWarning = 'noMainThrust' | 'noTurning' | 'noWeapons';
+
+/**
+ * What a ship with these stats cannot do. A fit like this is allowed
+ * (consequences are part of fitting) but the pilot should be told before
+ * they undock in it.
+ */
+export function flightWarnings(stats: ShipStats): FlightWarning[] {
+  const out: FlightWarning[] = [];
+  if (stats.mainThrust <= 0) out.push('noMainThrust');
+  if (stats.rotationThrust <= 0) out.push('noTurning');
+  if (Object.keys(stats.weapons).length === 0) out.push('noWeapons');
+  return out;
+}

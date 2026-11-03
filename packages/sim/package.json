@@ -1,6 +1,6 @@
 {
   "name": "@spacegame/sim",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "private": true,
   "description": "Headless game simulation. No DOM, no canvas, no timers. Pure functions over plain data.",
   "type": "module",

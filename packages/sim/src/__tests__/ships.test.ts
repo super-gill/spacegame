@@ -6,7 +6,7 @@ import { LOADOUTS } from '../loadouts.js';
 import { MANUFACTURERS } from '../manufacturers.js';
 import { MODULES } from '../modules.js';
 import { deserializeWorld, SAVE_FORMAT, SAVE_VERSION } from '../save.js';
-import { fitStats, shipStats } from '../stats.js';
+import { fitStats, flightWarnings, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, World } from '../types.js';
 import { length } from '../vec2.js';
@@ -367,6 +367,12 @@ describe('ships in the world', () => {
     const w = createStarterWorld();
     expect(w.ships['npc-trader-1']!.hullId).toBe('tessaract-spine');
     expect(w.ships['npc-pirate-1']!.hullId).toBe('kessari-wedge');
+  });
+
+  it('warns when a fit cannot thrust, turn or shoot', () => {
+    expect(flightWarnings(loadoutStats(STARTER_LOADOUT_ID))).toEqual([]);
+    const { e1: _engine, c1: _thrusters, w1: _gun, w2: _turret, ...stripped } = LOADOUTS[STARTER_LOADOUT_ID]!.fit;
+    expect(flightWarnings(fitStats(TEST_CATALOGUES, courier, stripped))).toEqual(['noMainThrust', 'noTurning', 'noWeapons']);
   });
 
   it('a new pilot outlasts the pirate raider', () => {

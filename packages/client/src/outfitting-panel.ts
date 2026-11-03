@@ -1,6 +1,7 @@
 import {
   cargoMass,
   fitStats,
+  flightWarnings,
   mountRefusal,
   fitFee,
   planRefit,
@@ -9,6 +10,7 @@ import {
   storedCount,
   weaponDps,
   type FitRefusal,
+  type FlightWarning,
   type HullSpec,
   type ModuleSpec,
   type MountPoint,
@@ -82,6 +84,31 @@ const credits = (n: number): string => `${n.toLocaleString('en-GB')} cr`;
 const fixed1 = (n: number): string => (Math.round(n * 10) / 10).toString();
 
 /** One line on what a module does. */
+/** Plain name for what a module is, beside its brand name. */
+export function moduleType(m: ModuleSpec, world: World): string {
+  if (m.kind === 'weapon') {
+    const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
+    return w?.kind === 'turret' ? 'Turret' : 'Fixed gun';
+  }
+  return MODULE_TYPE_NAME[m.kind];
+}
+
+const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = {
+  engine: 'Engine',
+  thrusters: 'Thruster package',
+  reactor: 'Reactor',
+  shieldGenerator: 'Shield generator',
+  armour: 'Armour',
+  cargoPod: 'Cargo',
+};
+
+/** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
+export const FLIGHT_WARNINGS: Record<FlightWarning, string> = {
+  noMainThrust: 'No engine: cannot thrust forward.',
+  noTurning: 'No thruster package: cannot turn or strafe.',
+  noWeapons: 'No weapons fitted.',
+};
+
 export function describeModule(m: ModuleSpec, world: World): string {
   const s = m.stats;
   const parts: string[] = [];
@@ -288,8 +315,9 @@ export class OutfittingPanel {
   private renderStats(now: ShipStats, after: ShipStats | null): void {
     const table = el('table');
     const head = el('tr');
-    head.append(el('th', undefined, 'Ship'), el('th', 'num', 'Now'));
-    if (after) head.append(el('th', 'num', 'After'));
+    // The After column is always there, empty until something is pointed
+    // at, so a preview never changes the panel's layout under the pointer.
+    head.append(el('th', undefined, 'Ship'), el('th', 'num', 'Now'), el('th', 'num', after ? 'After' : ''));
     table.append(head);
     for (const row of STAT_ROWS) {
       const tr = el('tr');
@@ -299,10 +327,21 @@ export class OutfittingPanel {
         const b = row.value(after);
         const diff = Math.abs(b - a) > 1e-6;
         tr.append(el('td', `num ${compareClass(row, a, b, diff)}`, row.format(b)));
+      } else {
+        tr.append(el('td', 'num'));
       }
       table.append(tr);
     }
     this.statsBox.replaceChildren(table);
+    // Warn about the fit being shown (the preview if there is one), so a
+    // ship that cannot fly is obvious before undocking in it. The box keeps
+    // its height when empty: hovering must never move the buttons.
+    const warnings = el('div', 'fit-warnings');
+    for (const w of flightWarnings(after ?? now)) {
+      if (w === 'noWeapons') continue; // a legitimate choice, not a trap
+      warnings.append(el('p', 'fit-warning', FLIGHT_WARNINGS[w]));
+    }
+    this.statsBox.append(warnings);
   }
 
   private renderMounts(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
@@ -326,7 +365,9 @@ export class OutfittingPanel {
       name.addEventListener('click', () => this.select(mount.id));
       const nameCell = el('td');
       nameCell.append(name);
-      tr.append(nameCell, el('td', undefined, mount.size), el('td', module ? undefined : 'muted-cell', module?.name ?? 'empty'));
+      const fitted = el('td', module ? undefined : 'muted-cell', module?.name ?? 'empty');
+      if (module) fitted.append(el('span', 'module-type', ` · ${moduleType(module, world)}`));
+      tr.append(nameCell, el('td', undefined, mount.size), fitted);
 
       const actions = el('td', 'actions');
       if (module && !hull.sealed) {
@@ -367,7 +408,7 @@ export class OutfittingPanel {
 
     const table = el('table');
     const head = el('tr');
-    for (const h of ['Module', 'Maker', 'Mass', 'Power', 'Does', 'Owned', 'Cost', '']) head.append(el('th', undefined, h));
+    for (const h of ['Module', 'Type', 'Maker', 'Mass', 'Power', 'Does', 'Owned', 'Cost', '']) head.append(el('th', undefined, h));
     table.append(head);
     const current = fit[mount.id];
     const pilot = world.pilots[this.pilotId];
@@ -382,6 +423,7 @@ export class OutfittingPanel {
       const smaller = m.size !== mount.size ? ' (no hull bonus)' : '';
       tr.append(
         el('td', undefined, `${m.name}${smaller}`),
+        el('td', undefined, moduleType(m, world)),
         el('td', undefined, world.manufacturers[m.manufacturer]?.name ?? m.manufacturer),
         el('td', 'num', fixed1(m.mass)),
         el('td', 'num', m.power ? `-${m.power}` : m.stats.powerOutput ? `+${m.stats.powerOutput}` : '0'),
@@ -422,12 +464,12 @@ export class OutfittingPanel {
     }
     const table = el('table');
     const head = el('tr');
-    for (const h of ['Module', 'Size', 'Count', '']) head.append(el('th', undefined, h));
+    for (const h of ['Module', 'Type', 'Size', 'Count', '']) head.append(el('th', undefined, h));
     table.append(head);
     for (const id of ids) {
       const m = world.modules[id];
       const tr = el('tr');
-      tr.append(el('td', undefined, m?.name ?? id), el('td', undefined, m?.size ?? ''), el('td', 'num', String(here[id])));
+      tr.append(el('td', undefined, m?.name ?? id), el('td', undefined, m ? moduleType(m, world) : ''), el('td', undefined, m?.size ?? ''), el('td', 'num', String(here[id])));
       const actions = el('td', 'actions');
       if (m) {
         const sell = el('button', undefined, `Sell +${credits(resaleValue(m))}`);

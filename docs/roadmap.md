@@ -23,7 +23,7 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Known gaps in 0.7.1
+## Known gaps in 0.7.2
 
 - One world per browser. Several save slots would need a picker; export and import cover it for now.
 - Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ship stays, flown by nobody). A way to carry your pilot over comes before the shared world.

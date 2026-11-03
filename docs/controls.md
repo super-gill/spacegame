@@ -76,7 +76,7 @@ The docked panel has two tabs.
 
 **Market** lists each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
 
-**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
+**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Each module shows what it is (engine, reactor and so on) beside its brand name. If the fit shown cannot thrust forward or cannot turn, a warning says so, and undocking in that ship repeats it. Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
 
 ## Interface
 

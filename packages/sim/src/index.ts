@@ -15,7 +15,7 @@ export { MODULES } from './modules.js';
 export { LOADOUTS } from './loadouts.js';
 export { MANUFACTURERS } from './manufacturers.js';
 export { WEAPONS, weaponDps } from './weapons.js';
-export { fitStats, shipStats, cargoMass, bonusApplies, type Catalogues } from './stats.js';
+export { fitStats, shipStats, cargoMass, bonusApplies, flightWarnings, type Catalogues, type FlightWarning } from './stats.js';
 export {
   fitModule,
   unfitModule,
