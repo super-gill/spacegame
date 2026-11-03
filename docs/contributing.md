@@ -2,6 +2,8 @@
 
 Conventions for anyone (human or AI) changing this repository.
 
+Several Claude chats work on this repo at once. Read [coordination.md](coordination.md) before starting: it says who owns `main`, which branch and files are yours, and where to leave notes for the other chats.
+
 ## Code
 
 - TypeScript strict mode everywhere. No `any`.
