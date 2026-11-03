@@ -2,7 +2,7 @@
 
 A single-player 2D free-roam space sim in the spirit of Flatspace, built for the browser.
 
-Version 0.1.1. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.1.2. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 

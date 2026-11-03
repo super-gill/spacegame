@@ -29,7 +29,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `vec2.ts`, `angle.ts` | Maths helpers, immutable |
 | `constants.ts` | Tuning constants |
 | `hulls.ts` | Hull catalogue (data) |
-| `ship.ts` | Flight model: turning, thrust, drag, integration |
+| `ship.ts` | Flight model: rotation and linear thrust, space drag, flight computer limits, braking |
 | `docking.ts` | Dock range check, dock and undock transitions |
 | `world.ts` | World construction and lookups, starter sector content |
 | `step.ts` | The tick: applies input, runs ship step, collects events |
@@ -73,7 +73,7 @@ Canvas 2D, vector line art, device-pixel-ratio aware. Colours are defined once a
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover the flight model (acceleration, drift, terminal velocity, braking, rotation rate and direction, heading wrap), angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover the flight model (acceleration, drift, drag staying minor, speed and spin limits, braking, angular momentum, heading wrap), angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 

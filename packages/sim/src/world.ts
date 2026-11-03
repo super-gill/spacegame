@@ -35,6 +35,7 @@ export function createStarterWorld(): World {
     position: { x: 600, y: 250 },
     velocity: { x: 0, y: 0 },
     heading: Math.PI,
+    angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
   };

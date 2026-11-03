@@ -24,8 +24,12 @@ export interface HullSpec {
   reverseThrust: number;
   /** Lateral thruster force (strafe). */
   lateralThrust: number;
-  /** Maximum turn rate in radians per second. */
-  turnRate: number;
+  /** Flight computer speed limit in units/s. Thrust cannot push past this. */
+  maxSpeed: number;
+  /** Rotation thruster force. rotationThrust / mass = angular acceleration (rad/s^2). */
+  rotationThrust: number;
+  /** Flight computer spin limit in rad/s. */
+  maxTurnRate: number;
   /** Approximate hull radius for collision and docking checks. */
   radius: number;
 }
@@ -39,6 +43,8 @@ export interface Ship {
   velocity: Vec2;
   /** Facing direction in radians. */
   heading: number;
+  /** Spin in rad/s. Positive is clockwise on screen. */
+  angularVelocity: number;
   state: ShipState;
   /** Station id when docked, otherwise null. */
   dockedAt: string | null;
@@ -66,7 +72,7 @@ export interface PlayerInput {
   thrustReverse: boolean;
   strafeLeft: boolean;
   strafeRight: boolean;
-  /** Kill velocity using available thrust. */
+  /** Kill velocity and spin using available thrusters. */
   brake: boolean;
   /** Edge-triggered: request docking or undocking this tick. */
   toggleDock: boolean;

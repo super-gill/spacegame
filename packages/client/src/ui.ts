@@ -31,6 +31,7 @@ export class Ui {
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
+      `ROT ${((ship.angularVelocity * 180) / Math.PI).toFixed(0).padStart(4)}°/s`,
       near && ship.state === 'flying' ? `DOCK ${near.name.toUpperCase()}  [F]` : '',
       `${fps.toFixed(0)} fps  tick ${world.tick}`,
     ];

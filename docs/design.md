@@ -19,11 +19,13 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
 ## Flight model
 
 - Newtonian. Thrust adds velocity. Nothing stops you except opposing thrust.
-- Soft drag gives every hull a terminal velocity so speeds stay sane (see `DRAG_PER_SECOND` in the sim constants).
-- The ship rotates on the keyboard (Q/E) at a hull-specific turn rate, with no angular momentum: it stops rotating when the key is released. Fixed weapons are aimed by pointing the hull, which makes piloting a skill.
+- Rotation is Newtonian too. Q/E fire rotation thrusters that add or remove spin; the ship keeps spinning after the key is released until countered. Fixed weapons are aimed by pointing the hull, which makes piloting a skill.
+- All accelerations are thrust divided by hull mass, so heavier hulls are slower to speed up, stop and turn with the same engines.
+- Space drag is a small fixed deceleration (`SPACE_DRAG`, `SPACE_ANGULAR_DRAG`). It exists only to bleed off stray drift and spin so a ship left alone eventually comes to rest. It is kept under 5% of thruster strength so it never fights the pilot; there is a test enforcing that.
+- Top speed and top spin are flight computer limits per hull (`maxSpeed`, `maxTurnRate`), not a product of drag. At the limit, thrust can still change the direction of travel but cannot add magnitude.
 - The mouse is deliberately not used for flight. It is reserved for targeting, interacting with objects (scooping, hailing, selecting) and turret aim.
 - Thrust is relative to heading: main engine forward, retro reverse, lateral strafe.
-- Brake is a convenience that fires thrusters against the current velocity.
+- Brake is a convenience that fires thrusters against current velocity and spin until both reach zero.
 
 ## Docking
 

@@ -44,6 +44,7 @@ export function tryDock(ship: Ship, stations: Record<string, Station>): DockAtte
       dockedAt: station.id,
       position: { ...station.position },
       velocity: { x: 0, y: 0 },
+      angularVelocity: 0,
     },
     event: { type: 'docked', shipId: ship.id, stationId: station.id },
   };
