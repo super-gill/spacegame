@@ -28,7 +28,7 @@ export type SimAction =
  * the client (it needs the camera and the pointer) and reaches the sim as
  * a `selectTarget` input.
  */
-export type UiAction = 'toggleControls' | 'cycleTarget' | 'clearTarget';
+export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget';
 
 export type Action = SimAction | UiAction;
 
@@ -72,12 +72,13 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },
+  { action: 'toggleMenu', codes: ['F2'], group: 'Interface', label: 'Menu: pilot name, settings, save', kind: 'press' },
 ];
 
 export const POINTER_CONTROLS: readonly PointerControl[] = [
   { input: 'Left click', group: 'Targeting', label: 'Click a ship to target it' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
-  { input: 'Click', group: 'Interface', label: 'Controls button, top right' },
+  { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },
 ];
 
 const KEY_NAMES: Record<string, string> = {
@@ -113,5 +114,6 @@ export const SUPPRESS_DEFAULT: ReadonlySet<string> = new Set([
   'ArrowLeft',
   'ArrowRight',
   'F1',
+  'F2',
   'Tab',
 ]);

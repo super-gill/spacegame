@@ -19,7 +19,10 @@ import {
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
-import { loadLocalPilot } from './identity.js';
+import { loadLocalPilot, saveLocalPilot } from './identity.js';
+import { MenuPanel } from './menu-panel.js';
+import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWorld, storeWorld } from './persistence.js';
+import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
 import { MarketPanel, type TradeRequest } from './market-panel.js';
 import {
@@ -68,6 +71,7 @@ const input = new InputController(
   canvas,
   (action) => {
     if (action === 'toggleControls') controlsPanel.toggle();
+    else if (action === 'toggleMenu') menu.toggle();
     else if (action === 'cycleTarget') cycleTarget();
     else if (action === 'clearTarget') input.requestTarget(null);
   },
@@ -78,7 +82,8 @@ const ui = new Ui(
   () => respawn(),
 );
 
-const me = loadLocalPilot();
+let me = loadLocalPilot();
+const settings = loadSettings();
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 
@@ -109,8 +114,73 @@ function trade(request: TradeRequest): void {
   }
 }
 
-let previous: World = joinPilot(createStarterWorld(), me.id, me.name);
+// Start from the saved world if there is one. joinPilot leaves a returning
+// pilot exactly as they were, and gives a new one a starter ship.
+const stored = loadStoredWorld();
+let previous: World = joinPilot(stored.kind === 'loaded' ? stored.world : createStarterWorld(), me.id, me.name);
 let current: World = previous;
+if (stored.kind === 'unreadable') {
+  ui.notify(`${LOAD_REFUSALS[stored.reason]} Starting a new world; the old save was kept aside.`, 'warn');
+}
+
+/** Replace the whole world (load, import, new game) and point the camera at our ship. */
+function replaceWorld(world: World): void {
+  current = joinPilot(world, me.id, me.name);
+  previous = current;
+  const ship = myShip(current);
+  if (ship) camera.snapTo(ship.position);
+  market.invalidate();
+}
+
+// Saving: autosave every few seconds and whenever the tab is hidden or closed.
+const AUTOSAVE_MS = 10_000;
+let lastSaveMs = performance.now();
+let lastSaveOk = true;
+function saveNow(): void {
+  lastSaveOk = storeWorld(current, new Date());
+  lastSaveMs = performance.now();
+}
+window.addEventListener('pagehide', saveNow);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveNow();
+});
+
+const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, me.name, settings.showLabels, {
+  rename(name) {
+    me = { ...me, name };
+    saveLocalPilot(me);
+    current = joinPilot(current, me.id, me.name);
+    ui.notify(`Pilot name: ${name}`);
+  },
+  setShowLabels(show) {
+    settings.showLabels = show;
+    saveSettings(settings);
+  },
+  saveNow() {
+    saveNow();
+    ui.notify(lastSaveOk ? 'World saved.' : 'Could not save: browser storage is not available.', lastSaveOk ? 'info' : 'warn');
+  },
+  exportSave() {
+    exportWorld(current, new Date());
+  },
+  importSave(file) {
+    void importWorld(file).then((r) => {
+      if (!r.ok) {
+        ui.notify(LOAD_REFUSALS[r.reason], 'warn');
+        return;
+      }
+      replaceWorld(r.world);
+      saveNow();
+      ui.notify('World imported.');
+    });
+  },
+  newGame() {
+    clearStoredWorld();
+    replaceWorld(createStarterWorld());
+    saveNow();
+    ui.notify('New world started.');
+  },
+});
 
 /** The ship this client is flying, or null while the pilot has none (destroyed). */
 function myShip(world: World): Ship | null {
@@ -220,6 +290,9 @@ function tick(nowMs: number): void {
 function frame(nowMs: number): void {
   const frameSeconds = Math.min((nowMs - lastFrameMs) / 1000, MAX_FRAME_SECONDS);
   lastFrameMs = nowMs;
+  if (nowMs - lastSaveMs >= AUTOSAVE_MS) saveNow();
+  const ago = Math.round((nowMs - lastSaveMs) / 1000);
+  menu.setSavedStatus(lastSaveOk ? `Saved ${ago} s ago, in this browser.` : 'Not saving: browser storage is not available.');
   accumulator += frameSeconds;
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 
@@ -285,7 +358,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const hull = current.hulls[ship.hullId]!;
     const style = shipStyle(current, ship, mine);
     const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
-    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', style);
+    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', settings.showLabels ? style : { colour: style.colour });
     if (ship.state !== 'flying') continue;
     for (const w of ship.weapons) {
       if (current.weapons[w.weaponId]?.kind === 'turret') drawTurret(ctx!, camera, shipView.position, w.aim, hull, style.colour);

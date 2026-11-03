@@ -39,6 +39,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
 | `weapons.ts` | Weapon catalogue (data) |
 | `goods.ts` | Goods catalogue (data) |
+| `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |
 | `trade.ts` | Price source interface and scripted prices, cargo space and mass (`loadedHull`), buy and sell commands |
 | `factory.ts` | `buildShip`: the one place a ship is made from its hull spec |
 | `lifecycle.ts` | Destruction into wrecks and loot, NPCs leaving, wreck drift, loot and tractor beam, spawners |
@@ -74,6 +75,9 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | --- | --- |
 | `main.ts` | Loop, wiring, interpolation. Joins as the local pilot and sends input for that pilot's ship only. The only file that knows both sim and DOM |
 | `identity.ts` | The local pilot's stable id and name, kept in browser storage |
+| `persistence.ts` | World in browser storage (autosave, load, unreadable saves set aside), export and import as files |
+| `settings.ts` | Client display settings, kept in browser storage, not in the world |
+| `menu-panel.ts` | Game menu (F2): pilot name, settings, saving |
 | `bindings.ts` | Every control in the game, in one table. Single source of truth for input and the controls panel |
 | `input.ts` | Keyboard state sampled into a `ShipInput`; left clicks on the canvas go to a callback (target selection); interface actions go to another; pending target changes ride along with the next sample |
 | `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
@@ -98,7 +102,7 @@ Today the world runs inside the browser in `main.ts`. For the private-server mod
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover trade (economy data sanity, buying and selling, refusals leaving the world untouched, buy limits, swappable prices, cargo mass slowing ships, cargo spill on death, credits surviving death, tractor respecting hold space), combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover saves (round trip, a loaded world carrying on identically to the original, pilots' credits and cargo kept, current catalogues applied on load, bad files refused with a reason, migrations), trade (economy data sanity, buying and selling, refusals leaving the world untouched, buy limits, swappable prices, cargo mass slowing ships, cargo spill on death, credits surviving death, tractor respecting hold space), combat (the fixed beats turret rule across the catalogue, firing, turret slew, projectile hits without tunnelling, shields, docked repair, mass-based ramming and momentum conservation, station impacts, destruction into wreck and loot, respawn, tractor scooping, NPC respawn, pirate gunnery and retaliation, traders shooting back, damaged pirates leaving), NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 

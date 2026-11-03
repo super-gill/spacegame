@@ -2,6 +2,22 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.6.0] - 2026-11-03
+
+Milestone 5: persist.
+
+### Added
+- Versioned save format for the whole world (`save.ts`): serialize, load with validation, migrations, and clear reasons for refusing bad files.
+- Autosave to browser storage every 10 seconds and when the tab is hidden or closed; the world loads on start.
+- Export the world as a `.json` file and import one back; New game.
+- Game menu (F2 or the Menu button): pilot name, show or hide ship labels, save status, Save now, Export, Import, New game.
+- Client settings stored in the browser, separate from the world.
+- Tests for saving, loading, refusals and migrations.
+
+### Changed
+- Hull, weapon and goods stats are taken from the code when a world loads, so tuning applies to existing saves.
+- Keys typed into a text box no longer fly the ship.
+
 ## [0.5.0] - 2026-11-03
 
 Milestone 4: trade.

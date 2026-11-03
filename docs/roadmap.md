@@ -9,8 +9,8 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 3 Fight | Weapon module, damage, shields, wrecks, loot drops, tractor scoop | Done, 0.3.0 |
 | 3a Targeting | Click and Tab targeting, weapons hot/cold, self-engaging turrets, Space fires fixed guns, lead marker | Done, 0.4.0 |
 | 4 Trade | Cargo hold, two stations with scripted prices, buy and sell UI | Done, 0.5.0 |
-| 5 Persist | Save and load (browser storage plus file export), settings | Next |
-| 6 Fit | Module slots with positions (turret arcs and blind spots), power grid and CPU, ammunition, fire groups, outfitting at stations, second hull | |
+| 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
+| 6 Fit | Module slots with positions (turret arcs and blind spots), power grid and CPU, ammunition, fire groups, outfitting at stations, second hull | Next |
 | 7 Law | Witnessed crime, reputation record, security response, bounties | |
 | 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic | |
 | 9 Industry | Mining, salvage, drones, manufacturing | |
@@ -21,11 +21,13 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Known gaps in 0.5.0
+## Known gaps in 0.6.0
+
+- One world per browser. Several save slots would need a picker; export and import cover it for now.
+- Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ship stays, flown by nobody). A way to carry your pilot over comes before the shared world.
 
 - Station stock is unlimited and prices never move, so one profitable run can be repeated forever.
 - NPC traders do not actually buy or sell; they carry a fixed cargo.
-- Nothing saves yet: a refresh loses credits and cargo (milestone 5).
 
 - No balancing pass: damage, shields and pirate accuracy are first guesses and have not been tuned against real play.
 - Shooting the trader or anyone else is not a crime yet; station security is only a rule pirates obey (milestone 7).

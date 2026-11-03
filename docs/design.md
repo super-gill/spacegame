@@ -54,6 +54,15 @@ The target is a group of friends on one shared world, the way Minecraft servers 
 
 Networking, the server process, join and leave UI, and choosing a pilot name. They come after the game is fun solo (see the roadmap). Until then the world runs inside the browser.
 
+## Saving
+
+- A save is the **whole world**, every pilot included, never one pilot's career. It is the same file a shared-world host will load, so solo saves and server worlds are one format.
+- The world autosaves to browser storage every 10 seconds and when the tab is hidden or closed. On start it loads; you carry on exactly where you were, docked or flying, with the same credits and cargo.
+- **Export** downloads the world as a `.json` file; **Import** loads one. Importing someone else's world puts you into it as a new pilot (or as yourself, if you have flown in it before). **New game** starts a fresh world.
+- The file has an envelope with a format name and a version. Older versions are upgraded by migrations, one step at a time. Pre-1.0, a change not worth migrating bumps the version and old saves are refused with a clear reason rather than loaded wrong. A save that cannot be read is set aside, never overwritten.
+- Hull, weapon and goods stats come from the code on load, not from the save, so tuning applies to existing worlds. Stations, markets and everything else are kept as saved.
+- Client settings (ship labels on or off) and your pilot identity and name live in this browser, not in the world.
+
 ## Docking
 
 - A station has a dock range. Inside it, with speed below the docking limit, pressing dock parks the ship.

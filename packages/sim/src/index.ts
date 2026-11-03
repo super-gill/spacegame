@@ -41,6 +41,17 @@ export {
   STARTER_HULL_ID,
 } from './world.js';
 export { stepWorld } from './step.js';
+export {
+  serializeWorld,
+  deserializeWorld,
+  SAVE_FORMAT,
+  SAVE_VERSION,
+  MIGRATIONS,
+  type LoadRefusal,
+  type LoadResult,
+  type Migration,
+  type SaveEnvelope,
+} from './save.js';
 export { collideWithStations } from './collision.js';
 export { thinkNpcs, PIRATE_TUNING, TRADER_TUNING, inSecurityZone } from './ai/index.js';
 export { stepShip, linearAcceleration, angularAcceleration } from './ship.js';

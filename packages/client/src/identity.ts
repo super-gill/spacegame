@@ -46,3 +46,13 @@ export function loadLocalPilot(): LocalPilot {
   }
   return pilot;
 }
+
+/** Store a changed pilot (e.g. a new display name). The id must not change. Returns false if storage is blocked. */
+export function saveLocalPilot(pilot: LocalPilot): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pilot));
+    return true;
+  } catch {
+    return false;
+  }
+}

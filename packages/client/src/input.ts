@@ -15,7 +15,14 @@ import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bi
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'cycleTarget', 'clearTarget']);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'clearTarget']);
+
+/** True while the person is typing in a text field, when keys must not fly the ship. */
+function typingInField(e: KeyboardEvent): boolean {
+  const t = e.target;
+  if (t instanceof HTMLInputElement) return t.type === 'text';
+  return t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement;
+}
 
 /** Which action, if any, a code triggers. Built once from the table. */
 const ACTION_BY_CODE = new Map<string, (typeof KEY_BINDINGS)[number]>();
@@ -107,6 +114,7 @@ export class InputController {
   }
 
   private onKeyDown = (e: KeyboardEvent): void => {
+    if (typingInField(e)) return;
     if (SUPPRESS_DEFAULT.has(e.code)) e.preventDefault();
     if (e.repeat) return;
     this.press(e.code);

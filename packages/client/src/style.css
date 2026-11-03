@@ -169,6 +169,63 @@ button:hover {
   padding: 4px 10px;
 }
 
+.menu-button {
+  right: 128px;
+}
+
+/* Game menu: pilot name, display settings, saves. */
+.menu-panel {
+  position: fixed;
+  top: 48px;
+  right: 12px;
+  width: min(420px, calc(100vw - 24px));
+  padding: 16px 20px;
+  border: 1px solid var(--ink-dim);
+  background: rgba(5, 7, 10, 0.94);
+}
+
+.menu-panel h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-bright);
+}
+
+.menu-panel h2 {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 16px 0 6px;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.menu-panel .muted {
+  margin: 0 0 8px;
+}
+
+.menu-panel input[type='checkbox'] {
+  accent-color: var(--ink);
+}
+
+.menu-panel input[type='text'] {
+  flex: 1;
+  font: inherit;
+  color: var(--ink-bright);
+  background: transparent;
+  border: 1px solid var(--ink-dim);
+  padding: 5px 8px;
+}
+
 /* Developer controls panel: generated from bindings.ts. */
 .controls-panel {
   position: fixed;

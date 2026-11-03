@@ -2,11 +2,11 @@
 
 A 2D free-roam space sim in the spirit of Flatspace, built for the browser. Play solo, or (later) with a few friends on a world one of you hosts, Minecraft style.
 
-Version 0.5.0. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.6.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 4, "trade": one sector with two stations that trade complementary goods, an armed trader running cargo between them and a pirate that hunts lone ships outside station security. Click or Tab to target; fixed guns on Space with a lead marker, and turrets that engage your target on their own while weapons are hot. Shields, ramming, wrecks, loot and a tractor beam. Cargo has mass. Pure Newtonian flight with three flight-assist modes. Nothing saves yet. See [docs/roadmap.md](docs/roadmap.md).
+Milestone 4, "trade": one sector with two stations that trade complementary goods, an armed trader running cargo between them and a pirate that hunts lone ships outside station security. Click or Tab to target; fixed guns on Space with a lead marker, and turrets that engage your target on their own while weapons are hot. Shields, ramming, wrecks, loot and a tractor beam. Cargo has mass. The world autosaves in the browser and can be exported and imported as a file. Pure Newtonian flight with three flight-assist modes. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Quick start
 
@@ -35,6 +35,7 @@ Open the URL Vite prints (normally http://localhost:5173).
 | Cycle flight mode | Z |
 | Dock / undock | F (when the station name shows in the HUD) |
 | Controls panel | F1 or ` |
+| Menu (name, settings, save, export, import, new game) | F2 |
 
 Press F1 in game for the full list. Detail in [docs/controls.md](docs/controls.md).
 

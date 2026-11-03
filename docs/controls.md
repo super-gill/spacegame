@@ -75,6 +75,9 @@ The docked panel is the station market: each good the station trades, what it ch
 | Action | Key | Notes |
 | --- | --- | --- |
 | Show or hide the controls panel | F1 | Also `, or click Controls in the top right |
+| Show or hide the menu | F2 | Also the Menu button. Pilot name, show or hide ship labels, Save now, Export save, Import save, New game |
+
+While you are typing in a text box (the pilot name), keys go to the box, not the ship.
 
 ## HUD
 
