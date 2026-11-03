@@ -1,6 +1,6 @@
 # Races and manufacturers
 
-Status: agreed design, 3 November 2026. The full version, with every manufacturer's house style and a coverage matrix, is the "Spacegame: Races and Manufacturers" doc; the history and politics are in "Spacegame: Lore of the Known Universe". This page is the summary the code is built against. Names are placeholders.
+Status: agreed design, 3 November 2026. The full version, with every manufacturer's house style and a coverage matrix, is the "Spacegame: Races and Manufacturers" doc; the history and politics are in [lore.md](lore.md), which is canon. This page is the summary the code is built against. Names are placeholders.
 
 ## Structure
 

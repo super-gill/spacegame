@@ -124,6 +124,7 @@ Candidates (not open yet):
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
 - Lore contradictions: Hive Ossk growing every station's shell vs race-specific stations; whether a living Aurel ship can appear for sale; whether the Oru are a playable starting race.
+- Lore (asked by the lore chat): the core premise (the Aurel caged the Unsung and human gate-waking is undoing it); whether the Unsung appear in play; whether pilots can gain standing with pirate factions; the starter sector in `docs/lore.md`.
 - Player organisations and what to call them ("clan" is the Drifters' word).
 - Navy duties.
 
@@ -156,6 +157,7 @@ _None._
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-03, lore: created `docs/lore.md` as canon from the claude.ai lore doc: premise, the Lattice, the Aurel and the Sundering, timeline, the six peoples, the Concord and navy service, manufacturer origins, six pirate factions, present-day tensions. Added the starter sector in lore terms (Calder system; Harbour a Concord free port; Ridge a Belt cooperative; the trader on a Tessaract contract; the pirate a Black Strike raider in a captured Kessari Wedge), marked proposed. Pointed `races.md` at `lore.md`. Needs: Jason's answers to the lore questions (being asked in the lore chat). Blocked: nothing. Changelog line: "Add lore.md, the game's canon setting and history".
 - 2026-11-03, lead: planned 6b with Jason (ownership, pads, ship mart, boarding, pods) in `docs/ships.md`. Lead handing over to a fresh lead chat to build it, because this one is long.
 - 2026-11-03, lead: released 0.7.2. Outfitting names what each module is, warns when a fit cannot thrust or turn, and toasts the same on undock. Fixed outfitting clicks being lost: previewing a module could reflow the panel and move the button out from under the pointer mid-click. Opened the lore workstream.
 - 2026-11-03, lead: released 0.7.1, owned modules with per-station storage, handling fees and selling. Save version 3, with an automatic upgrade from 0.7.0. Filed ship ownership and escape pods in the ideas inbox for 6b planning.
