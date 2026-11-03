@@ -18,6 +18,51 @@ Chats cannot message each other. This file, the branches and their commits are t
 2. **Fan-out.** The lead opens workstreams for parts with clean boundaries, writes their briefs below, and Jason starts a chat for each one.
 3. **Integrate.** The lead merges branches, resolves conflicts, runs the full test suite and a headless play check, then releases.
 
+## When to split work
+
+The lead decides when work goes to its own chat and tells Jason, unprompted, at these points:
+
+- the start of each milestone: what the foundation is and which workstreams follow it
+- when a foundation lands on `main`: which workstreams open now
+- whenever a request to the lead or an idea from Jason is big enough to stand alone
+
+**Split when all of these hold:**
+
+1. The contracts it depends on are on `main` and not expected to change.
+2. It lives mostly in its own files, such as client rendering vs client UI vs sim catalogue vs docs.
+3. It can be tested or played on its own, without another open workstream's branch.
+4. It is at least a full session's work. Anything smaller, the lead does directly.
+
+**Keep it in the lead chat when any of these hold:**
+
+- It changes core types, the save format, `stepWorld` or anything most of the code touches.
+- Two workstreams would need the same files at the same time.
+- It is a balance pass that needs the whole game in view.
+- It is a small fix, even in an area a workstream owns. The lead tells that workstream in the log.
+
+**Limits:**
+
+- At most three workstreams open at once. Jason carries messages between chats and the lead merges every branch, so more than three costs more than it saves.
+- Short-lived workstreams (one feature) close when merged. Long-lived ones (lore, balance) stay open across milestones but rebase often.
+
+### Opening a workstream
+
+The lead adds a row to "Workstreams" with a brief in the same commit:
+
+- **Goal:** what done looks like, in play terms
+- **Owns:** the files and folders it may change
+- **Uses:** the contracts it depends on
+- **Out of scope:** what it must leave alone
+- **Done when:** tests, a play check, docs updated
+
+Then the lead gives Jason this opener to paste into a new chat in the Spacegame project:
+
+> You are the `<name>` workstream for Spacegame. Read the project handover doc, then clone the repo and read `docs/coordination.md` and your brief in it. Work on branch `ws/<name>`. Start now.
+
+### Closing a workstream
+
+The lead merges the branch, moves its log entries and changelog lines onto `main`, marks the row "Closed", and tells Jason that chat is finished.
+
 ## Rules for every chat
 
 - Read `docs/contributing.md` and the handover doc in the project before changing anything.
@@ -71,6 +116,7 @@ _Empty._
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-03: The lead decides when work splits into its own chat, using the rules in "When to split work", and tells Jason at each milestone start and foundation landing. (Jason)
 - 2026-11-03: Work runs as a lead chat plus workstream chats coordinated through this file; the lead builds the 6a foundation before any workstream opens. (Jason)
 
 ## Requests to the lead
@@ -83,4 +129,5 @@ _None._
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-03, lead: added "When to split work" with split rules, limits and the opener for new chats. No code change.
 - 2026-11-03, lead: added this file and the coordination rules. No code change.
