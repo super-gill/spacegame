@@ -116,9 +116,26 @@ Split in two so each half is playable:
 - Outfitting screen when docked at a station with outfitting: see mounts, fit and remove modules, see derived stats change.
 - Bonuses on those three hulls.
 
-**6b: ship mart and pads (0.8.0)**
+**6b: ships you own, pads, ship mart, boarding and pods (0.8.0)**
 
-- Stations get pads (sized S/M/L); docking assigns a pad; docked ships are drawn on their pads.
-- Ships for sale parked on pads; buy from the station list; your old ship stays parked on its pad and you can switch between owned ships.
+Planned 3 November 2026 with Jason's decisions. Not built yet.
+
+*Owning versus flying.* A ship's owner (`Ship.ownerId`) and whoever is flying it are separate facts. A pilot flies at most one ship (`Pilot.shipId`) and may own any number. A ship nobody is flying is **empty**; an NPC brain flying a pilot's ship is how hired pilots will work later, so nothing may assume "owner" means "pilot aboard".
+
+*Pads.* Stations have pads (S, M, L), each with a position and facing on the station. Hulls already have a size class. Docking puts the ship on the smallest free pad it fits and records the pad on the ship; no free pad that fits refuses docking with a reason. Docked ships, flown or empty, are drawn on their pads.
+
+*Ship mart.* A station may sell ships: its stock is a list of loadouts, unlimited for now. A ship's price is its hull's price (a new hull field) plus its modules' prices. Buying needs a free pad that fits; the new ship is the buyer's, empty, docked on that pad. Pilots fly it by boarding it. Harbour sells the Courier, the Wedge and the Spine to start with.
+
+*Boarding.* A pilot command, `boardShip`, moves the pilot from the ship they are in to another ship they own that is empty. Allowed when both are docked at the same station, or in space within a short range of each other with a low relative speed (named constants). The ship left behind stays exactly where it is, empty. Boarding from a pod consumes the pod.
+
+*Empty ships.* Stay where they were left, drift with their momentum in space, and can be shot, rammed and destroyed like any ship (they leave a wreck and loot; there is no pod). Taking someone else's ship belongs with law and salvage later. NPC pirates hunt pilots, not empty ships, for now.
+
+*Escape pods.* A pod is a sealed small hull with a fixed fit: a small engine and thrusters, no weapons, no cargo. It cannot be bought or refitted. When a ship a pilot is flying is destroyed, the pilot is ejected in a new pod at the wreck, with a little of the wreck's velocity. A pod can fly, dock (small pad) and board ships its pilot owns. Pods can be shot; making that a crime is milestone 7. NPCs do not get pods.
+
+*Losing everything.* When a pod is destroyed, the pilot wakes at Harbour Station: in a new pod docked there if they own any ship, or in a free starter Courier docked there if they own none. A pilot in a pod who owns no ship can also claim the free starter Courier while docked at Harbour. Owning other ships means fetching one.
+
+*Saves.* New save version with a migration: stations gain pads, docked ships are put on pads, everything else carries over.
+
+*Build order.* The lead builds the sim foundation first (ownership rules, pads and docking, buying, boarding, pods, the death flow, the save migration, all with tests and the new contracts in `docs/coordination.md`). Then a client workstream builds the ship mart screen, pads and docked ships on screen, the board key and prompt, and the pod's look.
 
 Later in milestone 6: oversized modules across two mounts, turret arcs from mount positions, fire groups, ammunition, power management in combat.
