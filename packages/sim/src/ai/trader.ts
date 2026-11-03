@@ -1,5 +1,5 @@
 import { DOCK_MAX_SPEED } from '../constants.js';
-import type { HullSpec, Ship, ShipInput, TraderBrain, World } from '../types.js';
+import type { ShipStats, Ship, ShipInput, TraderBrain, World } from '../types.js';
 import { add, distance, length, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
@@ -69,7 +69,7 @@ export interface TraderThought {
   brain: TraderBrain;
 }
 
-export function thinkTrader(world: World, ship: Ship, hull: HullSpec, brain: TraderBrain): TraderThought {
+export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: TraderBrain): TraderThought {
   const stationId = brain.route[brain.leg];
   const station = stationId ? world.stations[stationId] : undefined;
   if (!station) return { input: emptyInput(), brain };
@@ -93,9 +93,9 @@ export function thinkTrader(world: World, ship: Ship, hull: HullSpec, brain: Tra
 
   // Aim for the point on the station's near side, just clear of the hull.
   const fromStation = normalise(sub(ship.position, station.position));
-  const approach = add(station.position, scale(fromStation, station.radius + hull.radius + TRADER_TUNING.approachStandoff));
-  const waypoint = routeAround(ship, hull, approach, world.stations);
-  const cruise = hull.maxSpeed * TRADER_TUNING.cruiseFraction;
-  const desired = arriveVelocity(ship, hull, waypoint, cruise);
-  return { input: defend(world, ship, steerToVelocity(ship, hull, desired)), brain };
+  const approach = add(station.position, scale(fromStation, station.radius + stats.radius + TRADER_TUNING.approachStandoff));
+  const waypoint = routeAround(ship, stats, approach, world.stations);
+  const cruise = stats.maxSpeed * TRADER_TUNING.cruiseFraction;
+  const desired = arriveVelocity(ship, stats, waypoint, cruise);
+  return { input: defend(world, ship, steerToVelocity(ship, stats, desired)), brain };
 }

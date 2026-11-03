@@ -1,5 +1,5 @@
 import { ASSIST_LINEAR_STRENGTH, ASSIST_ROTATION_STRENGTH, BRAKE_STRENGTH } from './constants.js';
-import type { FlightMode, HullSpec, ShipInput, Ship, Thrusters } from './types.js';
+import type { FlightMode, ShipStats, ShipInput, Ship, Thrusters } from './types.js';
 import { fromAngle, rotate, type Vec2 } from './vec2.js';
 
 /**
@@ -77,15 +77,15 @@ function cancelAxis(
 const on = (held: boolean): number => (held ? 1 : 0);
 
 /** Decide this tick's thruster throttles. Pure. */
-export function computeThrusters(ship: Ship, hull: HullSpec, input: ShipInput, dt: number): Thrusters {
+export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput, dt: number): Thrusters {
   const { forward, right } = shipAxes(ship.heading);
   const forwardSpeed = dot(ship.velocity, forward);
   const rightSpeed = dot(ship.velocity, right);
 
-  const mainAccel = hull.mainThrust / hull.mass;
-  const reverseAccel = hull.reverseThrust / hull.mass;
-  const lateralAccel = hull.lateralThrust / hull.mass;
-  const rotationAccel = hull.rotationThrust / hull.mass;
+  const mainAccel = stats.mainThrust / stats.mass;
+  const reverseAccel = stats.reverseThrust / stats.mass;
+  const lateralAccel = stats.lateralThrust / stats.mass;
+  const rotationAccel = stats.rotationThrust / stats.mass;
 
   const linearAssist = ship.flightMode === 'assisted';
   const rotationAssist = ship.flightMode === 'assisted' || ship.flightMode === 'rotation';

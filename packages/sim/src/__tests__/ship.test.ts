@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
-import { TEST_SHIP_COMBAT } from './fixtures.js';
-import { HULLS } from '../hulls.js';
+import { TEST_SHIP_COMBAT, TEST_STATS } from './fixtures.js';
 import { stepShip } from '../ship.js';
 import type { FlightMode, ShipInput, Ship } from '../types.js';
 import { emptyInput } from '../world.js';
@@ -14,14 +13,14 @@ import { length } from '../vec2.js';
  * Assist behaviour is tested in flight.test.ts.
  */
 
-const hull = HULLS['sparrow']!;
+const hull = TEST_STATS;
 const mainAccel = hull.mainThrust / hull.mass;
 const angularAccel = hull.rotationThrust / hull.mass;
 
 function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship {
   return {
     id: 's',
-    hullId: hull.id,
+    hullId: 'sparrow',
     position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
     heading: 0,

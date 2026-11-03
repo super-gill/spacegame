@@ -1,23 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { ASSIST_LINEAR_STRENGTH, FIXED_DT } from '../constants.js';
 import { FLIGHT_MODES, idleThrusters, nextFlightMode } from '../flight.js';
-import { TEST_SHIP_COMBAT } from './fixtures.js';
-import { HULLS } from '../hulls.js';
+import { TEST_SHIP_COMBAT, TEST_STATS } from './fixtures.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
-import type { FlightMode, HullSpec, ShipInput, Ship } from '../types.js';
+import type { FlightMode, ShipStats, ShipInput, Ship } from '../types.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
 import { length } from '../vec2.js';
 
 /** Flight computer tests: what each assist mode does on the pilot's behalf. */
 
-const hull = HULLS['sparrow']!;
+const hull = TEST_STATS;
 const SECOND = 60;
 
 function ship(mode: FlightMode, overrides: Partial<Ship> = {}): Ship {
   return {
     id: 's',
-    hullId: hull.id,
+    hullId: 'sparrow',
     position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
     heading: 0,
@@ -36,7 +35,7 @@ function input(overrides: Partial<ShipInput> = {}): ShipInput {
   return { ...emptyInput(), ...overrides };
 }
 
-function run(s: Ship, i: ShipInput = emptyInput(), ticks = 1, h: HullSpec = hull): Ship {
+function run(s: Ship, i: ShipInput = emptyInput(), ticks = 1, h: ShipStats = hull): Ship {
   for (let n = 0; n < ticks; n++) s = stepShip(s, h, i, FIXED_DT);
   return s;
 }
@@ -102,7 +101,7 @@ describe('full assist', () => {
   });
 
   it('is limited by the real thrusters: a heavier hull settles more slowly', () => {
-    const heavy: HullSpec = { ...hull, mass: hull.mass * 4 };
+    const heavy: ShipStats = { ...hull, mass: hull.mass * 4 };
     const start = { velocity: { x: 100, y: 0 } };
     const light = run(ship('assisted', start), emptyInput(), SECOND);
     const slow = run(ship('assisted', start), emptyInput(), SECOND, heavy);

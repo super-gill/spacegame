@@ -1,5 +1,5 @@
 import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation } from '@spacegame/sim';
+import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation, shipStats } from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel, death panel and transient toasts.
@@ -19,6 +19,12 @@ export class Ui {
   private readonly dockPanel = must<HTMLDivElement>('dock-panel');
   private readonly dockStationName = must<HTMLHeadingElement>('dock-station-name');
   private readonly undockButton = must<HTMLButtonElement>('undock-button');
+  private readonly marketTab = must<HTMLButtonElement>('tab-market');
+  private readonly outfittingTab = must<HTMLButtonElement>('tab-outfitting');
+  private readonly marketContainer = must<HTMLDivElement>('market-container');
+  private readonly outfittingContainer = must<HTMLDivElement>('outfitting-container');
+  /** Which station service the docked panel shows. */
+  dockTab: 'market' | 'outfitting' = 'market';
   private readonly deathPanel = must<HTMLDivElement>('death-panel');
   private readonly respawnButton = must<HTMLButtonElement>('respawn-button');
   private readonly toast = must<HTMLDivElement>('toast');
@@ -27,6 +33,8 @@ export class Ui {
   constructor(onUndock: () => void, onRespawn: () => void) {
     this.undockButton.addEventListener('click', onUndock);
     this.respawnButton.addEventListener('click', onRespawn);
+    this.marketTab.addEventListener('click', () => (this.dockTab = 'market'));
+    this.outfittingTab.addEventListener('click', () => (this.dockTab = 'outfitting'));
   }
 
   /** Refresh the HUD. `ship` is null while the pilot has no ship (destroyed). */
@@ -38,7 +46,7 @@ export class Ui {
       this.hud.textContent = `NO SHIP\n${fps.toFixed(0)} fps  tick ${world.tick}`;
       return;
     }
-    const hull = world.hulls[ship.hullId];
+    const stats = shipStats(world, ship);
     const hold = Object.entries(ship.hold)
       .filter(([, n]) => n > 0)
       .map(([item, n]) => `${item} ${n}`)
@@ -50,9 +58,9 @@ export class Ui {
     const lines = [
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
-      hull ? `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${hull.shield}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${hull.structure}` : '',
+      `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
       `CR  ${(ship.ownerId ? (world.pilots[ship.ownerId]?.credits ?? 0) : 0).toLocaleString('en-GB')}`,
-      `CARGO ${cargoUsed(ship)}/${hull?.cargoCapacity ?? 0}${hold ? `  ${hold}` : ''}`,
+      `CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}${hold ? `  ${hold}` : ''}`,
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
@@ -69,6 +77,17 @@ export class Ui {
     if (docked && ship.dockedAt) {
       const station: Station | undefined = world.stations[ship.dockedAt];
       this.dockStationName.textContent = station?.name ?? 'Station';
+      // Outfitting only where the station offers it.
+      const canRefit = station?.outfitting ?? false;
+      if (!canRefit) this.dockTab = 'market';
+      this.outfittingTab.disabled = !canRefit;
+      this.outfittingTab.title = canRefit ? '' : 'No outfitting at this station';
+      const onMarket = this.dockTab === 'market';
+      this.marketTab.setAttribute('aria-selected', String(onMarket));
+      this.outfittingTab.setAttribute('aria-selected', String(!onMarket));
+      this.marketContainer.classList.toggle('hidden', !onMarket);
+      this.outfittingContainer.classList.toggle('hidden', onMarket);
+      this.dockPanel.classList.toggle('wide', !onMarket);
     }
   }
 
@@ -80,6 +99,7 @@ export class Ui {
       this.targetPanel.classList.add('hidden');
       return;
     }
+    const stats = shipStats(world, target);
     const brain = world.npcs[target.id];
     const owner = target.ownerId ? world.pilots[target.ownerId] : undefined;
     const who = brain ? brain.kind.toUpperCase() : (owner?.name.toUpperCase() ?? 'UNKNOWN');
@@ -95,7 +115,7 @@ export class Ui {
       `HULL   ${hull.name.toUpperCase()}`,
       `RANGE  ${range.toFixed(0).padStart(5)}`,
       `CLOSE  ${closing.toFixed(0).padStart(5)} u/s`,
-      `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${hull.shield}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${hull.structure}`,
+      `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
       `[Tab] next  [Esc] clear`,
     ].join('\n');
     this.targetPanel.classList.remove('hidden');

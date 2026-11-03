@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { CARGO_SURVIVAL_FRACTION, FIXED_DT, STARTING_CREDITS } from '../constants.js';
-import { HULLS } from '../hulls.js';
+import { cargoMass, shipStats } from '../stats.js';
+import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { stepWorld } from '../step.js';
-import { buyGood, cargoFree, cargoMass, loadedHull, maxBuyable, sellGood, type PriceSource } from '../trade.js';
+import { buyGood, cargoFree, maxBuyable, sellGood, type PriceSource } from '../trade.js';
 import type { World } from '../types.js';
 import { length } from '../vec2.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
@@ -10,7 +11,8 @@ import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } fr
 const SECOND = 60;
 const HARBOUR = 'station-harbour';
 const RIDGE = 'station-ridge';
-const sparrow = HULLS['sparrow']!;
+/** What new pilots fly. */
+const starter = loadoutStats('meridian-starter');
 
 /** A world with one pilot docked at the given station, and no NPCs to get in the way. */
 function dockedAt(stationId: string): { w: World; me: string } {
@@ -97,7 +99,7 @@ describe('buying and selling', () => {
     const { w, me } = dockedAt(HARBOUR);
     const cases: Array<[ReturnType<typeof buyGood>, string]> = [
       [buyGood(w, 'ana', 'machinery', 100), 'credits'], // 7000 credits
-      [buyGood(w, 'ana', 'food', sparrow.cargoCapacity + 1), 'space'],
+      [buyGood(w, 'ana', 'food', starter.cargoCapacity + 1), 'space'],
       [buyGood(w, 'ana', 'scrap', 1), 'notTraded'], // Harbour does not sell scrap
       [buyGood(w, 'ana', 'food', 0), 'badQuantity'],
       [buyGood(w, 'ana', 'food', 1.5), 'badQuantity'],
@@ -117,7 +119,7 @@ describe('buying and selling', () => {
   it('maxBuyable is limited by credits and by space', () => {
     const { w } = dockedAt(HARBOUR);
     expect(maxBuyable(w, 'ana', 'machinery')).toBe(Math.floor(STARTING_CREDITS / 70)); // 14, credits bind
-    expect(maxBuyable(w, 'ana', 'food')).toBe(sparrow.cargoCapacity); // 20, space binds
+    expect(maxBuyable(w, 'ana', 'food')).toBe(starter.cargoCapacity); // 20, space binds
     expect(maxBuyable(w, 'ana', 'scrap')).toBe(0);
   });
 
@@ -135,14 +137,15 @@ describe('cargo', () => {
     const empty = w.ships[me]!;
     const loaded = { ...empty, hold: { ore: 20 } };
     expect(cargoMass(loaded, w.goods)).toBeCloseTo(6, 9);
-    expect(loadedHull(sparrow, loaded, w.goods).mass).toBeCloseTo(sparrow.mass + 6, 9);
+    expect(shipStats(TEST_CATALOGUES, loaded).mass).toBeCloseTo(starter.mass + 6, 9);
 
     const fly = (shipHold: Record<string, number>) => {
       let x: World = { ...w, ships: { ...w.ships, [me]: { ...empty, state: 'flying', dockedAt: null, position: { x: 3000, y: 3000 }, hold: shipHold } } };
       for (let i = 0; i < SECOND; i++) x = stepWorld(x, { [me]: { ...emptyInput(), thrustForward: true } });
       return length(x.ships[me]!.velocity);
     };
-    expect(fly({ ore: 20 })).toBeLessThan(fly({}) * 0.7);
+    // Same thrust, more mass: speed after one second scales with 1 / mass.
+    expect(fly({ ore: 20 }) / fly({})).toBeCloseTo(starter.mass / (starter.mass + 6), 2);
   });
 
   it('a destroyed ship spills part of its cargo as loot', () => {
@@ -170,12 +173,12 @@ describe('cargo', () => {
     const pos = { x: 3000, y: 3000 };
     w = {
       ...w,
-      ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'flying', dockedAt: null, position: pos, hold: { food: sparrow.cargoCapacity - 2 } } },
+      ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'flying', dockedAt: null, position: pos, hold: { food: starter.cargoCapacity - 2 } } },
       loot: [{ id: 'l1', item: 'ore', amount: 5, position: { x: pos.x + 100, y: pos.y }, velocity: { x: 0, y: 0 }, ticksLeft: 5000 }],
     };
     for (let i = 0; i < SECOND * 3; i++) w = stepWorld(w, { [me]: { ...emptyInput(), tractor: true } });
     expect(w.ships[me]!.hold['ore']).toBe(2);
-    expect(cargoFree(w.ships[me]!, sparrow)).toBe(0);
+    expect(cargoFree(w.ships[me]!, starter)).toBe(0);
     expect(w.loot.map((l) => l.amount)).toEqual([3]);
   });
 

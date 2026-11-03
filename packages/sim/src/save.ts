@@ -1,5 +1,8 @@
 import { GOODS } from './goods.js';
 import { HULLS } from './hulls.js';
+import { LOADOUTS } from './loadouts.js';
+import { MANUFACTURERS } from './manufacturers.js';
+import { MODULES } from './modules.js';
 import type { World } from './types.js';
 import { WEAPONS } from './weapons.js';
 
@@ -19,17 +22,27 @@ import { WEAPONS } from './weapons.js';
  * - Older versions are brought up to date by MIGRATIONS, one step at a
  *   time. Pre-1.0, a change that is not worth migrating bumps the version
  *   with no migration, and old saves are refused with a clear reason.
- * - Catalogues (hulls, weapons, goods) are replaced with the ones in the
- *   code, so tuning a hull, weapon or good applies to existing saves.
- *   Ships refer to specs by id for exactly this reason. Stations, markets
+ * - Catalogues (hulls, modules, loadouts, manufacturers, weapons, goods)
+ *   are replaced with the ones in the code, so tuning any of them applies
+ *   to existing saves. Ships refer to specs by id (a hull id, and module
+ *   ids in their fit) for exactly this reason, and stats are derived, never
+ *   saved. Stations, markets
  *   and everything else in the world are kept as saved.
  * - Per-tick events are dropped.
  */
 
 export const SAVE_FORMAT = 'spacegame-world';
 
-/** Bump when the shape of the saved world changes. */
-export const SAVE_VERSION = 1;
+/**
+ * Bump when the shape of the saved world changes.
+ *
+ * History:
+ * - 1: 0.5.0 to 0.6.x.
+ * - 2: 0.7.0, modular ships. Ships carry a fit, spawners a loadout,
+ *   stations an outfitting flag. Version 1 saves are refused (no
+ *   migration: their hulls no longer exist).
+ */
+export const SAVE_VERSION = 2;
 
 /** Upgrade a world from version N to N + 1, keyed by N. Empty until a saved format changes. */
 export type Migration = (world: unknown) => unknown;
@@ -106,6 +119,15 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   return {
     ok: true,
     savedAt,
-    world: { ...world, hulls: { ...HULLS }, weapons: { ...WEAPONS }, goods: { ...GOODS }, events: [] },
+    world: {
+      ...world,
+      hulls: { ...HULLS },
+      modules: { ...MODULES },
+      loadouts: { ...LOADOUTS },
+      manufacturers: { ...MANUFACTURERS },
+      weapons: { ...WEAPONS },
+      goods: { ...GOODS },
+      events: [],
+    },
   };
 }

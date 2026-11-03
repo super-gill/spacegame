@@ -2,19 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { collideWithStations } from '../collision.js';
 import { HULL_RESTITUTION } from '../constants.js';
 import { idleThrusters } from '../flight.js';
-import { TEST_SHIP_COMBAT } from './fixtures.js';
-import { HULLS } from '../hulls.js';
+import { TEST_SHIP_COMBAT, TEST_STATS } from './fixtures.js';
 import type { Ship, Station } from '../types.js';
 import { distance } from '../vec2.js';
 
-const hull = HULLS['sparrow']!;
-const station: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 220, securityRadius: 900, market: {} };
+const hull = TEST_STATS;
+const station: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 220, securityRadius: 900, market: {}, outfitting: false };
 const stations = { st: station };
 
 function ship(overrides: Partial<Ship>): Ship {
   return {
     id: 's',
-    hullId: hull.id,
+    hullId: 'sparrow',
     ownerId: null,
     position: { x: 200, y: 0 },
     velocity: { x: 0, y: 0 },

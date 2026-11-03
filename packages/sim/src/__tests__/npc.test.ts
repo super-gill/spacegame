@@ -3,8 +3,7 @@ import { PIRATE_TUNING } from '../ai/pirate.js';
 import { arriveVelocity, steerToVelocity, turnTowards } from '../ai/steer.js';
 import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
-import { TEST_SHIP_COMBAT } from './fixtures.js';
-import { HULLS } from '../hulls.js';
+import { TEST_SHIP_COMBAT, loadoutStats } from './fixtures.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
 import type { PirateBrain, Ship, World, WorldEvent } from '../types.js';
@@ -48,17 +47,17 @@ function freeShip(hullId: string, overrides: Partial<Ship> = {}): Ship {
 
 describe('steering', () => {
   it('turns to a heading and settles there without oscillating', () => {
-    const hull = HULLS['mule']!;
-    let s = freeShip('mule');
+    const hull = loadoutStats('tessaract-trader');
+    let s = freeShip('tessaract-spine');
     for (let i = 0; i < SECOND * 4; i++) s = stepShip(s, hull, { ...emptyInput(), ...turnTowards(s, hull, 2) }, FIXED_DT);
     expect(Math.abs(s.heading - 2)).toBeLessThan(0.05);
     expect(s.angularVelocity).toBe(0);
   });
 
   it('arrives at a point and stops near it', () => {
-    const hull = HULLS['sparrow']!;
+    const hull = loadoutStats('meridian-starter');
     const target = { x: 1500, y: 600 };
-    let s = freeShip('sparrow');
+    let s = freeShip('meridian-courier');
     for (let i = 0; i < SECOND * 30; i++) {
       s = stepShip(s, hull, steerToVelocity(s, hull, arriveVelocity(s, hull, target, hull.maxSpeed)), FIXED_DT);
     }

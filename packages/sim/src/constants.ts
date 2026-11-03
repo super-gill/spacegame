@@ -1,4 +1,4 @@
-/** Tuning constants. Everything that affects feel lives here or in a HullSpec. */
+/** Tuning constants. Everything that affects feel lives here or in a catalogue (hulls, modules, weapons). */
 
 /** Simulation runs at a fixed 60 ticks per second. */
 export const TICKS_PER_SECOND = 60;
@@ -97,3 +97,13 @@ export const MAX_LOOT_CANISTERS = 4;
 /** When undocking, ships are placed this far outside the station and given this push. */
 export const UNDOCK_CLEARANCE = 40;
 export const UNDOCK_PUSH_SPEED = 30;
+
+/** Seconds after taking damage before shields start recharging. */
+export const SHIELD_REGEN_DELAY = 3;
+
+/**
+ * Fraction of a module's price paid back when it is taken off or
+ * replaced at outfitting. There is nowhere to store a removed module yet,
+ * so it is sold back to the station.
+ */
+export const MODULE_RESALE_FRACTION = 0.5;

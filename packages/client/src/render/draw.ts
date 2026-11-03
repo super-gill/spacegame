@@ -1,5 +1,6 @@
-import type { HullSpec, Loot, Projectile, Ship, Station, Thrusters, Wreck } from '@spacegame/sim';
+import type { HullSpec, Loot, Projectile, Ship, ShipStats, Station, Wreck } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
+import { drawShipArt, type ShipArt } from './ship-art.js';
 
 /**
  * Vector drawing of world objects. Everything is lines on a dark background.
@@ -21,19 +22,6 @@ export interface ShipStyle {
   colour: string;
   label?: string;
 }
-
-/**
- * Hull outlines, in units of hull radius, nose pointing along +x.
- * Each hull gets a silhouette so ships are recognisable at a glance.
- * Unknown hulls fall back to the Sparrow's arrowhead.
- */
-const HULL_OUTLINES: Record<string, ReadonlyArray<readonly [number, number]>> = {
-  sparrow: [[1, 0], [-0.7, -0.65], [-0.4, 0], [-0.7, 0.65]],
-  // Mule: a blunt box with a narrow bridge at the front.
-  mule: [[0.9, -0.2], [0.9, 0.2], [0.5, 0.45], [-0.9, 0.45], [-0.9, -0.45], [0.5, -0.45]],
-  // Jackal: a long thin dart with swept fins.
-  jackal: [[1.2, 0], [-0.3, -0.25], [-0.8, -0.75], [-0.6, 0], [-0.8, 0.75], [-0.3, 0.25]],
-};
 
 export interface ShipView {
   position: { x: number; y: number };
@@ -90,82 +78,25 @@ export function drawStation(ctx: CanvasRenderingContext2D, camera: Camera, stati
   ctx.fillText(station.name.toUpperCase(), c.x, c.y + r + 18);
 }
 
+/**
+ * A ship in space: hull and fitted modules (see ship-art.ts), with an
+ * optional label underneath. Docked ships are not drawn.
+ */
 export function drawShip(
   ctx: CanvasRenderingContext2D,
   camera: Camera,
   view: ShipView,
-  hull: HullSpec,
-  thrusters: Thrusters,
+  art: Omit<ShipArt, 'colour' | 'heading'>,
   docked: boolean,
   style: ShipStyle = { colour: COLOUR.inkBright },
 ): void {
   if (docked) return;
   const c = camera.worldToScreen(view.position);
-  const s = hull.radius * camera.zoom;
-
   ctx.save();
   ctx.translate(c.x, c.y);
   ctx.rotate(view.heading);
-
-  // Flames are drawn from what actually fired this tick, so flight-assist
-  // and brake burns show up as well as the pilot's own. Length scales
-  // with throttle; a faint minimum keeps small assist burns visible.
-  ctx.strokeStyle = COLOUR.flame;
-  const len = (throttle: number): number => 0.25 + 0.75 * throttle;
-
-  if (thrusters.main > 0) {
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.7, -s * 0.35);
-    ctx.lineTo(-s * (0.7 + 0.9 * len(thrusters.main)), 0);
-    ctx.lineTo(-s * 0.7, s * 0.35);
-    ctx.stroke();
-  }
-  if (thrusters.reverse > 0) {
-    const l = 0.5 * len(thrusters.reverse);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(s * 0.6, -s * 0.5);
-    ctx.lineTo(s * (0.6 + l), -s * 0.55);
-    ctx.moveTo(s * 0.6, s * 0.5);
-    ctx.lineTo(s * (0.6 + l), s * 0.55);
-    ctx.stroke();
-  }
-  // Lateral thrusters fire on the side opposite the push.
-  for (const [throttle, side] of [
-    [thrusters.strafeRight, -1],
-    [thrusters.strafeLeft, 1],
-  ] as const) {
-    if (throttle <= 0) continue;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.2, side * s * 0.6);
-    ctx.lineTo(-s * 0.2, side * s * (0.6 + 0.5 * len(throttle)));
-    ctx.stroke();
-  }
-  // Rotation thrusters: a puff at the nose on the side opposite the turn.
-  for (const [throttle, side] of [
-    [thrusters.rotateRight, -1],
-    [thrusters.rotateLeft, 1],
-  ] as const) {
-    if (throttle <= 0) continue;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(s * 0.55, side * s * 0.2);
-    ctx.lineTo(s * 0.55, side * s * (0.2 + 0.4 * len(throttle)));
-    ctx.stroke();
-  }
-
-  // Hull outline.
-  const outline = HULL_OUTLINES[hull.id] ?? HULL_OUTLINES['sparrow']!;
-  ctx.strokeStyle = style.colour;
-  ctx.lineWidth = 1.5;
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  outline.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x * s, y * s) : ctx.lineTo(x * s, y * s)));
-  ctx.closePath();
-  ctx.stroke();
-
+  ctx.scale(camera.zoom, camera.zoom);
+  drawShipArt(ctx, camera.zoom, { ...art, colour: style.colour, heading: view.heading });
   ctx.restore();
 
   if (style.label) {
@@ -173,7 +104,7 @@ export function drawShip(
     ctx.globalAlpha = 0.8;
     ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(style.label, c.x, c.y + s + 16);
+    ctx.fillText(style.label, c.x, c.y + art.hull.radius * camera.zoom + 16);
     ctx.globalAlpha = 1;
   }
 }
@@ -268,11 +199,10 @@ export function drawProjectile(ctx: CanvasRenderingContext2D, camera: Camera, p:
   ctx.stroke();
 }
 
-/** A wreck: the hull outline broken into pieces, fading out over its lifetime. */
+/** A wreck: the bare hull outline, dashed, fading out over its lifetime. */
 export function drawWreck(ctx: CanvasRenderingContext2D, camera: Camera, w: Wreck, hull: HullSpec, fade: number): void {
   const c = camera.worldToScreen(w.position);
-  const s = hull.radius * camera.zoom;
-  const outline = HULL_OUTLINES[hull.id] ?? HULL_OUTLINES['sparrow']!;
+  const z = camera.zoom;
   ctx.save();
   ctx.translate(c.x, c.y);
   ctx.rotate(w.heading);
@@ -281,7 +211,7 @@ export function drawWreck(ctx: CanvasRenderingContext2D, camera: Camera, w: Wrec
   ctx.lineWidth = 1;
   ctx.setLineDash([4, 5]);
   ctx.beginPath();
-  outline.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x * s, y * s) : ctx.lineTo(x * s, y * s)));
+  hull.outline.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x * z, p.y * z) : ctx.lineTo(p.x * z, p.y * z)));
   ctx.closePath();
   ctx.stroke();
   ctx.setLineDash([]);
@@ -327,33 +257,20 @@ export function drawTractor(ctx: CanvasRenderingContext2D, camera: Camera, at: {
   ctx.globalAlpha = 1;
 }
 
-/** A turret's bearing: a short barrel line out from the hull. */
-export function drawTurret(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, aim: number, hull: HullSpec, colour: string): void {
-  const c = camera.worldToScreen(at);
-  const inner = hull.radius * 0.2 * camera.zoom;
-  const outer = hull.radius * 0.95 * camera.zoom;
-  ctx.strokeStyle = colour;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(c.x + Math.cos(aim) * inner, c.y + Math.sin(aim) * inner);
-  ctx.lineTo(c.x + Math.cos(aim) * outer, c.y + Math.sin(aim) * outer);
-  ctx.stroke();
-}
-
 /** Shield and structure bars over a ship, shown once it has taken damage. */
-export function drawHealthBars(ctx: CanvasRenderingContext2D, camera: Camera, ship: Ship, hull: HullSpec, at: { x: number; y: number }): void {
-  if (ship.shield >= hull.shield && ship.structure >= hull.structure) return;
+export function drawHealthBars(ctx: CanvasRenderingContext2D, camera: Camera, ship: Ship, stats: ShipStats, at: { x: number; y: number }): void {
+  if (ship.shield >= stats.shield && ship.structure >= stats.structure) return;
   const c = camera.worldToScreen(at);
   const w = 36;
-  const y = c.y - hull.radius * camera.zoom - 14;
+  const y = c.y - stats.radius * camera.zoom - 14;
   const bar = (row: number, fraction: number, colour: string): void => {
     ctx.fillStyle = 'rgba(79, 122, 114, 0.35)';
     ctx.fillRect(c.x - w / 2, y + row * 5, w, 3);
     ctx.fillStyle = colour;
     ctx.fillRect(c.x - w / 2, y + row * 5, w * Math.max(0, Math.min(1, fraction)), 3);
   };
-  bar(0, ship.shield / hull.shield, COLOUR.neutral);
-  bar(1, ship.structure / hull.structure, ship.structure / hull.structure < 0.3 ? COLOUR.hostile : COLOUR.ink);
+  if (stats.shield > 0) bar(0, ship.shield / stats.shield, COLOUR.neutral);
+  bar(1, ship.structure / stats.structure, ship.structure / stats.structure < 0.3 ? COLOUR.hostile : COLOUR.ink);
 }
 
 /** An expanding ring where a ship blew up. `t` runs 0 to 1. */

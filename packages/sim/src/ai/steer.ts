@@ -1,6 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
-import type { HullSpec, Ship, ShipInput, Station } from '../types.js';
+import type { ShipStats, Ship, ShipInput, Station } from '../types.js';
 import { add, distance, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
 
@@ -44,10 +44,10 @@ function dot(a: Vec2, b: Vec2): number {
  * full rotation thrust. So: keep turning until the angle left is about
  * the angle needed to stop, then let go and let the assist brake.
  */
-export function turnTowards(ship: Ship, hull: HullSpec, target: number): Pick<ShipInput, 'turnLeft' | 'turnRight'> {
+export function turnTowards(ship: Ship, stats: ShipStats, target: number): Pick<ShipInput, 'turnLeft' | 'turnRight'> {
   const error = angleDelta(ship.heading, target);
   const spin = ship.angularVelocity;
-  const alpha = hull.rotationThrust / hull.mass;
+  const alpha = stats.rotationThrust / stats.mass;
   const stoppingAngle = (spin * spin) / (2 * alpha);
 
   const spinningTowards = Math.sign(spin) === Math.sign(error) && spin !== 0;
@@ -65,13 +65,13 @@ export function turnTowards(ship: Ship, hull: HullSpec, target: number): Pick<Sh
  * if given), so the strong main engine does most of the work, and the
  * thrusters on each axis fire to close whatever error remains.
  */
-export function steerToVelocity(ship: Ship, hull: HullSpec, desired: Vec2, faceAt?: Vec2): ShipInput {
+export function steerToVelocity(ship: Ship, stats: ShipStats, desired: Vec2, faceAt?: Vec2): ShipInput {
   const input = emptyInput();
 
   let targetHeading = ship.heading;
   if (faceAt) targetHeading = toAngle(sub(faceAt, ship.position));
   else if (length(desired) > MIN_SPEED_TO_FACE) targetHeading = toAngle(desired);
-  Object.assign(input, turnTowards(ship, hull, targetHeading));
+  Object.assign(input, turnTowards(ship, stats, targetHeading));
 
   const error = sub(desired, ship.velocity);
   const { forward, right } = shipAxes(ship.heading);
@@ -86,8 +86,8 @@ export function steerToVelocity(ship: Ship, hull: HullSpec, desired: Vec2, faceA
 }
 
 /** Deceleration (units/s^2) the hull can plan on when stopping head-on with its retro engine. */
-export function plannedBraking(hull: HullSpec): number {
-  return (Math.min(hull.reverseThrust, hull.lateralThrust) / hull.mass) * BRAKE_PLANNING_FACTOR;
+export function plannedBraking(stats: ShipStats): number {
+  return (Math.min(stats.reverseThrust, stats.lateralThrust) / stats.mass) * BRAKE_PLANNING_FACTOR;
 }
 
 /**
@@ -95,11 +95,11 @@ export function plannedBraking(hull: HullSpec): number {
  * faster than `cruise`. Speed falls off as sqrt(2 * a * d), the fastest
  * you can go and still stop in the distance left.
  */
-export function arriveVelocity(ship: Ship, hull: HullSpec, point: Vec2, cruise: number): Vec2 {
+export function arriveVelocity(ship: Ship, stats: ShipStats, point: Vec2, cruise: number): Vec2 {
   const offset = sub(point, ship.position);
   const dist = length(offset);
   if (dist < 1) return { x: 0, y: 0 };
-  const speed = Math.min(cruise, Math.sqrt(2 * plannedBraking(hull) * dist));
+  const speed = Math.min(cruise, Math.sqrt(2 * plannedBraking(stats) * dist));
   return scale(normalise(offset), speed);
 }
 
@@ -109,7 +109,7 @@ export function arriveVelocity(ship: Ship, hull: HullSpec, point: Vec2, cruise: 
  * return `goal` unchanged. Good enough for open space with a few
  * stations; real pathfinding can come with busier sectors.
  */
-export function routeAround(ship: Ship, hull: HullSpec, goal: Vec2, stations: Record<string, Station>): Vec2 {
+export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, stations: Record<string, Station>): Vec2 {
   const path = sub(goal, ship.position);
   const pathLength = length(path);
   if (pathLength < 1) return goal;
@@ -117,7 +117,7 @@ export function routeAround(ship: Ship, hull: HullSpec, goal: Vec2, stations: Re
 
   let nearestBlock: { station: Station; along: number } | null = null;
   for (const station of Object.values(stations)) {
-    const clearance = station.radius + hull.radius + STATION_CLEARANCE;
+    const clearance = station.radius + stats.radius + STATION_CLEARANCE;
     if (distance(goal, station.position) < clearance) continue; // goal is at this station
     const along = dot(sub(station.position, ship.position), dir);
     if (along <= 0 || along >= pathLength) continue;
@@ -129,7 +129,7 @@ export function routeAround(ship: Ship, hull: HullSpec, goal: Vec2, stations: Re
 
   // Go round on whichever side the ship is already offset towards.
   const { station } = nearestBlock;
-  const clearance = station.radius + hull.radius + STATION_CLEARANCE;
+  const clearance = station.radius + stats.radius + STATION_CLEARANCE;
   const side = { x: -dir.y, y: dir.x };
   const offsetSide = dot(sub(ship.position, station.position), side) >= 0 ? 1 : -1;
   return add(station.position, scale(side, offsetSide * (clearance + 40)));
