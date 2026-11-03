@@ -60,6 +60,20 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 - Docked ships do not move and cannot be damaged (later: unless the station is under attack).
 - Undocking places the ship just outside the station hull in the direction it is facing, with a small push.
 
+## Stations and security
+
+- Station hulls are solid. A ship that hits one is pushed back out and bounces: the inward part of its velocity is reflected at 40% (`HULL_RESTITUTION`) and sliding along the hull loses 10% (`HULL_FRICTION`). Impacts over 8 u/s raise a `collided` event carrying the speed, ready for damage in milestone 3. Ship to ship collision is not modelled yet.
+- Every station has a security zone (`securityRadius`), drawn as a faint dashed ring. Inside it, pirates will not hunt you. Later, crimes witnessed inside it bring a security response. Outside every zone is open space.
+- New pilots spawn inside the starter station's security zone.
+
+## NPCs
+
+- NPCs fly through exactly the same flight computer and physics as pilots. Their brains produce a `ShipInput` each tick, the same keys a person would press, so they have no extra thrust and can be outflown. They fly in rotation-assist mode and steer their own drift.
+- Brains are plain data on the world (`World.npcs`), so NPC state saves with everything else. Every brain decides from the start-of-tick world, so the order they think in never changes the outcome, and the whole sim stays deterministic.
+- **Trader**: flies a loop of stations, docking at each for a while. Routes round station hulls rather than through them. For now it is traffic and a target; it will carry cargo once trade exists.
+- **Pirate**: prowls a loop near a home point off the trade lane. It hunts the nearest flying ship in detection range (1400) that is well outside every security zone, closes in and holds about 160 units off it, nose on. It breaks off if the target docks, gets close to a security zone, gets more than 2200 away, or after 45 seconds, then goes home and waits 20 seconds before hunting again. It treats each security zone as 300 units bigger than it is, so it turns away before crossing the edge.
+- The pirate hull (Jackal) accelerates and turns faster than a Sparrow but has a lower top speed (320 against 350), so a pilot who sees it coming can run for security. With no weapons until milestone 3, a hunt is a pirate on your tail and nothing more.
+- All behaviour numbers are named in `PIRATE_TUNING` and `TRADER_TUNING`.
 ## World structure (planned)
 
 Map modelled on EVE's security bands: busy, well-policed core; unregulated low-security fringe; lawless null space; possibly unknown space beyond. Sectors are discrete and linked. NPC traffic exists abstractly in sectors the player is not in and is only instantiated when the player arrives.

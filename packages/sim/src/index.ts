@@ -21,6 +21,8 @@ export {
   STARTER_HULL_ID,
 } from './world.js';
 export { stepWorld } from './step.js';
+export { collideWithStations } from './collision.js';
+export { thinkNpcs, PIRATE_TUNING, TRADER_TUNING, inSecurityZone } from './ai/index.js';
 export { stepShip, linearAcceleration, angularAcceleration } from './ship.js';
 export {
   FLIGHT_MODES,

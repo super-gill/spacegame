@@ -94,6 +94,12 @@ export interface Station {
   radius: number;
   /** Ships inside this distance of the station centre may request docking. */
   dockRange: number;
+  /**
+   * Radius of the station's protected zone, from its centre. Pirates will
+   * not hunt a ship inside it or enter it themselves. Later, crimes
+   * witnessed inside it bring a security response.
+   */
+  securityRadius: number;
 }
 
 /**
@@ -134,6 +140,41 @@ export interface ShipInput {
   cycleFlightMode: boolean;
 }
 
+/**
+ * NPC brains. Plain data, stored in `World.npcs` keyed by the ship the
+ * brain flies, so NPC state saves and loads with the world like anything
+ * else. The behaviour lives in `ai/`.
+ */
+export type NpcBrain = TraderBrain | PirateBrain;
+
+/** Flies a fixed loop of stations, docking at each for a while. */
+export interface TraderBrain {
+  kind: 'trader';
+  /** Station ids visited in order, then back to the first. */
+  route: string[];
+  /** Index into `route` of the station currently heading for or docked at. */
+  leg: number;
+  /** Ticks left to wait while docked. */
+  waitTicks: number;
+}
+
+export type PirateMode = 'prowl' | 'hunt' | 'withdraw';
+
+/** Patrols near a home point and hunts lone ships outside station security. */
+export interface PirateBrain {
+  kind: 'pirate';
+  home: Vec2;
+  mode: PirateMode;
+  /** Ship being hunted, when mode is `hunt`. */
+  targetId: string | null;
+  /** Ticks spent in the current mode. */
+  modeTicks: number;
+  /** Ticks before the pirate will look for a new target. */
+  cooldownTicks: number;
+  /** Which patrol point round `home` it is flying to. */
+  patrolIndex: number;
+}
+
 export interface World {
   /** Monotonic tick counter. */
   tick: number;
@@ -141,6 +182,8 @@ export interface World {
   dt: number;
   pilots: Record<string, Pilot>;
   ships: Record<string, Ship>;
+  /** NPC brains keyed by the id of the ship they fly. */
+  npcs: Record<string, NpcBrain>;
   stations: Record<string, Station>;
   hulls: Record<string, HullSpec>;
   /**
@@ -154,4 +197,10 @@ export type WorldEvent =
   | { type: 'docked'; shipId: string; stationId: string }
   | { type: 'undocked'; shipId: string; stationId: string }
   | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' }
-  | { type: 'flightModeChanged'; shipId: string; mode: FlightMode };
+  | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
+  /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
+  | { type: 'collided'; shipId: string; stationId: string; speed: number }
+  /** A pirate has picked `shipId` as its target. */
+  | { type: 'huntStarted'; shipId: string; pirateId: string }
+  /** A pirate has given up on `shipId`. */
+  | { type: 'huntEnded'; shipId: string; pirateId: string };

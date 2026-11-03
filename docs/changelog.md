@@ -2,6 +2,27 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.2.0] - 2026-11-03
+
+Milestone 2: company. The sector now has traffic and a threat.
+
+### Added
+- NPCs that fly through the same flight computer and physics as pilots, steering by pressing the same virtual keys (`ai/steer.ts`).
+- Trader NPC (Mule hull) running a loop between Harbour Station and Ridge Outpost, docking at each.
+- Pirate NPC (Jackal hull) that prowls off the lane, hunts lone ships outside station security, holds station on their tail, and gives up when they dock, reach security, escape or outlast it.
+- Second station, Ridge Outpost.
+- Station security zones (`Station.securityRadius`), drawn as a faint ring.
+- Station hull collision with bounce and friction, and a `collided` event with impact speed.
+- Mule and Jackal hulls, each with its own outline.
+- Off-screen edge markers for stations and ships, with distance.
+- HUD lines for the current security zone and for being hunted; toasts for hunts and hull contact.
+- NPC colours and labels.
+- `World.npcs` brain storage; `huntStarted`, `huntEnded` and `collided` events.
+- Tests for steering, trader loop, pirate behaviour and security, station collision, and whole-sim determinism.
+
+### Changed
+- `stepWorld` runs NPC brains each tick; an input passed in for an NPC ship overrides its brain.
+
 ## [0.1.4] - 2026-11-03
 
 Groundwork for the private-server model: a few friends on one shared world, each with their own progress. No networking yet.

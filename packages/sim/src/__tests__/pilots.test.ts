@@ -12,10 +12,10 @@ import { createStarterWorld, emptyInput, joinPilot, pilotShip, starterShipId } f
 const SECOND = 60;
 
 describe('joining', () => {
-  it('starts with no pilots and no ships', () => {
+  it('starts with no pilots and no pilot-owned ships', () => {
     const w = createStarterWorld();
     expect(w.pilots).toEqual({});
-    expect(w.ships).toEqual({});
+    expect(Object.values(w.ships).filter((s) => s.ownerId !== null)).toEqual([]);
   });
 
   it('gives a new pilot their own starter ship', () => {
@@ -46,7 +46,7 @@ describe('joining', () => {
     const rejoined = joinPilot(w, 'ana', 'Ana');
     expect(rejoined).toBe(w); // nothing changed at all
     expect(pilotShip(rejoined, 'ana')).toEqual(before);
-    expect(Object.keys(rejoined.ships)).toHaveLength(1);
+    expect(Object.values(rejoined.ships).filter((s) => s.ownerId === 'ana')).toHaveLength(1);
   });
 
   it('a returning pilot can change display name without losing anything', () => {

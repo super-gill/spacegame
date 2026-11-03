@@ -1,5 +1,5 @@
 import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { FLIGHT_MODE_LABELS, nearestDockableStation } from '@spacegame/sim';
+import { FLIGHT_MODE_LABELS, distance, nearestDockableStation } from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel and transient toasts.
@@ -27,7 +27,11 @@ export class Ui {
   update(world: World, ship: Ship, fps: number): void {
     const speed = Math.hypot(ship.velocity.x, ship.velocity.y);
     const near = nearestDockableStation(ship, world.stations);
+    const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
+    const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
     const lines = [
+      hunted ? '!! PIRATE ON YOUR TAIL' : '',
+      `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
@@ -52,6 +56,12 @@ export class Ui {
         this.showToast(e.reason === 'tooFast' ? 'Too fast to dock. Slow down.' : 'No station in range.');
       } else if (e.type === 'flightModeChanged') {
         this.showToast(`Flight mode: ${FLIGHT_MODE_LABELS[e.mode]}`, 1200, 'info');
+      } else if (e.type === 'huntStarted') {
+        this.showToast('Pirate closing in. Run for station security.', 3000);
+      } else if (e.type === 'huntEnded') {
+        this.showToast('The pirate has broken off.', 2000, 'info');
+      } else if (e.type === 'collided') {
+        this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
       }
     }
   }

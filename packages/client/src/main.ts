@@ -1,5 +1,6 @@
 import {
   createStarterWorld,
+  distance,
   joinPilot,
   nearestDockableStation,
   pilotShip,
@@ -12,7 +13,7 @@ import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { loadLocalPilot } from './identity.js';
 import { InputController } from './input.js';
-import { drawShip, drawStation, drawVelocityVector } from './render/draw.js';
+import { COLOUR, drawOffscreenMarker, drawShip, drawStation, drawVelocityVector, type ShipStyle } from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
 import { Ui } from './ui.js';
 
@@ -110,6 +111,19 @@ function interpolate(now: Ship, prev: Ship | undefined, alpha: number) {
   };
 }
 
+/** Colour and label for a ship, from who flies it. Labels are a dev aid for now. */
+function shipStyle(world: World, ship: Ship, mine: Ship): ShipStyle {
+  if (ship.id === mine.id) return { colour: COLOUR.inkBright };
+  const brain = world.npcs[ship.id];
+  if (brain?.kind === 'pirate') {
+    const hunting = brain.mode === 'hunt' ? (brain.targetId === mine.id ? ' · HUNTING YOU' : ' · HUNTING') : '';
+    return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
+  }
+  if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
+  const owner = ship.ownerId ? world.pilots[ship.ownerId] : undefined;
+  return owner ? { colour: COLOUR.ink, label: owner.name.toUpperCase() } : { colour: COLOUR.ink };
+}
+
 function render(alpha: number, frameSeconds: number): void {
   const shipNow = myShip(current);
   const view = interpolate(shipNow, previous.ships[shipNow.id], alpha);
@@ -132,7 +146,17 @@ function render(alpha: number, frameSeconds: number): void {
   for (const ship of Object.values(current.ships)) {
     const hull = current.hulls[ship.hullId]!;
     const shipView = ship.id === shipNow.id ? view : interpolate(ship, previous.ships[ship.id], alpha);
-    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked');
+    drawShip(ctx!, camera, shipView, hull, ship.thrusters, ship.state === 'docked', shipStyle(current, ship, shipNow));
+  }
+
+  // Edge markers for anything off screen, so the sector is navigable.
+  for (const station of Object.values(current.stations)) {
+    drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(view.position, station.position), COLOUR.ink, station.radius);
+  }
+  for (const ship of Object.values(current.ships)) {
+    if (ship.id === shipNow.id || ship.state !== 'flying') continue;
+    const style = shipStyle(current, ship, shipNow);
+    drawOffscreenMarker(ctx!, camera, ship.position, style.label ?? 'SHIP', distance(view.position, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 
   ui.update(current, shipNow, fpsSmoothed);

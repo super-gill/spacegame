@@ -37,6 +37,17 @@ export const REST_EPSILON = 1e-9;
 /** A ship must be slower than this (units/s) to dock. */
 export const DOCK_MAX_SPEED = 60;
 
+/**
+ * Station hull collisions. Restitution is the fraction of the inward
+ * speed kept after bouncing off; friction is the fraction of sliding
+ * speed lost at contact.
+ */
+export const HULL_RESTITUTION = 0.4;
+export const HULL_FRICTION = 0.1;
+
+/** Impacts slower than this (units/s) are contact, not collision, and raise no event. */
+export const COLLISION_EVENT_MIN_SPEED = 8;
+
 /** When undocking, ships are placed this far outside the station and given this push. */
 export const UNDOCK_CLEARANCE = 40;
 export const UNDOCK_PUSH_SPEED = 30;

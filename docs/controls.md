@@ -55,6 +55,8 @@ If docking is refused a message says why: too far, or too fast.
 
 Bottom left, top to bottom:
 
+- `!! PIRATE ON YOUR TAIL` while a pirate is hunting you
+- `ZONE` the station security zone you are in, or `OPEN SPACE`
 - `VEL` speed in units per second
 - `POS` world position
 - `HDG` heading in degrees
@@ -62,3 +64,9 @@ Bottom left, top to bottom:
 - `FLT` current flight mode
 - `DOCK <station> [F]` when docking is available
 - frame rate and sim tick
+
+## On screen
+
+- Edge markers point at stations and ships that are off screen, with their distance.
+- Your ship is white. Traders are blue-grey, pirates red. NPC labels (`TRADER`, `PIRATE · HUNTING YOU`) are a development aid and may go later.
+- Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).

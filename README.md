@@ -2,11 +2,11 @@
 
 A 2D free-roam space sim in the spirit of Flatspace, built for the browser. Play solo, or (later) with a few friends on a world one of you hosts, Minecraft style.
 
-Version 0.1.4. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.2.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 1, "fly and dock": one sector, one station, one ship. Pure Newtonian flight on the keyboard with three flight-assist modes, docking and undocking. No combat, trade or NPCs yet. See [docs/roadmap.md](docs/roadmap.md).
+Milestone 2, "company": one sector with two stations, a trader running between them and a pirate that hunts lone ships outside station security. Pure Newtonian flight with three flight-assist modes, docking, and solid station hulls. No combat or trade yet. See [docs/roadmap.md](docs/roadmap.md).
 
 ## Quick start
 

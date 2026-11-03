@@ -19,4 +19,31 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 2.4, // about 140 degrees per second
     radius: 18,
   },
+  mule: {
+    // Slow bulk hauler: heavy, modest engines, ponderous to turn.
+    id: 'mule',
+    name: 'Mule',
+    mass: 30,
+    mainThrust: 1800, // 60 u/s^2
+    reverseThrust: 900, // 30 u/s^2
+    lateralThrust: 900, // 30 u/s^2
+    maxSpeed: 220,
+    rotationThrust: 90, // 3 rad/s^2
+    maxTurnRate: 1.2, // about 70 degrees per second
+    radius: 26,
+  },
+  jackal: {
+    // Raider: quicker off the mark and nimbler than a Sparrow, but a
+    // lower top speed, so a pilot who sees it coming can run.
+    id: 'jackal',
+    name: 'Jackal',
+    mass: 12,
+    mainThrust: 1500, // 125 u/s^2
+    reverseThrust: 720, // 60 u/s^2
+    lateralThrust: 840, // 70 u/s^2
+    maxSpeed: 320,
+    rotationThrust: 84, // 7 rad/s^2
+    maxTurnRate: 2.8, // about 160 degrees per second
+    radius: 16,
+  },
 };

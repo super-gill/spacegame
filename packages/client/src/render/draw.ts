@@ -12,6 +12,27 @@ const COLOUR = {
   inkBright: '#dffbf3',
   warn: '#e0a458',
   flame: '#e0a458',
+  hostile: '#e06c5a',
+  neutral: '#8fa8c8',
+};
+
+/** How a ship is drawn: outline colour and an optional label underneath. */
+export interface ShipStyle {
+  colour: string;
+  label?: string;
+}
+
+/**
+ * Hull outlines, in units of hull radius, nose pointing along +x.
+ * Each hull gets a silhouette so ships are recognisable at a glance.
+ * Unknown hulls fall back to the Sparrow's arrowhead.
+ */
+const HULL_OUTLINES: Record<string, ReadonlyArray<readonly [number, number]>> = {
+  sparrow: [[1, 0], [-0.7, -0.65], [-0.4, 0], [-0.7, 0.65]],
+  // Mule: a blunt box with a narrow bridge at the front.
+  mule: [[0.9, -0.2], [0.9, 0.2], [0.5, 0.45], [-0.9, 0.45], [-0.9, -0.45], [0.5, -0.45]],
+  // Jackal: a long thin dart with swept fins.
+  jackal: [[1.2, 0], [-0.3, -0.25], [-0.8, -0.75], [-0.6, 0], [-0.8, 0.75], [-0.3, 0.25]],
 };
 
 export interface ShipView {
@@ -22,6 +43,17 @@ export interface ShipView {
 export function drawStation(ctx: CanvasRenderingContext2D, camera: Camera, station: Station, inRange: boolean): void {
   const c = camera.worldToScreen(station.position);
   const r = station.radius * camera.zoom;
+
+  // Security zone edge: very faint, long dashes. Pirates will not hunt inside it.
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, station.securityRadius * camera.zoom, 0, Math.PI * 2);
+  ctx.strokeStyle = COLOUR.ink;
+  ctx.globalAlpha = 0.12;
+  ctx.setLineDash([24, 18]);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
 
   // Dock range ring: faint unless the player is inside it.
   ctx.beginPath();
@@ -65,6 +97,7 @@ export function drawShip(
   hull: HullSpec,
   thrusters: Thrusters,
   docked: boolean,
+  style: ShipStyle = { colour: COLOUR.inkBright },
 ): void {
   if (docked) return;
   const c = camera.worldToScreen(view.position);
@@ -123,19 +156,26 @@ export function drawShip(
     ctx.stroke();
   }
 
-  // Hull: arrowhead with a notched tail.
-  ctx.strokeStyle = COLOUR.inkBright;
+  // Hull outline.
+  const outline = HULL_OUTLINES[hull.id] ?? HULL_OUTLINES['sparrow']!;
+  ctx.strokeStyle = style.colour;
   ctx.lineWidth = 1.5;
   ctx.lineJoin = 'round';
   ctx.beginPath();
-  ctx.moveTo(s, 0);
-  ctx.lineTo(-s * 0.7, -s * 0.65);
-  ctx.lineTo(-s * 0.4, 0);
-  ctx.lineTo(-s * 0.7, s * 0.65);
+  outline.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x * s, y * s) : ctx.lineTo(x * s, y * s)));
   ctx.closePath();
   ctx.stroke();
 
   ctx.restore();
+
+  if (style.label) {
+    ctx.fillStyle = style.colour;
+    ctx.globalAlpha = 0.8;
+    ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(style.label, c.x, c.y + s + 16);
+    ctx.globalAlpha = 1;
+  }
 }
 
 /** Short line from the ship showing where it is drifting. */
@@ -161,3 +201,56 @@ export function drawVelocityVector(
 }
 
 export { COLOUR };
+
+/**
+ * Marker at the screen edge pointing at something off screen, with a
+ * label and distance. Draws nothing if any part of the object (a circle
+ * of `radius` world units) is on screen.
+ */
+export function drawOffscreenMarker(
+  ctx: CanvasRenderingContext2D,
+  camera: Camera,
+  target: { x: number; y: number },
+  label: string,
+  distance: number,
+  colour: string,
+  radius = 0,
+): void {
+  const p = camera.worldToScreen(target);
+  const w = camera.viewportWidth;
+  const h = camera.viewportHeight;
+  const margin = 28;
+  // Any part of the object on screen counts as visible.
+  const r = radius * camera.zoom;
+  if (p.x >= -r && p.x <= w + r && p.y >= -r && p.y <= h + r) return;
+
+  // Clamp the direction from screen centre onto an inset rectangle.
+  const cx = w / 2;
+  const cy = h / 2;
+  const dx = p.x - cx;
+  const dy = p.y - cy;
+  const scale = Math.min((cx - margin) / Math.abs(dx || 1e-9), (cy - margin) / Math.abs(dy || 1e-9));
+  const mx = cx + dx * scale;
+  const my = cy + dy * scale;
+  const angle = Math.atan2(dy, dx);
+
+  ctx.save();
+  ctx.translate(mx, my);
+  ctx.rotate(angle);
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(8, 0);
+  ctx.lineTo(-4, -6);
+  ctx.lineTo(-4, 6);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = colour;
+  ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+  ctx.textAlign = mx > cx ? 'right' : 'left';
+  const tx = mx + (mx > cx ? -14 : 14);
+  const ty = my + (my > cy ? -10 : 18);
+  ctx.fillText(`${label} ${Math.round(distance)}`, tx, ty);
+}

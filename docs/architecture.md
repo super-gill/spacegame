@@ -29,12 +29,17 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `types.ts` | All world state types and the `ShipInput` contract |
 | `vec2.ts`, `angle.ts` | Maths helpers, immutable |
 | `constants.ts` | Tuning constants |
-| `hulls.ts` | Hull catalogue (data) |
+| `hulls.ts` | Hull catalogue (data): Sparrow, Mule, Jackal |
 | `flight.ts` | Flight computer: input and flight mode to thruster throttles. Assist and brake logic |
 | `ship.ts` | Physics: applies throttles as acceleration, enforces hull speed and spin limits |
 | `docking.ts` | Dock range check, dock and undock transitions |
 | `world.ts` | World construction, pilots joining (`joinPilot`), lookups (`pilotShip`), starter sector content |
-| `step.ts` | The tick: steps every ship with its input (or none), collects events |
+| `step.ts` | The tick: NPCs decide, then every ship docks, changes mode, moves and collides; events collected |
+| `collision.ts` | Ship against station hull: push out, bounce, `collided` event |
+| `ai/steer.ts` | NPC piloting: turn to a heading, steer to a velocity, arrive at a point, route round stations. Produces a `ShipInput` |
+| `ai/trader.ts` | Trader brain: station loop, docking and dwell |
+| `ai/pirate.ts` | Pirate brain: prowl, hunt, withdraw; security zone rules |
+| `ai/index.ts` | Runs every NPC brain against the start-of-tick world |
 | `index.ts` | Public API |
 
 ### Events
@@ -64,7 +69,7 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
-| `render/draw.ts` | Vector drawing of ships and stations |
+| `render/draw.ts` | Vector drawing of ships (outline per hull), stations, security zones and off-screen markers |
 | `ui.ts` | HUD text, docked panel, toasts (DOM, not canvas) |
 | `style.css` | Theme variables and overlay layout |
 
@@ -82,7 +87,7 @@ Today the world runs inside the browser in `main.ts`. For the private-server mod
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover NPCs over simulated minutes (steering settles, trader completes its loop without hitting anything, pirate hunts, holds standoff, gives up, never enters security), station collision, determinism (two runs are byte-identical), pilots (joining, spawn spacing, returning pilots keeping their ship, inputs only moving their own ship), the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 
@@ -90,4 +95,5 @@ The sim is tested with Vitest (`npm test`). Tests cover pilots (joining, spawn s
 - **A new station in the starter sector**: add it in `createStarterWorld`. When sectors become data files this moves there.
 - **A new flight control**: add a field to `ShipInput`, a row in `bindings.ts`, map it in `InputController.sample`, and handle it in the sim. The controls panel updates itself. Update `docs/controls.md`.
 - **A new interface control**: add a `UiAction`, a row in `bindings.ts`, and handle it in the callback in `main.ts`.
+- **A new NPC type**: add a brain type to `NpcBrain` in `types.ts`, a module in `ai/` that returns an input and an updated brain, and a branch in `ai/index.ts`. Steer with the helpers in `ai/steer.ts` so it flies like everyone else.
 - **A new world event**: add a variant to `WorldEvent`, emit it from the sim, handle it in `ui.ts`.

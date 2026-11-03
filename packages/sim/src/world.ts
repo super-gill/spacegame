@@ -1,7 +1,7 @@
 import { FIXED_DT } from './constants.js';
 import { idleThrusters } from './flight.js';
 import { HULLS } from './hulls.js';
-import type { Pilot, Ship, ShipInput, Station, World } from './types.js';
+import type { NpcBrain, Pilot, Ship, ShipInput, Station, World } from './types.js';
 import { add, fromAngle, scale } from './vec2.js';
 
 /** A blank input: nothing pressed. */
@@ -28,26 +28,77 @@ export const STARTER_HULL_ID = 'sparrow';
 /** How far from the starter station a new pilot's ship appears. */
 const SPAWN_DISTANCE = 650;
 
+/** An NPC ship with its brain, ready to add to a world. */
+function npcShip(id: string, hullId: string, position: Ship['position'], heading: number): Ship {
+  return {
+    id,
+    hullId,
+    ownerId: null,
+    position,
+    velocity: { x: 0, y: 0 },
+    heading,
+    angularVelocity: 0,
+    state: 'flying',
+    dockedAt: null,
+    flightMode: 'rotation', // NPC steering handles drift itself; see ai/steer.ts
+    thrusters: idleThrusters(),
+  };
+}
+
 /**
- * An empty starter sector: one station, no pilots. Pilots are added with
- * `joinPilot`. This is content, not engine; later sectors will be data
- * files.
+ * The starter sector: two stations, a trader running between them and a
+ * pirate prowling the lane. No pilots; they are added with `joinPilot`.
+ * This is content, not engine; later sectors will be data files.
+ *
+ * New pilots spawn inside Harbour Station's security zone, so they are
+ * never hunted the moment they arrive.
  */
 export function createStarterWorld(): World {
-  const station: Station = {
+  const harbour: Station = {
     id: STARTER_STATION_ID,
     name: 'Harbour Station',
     position: { x: 0, y: 0 },
     radius: 90,
     dockRange: 220,
+    securityRadius: 900,
+  };
+  const outpost: Station = {
+    id: 'station-ridge',
+    name: 'Ridge Outpost',
+    position: { x: 4800, y: -1600 },
+    radius: 70,
+    dockRange: 190,
+    securityRadius: 700,
+  };
+
+  // The trader starts docked at Harbour and leaves after a short wait.
+  const trader: Ship = {
+    ...npcShip('npc-trader-1', 'mule', { ...harbour.position }, -0.34),
+    state: 'docked',
+    dockedAt: harbour.id,
+  };
+  const traderBrain: NpcBrain = { kind: 'trader', route: [harbour.id, outpost.id], leg: 0, waitTicks: 3 * 60 };
+
+  // The pirate lurks off the lane between the two stations, outside both zones.
+  const pirateHome = { x: 2600, y: -300 };
+  const pirate = npcShip('npc-pirate-1', 'jackal', pirateHome, Math.PI);
+  const pirateBrain: NpcBrain = {
+    kind: 'pirate',
+    home: pirateHome,
+    mode: 'prowl',
+    targetId: null,
+    modeTicks: 0,
+    cooldownTicks: 0,
+    patrolIndex: 0,
   };
 
   return {
     tick: 0,
     dt: FIXED_DT,
     pilots: {},
-    ships: {},
-    stations: { [station.id]: station },
+    ships: { [trader.id]: trader, [pirate.id]: pirate },
+    npcs: { [trader.id]: traderBrain, [pirate.id]: pirateBrain },
+    stations: { [harbour.id]: harbour, [outpost.id]: outpost },
     hulls: { ...HULLS },
     events: [],
   };
