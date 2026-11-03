@@ -1,37 +1,24 @@
-import { SPACE_ANGULAR_DRAG, SPACE_DRAG } from './constants.js';
+import { REST_EPSILON } from './constants.js';
 import { wrapAngle } from './angle.js';
-import type { HullSpec, PlayerInput, Ship } from './types.js';
-import { add, fromAngle, length, rotate, scale, type Vec2 } from './vec2.js';
+import { computeThrusters, idleThrusters, shipAxes } from './flight.js';
+import type { HullSpec, PlayerInput, Ship, Thrusters } from './types.js';
+import { add, length, scale, type Vec2 } from './vec2.js';
 
 /**
- * Ship flight model.
+ * Ship physics.
  *
- * Newtonian, both linear and rotational. Thrusters add velocity and spin;
- * the ship keeps drifting and spinning until something opposes it.
+ * Pure Newtonian, linear and rotational. There is no drag: thrusters add
+ * velocity and spin, and nothing else takes them away. Each tick:
  *
- * - Space drag is a small fixed deceleration that bleeds off stray drift
- *   and spin. It is tiny compared with any thruster.
- * - Each hull has a flight computer limit on speed and spin. Thrust can
- *   still change direction at the limit, it just cannot add magnitude.
- * - Brake fires thrusters against current velocity and spin.
+ *   1. The flight computer (flight.ts) turns input and flight mode into
+ *      thruster throttles.
+ *   2. This module applies those throttles as accelerations (force / mass).
+ *   3. The hull's hard limits on speed and spin are enforced.
+ *
+ * Linear thrust is applied along the heading the flight computer planned
+ * with, before the heading is advanced, so assist and brake cancel drift
+ * exactly instead of chasing a moving target.
  */
-
-/**
- * Reduce the magnitude of a scalar towards zero by `amount`, never
- * overshooting. Used for drag and braking so they stop at exactly zero
- * instead of oscillating.
- */
-function towardsZero(value: number, amount: number): number {
-  if (Math.abs(value) <= amount) return 0;
-  return value - Math.sign(value) * amount;
-}
-
-/** Same as towardsZero, for vectors: shrinks length, keeps direction. */
-function shrinkVector(v: Vec2, amount: number): Vec2 {
-  const len = length(v);
-  if (len <= amount) return { x: 0, y: 0 };
-  return scale(v, (len - amount) / len);
-}
 
 /** Cap a vector's length. */
 function clampLength(v: Vec2, max: number): Vec2 {
@@ -39,54 +26,43 @@ function clampLength(v: Vec2, max: number): Vec2 {
   return len > max ? scale(v, max / len) : v;
 }
 
-/** Sum the engine thrust requested by the input, in world space. Brake is handled separately. */
-export function thrustFromInput(hull: HullSpec, heading: number, input: PlayerInput): Vec2 {
-  let force: Vec2 = { x: 0, y: 0 };
-
-  const forward = fromAngle(heading);
-  const right = rotate(forward, Math.PI / 2);
-
-  if (input.thrustForward) force = add(force, scale(forward, hull.mainThrust));
-  if (input.thrustReverse) force = add(force, scale(forward, -hull.reverseThrust));
-  if (input.strafeRight) force = add(force, scale(right, hull.lateralThrust));
-  if (input.strafeLeft) force = add(force, scale(right, -hull.lateralThrust));
-
-  return force;
+function clamp(value: number, max: number): number {
+  return Math.max(-max, Math.min(max, value));
 }
 
-/** Advance the ship's spin and heading by `dt`. */
-function stepRotation(ship: Ship, hull: HullSpec, input: PlayerInput, dt: number): { heading: number; angularVelocity: number } {
-  const angularAccel = hull.rotationThrust / hull.mass;
+/** Snap floating-point dust to an exact stop. */
+function settle(v: Vec2): Vec2 {
+  return length(v) < REST_EPSILON ? { x: 0, y: 0 } : v;
+}
 
-  // Screen y points down, so positive spin is clockwise on screen.
-  // Both keys held cancel out.
-  const turn = (input.turnRight ? 1 : 0) - (input.turnLeft ? 1 : 0);
-  let spin = ship.angularVelocity + turn * angularAccel * dt;
+/** Linear acceleration (units/s^2, world space) produced by the given throttles. */
+export function linearAcceleration(hull: HullSpec, heading: number, t: Thrusters): Vec2 {
+  const { forward, right } = shipAxes(heading);
+  const along = (t.main * hull.mainThrust - t.reverse * hull.reverseThrust) / hull.mass;
+  const across = ((t.strafeRight - t.strafeLeft) * hull.lateralThrust) / hull.mass;
+  return add(scale(forward, along), scale(right, across));
+}
 
-  if (input.brake) spin = towardsZero(spin, angularAccel * dt);
-  spin = towardsZero(spin, SPACE_ANGULAR_DRAG * dt);
-  spin = Math.max(-hull.maxTurnRate, Math.min(hull.maxTurnRate, spin));
-
-  return { heading: wrapAngle(ship.heading + spin * dt), angularVelocity: spin };
+/** Angular acceleration (rad/s^2, positive clockwise) produced by the given throttles. */
+export function angularAcceleration(hull: HullSpec, t: Thrusters): number {
+  return ((t.rotateRight - t.rotateLeft) * hull.rotationThrust) / hull.mass;
 }
 
 /** Advance one ship by `dt` seconds under `input`. Returns a new Ship. */
 export function stepShip(ship: Ship, hull: HullSpec, input: PlayerInput, dt: number): Ship {
-  if (ship.state === 'docked') return ship;
+  if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
-  const { heading, angularVelocity } = stepRotation(ship, hull, input, dt);
+  const thrusters = computeThrusters(ship, hull, input, dt);
 
-  const acceleration = scale(thrustFromInput(hull, heading, input), 1 / hull.mass);
-  let velocity = add(ship.velocity, scale(acceleration, dt));
+  let velocity = add(ship.velocity, scale(linearAcceleration(hull, ship.heading, thrusters), dt));
+  velocity = settle(clampLength(velocity, hull.maxSpeed));
 
-  if (input.brake) {
-    // Brake uses the lateral thrusters' strength as "all thrusters together".
-    velocity = shrinkVector(velocity, (hull.lateralThrust / hull.mass) * dt);
-  }
-  velocity = shrinkVector(velocity, SPACE_DRAG * dt);
-  velocity = clampLength(velocity, hull.maxSpeed);
+  let angularVelocity = ship.angularVelocity + angularAcceleration(hull, thrusters) * dt;
+  angularVelocity = clamp(angularVelocity, hull.maxTurnRate);
+  if (Math.abs(angularVelocity) < REST_EPSILON) angularVelocity = 0;
 
   const position = add(ship.position, scale(velocity, dt));
+  const heading = wrapAngle(ship.heading + angularVelocity * dt);
 
-  return { ...ship, heading, angularVelocity, velocity, position };
+  return { ...ship, heading, angularVelocity, velocity, position, thrusters };
 }

@@ -13,5 +13,12 @@ export * from './constants.js';
 export { HULLS } from './hulls.js';
 export { createStarterWorld, emptyInput, playerShip } from './world.js';
 export { stepWorld } from './step.js';
-export { stepShip, thrustFromInput } from './ship.js';
+export { stepShip, linearAcceleration, angularAcceleration } from './ship.js';
+export {
+  FLIGHT_MODES,
+  FLIGHT_MODE_LABELS,
+  nextFlightMode,
+  computeThrusters,
+  idleThrusters,
+} from './flight.js';
 export { nearestDockableStation, tryDock, undock, bearingFromStation } from './docking.js';

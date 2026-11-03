@@ -29,7 +29,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `vec2.ts`, `angle.ts` | Maths helpers, immutable |
 | `constants.ts` | Tuning constants |
 | `hulls.ts` | Hull catalogue (data) |
-| `ship.ts` | Flight model: rotation and linear thrust, space drag, flight computer limits, braking |
+| `flight.ts` | Flight computer: input and flight mode to thruster throttles. Assist and brake logic |
+| `ship.ts` | Physics: applies throttles as acceleration, enforces hull speed and spin limits |
 | `docking.ts` | Dock range check, dock and undock transitions |
 | `world.ts` | World construction and lookups, starter sector content |
 | `step.ts` | The tick: applies input, runs ship step, collects events |
@@ -37,11 +38,11 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 
 ### Events
 
-Each tick produces a fresh `events` array on the world (`docked`, `dockRefused`, and so on). The client reads it to show toasts or play sounds. Events are facts about what happened in the tick, not requests to the UI.
+Each tick produces a fresh `events` array on the world (`docked`, `dockRefused`, `flightModeChanged`, and so on). The client reads it to show toasts or play sounds. Events are facts about what happened in the tick, not requests to the UI.
 
 ### Input contract
 
-The client hands the sim one `PlayerInput` per tick. It contains the rotate and thrust booleans and edge-triggered actions such as `toggleDock`. The sim never reads keys or the mouse. This is what keeps replays, tests and AI-controlled ships possible: anything that can produce a `PlayerInput` can fly a ship.
+The client hands the sim one `PlayerInput` per tick. It contains the rotate and thrust booleans and edge-triggered actions such as `toggleDock` and `cycleFlightMode`. The sim never reads keys or the mouse. This is what keeps replays, tests and AI-controlled ships possible: anything that can produce a `PlayerInput` can fly a ship.
 
 ## The client
 
@@ -56,7 +57,9 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | File | Responsibility |
 | --- | --- |
 | `main.ts` | Loop, wiring, interpolation. The only file that knows both sim and DOM |
-| `input.ts` | Keyboard state sampled into a `PlayerInput`. Key bindings in one table |
+| `bindings.ts` | Every control in the game, in one table. Single source of truth for input and the controls panel |
+| `input.ts` | Keyboard state sampled into a `PlayerInput`; interface actions sent to a callback |
+| `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
 | `render/draw.ts` | Vector drawing of ships and stations |
@@ -73,11 +76,12 @@ Canvas 2D, vector line art, device-pixel-ratio aware. Colours are defined once a
 
 ## Testing
 
-The sim is tested with Vitest (`npm test`). Tests cover the flight model (acceleration, drift, drag staying minor, speed and spin limits, braking, angular momentum, heading wrap), angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
+The sim is tested with Vitest (`npm test`). Tests cover the physics (acceleration, no drag, speed and spin limits, braking, angular momentum, heading wrap), each flight mode's assist behaviour, angle helpers, docking rules, and purity of `stepWorld`. The client is checked visually; there is no DOM test harness yet.
 
 ## Adding things
 
 - **A new hull**: add an entry to `hulls.ts`. Nothing else.
 - **A new station in the starter sector**: add it in `createStarterWorld`. When sectors become data files this moves there.
-- **A new control**: add a field to `PlayerInput`, a binding in `input.ts` `KEYS`, and handle it in the sim. Update `docs/controls.md`.
+- **A new flight control**: add a field to `PlayerInput`, a row in `bindings.ts`, map it in `InputController.sample`, and handle it in the sim. The controls panel updates itself. Update `docs/controls.md`.
+- **A new interface control**: add a `UiAction`, a row in `bindings.ts`, and handle it in the callback in `main.ts`.
 - **A new world event**: add a variant to `WorldEvent`, emit it from the sim, handle it in `ui.ts`.

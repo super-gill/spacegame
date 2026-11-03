@@ -1,4 +1,5 @@
 import { tryDock, undock } from './docking.js';
+import { nextFlightMode } from './flight.js';
 import { stepShip } from './ship.js';
 import type { PlayerInput, World, WorldEvent } from './types.js';
 import { playerShip } from './world.js';
@@ -30,6 +31,13 @@ export function stepWorld(world: World, input: PlayerInput): World {
       player = result.ship;
       events.push(result.event);
     }
+  }
+
+  // Mode changes apply before movement so the new mode governs this tick.
+  if (input.cycleFlightMode) {
+    const mode = nextFlightMode(player.flightMode);
+    player = { ...player, flightMode: mode };
+    events.push({ type: 'flightModeChanged', shipId: player.id, mode });
   }
 
   player = stepShip(player, hull, input, world.dt);

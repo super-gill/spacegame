@@ -1,16 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { FIXED_DT, SPACE_ANGULAR_DRAG, SPACE_DRAG } from '../constants.js';
+import { FIXED_DT } from '../constants.js';
+import { idleThrusters } from '../flight.js';
 import { HULLS } from '../hulls.js';
 import { stepShip } from '../ship.js';
-import type { PlayerInput, Ship } from '../types.js';
+import type { FlightMode, PlayerInput, Ship } from '../types.js';
 import { emptyInput } from '../world.js';
 import { length } from '../vec2.js';
+
+/**
+ * Physics tests. These run in manual mode so the flight computer only
+ * fires what the input asks for, and we are testing pure Newtonian motion.
+ * Assist behaviour is tested in flight.test.ts.
+ */
 
 const hull = HULLS['sparrow']!;
 const mainAccel = hull.mainThrust / hull.mass;
 const angularAccel = hull.rotationThrust / hull.mass;
 
-function ship(overrides: Partial<Ship> = {}): Ship {
+function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship {
   return {
     id: 's',
     hullId: hull.id,
@@ -20,6 +27,8 @@ function ship(overrides: Partial<Ship> = {}): Ship {
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    flightMode: mode,
+    thrusters: idleThrusters(),
     ...overrides,
   };
 }
@@ -35,36 +44,23 @@ function run(s: Ship, i: PlayerInput = emptyInput(), ticks = 1): Ship {
 
 const SECOND = 60;
 
-describe('linear flight', () => {
+describe('linear flight (manual)', () => {
   it('stays put with no input', () => {
     const s = run(ship(), emptyInput(), SECOND);
     expect(s.position).toEqual({ x: 0, y: 0 });
     expect(s.velocity).toEqual({ x: 0, y: 0 });
   });
 
-  it('accelerates along its heading when thrusting forward', () => {
+  it('accelerates along its heading at exactly thrust / mass', () => {
     const s = run(ship(), input({ thrustForward: true }), SECOND);
-    expect(s.velocity.x).toBeGreaterThan(0);
+    expect(s.velocity.x).toBeCloseTo(mainAccel, 6);
     expect(Math.abs(s.velocity.y)).toBeLessThan(1e-9);
   });
 
-  it('keeps drifting after thrust stops (Newtonian)', () => {
-    const moving = run(ship(), input({ thrustForward: true }), SECOND);
-    const later = run(moving, emptyInput(), SECOND);
-    expect(length(later.velocity)).toBeGreaterThan(length(moving.velocity) * 0.9);
-  });
-
-  it('space drag is minor next to engine thrust', () => {
-    // One second of thrust should land within a few percent of drag-free.
-    const s = run(ship(), input({ thrustForward: true }), SECOND);
-    expect(s.velocity.x).toBeCloseTo(mainAccel - SPACE_DRAG, 6);
-    expect(SPACE_DRAG / mainAccel).toBeLessThan(0.05);
-  });
-
-  it('space drag bleeds stray drift to exactly zero', () => {
-    const drifting = ship({ velocity: { x: 12, y: -9 } }); // 15 u/s
-    const s = run(drifting, emptyInput(), SECOND * 10);
-    expect(s.velocity).toEqual({ x: 0, y: 0 });
+  it('has no drag: drift is preserved exactly', () => {
+    const drifting = ship({ velocity: { x: 12, y: -9 } });
+    const later = run(drifting, emptyInput(), SECOND * 60);
+    expect(later.velocity).toEqual({ x: 12, y: -9 });
   });
 
   it('never exceeds the hull speed limit', () => {
@@ -79,17 +75,36 @@ describe('linear flight', () => {
     expect(length(bent.velocity)).toBeLessThanOrEqual(hull.maxSpeed + 1e-9);
   });
 
-  it('braking brings the ship to a full stop', () => {
-    const moving = run(ship(), input({ thrustForward: true }), SECOND);
+  it('braking brings the ship to an exact stop', () => {
+    const moving = run(ship(), input({ thrustForward: true, strafeLeft: true }), SECOND);
     const stopped = run(moving, input({ brake: true }), SECOND * 5);
     expect(stopped.velocity).toEqual({ x: 0, y: 0 });
   });
+
+  it('brake overrides thrust keys held at the same time', () => {
+    const moving = run(ship(), input({ thrustForward: true }), SECOND);
+    const stopped = run(moving, input({ brake: true, thrustForward: true }), SECOND * 5);
+    expect(stopped.velocity).toEqual({ x: 0, y: 0 });
+  });
+
+  it('brakes with the real thrusters: forward motion is stopped by the weaker reverse engine', () => {
+    const moving = ship({ velocity: { x: 100, y: 0 } });
+    const s = run(moving, input({ brake: true }), 1);
+    expect(s.thrusters.reverse).toBe(1);
+    expect(s.thrusters.main).toBe(0);
+    expect(s.velocity.x).toBeCloseTo(100 - (hull.reverseThrust / hull.mass) * FIXED_DT, 9);
+  });
+
+  it('records which thrusters fired', () => {
+    const s = run(ship(), input({ thrustForward: true, strafeRight: true }), 1);
+    expect(s.thrusters).toEqual({ ...idleThrusters(), main: 1, strafeRight: 1 });
+  });
 });
 
-describe('rotation', () => {
+describe('rotation (manual)', () => {
   it('rotation thrusters add spin, clockwise for turnRight', () => {
     const s = run(ship(), input({ turnRight: true }), 1);
-    expect(s.angularVelocity).toBeCloseTo((angularAccel - SPACE_ANGULAR_DRAG) * FIXED_DT, 9);
+    expect(s.angularVelocity).toBeCloseTo(angularAccel * FIXED_DT, 9);
     expect(s.heading).toBeGreaterThan(0);
   });
 
@@ -99,15 +114,10 @@ describe('rotation', () => {
     expect(s.heading).toBeLessThan(0);
   });
 
-  it('keeps spinning after the key is released (angular momentum)', () => {
+  it('has no angular drag: spin is preserved exactly', () => {
     const spun = run(ship(), input({ turnRight: true }), 10);
-    const later = run(spun, emptyInput(), SECOND / 2);
-    expect(later.angularVelocity).toBeGreaterThan(spun.angularVelocity * 0.8);
-    expect(later.heading).toBeGreaterThan(spun.heading);
-  });
-
-  it('angular drag is minor next to rotation thrust', () => {
-    expect(SPACE_ANGULAR_DRAG / angularAccel).toBeLessThan(0.05);
+    const later = run(spun, emptyInput(), SECOND * 10);
+    expect(later.angularVelocity).toBe(spun.angularVelocity);
   });
 
   it('the opposite key slows the spin', () => {
@@ -121,12 +131,7 @@ describe('rotation', () => {
     expect(s.angularVelocity).toBeCloseTo(hull.maxTurnRate, 9);
   });
 
-  it('angular drag bleeds stray spin to exactly zero', () => {
-    const s = run(ship({ angularVelocity: 0.5 }), emptyInput(), SECOND * 5);
-    expect(s.angularVelocity).toBe(0);
-  });
-
-  it('brake kills spin', () => {
+  it('brake kills spin exactly', () => {
     const spun = run(ship(), input({ turnRight: true }), SECOND);
     const s = run(spun, input({ brake: true }), SECOND);
     expect(s.angularVelocity).toBe(0);
@@ -152,8 +157,8 @@ describe('rotation', () => {
 });
 
 describe('docked', () => {
-  it('does not move or spin while docked', () => {
-    const docked = ship({ state: 'docked', dockedAt: 'x', angularVelocity: 0 });
+  it('does not move, spin or fire thrusters while docked', () => {
+    const docked = ship({ state: 'docked', dockedAt: 'x' });
     const s = run(docked, input({ thrustForward: true, turnRight: true }), SECOND);
     expect(s).toEqual(docked);
   });

@@ -1,6 +1,8 @@
 # Controls
 
-Bindings are defined in `packages/client/src/input.ts` in the `KEYS` table. Remapping in-game is not yet supported.
+Every binding is defined once, in `packages/client/src/bindings.ts`. Input handling and the in-game controls panel both read that table, so the panel always matches what the keys do. Remapping in-game is not yet supported.
+
+Press **F1** (or **`**) in game, or click **Controls** in the top right, to see every control. The panel is a developer aid for now and will become part of a settings menu later.
 
 ## Flight
 
@@ -8,17 +10,31 @@ Flight is keyboard only. The mouse is reserved for targeting, interacting with o
 
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |
-| Rotate left | Q | Left arrow | Adds anticlockwise spin; spin continues after release |
-| Rotate right | E | Right arrow | Adds clockwise spin; tap the other key to stop |
+| Spin left | Q | Left arrow | Fires rotation thrusters anticlockwise |
+| Spin right | E | Right arrow | Fires rotation thrusters clockwise |
 | Main engine | W | Up arrow | Accelerates along the heading |
 | Reverse thrust | S | Down arrow | Weaker than main; useful for fine approach |
 | Strafe left | A | | Lateral thrust, does not change heading |
 | Strafe right | D | | |
-| Brake | Space | X | Fires thrusters against your velocity and spin until both stop |
+| Brake | Space | X | Fires thrusters against your velocity and spin until both stop. Works in every mode and overrides other flight keys |
 
-Rotation works like thrust: Q and E add spin, and the ship keeps turning until you counter it or brake. Rotating does not change your velocity. Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast.
+Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast. Rotating never changes your velocity.
 
-A very small amount of space drag slowly bleeds off leftover drift and spin, so a ship left alone will eventually come to rest. It is far weaker than your thrusters.
+## Flight computer
+
+| Action | Key | Notes |
+| --- | --- | --- |
+| Cycle flight mode | Z | Full assist, then rotation assist, then manual, then back |
+
+The physics has no drag. What the ship does when you let go of the keys depends on the flight mode, shown on the HUD as `FLT`:
+
+| Mode | When you release Q/E | When you release the thrust keys |
+| --- | --- | --- |
+| Full assist (default) | Spin stops | Drift on that axis eases to a stop |
+| Rotation assist | Spin stops | You keep drifting |
+| Manual | You keep spinning | You keep drifting |
+
+Assists fire the ship's real thrusters, so you will see the flames, and a heavier ship takes longer to settle. In full assist, axes are handled separately: holding W while sliding sideways lets you accelerate forward while the computer cancels the slide.
 
 ## Station
 
@@ -29,6 +45,12 @@ A very small amount of space drag slowly bleeds off leftover drift and spin, so 
 
 If docking is refused a message says why: too far, or too fast.
 
+## Interface
+
+| Action | Key | Notes |
+| --- | --- | --- |
+| Show or hide the controls panel | F1 | Also `, or click Controls in the top right |
+
 ## HUD
 
 Bottom left, top to bottom:
@@ -37,5 +59,6 @@ Bottom left, top to bottom:
 - `POS` world position
 - `HDG` heading in degrees
 - `ROT` spin in degrees per second (positive is clockwise)
+- `FLT` current flight mode
 - `DOCK <station> [F]` when docking is available
 - frame rate and sim tick

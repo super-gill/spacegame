@@ -5,20 +5,34 @@ export const TICKS_PER_SECOND = 60;
 export const FIXED_DT = 1 / TICKS_PER_SECOND;
 
 /**
- * Space drag, in units/s^2: a small fixed deceleration opposing velocity.
- *
- * Its only job is to bleed off stray drift so a ship left alone eventually
- * comes to rest. It is deliberately tiny next to engine thrust (a Sparrow's
- * main engine gives 100 u/s^2) so it never fights the pilot. Top speed is
- * set per hull by `maxSpeed`, not by drag.
+ * There is no space drag. Physics is pure Newtonian: a ship left alone
+ * drifts and spins forever. Anything that feels like drag comes from the
+ * flight computer firing real thrusters (see flight.ts).
  */
-export const SPACE_DRAG = 3;
 
 /**
- * Angular drag, in rad/s^2: the rotational equivalent of SPACE_DRAG.
- * Stray spin dies away slowly; deliberate rotation is unaffected.
+ * Fraction of thruster strength the full-assist mode spends cancelling
+ * drift on axes the pilot is not using. Below 1 so assisted flight eases
+ * to a stop like drag, rather than slamming to a halt.
  */
-export const SPACE_ANGULAR_DRAG = 0.2;
+export const ASSIST_LINEAR_STRENGTH = 0.5;
+
+/**
+ * Fraction of rotation thruster strength the assist spends cancelling
+ * spin when no rotate key is held. Full strength, because stopping
+ * crisply on a heading is the point of rotation assist.
+ */
+export const ASSIST_ROTATION_STRENGTH = 1;
+
+/** Brake always uses every relevant thruster at full strength. */
+export const BRAKE_STRENGTH = 1;
+
+/**
+ * Speeds below this (units/s or rad/s) are treated as exactly zero.
+ * Only mops up floating-point dust after the computer cancels motion;
+ * it is far too small to feel like drag.
+ */
+export const REST_EPSILON = 1e-9;
 
 /** A ship must be slower than this (units/s) to dock. */
 export const DOCK_MAX_SPEED = 60;

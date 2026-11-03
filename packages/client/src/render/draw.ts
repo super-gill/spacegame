@@ -1,4 +1,4 @@
-import type { HullSpec, PlayerInput, Ship, Station } from '@spacegame/sim';
+import type { HullSpec, Ship, Station, Thrusters } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 
 /**
@@ -63,7 +63,7 @@ export function drawShip(
   camera: Camera,
   view: ShipView,
   hull: HullSpec,
-  input: PlayerInput,
+  thrusters: Thrusters,
   docked: boolean,
 ): void {
   if (docked) return;
@@ -74,45 +74,52 @@ export function drawShip(
   ctx.translate(c.x, c.y);
   ctx.rotate(view.heading);
 
-  // Main engine flame, drawn first so the hull sits on top.
-  if (input.thrustForward) {
-    ctx.strokeStyle = COLOUR.flame;
+  // Flames are drawn from what actually fired this tick, so flight-assist
+  // and brake burns show up as well as the pilot's own. Length scales
+  // with throttle; a faint minimum keeps small assist burns visible.
+  ctx.strokeStyle = COLOUR.flame;
+  const len = (throttle: number): number => 0.25 + 0.75 * throttle;
+
+  if (thrusters.main > 0) {
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(-s * 0.7, -s * 0.35);
-    ctx.lineTo(-s * 1.6, 0);
+    ctx.lineTo(-s * (0.7 + 0.9 * len(thrusters.main)), 0);
     ctx.lineTo(-s * 0.7, s * 0.35);
     ctx.stroke();
   }
-  if (input.thrustReverse) {
-    ctx.strokeStyle = COLOUR.flame;
+  if (thrusters.reverse > 0) {
+    const l = 0.5 * len(thrusters.reverse);
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(s * 0.6, -s * 0.5);
-    ctx.lineTo(s * 1.1, -s * 0.55);
+    ctx.lineTo(s * (0.6 + l), -s * 0.55);
     ctx.moveTo(s * 0.6, s * 0.5);
-    ctx.lineTo(s * 1.1, s * 0.55);
+    ctx.lineTo(s * (0.6 + l), s * 0.55);
     ctx.stroke();
   }
-  if (input.strafeLeft || input.strafeRight) {
-    // Strafe thrusters fire on the opposite side to the direction of travel.
-    const side = input.strafeRight ? -1 : 1;
-    ctx.strokeStyle = COLOUR.flame;
+  // Lateral thrusters fire on the side opposite the push.
+  for (const [throttle, side] of [
+    [thrusters.strafeRight, -1],
+    [thrusters.strafeLeft, 1],
+  ] as const) {
+    if (throttle <= 0) continue;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(-s * 0.2, side * s * 0.6);
-    ctx.lineTo(-s * 0.2, side * s * 1.1);
+    ctx.lineTo(-s * 0.2, side * s * (0.6 + 0.5 * len(throttle)));
     ctx.stroke();
   }
-
-  if (input.turnLeft !== input.turnRight) {
-    // Rotation thrusters: a puff at the nose on the side opposite the turn.
-    const side = input.turnRight ? -1 : 1;
-    ctx.strokeStyle = COLOUR.flame;
+  // Rotation thrusters: a puff at the nose on the side opposite the turn.
+  for (const [throttle, side] of [
+    [thrusters.rotateRight, -1],
+    [thrusters.rotateLeft, 1],
+  ] as const) {
+    if (throttle <= 0) continue;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(s * 0.55, side * s * 0.2);
-    ctx.lineTo(s * 0.55, side * s * 0.6);
+    ctx.lineTo(s * 0.55, side * s * (0.2 + 0.4 * len(throttle)));
     ctx.stroke();
   }
 

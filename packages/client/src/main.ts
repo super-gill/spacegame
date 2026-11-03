@@ -1,14 +1,13 @@
 import {
   createStarterWorld,
-  emptyInput,
   nearestDockableStation,
   playerShip,
   stepWorld,
   wrapAngle,
-  type PlayerInput,
   type World,
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
+import { ControlsPanel } from './controls-panel.js';
 import { InputController } from './input.js';
 import { drawShip, drawStation, drawVelocityVector } from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
@@ -28,12 +27,17 @@ const ctx = canvas.getContext('2d');
 if (!ctx) throw new Error('Canvas 2D not supported');
 
 const camera = new Camera();
-const input = new InputController();
+const controlsPanel = new ControlsPanel(
+  document.body,
+  document.getElementById('controls-button') as HTMLButtonElement,
+);
+const input = new InputController((action) => {
+  if (action === 'toggleControls') controlsPanel.toggle();
+});
 const ui = new Ui(() => input.requestToggleDock());
 
 let previous: World = createStarterWorld();
 let current: World = previous;
-let lastInput: PlayerInput = emptyInput();
 camera.snapTo(playerShip(current).position);
 
 function resize(): void {
@@ -63,9 +67,8 @@ function frame(nowMs: number): void {
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 
   while (accumulator >= current.dt) {
-    lastInput = input.sample();
     previous = current;
-    current = stepWorld(current, lastInput);
+    current = stepWorld(current, input.sample());
     ui.handleEvents(current.events);
     accumulator -= current.dt;
   }
@@ -104,7 +107,7 @@ function render(alpha: number, frameSeconds: number): void {
   }
 
   drawVelocityVector(ctx!, camera, shipNow, view);
-  drawShip(ctx!, camera, view, hull, lastInput, shipNow.state === 'docked');
+  drawShip(ctx!, camera, view, hull, shipNow.thrusters, shipNow.state === 'docked');
 
   ui.update(current, shipNow, fpsSmoothed);
 }

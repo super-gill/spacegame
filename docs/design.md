@@ -18,14 +18,19 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
 
 ## Flight model
 
-- Newtonian. Thrust adds velocity. Nothing stops you except opposing thrust.
-- Rotation is Newtonian too. Q/E fire rotation thrusters that add or remove spin; the ship keeps spinning after the key is released until countered. Fixed weapons are aimed by pointing the hull, which makes piloting a skill.
+- Pure Newtonian, linear and rotational. Thrust adds velocity and spin. There is no drag: a ship left alone drifts and spins forever.
 - All accelerations are thrust divided by hull mass, so heavier hulls are slower to speed up, stop and turn with the same engines.
-- Space drag is a small fixed deceleration (`SPACE_DRAG`, `SPACE_ANGULAR_DRAG`). It exists only to bleed off stray drift and spin so a ship left alone eventually comes to rest. It is kept under 5% of thruster strength so it never fights the pilot; there is a test enforcing that.
-- Top speed and top spin are flight computer limits per hull (`maxSpeed`, `maxTurnRate`), not a product of drag. At the limit, thrust can still change the direction of travel but cannot add magnitude.
+- Top speed and top spin are hard limits per hull (`maxSpeed`, `maxTurnRate`), enforced by the physics in every mode. At the limit, thrust can still change the direction of travel but cannot add magnitude. They exist because unbounded speed breaks a 2D game: objects arrive before they render, collisions tunnel, and every AI and weapon system would have to cope.
+- A flight computer sits between the pilot and the thrusters. It turns input plus the ship's flight mode into thruster throttles; the physics applies them. Assist can only do what the real thrusters can, so a heavy hull is as slow to settle in assisted mode as it is by hand, and assist burns are visible.
+- Flight modes, cycled with Z, in the spirit of Elite Dangerous flight assist:
+  - **Full assist** (default): cancels spin when no rotate key is held, and eases drift to a stop on any axis the pilot is not using, at half thruster strength (`ASSIST_LINEAR_STRENGTH`) so it feels like drag rather than a handbrake.
+  - **Rotation assist**: cancels spin only; drift is untouched.
+  - **Manual**: fires only what the pilot asks for.
+- Brake overrides everything: it fires the relevant thrusters at full strength against velocity and spin on every axis, in every mode.
+- NPC ships use the same flight computer, so they fly by the same rules as the player.
+- Weapon handling is undecided (fixed with assist, turrets, missiles and mines are all candidates). The mode system is meant to support all of them: fixed guns favour assisted flight, turrets and missiles free a pilot to fight while drifting in manual.
 - The mouse is deliberately not used for flight. It is reserved for targeting, interacting with objects (scooping, hailing, selecting) and turret aim.
 - Thrust is relative to heading: main engine forward, retro reverse, lateral strafe.
-- Brake is a convenience that fires thrusters against current velocity and spin until both reach zero.
 
 ## Docking
 

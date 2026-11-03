@@ -24,17 +24,49 @@ export interface HullSpec {
   reverseThrust: number;
   /** Lateral thruster force (strafe). */
   lateralThrust: number;
-  /** Flight computer speed limit in units/s. Thrust cannot push past this. */
+  /**
+   * Hard speed limit in units/s, enforced by the physics in every flight
+   * mode. Thrust can still change direction at the limit, not magnitude.
+   */
   maxSpeed: number;
   /** Rotation thruster force. rotationThrust / mass = angular acceleration (rad/s^2). */
   rotationThrust: number;
-  /** Flight computer spin limit in rad/s. */
+  /** Hard spin limit in rad/s, enforced by the physics in every flight mode. */
   maxTurnRate: number;
   /** Approximate hull radius for collision and docking checks. */
   radius: number;
 }
 
 export type ShipState = 'flying' | 'docked';
+
+/**
+ * Flight computer modes. The physics is the same in all of them; the mode
+ * only decides whether the computer fires thrusters on the pilot's behalf.
+ *
+ * - `assisted`: cancels spin when no rotate key is held, and bleeds off
+ *   drift on any axis the pilot is not thrusting along.
+ * - `rotation`: cancels spin only. Drift is left alone.
+ * - `manual`: fires only what the pilot asks for. Pure Newtonian.
+ */
+export type FlightMode = 'assisted' | 'rotation' | 'manual';
+
+/**
+ * Throttle per thruster group for one tick, each 0 to 1. Produced by the
+ * flight computer and applied by the physics. Stored on the ship so the
+ * renderer can draw exactly what fired, including assist burns.
+ */
+export interface Thrusters {
+  main: number;
+  reverse: number;
+  /** Lateral thrusters pushing the ship to its left. */
+  strafeLeft: number;
+  /** Lateral thrusters pushing the ship to its right. */
+  strafeRight: number;
+  /** Rotation thrusters adding anticlockwise spin. */
+  rotateLeft: number;
+  /** Rotation thrusters adding clockwise spin. */
+  rotateRight: number;
+}
 
 export interface Ship {
   id: string;
@@ -48,6 +80,9 @@ export interface Ship {
   state: ShipState;
   /** Station id when docked, otherwise null. */
   dockedAt: string | null;
+  flightMode: FlightMode;
+  /** What the thrusters did on the last tick. All zero when idle or docked. */
+  thrusters: Thrusters;
 }
 
 export interface Station {
@@ -64,9 +99,9 @@ export interface Station {
  * This is the only way the outside world influences the sim.
  */
 export interface PlayerInput {
-  /** Rotate anticlockwise on screen at the hull's turn rate. */
+  /** Fire rotation thrusters to add anticlockwise spin. */
   turnLeft: boolean;
-  /** Rotate clockwise on screen at the hull's turn rate. */
+  /** Fire rotation thrusters to add clockwise spin. */
   turnRight: boolean;
   thrustForward: boolean;
   thrustReverse: boolean;
@@ -76,6 +111,8 @@ export interface PlayerInput {
   brake: boolean;
   /** Edge-triggered: request docking or undocking this tick. */
   toggleDock: boolean;
+  /** Edge-triggered: switch to the next flight mode. */
+  cycleFlightMode: boolean;
 }
 
 export interface World {
@@ -94,4 +131,5 @@ export interface World {
 export type WorldEvent =
   | { type: 'docked'; shipId: string; stationId: string }
   | { type: 'undocked'; shipId: string; stationId: string }
-  | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' };
+  | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' }
+  | { type: 'flightModeChanged'; shipId: string; mode: FlightMode };

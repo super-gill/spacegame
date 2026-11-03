@@ -1,5 +1,5 @@
 import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { nearestDockableStation } from '@spacegame/sim';
+import { FLIGHT_MODE_LABELS, nearestDockableStation } from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel and transient toasts.
@@ -32,6 +32,7 @@ export class Ui {
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
       `ROT ${((ship.angularVelocity * 180) / Math.PI).toFixed(0).padStart(4)}°/s`,
+      `FLT ${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()}  [Z]`,
       near && ship.state === 'flying' ? `DOCK ${near.name.toUpperCase()}  [F]` : '',
       `${fps.toFixed(0)} fps  tick ${world.tick}`,
     ];
@@ -49,12 +50,15 @@ export class Ui {
     for (const e of events) {
       if (e.type === 'dockRefused') {
         this.showToast(e.reason === 'tooFast' ? 'Too fast to dock. Slow down.' : 'No station in range.');
+      } else if (e.type === 'flightModeChanged') {
+        this.showToast(`Flight mode: ${FLIGHT_MODE_LABELS[e.mode]}`, 1200, 'info');
       }
     }
   }
 
-  private showToast(text: string, ms = 1800): void {
+  private showToast(text: string, ms = 1800, tone: 'warn' | 'info' = 'warn'): void {
     this.toast.textContent = text;
+    this.toast.classList.toggle('info', tone === 'info');
     this.toast.classList.remove('hidden');
     if (this.toastTimer !== null) window.clearTimeout(this.toastTimer);
     this.toastTimer = window.setTimeout(() => this.toast.classList.add('hidden'), ms);

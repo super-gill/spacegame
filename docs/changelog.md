@@ -2,6 +2,25 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x until a proper 1.0 release; minor versions may break saves.
 
+## [0.1.3] - 2026-11-03
+
+### Changed
+- Physics is now pure Newtonian: removed space drag entirely. A ship left alone drifts and spins forever.
+- Top speed and spin are hard physics limits per hull, applied in every flight mode.
+- Brake now uses the real thrusters on each axis (forward motion is stopped by the weaker reverse engine) and overrides any flight keys held at the same time.
+- Thruster flames are drawn from what actually fired, scaled by throttle, so assist and brake burns are visible.
+- Key bindings moved to a single table in `bindings.ts`.
+
+### Added
+- Flight computer (`flight.ts`) with three modes, cycled with Z: full assist (default), rotation assist and manual.
+- `FLT` flight mode readout on the HUD and a toast when the mode changes.
+- Developer controls panel listing every control in the game, opened with F1, ` or the Controls button. Generated from the bindings table.
+- `Ship.flightMode`, `Ship.thrusters`, `PlayerInput.cycleFlightMode`, `flightModeChanged` event.
+- Tests for every flight mode, brake in all modes, and assist being limited by hull mass.
+
+### Removed
+- `SPACE_DRAG`, `SPACE_ANGULAR_DRAG` and `thrustFromInput`.
+
 ## [0.1.2] - 2026-11-03
 
 ### Changed

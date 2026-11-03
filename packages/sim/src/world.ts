@@ -1,5 +1,6 @@
 import { FIXED_DT } from './constants.js';
 import { HULLS } from './hulls.js';
+import { idleThrusters } from './flight.js';
 import type { PlayerInput, Ship, Station, World } from './types.js';
 
 /** A blank input: nothing pressed, hold heading. */
@@ -13,6 +14,7 @@ export function emptyInput(): PlayerInput {
     strafeRight: false,
     brake: false,
     toggleDock: false,
+    cycleFlightMode: false,
   };
 }
 
@@ -38,6 +40,8 @@ export function createStarterWorld(): World {
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    flightMode: 'assisted',
+    thrusters: idleThrusters(),
   };
 
   return {

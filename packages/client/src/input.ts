@@ -1,4 +1,5 @@
 import type { PlayerInput } from '@spacegame/sim';
+import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bindings.js';
 
 /**
  * Keyboard state, sampled once per sim tick into a PlayerInput.
@@ -6,27 +7,25 @@ import type { PlayerInput } from '@spacegame/sim';
  * Flight is keyboard only so the mouse stays free for targeting,
  * interacting with objects and UI in later versions.
  *
- * Bindings live in KEYS so they can be remapped from one place later.
- * Edge-triggered actions (dock) are latched between samples so a quick
- * tap between two ticks is never lost.
+ * Bindings come from bindings.ts. `press` actions are latched between
+ * samples so a quick tap between two ticks is never lost. Interface
+ * actions are not sent to the sim; they go straight to a callback.
  */
 
-const KEYS = {
-  turnLeft: ['KeyQ', 'ArrowLeft'],
-  turnRight: ['KeyE', 'ArrowRight'],
-  thrustForward: ['KeyW', 'ArrowUp'],
-  thrustReverse: ['KeyS', 'ArrowDown'],
-  strafeLeft: ['KeyA'],
-  strafeRight: ['KeyD'],
-  brake: ['Space', 'KeyX'],
-  toggleDock: ['KeyF'],
-} as const;
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls']);
+
+/** Which action, if any, a key code triggers. Built once from the table. */
+const ACTION_BY_CODE = new Map<string, (typeof KEY_BINDINGS)[number]>();
+for (const binding of KEY_BINDINGS) {
+  for (const code of binding.codes) ACTION_BY_CODE.set(code, binding);
+}
 
 export class InputController {
-  private readonly down = new Set<string>();
-  private dockLatched = false;
+  private readonly held = new Set<Action>();
+  private readonly latched = new Set<Action>();
+  private readonly downCodes = new Set<string>();
 
-  constructor() {
+  constructor(private readonly onUiAction: (action: UiAction) => void) {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     window.addEventListener('blur', this.onBlur);
@@ -34,42 +33,57 @@ export class InputController {
 
   /** Allow UI buttons (e.g. Undock) to trigger the same latch as the key. */
   requestToggleDock(): void {
-    this.dockLatched = true;
+    this.latched.add('toggleDock');
   }
 
-  /** Build this tick's PlayerInput. Consumes latched edge actions. */
+  /** Build this tick's PlayerInput. Consumes latched press actions. */
   sample(): PlayerInput {
     const input: PlayerInput = {
-      turnLeft: this.any(KEYS.turnLeft),
-      turnRight: this.any(KEYS.turnRight),
-      thrustForward: this.any(KEYS.thrustForward),
-      thrustReverse: this.any(KEYS.thrustReverse),
-      strafeLeft: this.any(KEYS.strafeLeft),
-      strafeRight: this.any(KEYS.strafeRight),
-      brake: this.any(KEYS.brake),
-      toggleDock: this.dockLatched,
+      thrustForward: this.held.has('thrustForward'),
+      thrustReverse: this.held.has('thrustReverse'),
+      strafeLeft: this.held.has('strafeLeft'),
+      strafeRight: this.held.has('strafeRight'),
+      turnLeft: this.held.has('turnLeft'),
+      turnRight: this.held.has('turnRight'),
+      brake: this.held.has('brake'),
+      cycleFlightMode: this.latched.has('cycleFlightMode'),
+      toggleDock: this.latched.has('toggleDock'),
     };
-    this.dockLatched = false;
+    this.latched.clear();
     return input;
   }
 
-  private any(codes: readonly string[]): boolean {
-    return codes.some((c) => this.down.has(c));
+  /** Recompute held actions from the keys currently down, so two keys for one action behave. */
+  private refreshHeld(): void {
+    this.held.clear();
+    for (const code of this.downCodes) {
+      const binding = ACTION_BY_CODE.get(code);
+      if (binding?.kind === 'hold') this.held.add(binding.action);
+    }
   }
 
   private onKeyDown = (e: KeyboardEvent): void => {
+    if (SUPPRESS_DEFAULT.has(e.code)) e.preventDefault();
     if (e.repeat) return;
-    if ((KEYS.toggleDock as readonly string[]).includes(e.code)) this.dockLatched = true;
-    this.down.add(e.code);
-    // Stop the page scrolling on space and arrows.
-    if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
+    const binding = ACTION_BY_CODE.get(e.code);
+    if (!binding) return;
+
+    if (binding.kind === 'press') {
+      if (UI_ACTIONS.has(binding.action)) this.onUiAction(binding.action as UiAction);
+      else this.latched.add(binding.action);
+      return;
+    }
+    this.downCodes.add(e.code);
+    this.refreshHeld();
   };
 
   private onKeyUp = (e: KeyboardEvent): void => {
-    this.down.delete(e.code);
+    this.downCodes.delete(e.code);
+    this.refreshHeld();
   };
 
   private onBlur = (): void => {
-    this.down.clear();
+    this.downCodes.clear();
+    this.held.clear();
   };
 }
