@@ -89,6 +89,7 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Derived stats** (`stats.ts`): `ShipStats`, `shipStats(world, ship)`, `fitStats(cat, hull, fit, cargoMass)`. Nothing stores performance; everything calls these.
 - **Fitting** (`fitting.ts`): `FitRefusal`, `mountRefusal`, `planRefit`, `fitModule`, `unfitModule`. The client never applies fitting rules itself; it asks `planRefit`.
 - **Ship fit** (`types.ts`): `Ship.fit` maps mount id to module id; `WeaponState` is keyed by `mountId`.
+- **Pilot storage** (`types.ts`): `Pilot.storage` maps station id to module id to count.
 - **Save format** (`save.ts`): `SAVE_VERSION`. Only the lead bumps it.
 
 ## Workstreams
@@ -112,18 +113,21 @@ Open design questions any chat needs answered. Jason answers in the lead chat or
 - Lore contradictions: Hive Ossk growing every station's shell vs race-specific stations; whether a living Aurel ship can appear for sale; whether the Oru are a playable starting race.
 - Player organisations and what to call them ("clan" is the Drifters' word).
 - Navy duties.
-- 0.7.0 design calls made by the 6a chat, to confirm or change: removing a module refunds half and the module vanishes; only Harbour has outfitting; the Mule and Jackal are gone (trader in a Tessaract Spine, pirate in a Kessari Wedge); the Spine has six bays; bonus values (Courier +25% cargo, Wedge +15% damage, Kessari +20% shield, Spine +25% cargo); all hull and module names are placeholders.
+- 0.7.0 design calls made by the 6a chat, to confirm or change: only Harbour has outfitting; the Mule and Jackal are gone (trader in a Tessaract Spine, pirate in a Kessari Wedge); the Spine has six bays; bonus values (Courier +25% cargo, Wedge +15% damage, Kessari +20% shield, Spine +25% cargo); all hull and module names are placeholders.
 
 ## Ideas inbox
 
 Jason's ideas that are not scheduled yet. The lead triages them into the roadmap, a workstream or "not now".
 
-_Empty._
+- **Owning ships and swapping in space** (2026-11-03): pilots own several ships and can change ship without docking. Feeds 6b, which already plans owned ships parked on pads.
+- **Escape pods** (2026-11-03, a maybe): when your ship is destroyed you eject in a pod that flies but has no modules, instead of respawning at once. A pod could transfer into a ship you own, or possibly an abandoned ship. Lead's notes: fits the modular model well (a pod is a sealed hull with a fixed fit); needs answers on what happens if the pod is destroyed, whether pod killing is allowed (it matters with friends on a shared world), and whether boarding abandoned ships belongs with salvage in milestone 9.
+- **Hireable NPC agents** (2026-11-03, long term): pay a station for an escort; hire a pilot to fly another ship you own alongside you; later, a hired captain who takes one of your ships off to work a trade route or mine, building towards a fleet. Lead's notes: the sim already suits this, because NPCs fly through the same inputs as people and their brains are plain data, so a hired pilot is a brain attached to a ship a pilot owns. 6b should keep "who owns a ship" separate from "who is flying it" so this slots in later. Escorts need little more than today's AI; captains on routes need the economy (10), industry (9) and off-screen traffic (8) first.
 
 ## Decisions
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-03: Modules are owned. Unfitting stores the module at that station for the pilot; fitting uses a stored one if there is one, else buys new. Fitting and unfitting each cost 5% of the module's price. Stored modules sell back for half. Storage is shaped like a cargo hold so modules can join the goods economy later and be carried and traded. (Jason)
 - 2026-11-03: The lead decides when work splits into its own chat, using the rules in "When to split work", and tells Jason at each milestone start and foundation landing. (Jason)
 - 2026-11-03: Work runs as a lead chat plus workstream chats coordinated through this file; the lead builds the 6a foundation before any workstream opens. (Jason)
 
@@ -137,6 +141,7 @@ _None._
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-03, lead: released 0.7.1, owned modules with per-station storage, handling fees and selling. Save version 3, with an automatic upgrade from 0.7.0. Filed ship ownership and escape pods in the ideas inbox for 6b planning.
 - 2026-11-03, lead: released 0.7.0 from the 6a chat's `ws/6a-handoff` branch. Added light armour to the starter so it outlasts the raider (a test now enforces it), stopped "power spare" showing as worse unless negative, moved the docked panel clear of the HUD, did the docs pass and version bump. Play checked: docking, outfitting, the Wedge and Spine in flight, a pirate fight, the old-save refusal.
 - 2026-11-03, lead: added "When to split work" with split rules, limits and the opener for new chats. No code change.
 - 2026-11-03, lead: added this file and the coordination rules. No code change.

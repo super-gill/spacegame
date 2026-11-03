@@ -23,7 +23,7 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Known gaps in 0.7.0
+## Known gaps in 0.7.1
 
 - One world per browser. Several save slots would need a picker; export and import cover it for now.
 - Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ship stays, flown by nobody). A way to carry your pilot over comes before the shared world.
@@ -36,7 +36,7 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 - Wrecks cannot be salvaged yet (milestone 9).
 - Pressing the same one-shot key twice within one sim tick (1/60 s) counts once.
 - No sound.
-- Removed modules vanish (half their price is refunded); there is nowhere to store them until ship storage arrives.
+- Only Harbour has outfitting, so all module storage is at Harbour for now. Modules cannot be carried or traded between stations until they join the economy.
 - No keyboard way to select mounts in the outfitting screen.
 - On screens 720 pixels tall the docked panel scrolls to reach the Undock button (F still undocks).
 - The new hulls, modules and fights are balanced on paper and by test, not yet by hand.

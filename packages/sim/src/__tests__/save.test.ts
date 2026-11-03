@@ -76,7 +76,7 @@ describe('refusing bad files', () => {
       [JSON.stringify({ hello: 'world' }), 'notASave'],
       [JSON.stringify({ ...good, format: 'something-else' }), 'notASave'],
       [JSON.stringify({ ...good, version: SAVE_VERSION + 1 }), 'tooNew'],
-      [JSON.stringify({ ...good, version: SAVE_VERSION - 1 }), 'tooOld'],
+      [JSON.stringify({ ...good, version: 1 }), 'tooOld'], // no migration from 1
       [JSON.stringify({ ...good, world: { ...good.world, ships: 'nope' } }), 'damaged'],
       [JSON.stringify({ ...good, world: null }), 'damaged'],
     ];

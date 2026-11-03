@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { MODULE_RESALE_FRACTION, STARTER_VS_RAIDER_MIN_EDGE, STARTING_CREDITS } from '../constants.js';
-import { fitModule, mountRefusal, planRefit, resaleValue, unfitModule, type FitResult } from '../fitting.js';
+import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION, STARTER_VS_RAIDER_MIN_EDGE, STARTING_CREDITS } from '../constants.js';
+import { fitFee, fitModule, mountRefusal, planRefit, resaleValue, sellModule, storedCount, unfitModule, type FitResult } from '../fitting.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { MANUFACTURERS } from '../manufacturers.js';
@@ -165,30 +165,94 @@ describe('mount rules', () => {
 });
 
 describe('fitting', () => {
-  it('fits a module into an empty mount and charges its price', () => {
+  it('buys a module it does not own, paying its price plus the fitting fee', () => {
     const { w } = dockedAt();
     const armour = MODULES['rookrivet-armour-s']!;
     const r = fitModule(w, 'ana', 'u1', armour.id);
     const after = ok(r);
     expect(myShip(after).fit['u1']).toBe(armour.id);
-    expect(credits(after)).toBe(STARTING_CREDITS - armour.price);
+    expect(credits(after)).toBe(STARTING_CREDITS - armour.price - fitFee(armour));
     expect(shipStats(after, myShip(after)).structure).toBe(shipStats(w, myShip(w)).structure + armour.stats.structure!);
-    expect(r.ok && r.event).toEqual({ type: 'fitted', shipId: myShip(w).id, mountId: 'u1', moduleId: armour.id, replaced: null, cost: armour.price });
+    expect(r.ok && r.event).toEqual({
+      type: 'fitted',
+      shipId: myShip(w).id,
+      mountId: 'u1',
+      moduleId: armour.id,
+      replaced: null,
+      bought: true,
+      cost: armour.price + fitFee(armour),
+    });
   });
 
-  it('replacing a module refunds part of the old one', () => {
-    const { w } = dockedAt();
-    const after = ok(fitModule(w, 'ana', 'e1', 'slagline-engine-s'));
-    const expected = MODULES['slagline-engine-s']!.price - Math.floor(MODULES['meridian-engine-s']!.price * MODULE_RESALE_FRACTION);
-    expect(credits(after)).toBe(STARTING_CREDITS - expected);
+  it('charges a fee of FIT_FEE_FRACTION of the price, rounded up', () => {
+    for (const m of Object.values(MODULES)) expect(fitFee(m)).toBe(Math.ceil(m.price * FIT_FEE_FRACTION));
+    expect(fitFee({ ...MODULES['meridian-pod-s']!, price: 1 })).toBe(1);
   });
 
-  it('removing a module sells it back', () => {
+  it('unfitting puts the module in storage at this station for a fee', () => {
     const { w } = dockedAt();
-    const after = ok(unfitModule(w, 'ana', 'b1'));
+    const pod = MODULES['meridian-pod-s']!;
+    const r = unfitModule(w, 'ana', 'b1');
+    const after = ok(r);
     expect(myShip(after).fit['b1']).toBeUndefined();
-    expect(credits(after)).toBe(STARTING_CREDITS + resaleValue(MODULES['meridian-pod-s']!));
+    expect(credits(after)).toBe(STARTING_CREDITS - fitFee(pod));
+    expect(storedCount(after.pilots['ana']!, HARBOUR, pod.id)).toBe(1);
     expect(shipStats(after, myShip(after)).cargoCapacity).toBe(0);
+    expect(r.ok && r.event).toEqual({ type: 'unfitted', shipId: myShip(w).id, mountId: 'b1', moduleId: pod.id, fee: fitFee(pod) });
+  });
+
+  it('replacing a module stores the old one and charges both fees', () => {
+    const { w } = dockedAt();
+    const kick = MODULES['slagline-engine-s']!;
+    const steady = MODULES['meridian-engine-s']!;
+    const after = ok(fitModule(w, 'ana', 'e1', kick.id));
+    expect(credits(after)).toBe(STARTING_CREDITS - kick.price - fitFee(kick) - fitFee(steady));
+    expect(storedCount(after.pilots['ana']!, HARBOUR, steady.id)).toBe(1);
+  });
+
+  it('fits an owned module from storage for the fee alone', () => {
+    const { w } = dockedAt();
+    const pod = MODULES['meridian-pod-s']!;
+    const stored = ok(unfitModule(w, 'ana', 'b1'));
+    const r = fitModule(stored, 'ana', 'b1', pod.id);
+    const back = ok(r);
+    expect(myShip(back).fit['b1']).toBe(pod.id);
+    expect(credits(back)).toBe(STARTING_CREDITS - 2 * fitFee(pod));
+    expect(back.pilots['ana']!.storage).toEqual({});
+    expect(r.ok && r.event.type === 'fitted' && r.event.bought).toBe(false);
+  });
+
+  it('swapping between two owned modules costs only fees', () => {
+    const { w } = dockedAt(HARBOUR, 100_000);
+    const kick = MODULES['slagline-engine-s']!;
+    const steady = MODULES['meridian-engine-s']!;
+    const a = ok(fitModule(w, 'ana', 'e1', kick.id)); // steady to storage
+    const b = ok(fitModule(a, 'ana', 'e1', steady.id)); // kick to storage, steady back
+    expect(credits(a) - credits(b)).toBe(fitFee(steady) + fitFee(kick));
+    expect(storedCount(b.pilots['ana']!, HARBOUR, kick.id)).toBe(1);
+    expect(storedCount(b.pilots['ana']!, HARBOUR, steady.id)).toBe(0);
+  });
+
+  it('sells a stored module back for MODULE_RESALE_FRACTION of its price', () => {
+    const { w } = dockedAt();
+    const pod = MODULES['meridian-pod-s']!;
+    const stored = ok(unfitModule(w, 'ana', 'b1'));
+    const r = sellModule(stored, 'ana', pod.id);
+    const sold = ok(r);
+    expect(resaleValue(pod)).toBe(Math.floor(pod.price * MODULE_RESALE_FRACTION));
+    expect(credits(sold)).toBe(credits(stored) + resaleValue(pod));
+    expect(sold.pilots['ana']!.storage).toEqual({});
+    expect(r.ok && r.event).toEqual({ type: 'moduleSold', shipId: myShip(w).id, stationId: HARBOUR, moduleId: pod.id, credits: resaleValue(pod) });
+  });
+
+  it('refuses to sell what is not stored here, or away from outfitting', () => {
+    const { w } = dockedAt();
+    const notStored = sellModule(w, 'ana', 'meridian-pod-s');
+    expect(notStored.ok ? 'ok' : notStored.reason).toBe('notStored');
+    expect(notStored.world).toBe(w);
+    const ridge = dockedAt(RIDGE).w;
+    const away = sellModule(ridge, 'ana', 'meridian-pod-s');
+    expect(away.ok ? 'ok' : away.reason).toBe('noOutfitting');
   });
 
   it('refuses, and changes nothing, when a rule is broken', () => {
@@ -324,7 +388,15 @@ describe('ships in the world', () => {
 
   it('refuses saves from before modular ships', () => {
     const old = JSON.stringify({ format: SAVE_FORMAT, version: 1, savedAt: '', world: {} });
-    expect(SAVE_VERSION).toBe(2);
     expect(deserializeWorld(old)).toEqual({ ok: false, reason: 'tooOld' });
+  });
+
+  it('upgrades 0.7.0 saves by giving every pilot empty storage', () => {
+    const w = joinPilot(createStarterWorld(), 'ana', 'Ana');
+    const { storage: _storage, ...pilot } = w.pilots['ana']!;
+    const v2 = JSON.stringify({ format: SAVE_FORMAT, version: 2, savedAt: '', world: { ...w, pilots: { ana: pilot } } });
+    expect(SAVE_VERSION).toBe(3);
+    const r = deserializeWorld(v2);
+    expect(r.ok && r.world.pilots['ana']).toEqual(w.pilots['ana']);
   });
 });

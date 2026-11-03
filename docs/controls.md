@@ -67,7 +67,8 @@ Assists fire the ship's real thrusters, so you will see the flames, and a heavie
 | Trade | Buttons in the Market tab | Buy 1, Buy max (as many as your credits and hold allow), Sell 1, Sell all |
 | Select a mount | Click it in the Outfitting tab, on the drawing or in the mount list | Lists the modules that fit it |
 | Preview a module | Hover it | Shows stats after the change beside stats now, even for a change that would be refused |
-| Fit or remove | Buttons in the Outfitting tab | Fit pays the module's price less half the price of what it replaces; Remove pays back half |
+| Fit or unfit | Buttons in the Outfitting tab | Fit takes the module from your storage here if you have one, otherwise buys it; either way there is a 5% handling fee, plus 5% on anything it replaces. Unfit moves the module to storage here for the 5% fee |
+| Sell a stored module | Sell button under Stored here | Pays half its price |
 
 If docking is refused a message says why: too far, or too fast.
 
@@ -75,7 +76,7 @@ The docked panel has two tabs.
 
 **Market** lists each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
 
-**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). There is no keyboard way to select mounts yet.
+**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
 
 ## Interface
 

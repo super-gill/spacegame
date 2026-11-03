@@ -413,6 +413,13 @@ export interface Pilot {
   shipsIssued: number;
   /** The pilot's money. Belongs to the pilot, not the ship, so it survives losing a ship. */
   credits: number;
+  /**
+   * Modules the pilot owns but has not fitted, by station id then module
+   * id to count. They stay where they were unfitted and are collected
+   * there. Same shape as a cargo hold, so modules can join the goods
+   * economy later.
+   */
+  storage: Record<string, Record<string, number>>;
 }
 
 /**
@@ -540,9 +547,13 @@ export type WorldEvent =
   /** A pirate has given up on `shipId`. */
   | { type: 'huntEnded'; shipId: string; pirateId: string }
   /**
-   * A module was fitted, replacing `replaced` if the mount was full. `cost`
-   * is credits paid after any refund (negative: the pilot was paid).
+   * A module was fitted, replacing `replaced` (which went to storage) if
+   * the mount was full. `bought` is true when it was bought new rather
+   * than taken from storage. `cost` is every credit paid: price if bought,
+   * plus the fitting fee, plus the unfitting fee on what it replaced.
    */
-  | { type: 'fitted'; shipId: string; mountId: string; moduleId: string; replaced: string | null; cost: number }
-  /** A module was taken off. `refund` is credits paid back. */
-  | { type: 'unfitted'; shipId: string; mountId: string; moduleId: string; refund: number };
+  | { type: 'fitted'; shipId: string; mountId: string; moduleId: string; replaced: string | null; bought: boolean; cost: number }
+  /** A module was taken off and put in storage at this station. `fee` is what it cost. */
+  | { type: 'unfitted'; shipId: string; mountId: string; moduleId: string; fee: number }
+  /** A stored module was sold back to the station the ship is docked at. */
+  | { type: 'moduleSold'; shipId: string; stationId: string; moduleId: string; credits: number };

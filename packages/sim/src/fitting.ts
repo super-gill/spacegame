@@ -1,7 +1,7 @@
-import { MODULE_RESALE_FRACTION } from './constants.js';
+import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION } from './constants.js';
 import { cargoMass, fitStats, type Catalogues } from './stats.js';
 import { cargoUsed } from './trade.js';
-import type { HullSpec, ModuleSpec, MountPoint, Ship, ShipStats, WeaponState, World, WorldEvent } from './types.js';
+import type { HullSpec, ModuleSpec, MountPoint, Pilot, Ship, ShipStats, WeaponState, World, WorldEvent } from './types.js';
 
 /**
  * Fitting: putting modules on mounts and taking them off.
@@ -13,12 +13,18 @@ import type { HullSpec, ModuleSpec, MountPoint, Ship, ShipStats, WeaponState, Wo
  *      than the mount, where the mount provides every service it needs.
  *   3. After the change, total power draw is within reactor output and
  *      the cargo aboard still fits.
- *   4. The pilot can pay: the module's price, less the resale value of
- *      anything it replaces.
+ *   4. The pilot can pay.
  *
- * Fitting and removing are pilot commands, like trading: a person asks
- * once, the sim checks and applies it, and over a network they become
- * requests. Credits belong to the pilot; the fit belongs to the ship.
+ * Modules are owned. A module the pilot has in storage at this station
+ * is fitted from there; otherwise it is bought new. Unfitting puts the
+ * module into storage at this station. Fitting and unfitting each cost a
+ * small handling fee (FIT_FEE_FRACTION of the module's price), so
+ * swapping between owned modules is cheap but not free. Stored modules
+ * can be sold back to the station.
+ *
+ * These are pilot commands, like trading: a person asks once, the sim
+ * checks and applies it, and over a network they become requests.
+ * Credits and storage belong to the pilot; the fit belongs to the ship.
  */
 
 export type FitRefusal =
@@ -35,7 +41,8 @@ export type FitRefusal =
   | 'emptyMount' // nothing to remove
   | 'power' // the fit would draw more power than the reactors make
   | 'cargo' // the cargo aboard would no longer fit
-  | 'credits'; // not enough credits
+  | 'credits' // not enough credits
+  | 'notStored'; // no such module in storage here
 
 const SIZE_ORDER = { S: 0, M: 1, L: 2, XL: 3 } as const;
 
@@ -47,9 +54,31 @@ export function mountRefusal(mount: MountPoint, module: ModuleSpec): FitRefusal 
   return null;
 }
 
-/** Credits paid back for a module taken off. */
+/** Credits a station pays for a stored module sold back to it. */
 export function resaleValue(module: ModuleSpec): number {
   return Math.floor(module.price * MODULE_RESALE_FRACTION);
+}
+
+/** Handling fee for fitting or unfitting a module, in whole credits. */
+export function fitFee(module: ModuleSpec): number {
+  return Math.ceil(module.price * FIT_FEE_FRACTION);
+}
+
+/** How many of `moduleId` the pilot has stored at `stationId`. */
+export function storedCount(pilot: Pilot, stationId: string, moduleId: string): number {
+  return pilot.storage[stationId]?.[moduleId] ?? 0;
+}
+
+/** The pilot with `delta` of a module added to (or taken from) storage at a station. Empty entries are removed. */
+function withStored(pilot: Pilot, stationId: string, moduleId: string, delta: number): Pilot {
+  const here = { ...(pilot.storage[stationId] ?? {}) };
+  const n = (here[moduleId] ?? 0) + delta;
+  if (n > 0) here[moduleId] = n;
+  else delete here[moduleId];
+  const storage = { ...pilot.storage };
+  if (Object.keys(here).length > 0) storage[stationId] = here;
+  else delete storage[stationId];
+  return { ...pilot, storage };
 }
 
 /**
@@ -79,10 +108,14 @@ export type RefitPlan =
   | {
       ok: true;
       ship: Ship;
+      /** The pilot after paying and after storage changes. */
+      pilot: Pilot;
       /** Stats after the change, cargo included. */
       stats: ShipStats;
-      /** Credits the pilot pays (negative: is paid). */
+      /** Credits the pilot pays. */
       cost: number;
+      /** True when the module is bought new rather than taken from storage. */
+      bought: boolean;
       event: WorldEvent;
     }
   | { ok: false; reason: FitRefusal };
@@ -125,9 +158,15 @@ export function planRefit(world: World, pilotId: string, mountId: string, module
   if (stats.powerDraw > stats.powerOutput) return { ok: false, reason: 'power' };
   if (cargoUsed(ship) > stats.cargoCapacity) return { ok: false, reason: 'cargo' };
 
-  const refund = old ? resaleValue(old) : 0;
-  const cost = (module?.price ?? 0) - refund;
+  const stationId = ship.dockedAt;
+  const fromStorage = module ? storedCount(pilot, stationId, module.id) > 0 : false;
+  const bought = module !== undefined && !fromStorage;
+  const cost = (bought && module ? module.price : 0) + (module ? fitFee(module) : 0) + (old ? fitFee(old) : 0);
   if (cost > pilot.credits) return { ok: false, reason: 'credits' };
+
+  let paid: Pilot = { ...pilot, credits: pilot.credits - cost };
+  if (module && fromStorage) paid = withStored(paid, stationId, module.id, -1);
+  if (oldId) paid = withStored(paid, stationId, oldId, 1);
 
   const refitted: Ship = {
     ...ship,
@@ -137,33 +176,59 @@ export function planRefit(world: World, pilotId: string, mountId: string, module
     structure: Math.min(ship.structure, stats.structure),
   };
   const event: WorldEvent = module
-    ? { type: 'fitted', shipId: ship.id, mountId, moduleId: module.id, replaced: oldId, cost }
-    : { type: 'unfitted', shipId: ship.id, mountId, moduleId: oldId!, refund };
-  return { ok: true, ship: refitted, stats, cost, event };
+    ? { type: 'fitted', shipId: ship.id, mountId, moduleId: module.id, replaced: oldId, bought, cost }
+    : { type: 'unfitted', shipId: ship.id, mountId, moduleId: oldId!, fee: cost };
+  return { ok: true, ship: refitted, pilot: paid, stats, cost, bought, event };
 }
 
 export type FitResult = { ok: true; world: World; event: WorldEvent } | { ok: false; world: World; reason: FitRefusal };
 
 function apply(world: World, pilotId: string, plan: RefitPlan): FitResult {
   if (!plan.ok) return { ok: false, world, reason: plan.reason };
-  const pilot = world.pilots[pilotId]!;
   return {
     ok: true,
     world: {
       ...world,
-      pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits - plan.cost } },
+      pilots: { ...world.pilots, [pilotId]: plan.pilot },
       ships: { ...world.ships, [plan.ship.id]: plan.ship },
     },
     event: plan.event,
   };
 }
 
-/** Fit a module to a mount on the pilot's docked ship, replacing what is there. All or nothing. */
+/**
+ * Fit a module to a mount on the pilot's docked ship, from storage here if
+ * the pilot has one, otherwise bought new. What it replaces goes to
+ * storage here. All or nothing.
+ */
 export function fitModule(world: World, pilotId: string, mountId: string, moduleId: string): FitResult {
   return apply(world, pilotId, planRefit(world, pilotId, mountId, moduleId));
 }
 
-/** Take the module off a mount on the pilot's docked ship and sell it back. All or nothing. */
+/** Take the module off a mount on the pilot's docked ship and put it in storage here. All or nothing. */
 export function unfitModule(world: World, pilotId: string, mountId: string): FitResult {
   return apply(world, pilotId, planRefit(world, pilotId, mountId, null));
+}
+
+/**
+ * Sell one stored module back to the station the pilot is docked at.
+ * Needs a station with outfitting; the module must be in storage there.
+ */
+export function sellModule(world: World, pilotId: string, moduleId: string): FitResult {
+  const pilot = world.pilots[pilotId];
+  const ship = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
+  if (!pilot || !ship) return { ok: false, world, reason: 'noShip' };
+  if (ship.state !== 'docked' || !ship.dockedAt) return { ok: false, world, reason: 'notDocked' };
+  const stationId = ship.dockedAt;
+  if (!world.stations[stationId]?.outfitting) return { ok: false, world, reason: 'noOutfitting' };
+  const module = world.modules[moduleId];
+  if (!module) return { ok: false, world, reason: 'unknownModule' };
+  if (storedCount(pilot, stationId, moduleId) < 1) return { ok: false, world, reason: 'notStored' };
+  const credits = resaleValue(module);
+  const sold = withStored({ ...pilot, credits: pilot.credits + credits }, stationId, moduleId, -1);
+  return {
+    ok: true,
+    world: { ...world, pilots: { ...world.pilots, [pilotId]: sold } },
+    event: { type: 'moduleSold', shipId: ship.id, stationId, moduleId, credits },
+  };
 }

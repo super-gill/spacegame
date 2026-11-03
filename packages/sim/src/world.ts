@@ -203,7 +203,7 @@ export function joinPilot(world: World, pilotId: string, name: string): World {
     if (existing.name === name) return world;
     return { ...world, pilots: { ...world.pilots, [pilotId]: { ...existing, name } } };
   }
-  const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS };
+  const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS, storage: {} };
   return issueStarterShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilot);
 }
 

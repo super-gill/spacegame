@@ -41,12 +41,22 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 2: 0.7.0, modular ships. Ships carry a fit, spawners a loadout,
  *   stations an outfitting flag. Version 1 saves are refused (no
  *   migration: their hulls no longer exist).
+ * - 3: 0.7.1, owned modules. Pilots carry module storage by station.
+ *   Version 2 saves migrate: every pilot starts with empty storage.
  */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
-/** Upgrade a world from version N to N + 1, keyed by N. Empty until a saved format changes. */
+/** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
-export const MIGRATIONS: Record<number, Migration> = {};
+export const MIGRATIONS: Record<number, Migration> = {
+  // 2 to 3: pilots gain module storage.
+  2: (world) => {
+    if (!isRecord(world) || !isRecord(world['pilots'])) return world;
+    const pilots: Record<string, unknown> = {};
+    for (const [id, p] of Object.entries(world['pilots'])) pilots[id] = isRecord(p) ? { storage: {}, ...p } : p;
+    return { ...world, pilots };
+  },
+};
 
 export interface SaveEnvelope {
   format: string;

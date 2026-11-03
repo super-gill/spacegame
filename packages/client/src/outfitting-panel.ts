@@ -2,9 +2,11 @@ import {
   cargoMass,
   fitStats,
   mountRefusal,
+  fitFee,
   planRefit,
   resaleValue,
   shipStats,
+  storedCount,
   weaponDps,
   type FitRefusal,
   type HullSpec,
@@ -22,7 +24,9 @@ import { RACE_COLOUR, drawShipArt } from './render/ship-art.js';
  * Left: the ship as fitted, with empty mounts as dashed sockets; click a
  * mount (there or in the list) to select it. Right: the ship's derived
  * stats. Below: the modules that physically fit the selected mount, each
- * with what it costs after the refund on what it replaces. Pointing at a
+ * with how many you own here and what fitting it costs (the handling fee,
+ * plus the price if you do not own one), then the modules you have in
+ * storage at this station, which you can sell. Pointing at a
  * module previews it: the drawing and the stats show the ship as it would
  * be, so the effect of a change is visible before paying for it.
  *
@@ -30,7 +34,8 @@ import { RACE_COLOUR, drawShipArt } from './render/ship-art.js';
  * by main.ts, which owns the world.
  */
 
-export type RefitRequest = { mountId: string; moduleId: string | null };
+/** Fit `moduleId` on a mount, or with `moduleId` null unfit it; or sell one stored module. */
+export type RefitRequest = { kind: 'refit'; mountId: string; moduleId: string | null } | { kind: 'sell'; moduleId: string };
 
 /** Player-facing reasons a refit is refused. Shared with main.ts for toasts. */
 export const FIT_REFUSALS: Record<FitRefusal, string> = {
@@ -48,6 +53,7 @@ export const FIT_REFUSALS: Record<FitRefusal, string> = {
   power: 'Not enough reactor power.',
   cargo: 'Cargo aboard would not fit.',
   credits: 'Not enough credits.',
+  notStored: 'You have none of those stored here.',
 };
 
 const MOUNT_TYPE_NAME: Record<MountType, string> = {
@@ -135,6 +141,7 @@ export class OutfittingPanel {
   private readonly canvas: HTMLCanvasElement;
   private readonly statsBox: HTMLDivElement;
   private readonly mountsBox: HTMLDivElement;
+  private readonly storageBox: HTMLDivElement;
   private readonly modulesBox: HTMLDivElement;
   private signature = '';
   private selected: string | null = null;
@@ -155,7 +162,8 @@ export class OutfittingPanel {
     top.append(this.canvas, this.statsBox);
     this.mountsBox = el('div', 'outfitting-mounts');
     this.modulesBox = el('div', 'outfitting-modules');
-    this.root.append(top, this.mountsBox, this.modulesBox);
+    this.storageBox = el('div', 'outfitting-storage');
+    this.root.append(top, this.mountsBox, this.modulesBox, this.storageBox);
     container.append(this.root);
 
     const dpr = window.devicePixelRatio || 1;
@@ -175,12 +183,13 @@ export class OutfittingPanel {
     if (!pilot || !ship || !hull) return;
     if (this.selected && !hull.mounts.some((m) => m.id === this.selected)) this.selected = null;
 
-    const signature = JSON.stringify([ship.id, ship.dockedAt, pilot.credits, ship.fit, ship.hold, this.selected]);
+    const signature = JSON.stringify([ship.id, ship.dockedAt, pilot.credits, pilot.storage, ship.fit, ship.hold, this.selected]);
     if (signature === this.signature) return;
     this.signature = signature;
     this.preview = null;
     this.renderMounts(world, hull, ship.fit);
     this.renderModules(world, hull, ship.fit);
+    this.renderStorage(world, ship.dockedAt);
     this.renderPreview();
   }
 
@@ -322,11 +331,12 @@ export class OutfittingPanel {
       const actions = el('td', 'actions');
       if (module && !hull.sealed) {
         const plan = planRefit(world, this.pilotId, mount.id, null);
-        const remove = el('button', undefined, `Remove +${credits(resaleValue(module))}`);
+        const remove = el('button', undefined, `Unfit ${credits(fitFee(module))}`);
+        remove.title = 'Moves it to storage at this station';
         remove.type = 'button';
         remove.disabled = !plan.ok;
         if (!plan.ok) remove.title = FIT_REFUSALS[plan.reason];
-        remove.addEventListener('click', () => this.onRefit({ mountId: mount.id, moduleId: null }));
+        remove.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: null }));
         remove.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: null }));
         remove.addEventListener('mouseleave', () => this.setPreview(null));
         actions.append(remove);
@@ -357,13 +367,17 @@ export class OutfittingPanel {
 
     const table = el('table');
     const head = el('tr');
-    for (const h of ['Module', 'Maker', 'Mass', 'Power', 'Does', 'Cost', '']) head.append(el('th', undefined, h));
+    for (const h of ['Module', 'Maker', 'Mass', 'Power', 'Does', 'Owned', 'Cost', '']) head.append(el('th', undefined, h));
     table.append(head);
     const current = fit[mount.id];
+    const pilot = world.pilots[this.pilotId];
+    const stationId = world.ships[pilot?.shipId ?? '']?.dockedAt ?? '';
     for (const m of options) {
       const plan = planRefit(world, this.pilotId, mount.id, m.id);
       const old = current ? world.modules[current] : undefined;
-      const cost = m.price - (old ? resaleValue(old) : 0);
+      const owned = pilot ? storedCount(pilot, stationId, m.id) : 0;
+      // Same sum the sim charges: price unless owned, fee to fit, fee to unfit what it replaces.
+      const cost = (owned > 0 ? 0 : m.price) + fitFee(m) + (old ? fitFee(old) : 0);
       const tr = el('tr', m.id === current ? 'selected' : undefined);
       const smaller = m.size !== mount.size ? ' (no hull bonus)' : '';
       tr.append(
@@ -372,13 +386,14 @@ export class OutfittingPanel {
         el('td', 'num', fixed1(m.mass)),
         el('td', 'num', m.power ? `-${m.power}` : m.stats.powerOutput ? `+${m.stats.powerOutput}` : '0'),
         el('td', 'does', describeModule(m, world)),
-        el('td', 'num', cost < 0 ? `+${credits(-cost)}` : credits(cost)),
+        el('td', 'num', owned ? String(owned) : ''),
+        el('td', 'num', m.id === current ? '' : credits(cost)),
       );
       const actions = el('td', 'actions');
       if (plan.ok) {
         const b = el('button', undefined, 'Fit');
         b.type = 'button';
-        b.addEventListener('click', () => this.onRefit({ mountId: mount.id, moduleId: m.id }));
+        b.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: m.id }));
         actions.append(b);
       } else {
         actions.append(el('span', 'refused', m.id === current ? 'Fitted' : FIT_REFUSALS[plan.reason]));
@@ -388,6 +403,39 @@ export class OutfittingPanel {
         tr.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: m.id }));
         tr.addEventListener('mouseleave', () => this.setPreview(null));
       }
+      table.append(tr);
+    }
+    box.append(table);
+  }
+
+  /** Modules the pilot owns in storage at this station, with a Sell button each. */
+  private renderStorage(world: World, stationId: string | null): void {
+    const box = this.storageBox;
+    box.replaceChildren();
+    const pilot = world.pilots[this.pilotId];
+    const here = stationId && pilot ? (pilot.storage[stationId] ?? {}) : {};
+    const ids = Object.keys(here).sort((a, b) => (world.modules[a]?.name ?? a).localeCompare(world.modules[b]?.name ?? b));
+    box.append(el('h2', undefined, 'Stored here'));
+    if (ids.length === 0) {
+      box.append(el('p', 'muted', 'Nothing stored here. Unfitted modules are kept at the station you unfit them at.'));
+      return;
+    }
+    const table = el('table');
+    const head = el('tr');
+    for (const h of ['Module', 'Size', 'Count', '']) head.append(el('th', undefined, h));
+    table.append(head);
+    for (const id of ids) {
+      const m = world.modules[id];
+      const tr = el('tr');
+      tr.append(el('td', undefined, m?.name ?? id), el('td', undefined, m?.size ?? ''), el('td', 'num', String(here[id])));
+      const actions = el('td', 'actions');
+      if (m) {
+        const sell = el('button', undefined, `Sell +${credits(resaleValue(m))}`);
+        sell.type = 'button';
+        sell.addEventListener('click', () => this.onRefit({ kind: 'sell', moduleId: id }));
+        actions.append(sell);
+      }
+      tr.append(actions);
       table.append(tr);
     }
     box.append(table);

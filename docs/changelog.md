@@ -4,6 +4,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-03
+
+### Added
+- Modules are owned. Unfitted and replaced modules go to the pilot's storage at that station, and fitting one you have stored there takes it out instead of buying a new one.
+- Fitting and unfitting cost a handling fee of 5% of the module's price, each way.
+- Stored modules can be sold back to the station for half their price.
+- Outfitting shows how many of each module you have stored here and what fitting it costs, and a Stored here list with Sell buttons.
+- Tests for buying, storing, fitting from storage, fees, selling and the save upgrade.
+
+### Changed
+- Removing or replacing a module no longer refunds half its price; it goes to storage instead.
+- Save format version 3. Saves from 0.7.0 upgrade automatically, with empty storage for every pilot.
+
 ## [0.7.0] - 2026-11-03
 
 Milestone 6a: modular ships.

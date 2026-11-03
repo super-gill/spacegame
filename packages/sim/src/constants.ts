@@ -102,9 +102,15 @@ export const UNDOCK_PUSH_SPEED = 30;
 export const SHIELD_REGEN_DELAY = 3;
 
 /**
- * Fraction of a module's price paid back when it is taken off or
- * replaced at outfitting. There is nowhere to store a removed module yet,
- * so it is sold back to the station.
+ * Fee for fitting or unfitting a module, as a fraction of its price,
+ * charged each way and rounded up to whole credits. Handling, not buying:
+ * an owned module costs only this to move between ship and storage.
+ */
+export const FIT_FEE_FRACTION = 0.05;
+
+/**
+ * Fraction of a module's price a station pays for a stored module sold
+ * back to it. A placeholder until modules join the goods economy.
  */
 export const MODULE_RESALE_FRACTION = 0.5;
 

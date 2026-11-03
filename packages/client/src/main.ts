@@ -2,6 +2,7 @@ import {
   buyGood,
   createStarterWorld,
   fitModule,
+  sellModule,
   unfitModule,
   distance,
   sellGood,
@@ -118,24 +119,29 @@ function trade(request: TradeRequest): void {
   }
 }
 
-/** Pilot command: fit or remove a module at the station we are docked at. */
+/** Pilot command: fit, unfit or sell a module at the station we are docked at. */
 function refit(request: RefitRequest): void {
-  const r = request.moduleId
-    ? fitModule(current, me.id, request.mountId, request.moduleId)
-    : unfitModule(current, me.id, request.mountId);
+  const r =
+    request.kind === 'sell'
+      ? sellModule(current, me.id, request.moduleId)
+      : request.moduleId
+        ? fitModule(current, me.id, request.mountId, request.moduleId)
+        : unfitModule(current, me.id, request.mountId);
   if (!r.ok) {
     ui.notify(FIT_REFUSALS[r.reason], 'warn');
     return;
   }
   current = r.world;
   const e = r.event;
+  const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
+  const name = current.modules[e.type === 'fitted' || e.type === 'unfitted' || e.type === 'moduleSold' ? e.moduleId : '']?.name;
   if (e.type === 'fitted') {
-    const name = current.modules[e.moduleId]?.name ?? e.moduleId;
-    const paid = e.cost >= 0 ? `for ${e.cost.toLocaleString('en-GB')} cr` : `and got ${(-e.cost).toLocaleString('en-GB')} cr back`;
-    ui.notify(`Fitted ${name} ${paid}`);
+    const stored = e.replaced ? `; ${current.modules[e.replaced]?.name ?? e.replaced} to storage` : '';
+    ui.notify(`${e.bought ? 'Bought and fitted' : 'Fitted'} ${name ?? e.moduleId} for ${cr(e.cost)}${stored}`);
   } else if (e.type === 'unfitted') {
-    const name = current.modules[e.moduleId]?.name ?? e.moduleId;
-    ui.notify(`Removed ${name}, +${e.refund.toLocaleString('en-GB')} cr`);
+    ui.notify(`Unfitted ${name ?? e.moduleId} to storage for ${cr(e.fee)}`);
+  } else if (e.type === 'moduleSold') {
+    ui.notify(`Sold ${name ?? e.moduleId} for ${cr(e.credits)}`);
   }
 }
 
