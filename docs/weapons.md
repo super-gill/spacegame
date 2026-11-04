@@ -30,8 +30,8 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 | Hybrid | Blaster | Railgun | Some | Charges | The extremes of range: blasters point blank, railguns the longest reach |
 | Missile | Missile | Torpedo | None | Warheads | Homing, counterable; torpedoes heavy, slow and devastating |
 
-- Each gun exists in sizes S, M and L (XL later). Today's weapons map in: the pulse cannon becomes the pulse laser (energy), the autocannon stays projectile, the light and medium turrets become PDCs (below).
-- **Hull bonuses by family** use the existing `HullBonus` tag: a hull rewards full-size weapons of its family with damage, rate of fire, range or capacitor use. The lore names which maker favours which family.
+- Each gun exists in sizes S, M and L (XL later), one name across sizes: Union Picket (autocannon) and Lockout (artillery); Cantor-Vell Verse (pulse) and Litany (beam), with the Paragon Fairshot as the open-market pulse laser; Commonwealth Retort (blaster) and Answer (railgun); Ito-Marr Magazine (launcher) and Arsenal (torpedo tube). Munitions are KOD's: Summons (missile), Foreclosure (torpedo), Scatter (frag) and Breach (explosive) warheads, Heat for heat-seeking. Today's weapons map in: the Fairshot becomes an energy pulse laser, the Picket stays projectile, the Watchman and Sentry become swivels.
+- **Hull bonuses by family** use the existing `HullBonus` tag: a hull rewards full-size weapons of its family with damage, rate of fire, range or capacitor use. From the lore: Halcyon energy (Cantor-Vell), Kessari missile (Ito-Marr launchers, KOD munitions), Free Belt projectile (Union Defence Works), Vael hybrid (Commonwealth Fleet Works); the Oru and Drifters favour none. Paragon sells light guns of every family. The Warrant's family is missiles, which arrive in part 2; in part 1 it keeps a plain weapon damage bonus.
 - **Turret is a property of the weapon**, not the mount (`WeaponKind`, as now). A mount takes a turreted weapon only if it provides `fireControl`, which is how a hull decides where turrets can go.
 
 ## Ammunition
@@ -57,7 +57,7 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 
 ## Point defence cannons (part 2)
 
-- Turreted weapons become **PDCs**: multi-role, slewing guns for both munitions and ships. Default behaviour is point defence: engage the closest incoming missile or torpedo automatically, no lock needed, because nobody can click a missile while flying. Assigned to a lock (`WeaponState.lockTarget`), a PDC engages that ship instead.
+- Turreted weapons become **PDCs** (in the world, **swivels**: the Paragon Watchman and Sentry): multi-role, slewing guns for both munitions and ships. Default behaviour is point defence: engage the closest incoming missile or torpedo automatically, no lock needed, because nobody can click a missile while flying. Assigned to a lock (`WeaponState.lockTarget`), a PDC engages that ship instead.
 - Being multi-role, a PDC is worse than a dedicated gun at both jobs: less damage than a fixed gun of its size against ships (the standing rule), and its value against munitions is coverage.
 
 ## Countermeasures (part 2)
@@ -67,7 +67,7 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 
 ## Hull classes
 
-Hulls get a class on an age-of-sail ladder (`HullSpec.class`), separate from module size, which stays what fits a mount: pod, cutter, sloop, brig, frigate, ship of the line, capital, and hulk for trade and industry at any size. Classes set the expectations for coverage (below), bonuses and later crew, and give the navy, the Watch and the lore a shared language. Capitals (first-rates, flagships) are where station services aboard, hangars and squadrons live, later. Today's hulls: the Tern a cutter, the Warrant a sloop, the Manifest a hulk, the Ark a pod; the Aurel Tacet sits outside the ladder. Names are the lore's.
+Hulls get a class on an age-of-sail ladder (`HullSpec.class`), separate from module size, which stays what fits a mount: pod, cutter, sloop, brig, frigate, ship of the line, capital, and, at any size, merchantman for trade and passengers and hulk for industry. Classes set the expectations for coverage (below), bonuses and later crew, and give the navy, the Watch and the lore a shared language. Capitals (first-rates, flagships) are where station services aboard, hangars and squadrons live, later. Today's hulls: the Tern a cutter, the Warrant a sloop, the Manifest a merchantman, the Ark a pod; the Aurel Tacet sits outside the ladder. Each people's words for line ships and capitals are in `docs/lore.md`.
 
 ## Arcs and blind spots
 
