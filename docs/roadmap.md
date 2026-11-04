@@ -13,17 +13,25 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Done, 0.7.0 |
 | 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | Done, 0.8.0 |
 | 6c Living system | A star system on rails: a star, a planet, a moon, the belt, stations in orbit; spheres of influence and real gravity with free orbits; tiered gravity warnings; sensor range; Calder Watch patrols that hunt pirates; more traders; a third station (see `docs/system.md`) | Built on `main`, release pending (0.9.0): part 1 (bodies, frames, moving stations, save 5) and part 2 (target locks, fitted sensors and nav computers, lock readouts, gravity, surfaces, Lantern Works, the Scree, the Calder Watch, the trade triangle) |
-| 6d Ship interface and navigation | Flight HUD with shield, hull and module gauges; radar and contacts by sensor range; nav target with distance and arrival time; system map; warnings; predicted path and orbit readouts. Mockups first | In progress: interface workstream, mockups done |
-| 6e Weapons and capacitor | A capacitor that energy weapons and shield recharge draw on; projectile guns and missiles on ammunition; missile launchers; fire groups; turret arcs; modules across two mounts; maybe a mining laser | |
+| 6d Ship interface and navigation | Flight HUD with shield, hull and module gauges; radar and contacts by sensor range; nav target with distance and arrival time; system map; warnings; predicted path and orbit readouts. Everything shown about a ship or the system comes through the readouts (`lockReadout`, `navReadout`), the window rule. Mockups first | In progress: interface workstream; mockups and stage 2 (flight HUD, lock strip, target card) merged; next stage 3, the radar |
+| 6e Weapons and power | A capacitor that energy weapons, shield recharge and active systems (radar, computers) draw on; projectile guns, missiles and torpedoes on ammunition (missiles fast, cheap, light damage; torpedoes heavy, slow, massive damage) with guidance kinds; turrets as automatic CIWS (closest hostile missile, torpedo or ship, or an assigned lock); countermeasures (chaff, flares, decoys) as modules carrying a mix from different makers; systems assignable to locks; fire groups; turret arcs; modules across two mounts | Next to plan with Jason, while 6d runs |
+| 6f Ship systems | Every remaining capability becomes a fitted system with a cost: the tractor beam, turret fire control, shield recharge timing (from the shield generator), flight assist quality (from a flight computer), escape pods (from a pod bay). Possibly fuel: tanks as modules, one fuel for thrust and later faster-than-light travel, scooped from stars (Jason to decide whether fuel bites in-system now or waits for the map) | |
 | 7 Law | Witnessed crime, reputation record, security response that escalates (the local watch, then its reserve, then the holder's navy, thinner the farther out; all ordinary, beatable ships, no galactic police), bounties; standing with NPC factions, including the four pirate factions from the lore; shooting escape pods as a crime | |
-| 8 Map | Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; the Unsung as hostile ships in unknown space | |
-| 9 Industry | Mining (starting in the belt), salvage, drones, manufacturing | |
+| 8 Map | Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; fuel and star scooping if not in 6f; the Unsung as hostile ships in unknown space | |
+| 9 Industry | Mining (starting in the Scree; ore read by a mining computer, gate-glass as a rare find), salvage (read by a salvage scanner), drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
 | 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | |
 
 Version 1.0 is milestone 8 polished. Everything after that is content, plus the shared world.
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
+
+## Plan from here (4 November 2026)
+
+1. Jason playtests `main`; the lead fixes what he finds and releases 0.9.0 (milestone 6c).
+2. The interface workstream carries on with 6d: stage 3 the radar (replacing the stopgap off-screen markers), then contacts and the nav target, the system map, warnings, and bodies, orbits and the path line. Its two readout follow-ups (target card through `lockReadout`, speed through `navReadout`) go first.
+3. The lead plans 6e with Jason while 6d runs: missile guidance kinds, what the capacitor feeds, ammunition, countermeasures.
+4. Then 6e, then 6f, then law (7), then the map (8).
 
 ## Known gaps in 0.8.0
 
