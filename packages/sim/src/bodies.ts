@@ -7,8 +7,8 @@ import type { Body, Orbit } from './types.js';
  * systems are generated once from a seed and stored in the world in this
  * same shape (docs/system.md).
  *
- * Names other than Calder are placeholders until the lore workstream
- * names them.
+ * Names from the lore (docs/lore.md, "Bodies"): Fieldmark, a farmed
+ * garden world; Lantern, its ice moon; the Scree, the belt.
  *
  * Sizes and periods are for play time, since the world never pauses:
  * a low orbit round the planet (Harbour's) takes two minutes, the moon
@@ -53,7 +53,7 @@ export function starterBodies(): Record<string, Body> {
   };
   const planet: Body = {
     id: PLANET_ID,
-    name: 'Calder I',
+    name: 'Fieldmark',
     kind: 'planet',
     orbit: { parent: STAR_ID, radius: 4500, period: 1800, phase: 0, direction: 1 },
     radius: 400,
@@ -63,7 +63,7 @@ export function starterBodies(): Record<string, Body> {
   };
   const moon: Body = {
     id: MOON_ID,
-    name: 'Calder Ia',
+    name: 'Lantern',
     kind: 'moon',
     orbit: boundOrbit(PLANET_ID, PLANET_GRAVITY, MOON_ORBIT_RADIUS, Math.PI),
     radius: 150,
@@ -72,7 +72,7 @@ export function starterBodies(): Record<string, Body> {
   };
   const belt: Body = {
     id: BELT_ID,
-    name: 'Calder Belt',
+    name: 'The Scree',
     kind: 'belt',
     // Sits on the star and only turns; the ring is what you see.
     orbit: { parent: STAR_ID, radius: 0, period: BELT_PERIOD, phase: 0, direction: 1 },

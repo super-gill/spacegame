@@ -285,7 +285,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Long range for a small mount, paid for in power.
   'itomarr-radar-s': {
     id: 'itomarr-radar-s',
-    name: 'Ito-Marr Farsight S',
+    name: 'Ito-Marr Watchtower S',
     kind: 'radar',
     size: 'S',
     mounts: ['radar'],
@@ -300,7 +300,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // A freighter traffic radar: sees far, at a power and mass cost.
   'tessaract-radar-m': {
     id: 'tessaract-radar-m',
-    name: 'Tessaract Traffic Array M',
+    name: 'Tessaract Clearance M',
     kind: 'radar',
     size: 'M',
     mounts: ['radar'],
@@ -349,7 +349,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Dedicated fire control: the same two locks, much faster.
   'paragon-computer-s': {
     id: 'paragon-computer-s',
-    name: 'Paragon Fire Director S',
+    name: 'Paragon Marksman S',
     kind: 'targetingComputer',
     size: 'S',
     mounts: ['computer'],
@@ -366,7 +366,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // More locks for a bigger ship, at a bigger power bill.
   'paragon-computer-m': {
     id: 'paragon-computer-m',
-    name: 'Paragon Fire Director M',
+    name: 'Paragon Marksman M',
     kind: 'targetingComputer',
     size: 'M',
     mounts: ['computer'],
@@ -382,7 +382,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Reads holds, not guns: customs officers, traders sizing up a market, and pirates choosing a prize.
   'tessaract-scanner-s': {
     id: 'tessaract-scanner-s',
-    name: 'Tessaract Manifest Reader S',
+    name: 'Tessaract Tally S',
     kind: 'targetingComputer',
     size: 'S',
     mounts: ['computer'],
@@ -415,7 +415,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // An explorer set: two minutes of path, for flying orbits and transfers.
   'itomarr-nav-m': {
     id: 'itomarr-nav-m',
-    name: 'Ito-Marr Deep Reckoner M',
+    name: 'Ito-Marr Chartvault M',
     kind: 'navComputer',
     size: 'M',
     mounts: ['nav'],

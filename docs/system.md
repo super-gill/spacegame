@@ -73,7 +73,7 @@ Calder (the lore's name) becomes a star with a planet, a moon and the belt:
 - **Harbour Station** in orbit round the planet. New pilots start here, as now.
 - **A third station** round the moon. Its role and market come from the lore workstream.
 - **Ridge Outpost** in the belt.
-- Traders run between all three; pirates lurk in the belt and the lanes; Concord patrols work the lanes near security zones and hunt pirates (not pilots: crime is milestone 7).
+- Traders run between all three; pirates lurk in the belt and the lanes; the Calder Watch (the port's own patrol, in ordinary, beatable ships) works the lanes near security zones and hunts pirates (not pilots: crime is milestone 7).
 
 Sizes and periods are set during the build and tuned in play. The system is about two to three times the size of today's sector. There is no in-system faster-than-light travel for now; it is revisited with the map (milestone 8).
 
@@ -81,7 +81,7 @@ Sizes and periods are set during the build and tuned in play. The system is abou
 
 **6c part 1: bodies and frames (lead).** Body data and rails; spheres of influence carrying ships, projectiles, loot and wrecks; moving stations and pads; docking, undocking and assist against the local frame; NPC steering in moving frames; sensor range as a ship stat; the new starter system; a save migration that keeps every pilot's credits, storage and ships (ships in space are towed to Harbour).
 
-**6c part 2: gravity and life (lead).** Gravity with the eased edge; surface impact; gravity, orbit and path prediction helpers for the client; the belt's asteroids; the third station; Concord patrols; more traders on more routes.
+**6c part 2: gravity and life (lead).** Gravity with the eased edge; surface impact; gravity, orbit and path prediction helpers for the client; the belt's asteroids; the third station; Calder Watch patrols; more traders on more routes.
 
 **Client (interface workstream).** Drawing bodies, orbits, the belt and moving stations; the predicted path line; the gravity gauge and warnings; the radar and system map. See "Brief: Interface" in `coordination.md`.
 
@@ -100,7 +100,7 @@ Choices the build made where the plan was silent (Lead 3, 4 November 2026).
 - **NPCs** route round bodies as well as stations; a trader arrives at a station by adding the station's velocity to its approach.
 - **Save version 5** migrates version 4: pilots keep credits, storage and ships; docked ships stay on their pads; ships in space are towed to Harbour; NPCs, shots, wrecks and loot start fresh.
 - **Client stopgap:** `packages/client/src/render/bodies.ts` draws each body as a plain circle with its sphere dashed and the belt as a dashed band; stations are drawn between ticks; the HUD's speed is relative to the local frame and names it. The interface workstream owns all of it.
-- **Names** other than Calder (Calder I, Calder Ia, Calder Belt) are placeholders for the lore workstream.
+- **Names** are from the lore: Fieldmark (the planet), Lantern (its moon), the Scree (the belt).
 
 ## As built: part 2 (so far)
 
