@@ -111,9 +111,9 @@ The Pale Reach is a dense cluster of bright stars at the tip of the Arm. The Sho
 | Oru Collective | The Singers. The hives remember the Quiet War and fear both the Aurel and the Unsung, and will not say why. |
 | Drifter Clans | Neighbours who do not open the door. Clan Saro knows more than it tells. |
 
-### Aurel ships in the hands of pilots (proposed)
+### Aurel ships in the hands of pilots
 
-Not confirmed by Jason yet; see "Open questions". Three routes, each rarer than the last:
+Three routes, each rarer than the last (confirmed 4 November 2026). When each opens in play is the lead's call.
 
 - **Husks.** Dead hulls from the Quiet War drift in the Shoals and the Dark. A husk has no voice: no fields, no glow, unflyable. Its parts are priceless to researchers.
 - **The one on the pad.** Very rarely a living Aurel ship turns up for sale at a remote station at an absurd price. **(canon, hidden)** These are voices the Chorus sends out on purpose, to be flown by younger peoples and to watch them. Whoever buys one is being studied.
@@ -143,14 +143,14 @@ Oldest first.
 | 171 AL | The Slagline Accord ends the Strikes: debts cancelled, Kessari keep most ore rights. | Free Belt independence |
 | 212 AL | **The Halden Heresy.** The Canticle bans study of Aurel relics; Dr Ilse Halden leads the fleet's science and medical corps out of Halcyon. | The Vael Commonwealth is founded |
 | 260 to 275 AL | **The Hive War.** Halcyon crusades into Oru space hunting Radiant relics; Hive Tessh carriers rout the crusade. | Halcyon's lasting humiliation |
-| 275 AL | **The Hive Peace,** brokered by the Vael. The Oru agree to grow stations for every people in exchange for fixed borders. | Why stations are Ossk-grown (see Open questions) |
+| 275 AL | **The Hive Peace,** brokered by the Vael. The Oru agree to grow station cores for every people in exchange for fixed borders. | Every station has an Oru-grown core |
 | 301 AL | **The Novum Key.** Novum Systems builds a synthetic gate-waker. | Halcyon's gate monopoly ends and expansion explodes |
 | 388 AL | **The Concord Accord,** signed at Landfall by all six peoples. | Concord space, Witness Law and the Mercy Clause |
 | 402 AL | The Halo Drone Consortium is founded. | The only joint human and Oru firm |
 | 451 AL | **The Dimming** begins: woken gates at the outer edge start falling asleep again. | Patrols pull back; the Marches and the Unclaimed form |
 | 530 AL | **The Kerran Incident.** A white ship destroys a Novum gate-waking expedition at the edge of the Dark, then leaves. | First modern Aurel sighting |
 | 588 AL | Clan Saro crosses the Shoals and returns with half its crews. | The only human sight of the Pale Reach |
-| 604 AL | A living Aurel ship is offered for sale at a remote station and sells within a day. Nobody knows to whom. | Proposed; see Open questions |
+| 604 AL | A living Aurel ship is offered for sale at a remote station and sells within a day. Nobody knows to whom. | Proof that the one on the pad is real |
 | 612 AL | **Present day.** | Where pilots start |
 
 ## The peoples
@@ -163,7 +163,7 @@ Five of the six major peoples are human, all descended from the one Covenant Fle
 | Kessari Combine | The charter companies that financed the arks | Kessar Exchange | 58 AL |
 | Free Belt Union | Indentured crews who paid their passage in labour | Slagline | 171 AL |
 | Vael Commonwealth | The fleet's science and medical corps | Halden's Rest | 212 AL |
-| Oru Collective | Native hives of the Arm | No capital; three great hives | c. 200,000 years ago |
+| Oru Collective | Native hives of the Arm (pilots are human wards raised among them) | No capital; three great hives | c. 200,000 years ago |
 | Drifter Clans | The seven arks that never landed | The clan ships themselves | 3 AL |
 
 ### Halcyon Dominion
@@ -217,6 +217,7 @@ A non-human people living in hives, each hive one slow shared mind spread across
 - **Why they unsettle humans.** They speak through drone-bodies that all say the same thing at once, and they ask questions about death that humans find hard to answer.
 - **What they remember (canon, partly hidden).** The Quiet War. The Unsung overwrote whole hives. The Oru keep each hive's mind separate on purpose and distrust any network that joins minds.
 - **Wants.** For the gates near the Dark to stay asleep. They have said so plainly for 300 years. Nobody listens.
+- **Wards.** Since the Hive Peace, small human communities live in Oru-grown habitats on the hives' borders, mostly Halo Drone Consortium families and Vael researchers' descendants. Their children are Oru wards: fully human, raised among the hives, speaking to drone-bodies as easily as to people. A pilot who starts as Oru is a ward: Oru origin and standing, human body. The hives treat wards as guests they are responsible for, which is the closest thing to citizenship the Oru grant.
 - **Secret (canon, hidden).** The Oru know what the Unsung are and believe humans will wake them. Hive Tessh has begun breeding warships again for the first time since the Hive War.
 
 ### Drifter Clans
@@ -240,6 +241,10 @@ The Concord Accord (388 AL) binds all six peoples. It is not a government; it is
 - **The Mercy Clause.** Solace ships are protected in all signatory space, and the Vael must sell support ships to every signatory. Attacking a Solace ship is the one crime every people hunts.
 - **The Open Lanes.** Concord gates stay open to every licensed pilot of every signatory, whatever their people.
 
+### Outfits
+
+Pilots who work together register with the Concord as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name. The word is neutral on purpose; "clan" belongs to the Drifters, "company" sounds Kessari and "house" sounds Halcyon.
+
 ### Navy service
 
 Every people raises its navy mostly from licensed private pilots, which is why navy ships are bought with standing and a licence rather than issued.
@@ -251,7 +256,7 @@ Every people raises its navy mostly from licensed private pilots, which is why n
 | Free Belt | Membership of a cooperative militia | Expelled by vote, and remembered |
 | Vael | Enlistment in the Commonwealth Fleet | Deserter |
 | Drifter | Adoption into Clan Vesk's shared fleet | Cut loose (see the Cutloose) |
-| Oru | None. The Oru license no humans. | Not applicable (see Open questions) |
+| Oru | None yet. The Oru license no humans, not even their wards. | Not applicable |
 
 What navy duties are in play, and how often, is a design question for Jason and the lead.
 
@@ -312,7 +317,7 @@ Specialities and navy roles are set in `races.md`. This section says where each 
 | Hive | Grown | Origin | Hook |
 | --- | --- | --- | --- |
 | Hive Tessh | Before the Quiet War | The war-hive; lost most of itself to the Unsung and regrew | Breeding warships again after 337 years of peace |
-| Hive Ossk | After the Quiet War | The builder-hive, grown to rebuild what the war destroyed | Grows station cores across known space under the Hive Peace (see Open questions) |
+| Hive Ossk | After the Quiet War | The builder-hive, grown to rebuild what the war destroyed | Grows the core of every station in known space under the Hive Peace; each people clads it in its own look. Every pilot docks inside an Oru. |
 | Hive Thiel | After the Quiet War | The smallest great hive, and the one that met humans first | Its drones deliberately do not network with each other, a lesson from the Unsung |
 
 ### Drifter: the clans
@@ -334,7 +339,7 @@ Specialities and navy roles are set in `races.md`. This section says where each 
 
 ## Pirate factions
 
-Six NPC factions work outside the law, each born from a wound in a people's history. Player piracy stays emergent as `design.md` says; these factions give it somewhere to sell, hide and belong. All fly kitbashed ships, with a signature on top of the mongrel look so a pilot can tell who is attacking.
+Six NPC factions work outside the law, each born from a wound in a people's history. Player piracy stays emergent as `design.md` says; these factions give it somewhere to sell, hide and belong. Pilots can earn standing with the Red Tithe, the Null Ledger, the Black Strike and the Cutloose, for safe harbour, fences and contracts. The Hiveless cannot be joined. The Hollow Choir deals only with pilots deep in its trust, and late. All fly kitbashed ships, with a signature on top of the mongrel look so a pilot can tell who is attacking.
 
 | Faction | Born from | Where | What they do | Signature |
 | --- | --- | --- | --- | --- |
@@ -354,7 +359,7 @@ Six NPC factions work outside the law, each born from a wound in a people's hist
 
 ## The starter sector
 
-The starter world (two stations, a trader and a pirate, `createStarterWorld`) in lore terms. Proposed; Jason to confirm.
+The starter world (two stations, a trader and a pirate, `createStarterWorld`) in lore terms. Confirmed 4 November 2026.
 
 **Calder** is a Concord system on the edge of the Marches, where a Kessari freight lane meets a Free Belt mining ridge. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
 
@@ -371,6 +376,7 @@ The Arm is richer than ever and closer to disaster than anyone but the Aurel and
 - **The Dimming is speeding up.** Edge gates fall asleep faster each year. Common knowledge says the Lattice is decaying. **(canon, hidden)** The Aurel are putting them back to sleep, one by one, because the Unsung have started moving along them.
 - **Tessh is arming.** Halcyon reads it as a threat. It is a preparation.
 - **White ships at the edge.** Aurel sightings have tripled since 590 AL, and some expeditions into the Dark are destroyed. Halcyon calls it judgement, Kessari calls it sabotage; the truth is quarantine.
+- **Hollow ships in the Dark.** Expeditions that do come back from the Dark report ships that answer no hail and carry no crew: Aurel shapes gone dark grey, or human and Oru wrecks moving again. **(canon, hidden)** These are Unsung vessels, voices wearing whatever hull they can take. They appear in play once the Dark is reachable.
 - **The Hollow Choir is growing,** recruiting Red Tithe deserters and desperate Marches colonists.
 - **Halo under strain.** Halcyon pressure on the Vael to end the human and Oru partnership is rising.
 
@@ -378,15 +384,22 @@ The Arm is richer than ever and closer to disaster than anyone but the Aurel and
 
 Humans keep waking gates because the economy demands it. Each gate woken near the Dark loosens the Unsung's cage. The Aurel cannot explain without opening a channel, so they act in silence and are taken for enemies. The Oru know but are not believed. Pilots sit in the middle, flying ships built by people who do not know what they are standing on.
 
+## Decisions
+
+Lore decisions by Jason, newest first.
+
+- 2026-11-04: The core premise stands: the Aurel caged the Unsung by silencing the Lattice, and human gate-waking is slowly undoing it.
+- 2026-11-04: Hive Ossk grows the core of every station; each people clads it in its own look.
+- 2026-11-04: A pilot can start as Oru, as a human ward raised among the hives.
+- 2026-11-04: All three routes to an Aurel ship stand (husks, the one on the pad, gifted), and so does the 604 AL sale.
+- 2026-11-04: Player organisations are called outfits.
+- 2026-11-04: The Unsung appear in play later, as hostile hollow ships in the Dark; offscreen until then.
+- 2026-11-04: Pilots can gain standing with the Red Tithe, Null Ledger, Black Strike and Cutloose; never the Hiveless; the Hollow Choir only very late.
+- 2026-11-04: The starter sector stands as written (Calder, Harbour, Ridge, the Tessaract trader, the Black Strike raider).
+
 ## Open questions
 
-Tracked in `coordination.md` under "Questions for Jason". Until answered, sections marked proposed are not canon to build on.
-
-- Is the core premise right: the Aurel caged part of themselves, and human gate-waking is slowly undoing it?
-- Does Hive Ossk grow every station's core, with each people cladding it in its own look?
-- Can a living Aurel ship ever be bought, and does the 604 AL sale stand?
-- Can a pilot start as Oru, and if so, as what?
-- What are player organisations called?
-- Do the Unsung ever appear in play, or stay offscreen?
-- Can pilots gain standing with pirate factions?
-- Is the starter sector (Calder, Harbour, Ridge, Tessaract trader, Black Strike raider) right?
+- Names: the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder and the faction names are placeholders until the naming pass.
+- Where humans came from and why the Covenant Fleet fled. Leaving it unanswered is a valid choice.
+- Whether the Drifters' search for the Mouth becomes a late-game exploration goal.
+- Whether the Oru ever license human navy pilots, wards included.

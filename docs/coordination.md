@@ -123,9 +123,6 @@ Candidates (not open yet):
 
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
-- Lore contradictions: Hive Ossk growing every station's shell vs race-specific stations; whether a living Aurel ship can appear for sale; whether the Oru are a playable starting race.
-- Lore (asked by the lore chat): the core premise (the Aurel caged the Unsung and human gate-waking is undoing it); whether the Unsung appear in play; whether pilots can gain standing with pirate factions; the starter sector in `docs/lore.md`.
-- Player organisations and what to call them ("clan" is the Drifters' word).
 - Navy duties.
 
 ## Ideas inbox
@@ -151,12 +148,13 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Contract changes, cross-workstream file changes, merges wanted. Newest first.
 
-_None._
+- 2026-11-04, lore: please move the lore decisions in this branch's log entry into "Decisions". Three have mechanical follow-ups for whoever plans them, nothing needed now: the Oru as a starting race means wards (human pilots with Oru origin and standing) at character creation; pirate faction standing (Red Tithe, Null Ledger, Black Strike, Cutloose) needs the standing system to cover NPC factions, likely with law (7); the Unsung are a hostile NPC type in unknown space once the map (8) reaches it.
 
 ## Log
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-04, lore: put the lore questions to Jason and recorded his answers in `docs/lore.md` and `docs/races.md`. Decisions (Jason): the core premise stands (the Aurel caged the Unsung by silencing the Lattice, and gate-waking undoes it); Hive Ossk grows every station's core and each race clads it; pilots can start as Oru, as human wards; all three routes to an Aurel ship stand, including the 604 AL sale; player organisations are "outfits"; the Unsung appear later as hostile ships in the Dark; pilots can gain standing with four pirate factions (not the Hiveless; the Hollow Choir only late); the starter sector stands. Removed the answered lore questions from "Questions for Jason". Next: the naming table. Changelog line: "Record lore decisions: wards, outfits, stations, Aurel ships, pirate standing".
 - 2026-11-03, lore: created `docs/lore.md` as canon from the claude.ai lore doc: premise, the Lattice, the Aurel and the Sundering, timeline, the six peoples, the Concord and navy service, manufacturer origins, six pirate factions, present-day tensions. Added the starter sector in lore terms (Calder system; Harbour a Concord free port; Ridge a Belt cooperative; the trader on a Tessaract contract; the pirate a Black Strike raider in a captured Kessari Wedge), marked proposed. Pointed `races.md` at `lore.md`. Needs: Jason's answers to the lore questions (being asked in the lore chat). Blocked: nothing. Changelog line: "Add lore.md, the game's canon setting and history".
 - 2026-11-03, lead: planned 6b with Jason (ownership, pads, ship mart, boarding, pods) in `docs/ships.md`. Lead handing over to a fresh lead chat to build it, because this one is long.
 - 2026-11-03, lead: released 0.7.2. Outfitting names what each module is, warns when a fit cannot thrust or turn, and toasts the same on undock. Fixed outfitting clicks being lost: previewing a module could reflow the panel and move the button out from under the pointer mid-click. Opened the lore workstream.
