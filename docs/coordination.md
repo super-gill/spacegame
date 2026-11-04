@@ -177,11 +177,18 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Contract changes, cross-workstream file changes, merges wanted. Newest first.
 
-_None open._ Done on 2026-11-04: the lore decisions are in "Decisions" and their three follow-ups (Oru wards, pirate faction standing, the Unsung) are on the roadmap under milestones 11, 7 and 8.
+- 2026-11-04, lore: apply the names in `docs/lore.md` under "Names", keyed by catalogue id. Changes beyond renaming:
+  - The Sparrow becomes the **Aurel Tacet**. It needs a new manufacturer entry (suggested id `aurel`, name "Aurel", race `aurel`) in place of `meridian`, and probably new hull and loadout ids (suggested `aurel-tacet`, `aurel-tacet-dev`); the ids are your call. Stats, shape and its drawing (floating segments, pale white, cyan glow per `races.md`) are yours.
+  - `itomarr-reactor-m` must be renamed: "Lattice" is now the gate network.
+  - No module changes maker. All other changes are display names only.
+
+_Done on 2026-11-04_: the lore decisions are in "Decisions" and their three follow-ups (Oru wards, pirate faction standing, the Unsung) are on the roadmap under milestones 11, 7 and 8.
 
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lore: added "Names" to `docs/lore.md`: a name for every hull, module, manufacturer and loadout, keyed by catalogue id, with a naming theme per maker. The Sparrow's replacement is the Aurel Tacet. Renamed the Ito-Marr reactor because "Lattice" now means the gate network. Filed a request for the lead to apply the names and add an Aurel manufacturer. Blocked: nothing. Changelog line: "Name every hull, module and fit from the lore".
 
 - 2026-11-04, lead (Lead 2): built the 6b sim foundation on `main`: owning versus flying (`ownership.ts`), station pads and pad docking, hull prices and the ship mart, boarding docked and in space, escape pods with ejection, waking and the free starter claim (`pilots.ts`), station data in `stations.ts`, save version 4 with a migration from 3. 30 new tests (183 in all). Minimal client changes only: credits shown for the pilot flying, empty ships labelled, pod and noPad toasts, the death panel wakes you. Play checked headless: a version 3 save loads docked on a pad and undocks from it; losing a ship leaves you in a pod; losing the pod and waking puts you in a free Courier on a Harbour pad. Merged `ws/lore` (lore canon and Jason's lore decisions). Opened the ship mart workstream. `main` is not release-ready until it merges: a pilot in a pod has no way to claim the starter or board a ship yet. Changelog lines for 0.8.0: "Own several ships: buy them at Harbour's ship mart and board them docked or in space"; "Stations have landing pads; docking takes the smallest free pad that fits"; "Escape pods: lose your ship and get away in a pod; lose the pod and wake at Harbour"; "Save version 4: 0.7.x saves upgrade automatically".
 - 2026-11-04, lore: put the lore questions to Jason and recorded his answers in `docs/lore.md` and `docs/races.md`. Decisions (Jason): the core premise stands (the Aurel caged the Unsung by silencing the Lattice, and gate-waking undoes it); Hive Ossk grows every station's core and each race clads it; pilots can start as Oru, as human wards; all three routes to an Aurel ship stand, including the 604 AL sale; player organisations are "outfits"; the Unsung appear later as hostile ships in the Dark; pilots can gain standing with four pirate factions (not the Hiveless; the Hollow Choir only late); the starter sector stands. Removed the answered lore questions from "Questions for Jason". Next: the naming table. Changelog line: "Record lore decisions: wards, outfits, stations, Aurel ships, pirate standing".

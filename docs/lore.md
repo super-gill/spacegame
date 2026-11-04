@@ -119,7 +119,7 @@ Three routes, each rarer than the last (confirmed 4 November 2026). When each op
 - **The one on the pad.** Very rarely a living Aurel ship turns up for sale at a remote station at an absurd price. **(canon, hidden)** These are voices the Chorus sends out on purpose, to be flown by younger peoples and to watch them. Whoever buys one is being studied.
 - **Gifted.** A pilot who fights the Unsung again and again may one day be met at the Shoals by an Aurel ship that simply waits for them. The legendary endgame route.
 
-The Sparrow, today's sealed development ship, becomes an Aurel dev hull in this light: a voice that never left the Reach, used for testing and never issued to anyone.
+Today's sealed development ship becomes an Aurel hull, the Tacet: a voice that never left the Reach, used for testing and never issued to anyone. See "Names".
 
 ## Timeline
 
@@ -384,6 +384,86 @@ The Arm is richer than ever and closer to disaster than anyone but the Aurel and
 
 Humans keep waking gates because the economy demands it. Each gate woken near the Dark loosens the Unsung's cage. The Aurel cannot explain without opening a channel, so they act in silence and are taken for enemies. The Oru know but are not believed. Pilots sit in the middle, flying ships built by people who do not know what they are standing on.
 
+## Names
+
+Every hull, module, manufacturer and loadout in the catalogue, keyed by its id in `packages/sim/src`. Names only; the lead applies them. Hull and module names read "maker, then model", and the UI already shows each module's type, so model names do not repeat it.
+
+### Naming themes
+
+| Maker | Theme for model names | Why |
+| --- | --- | --- |
+| Meridian Civil Yards | Plain, friendly words; small hulls named for seabirds | Civilian, Concord-held, the first ship anyone flies |
+| Kessari Orbital Defence | Legal and enforcement terms | Its job is enforcing the Combine's contracts and tolls |
+| Tessaract Logistics | Freight paperwork | The oldest freight line, run on documents |
+| Ito-Marr Dynamics | Strongholds and stores | Shields and power that hold the line |
+| Cantor-Vell Arms | Canticle and vigil words | Armed the Cantors |
+| Slagline Motors | Belter slang for running | Built so crews could outrun Kessari patrols |
+| Rook and Rivet | Salvager's shop talk | Its plate is cut from wrecks |
+| Union Defence Works | Strike words | The Belt Strikes' arsenal |
+| Paragon Arms | Plain trade names that promise fairness | Sells to anyone, and wants you to feel fine about it |
+| Aurel | Silent and musical terms given by human scholars | The Aurel share no names; humans name what they see |
+
+### Hulls (`hulls.ts`)
+
+| Id | Name | Maker | Lore |
+| --- | --- | --- | --- |
+| `meridian-courier` | Meridian Tern | Meridian Civil Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
+| `kessari-wedge` | Kessari Warrant | Kessari Orbital Defence | KOD's toll-gate frigate. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
+| `tessaract-spine` | Tessaract Manifest | Tessaract Logistics | The six-bay hauler on half the freight contracts in Concord space |
+| `escape-pod` | Meridian Ark | Meridian Civil Yards | The Concord requires every licensed ship to carry one. Pilots call it an ark because it brings you home the way the fleet brought everyone here. |
+| Sparrow's replacement | Aurel Tacet | Aurel (needs a new manufacturer entry, see below) | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Halcyon Cantors call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship, outside the economy and never issued. |
+
+### Modules (`modules.ts`)
+
+| Id | Name | Note |
+| --- | --- | --- |
+| `meridian-engine-s` | Meridian Steady S | Unchanged |
+| `slagline-engine-s` | Slagline Kick S | Unchanged |
+| `slagline-engine-m` | Slagline Runner M | The Strike ore runners' engine |
+| `meridian-thrusters-s` | Meridian Trim S | Unchanged |
+| `slagline-thrusters-m` | Slagline Jink M | Belter for a sudden sideways dodge |
+| `meridian-reactor-s` | Meridian Cell S | Unchanged |
+| `itomarr-reactor-m` | Ito-Marr Reservoir M | Renamed: "Lattice" is the gate network's name |
+| `meridian-shield-s` | Meridian Ward S | Unchanged |
+| `itomarr-shield-m` | Ito-Marr Bastion M | Unchanged |
+| `rookrivet-armour-s` | Rook and Rivet Patchplate S | Cut from salvaged hull plate |
+| `cantorvell-armour-m` | Cantor-Vell Vigil M | The armour the Cantors wore on gate-waking voyages |
+| `meridian-pod-s` | Meridian Carryall S | A small general cargo pod |
+| `tessaract-container-m` | Tessaract Standard M | The standard box every port in the Arm handles |
+| `paragon-pulse-s` | Paragon Fairshot S | Fixed pulse cannon |
+| `paragon-turret-s` | Paragon Watchman S | Light turret |
+| `union-autocannon-m` | Union Picket M | Named for the strike picket lines |
+| `paragon-turret-m` | Paragon Sentry M | Medium turret |
+
+### Manufacturers (`manufacturers.ts`)
+
+The names already in the catalogue are confirmed. The other makers in `races.md` keep their names for when they enter the catalogue.
+
+| Id | Name | Race |
+| --- | --- | --- |
+| `meridian` | Meridian Civil Yards | none (multi-race) |
+| `paragon` | Paragon Arms | none (multi-race) |
+| `kessariOrbital` | Kessari Orbital Defence | Kessari |
+| `itoMarr` | Ito-Marr Dynamics | Kessari |
+| `tessaract` | Tessaract Logistics | Kessari |
+| `slagline` | Slagline Motors | Free Belt |
+| `rookRivet` | Rook and Rivet | Free Belt |
+| `unionDefence` | Union Defence Works | Free Belt |
+| `cantorVell` | Cantor-Vell Arms | Halcyon |
+| new, suggested `aurel` | Aurel | Aurel |
+
+The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catalogue still needs a maker on each hull, so the entry is simply "Aurel", and the UI should show it the same way it would show a maker.
+
+### Loadouts (`loadouts.ts`, optional)
+
+| Id | Name |
+| --- | --- |
+| `meridian-starter` | Meridian Tern, Registry issue |
+| `tessaract-trader` | Tessaract Manifest, Calder supply run |
+| `kessari-raider` | Kessari Warrant, Black Strike trophy |
+| `sparrow-dev` | Aurel Tacet, test voice |
+| `escape-pod` | Meridian Ark |
+
 ## Decisions
 
 Lore decisions by Jason, newest first.
@@ -399,7 +479,7 @@ Lore decisions by Jason, newest first.
 
 ## Open questions
 
-- Names: the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder and the faction names are placeholders until the naming pass.
+- Place and faction names (the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder, the pirate factions) are placeholders until Jason confirms them. Catalogue names are in "Names".
 - Where humans came from and why the Covenant Fleet fled. Leaving it unanswered is a valid choice.
 - Whether the Drifters' search for the Mouth becomes a late-game exploration goal.
 - Whether the Oru ever license human navy pilots, wards included.
