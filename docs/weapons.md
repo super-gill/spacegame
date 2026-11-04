@@ -65,6 +65,10 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 - A countermeasure module (core or utility mount) carries charges. Chaff spoofs radar-homing, flares spoof heat-seeking, a decoy spoofs both for longer but is dear. Makers bundle different mixes.
 - Manual launch on a key, with charges resupplied at stations like ammunition.
 
+## Hull classes
+
+Hulls get a class on an age-of-sail ladder (`HullSpec.class`), separate from module size, which stays what fits a mount: pod, cutter, sloop, brig, frigate, ship of the line, capital, and hulk for trade and industry at any size. Classes set the expectations for coverage (below), bonuses and later crew, and give the navy, the Watch and the lore a shared language. Capitals (first-rates, flagships) are where station services aboard, hangars and squadrons live, later. Today's hulls: the Tern a cutter, the Warrant a sloop, the Manifest a hulk, the Ark a pod; the Aurel Tacet sits outside the ladder. Names are the lore's.
+
 ## Arcs and blind spots
 
 - Each weapon mount gains an **arc**: a centre bearing and a width in hull space. A fixed gun fires only along its mount's facing (as now); a turreted weapon slews within its arc and cannot engage outside it.
@@ -77,7 +81,7 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 
 ## Build order
 
-**6e part 1: power and guns (lead).** The capacitor as a hull property with reactor recharge and size-based draw; the six gun types with ammunition as goods, reloading, damage types and resistances in the data; hull bonuses by family; arcs; fire groups. The game is playable and more varied after this alone.
+**6e part 1: power and guns (lead).** Hull classes as data; the capacitor as a hull property with reactor recharge and size-based draw; the six gun types with ammunition as goods, reloading, damage types and resistances in the data; hull bonuses by family; arcs; fire groups. The game is playable and more varied after this alone.
 
 **6e part 2: munitions (lead).** Missiles and torpedoes with guidance and warheads; PDC point defence; countermeasures.
 
