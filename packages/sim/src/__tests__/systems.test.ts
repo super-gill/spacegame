@@ -248,3 +248,14 @@ describe('active modules', () => {
     expect(stepWorld(w, { [id]: { ...emptyInput(), afterburner: true } }).ships[id]!.afterburning).toBeFalsy();
   });
 });
+
+describe('loading a save', () => {
+  it('refreshes the starter stations’ market prices from the catalogue', async () => {
+    const { serializeWorld } = await import('../save.js');
+    const w = createStarterWorld();
+    const stale: World = { ...w, stations: { ...w.stations, 'station-harbour': { ...w.stations['station-harbour']!, market: { ...w.stations['station-harbour']!.market, rounds: { ask: 1, bid: 1 } } } } };
+    const r = deserializeWorld(serializeWorld(stale, ''));
+    expect(r.ok && r.world.stations['station-harbour']!.market['rounds']).toEqual(w.stations['station-harbour']!.market['rounds']);
+    expect(r.ok && r.world.stations['station-harbour']!.position).toEqual(stale.stations['station-harbour']!.position);
+  });
+});

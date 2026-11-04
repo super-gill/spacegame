@@ -879,7 +879,8 @@ button:hover {
 }
 
 .hud-weapon {
-  width: 62px;
+  min-width: 62px;
+  padding: 0 4px;
   height: 62px;
   border: 1px solid var(--ink-dim);
   background: var(--panel);

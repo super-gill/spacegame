@@ -455,9 +455,17 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const projectiles = world.projectiles.map((p) => ({ ...p, damageType: p.damageType ?? 'kinetic' }));
   // Version 5 worlds saved from main before the Scree had rocks get them now.
   const asteroids = Array.isArray(world.asteroids) ? world.asteroids : screeAsteroids();
+  // Prices and stock are design data until the economy arrives (milestone
+  // 10): the starter stations' markets are refreshed from the catalogue on
+  // load, like hulls and modules, so a save picks up rebalanced prices.
+  // Everything else about a station (where it is, its pads) stays as saved.
+  const current = starterStations();
+  const stations: Record<string, Station> = {};
+  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market } } : st;
   const loaded: World = {
       ...world,
       ships,
+      stations,
       projectiles,
       // Worlds saved before the rules existed take the defaults (gravity off).
       rules: { ...DEFAULT_RULES, ...(world.rules ?? {}) },

@@ -252,7 +252,7 @@ export class FlightHud {
       this.weapons.replaceChildren();
       this.weaponTiles = new Map();
       for (const mountId of mounts) {
-        const tile = weaponTile(specs[mountId]!.kind, specs[mountId]!.family, specs[mountId]!.name);
+        const tile = weaponTile(specs[mountId]!.kind, specs[mountId]!.family, specs[mountId]!.name, specs[mountId]!.id);
         this.weaponTiles.set(mountId, tile);
         this.weapons.append(tile.root);
       }
@@ -272,7 +272,9 @@ export class FlightHud {
         const boxes = goodsFitting(world.goods, spec.ammo).reduce((n, g) => n + (ship.hold[g.id] ?? 0), 0);
         const good = loadedGoodOf(state, spec, world.goods);
         const what = !isGun(spec) && good ? ` ${shortGoodName(world.goods[good]?.name ?? good)}` : '';
-        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded}${what} · ${boxes} BOX`);
+        // Name the ammunition a gun needs, so an empty one says what to buy.
+        const kind = isGun(spec) ? ` ${AMMO_SHORT[spec.ammo] ?? spec.ammo.toUpperCase()}` : '';
+        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded}${what} · ${boxes} BOX${kind}`);
         tile.ammo.classList.toggle('low', state.loaded === 0 && boxes === 0);
       } else {
         setText(tile.ammo, spec.capacitorPerShot > 0 ? 'CAP' : '');
@@ -300,11 +302,19 @@ function shortGoodName(name: string): string {
   return (words[words.length - 1] ?? name).toUpperCase();
 }
 
+/** Short names for ammunition on weapon tiles. */
+const AMMO_SHORT: Partial<Record<string, string>> = { rounds: 'ROUNDS', shells: 'SHELLS', charges: 'CHARGES' };
+
+/** The gun type from its weapon id ('railgun-m' is RAILGUN), for the tile. */
+function gunName(weaponId: string): string {
+  return weaponId.replace(/-[sml]$/, '').replace(/-/g, ' ').toUpperCase();
+}
+
 /** Short names for module tiles. */
 const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
-function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string): WeaponTile {
+function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string, weaponId: string): WeaponTile {
   const root = el('div', `hud-weapon ${kind}`);
   root.title = name;
   const icon = svg('svg', { width: 28, height: 28, viewBox: '0 0 28 28', 'aria-hidden': 'true' });
@@ -315,7 +325,7 @@ function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : kind === 'fixed' ? 'FIXED' : 'SWIVEL');
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : kind === 'fixed' ? gunName(weaponId) : 'SWIVEL');
   const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : kind === 'fixed' ? 'SPACE' : 'PD');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);
