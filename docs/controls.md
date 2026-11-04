@@ -26,11 +26,16 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Lock a ship | Left click on it | Locking takes a moment (the target panel shows LOCKING with a percentage); your ship's max locks limit how many you hold. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
-| Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship |
+| Lock a ship | Left click on it | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your ship's max locks limit how many you hold. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 
-The target gets corner brackets (white when cold, red when hot) and a readout bottom right: who it is, hull, range, closing speed, shields and structure. A target that docks or is destroyed is cleared.
+On the right edge, below the menu buttons:
+
+- **Lock strip:** a card per lock, with the ship's silhouette and range, a filling bar while it is still locking, and dashed `FREE` cards for your unused slots. The active lock is outlined. `LOCKS n/max` counts complete locks.
+- **Target card** for the active lock: hostile, neutral or pilot, `LOCKING n%` or `LOCKED`, its ship and who flies it, its silhouette inside its shield ring, shield and hull bars with values, range, and closing speed (positive while the gap shrinks).
+
+The active lock also gets corner brackets in space (white when cold, red when hot). A lock drops when its target leaves your sensor range, docks or is destroyed.
 
 ## Weapons
 
@@ -48,7 +53,7 @@ Fixed guns hit harder than turrets. Turrets let you fight while flying any direc
 | --- | --- | --- |
 | Cycle flight mode | Z | Full assist, then rotation assist, then manual, then back |
 
-The physics has no drag. What the ship does when you let go of the keys depends on the flight mode, shown on the HUD as `FLT`:
+The physics has no drag. What the ship does when you let go of the keys depends on the flight mode, shown under the status dial:
 
 | Mode | When you release Q/E | When you release the thrust keys |
 | --- | --- | --- |
@@ -104,7 +109,7 @@ Ships have no names yet; each is called by its hull and its number among the shi
 
 ## Escape pods
 
-When your ship is destroyed you get away in an escape pod: a small orange lifeboat with a blinking beacon. The HUD's top line reads `>> ESCAPE POD: DOCK AT A STATION`. Fly it to a station and dock as normal.
+When your ship is destroyed you get away in an escape pod: a small orange lifeboat with a blinking beacon. The HUD's top left reads `ESCAPE POD · DOCK AT A STATION`. Fly it to a station and dock as normal.
 
 In a pod at Harbour, if you own no ships, the bottom of the docked panel offers **Claim a free Tern**. If you still own a ship it tells you to fetch it (see Your ships) or buy another.
 
@@ -121,23 +126,22 @@ While you are typing in a text box (the pilot name), keys go to the box, not the
 
 ## HUD
 
-Bottom left, top to bottom:
+The flight HUD sits at the screen edges and leaves the middle clear. Clicks go through it to the game.
 
-- `!! PIRATE ON YOUR TAIL` while a pirate is hunting you
-- `SHIP` the ship you are in, or `>> ESCAPE POD: DOCK AT A STATION` in a pod
-- `ZONE` the station security zone you are in, or `OPEN SPACE`
-- `SHD` shields and `HUL` structure, current and maximum
-- `CR` your credits
-- `CARGO` space used and capacity, then what is aboard
-- `VEL` speed in units per second
-- `POS` world position
-- `HDG` heading in degrees
-- `ROT` spin in degrees per second (positive is clockwise)
-- `FLT` current flight mode
-- `WPN` weapons hot or cold
-- `DOCK <station> [F]` when docking is available
-- `BOARD <ship>` when one of your empty ships is near: `[B]` when you can board it, otherwise what to do first
-- frame rate and sim tick
+**Top left:** the ship you are in (`ESCAPE POD · DOCK AT A STATION` in a pod, or `· BOARD YOUR SHIP [B]` when one of yours is in reach), the security zone or `OPEN SPACE`, then your credits and cargo space used.
+
+**Top centre:** the warning in force. Today that is `CAUTION · PIRATE HUNTING YOU`; warnings in tiers, with sounds, are coming.
+
+**Bottom centre, in flight** (hidden while docked):
+
+- The status dial. The outer blue ring is your shields, the inner ring your structure (it turns amber below half and red below a quarter). The dashed ring inside is reserved for the capacitor. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). `SHD` and `HUL` values sit under the rings.
+- Under the dial: the flight mode (`Z` to change) and weapons hot or cold (`H`).
+- Right of the dial: a tile for each weapon you have fitted. A fixed gun says `SPACE`; a turret says `COLD`, `AUTO` (hot, no complete active lock) or `ENGAGING`. A ring round the icon fills as the weapon reloads. Only modules you use in flight get a tile.
+- Above the dial: what you can do now, `DOCK <station> [F]` and the boarding prompt (see Ships).
+
+**Right edge:** the lock strip and target card while you hold a lock (see Targeting). Lock cards are the only part of the HUD that takes clicks.
+
+**Bottom right:** frame rate and sim tick, dim, for testing.
 
 ## On screen
 

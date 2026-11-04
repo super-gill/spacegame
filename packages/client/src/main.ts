@@ -64,6 +64,8 @@ import {
 import { bodyMarkers, drawBodies } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
+import { FlightHud } from './hud/flight-hud.js';
+import { TargetCard } from './hud/target-card.js';
 import { Ui, shipLabel, shipName } from './ui.js';
 import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
 
@@ -106,6 +108,9 @@ const ui = new Ui(
   () => respawn(),
   () => claimStarter(),
 );
+const hudLayer = document.getElementById('hud-layer')!;
+const flightHud = new FlightHud(hudLayer);
+const targetCard = new TargetCard(hudLayer, (id) => input.requestActivate(id));
 
 let me = loadLocalPilot();
 const settings = loadSettings();
@@ -599,7 +604,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     shipMart.invalidate();
     yourShips.invalidate();
   }
-  ui.update(current, mine, fpsSmoothed);
+  ui.update(current, mine);
+  flightHud.update(current, mine, fpsSmoothed);
+  targetCard.update(current, mine);
 }
 
 requestAnimationFrame(frame);

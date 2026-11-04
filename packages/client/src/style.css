@@ -1,9 +1,16 @@
 :root {
   --bg: #05070a;
   --ink: #9fd3c7;
-  --ink-dim: #4f7a72;
+  /* Brightened from #4f7a72 so small dim text passes 4.5:1 on the background. */
+  --ink-dim: #6a988f;
   --ink-bright: #dffbf3;
   --warn: #e0a458;
+  --faint: #1f3532;
+  --shield: #7cc8ff;
+  --hostile: #e06c5a;
+  --neutral: #8fa8c8;
+  --alarm: #ff5c5c;
+  --panel: rgba(12, 24, 24, 0.6);
   --font: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 }
 
@@ -30,23 +37,6 @@ canvas#game {
 
 .hidden {
   display: none !important;
-}
-
-.hud {
-  position: fixed;
-  left: 12px;
-  bottom: 12px;
-  pointer-events: none;
-  white-space: pre;
-  line-height: 1.5;
-  color: var(--ink-dim);
-}
-
-.target-panel {
-  left: auto;
-  right: 12px;
-  text-align: left;
-  color: var(--ink);
 }
 
 /*
@@ -465,7 +455,8 @@ button:hover {
 
 .toast {
   position: fixed;
-  top: 16px;
+  /* Below the warning slot at the top centre. */
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
   padding: 6px 12px;
@@ -645,4 +636,398 @@ button:hover {
 .controls-panel .modes strong {
   font-weight: 500;
   color: var(--ink-bright);
+}
+
+/*
+ * Flight HUD (hud/). Instruments sit at the screen edges and the middle
+ * stays clear. None of it takes pointer events, so clicks reach the
+ * canvas.
+ */
+.hud-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hud-dim {
+  color: var(--ink-dim);
+}
+
+.hud-status {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.hud-ship {
+  color: var(--ink-bright);
+}
+
+.hud-ship.pod {
+  color: var(--warn);
+}
+
+.hud-alert {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border: 1px solid var(--warn);
+  background: var(--panel);
+  color: var(--warn);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hud-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 252px;
+  transform: translateX(-50%);
+  color: var(--ink-bright);
+  white-space: nowrap;
+}
+
+.hud-cluster {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.hud-dial-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-dial .ring {
+  fill: none;
+  stroke-width: 8;
+}
+
+.ring.track {
+  stroke: var(--faint);
+}
+
+.ring.track.thin {
+  stroke-width: 4;
+}
+
+.ring.shield {
+  stroke: var(--shield);
+}
+
+.ring.hull {
+  stroke: var(--ink);
+}
+
+.ring.hull.caution {
+  stroke: var(--warn);
+}
+
+.ring.hull.alarm {
+  stroke: var(--alarm);
+}
+
+.hud-dial .ring.capacitor {
+  stroke: var(--faint);
+  stroke-width: 5;
+  stroke-dasharray: 6 4;
+}
+
+.dial-speed {
+  fill: var(--ink-bright);
+  font-size: 30px;
+  font-weight: 600;
+  font-family: var(--font);
+}
+
+.dial-unit,
+.dial-label {
+  font-size: 10px;
+  font-family: var(--font);
+  fill: var(--ink-dim);
+}
+
+.dial-label.shield {
+  fill: var(--shield);
+}
+
+.dial-label.hull {
+  fill: var(--ink);
+}
+
+.hud-chips {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.hud-chip {
+  padding: 2px 6px;
+  border: 1px solid var(--faint);
+  white-space: nowrap;
+}
+
+.hud-chip.hot {
+  border-color: var(--hostile);
+  color: var(--hostile);
+}
+
+.hud-weapons {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 30px;
+}
+
+.hud-weapon {
+  width: 62px;
+  height: 62px;
+  border: 1px solid var(--ink-dim);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 10px;
+}
+
+.hud-weapon .icon {
+  fill: none;
+  stroke: var(--ink-bright);
+  stroke-width: 1.5;
+}
+
+.hud-weapon .reload {
+  fill: none;
+  stroke: var(--ink-dim);
+  stroke-width: 2;
+}
+
+.hud-weapon.active {
+  border-color: var(--hostile);
+}
+
+.hud-weapon.active .hud-weapon-kind {
+  color: var(--hostile);
+}
+
+.hud-weapon-key {
+  color: var(--ink-dim);
+  font-size: 9px;
+}
+
+.hud-debug {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+/*
+ * Right edge, below the menu buttons: the lock strip, then the target
+ * card for the active lock. Fixed widths and rows so changing numbers
+ * never resize them.
+ */
+.hud-right {
+  position: absolute;
+  right: 16px;
+  top: 52px;
+  width: 248px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hud-locks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-locks-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+.hud-lock-chips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* The lock cards are the one part of the HUD that takes clicks. */
+.hud-lock {
+  pointer-events: auto;
+  height: 64px;
+  padding: 3px;
+  border: 1px solid var(--faint);
+  background: rgba(5, 10, 12, 0.92);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 10px;
+}
+
+.hud-lock.active {
+  border: 2px solid var(--ink-bright);
+}
+
+.hud-lock .silhouette {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+
+.hud-lock[data-stance='hostile'] {
+  color: var(--hostile);
+}
+
+.hud-lock[data-stance='hostile'] .silhouette {
+  stroke: var(--hostile);
+}
+
+.hud-lock[data-stance='hostile'].active {
+  border-color: var(--hostile);
+}
+
+.hud-lock[data-stance='neutral'] {
+  color: var(--neutral);
+}
+
+.hud-lock[data-stance='neutral'] .silhouette {
+  stroke: var(--neutral);
+}
+
+.hud-lock-bar {
+  display: block;
+  width: 56px;
+  margin-top: 3px;
+}
+
+.hud-lock-bar .bar-fill {
+  display: block;
+  background: currentColor;
+}
+
+.hud-lock-free {
+  height: 64px;
+  border: 1px dashed var(--faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.hud-target {
+  width: 248px;
+  padding: 12px 14px;
+  border: 1px solid var(--faint);
+  /* Near opaque: the world is drawn underneath and must not show through the numbers. */
+  background: rgba(5, 10, 12, 0.92);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hud-target-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.hud-frame {
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.hud-target-name {
+  color: var(--ink-bright);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hud-target-pic {
+  align-self: center;
+  margin: 2px 0;
+}
+
+.hud-target .silhouette {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.hud-target .ring.shield {
+  fill: none;
+  stroke-width: 4;
+}
+
+.hud-target .ring.track {
+  fill: none;
+}
+
+.hud-target[data-stance='hostile'] .hud-target-stance,
+.hud-target[data-stance='hostile'] .silhouette {
+  color: var(--hostile);
+  stroke: var(--hostile);
+}
+
+.hud-target[data-stance='neutral'] .hud-target-stance,
+.hud-target[data-stance='neutral'] .silhouette {
+  color: var(--neutral);
+  stroke: var(--neutral);
+}
+
+.hud-target-grid {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 70px;
+  gap: 5px 8px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.hud-target-grid .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  height: 4px;
+  background: var(--faint);
+}
+
+.bar-fill {
+  height: 4px;
+  width: 0;
+}
+
+.bar-fill.shield {
+  background: var(--shield);
+}
+
+.bar-fill.hull {
+  background: var(--ink);
+}
+
+.hud-target[data-stance='hostile'] .bar-fill.hull {
+  background: var(--hostile);
 }

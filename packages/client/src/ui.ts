@@ -5,18 +5,13 @@ import {
   FLIGHT_MODE_LABELS,
   boardRefusal,
   boardableShips,
-  cargoUsed,
   claimRefusal,
   distance,
   isEmptyShip,
   isEscapePod,
   length,
-  localFrame,
-  nearestDockableStation,
   ownedShips,
-  relativeVelocity,
   shipPilot,
-  shipStats,
   sub,
 } from '@spacegame/sim';
 
@@ -26,7 +21,6 @@ import {
  * back into main.ts, which owns the world.
  */
 
-/** Why docking was refused, in words. */
 /** Why a lock could not start, in words. */
 const LOCK_REFUSALS: Record<LockRefusal, string> = {
   invalid: 'Cannot lock that.',
@@ -36,6 +30,7 @@ const LOCK_REFUSALS: Record<LockRefusal, string> = {
   docked: 'Cannot lock while docked.',
 };
 
+/** Why docking was refused, in words. */
 const DOCK_REFUSALS: Record<'tooFar' | 'tooFast' | 'noPad', string> = {
   tooFar: 'No station in range.',
   tooFast: 'Too fast to dock. Slow down.',
@@ -133,8 +128,6 @@ function must<T extends HTMLElement>(id: string): T {
 }
 
 export class Ui {
-  private readonly hud = must<HTMLDivElement>('hud');
-  private readonly targetPanel = must<HTMLDivElement>('target-panel');
   private readonly dockPanel = must<HTMLDivElement>('dock-panel');
   private readonly dockStationName = must<HTMLHeadingElement>('dock-station-name');
   private readonly undockButton = must<HTMLButtonElement>('undock-button');
@@ -169,53 +162,18 @@ export class Ui {
     }
   }
 
-  /** Refresh the HUD. `ship` is null while the pilot has no ship (destroyed). */
-  update(world: World, ship: Ship | null, fps: number): void {
+  /**
+   * Refresh the docked and death panels. `ship` is null while the pilot
+   * has no ship (destroyed). The flight HUD lives in hud/flight-hud.ts.
+   */
+  update(world: World, ship: Ship | null): void {
     this.deathPanel.classList.toggle('hidden', ship !== null);
-    this.updateTarget(world, ship);
     if (!ship) {
       this.dockPanel.classList.add('hidden');
-      this.hud.textContent = `NO SHIP\n${fps.toFixed(0)} fps  tick ${world.tick}`;
       return;
     }
-    const stats = shipStats(world, ship);
-    const hold = Object.entries(ship.hold)
-      .filter(([, n]) => n > 0)
-      .map(([item, n]) => `${item} ${n}`)
-      .join(', ');
-    // Speed against the local frame (6c): the station in dock range, else the body whose sphere you are in.
-    const frame = localFrame(world, ship);
-    const rel = relativeVelocity(world, ship);
-    const speed = Math.hypot(rel.x, rel.y);
-    const frameName = frame.kind === 'station' ? world.stations[frame.id]?.name : frame.kind === 'body' ? world.bodies[frame.id]?.name : undefined;
-    const near = nearestDockableStation(ship, world.stations);
-    const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
-    const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
     const pilot = shipPilot(world, ship.id);
     const inPod = isEscapePod(world, ship);
-    const lines = [
-      hunted ? '!! PIRATE ON YOUR TAIL' : '',
-      inPod
-        ? pilot && boardableShips(world, pilot.id).length > 0
-          ? '>> ESCAPE POD: BOARD YOUR SHIP [B]'
-          : '>> ESCAPE POD: DOCK AT A STATION'
-        : `SHIP ${shipName(world, ship).toUpperCase()}`,
-      `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
-      `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `CR  ${(pilot?.credits ?? 0).toLocaleString('en-GB')}`,
-      `CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}${hold ? `  ${hold}` : ''}`,
-      `VEL ${speed.toFixed(0).padStart(4)} u/s${frameName ? `  REL ${frameName.toUpperCase()}` : ''}`,
-      `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
-      `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
-      `ROT ${((ship.angularVelocity * 180) / Math.PI).toFixed(0).padStart(4)}°/s`,
-      `FLT ${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()}  [Z]`,
-      `WPN ${ship.weaponsHot ? 'HOT' : 'COLD'}  [H]`,
-      near && ship.state === 'flying' ? `DOCK ${near.name.toUpperCase()}  [F]` : '',
-      pilot ? boardPrompt(world, pilot.id, ship) : '',
-      `${fps.toFixed(0)} fps  tick ${world.tick}`,
-    ];
-    this.hud.textContent = lines.filter(Boolean).join('\n');
-
     const docked = ship.state === 'docked';
     this.dockPanel.classList.toggle('hidden', !docked);
     if (docked && ship.dockedAt) {
@@ -259,36 +217,6 @@ export class Ui {
           ? 'You still own a ship, so there is no free Tern. Find it under Your ships and fetch it, or buy another.'
           : 'The free Tern is given at Harbour Station, to pilots who own no ships.';
     if (this.podText.textContent !== text) this.podText.textContent = text;
-  }
-
-  /** Bottom-right readout for the selected target: who, how far, closing speed, shields and structure. */
-  private updateTarget(world: World, ship: Ship | null): void {
-    const target = ship?.activeLock ? world.ships[ship.activeLock] : undefined;
-    const lock = ship?.locks.find((l) => l.targetId === ship.activeLock);
-    const hull = target ? world.hulls[target.hullId] : undefined;
-    if (!ship || !target || !hull) {
-      this.targetPanel.classList.add('hidden');
-      return;
-    }
-    const stats = shipStats(world, target);
-    const brain = world.npcs[target.id];
-    const who = brain ? brain.kind.toUpperCase() : shipLabel(world, target);
-    const range = distance(ship.position, target.position);
-    // Closing speed: positive when the gap is shrinking.
-    const dx = target.position.x - ship.position.x;
-    const dy = target.position.y - ship.position.y;
-    const rvx = target.velocity.x - ship.velocity.x;
-    const rvy = target.velocity.y - ship.velocity.y;
-    const closing = range > 0 ? -(dx * rvx + dy * rvy) / range : 0;
-    this.targetPanel.textContent = [
-      `TARGET ${who}  ${lock && lock.progress < 1 ? `LOCKING ${Math.floor(lock.progress * 100)}%` : 'LOCKED'}`,
-      `HULL   ${hull.name.toUpperCase()}`,
-      `RANGE  ${range.toFixed(0).padStart(5)}`,
-      `CLOSE  ${closing.toFixed(0).padStart(5)} u/s`,
-      `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `LOCKS ${ship.locks.length}/${shipStats(world, ship).maxLocks}  [Tab] next  [Esc] unlock`,
-    ].join('\n');
-    this.targetPanel.classList.remove('hidden');
   }
 
   /**
