@@ -75,7 +75,7 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  */
 export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInput>>): World {
   // 0. Rails: what carries what this tick, and where stations will be.
-  const rails = tickRails(world.bodies, world.tick, world.dt);
+  const rails = tickRails(world.bodies, world.tick, world.dt, world.rules.gravity);
   const stationsNext = placeStations(world.bodies, world.stations, world.tick + 1, world.dt);
   const surfaces = surfacesNext(world.bodies, rails);
   // The belt's rocks at the end of the tick: solid to ships and shots alike.

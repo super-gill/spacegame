@@ -16,7 +16,9 @@ import { createStarterWorld, emptyInput } from '../world.js';
 const SECOND = 60;
 
 function quiet(): World {
-  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+  // Gravity is a world rule, off by default since the 4 November playtest;
+  // these tests are about the mechanic, so they switch it on.
+  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rules: { gravity: true } };
 }
 
 function planetNow(w: World) {

@@ -20,6 +20,8 @@ import { add, distance, scale, sub, type Vec2 } from './vec2.js';
  *
  * Inside a sphere the body also pulls (`gravityAt`): inverse-square,
  * eased to zero at the sphere's edge. Only the innermost body pulls.
+ * The pull is a world rule (`World.rules.gravity`), off by default;
+ * rails and carrying do not depend on it.
  *
  * The local frame (`frameVelocity`) is what speed is measured against:
  * the station whose dock range a ship is in, else the body whose sphere
@@ -226,7 +228,7 @@ export interface TickRails {
   gravityAt(point: Vec2): Vec2;
 }
 
-export function tickRails(bodies: Readonly<Record<string, Body>>, tick: number, dt: number): TickRails {
+export function tickRails(bodies: Readonly<Record<string, Body>>, tick: number, dt: number, gravity = true): TickRails {
   const states = bodyStates(bodies, railTime(tick, dt));
   const next = bodyStates(bodies, railTime(tick + 1, dt));
   const carries = carriesForTick(bodies, tick, dt);
@@ -239,7 +241,7 @@ export function tickRails(bodies: Readonly<Record<string, Body>>, tick: number, 
       return body ? carries[body.id]! : NO_CARRY;
     },
     gravityAt(point: Vec2): Vec2 {
-      return gravityAt(bodies, states, point);
+      return gravity ? gravityAt(bodies, states, point) : { x: 0, y: 0 };
     },
   };
 }

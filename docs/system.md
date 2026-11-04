@@ -44,6 +44,8 @@ It also means:
 
 ## Gravity
 
+**Off by default since 4 November 2026** (Jason, after playtesting: "a clash between the flat space idea and something trying to be more realistic"). It is a world rule, `World.rules.gravity`, saved with the world and switched in the F2 menu's Admin section. Off, nothing pulls: no gravity on ships, shots, loot or wrecks, no gravity tier or orbit in the nav readout (the path line still shows coasting and carrying), no gravity margin in NPC routing, and new pilots wait at rest in the planet's frame on Harbour's path instead of in orbit. Rails, carrying, station orbits and solid surfaces are unchanged. What follows describes the rule switched on.
+
 - Inverse-square towards the body's centre inside its sphere, eased smoothly to zero over the outer part of the sphere, so crossing the edge never jolts you.
 - **Free orbits with no thrust.** Once captured you coast on an ellipse with an apoapsis and periapsis, faster low and slower high. Burns change the orbit as they should. The physics updates velocity before position, which keeps an orbit's energy from drifting; a test proves an orbit holds for an hour of play.
 - **Flight modes:** full assist cancels gravity as far as your thrusters can, so you hover. That kills an orbit, so orbits are flown in rotation assist or manual. Full assist is for station-keeping; the others are for flying orbits.

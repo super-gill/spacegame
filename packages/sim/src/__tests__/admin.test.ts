@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { adminGrantCredits, adminSpawnShip, boardShip } from '../pilots.js';
+import { adminGrantCredits, adminSetRule, adminSpawnShip, boardShip } from '../pilots.js';
+import { deserializeWorld, serializeWorld } from '../save.js';
 import type { World } from '../types.js';
 import { createStarterWorld, joinPilot, pilotShip } from '../world.js';
 
@@ -46,5 +47,20 @@ describe('admin', () => {
     const flying = { ...w, ships: { ...w.ships, [me.id]: { ...me, state: 'flying' as const, dockedAt: null, padId: null } } };
     expect(adminSpawnShip(flying, 'ana', 'aurel-tacet-dev')).toMatchObject({ ok: false, reason: 'notDocked' });
     expect(adminSpawnShip(w, 'ana', 'no-such-ship')).toMatchObject({ ok: false, reason: 'unknownLoadout' });
+  });
+});
+
+describe('admin rules', () => {
+  it('switches gravity on and off for the whole world, and saves keep it', () => {
+    const w = docked();
+    expect(w.rules.gravity).toBe(false);
+    const on = adminSetRule(w, 'ana', 'gravity', true);
+    expect(on.ok && on.world.rules.gravity).toBe(true);
+    const back = on.ok ? deserializeWorld(serializeWorld(on.world, '')) : null;
+    expect(back?.ok && back.world.rules.gravity).toBe(true);
+    // A save from before the rules existed loads with the default: off.
+    const { rules: _r, ...older } = w;
+    const old = deserializeWorld(serializeWorld(older as World, ''));
+    expect(old.ok && old.world.rules.gravity).toBe(false);
   });
 });

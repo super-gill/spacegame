@@ -12,7 +12,7 @@ import { runSpawners } from './lifecycle.js';
 import { defaultPads, defaultShipMart, HARBOUR_ID, starterStations } from './stations.js';
 import type { Ship, Spawner, Station, World } from './types.js';
 import { add, fromAngle, scale } from './vec2.js';
-import { createStarterWorld } from './world.js';
+import { createStarterWorld, DEFAULT_RULES } from './world.js';
 import { WEAPONS } from './weapons.js';
 
 /**
@@ -372,6 +372,8 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
       ...world,
       ships,
       projectiles,
+      // Worlds saved before the rules existed take the defaults (gravity off).
+      rules: { ...DEFAULT_RULES, ...(world.rules ?? {}) },
       // Worlds saved before 6e part 2 had nothing in flight but shots.
       munitions: Array.isArray(world.munitions) ? world.munitions : [],
       decoys: Array.isArray(world.decoys) ? world.decoys : [],

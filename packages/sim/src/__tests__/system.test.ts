@@ -358,10 +358,19 @@ describe('NPCs in moving frames', () => {
     const harbour = w.stations[HARBOUR_ID]!;
     expect(nearest).toBeLessThan(harbour.dockRange);
     expect(hit).toBe(false);
-    // Starts in orbit round the planet, so it holds its place on Harbour's path rather than falling.
-    const nav = navReadout(w, w.ships[me]!)!;
+    // Gravity is off by default: the pilot waits at rest in the planet's frame, and nothing reads as an orbit.
+    expect(navReadout(w, w.ships[me]!)!.orbit).toBeNull();
+  });
+
+  it('with gravity on, a new pilot starts in orbit round the planet, holding its place on the path', () => {
+    const w = joinPilot({ ...quiet(), rules: { gravity: true } }, 'ana', 'Ana');
+    const nav = navReadout(w, pilotShip(w, 'ana')!)!;
     expect(nav.orbit?.bound).toBe(true);
     expect(nav.orbit!.periapsisAltitude).toBeGreaterThan(0);
+  });
+
+  it('starts new worlds with gravity off', () => {
+    expect(createStarterWorld().rules.gravity).toBe(false);
   });
 });
 

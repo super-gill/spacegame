@@ -5,7 +5,7 @@ import { isEmptyShip, isEscapePod, ownedShips, vacated } from './ownership.js';
 import { HARBOUR_ID } from './stations.js';
 import type { Catalogues } from './stats.js';
 import { bodyState, frameVelocity, orbitAngle, railTime } from './rails.js';
-import type { Loadout, Pilot, Ship, Station, World, WorldEvent } from './types.js';
+import type { Loadout, Pilot, Ship, Station, World, WorldEvent, WorldRules } from './types.js';
 import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
@@ -129,7 +129,9 @@ function spawnPlace(world: World, station: Station, index: number): { position: 
   const parent = world.bodies[parentId];
   const parentState = bodyState(world.bodies, parentId, railTime(world.tick, world.dt));
   let velocity = parentState.velocity;
-  if (parent && parent.gravity > 0) {
+  // With gravity off there is nothing to orbit with: waiting at rest in
+  // the planet's frame on the station's path does the same job.
+  if (world.rules.gravity && parent && parent.gravity > 0) {
     const r = orbit.radius + SPAWN_ORBIT_OFFSET;
     const speed = Math.sqrt(parent.gravity / r);
     const tangent = fromAngle(ahead + orbit.direction * (Math.PI / 2));
@@ -285,6 +287,17 @@ export function adminSpawnShip(world: World, pilotId: string, loadoutId: string)
     ok: true,
     world: { ...world, pilots: { ...world.pilots, [pilotId]: made.pilot }, ships: { ...world.ships, [ship.id]: ship } },
     event: { type: 'adminShipSpawned', shipId: ship.id, stationId: station.id, loadoutId },
+  };
+}
+
+/** Admin: switch a world rule on or off (see `WorldRules`). */
+export function adminSetRule(world: World, pilotId: string, rule: keyof WorldRules, on: boolean): CommandResult<AdminRefusal> {
+  const pilot = world.pilots[pilotId];
+  if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
+  return {
+    ok: true,
+    world: { ...world, rules: { ...world.rules, [rule]: on } },
+    event: { type: 'adminRuleChanged', shipId: pilot.shipId ?? '', rule, on },
   };
 }
 

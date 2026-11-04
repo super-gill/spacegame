@@ -923,7 +923,25 @@ export interface PirateBrain {
   provokedBy: string | null;
 }
 
+/**
+ * Switches for mechanics under trial, kept in the world so a save keeps
+ * them and every system reads the same answer. Changed only through
+ * admin commands (pilots.ts).
+ */
+export interface WorldRules {
+  /**
+   * Bodies pull ships, shots, munitions' wrecks and loot (rails.ts
+   * `gravityAt`). Off by default since the 4 November 2026 playtest: at
+   * these speeds it cost attention without giving real orbits. Bodies
+   * still ride their rails, carry what is in their spheres, and have
+   * solid surfaces either way.
+   */
+  gravity: boolean;
+}
+
 export interface World {
+  /** Mechanics under trial (see `WorldRules`). */
+  rules: WorldRules;
   /** Monotonic tick counter. */
   tick: number;
   /** Fixed seconds per tick. */
@@ -986,6 +1004,8 @@ export type WorldEvent =
   | { type: 'adminCreditsGranted'; shipId: string; pilotId: string; amount: number }
   /** Admin (testing): a ship from any loadout, free, docked here. */
   | { type: 'adminShipSpawned'; shipId: string; stationId: string; loadoutId: string }
+  /** Admin (testing): a world rule switched. `shipId` is the pilot's ship, or empty. */
+  | { type: 'adminRuleChanged'; shipId: string; rule: keyof WorldRules; on: boolean }
   /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */
   | { type: 'boarded'; shipId: string; from: string }
   /** The ship a pilot was flying was destroyed and they got away in the pod `shipId`. */

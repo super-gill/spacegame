@@ -49,6 +49,7 @@ export { decoySignature, incomingMunitions, launchMunition, dropDecoy, stepMunit
 export { collideShips } from './collision.js';
 export {
   createStarterWorld,
+  DEFAULT_RULES,
   emptyInput,
   joinPilot,
   respawnPilot,
@@ -115,6 +116,7 @@ export {
   buyRefusal,
   adminGrantCredits,
   adminSpawnShip,
+  adminSetRule,
   type AdminRefusal,
   boardShip,
   boardRefusal,

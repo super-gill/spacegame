@@ -97,7 +97,7 @@ export function orbitElements(relPosition: Vec2, relVelocity: Vec2, mu: number):
  * `tick`: gravity and carrying as the sim applies them, at a coarser step.
  * No thrust, no collisions with ships or stations.
  */
-export function predictPath(world: Pick<World, 'bodies' | 'tick' | 'dt'>, position: Vec2, velocity: Vec2, seconds: number): PathReadout {
+export function predictPath(world: Pick<World, 'bodies' | 'tick' | 'dt' | 'rules'>, position: Vec2, velocity: Vec2, seconds: number): PathReadout {
   const bodies = world.bodies;
   const start = railTime(world.tick, world.dt);
   const startStates = bodyStates(bodies, start);
@@ -124,7 +124,7 @@ export function predictPath(world: Pick<World, 'bodies' | 'tick' | 'dt'>, positi
     }
     const next = bodyStates(bodies, t + PATH_STEP_SECONDS);
     const carrier = innermostBody(bodies, states, x);
-    const g = carrier ? gravityFrom(carrier, states[carrier.id]!, x) : { x: 0, y: 0 };
+    const g = carrier && world.rules.gravity ? gravityFrom(carrier, states[carrier.id]!, x) : { x: 0, y: 0 };
     let nv = add(v, scale(g, PATH_STEP_SECONDS));
     let nx = add(x, scale(nv, PATH_STEP_SECONDS));
     if (carrier) {
@@ -153,23 +153,25 @@ export function navReadout(world: World, ship: Ship): NavReadout | null {
   const body = innermostBody(world.bodies, states, ship.position);
   const docked = ship.state === 'docked';
 
-  const acceleration = body && !docked ? gravityFrom(body, states[body.id]!, ship.position) : { x: 0, y: 0 };
+  // With gravity off (`World.rules`) there is no well, no pull and no orbit to read.
+  const pulls = world.rules.gravity && !!body && body.gravity > 0 && !docked;
+  const acceleration = pulls ? gravityFrom(body!, states[body!.id]!, ship.position) : { x: 0, y: 0 };
   const strength = length(acceleration);
   const mainAccel = stats.mass > 0 ? stats.mainThrust / stats.mass : 0;
-  const inWell = !!body && body.gravity > 0 && !docked;
+  const inWell = pulls;
   const ratio = mainAccel > 0 ? strength / mainAccel : strength > 0 ? Infinity : 0;
 
   let orbit: OrbitReadout | null = null;
-  if (body && body.gravity > 0 && !docked) {
-    const state = states[body.id]!;
-    const el = orbitElements(sub(ship.position, state.position), sub(ship.velocity, state.velocity), body.gravity);
-    const bound = Number.isFinite(el.apoapsis) && el.apoapsis < body.sphere;
+  if (pulls) {
+    const state = states[body!.id]!;
+    const el = orbitElements(sub(ship.position, state.position), sub(ship.velocity, state.velocity), body!.gravity);
+    const bound = Number.isFinite(el.apoapsis) && el.apoapsis < body!.sphere;
     orbit = {
-      bodyId: body.id,
+      bodyId: body!.id,
       periapsis: el.periapsis,
       apoapsis: el.apoapsis,
-      periapsisAltitude: el.periapsis - body.radius,
-      apoapsisAltitude: el.apoapsis - body.radius,
+      periapsisAltitude: el.periapsis - body!.radius,
+      apoapsisAltitude: el.apoapsis - body!.radius,
       bound,
     };
   }

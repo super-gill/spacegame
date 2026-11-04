@@ -156,7 +156,7 @@ export interface Obstacle {
  * Every station hull, body surface and asteroid as it stands at the start
  * of this tick.
  */
-export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids' | 'tick' | 'dt'>, stats?: ShipStats): Obstacle[] {
+export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids' | 'tick' | 'dt' | 'rules'>, stats?: ShipStats): Obstacle[] {
   const out: Obstacle[] = Object.values(world.stations).map((s) => ({ position: s.position, radius: s.radius }));
   for (const rock of asteroidPositions(world)) out.push({ position: rock.position, radius: rock.radius });
   const states = bodyStates(world.bodies, railTime(world.tick, world.dt));
@@ -165,7 +165,7 @@ export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids'
     const body = world.bodies[id]!;
     if (body.radius <= 0) continue;
     // Keep out of the depth where gravity would beat the engine.
-    const deep = mainAccel > 0 && body.gravity > 0 ? Math.sqrt(body.gravity / (GRAVITY_ROUTE_FRACTION * mainAccel)) : 0;
+    const deep = world.rules.gravity && mainAccel > 0 && body.gravity > 0 ? Math.sqrt(body.gravity / (GRAVITY_ROUTE_FRACTION * mainAccel)) : 0;
     // A body gets a wider berth than a hull: its pull bends a path towards it.
     out.push({ position: states[id]!.position, radius: Math.min(Math.max(body.radius * BODY_BERTH, deep), body.sphere * 0.6 || body.radius) });
   }
@@ -222,7 +222,8 @@ export function canAfford(ship: Ship, stats: ShipStats, gun: { capacitorPerShot:
 const GUNNERY_RESERVE = 0.15;
 
 /** Gravity where the ship is, for steering. */
-export function pullOn(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship): Vec2 {
+export function pullOn(world: Pick<World, 'bodies' | 'tick' | 'dt' | 'rules'>, ship: Ship): Vec2 {
+  if (!world.rules.gravity) return { x: 0, y: 0 };
   return gravityAt(world.bodies, bodyStates(world.bodies, railTime(world.tick, world.dt)), ship.position);
 }
 

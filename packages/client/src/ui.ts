@@ -273,7 +273,9 @@ export class Ui {
   announce(world: World, e: WorldEvent): void {
     const ship = world.ships[e.shipId];
     const name = ship ? shipName(world, ship) : 'ship';
-    if (e.type === 'adminCreditsGranted') {
+    if (e.type === 'adminRuleChanged') {
+      this.showToast(`Admin: ${e.rule} ${e.on ? 'on' : 'off'}.`, 2000, 'info');
+    } else if (e.type === 'adminCreditsGranted') {
       this.showToast(`Admin: +${e.amount.toLocaleString('en-GB')} cr.`, 2000, 'info');
     } else if (e.type === 'adminShipSpawned') {
       const pad = ship?.padId ? ` It is on pad ${ship.padId.toUpperCase()}; board it with B.` : '';

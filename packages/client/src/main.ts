@@ -1,6 +1,7 @@
 import {
   adminGrantCredits,
   adminSpawnShip,
+  adminSetRule,
   type AdminRefusal,
   boardShip,
   stepOut,
@@ -352,6 +353,14 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     }
     commanded(r.world, r.event);
   },
+  setGravity(on) {
+    const r = adminSetRule(current, me.id, 'gravity', on);
+    if (!r.ok) {
+      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
+      return;
+    }
+    commanded(r.world, r.event);
+  },
   spawnShip(loadoutId) {
     const r = adminSpawnShip(current, me.id, loadoutId);
     if (!r.ok) {
@@ -532,6 +541,7 @@ function frame(nowMs: number): void {
   if (nowMs - lastSaveMs >= AUTOSAVE_MS) saveNow();
   const ago = Math.round((nowMs - lastSaveMs) / 1000);
   menu.setSavedStatus(lastSaveOk ? `Saved ${ago} s ago, in this browser.` : 'Not saving: browser storage is not available.');
+  menu.setGravity(current.rules.gravity);
   accumulator += frameSeconds;
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 

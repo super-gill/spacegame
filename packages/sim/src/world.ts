@@ -10,7 +10,7 @@ import { screeAsteroids } from './asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
 import { pirateHome } from './rails.js';
 import { HARBOUR_ID, LANTERN_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
-import type { Pilot, Ship, ShipInput, Spawner, World } from './types.js';
+import type { Pilot, Ship, ShipInput, Spawner, World, WorldRules } from './types.js';
 import { WEAPONS } from './weapons.js';
 
 /** A blank input: nothing pressed. */
@@ -40,6 +40,9 @@ export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, res
 
 /** How far inward of Ridge Outpost, towards the star, the pirate's home is, units. */
 const PIRATE_HOME_INWARD = 1300;
+
+/** The rules a new world starts with: mechanics under trial, off (see `WorldRules`). */
+export const DEFAULT_RULES: WorldRules = { gravity: false };
 
 /**
  * The starter system, Calder (bodies.ts, stations.ts): a star, a planet
@@ -139,6 +142,7 @@ export function createStarterWorld(): World {
     ships: {},
     npcs: {},
     spawners: [trader, secondTrader, watch, pirate],
+    rules: { ...DEFAULT_RULES },
     projectiles: [],
     munitions: [],
     decoys: [],

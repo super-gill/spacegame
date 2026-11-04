@@ -12,6 +12,9 @@ import type { Camera } from '../camera.js';
 const BODY_INK = '#6f8f9a';
 const SPHERE_INK = 'rgba(111, 143, 154, 0.25)';
 const BELT_INK = 'rgba(160, 140, 110, 0.35)';
+const STAR_INK = '#f0b45a';
+const STAR_FILL = '#3a2410';
+const STAR_GLOW = 'rgba(240, 180, 90, 0.18)';
 
 /** Draw every body as it is at `world.tick`, moved on by `alpha` of a tick to match interpolated ships. */
 export function drawBodies(ctx: CanvasRenderingContext2D, camera: Camera, world: World, alpha: number): void {
@@ -44,14 +47,26 @@ export function drawBodies(ctx: CanvasRenderingContext2D, camera: Camera, world:
       ctx.setLineDash([]);
     }
 
-    ctx.strokeStyle = BODY_INK;
-    ctx.fillStyle = '#0a1014';
+    const star = body.kind === 'star';
+    const r = body.radius * camera.zoom;
+    if (star) {
+      // A star burns: a warm glow round a bright disc.
+      const glow = ctx.createRadialGradient(c.x, c.y, r * 0.8, c.x, c.y, r * 2.2);
+      glow.addColorStop(0, STAR_GLOW);
+      glow.addColorStop(1, 'rgba(240, 180, 90, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, r * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = star ? STAR_INK : BODY_INK;
+    ctx.fillStyle = star ? STAR_FILL : '#0a1014';
     ctx.beginPath();
-    ctx.arc(c.x, c.y, body.radius * camera.zoom, 0, Math.PI * 2);
+    ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = BODY_INK;
+    ctx.fillStyle = star ? STAR_INK : BODY_INK;
     ctx.font = '11px ui-monospace, monospace';
     ctx.textAlign = 'center';
     ctx.fillText(body.name.toUpperCase(), c.x, c.y + body.radius * camera.zoom + 16);

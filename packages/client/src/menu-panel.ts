@@ -16,6 +16,8 @@ export interface MenuActions {
   grantCredits(amount: number): void;
   /** Admin (testing): a free ship from any loadout, docked where you are. */
   spawnShip(loadoutId: string): void;
+  /** Admin (testing): switch gravity on or off for the whole world. */
+  setGravity(on: boolean): void;
 }
 
 /** A loadout the admin spawner offers. */
@@ -49,6 +51,7 @@ export class MenuPanel {
   private readonly nameInput = el('input');
   private readonly labelsBox = el('input');
   private readonly savedLine = el('p', 'muted');
+  private readonly gravityBox = el('input');
 
   constructor(root: HTMLElement, openButton: HTMLButtonElement, name: string, showLabels: boolean, actions: MenuActions, spawnChoices: readonly SpawnChoice[]) {
     this.panel.setAttribute('role', 'dialog');
@@ -131,6 +134,12 @@ export class MenuPanel {
     spawnRow.append(select, button('Spawn ship', () => actions.spawnShip(select.value)));
     this.panel.append(spawnRow);
     this.panel.append(el('p', 'muted', 'Spawned ships are yours, free, on a pad where you are docked; board with B. Sealed hulls such as the Aurel Tacet included.'));
+    const gravityRow = el('label', 'menu-row');
+    this.gravityBox.type = 'checkbox';
+    this.gravityBox.addEventListener('change', () => actions.setGravity(this.gravityBox.checked));
+    gravityRow.append(this.gravityBox, document.createTextNode(' Gravity: planets and the star pull ships, shots and loot'));
+    this.panel.append(gravityRow);
+    this.panel.append(el('p', 'muted', 'Off by default. Bodies still orbit, carry what is near them and have solid surfaces either way. Saved with the world.'));
 
     root.append(this.panel);
   }
@@ -142,6 +151,11 @@ export class MenuPanel {
   /** Show when the world was last saved, e.g. "Saved 12 s ago". */
   setSavedStatus(text: string): void {
     if (this.savedLine.textContent !== text) this.savedLine.textContent = text;
+  }
+
+  /** Reflect the world's gravity rule (it changes with loads and imports too). */
+  setGravity(on: boolean): void {
+    if (this.gravityBox.checked !== on) this.gravityBox.checked = on;
   }
 
   setName(name: string): void {
