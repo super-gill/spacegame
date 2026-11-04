@@ -48,11 +48,16 @@ export function angularAcceleration(stats: ShipStats, t: Thrusters): number {
   return ((t.rotateRight - t.rotateLeft) * stats.rotationThrust) / stats.mass;
 }
 
-/** Advance one ship by `dt` seconds under `input`. Returns a new Ship. */
-export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput, dt: number): Ship {
+/**
+ * Advance one ship by `dt` seconds under `input`. Returns a new Ship.
+ *
+ * `input` is null for an empty ship (nobody aboard): the flight computer
+ * does not run, no thruster fires, and the ship coasts on its momentum.
+ */
+export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput | null, dt: number): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
-  const thrusters = computeThrusters(ship, stats, input, dt);
+  const thrusters = input ? computeThrusters(ship, stats, input, dt) : idleThrusters();
 
   let velocity = add(ship.velocity, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
   velocity = settle(clampLength(velocity, stats.maxSpeed));

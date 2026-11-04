@@ -68,4 +68,16 @@ export const LOADOUTS: Record<string, Loadout> = {
       b1: 'meridian-pod-s',
     },
   },
+  'escape-pod': {
+    // The fixed fit every pod has: a small engine and thrusters, power for
+    // them, nothing else. No guns, no cargo, no shield.
+    id: 'escape-pod',
+    name: 'Escape pod',
+    hullId: 'escape-pod',
+    fit: {
+      e1: 'meridian-engine-s',
+      c1: 'meridian-thrusters-s',
+      c2: 'meridian-reactor-s',
+    },
+  },
 };

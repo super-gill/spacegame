@@ -5,6 +5,7 @@ import { tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
+import { pilotsAboard } from './ownership.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
 import type { Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
@@ -17,8 +18,13 @@ import { emptyInput } from './world.js';
  * people (on this machine or, later, over the network). Ships with an NPC
  * brain get their input from the brain instead; an input supplied for an
  * NPC ship wins, which is how tests and debugging can take one over.
- * Any other ship gets an empty input and keeps drifting under whatever
- * its flight computer does on its own.
+ * A ship a pilot is flying with no input this tick gets a blank one, so
+ * its flight computer still runs (assist still bleeds off drift).
+ * An empty ship (nobody aboard, see ownership.ts) with no input gets
+ * none at all: it coasts with every thruster and gun idle.
+ *
+ * Inputs are trusted. Over a network, the host must accept a client's
+ * input only for the ship that client's pilot is flying.
  *
  * Order within a tick:
  *   1. NPCs decide, all from the start-of-tick world.
@@ -41,11 +47,14 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const newProjectiles: Projectile[] = [];
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
+  const aboard = pilotsAboard(world);
 
   // 2. Per-ship. Sorted so results never depend on object insertion order.
   for (const id of Object.keys(world.ships).sort()) {
     let ship = world.ships[id]!;
-    const input = inputs[id] ?? npc.inputs[id] ?? emptyInput();
+    const crewed = aboard[id] !== undefined || world.npcs[id] !== undefined;
+    const given = inputs[id] ?? npc.inputs[id] ?? (crewed ? emptyInput() : null);
+    const input = given ?? emptyInput();
     // The ship flies as its fit and cargo make it. Fits only change while
     // docked, so these hold for the whole tick.
     const stats = shipStats(world, ship);
@@ -59,7 +68,9 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
           events.push(result.event);
         }
       } else {
-        const result = tryDock(ship, world.stations);
+        // Ships already handled this tick are seen as they now are, so two
+        // ships docking together never land on the same pad.
+        const result = tryDock(ship, { stations: world.stations, hulls: world.hulls, ships: { ...world.ships, ...ships } });
         ship = result.ship;
         events.push(result.event);
       }
@@ -72,7 +83,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       events.push({ type: 'flightModeChanged', shipId: ship.id, mode });
     }
 
-    const moved = collideWithStations(stepShip(ship, stats, input, world.dt), stats, world.stations);
+    const moved = collideWithStations(stepShip(ship, stats, given, world.dt), stats, world.stations);
     events.push(...moved.events);
     damage.push(...moved.damage);
 

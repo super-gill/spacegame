@@ -3,7 +3,11 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import type { World } from './types.js';
+import { UNDOCK_CLEARANCE } from './constants.js';
+import { freePadFor, onPad } from './docking.js';
+import { defaultPads, defaultShipMart } from './stations.js';
+import type { Ship, Station, World } from './types.js';
+import { add, fromAngle, scale } from './vec2.js';
 import { WEAPONS } from './weapons.js';
 
 /**
@@ -43,8 +47,11 @@ export const SAVE_FORMAT = 'spacegame-world';
  *   migration: their hulls no longer exist).
  * - 3: 0.7.1, owned modules. Pilots carry module storage by station.
  *   Version 2 saves migrate: every pilot starts with empty storage.
+ * - 4: 0.8.0, ships you own, pads, ship marts and escape pods. Stations
+ *   carry pads and ship mart stock, ships the pad they are docked on.
+ *   Version 3 saves migrate: see `migrate3to4`.
  */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -56,7 +63,64 @@ export const MIGRATIONS: Record<number, Migration> = {
     for (const [id, p] of Object.entries(world['pilots'])) pilots[id] = isRecord(p) ? { storage: {}, ...p } : p;
     return { ...world, pilots };
   },
+  3: (world) => migrate3to4(world),
 };
+
+/**
+ * 3 to 4: pads and ship marts.
+ *
+ * - Stations gain the pads and ship mart stock their starter-sector
+ *   layout has (stations.ts), or a default ring of pads and no ship mart
+ *   if the station is not one of ours.
+ * - Every ship gains `padId`. Docked ships, in id order, are set down on
+ *   the smallest free pad that fits, exactly as docking would. A docked
+ *   ship with no pad left for it is moved just outside the station,
+ *   at rest and flying, rather than lost.
+ * - Nothing else changes. A pilot whose ship was destroyed under version
+ *   3 has none, and wakes as version 4 pilots do.
+ */
+export function migrate3to4(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['stations']) || !isRecord(world['ships'])) return world;
+
+  const stations: Record<string, Station> = {};
+  for (const [id, st] of Object.entries(world['stations'])) {
+    if (!isRecord(st)) continue;
+    const station = st as unknown as Station;
+    stations[id] = {
+      ...station,
+      pads: Array.isArray(st['pads']) ? station.pads : defaultPads(station),
+      shipMart: Array.isArray(st['shipMart']) ? station.shipMart : defaultShipMart(id),
+    };
+  }
+
+  // Undocked ships first get a null pad, so docked ones are placed against a clean slate.
+  const ships: Record<string, Ship> = {};
+  for (const [id, sh] of Object.entries(world['ships'])) {
+    if (!isRecord(sh)) continue;
+    ships[id] = { ...(sh as unknown as Ship), padId: null };
+  }
+  for (const id of Object.keys(ships).sort()) {
+    const ship = ships[id]!;
+    if (ship.state !== 'docked' || !ship.dockedAt) continue;
+    const station = stations[ship.dockedAt];
+    const hull = HULLS[ship.hullId];
+    const pad = station && hull ? freePadFor(station, hull.sizeClass, ships) : null;
+    if (station && pad) {
+      ships[id] = onPad(ship, station, pad);
+    } else if (station) {
+      const out = fromAngle(ship.heading);
+      ships[id] = {
+        ...ship,
+        state: 'flying',
+        dockedAt: null,
+        position: add(station.position, scale(out, station.radius + UNDOCK_CLEARANCE)),
+        velocity: { x: 0, y: 0 },
+        angularVelocity: 0,
+      };
+    }
+  }
+  return { ...world, stations, ships };
+}
 
 export interface SaveEnvelope {
   format: string;

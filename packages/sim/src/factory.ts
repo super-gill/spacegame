@@ -18,6 +18,8 @@ export interface NewShipOptions {
   heading: number;
   flightMode: FlightMode;
   dockedAt?: string | null;
+  /** Pad at `dockedAt` the ship sits on. Use `docking.onPad` to place a ship on a pad properly. */
+  padId?: string | null;
   /** Cargo aboard at build time. */
   hold?: Record<string, number>;
 }
@@ -44,6 +46,7 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
     angularVelocity: 0,
     state: docked ? 'docked' : 'flying',
     dockedAt: docked ? o.dockedAt! : null,
+    padId: docked ? (o.padId ?? null) : null,
     flightMode: o.flightMode,
     thrusters: idleThrusters(),
     shield: stats.shield,

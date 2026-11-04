@@ -1,18 +1,73 @@
 import { DOCK_MAX_SPEED, UNDOCK_CLEARANCE, UNDOCK_PUSH_SPEED } from './constants.js';
-import type { Ship, Station, WorldEvent } from './types.js';
-import { add, distance, fromAngle, length, scale, sub, toAngle } from './vec2.js';
+import type { HullSpec, ModuleSize, Pad, Ship, Station, World, WorldEvent } from './types.js';
+import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
  * Docking rules.
  *
- * A ship may dock when it is inside a station's dock range and moving
- * slowly. Docking parks the ship at the station; undocking places it just
- * outside the station on the side it was last facing, with a gentle push.
+ * A ship may dock when it is inside a station's dock range, moving
+ * slowly, and a pad its hull fits is free. It is set down on the smallest
+ * free pad that fits (ties go to the lowest pad id), facing the way the
+ * pad faces. Undocking launches it from that pad: placed a little way out
+ * along the pad's facing, with a gentle push.
  */
 
 export interface DockAttempt {
   ship: Ship;
   event: WorldEvent;
+}
+
+/** The parts of the world docking reads. */
+export type DockingView = Pick<World, 'stations' | 'ships' | 'hulls'>;
+
+const SIZE_RANK: Record<ModuleSize, number> = { S: 0, M: 1, L: 2, XL: 3 };
+
+/** True if a hull of size class `size` fits on the pad. Smaller hulls fit bigger pads. */
+export function padFits(pad: Pad, size: ModuleSize): boolean {
+  return SIZE_RANK[size] <= SIZE_RANK[pad.size];
+}
+
+/** Pad ids at this station that have a ship on them. */
+export function occupiedPads(station: Station, ships: Record<string, Ship>): Set<string> {
+  const taken = new Set<string>();
+  for (const s of Object.values(ships)) if (s.dockedAt === station.id && s.padId) taken.add(s.padId);
+  return taken;
+}
+
+/**
+ * The pad a hull of size class `size` would be given here: the smallest
+ * free pad that fits, lowest id first among equals. Null if none is free.
+ */
+export function freePadFor(station: Station, size: ModuleSize, ships: Record<string, Ship>): Pad | null {
+  const taken = occupiedPads(station, ships);
+  const fitting = station.pads
+    .filter((p) => !taken.has(p.id) && padFits(p, size))
+    .sort((a, b) => SIZE_RANK[a.size] - SIZE_RANK[b.size] || (a.id < b.id ? -1 : 1));
+  return fitting[0] ?? null;
+}
+
+/** Where a pad is in the world. */
+export function padWorldPosition(station: Station, pad: Pad): Vec2 {
+  return add(station.position, pad.position);
+}
+
+/** Where a ship leaving a pad is placed: out along the pad's facing, clear of the station hull. */
+export function launchPoint(station: Station, pad: Pad): Vec2 {
+  return add(padWorldPosition(station, pad), scale(fromAngle(pad.facing), UNDOCK_CLEARANCE));
+}
+
+/** The ship set down on a pad: docked there, at rest, facing the pad's way. */
+export function onPad(ship: Ship, station: Station, pad: Pad): Ship {
+  return {
+    ...ship,
+    state: 'docked',
+    dockedAt: station.id,
+    padId: pad.id,
+    position: padWorldPosition(station, pad),
+    heading: pad.facing,
+    velocity: { x: 0, y: 0 },
+    angularVelocity: 0,
+  };
 }
 
 /** Find the nearest station within dock range of the ship, if any. */
@@ -29,24 +84,27 @@ export function nearestDockableStation(ship: Ship, stations: Record<string, Stat
   return best;
 }
 
-export function tryDock(ship: Ship, stations: Record<string, Station>): DockAttempt {
-  const station = nearestDockableStation(ship, stations);
+/**
+ * Try to dock at the nearest station in range. `world.ships` must hold
+ * every other ship as it stands now, so two ships docking in the same
+ * tick are never given the same pad.
+ */
+export function tryDock(ship: Ship, world: DockingView): DockAttempt {
+  const station = nearestDockableStation(ship, world.stations);
   if (!station) {
     return { ship, event: { type: 'dockRefused', shipId: ship.id, reason: 'tooFar' } };
   }
   if (length(ship.velocity) > DOCK_MAX_SPEED) {
     return { ship, event: { type: 'dockRefused', shipId: ship.id, reason: 'tooFast' } };
   }
+  const hull: HullSpec | undefined = world.hulls[ship.hullId];
+  const pad = hull ? freePadFor(station, hull.sizeClass, world.ships) : null;
+  if (!pad) {
+    return { ship, event: { type: 'dockRefused', shipId: ship.id, reason: 'noPad' } };
+  }
   return {
-    ship: {
-      ...ship,
-      state: 'docked',
-      dockedAt: station.id,
-      position: { ...station.position },
-      velocity: { x: 0, y: 0 },
-      angularVelocity: 0,
-    },
-    event: { type: 'docked', shipId: ship.id, stationId: station.id },
+    ship: onPad(ship, station, pad),
+    event: { type: 'docked', shipId: ship.id, stationId: station.id, padId: pad.id },
   };
 }
 
@@ -54,14 +112,17 @@ export function undock(ship: Ship, stations: Record<string, Station>): DockAttem
   if (ship.state !== 'docked' || ship.dockedAt === null) return null;
   const station = stations[ship.dockedAt];
   if (!station) return null;
+  const pad = station.pads.find((p) => p.id === ship.padId);
 
-  // Leave in the direction the ship is facing, clear of the station hull.
-  const outward = fromAngle(ship.heading);
-  const position = add(station.position, scale(outward, station.radius + UNDOCK_CLEARANCE));
+  // Leave from the pad along its facing. A ship with no pad (should not
+  // happen) leaves the old way: out from the centre along its heading.
+  const facing = pad ? pad.facing : ship.heading;
+  const outward = fromAngle(facing);
+  const position = pad ? launchPoint(station, pad) : add(station.position, scale(outward, station.radius + UNDOCK_CLEARANCE));
   const velocity = scale(outward, UNDOCK_PUSH_SPEED);
 
   return {
-    ship: { ...ship, state: 'flying', dockedAt: null, position, velocity },
+    ship: { ...ship, state: 'flying', dockedAt: null, padId: null, heading: facing, position, velocity },
     event: { type: 'undocked', shipId: ship.id, stationId: station.id },
   };
 }

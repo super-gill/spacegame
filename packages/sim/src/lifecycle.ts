@@ -8,7 +8,10 @@ import {
   TRACTOR_RANGE,
   WRECK_LIFETIME,
 } from './constants.js';
+import { freePadFor, onPad } from './docking.js';
 import { buildShip } from './factory.js';
+import { isEscapePod, pilotsAboard } from './ownership.js';
+import { ejectPilot } from './pilots.js';
 import { fitStats, shipStats } from './stats.js';
 import { cargoFree } from './trade.js';
 import type { Loot, Ship, Spawner, World, WorldEvent, Wreck } from './types.js';
@@ -21,6 +24,9 @@ import { add, distance, fromAngle, normalise, scale, sub } from './vec2.js';
  * returns the parts of the world it changes.
  */
 
+/** A spawner whose station has no free pad waits this long before trying again, seconds. */
+const SPAWN_RETRY_SECONDS = 5;
+
 /** Speed loot canisters scatter at from a destroyed ship, units/s. */
 const LOOT_SCATTER_SPEED = 40;
 
@@ -32,8 +38,10 @@ export interface Destruction {
 /**
  * Remove every ship whose structure has reached zero. Each leaves a wreck,
  * scrap from its hull, and part of its cargo (CARGO_SURVIVAL_FRACTION of
- * each good, rounded down), in canisters. A pilot who loses their ship is left without one
- * until they respawn; an NPC's spawner starts its respawn countdown.
+ * each good, rounded down), in canisters. A pilot flying a destroyed
+ * ship is ejected in an escape pod; a pilot whose pod is destroyed has no
+ * ship until they wake (pilots.ts). An NPC's spawner starts its respawn
+ * countdown.
  * `killers` names who last damaged each ship, for the event.
  */
 export function destroyShips(world: World, killers: Record<string, string | null>): Destruction {
@@ -48,6 +56,8 @@ export function destroyShips(world: World, killers: Record<string, string | null
   const wrecks = [...world.wrecks];
   const loot = [...world.loot];
   const events: WorldEvent[] = [];
+  const aboard = pilotsAboard(world);
+  const ejections: { pilotId: string; ship: Ship }[] = [];
   let nextId = world.nextEntityId;
 
   for (const ship of dead) {
@@ -55,8 +65,16 @@ export function destroyShips(world: World, killers: Record<string, string | null
     delete npcs[ship.id];
     events.push({ type: 'destroyed', shipId: ship.id, by: killers[ship.id] ?? null });
 
-    if (ship.ownerId && pilots[ship.ownerId]?.shipId === ship.id) {
-      pilots[ship.ownerId] = { ...pilots[ship.ownerId]!, shipId: null };
+    // Whoever was flying it: from a ship they get away in a pod; from a
+    // pod they are left with nothing until they wake at Harbour. Owners
+    // who were not aboard lose only the ship.
+    const pilotId = aboard[ship.id];
+    if (pilotId) {
+      if (isEscapePod(world, ship)) {
+        pilots[pilotId] = { ...pilots[pilotId]!, shipId: null };
+      } else {
+        ejections.push({ pilotId, ship });
+      }
     }
 
     const wreck: Wreck = {
@@ -107,7 +125,13 @@ export function destroyShips(world: World, killers: Record<string, string | null
       : sp,
   );
 
-  return { world: { ...world, ships, npcs, pilots, wrecks, loot, spawners, nextEntityId: nextId }, events };
+  let out: World = { ...world, ships, npcs, pilots, wrecks, loot, spawners, nextEntityId: nextId };
+  for (const e of ejections) {
+    const r = ejectPilot(out, e.pilotId, e.ship);
+    out = r.world;
+    events.push(r.event);
+  }
+  return { world: out, events };
 }
 
 /**
@@ -217,16 +241,22 @@ function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
   const loadout = world.loadouts[sp.loadoutId];
   if (!loadout || !world.hulls[loadout.hullId]) return { world, spawner: sp };
   const id = `npc-${sp.id}-${sp.spawned + 1}`;
-  const ship: Ship = buildShip(world, {
+  let ship: Ship = buildShip(world, {
     id,
     loadout,
     ownerId: null,
     position: sp.position,
     heading: sp.heading,
     flightMode: 'rotation', // NPC steering handles drift itself; see ai/steer.ts
-    dockedAt: sp.dockedAt,
     hold: sp.hold,
   });
+  if (sp.dockedAt) {
+    // Starts on a pad. With every fitting pad taken, try again shortly.
+    const station = world.stations[sp.dockedAt];
+    const pad = station ? freePadFor(station, world.hulls[loadout.hullId]!.sizeClass, world.ships) : null;
+    if (!station || !pad) return { world, spawner: { ...sp, timerTicks: Math.round(SPAWN_RETRY_SECONDS / world.dt) } };
+    ship = onPad(ship, station, pad);
+  }
   return {
     world: { ...world, ships: { ...world.ships, [id]: ship }, npcs: { ...world.npcs, [id]: sp.brain } },
     spawner: { ...sp, shipId: id, spawned: sp.spawned + 1, timerTicks: 0 },

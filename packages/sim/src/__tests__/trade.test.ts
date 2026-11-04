@@ -165,6 +165,8 @@ describe('cargo', () => {
     w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'flying', dockedAt: null, position: { x: 3000, y: 3000 }, structure: 0 } } };
     w = respawnPilot(stepWorld(w, {}), 'ana');
     expect(credits(w)).toBe(paid);
+    // The pilot got away in a pod, which carries nothing.
+    expect(pilotShip(w, 'ana')!.hullId).toBe('escape-pod');
     expect(pilotShip(w, 'ana')!.hold).toEqual({});
   });
 

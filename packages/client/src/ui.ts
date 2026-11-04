@@ -1,11 +1,30 @@
 import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation, shipStats } from '@spacegame/sim';
+import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation, shipPilot, shipStats } from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel, death panel and transient toasts.
  * Pure presentation; reads the world and never changes it. Buttons call
  * back into main.ts, which owns the world.
  */
+
+/** Why docking was refused, in words. */
+const DOCK_REFUSALS: Record<'tooFar' | 'tooFast' | 'noPad', string> = {
+  tooFar: 'No station in range.',
+  tooFast: 'Too fast to dock. Slow down.',
+  noPad: 'No free pad here fits this hull.',
+};
+
+/**
+ * Who a ship is, for labels: the pilot flying it, or for an empty ship
+ * its owner marked as empty. Owning is not flying; never label an empty
+ * ship with its owner's name alone.
+ */
+export function shipLabel(world: World, ship: Ship): string {
+  const pilot = shipPilot(world, ship.id);
+  if (pilot) return pilot.name.toUpperCase();
+  const owner = ship.ownerId ? world.pilots[ship.ownerId] : undefined;
+  return owner ? `EMPTY · ${owner.name.toUpperCase()}` : 'UNKNOWN';
+}
 
 function must<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -59,7 +78,7 @@ export class Ui {
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
       `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `CR  ${(ship.ownerId ? (world.pilots[ship.ownerId]?.credits ?? 0) : 0).toLocaleString('en-GB')}`,
+      `CR  ${(shipPilot(world, ship.id)?.credits ?? 0).toLocaleString('en-GB')}`,
       `CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}${hold ? `  ${hold}` : ''}`,
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
@@ -101,8 +120,7 @@ export class Ui {
     }
     const stats = shipStats(world, target);
     const brain = world.npcs[target.id];
-    const owner = target.ownerId ? world.pilots[target.ownerId] : undefined;
-    const who = brain ? brain.kind.toUpperCase() : (owner?.name.toUpperCase() ?? 'UNKNOWN');
+    const who = brain ? brain.kind.toUpperCase() : shipLabel(world, target);
     const range = distance(ship.position, target.position);
     // Closing speed: positive when the gap is shrinking.
     const dx = target.position.x - ship.position.x;
@@ -128,6 +146,10 @@ export class Ui {
   handleEvents(events: WorldEvent[], myShipId: string): void {
     for (const e of events) {
       const mine = e.shipId === myShipId;
+      if (e.type === 'podEjected' && e.from === myShipId) {
+        this.showToast('Your ship was destroyed. You got away in an escape pod.', 4000);
+        continue;
+      }
       if (e.type === 'destroyed') {
         if (mine) this.showToast('Your ship was destroyed.', 3000);
         else if (e.by === myShipId) this.showToast('Target destroyed.', 2000, 'info');
@@ -135,7 +157,7 @@ export class Ui {
       }
       if (!mine) continue;
       if (e.type === 'dockRefused') {
-        this.showToast(e.reason === 'tooFast' ? 'Too fast to dock. Slow down.' : 'No station in range.');
+        this.showToast(DOCK_REFUSALS[e.reason]);
       } else if (e.type === 'flightModeChanged') {
         this.showToast(`Flight mode: ${FLIGHT_MODE_LABELS[e.mode]}`, 1200, 'info');
       } else if (e.type === 'huntStarted') {

@@ -120,3 +120,18 @@ export const MODULE_RESALE_FRACTION = 0.5;
  * pirate fight stops being winnable by a new player who fights back.
  */
 export const STARTER_VS_RAIDER_MIN_EDGE = 1.4;
+
+/**
+ * Boarding in space: the ship being boarded must be within this distance
+ * of the pilot's ship, centre to centre, units.
+ */
+export const BOARD_RANGE = 150;
+
+/** Boarding in space: the two ships' relative speed may be at most this, units/s. */
+export const BOARD_MAX_RELATIVE_SPEED = 20;
+
+/** An escape pod keeps this fraction of its destroyed ship's velocity. */
+export const POD_INHERIT_FRACTION = 0.3;
+
+/** An escape pod is fired out to the ship's right at this speed, units/s, clear of the wreck. */
+export const POD_EJECT_SPEED = 30;

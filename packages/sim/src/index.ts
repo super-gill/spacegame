@@ -78,4 +78,35 @@ export {
   computeThrusters,
   idleThrusters,
 } from './flight.js';
-export { nearestDockableStation, tryDock, undock, bearingFromStation } from './docking.js';
+export {
+  nearestDockableStation,
+  tryDock,
+  undock,
+  bearingFromStation,
+  padFits,
+  freePadFor,
+  occupiedPads,
+  padWorldPosition,
+  launchPoint,
+  onPad,
+  type DockingView,
+} from './docking.js';
+export { pilotsAboard, shipPilot, isEmptyShip, isEscapePod, ownedShips } from './ownership.js';
+export {
+  shipPrice,
+  buyShip,
+  buyRefusal,
+  boardShip,
+  boardRefusal,
+  boardableShips,
+  wakePilot,
+  claimStarterShip,
+  claimRefusal,
+  ESCAPE_POD_LOADOUT_ID,
+  type CommandResult,
+  type BuyRefusal,
+  type BoardRefusal,
+  type ClaimRefusal,
+  type WakeRefusal,
+} from './pilots.js';
+export { starterStations, padRing, HARBOUR_ID, RIDGE_ID } from './stations.js';

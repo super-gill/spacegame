@@ -1,14 +1,14 @@
 import { FIXED_DT, STARTING_CREDITS } from './constants.js';
 import { GOODS } from './goods.js';
-import { buildShip } from './factory.js';
 import { HULLS } from './hulls.js';
 import { runSpawners } from './lifecycle.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import type { Pilot, Ship, ShipInput, Spawner, Station, World } from './types.js';
+import { issueShip, STARTER_LOADOUT_ID, STARTER_STATION_ID } from './pilots.js';
+import { HARBOUR_ID, RIDGE_ID, starterStations } from './stations.js';
+import type { Pilot, Ship, ShipInput, Spawner, World } from './types.js';
 import { WEAPONS } from './weapons.js';
-import { add, fromAngle, scale } from './vec2.js';
 
 /** A blank input: nothing pressed. */
 export function emptyInput(): ShipInput {
@@ -29,14 +29,7 @@ export function emptyInput(): ShipInput {
   };
 }
 
-/** The station new pilots start next to. */
-export const STARTER_STATION_ID = 'station-harbour';
-
-/** Loadout every new pilot is given: a Meridian civilian starter. */
-export const STARTER_LOADOUT_ID = 'meridian-starter';
-
-/** How far from the starter station a new pilot's ship appears. */
-const SPAWN_DISTANCE = 650;
+export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
 
 /**
  * The starter sector: two stations, a trader running between them and a
@@ -46,44 +39,14 @@ const SPAWN_DISTANCE = 650;
  * files.
  *
  * New pilots spawn inside Harbour Station's security zone, so they are
- * never hunted the moment they arrive. Harbour has outfitting; Ridge
- * Outpost does not, so refitting means a trip home.
+ * never hunted the moment they arrive. Harbour has outfitting and a ship
+ * mart; Ridge Outpost has neither, so refitting or buying a ship means a
+ * trip home. Station data lives in stations.ts.
  */
 export function createStarterWorld(): World {
-  const harbour: Station = {
-    id: STARTER_STATION_ID,
-    name: 'Harbour Station',
-    position: { x: 0, y: 0 },
-    radius: 90,
-    dockRange: 220,
-    securityRadius: 900,
-    // A busy farming and manufacturing hub: food, machinery and medicine are cheap here, ore is wanted.
-    market: {
-      food: { ask: 14, bid: 11 },
-      ore: { ask: 46, bid: 38 },
-      machinery: { ask: 70, bid: 60 },
-      medicine: { ask: 55, bid: 47 },
-      scrap: { ask: null, bid: 7 },
-    },
-    outfitting: true,
-  };
-  const outpost: Station = {
-    id: 'station-ridge',
-    name: 'Ridge Outpost',
-    position: { x: 4800, y: -1600 },
-    radius: 70,
-    dockRange: 190,
-    securityRadius: 700,
-    // A mining outpost: ore is cheap, everything else has to be shipped in.
-    market: {
-      food: { ask: 32, bid: 27 },
-      ore: { ask: 18, bid: 14 },
-      machinery: { ask: 112, bid: 98 },
-      medicine: { ask: 86, bid: 75 },
-      scrap: { ask: null, bid: 9 },
-    },
-    outfitting: false,
-  };
+  const stations = starterStations();
+  const harbour = stations[HARBOUR_ID]!;
+  const outpost = stations[RIDGE_ID]!;
 
   // The trader starts docked at Harbour and leaves after a short wait.
   const trader: Spawner = {
@@ -135,7 +98,7 @@ export function createStarterWorld(): World {
     projectiles: [],
     wrecks: [],
     loot: [],
-    stations: { [harbour.id]: harbour, [outpost.id]: outpost },
+    stations,
     hulls: { ...HULLS },
     modules: { ...MODULES },
     loadouts: { ...LOADOUTS },
@@ -149,52 +112,13 @@ export function createStarterWorld(): World {
   return runSpawners(empty);
 }
 
-/** Deterministic id for the `n`th ship issued to a pilot, counting from 1. */
-export function pilotShipId(pilotId: string, n: number): string {
-  return `ship-${pilotId}-${n}`;
-}
-
-/** Id of a pilot's first ship. */
-export function starterShipId(pilotId: string): string {
-  return pilotShipId(pilotId, 1);
-}
-
-/**
- * Issue a pilot a new starter ship near the starter station. Spawn points
- * are spread round the station by how many pilots there are, so pilots
- * arriving together do not appear on top of each other.
- */
-function issueStarterShip(world: World, pilot: Pilot): World {
-  const station = world.stations[STARTER_STATION_ID];
-  const loadout = world.loadouts[STARTER_LOADOUT_ID];
-  if (!station) throw new Error(`Starter station "${STARTER_STATION_ID}" missing from world`);
-  if (!loadout) throw new Error(`Starter loadout "${STARTER_LOADOUT_ID}" missing from world`);
-
-  const index = Object.keys(world.pilots).sort().indexOf(pilot.id);
-  const angle = Math.max(0, index) * (Math.PI / 3);
-  const n = pilot.shipsIssued + 1;
-  const ship = buildShip(world, {
-    id: pilotShipId(pilot.id, n),
-    loadout,
-    ownerId: pilot.id,
-    position: add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE)),
-    heading: angle + Math.PI, // facing the station
-    flightMode: 'assisted',
-  });
-  return {
-    ...world,
-    pilots: { ...world.pilots, [pilot.id]: { ...pilot, shipId: ship.id, shipsIssued: n } },
-    ships: { ...world.ships, [ship.id]: ship },
-  };
-}
-
 /**
  * Bring a pilot into the world. Pure: returns a new World.
  *
  * - A pilot seen before keeps everything they had: same ship, same place.
- *   Their progress is theirs and survives leaving and rejoining. If their
- *   ship was destroyed they stay without one until they respawn.
- * - A new pilot is created with a starter ship near the starter station.
+ *   Their progress is theirs and survives leaving and rejoining. If they
+ *   lost their escape pod they stay without a ship until they wake.
+ * - A new pilot is created with a starter ship in space near the starter station.
  */
 export function joinPilot(world: World, pilotId: string, name: string): World {
   const existing = world.pilots[pilotId];
@@ -204,19 +128,9 @@ export function joinPilot(world: World, pilotId: string, name: string): World {
     return { ...world, pilots: { ...world.pilots, [pilotId]: { ...existing, name } } };
   }
   const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS, storage: {} };
-  return issueStarterShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilot);
-}
-
-/**
- * Give a pilot whose ship was destroyed a fresh starter ship at the
- * starter station. Does nothing if the pilot still has a ship. This is a
- * pilot command, not a ship input: over a network it is a request the
- * client sends once.
- */
-export function respawnPilot(world: World, pilotId: string): World {
-  const pilot = world.pilots[pilotId];
-  if (!pilot || pilot.shipId) return world;
-  return issueStarterShip(world, pilot);
+  // New pilots arrive in space just off Harbour, facing it, so the first
+  // thing they do is fly and dock.
+  return issueShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilotId, STARTER_LOADOUT_ID, STARTER_STATION_ID, true).world;
 }
 
 /** The ship a pilot is currently flying, or null. */

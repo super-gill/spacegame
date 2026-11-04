@@ -50,20 +50,29 @@ describe('docking', () => {
     };
 
     const docked = step(w, { toggleDock: true });
-    expect(docked.events[0]).toEqual({ type: 'docked', shipId: SHIP, stationId: station.id });
+    // The Courier is size S: the smallest free pad that fits is Harbour's first S pad.
+    expect(docked.events[0]).toEqual({ type: 'docked', shipId: SHIP, stationId: station.id, padId: 's1' });
+    const pad = station.pads.find((p) => p.id === 's1')!;
+    const padAt = { x: station.position.x + pad.position.x, y: station.position.y + pad.position.y };
     expect(ship(docked).state).toBe('docked');
-    expect(ship(docked).position).toEqual(station.position);
+    expect(ship(docked).padId).toBe('s1');
+    expect(ship(docked).position).toEqual(padAt);
+    expect(ship(docked).heading).toBe(pad.facing);
 
     // Thrust while docked does nothing.
     const still = step(docked, { thrustForward: true });
-    expect(ship(still).position).toEqual(station.position);
+    expect(ship(still).position).toEqual(padAt);
 
     const undocked = step(still, { toggleDock: true });
     expect(undocked.events[0]).toEqual({ type: 'undocked', shipId: SHIP, stationId: station.id });
     const s = ship(undocked);
     expect(s.state).toBe('flying');
-    expect(s.position.x).toBeGreaterThan(station.position.x + station.radius);
-    expect(s.velocity.x).toBeGreaterThan(0);
+    expect(s.padId).toBeNull();
+    // Launched out along the pad's facing, clear of the hull.
+    const out = { x: Math.cos(pad.facing), y: Math.sin(pad.facing) };
+    const dist = Math.hypot(s.position.x - station.position.x, s.position.y - station.position.y);
+    expect(dist).toBeGreaterThan(station.radius + 18);
+    expect(s.velocity.x * out.x + s.velocity.y * out.y).toBeGreaterThan(0);
   });
 
   it('is pure: the input world is not mutated', () => {

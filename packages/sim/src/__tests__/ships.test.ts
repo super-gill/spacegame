@@ -401,7 +401,7 @@ describe('ships in the world', () => {
     const w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const { storage: _storage, ...pilot } = w.pilots['ana']!;
     const v2 = JSON.stringify({ format: SAVE_FORMAT, version: 2, savedAt: '', world: { ...w, pilots: { ana: pilot } } });
-    expect(SAVE_VERSION).toBe(3);
+    expect(SAVE_VERSION).toBeGreaterThan(2); // migrates through every version since
     const r = deserializeWorld(v2);
     expect(r.ok && r.world.pilots['ana']).toEqual(w.pilots['ana']);
   });

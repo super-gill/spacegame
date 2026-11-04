@@ -165,7 +165,7 @@ describe('projectiles', () => {
   });
 
   it('is absorbed by a station in the way', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false };
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
     expect(r.damage).toEqual([]);
     expect(r.projectiles).toEqual([]);
@@ -231,7 +231,7 @@ describe('ramming', () => {
   });
 
   it('hitting a station hard hurts; touching it does not', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {}, outfitting: false };
+    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
     const hard = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -200, y: 0 } }), sparrow, { st });
     const soft = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -IMPACT_SAFE_DELTA_V / 2, y: 0 } }), sparrow, { st });
     expect(hard.damage[0]!.amount).toBeGreaterThan(0);
@@ -242,23 +242,27 @@ describe('ramming', () => {
 describe('destruction, loot and respawn', () => {
   function destroyMe(w: World, me: string): World {
     return stepWorld({ ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, shield: 0, structure: 0.01 } }, projectiles: [
-      { id: 'px', ownerShipId: 'nobody', position: { x: w.ships[me]!.position.x, y: w.ships[me]!.position.y - 30 }, velocity: { x: 0, y: 900 }, damage: 50, ticksLeft: 10 },
+      { id: 'px', ownerShipId: 'nobody', position: { x: w.ships[me]!.position.x, y: w.ships[me]!.position.y - 10 }, velocity: { x: 0, y: 900 }, damage: 50, ticksLeft: 10 },
     ] }, {});
   }
 
-  it('a destroyed ship leaves a wreck and scrap, and its pilot is left shipless', () => {
+  it('a destroyed ship leaves a wreck and scrap, and its pilot gets away in a pod', () => {
     const { w, me } = quietWorld();
     const next = destroyMe(w, me);
     expect(next.ships[me]).toBeUndefined();
-    expect(next.pilots['ana']!.shipId).toBeNull();
+    const pod = pilotShip(next, 'ana')!;
+    expect(pod.hullId).toBe('escape-pod');
     expect(next.wrecks).toHaveLength(1);
     expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(starter.mass * 0.5));
     expect(next.events).toContainEqual({ type: 'destroyed', shipId: me, by: 'nobody' });
   });
 
-  it('respawning gives the pilot a fresh ship with a new id', () => {
+  it('losing the pod too and waking gives the pilot a fresh starter with a new id', () => {
     const { w, me } = quietWorld();
-    const dead = destroyMe(w, me);
+    const inPod = destroyMe(w, me);
+    expect(respawnPilot(inPod, 'ana')).toBe(inPod); // still has a ship (the pod): no change
+    const dead = destroyMe(inPod, pilotShip(inPod, 'ana')!.id);
+    expect(dead.pilots['ana']!.shipId).toBeNull();
     const back = respawnPilot(dead, 'ana');
     const s = pilotShip(back, 'ana')!;
     expect(s.id).not.toBe(me);

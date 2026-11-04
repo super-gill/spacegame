@@ -144,8 +144,19 @@ export interface HullSpec {
   maxTurnRate: number;
   mounts: MountPoint[];
   bonuses: HullBonus[];
-  /** A sealed hull cannot be refitted (the Sparrow dev ship). */
+  /** A sealed hull cannot be refitted or bought (the Sparrow dev ship, escape pods). */
   sealed?: boolean;
+  /**
+   * Price of the bare frame at a ship mart, credits. A ship's price is
+   * this plus the price of every module fitted.
+   */
+  price: number;
+  /**
+   * An escape pod: what a pilot is ejected in when the ship they fly is
+   * destroyed. Pods are never property; owning only a pod counts as
+   * owning no ship.
+   */
+  escapePod?: boolean;
 }
 
 /** A named fit for a hull. NPC spawners and new pilots are built from these. */
@@ -346,7 +357,11 @@ export interface Ship {
    * cargo. Changed only while docked at outfitting.
    */
   fit: Record<string, string>;
-  /** Pilot who owns this ship, or null for NPC and unowned ships. */
+  /**
+   * Pilot who owns this ship, or null for NPC and unowned ships. Owning is
+   * not flying: who is aboard is `Pilot.shipId` (see ownership.ts). An
+   * owned ship nobody is flying is empty.
+   */
   ownerId: string | null;
   position: Vec2;
   velocity: Vec2;
@@ -357,6 +372,8 @@ export interface Ship {
   state: ShipState;
   /** Station id when docked, otherwise null. */
   dockedAt: string | null;
+  /** The pad at `dockedAt` the ship sits on, or null when not docked. */
+  padId: string | null;
   flightMode: FlightMode;
   /** What the thrusters did on the last tick. All zero when idle or docked. */
   thrusters: Thrusters;
@@ -392,6 +409,30 @@ export interface Station {
   market: Record<string, MarketEntry>;
   /** Ships docked here can be refitted. */
   outfitting: boolean;
+  /**
+   * Landing pads. A docking ship takes the smallest free pad its hull's
+   * size class fits; with none free it is refused. Docked ships, flown or
+   * empty, sit on their pads, so pads also limit how many ships can be
+   * parked here.
+   */
+  pads: Pad[];
+  /** Loadout ids this station's ship mart sells, unlimited for now. Empty: no ship mart. */
+  shipMart: string[];
+}
+
+/**
+ * A landing pad on a station. Stations do not turn, so a pad's position
+ * and facing are fixed in the world once the station is placed.
+ */
+export interface Pad {
+  /** Unique within the station, e.g. `s1`. Ships record it in `padId`. */
+  id: string;
+  /** Largest hull size class that fits. Smaller hulls fit too. */
+  size: ModuleSize;
+  /** Offset of the pad centre from the station centre, world units. */
+  position: Vec2;
+  /** Heading of a ship sitting on the pad, radians. Ships launch this way. */
+  facing: number;
 }
 
 /**
@@ -407,7 +448,11 @@ export interface Pilot {
   /** Stable identity, chosen by the client and kept between sessions. */
   id: string;
   name: string;
-  /** The ship this pilot is currently flying, or null if they have none (destroyed). */
+  /**
+   * The ship this pilot is aboard and flying, or null between losing an
+   * escape pod and waking at Harbour. A pilot flies at most one ship and
+   * may own many; ownership is `Ship.ownerId`.
+   */
   shipId: string | null;
   /** How many ships this pilot has been issued, for unique ship ids. */
   shipsIssued: number;
@@ -524,9 +569,23 @@ export interface World {
 export type DamageCause = 'weapon' | 'ram' | 'station';
 
 export type WorldEvent =
-  | { type: 'docked'; shipId: string; stationId: string }
+  | { type: 'docked'; shipId: string; stationId: string; padId: string }
   | { type: 'undocked'; shipId: string; stationId: string }
-  | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' }
+  /** `noPad`: in range and slow enough, but no free pad fits the hull. */
+  | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' | 'noPad' }
+  /** A pilot bought a ship. `shipId` is the new ship, empty and docked at `stationId`. */
+  | { type: 'shipBought'; shipId: string; stationId: string; loadoutId: string; price: number }
+  /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */
+  | { type: 'boarded'; shipId: string; from: string }
+  /** The ship a pilot was flying was destroyed and they got away in the pod `shipId`. */
+  | { type: 'podEjected'; shipId: string; from: string }
+  /**
+   * A pilot with no ship woke at a station, aboard `shipId`: a pod if they
+   * own a ship somewhere, a free starter if they own none.
+   */
+  | { type: 'pilotWoke'; shipId: string; stationId: string }
+  /** A pilot in a pod who owned no ship took the free starter `shipId`; the pod is gone. */
+  | { type: 'starterClaimed'; shipId: string; stationId: string }
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
   | { type: 'weaponsHotChanged'; shipId: string; hot: boolean }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */

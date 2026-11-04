@@ -27,6 +27,7 @@ function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship 
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    padId: null,
     ownerId: null,
     flightMode: mode,
     thrusters: idleThrusters(),

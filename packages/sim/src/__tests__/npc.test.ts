@@ -38,6 +38,7 @@ function freeShip(hullId: string, overrides: Partial<Ship> = {}): Ship {
     angularVelocity: 0,
     state: 'flying',
     dockedAt: null,
+    padId: null,
     flightMode: 'rotation',
     thrusters: idleThrusters(),
     ...TEST_SHIP_COMBAT,

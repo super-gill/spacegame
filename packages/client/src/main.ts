@@ -11,7 +11,7 @@ import {
   leadPoint,
   nearestDockableStation,
   pilotShip,
-  respawnPilot,
+  wakePilot,
   flightWarnings,
   shipStats,
   stepWorld,
@@ -48,7 +48,7 @@ import {
   type ShipStyle,
 } from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
-import { Ui } from './ui.js';
+import { Ui, shipLabel } from './ui.js';
 
 /**
  * Game loop.
@@ -224,9 +224,12 @@ function myShip(world: World): Ship | null {
 let lastSeen: Vec2 = myShip(current)!.position;
 camera.snapTo(lastSeen);
 
-/** Pilot command: take a new ship after losing one. */
+/** Pilot command: wake at Harbour after losing your escape pod. */
 function respawn(): void {
-  current = respawnPilot(current, me.id);
+  const woke = wakePilot(current, me.id);
+  if (!woke.ok) return;
+  current = woke.world;
+  ui.notify(woke.world.ships[woke.event.shipId]?.hullId === 'escape-pod' ? 'You wake at Harbour in a new escape pod. Your ships are where you left them.' : 'You wake at Harbour with a free Meridian Courier.');
   previous = current;
   const ship = myShip(current);
   if (ship) camera.snapTo(ship.position);
@@ -367,8 +370,8 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
-  const owner = ship.ownerId ? world.pilots[ship.ownerId] : undefined;
-  return owner ? { colour: COLOUR.ink, label: owner.name.toUpperCase() } : { colour: COLOUR.ink };
+  const label = shipLabel(world, ship);
+  return label === 'UNKNOWN' ? { colour: COLOUR.ink } : { colour: COLOUR.ink, label };
 }
 
 function render(alpha: number, frameSeconds: number, nowMs: number): void {

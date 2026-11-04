@@ -1,5 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { leadPoint } from '../combat.js';
+import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
@@ -54,6 +55,11 @@ export const PIRATE_TUNING = {
   aimTolerance: 0.05,
   /** Fire only when the target is within this fraction of weapon range. */
   rangeFraction: 0.9,
+  /**
+   * Whether pirates hunt escape pods. Off until Jason decides: a pod has
+   * no cargo, so hunting one is cruelty rather than piracy.
+   */
+  huntPods: false as boolean,
   /** Break off when structure falls below this fraction of the hull's maximum. */
   fleeStructureFraction: 0.25,
   /**
@@ -83,6 +89,16 @@ function switchMode(brain: PirateBrain, mode: PirateMode, extra: Partial<PirateB
   return { ...brain, mode, modeTicks: 0, ...extra };
 }
 
+/**
+ * Pirates hunt people, not property: a ship nobody is flying is left
+ * alone (it can still be shot if it gets in the way). Escape pods are
+ * hunted only if `PIRATE_TUNING.huntPods` says so.
+ */
+function worthHunting(world: World, ship: Ship): boolean {
+  if (isEmptyShip(world, ship)) return false;
+  return PIRATE_TUNING.huntPods || !isEscapePod(world, ship);
+}
+
 /** Nearest ship worth hunting, or null. Ties break on id so the choice is deterministic. */
 function findTarget(world: World, self: Ship): Ship | null {
   let best: Ship | null = null;
@@ -90,6 +106,7 @@ function findTarget(world: World, self: Ship): Ship | null {
   for (const other of Object.values(world.ships)) {
     if (other.id === self.id || other.state !== 'flying') continue;
     if (world.npcs[other.id]?.kind === 'pirate') continue;
+    if (!worthHunting(world, other)) continue;
     if (inSecurityZone(world, other.position, PIRATE_TUNING.zoneCaution)) continue;
     const d = distance(self.position, other.position);
     if (d > PIRATE_TUNING.detectRange) continue;
@@ -104,6 +121,7 @@ function findTarget(world: World, self: Ship): Ship | null {
 /** True if a ship is a fair target to start or keep hunting. */
 function huntable(world: World, self: Ship, target: Ship | undefined): target is Ship {
   if (!target || target.state !== 'flying' || target.id === self.id) return false;
+  if (!worthHunting(world, target)) return false;
   if (inSecurityZone(world, target.position, PIRATE_TUNING.zoneCaution)) return false;
   return distance(self.position, target.position) <= PIRATE_TUNING.loseRange;
 }
@@ -112,6 +130,7 @@ function huntable(world: World, self: Ship, target: Ship | undefined): target is
 function huntOver(world: World, self: Ship, stats: ShipStats, target: Ship | undefined, brain: PirateBrain): boolean {
   if (self.structure < stats.structure * PIRATE_TUNING.fleeStructureFraction) return true;
   if (!target || target.state !== 'flying') return true;
+  if (!worthHunting(world, target)) return true;
   if (inSecurityZone(world, target.position, PIRATE_TUNING.zoneCaution)) return true;
   if (distance(self.position, target.position) > PIRATE_TUNING.loseRange) return true;
   return brain.modeTicks * world.dt > PIRATE_TUNING.maxHuntSeconds;
