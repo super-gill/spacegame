@@ -97,7 +97,29 @@ export type Resistances = Partial<Record<DamageType, number>>;
  * carry bonuses to one. `pointDefence` is the swivels: multi-role
  * turreted guns, worse than a fixed gun of their size at everything.
  */
-export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence' | 'countermeasure';
+export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence' | 'countermeasure' | 'mining';
+
+/**
+ * How valuable an ore is, broadly (docs/mining.md, "Ores"). A survey
+ * scanner reports a rock by the best tier it holds.
+ */
+export type OreTier = 'common' | 'middling' | 'valuable' | 'rare';
+
+/**
+ * An ore good: how it turns up in rocks. The ore catalogue is just the
+ * goods with this block, so a new ore is a new good and nothing else:
+ * rocks made from then on can hold it.
+ * - `chance`: of a rock at least `minRadius` across holding any.
+ * - `share`: of such a rock's ore that is this one, 0 to 1. A rock's
+ *   common ore makes up whatever the others leave.
+ * Common ores have chance 1 and share 0: every rock is mostly common ore.
+ */
+export interface OreSpec {
+  tier: OreTier;
+  chance: number;
+  share: number;
+  minRadius: number;
+}
 
 /** How a munition finds its target (docs/weapons.md, "Missiles and torpedoes"). */
 export type Guidance = 'radar' | 'heat';
@@ -176,7 +198,13 @@ export type ModuleStat =
   /** Afterburner: extra main thrust while lit, as a share of main thrust. */
   | 'afterburnerThrust'
   /** Afterburner: capacitor burnt per second while lit. */
-  | 'afterburnerDraw';
+  | 'afterburnerDraw'
+  /** Survey scanner: how far a pulse reaches, units. */
+  | 'surveyRange'
+  /** Survey scanner: capacitor spent per pulse. */
+  | 'surveyCost'
+  /** Survey scanner: 1 tells rich rocks from common ones; 2 names the best tier a rock holds. */
+  | 'surveyGrade';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -195,7 +223,8 @@ export type ModuleKind =
   | 'podBay'
   | 'fireControl'
   | 'tractor'
-  | 'afterburner';
+  | 'afterburner'
+  | 'surveyScanner';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -208,7 +237,7 @@ export type ModuleKind =
  * - `condition`: coarse state: shields up or down, hull sound, damaged or critical.
  * - `combat`: exact shield and structure, fitted weapons and damage per second.
  * - `cargo`: what is in the hold and how full it is.
- * - `composition`: what a rock is made of (milestone 9; nothing provides it yet).
+ * - `composition`: what a locked rock is made of, and how hard it is (a mining computer).
  */
 export type ReadoutKind = 'identity' | 'motion' | 'condition' | 'combat' | 'cargo' | 'composition';
 
@@ -383,6 +412,10 @@ export interface ShipStats {
   afterburnerSpeed: number;
   afterburnerThrust: number;
   afterburnerDraw: number;
+  /** Survey scanner: reach, capacitor per pulse, and grade (0 with none). */
+  surveyRange: number;
+  surveyCost: number;
+  surveyGrade: number;
   shieldRegenDelay: number;
   structure: number;
   cargoCapacity: number;
@@ -443,6 +476,8 @@ export interface GoodSpec {
   munition?: MunitionSpec;
   /** Chaff, flares and decoys: what a dropped charge does. Present only on countermeasure goods. */
   decoy?: DecoySpec;
+  /** Ores only: how it turns up in rocks (docs/mining.md). */
+  ore?: OreSpec;
 }
 
 /**
@@ -499,6 +534,14 @@ export interface WeaponSpec {
   range: number;
   /** Turrets only: how fast the turret slews, rad/s. */
   turretTurnRate: number;
+  /**
+   * Mining lasers only (family `mining`, docs/mining.md). A beam along the
+   * nose while the trigger is held, out to `range`: it cuts a rock no
+   * harder than `strength` (0 to 1), freeing `damage` units of ore a
+   * second, and draws `capacitorPerShot` from the capacitor every second.
+   * It does nothing to ships.
+   */
+  mining?: { strength: number };
 }
 
 /** A fitted weapon's live state, one per weapon module in the fit. */
@@ -708,6 +751,14 @@ export interface Ship {
   switchedOn?: string[];
   /** True on ticks the afterburner is lit. Absent: not lit. */
   afterburning?: boolean;
+  /**
+   * Mining lasers running this tick, for drawing: each beam's mount, how
+   * long it reached, the rock it touched (null: none in range) and
+   * whether it is cutting (false: the rock is too hard). Absent: none.
+   */
+  beams?: MiningBeam[];
+  /** The last survey pulse, which the HUD shows for a few seconds (docs/mining.md). Absent: none yet. */
+  survey?: SurveyResult;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
   /**
@@ -852,6 +903,51 @@ export interface Asteroid {
   orbit: Orbit;
   /** Units. */
   radius: number;
+  /**
+   * What it holds: ore good id to whole units left (docs/mining.md). A
+   * rock with nothing left crumbles away.
+   */
+  contents: Record<string, number>;
+  /** How hard it is to cut, 0 to 1: a mining laser needs at least this strength. Big rocks are harder. */
+  hardness: number;
+  /** Ore cut free but not yet released as a canister, units. Absent: none. */
+  cut?: number;
+  /** The field it belongs to, which tops it back up (`ROCK_FIELDS`). */
+  field: string;
+}
+
+/** A mining laser running this tick (`Ship.beams`). */
+export interface MiningBeam {
+  mountId: string;
+  /** World bearing, radians. */
+  bearing: number;
+  /** How far the beam reached, units from the ship's centre. */
+  length: number;
+  rockId: string | null;
+  cutting: boolean;
+}
+
+/** What a survey pulse found: each rock in reach that is worth reporting, and what the scanner could tell. */
+export interface SurveyResult {
+  /** Tick of the pulse. */
+  tick: number;
+  /** Where the ship was. */
+  origin: Vec2;
+  range: number;
+  /**
+   * Rocks found, by id, with what the scanner says: `common` for plain
+   * rock, `rich` for something better (a grade-1 scanner), or the best
+   * tier it holds (grade 2).
+   */
+  rocks: { id: string; reading: OreTier | 'rich' }[];
+}
+
+/** Belt respawn bookkeeping (asteroids.ts `stepRockfall`). */
+export interface Rockfall {
+  /** Rocks made since the world began, for unique ids and seeds. */
+  made: number;
+  /** Ticks until the next check. */
+  timerTicks: number;
 }
 
 /**
@@ -1084,8 +1180,10 @@ export interface World {
   stations: Record<string, Station>;
   /** The system's natural bodies, by id. Data, kept as saved. Empty in a flat sector. */
   bodies: Record<string, Body>;
-  /** The belts' rocks. Generated once from a seed when the world is made, then kept as saved. */
+  /** The belts' rocks. Generated once from a seed when the world is made, then mined, crumbled and topped up. */
   asteroids: Asteroid[];
+  /** Belt respawn state. Absent: none made yet. */
+  rockfall?: Rockfall;
   hulls: Record<string, HullSpec>;
   modules: Record<string, ModuleSpec>;
   loadouts: Record<string, Loadout>;
@@ -1175,6 +1273,16 @@ export type WorldEvent =
   /** A ship was destroyed. `by` is the ship responsible, or null. */
   | { type: 'destroyed'; shipId: string; by: string | null }
   | { type: 'lootCollected'; shipId: string; item: string; amount: number }
+  /** A survey pulse went out and found `found` rocks worth reporting. */
+  | { type: 'surveyed'; shipId: string; found: number }
+  /** A survey pulse could not go: the capacitor cannot pay, or the scanner is still cycling. */
+  | { type: 'surveyRefused'; shipId: string; reason: 'capacitor' | 'cycling' }
+  /** A mining laser touched a rock too hard for it. Once per rock per run of the beam. */
+  | { type: 'miningTooHard'; shipId: string; rockId: string }
+  /** A mining laser freed a canister of ore. */
+  | { type: 'oreFreed'; shipId: string; rockId: string; item: string; amount: number }
+  /** A rock was mined out and crumbled; `shipId` mined the last of it. */
+  | { type: 'rockCrumbled'; shipId: string; rockId: string }
   /** A trade completed while docked. `unitPrice` is per unit, in credits. */
   | { type: 'traded'; shipId: string; good: string; quantity: number; unitPrice: number; side: 'buy' | 'sell' }
   /** An NPC left the sector (no wreck). Its spawner will replace it later. */

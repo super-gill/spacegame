@@ -1,3 +1,4 @@
+import { oreLeft, rockAt } from './asteroids.js';
 import { LOCK_BASE_SECONDS, LOCK_REFERENCE_SIGNATURE } from './constants.js';
 import { isEmptyShip } from './ownership.js';
 import { shipStats } from './stats.js';
@@ -36,6 +37,10 @@ import { isGun, weaponDps } from './weapons.js';
  *   `WeaponState.lockTarget` (assigned from 6e); fixed guns stay on the
  *   nose and need no lock.
  *
+ * - Rocks can be locked too (docs/mining.md), by their id: a lock on a
+ *   rock is how a mining computer reads it. Guns and launchers never
+ *   engage a rock; `weaponTarget` returns ships only.
+ *
  * Like everything else, locks change only through `ShipInput`: `lock`,
  * `unlock` and `activateLock`. NPCs lock the same way, and take as long.
  */
@@ -55,11 +60,23 @@ export function isLocked(ship: Ship, targetId: string): boolean {
   return ship.locks.some((l) => l.targetId === targetId && l.progress >= 1);
 }
 
-/** Why `ship` could not start locking `targetId` right now, or null if it could. */
-export function lockRefusal(world: Pick<World, 'ships' | 'hulls' | 'modules' | 'weapons' | 'goods'>, ship: Ship, targetId: string): LockRefusal | null {
-  if (ship.state !== 'flying') return 'docked';
+/** What a lock can point at: the world's ships and rocks. */
+type LockWorld = Pick<World, 'ships' | 'hulls' | 'modules' | 'weapons' | 'goods' | 'asteroids' | 'bodies' | 'tick' | 'dt'>;
+
+/** Where a lockable thing is and how big it looks to sensors, or null if `targetId` is neither a flying ship nor a rock. */
+function lockable(world: LockWorld, targetId: string): { position: Vec2; signature: number } | null {
   const target = world.ships[targetId];
-  if (!target || target.id === ship.id || target.state !== 'flying') return 'invalid';
+  if (target) return target.state === 'flying' ? { position: target.position, signature: world.hulls[target.hullId]?.signature ?? LOCK_REFERENCE_SIGNATURE } : null;
+  const rock = world.asteroids ? rockAt(world, targetId) : null;
+  // A rock's signature is its size: big rocks lock almost at once.
+  return rock ? { position: rock.position, signature: rock.rock.radius } : null;
+}
+
+/** Why `ship` could not start locking `targetId` right now, or null if it could. */
+export function lockRefusal(world: LockWorld, ship: Ship, targetId: string): LockRefusal | null {
+  if (ship.state !== 'flying') return 'docked';
+  const target = targetId === ship.id ? null : lockable(world, targetId);
+  if (!target) return 'invalid';
   if (ship.locks.some((l) => l.targetId === targetId)) return 'already';
   const stats = shipStats(world, ship);
   if (stats.maxLocks <= 0) return 'noComputer';
@@ -69,10 +86,10 @@ export function lockRefusal(world: Pick<World, 'ships' | 'hulls' | 'modules' | '
 }
 
 /** Why an existing lock must go now, or null if it holds. */
-function lossReason(world: Pick<World, 'ships'>, ship: Ship, stats: ShipStats, lock: TargetLock): LockLossReason | null {
+function lossReason(world: LockWorld, ship: Ship, stats: ShipStats, lock: TargetLock): LockLossReason | null {
   if (ship.state !== 'flying') return 'docked';
-  const target = world.ships[lock.targetId];
-  if (!target || target.state !== 'flying') return 'targetGone';
+  const target = lockable(world, lock.targetId);
+  if (!target) return 'targetGone';
   if (distance(ship.position, target.position) > stats.sensorRange) return 'outOfRange';
   return null;
 }
@@ -89,7 +106,7 @@ export interface LockStep {
  * activate, so a click can lock and activate in one tick.
  */
 export function stepLocks(
-  world: Pick<World, 'ships' | 'hulls' | 'modules' | 'weapons' | 'goods' | 'dt'>,
+  world: LockWorld,
   ship: Ship,
   stats: ShipStats,
   input: Pick<ShipInput, 'lock' | 'unlock' | 'activateLock'>,
@@ -125,8 +142,7 @@ export function stepLocks(
       kept.push(lock);
       continue;
     }
-    const target = world.ships[lock.targetId]!;
-    const signature = world.hulls[target.hullId]?.signature ?? LOCK_REFERENCE_SIGNATURE;
+    const signature = lockable(world, lock.targetId)!.signature;
     const progress = Math.min(1, lock.progress + world.dt / lockSeconds(stats, signature));
     if (progress >= 1) events.push({ type: 'locked', shipId: ship.id, targetId: lock.targetId });
     kept.push({ ...lock, progress });
@@ -195,6 +211,17 @@ export interface LockReadout {
     used: number;
     capacity: number;
   };
+  /**
+   * A locked rock, read by a mining computer: the ore it holds by good id
+   * (whole units), how much in all, how hard it is (0 to 1; a laser needs
+   * that strength) and its size.
+   */
+  composition?: {
+    ores: Record<string, number>;
+    total: number;
+    hardness: number;
+    radius: number;
+  };
 }
 
 /** Hull above this fraction of its structure reads as sound; above CRITICAL_FRACTION, damaged. */
@@ -204,6 +231,23 @@ const CRITICAL_FRACTION = 0.33;
 /** The readout for `ship`'s complete lock on `targetId`, or null if it holds no complete lock on it. */
 export function lockReadout(world: World, ship: Ship, targetId: string): LockReadout | null {
   if (!isLocked(ship, targetId)) return null;
+  const rock = world.ships[targetId] ? null : rockAt(world, targetId);
+  if (rock) {
+    // A rock: where it is, and with a mining computer, what it holds.
+    const mine = shipStats(world, ship);
+    const out: LockReadout = { targetId };
+    if (mine.readouts.includes('motion')) {
+      const gap = sub(rock.position, ship.position);
+      const range = length(gap);
+      const relativeVelocity = sub(rock.velocity, ship.velocity);
+      const closingSpeed = range > 0 ? -(gap.x * relativeVelocity.x + gap.y * relativeVelocity.y) / range : 0;
+      out.motion = { range, closingSpeed, relativeVelocity };
+    }
+    if (mine.readouts.includes('composition')) {
+      out.composition = { ores: { ...rock.rock.contents }, total: oreLeft(rock.rock), hardness: rock.rock.hardness, radius: rock.rock.radius };
+    }
+    return out;
+  }
   const target = world.ships[targetId];
   const hull = target ? world.hulls[target.hullId] : undefined;
   if (!target || !hull) return null;

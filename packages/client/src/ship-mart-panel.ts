@@ -1,4 +1,4 @@
-import { buyRefusal, fitStats, occupiedPads, shipPrice, weaponDps, type BuyRefusal, type World } from '@spacegame/sim';
+import { buyRefusal, fitStats, isGun, occupiedPads, shipPrice, weaponDps, type BuyRefusal, type World } from '@spacegame/sim';
 import { shipThumb } from './render/ship-thumb.js';
 
 /**
@@ -97,7 +97,7 @@ export class ShipMartPanel {
       const hull = loadout ? world.hulls[loadout.hullId] : undefined;
       if (!loadout || !hull) return;
       const stats = fitStats(world, hull, loadout.fit);
-      const dps = Object.values(stats.weapons).reduce((sum, w) => sum + weaponDps(w), 0);
+      const dps = Object.values(stats.weapons).filter(isGun).reduce((sum, w) => sum + weaponDps(w), 0);
       const refusal = refusals[i] ?? null;
 
       const row = el('tr');

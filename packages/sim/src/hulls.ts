@@ -188,6 +188,55 @@ export const HULLS: Record<string, HullSpec> = {
     ],
   },
 
+  'rookrivet-prospector': {
+    // Rook and Rivet prospector (docs/mining.md; name provisional, a lore
+    // ask): the Collective's belt cutter. A survey scanner, an assay
+    // computer and a light mining laser; a small hold, so it finds rock and
+    // picks the easy ones, or scouts for a hulk. A swivel for company.
+    id: 'rookrivet-prospector',
+    name: 'Rook and Rivet Prospector',
+    race: 'freeBelt',
+    manufacturer: 'rookRivet',
+    role: 'civilian',
+    sizeClass: 'S',
+    mass: 6,
+    structure: 200,
+    price: 2600,
+    radius: 19,
+    outline: outline([[17, 0], [12, -9], [2, -11], [-14, -9], [-17, -4], [-17, 4], [-14, 9], [2, 11], [12, 9]]),
+    maxSpeed: 300,
+    maxTurnRate: 2.2,
+    signature: 20,
+    class: 'cutter',
+    // A deeper pool than the Tern's: lasers and pulses run on it.
+    capacitor: 110,
+    capacitorRecharge: 7,
+    mounts: [
+      mount('n1', 'nav', 'S', -1, 0, ['power']),
+      mount('r1', 'radar', 'S', 8, -3, ['power']),
+      mount('t1', 'computer', 'S', 8, 3, ['power']),
+      mount('f1', 'flight', 'S', 4, -6, ['power']),
+      mount('x1', 'fireControl', 'S', 4, 6, ['power']),
+      mount('p1', 'podBay', 'S', -12, -6, []),
+      // Cutter budget: 2 weapon, 2 utility, 3 internal, 1 bay.
+      mount('w1', 'weapon', 'S', 15, 0, ['power']),
+      gunMount('w2', 'S', 0, 0, ['power'], FORWARD, BROAD_ARC),
+      mount('e1', 'engine', 'S', -17, 0, ['power'], AFT),
+      mount('c1', 'core', 'S', -8, -4, ['power']),
+      mount('c2', 'core', 'S', -8, 4, ['power']),
+      mount('i1', 'internal', 'S', -13, 0, ['power']),
+      mount('i2', 'internal', 'S', -4, -5, ['power']),
+      mount('i3', 'internal', 'S', -4, 5, ['power']),
+      mount('u1', 'utility', 'S', -3, -11, ['power']),
+      mount('u2', 'utility', 'S', -3, 11, ['power']),
+      mount('b1', 'bay', 'S', -12, 6, []),
+    ],
+    bonuses: [
+      { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' },
+      { source: 'role', label: '+25% cargo from full-size pods', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
+    ],
+  },
+
   'aurel-tacet': {
     // Development and test ship: a living Aurel ship whose voice has never
     // sung to anyone (docs/lore.md, "Names"). Complete, sealed, outside

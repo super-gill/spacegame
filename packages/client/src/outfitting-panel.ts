@@ -112,6 +112,7 @@ const WEAPON_NAMES: Record<string, string> = {
   railgun: 'Railgun',
   'missile-launcher': 'Missile launcher',
   'torpedo-tube': 'Torpedo tube',
+  'mining-laser': 'Mining laser',
 };
 
 const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = {
@@ -130,6 +131,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   fireControl: 'Fire control',
   tractor: 'Tractor beam',
   afterburner: 'Afterburner',
+  surveyScanner: 'Survey scanner',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -156,12 +158,16 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.escapePod) parts.push('an escape pod: without one, losing the ship leaves you with nothing');
   if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
   if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
+  if (s.surveyRange) parts.push(`survey pulse ${s.surveyRange} u for ${s.surveyCost ?? 0} cap: ${(s.surveyGrade ?? 0) >= 2 ? 'names the best ore in each rock' : 'tells rich rock from plain'}`);
+  if (m.readouts?.includes('composition')) parts.push('reads what a locked rock holds and how hard it is, not guns');
   if (m.shieldRegenDelay) parts.push(`recharges ${fixed1(m.shieldRegenDelay)} s after a hit`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
   if (w && w.family === 'countermeasure') {
     // Dispensers: what they hold and what they come with.
     parts.push(`drops chaff, flares or decoys, holds ${w.magazine}, one every ${fixed1(w.fireInterval)} s`);
     if (m.startsLoadedWith) parts.push(`comes loaded with ${world.goods[m.startsLoadedWith]?.name ?? m.startsLoadedWith}`);
+  } else if (w && w.family === 'mining') {
+    parts.push(`cuts rock up to ${Math.round((w.mining?.strength ?? 0) * 100)}% hard, ${fixed1(w.damage)} ore/s, range ${Math.round(w.range)}, ${fixed1(w.capacitorPerShot)} cap/s`);
   } else if (w && w.family === 'missile') {
     parts.push(`${Math.round(w.damage)} warhead base, one every ${fixed1(w.fireInterval)} s, needs a lock`);
     parts.push(`loads ${w.ammo === 'torpedo' ? 'torpedoes' : 'missiles'}, holds ${w.magazine}`);

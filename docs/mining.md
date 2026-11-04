@@ -1,6 +1,6 @@
 # Mining (milestone 9a) and drones
 
-Mining with depth, and the drone system it introduces. Status: design for Jason's review, 4 November 2026. Built in two parts on `main` after he agrees.
+Mining with depth, and the drone system it introduces. Status: agreed design, 4 November 2026, with Jason. Built in two parts on `main`; "As built" at the end records the choices the build made.
 
 Related: [ship-systems.md](ship-systems.md) for slots and active modules; [weapons.md](weapons.md) for launchers, charges as goods and the capacitor; [system.md](system.md) for the Scree; [design.md](design.md), pillar 5, "Systems all the way down".
 
@@ -58,8 +58,26 @@ Built as a general system so later kinds slot in without rework.
 
 **Lore (lore workstream).** Ore names and what each is for; gate-glass; who builds the prospector, the hulk, the lasers, scanners and drones; mining charges.
 
-## Questions for Jason
+## Decisions (Jason, 4 November 2026)
 
-1. Full sequence only for big, rich rocks (lean), or for every rock?
-2. Charges placed and set off by their tile (lean), or fired from a launcher?
-3. Drones in part 2 (lean), or part 1?
+1. The full sequence (survey, analyse, break, cut, collect) is for big, rich rocks only; small ships work small rocks.
+2. Mining charges are placed on a rock and set off by their tile, not fired from a launcher.
+3. Drones come in part 2, built as a general system.
+4. Ores are an expandable catalogue, so more can be added later.
+5. Hulks get ore holds.
+6. Rocks respawn over time; a big hulk must really make money; drones will matter in most industries (fighters, light mining craft that strip a field from a mother ship, carriers), so the system must be easy to add to.
+
+## As built: part 1 (4 November 2026)
+
+- **Ore catalogue:** an ore is a good with an `ore` block (`OreSpec`: tier, chance, share, smallest rock). Rocks made from then on can hold any ore in the catalogue; adding one is adding a good. Four now, names other than plain ore provisional (a lore ask): Ore (common, 30), Banded ore and Black ore (middling, 60 and 75), Glintstone (valuable, 170, only in rocks of radius 35 and up). Gate-glass waits for part 2.
+- **Rocks:** each holds `contents` (ore to whole units, about radius squared over 12: 27 units at radius 18, 530 at 80), a `hardness` from 0.1 for the smallest to 0.9 for the biggest, give or take 0.08, and a `field` (`ring` 120 rocks, `ridge` 60). Mined out, a rock crumbles (`rockCrumbled`).
+- **Rockfall:** every 20 seconds each field below its count gains one rock, at least 1,500 units from any ship and clear of other rocks, seeded by how many have been made so worlds replay the same way; ids run `rock-n1`, `rock-n2` and on. New rocks keep to the belt's motion (frozen when orbits are stopped).
+- **Locking rocks:** any targeting computer can lock a rock by its id (signature is its radius, so it locks fast). `lockReadout` gives motion, and with the `composition` readout the ores, total, hardness and radius. Guns and launchers never engage a rock.
+- **Mining computer:** Rook and Rivet Assay S (computer mount; identity, motion and composition, no combat readings).
+- **Survey scanner** (utility, tile): Rook and Rivet Dowser S (1,500 units, 15 capacitor, grade 1: rich or plain) and Tessaract Deep Dowser M (2,600, 25, grade 2: names the best ore). A pulse records `Ship.survey` (rocks in reach and their readings); it cycles in 5 seconds and the HUD shows it for 8.
+- **Mining lasers** (weapon family `mining`, fire group 3 by default): a beam along the nose while the group fires, out to its range, cutting the first rock it reaches if the rock is no harder than the laser's strength. Mining laser S: strength 0.45, 1.5 ore a second, 4 capacitor a second, range 260 (Rook and Rivet Pick S). M: 0.7, 2.6, 8, 300. Freed ore comes out in canisters of 5 (the ore with most left first), drifting towards the laser; the tractor scoops them. A too-hard rock says so once (`miningTooHard`). `Ship.beams` carries what each laser is doing, for drawing. Lasers do nothing to ships.
+- **Prospector:** Rook and Rivet Prospector (cutter, Free Belt, 2,600 credits), sold at Ridge Outpost and Harbour: Assay S, Dowser S, Pick S, a swivel, a Gleaner and a 20-unit hold; +25% ore cut from full-size lasers. About 1.9 ore a second; a full hold in about 11 seconds of cutting.
+- **Prices:** Lantern Works pays best for every ore; Ridge buys cheaply (the real money is a long haul away). A prospector's hold of common ore is worth about 840 at Lantern, of glintstone about 3,800, so the survey matters.
+- **Client stopgaps (lead):** click a rock to lock it; the target card reads rock (ores, hardness, whether your laser cuts it); survey highlights outline rocks in amber (rich), gold (valuable) or cyan (rare) and the pulse ring spreads; mining beams flicker orange while cutting, dashed grey when not; tiles show SURVEY with its cycle and the laser's CUTTING or TOO HARD.
+- **Saves:** format version 7 (`migrate6to7`): existing rocks are given contents and a field, seeded from their ids. Starter stations' ship marts refresh on load, like their markets.
+- **Not yet:** NPC miners, charges, the hulk, drones, gate-glass (part 2).

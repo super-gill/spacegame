@@ -28,6 +28,7 @@ import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.j
 
 const HARBOUR = 'station-harbour';
 const RIDGE = 'station-ridge';
+const LANTERN = 'station-lantern';
 const SECOND = 60;
 
 /** Starter sector with no NPCs, and Ana in her starter in space off Harbour. */
@@ -264,7 +265,8 @@ describe('ship mart', () => {
   it('refuses with a reason', () => {
     const rich = 1_000_000;
     expect(buyRefusal(quietWorld().w, 'ana', 'meridian-starter')).toBe('notDocked');
-    expect(buyRefusal(anaDocked(RIDGE, rich).w, 'ana', 'meridian-starter')).toBe('noShipMart');
+    expect(buyRefusal(anaDocked(LANTERN, rich).w, 'ana', 'meridian-starter')).toBe('noShipMart');
+    expect(buyRefusal(anaDocked(RIDGE, rich).w, 'ana', 'meridian-starter')).toBe('notSold');
     expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'ana', 'aurel-tacet-dev')).toBe('notSold');
     expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'ana', 'escape-pod')).toBe('notSold');
     expect(buyRefusal(anaDocked(HARBOUR, 10).w, 'ana', 'meridian-starter')).toBe('credits');
@@ -585,7 +587,7 @@ describe('save version 4', () => {
     if (!r.ok) throw new Error(r.reason);
     expect(r.world.stations[HARBOUR]!.pads).toEqual(starterStations()[HARBOUR]!.pads);
     expect(r.world.stations[HARBOUR]!.shipMart).toEqual(starterStations()[HARBOUR]!.shipMart);
-    expect(r.world.stations[RIDGE]!.shipMart).toEqual([]);
+    expect(r.world.stations[RIDGE]!.shipMart).toEqual(starterStations()[RIDGE]!.shipMart);
     const docked = Object.values(r.world.ships).filter((s) => s.state === 'docked');
     expect(docked.length).toBe(4); // Ana, the two traders (one at Lantern Works) and the Watch
     for (const s of docked) expect(s.padId).not.toBeNull();

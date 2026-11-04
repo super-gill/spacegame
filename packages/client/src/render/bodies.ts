@@ -1,4 +1,4 @@
-import { asteroidPositions, bodyStates, navReadout, railTime, type Ship, type World } from '@spacegame/sim';
+import { SURVEY_SHOW_SECONDS, asteroidPositions, bodyStates, navReadout, railTime, type Ship, type SurveyResult, type World } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 
 /**
@@ -76,15 +76,40 @@ export function drawBodies(ctx: CanvasRenderingContext2D, camera: Camera, world:
 
 const ROCK_INK = 'rgba(176, 160, 132, 0.8)';
 
+/** Survey readings (docs/mining.md): how a rock is lit after a pulse. Plain rock stays as it is. */
+const SURVEY_INK: Partial<Record<SurveyResult['rocks'][number]['reading'], string>> = {
+  rich: '#e8b04a',
+  middling: '#d9a441',
+  valuable: '#ffd95e',
+  rare: '#7fe7ff',
+};
+
 /**
  * Stopgap: the belt's asteroids as rough grey outlines, each a fixed
  * lumpy shape from its id so it reads as a rock, not a circle. Only those
- * near the screen are drawn.
+ * near the screen are drawn. After a survey pulse from `ship`, rocks
+ * worth a look are outlined in the colour of their reading for
+ * `SURVEY_SHOW_SECONDS`, and the pulse's ring spreads for its first second.
+ * The interface workstream's belt art replaces this.
  */
-export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, world: World): void {
+export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, world: World, ship: Ship | null = null): void {
   const margin = 120;
+  const survey = ship?.survey;
+  const age = survey ? (world.tick - survey.tick) * world.dt : Infinity;
+  const readings = new Map<string, string>();
+  if (survey && age < SURVEY_SHOW_SECONDS) for (const r of survey.rocks) if (SURVEY_INK[r.reading]) readings.set(r.id, SURVEY_INK[r.reading]!);
+  const fade = Math.max(0, Math.min(1, (SURVEY_SHOW_SECONDS - age) / 2));
   ctx.save();
-  ctx.strokeStyle = ROCK_INK;
+  if (survey && age < 1) {
+    // The pulse going out.
+    const c = camera.worldToScreen(survey.origin);
+    ctx.strokeStyle = SURVEY_INK.rich!;
+    ctx.globalAlpha = 1 - age;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, survey.range * camera.zoom * Math.min(1, age * 1.5), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
   ctx.fillStyle = '#0b0d0f';
   ctx.lineWidth = 1;
   for (const rock of asteroidPositions(world)) {
@@ -106,7 +131,12 @@ export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, wor
     }
     ctx.closePath();
     ctx.fill();
+    const lit = readings.get(rock.id);
+    ctx.strokeStyle = lit ?? ROCK_INK;
+    ctx.lineWidth = lit ? 2 : 1;
+    ctx.globalAlpha = lit ? 0.4 + 0.6 * fade : 1;
     ctx.stroke();
+    ctx.globalAlpha = 1;
   }
   ctx.restore();
 }

@@ -26,7 +26,7 @@ const CHIP_SIL = 26;
 const NONE = '-';
 
 /** How a target reads, from its identity readout; `unknown` without one. */
-export type TargetStance = 'hostile' | 'neutral' | 'watch' | 'pilot' | 'empty' | 'unknown';
+export type TargetStance = 'hostile' | 'neutral' | 'watch' | 'pilot' | 'empty' | 'unknown' | 'rock';
 
 const FLOWN_BY_STANCE: Record<NonNullable<LockReadout['identity']>['flownBy'], TargetStance> = {
   pirate: 'hostile',
@@ -43,6 +43,7 @@ const STANCE_WORDS: Record<TargetStance, string> = {
   pilot: 'PILOT',
   empty: 'EMPTY',
   unknown: 'UNIDENTIFIED',
+  rock: 'ROCK',
 };
 
 const FLOWN_BY_WORDS: Record<NonNullable<LockReadout['identity']>['flownBy'], string> = {
@@ -141,6 +142,10 @@ export class TargetCard {
     if (!ship || !lock) return;
 
     const read = lockReadout(world, ship, lock.targetId);
+    if (isRock(world, lock.targetId)) {
+      this.showRock(world, ship, lock, read);
+      return;
+    }
     const stance = readoutStance(read);
     setAttr(this.root, 'data-stance', stance);
     setText(this.stance, lock.progress < 1 ? 'CONTACT' : STANCE_WORDS[stance]);
@@ -206,6 +211,52 @@ export class TargetCard {
   }
 
   /**
+   * A locked rock (docs/mining.md): where it is and, with a mining
+   * computer, what it holds and whether your laser can cut it.
+   */
+  private showRock(world: World, ship: Ship, lock: TargetLock, read: LockReadout | null): void {
+    setAttr(this.root, 'data-stance', 'rock');
+    setText(this.stance, lock.progress < 1 ? 'CONTACT' : 'ROCK');
+    setText(this.lockState, lock.progress < 1 ? `LOCKING ${Math.floor(lock.progress * 100)}%` : 'LOCKED');
+    const comp = read?.composition;
+    setText(this.name, comp ? `Rock, ${comp.total} units` : 'Rock');
+    setText(this.who, comp ? `Hardness ${Math.round(comp.hardness * 100)}%` : lock.progress < 1 ? 'Locking…' : 'No composition reading');
+    if (this.hullId !== 'rock') {
+      this.hullId = 'rock';
+      setAttr(this.outline, 'points', rockPoints(SIL_RING * 0.8));
+    }
+    setAttr(this.shieldRing, 'd', '');
+    this.shieldTrack.classList.add('invisible');
+    this.hullTrack.classList.add('invisible');
+    setText(this.shieldValue, NONE);
+    setText(this.hullValue, NONE);
+    this.hullValue.classList.remove('critical');
+    const motion = read?.motion;
+    setText(this.range, motion ? Math.round(motion.range).toLocaleString('en-GB') : NONE);
+    const close = motion ? Math.round(motion.closingSpeed) : 0;
+    setText(this.closing, motion ? `${close > 0 ? '+' : ''}${close} u/s` : NONE);
+    show(this.armed, Boolean(comp));
+    if (comp) {
+      // Can any fitted mining laser cut it?
+      const strength = Math.max(0, ...Object.values(shipStats(world, ship).weapons).map((w) => w.mining?.strength ?? 0));
+      setText(this.armed, strength <= 0 ? 'NO MINING LASER FITTED' : strength >= comp.hardness ? `YOUR LASER CUTS IT (${Math.round(strength * 100)}%)` : `TOO HARD FOR YOUR LASER (${Math.round(strength * 100)}%)`);
+    }
+    show(this.cargo, true);
+    setText(
+      this.cargo,
+      comp
+        ? 'ORE ' +
+            Object.entries(comp.ores)
+              .sort((a, b) => b[1] - a[1])
+              .map(([good, n]) => `${world.goods[good]?.name ?? good} ${n}`)
+              .join(' · ')
+        : 'A mining computer reads what it holds',
+    );
+    const kinds = shipStats(world, ship).readouts;
+    setText(this.reads, lock.progress < 1 ? 'Readings when locked' : `READS ${kinds.map((k) => k.toUpperCase()).join(' · ')}`);
+  }
+
+  /**
    * The lock strip. Cards are rebuilt only when the set of locks or the
    * slot count changes; otherwise only their text and bars move, so a
    * card never shifts under the pointer while it is being clicked.
@@ -231,18 +282,19 @@ export class TargetCard {
       const read = lockReadout(world, ship, lock.targetId);
       const id = read?.identity;
       const active = lock.targetId === ship.activeLock;
-      setAttr(chip.root, 'data-stance', readoutStance(read));
+      const rock = isRock(world, lock.targetId);
+      setAttr(chip.root, 'data-stance', rock ? 'rock' : readoutStance(read));
       chip.root.classList.toggle('active', active);
       setAttr(chip.root, 'aria-pressed', String(active));
-      const hullId = id?.hullId ?? '';
+      const hullId = rock ? 'rock' : (id?.hullId ?? '');
       if (chip.outline.dataset['hull'] !== hullId) {
         chip.outline.dataset['hull'] = hullId;
-        const hull = hullId ? world.hulls[hullId] : undefined;
-        setAttr(chip.outline, 'points', hull ? silhouettePoints(hull.outline, CHIP_SIL) : '');
+        const hull = hullId && !rock ? world.hulls[hullId] : undefined;
+        setAttr(chip.outline, 'points', rock ? rockPoints(CHIP_SIL * 0.4) : hull ? silhouettePoints(hull.outline, CHIP_SIL) : '');
       }
-      const name = id ? (id.escapePod ? 'POD' : id.hullName.split(' ').pop()!.toUpperCase()) : 'CONTACT';
+      const name = rock ? 'ROCK' : id ? (id.escapePod ? 'POD' : id.hullName.split(' ').pop()!.toUpperCase()) : 'CONTACT';
       setText(chip.name, name);
-      setAttr(chip.root, 'aria-label', `${id ? id.hullName : 'Contact'}${active ? ', active lock' : ''}`);
+      setAttr(chip.root, 'aria-label', `${rock ? 'Rock' : id ? id.hullName : 'Contact'}${active ? ', active lock' : ''}`);
       const locking = lock.progress < 1;
       show(chip.bar, locking);
       show(chip.detail, !locking);
@@ -250,6 +302,22 @@ export class TargetCard {
       else setText(chip.detail, read?.motion ? Math.round(read.motion.range).toLocaleString('en-GB') : NONE);
     }
   }
+}
+
+/** True if a lock's target is one of the belt's rocks. */
+function isRock(world: World, targetId: string): boolean {
+  return !world.ships[targetId] && world.asteroids.some((a) => a.id === targetId);
+}
+
+/** A lumpy rock outline of radius `r`, as SVG polygon points. */
+function rockPoints(r: number): string {
+  const lumps = [1, 0.82, 0.95, 0.74, 1, 0.88, 0.8, 0.97, 0.85];
+  return lumps
+    .map((k, i) => {
+      const a = (i / lumps.length) * Math.PI * 2;
+      return `${(Math.cos(a) * r * k).toFixed(1)},${(Math.sin(a) * r * k).toFixed(1)}`;
+    })
+    .join(' ');
 }
 
 function lockChip(onClick: () => void): LockChip {

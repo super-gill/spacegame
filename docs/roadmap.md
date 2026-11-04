@@ -31,7 +31,7 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 
 1. **0.11.0 released:** 6f, ship systems.
 2. The interface workstream carries on with 6d: stage 4 contacts and the nav target, then the aim reticle, munition warnings, shield arcs and the activation tiles on the HUD.
-3. **Next: mining (9a)**, with a design pass with Jason first: Jason wants depth (field scans, rock scans, blasting, lasers, collection by tractor or drones, new ships).
+3. **Mining (9a)**, designed with Jason (`docs/mining.md`). Part 1 is built: ore in rocks, respawn, survey scanners, mining computers, mining lasers, the prospector. **Next: part 2:** mining charges, the hulk with its ore hold, drones as a general system, gate-glass, NPC miners, and the money tuned in play.
 4. Then law (7, with electronic warfare), then the map (8).
 5. **Shared world, early slice (parked):** a host program on Jason's PC and a join mode, so his brother can play over Tailscale. Estimated three to five hours; picked up when his brother can play.
 

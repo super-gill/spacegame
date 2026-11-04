@@ -60,9 +60,24 @@ export interface FireResult {
   munitions: Munition[];
   /** Countermeasures dropped this tick. */
   decoys: Decoy[];
+  /** Mining lasers running this tick; the caller cuts the rocks they reach (mining.ts). */
+  beams: BeamShot[];
   /** Ids used, so the caller can advance the world's id counter. */
   idsUsed: number;
   events: WorldEvent[];
+}
+
+/** A mining laser fired this tick, before it is known what it reaches. */
+export interface BeamShot {
+  shipId: string;
+  mountId: string;
+  origin: Vec2;
+  /** World bearing, radians: along the nose. */
+  bearing: number;
+  range: number;
+  strength: number;
+  /** Ore it can free this tick, units. */
+  yield: number;
 }
 
 /** The hull-space bearing of a world bearing, for arc checks. */
@@ -134,11 +149,12 @@ export function fireWeapons(
   world: Pick<World, 'goods' | 'hulls'> = { goods: {}, hulls: {} },
   threats: readonly Munition[] = [],
 ): FireResult {
-  if (ship.state !== 'flying') return { ship, projectiles: [], munitions: [], decoys: [], idsUsed: 0, events: [] };
+  if (ship.state !== 'flying') return { ship, projectiles: [], munitions: [], decoys: [], beams: [], idsUsed: 0, events: [] };
 
   const projectiles: Projectile[] = [];
   const munitions: Munition[] = [];
   const decoys: Decoy[] = [];
+  const beams: BeamShot[] = [];
   const events: WorldEvent[] = [];
   let idsUsed = 0;
   let capacitor = ship.capacitor;
@@ -230,6 +246,20 @@ export function fireWeapons(
     let cooldownTicks = Math.max(0, w.cooldownTicks - 1);
     const kept = (): WeaponState => ({ ...w, aim, cooldownTicks, loaded, reloadTicks, ...(spec.ammo ? { loadedGood } : {}) });
     const inGroup = w.group === ship.fireGroup;
+
+    // A mining laser runs while its group fires, paying its capacitor by the tick.
+    if (spec.family === 'mining') {
+      if (!(input.fireFixed && inGroup)) return kept();
+      const cost = spec.capacitorPerShot * dt;
+      if (capacitor < cost) {
+        if (!capacitorWarned) events.push({ type: 'capacitorEmpty', shipId: ship.id });
+        capacitorWarned = true;
+        return kept();
+      }
+      capacitor -= cost;
+      beams.push({ shipId: ship.id, mountId: w.mountId, origin: ship.position, bearing: ship.heading, range: spec.range, strength: spec.mining?.strength ?? 0, yield: spec.damage * dt });
+      return kept();
+    }
     const trigger =
       spec.family === 'countermeasure'
         ? (input.launchCountermeasure && !dropped) || input.toggleModule === w.mountId
@@ -297,7 +327,7 @@ export function fireWeapons(
     return kept();
   });
 
-  return { ship: { ...ship, weapons, capacitor, hold }, projectiles, munitions, decoys, idsUsed, events };
+  return { ship: { ...ship, weapons, capacitor, hold }, projectiles, munitions, decoys, beams, idsUsed, events };
 }
 
 /**
@@ -319,7 +349,7 @@ export function rechargeCapacitor(ship: Ship, stats: ShipStats, dt: number): Shi
  * Distance along a segment from `start` (direction `dir`, length `len`)
  * at which it first enters a circle, or null if it misses.
  */
-function segmentHitsCircle(start: Vec2, dir: Vec2, len: number, centre: Vec2, radius: number): number | null {
+export function segmentHitsCircle(start: Vec2, dir: Vec2, len: number, centre: Vec2, radius: number): number | null {
   const toCentre = sub(centre, start);
   const along = dot(toCentre, dir);
   const perpSq = dot(toCentre, toCentre) - along * along;

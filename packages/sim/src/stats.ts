@@ -104,6 +104,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     afterburnerSpeed: 0,
     afterburnerThrust: 0,
     afterburnerDraw: 0,
+    surveyRange: 0,
+    surveyCost: 0,
+    surveyGrade: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -115,6 +118,8 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   let shieldRegenDelay = SHIELD_REGEN_DELAY;
   let hasShieldGenerator = false;
   let turretTracking = 0;
+  // The best survey scanner fitted does the surveying; a second adds nothing.
+  let survey = { range: 0, cost: 0, grade: 0 };
   let armourResists: Resistances = {};
 
   for (const mount of hull.mounts) {
@@ -137,6 +142,11 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
       hasShieldGenerator = true;
     }
     turretTracking = Math.max(turretTracking, module.stats.turretTracking ?? 0);
+    if (module.kind === 'surveyScanner') {
+      const grade = module.stats.surveyGrade ?? 0;
+      const range = module.stats.surveyRange ?? 0;
+      if (grade > survey.grade || (grade === survey.grade && range > survey.range)) survey = { range, cost: module.stats.surveyCost ?? 0, grade };
+    }
     if (module.resists) {
       if (module.kind === 'shieldGenerator') shieldResists = bestOf(shieldResists, module.resists);
       if (module.kind === 'armour') armourResists = bestOf(armourResists, module.resists);
@@ -178,6 +188,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     afterburnerSpeed: totals.afterburnerSpeed,
     afterburnerThrust: totals.afterburnerThrust,
     afterburnerDraw: totals.afterburnerDraw,
+    surveyRange: survey.range,
+    surveyCost: survey.cost,
+    surveyGrade: survey.grade,
     weapons,
     capacitor: hull.capacitor,
     capacitorRecharge: hull.capacitorRecharge,

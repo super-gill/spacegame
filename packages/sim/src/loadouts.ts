@@ -78,6 +78,30 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
     },
   },
+  'rookrivet-prospector': {
+    // Sold at Ridge and Harbour: everything a new miner needs to find and
+    // cut the easy rocks, and a swivel for company.
+    id: 'rookrivet-prospector',
+    name: 'Rook and Rivet Prospector, Collective issue',
+    hullId: 'rookrivet-prospector',
+    fit: {
+      n1: 'meridian-nav-s',
+      r1: 'meridian-radar-s',
+      t1: 'rookrivet-assay-s',
+      f1: 'meridian-helm-s',
+      x1: 'paragon-director-s',
+      p1: 'meridian-podbay-s',
+      w1: 'rookrivet-pick-s',
+      w2: 'paragon-turret-s',
+      e1: 'meridian-engine-s',
+      c1: 'meridian-thrusters-s',
+      c2: 'meridian-reactor-s',
+      i1: 'meridian-shield-s',
+      u1: 'meridian-gleaner-s',
+      u2: 'rookrivet-survey-s',
+      b1: 'meridian-pod-s',
+    },
+  },
   'calder-watch': {
     // The Calder Watch: a Port Authority Warrant fitted to police, not to
     // raid. One heavy fixed gun and a Magazine for the hull's missile

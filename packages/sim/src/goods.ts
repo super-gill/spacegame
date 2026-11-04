@@ -8,7 +8,15 @@ import type { GoodSpec } from './types.js';
 export const GOODS: Record<string, GoodSpec> = {
   scrap: { id: 'scrap', name: 'Scrap', unitMass: 0.3, basePrice: 8 },
   food: { id: 'food', name: 'Food', unitMass: 0.2, basePrice: 20 },
-  ore: { id: 'ore', name: 'Ore', unitMass: 0.3, basePrice: 30 },
+  // Ores (docs/mining.md). The ore catalogue is every good with an `ore`
+  // block: add one here and rocks made from then on can hold it. Names
+  // other than plain ore are provisional (a lore ask). Every rock is
+  // mostly common ore; richer ores turn up in some rocks, the best only
+  // in bigger, harder ones.
+  ore: { id: 'ore', name: 'Ore', unitMass: 0.3, basePrice: 30, ore: { tier: 'common', chance: 1, share: 0, minRadius: 0 } },
+  'banded-ore': { id: 'banded-ore', name: 'Banded ore', unitMass: 0.3, basePrice: 60, ore: { tier: 'middling', chance: 0.35, share: 0.25, minRadius: 0 } },
+  'black-ore': { id: 'black-ore', name: 'Black ore', unitMass: 0.3, basePrice: 75, ore: { tier: 'middling', chance: 0.25, share: 0.3, minRadius: 25 } },
+  glintstone: { id: 'glintstone', name: 'Glintstone', unitMass: 0.2, basePrice: 170, ore: { tier: 'valuable', chance: 0.15, share: 0.15, minRadius: 35 } },
   machinery: { id: 'machinery', name: 'Machinery', unitMass: 0.4, basePrice: 85 },
   medicine: { id: 'medicine', name: 'Medicine', unitMass: 0.1, basePrice: 65 },
   // Ammunition. One unit is one round; a gun's magazine says how many it
@@ -64,6 +72,11 @@ export const GOODS: Record<string, GoodSpec> = {
 };
 
 /** The goods whose boxes fit an ammunition slot, cheapest first. */
+/** The ore catalogue: every good that turns up in rocks, in id order. */
+export function oreGoods(goods: Readonly<Record<string, GoodSpec>>): GoodSpec[] {
+  return Object.values(goods).filter((g) => g.ore).sort((a, b) => a.id.localeCompare(b.id));
+}
+
 export function goodsFitting(goods: Record<string, GoodSpec>, slot: string): GoodSpec[] {
   return Object.values(goods).filter((g) => g.ammo?.fits === slot).sort((a, b) => a.basePrice - b.basePrice || a.id.localeCompare(b.id));
 }

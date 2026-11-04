@@ -4,6 +4,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- Mining, part 1. Every rock in the Scree holds ore: mostly common ore, some richer ores, and the best only in bigger, harder rocks. Mined-out rocks crumble, and the belt slowly brings in new ones.
+- A survey scanner: press its tile to pulse, and rocks worth a look light up for a few seconds. A better scanner reaches further and names the best ore in each rock.
+- Lock a rock by clicking it. A mining computer (the Assay) reads what it holds and how hard it is.
+- Mining lasers: hold fire on a rock to cut ore free in canisters, and scoop them with the tractor. A laser only cuts rock no harder than it is strong.
+- The Rook and Rivet Prospector, a mining cutter, sold at Ridge Outpost and Harbour.
+- Three new ores to sell: Banded ore, Black ore and Glintstone. Lantern Works pays best.
+
+### Changed
+- Save format version 7: saves upgrade automatically, and their rocks are given ore.
+- Station ship marts refresh from the game's data when a save loads.
+
+### Known
+- Ore and mining module names are provisional until the lore pass.
+- No NPC miners, mining charges, hulks or drones yet (mining part 2).
+
 ## [0.11.0] - 2026-11-04
 
 Milestone 6f, ship systems: everything a ship does comes from something fitted, in slots budgeted by hull class. (Release commit recorded in `docs/coordination.md`.)

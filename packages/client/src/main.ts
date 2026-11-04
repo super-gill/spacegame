@@ -28,6 +28,8 @@ import {
   incomingMunitions,
   isGun,
   lockReadout,
+  rockAt,
+  asteroidPositions,
   navReadout,
   nearestDockableStation,
   pilotShip,
@@ -66,6 +68,7 @@ import {
   drawShip,
   drawStation,
   drawTargetBracket,
+  drawMiningBeam,
   drawTractor,
   drawVelocityVector,
   drawWreck,
@@ -475,7 +478,7 @@ function unlockActive(): void {
   if (mine?.activeLock) input.requestUnlock(mine.activeLock);
 }
 
-/** Left click: target the ship under the pointer, if any. Clicking empty space leaves the target alone. */
+/** Click to lock: the ship under the pointer, else the rock under it. Clicking empty space leaves the target alone. */
 const CLICK_SLOP_PX = 10;
 function clickTarget(point: { x: number; y: number }): void {
   const mine = myShip(current);
@@ -491,7 +494,19 @@ function clickTarget(point: { x: number; y: number }): void {
       bestDist = d;
     }
   }
-  if (best) lockOrActivate(best.id);
+  if (best) {
+    lockOrActivate(best.id);
+    return;
+  }
+  // No ship there: a rock, for a mining computer to read.
+  for (const rock of asteroidPositions(current)) {
+    const p = camera.worldToScreen(rock.position);
+    const d = Math.hypot(p.x - point.x, p.y - point.y);
+    if (d <= rock.radius * camera.zoom + CLICK_SLOP_PX) {
+      lockOrActivate(rock.id);
+      return;
+    }
+  }
 }
 
 /** A click on a ship, in space or on the radar: make it active if already locked, else start a lock. */
@@ -676,7 +691,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   drawStarfield(ctx!, camera);
 
   drawBodies(ctx!, camera, current, alpha);
-  drawAsteroids(ctx!, camera, current);
+  drawAsteroids(ctx!, camera, current, mine);
 
   // Stations move on rails: draw them between ticks like ships, so docked ships stay on their pads.
   const near = mine ? nearestDockableStation(mine, current.stations) : null;
@@ -716,6 +731,13 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (read?.combat) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
   }
 
+  // Mining lasers: a bright line while cutting, a faint one when there is nothing to cut.
+  for (const ship of Object.values(current.ships)) {
+    if (!ship.beams) continue;
+    const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
+    for (const beam of ship.beams) drawMiningBeam(ctx!, camera, shipView.position, beam.bearing, beam.length, beam.cutting, nowMs);
+  }
+
   for (const p of current.projectiles) {
     const isMine = mine && p.ownerShipId === mine.id;
     const shooterBrain = current.npcs[p.ownerShipId];
@@ -750,6 +772,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
 
   // Target bracket on the active lock (locking or locked) and, for fixed guns, the lead marker.
   const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
+  // A locked rock gets the bracket too.
+  const lockedRock = mine?.activeLock && !target ? rockAt(current, mine.activeLock) : null;
+  if (lockedRock) drawTargetBracket(ctx!, camera, lockedRock.position, lockedRock.rock.radius, false);
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);

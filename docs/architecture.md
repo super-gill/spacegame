@@ -42,7 +42,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `world.ts` | World construction, pilots joining (`joinPilot`), lookups (`pilotShip`), starter sector spawners |
 | `stations.ts` | Starter system stations as data: orbits, markets, pads (`padRing`), ship mart stock; defaults for save migrations |
 | `bodies.ts` | Starter system bodies as data: Calder (star), planet, moon, belt; `boundOrbit` for orbits whose period comes from the parent's gravity |
-| `asteroids.ts` | The Scree's rocks: `screeAsteroids` (seeded, once), `asteroidStates`, `asteroidPositions` |
+| `asteroids.ts` | The Scree's rocks: `screeAsteroids` (seeded, once, with ore and hardness), `asteroidStates`, `asteroidPositions`, `rockAt`, and `stepRockfall` topping fields back up |
 | `random.ts` | `seededRandom` for content generated once from a seed; the running sim uses no randomness |
 | `nav.ts` | The nav computer: `navReadout` (frame, relative speed, gravity tier, orbit, predicted path), `predictPath`, `orbitElements`, `gravityTier` |
 | `locks.ts` | Target locks (from the fitted radar and targeting computer): `lockSeconds`, `lockRefusal`, `stepLocks` (inputs, progress, drops), `weaponTarget` and `activeTarget` for what turrets engage |
@@ -53,6 +53,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
 | `combat.ts` | Fixed fire, launchers and dispensers, turrets engaging the ship's target or shooting down incoming munitions (slew, lead, arcs, fire tolerance), reloading by ammunition slot, projectiles and hits on ships and munitions, capacitor, shields and damage, target leading |
 | `munitions.ts` | Missiles, torpedoes and countermeasures in flight: launching, radar and heat guidance, spoofing, steering, hits and burn-out |
+| `mining.ts` | Mining part 1: survey pulses, and mining lasers cutting rocks into canisters of ore |
+| `systems.ts` | Activation tiles: which fire groups and modules get a numbered tile, in order |
 | `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the swivel, each with capacitor cost, ammunition good and damage type |
 | `goods.ts` | Goods catalogue (data) |
 | `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |

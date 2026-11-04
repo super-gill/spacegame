@@ -22,6 +22,10 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  *   the good scales. They need a complete lock to fire.
  * - countermeasure: dispensers. Not guns at all, but they load boxes and
  *   drop charges by the same machinery. Fire on `launchCountermeasure`.
+ * - mining: mining lasers (docs/mining.md). Not guns either: a beam along
+ *   the nose while held, cutting ore from rocks no harder than its
+ *   `mining.strength`. `damage` is ore freed per second and
+ *   `capacitorPerShot` capacitor per second. Fire group 3 by default.
  *
  * Each size roughly doubles the one below in damage per shot and in
  * capacitor or round cost, a little less in damage per second, so bigger
@@ -179,7 +183,21 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // Dispensers: a box of charges, one drop at a time.
   'dispenser-s': dispenser('dispenser-s', 'Dispenser S', 'S', 12, 1),
   'dispenser-m': dispenser('dispenser-m', 'Dispenser M', 'M', 24, 0.8),
+
+  // Mining lasers. A light one fits a weapon mount and cuts soft, small
+  // rocks; the medium cuts most of what a cutter or sloop will meet. Heavy
+  // lasers for the hulk's mining mounts come with part 2.
+  'mining-laser-s': miningLaser('mining-laser-s', 'Mining laser S', 'S', 0.45, 1.5, 4, 260),
+  'mining-laser-m': miningLaser('mining-laser-m', 'Mining laser M', 'M', 0.7, 2.6, 8, 300),
 };
+
+function miningLaser(id: string, name: string, size: ModuleSize, strength: number, yieldPerSecond: number, capacitorPerSecond: number, range: number): WeaponSpec {
+  return {
+    id, name, size, kind: 'fixed', family: 'mining', damage: yieldPerSecond, damageType: 'thermal', fireInterval: 1,
+    projectileSpeed: 0, range, turretTurnRate: 0, capacitorPerShot: capacitorPerSecond, ammo: null, magazine: 0, reloadSeconds: 0,
+    mining: { strength },
+  };
+}
 
 function launcher(id: string, name: string, size: ModuleSize, slot: 'missile' | 'torpedo', damage: number, interval: number, magazine: number, reload: number, range: number): WeaponSpec {
   return {
@@ -195,9 +213,9 @@ function dispenser(id: string, name: string, size: ModuleSize, magazine: number,
   };
 }
 
-/** True for a weapon that fires a shot: a gun, not a launcher or a dispenser. */
+/** True for a weapon that fires a shot: a gun, not a launcher, a dispenser or a mining laser. */
 export function isGun(w: Pick<WeaponSpec, 'family'>): boolean {
-  return w.family !== 'missile' && w.family !== 'countermeasure';
+  return w.family !== 'missile' && w.family !== 'countermeasure' && w.family !== 'mining';
 }
 
 /** Damage per second of a weapon held on target, with its base ammunition. */

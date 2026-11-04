@@ -421,6 +421,33 @@ export function drawTractor(ctx: CanvasRenderingContext2D, camera: Camera, at: {
   ctx.globalAlpha = 1;
 }
 
+/**
+ * Stopgap (lead, mining part 1): a mining laser from the ship along its
+ * bearing, as far as it reached. Bright and flickering while it cuts,
+ * faint and dashed when it touches nothing or a rock too hard for it.
+ */
+export function drawMiningBeam(ctx: CanvasRenderingContext2D, camera: Camera, from: { x: number; y: number }, bearing: number, length: number, cutting: boolean, nowMs: number): void {
+  const a = camera.worldToScreen(from);
+  const b = camera.worldToScreen({ x: from.x + Math.cos(bearing) * length, y: from.y + Math.sin(bearing) * length });
+  ctx.save();
+  ctx.strokeStyle = cutting ? '#ffb347' : COLOUR.inkDim;
+  ctx.globalAlpha = cutting ? 0.75 + 0.25 * Math.sin(nowMs / 40) : 0.45;
+  ctx.lineWidth = cutting ? 2 : 1;
+  if (!cutting) ctx.setLineDash([4, 5]);
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+  if (cutting) {
+    // Sparks where it bites.
+    ctx.fillStyle = '#ffe2a8';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 2.5 + Math.sin(nowMs / 30) * 1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 /** Shield and structure bars over a ship, shown once it has taken damage. */
 export function drawHealthBars(ctx: CanvasRenderingContext2D, camera: Camera, ship: Ship, stats: ShipStats, at: { x: number; y: number }): void {
   if (ship.shield >= stats.shield && ship.structure >= stats.structure) return;

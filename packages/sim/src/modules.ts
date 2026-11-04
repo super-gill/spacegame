@@ -785,7 +785,71 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { turretControl: 3, turretTracking: 1.25 },
   },
 
-  // Tractor beams (utility, active): reach and pull for loot.
+  // Mining (docs/mining.md; names provisional, a lore ask). Rook and Rivet
+  // build for the Collective's prospectors: lasers for weapon mounts, a
+  // survey scanner and an assay computer that reads rock instead of guns.
+  'rookrivet-pick-s': {
+    id: 'rookrivet-pick-s',
+    name: 'Rook and Rivet Pick S',
+    kind: 'weapon',
+    size: 'S',
+    mounts: ['weapon'],
+    needs: ['power'],
+    mass: 1,
+    power: 1.5,
+    price: 900,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: {},
+    weaponId: 'mining-laser-s',
+  },
+  'rookrivet-pick-m': {
+    id: 'rookrivet-pick-m',
+    name: 'Rook and Rivet Pick M',
+    kind: 'weapon',
+    size: 'M',
+    mounts: ['weapon'],
+    needs: ['power'],
+    mass: 2,
+    power: 3,
+    price: 2400,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: {},
+    weaponId: 'mining-laser-m',
+  },
+  // Survey scanners (utility, active): a pulse that lights up rocks worth a look.
+  'rookrivet-survey-s': {
+    id: 'rookrivet-survey-s',
+    name: 'Rook and Rivet Dowser S',
+    kind: 'surveyScanner',
+    size: 'S',
+    mounts: ['utility'],
+    needs: ['power'],
+    mass: 0.4,
+    power: 0.5,
+    price: 600,
+    manufacturer: 'rookRivet',
+    tags: ['sensor', 'mining'],
+    // Tells rich rock from plain, not what is in it.
+    stats: { surveyRange: 1500, surveyCost: 15, surveyGrade: 1 },
+  },
+  'tessaract-survey-m': {
+    id: 'tessaract-survey-m',
+    name: 'Tessaract Deep Dowser M',
+    kind: 'surveyScanner',
+    size: 'M',
+    mounts: ['utility'],
+    needs: ['power'],
+    mass: 1,
+    power: 1,
+    price: 2200,
+    manufacturer: 'tessaract',
+    tags: ['sensor', 'mining'],
+    // Further, and names the best ore a rock holds.
+    stats: { surveyRange: 2600, surveyCost: 25, surveyGrade: 2 },
+  },
+
   'meridian-gleaner-s': {
     id: 'meridian-gleaner-s',
     name: 'Meridian Gleaner S',
@@ -966,6 +1030,23 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['sensor'],
     stats: { maxLocks: 4, scanResolution: 1.5 },
     readouts: ['identity', 'motion', 'condition', 'combat'],
+  },
+  // Reads rock, not guns: what a locked rock holds and how hard it is.
+  'rookrivet-assay-s': {
+    id: 'rookrivet-assay-s',
+    name: 'Rook and Rivet Assay S',
+    kind: 'targetingComputer',
+    size: 'S',
+    mounts: ['computer'],
+    needs: ['power'],
+    mass: 0.6,
+    power: 1,
+    price: 700,
+    manufacturer: 'rookRivet',
+    capacitorDraw: 0.2,
+    tags: ['sensor', 'mining'],
+    stats: { maxLocks: 2, scanResolution: 1 },
+    readouts: ['identity', 'motion', 'composition'],
   },
   // Reads holds, not guns: customs officers, traders sizing up a market, and pirates choosing a prize.
   'tessaract-scanner-s': {

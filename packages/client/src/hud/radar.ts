@@ -48,6 +48,7 @@ const STANCE_COLOUR: Record<TargetStance, string> = {
   pilot: C.ink,
   empty: C.dim,
   unknown: C.dim,
+  rock: C.body,
 };
 
 export class Radar {

@@ -67,6 +67,9 @@ export function harbourStation(): Station {
     market: {
       food: { ask: 14, bid: 11 },
       ore: { ask: 40, bid: 30 },
+      'banded-ore': { ask: null, bid: 52 },
+      'black-ore': { ask: null, bid: 64 },
+      glintstone: { ask: null, bid: 140 },
       machinery: { ask: 78, bid: 66 },
       medicine: { ask: 55, bid: 47 },
       scrap: { ask: null, bid: 7 },
@@ -81,13 +84,13 @@ export function harbourStation(): Station {
     outfitting: true,
     // Ten pads, sizes mixed so large hulls are never side by side.
     pads: padRing(90, ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'L', 'M', 'S']),
-    shipMart: ['meridian-starter', 'kessari-raider', 'tessaract-trader'],
+    shipMart: ['meridian-starter', 'kessari-raider', 'tessaract-trader', 'rookrivet-prospector'],
   };
 }
 
 /**
- * A mining outpost on the belt, turning with it. No outfitting, no ship
- * mart. The belt has no gravity, so its period is the belt's, not one
+ * A mining outpost on the belt, turning with it. No outfitting; its ship
+ * mart sells prospectors. The belt has no gravity, so its period is the belt's, not one
  * worked out from gravity.
  */
 export function ridgeOutpost(): Station {
@@ -104,6 +107,11 @@ export function ridgeOutpost(): Station {
     market: {
       food: { ask: 32, bid: 27 },
       ore: { ask: 18, bid: 14 },
+      // The Collective buys what its prospectors bring in, cheaply: the
+      // real money is a long haul away at Lantern Works.
+      'banded-ore': { ask: null, bid: 30 },
+      'black-ore': { ask: null, bid: 36 },
+      glintstone: { ask: null, bid: 80 },
       machinery: { ask: 112, bid: 98 },
       medicine: { ask: 86, bid: 75 },
       scrap: { ask: null, bid: 9 },
@@ -112,7 +120,8 @@ export function ridgeOutpost(): Station {
     },
     outfitting: false,
     pads: padRing(70, ['L', 'S', 'M', 'L', 'S', 'M']),
-    shipMart: [],
+    // The Collective sells its prospectors to anyone who will dig.
+    shipMart: ['rookrivet-prospector'],
   };
 }
 
@@ -136,6 +145,10 @@ export function lanternWorks(): Station {
     market: {
       food: { ask: 40, bid: 34 },
       ore: { ask: 52, bid: 42 },
+      // A foundry pays best for every ore.
+      'banded-ore': { ask: null, bid: 68 },
+      'black-ore': { ask: null, bid: 84 },
+      glintstone: { ask: null, bid: 190 },
       machinery: { ask: 48, bid: 40 },
       medicine: { ask: 96, bid: 82 },
       scrap: { ask: null, bid: 14 },

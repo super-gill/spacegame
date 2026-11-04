@@ -1,8 +1,9 @@
 import { thinkNpcs } from './ai/index.js';
-import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type Damage } from './combat.js';
+import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
 import { goodsFitting } from './goods.js';
 import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
-import { asteroidStates } from './asteroids.js';
+import { asteroidStates, stepRockfall } from './asteroids.js';
+import { cutRocks, surveyPulse } from './mining.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
@@ -61,7 +62,8 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  *   2. Each ship docks or undocks, changes flight mode, moves against its
  *      local frame under gravity, is carried by the body whose sphere it
  *      is in, bounces off stations and surfaces, fires, and recharges shields; docked ships are
- *      repaired and ride their pads.
+ *      repaired and ride their pads. A survey scanner's tile sends a pulse.
+ *      Then mining lasers cut the rocks they reach, freeing ore as loot (mining.ts).
  *   3. Ships collide with each other (rams).
  *   4. Projectiles fly (carried like ships) and hit ships or munitions;
  *      countermeasures drift and burn, fresh ones may draw radar seekers;
@@ -69,7 +71,7 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  *   5. All damage from this tick is applied; destroyed ships become
  *      wrecks and loot; NPCs that chose to leave the sector go.
  *   6. Loot is pulled in and scooped, wrecks drift (both carried),
- *      spawners replace lost NPCs.
+ *      spawners replace lost NPCs, and the belt tops up its rocks.
  *
  * Pure: returns a new World and never mutates the one passed in. The client
  * calls this from a fixed-timestep accumulator; tests call it directly.
@@ -90,6 +92,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const newProjectiles: Projectile[] = [];
   const newMunitions: Munition[] = [];
   const newDecoys: Decoy[] = [];
+  const beams: BeamShot[] = [];
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
   const aboard = pilotsAboard(world);
@@ -158,6 +161,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // tile fires it instead: fireWeapons reads the same input.
     if (input.toggleModule) {
       const moduleId = targeted.fit[input.toggleModule];
+      // A survey scanner's tile sends a pulse (mining.ts).
+      if (moduleId && world.modules[moduleId]?.kind === 'surveyScanner') {
+        const pulse = surveyPulse(targeted, stats, world.asteroids, rockStates, world.goods, world.tick, world.dt);
+        targeted = pulse.ship;
+        events.push(pulse.event);
+      }
       if (moduleId && world.modules[moduleId]?.kind === 'tractor') {
         const on = isSwitchedOn(targeted, input.toggleModule);
         const switchedOn = on ? (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) : [...(targeted.switchedOn ?? []), input.toggleModule];
@@ -177,6 +186,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     newProjectiles.push(...fired.projectiles);
     newMunitions.push(...fired.munitions);
     newDecoys.push(...fired.decoys);
+    beams.push(...fired.beams);
     events.push(...fired.events);
 
     // The reactor refills the capacitor; shields recharge from it.
@@ -193,6 +203,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const tractorOn = input.tractor || (ship.switchedOn ?? []).some((m) => world.modules[ship.fit[m] ?? '']?.kind === 'tractor');
     ships[id] = ridePad({ ...ship, tractorActive: tractorOn && ship.state === 'flying' && stats.tractorRange > 0 }, stationsNext);
   }
+
+  // Mining lasers cut the rocks they reach; freed ore joins the loot below.
+  const cut = cutRocks(world.asteroids, rockStates, ships, world.ships, beams, world.dt, nextEntityId);
+  nextEntityId += cut.idsUsed;
+  ships = cut.ships;
+  events.push(...cut.events);
 
   // 3. Rams.
   const statsFor = (s: Ship): ShipStats | undefined => (world.hulls[s.hullId] ? shipStats(world, s) : undefined);
@@ -243,6 +259,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
 
   let next: World = {
     ...world,
+    asteroids: cut.asteroids,
+    loot: [...world.loot, ...cut.loot],
     tick: world.tick + 1,
     stations: stationsNext,
     ships,
@@ -273,6 +291,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     wrecks: stepWrecks(next.wrecks, world.dt, rails.carryAt, rails.gravityAt).filter((w) => !insideSurface(w.position, surfaces)),
   };
   next = runSpawners(next);
+  // The belt tops itself up.
+  next = { ...next, ...stepRockfall(next) };
 
   return { ...next, events };
 }

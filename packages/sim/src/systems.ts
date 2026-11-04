@@ -6,19 +6,20 @@ import { isGun } from './weapons.js';
  * Ship systems the pilot works (docs/ship-systems.md, "Activation tiles").
  *
  * One row of numbered tiles on the HUD, in this order: a tile per fire
- * group that has a gun or launcher in it, lowest group first; then a tile
- * per active module on a utility mount (tractor, dispenser), in mount
- * order. Number keys 1 to 9 press them: a group tile selects the group
- * (the fire button fires it); a module tile switches the module on or off
- * (`ShipInput.toggleModule`). The afterburner is held on Shift instead,
- * so it has no number.
+ * group that has a gun, launcher or mining laser in it, lowest group
+ * first; then a tile per active module on a utility mount (tractor,
+ * dispenser, survey scanner), in mount order. Number keys 1 to 9 press
+ * them: a group tile selects the group (the fire button fires it); a
+ * module tile switches the module on or off, or fires it once (a
+ * dispenser, a survey pulse) (`ShipInput.toggleModule`). The afterburner
+ * is held on Shift instead, so it has no number.
  *
  * The sim decides the order so the HUD, the keys and any other client
  * agree.
  */
 
 /** Module kinds that get a numbered tile. */
-const ACTIVATED: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['tractor', 'countermeasure']);
+const ACTIVATED: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['tractor', 'countermeasure', 'surveyScanner']);
 
 /** How many tiles have number keys. */
 export const ACTIVATION_KEYS = 9;
@@ -35,7 +36,7 @@ export function activationSlots(cat: Catalogues, ship: Ship): ActivationSlot[] {
   const groups = new Set<number>();
   for (const w of ship.weapons) {
     const spec = stats.weapons[w.mountId];
-    if (spec && spec.kind === 'fixed' && (isGun(spec) || spec.family === 'missile')) groups.add(w.group);
+    if (spec && spec.kind === 'fixed' && (isGun(spec) || spec.family === 'missile' || spec.family === 'mining')) groups.add(w.group);
   }
   const out: ActivationSlot[] = [...groups].sort((a, b) => a - b).map((group) => ({ kind: 'group', group }));
   for (const mount of hull.mounts) {

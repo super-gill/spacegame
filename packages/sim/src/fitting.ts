@@ -126,7 +126,7 @@ export function weaponStatesFor(
       loaded,
       ...(loadedGood !== undefined ? { loadedGood } : {}),
       reloadTicks: 0,
-      group: weapon?.family === 'missile' ? 2 : 1,
+      group: weapon?.family === 'missile' ? 2 : weapon?.family === 'mining' ? 3 : 1,
     });
   }
   return states;

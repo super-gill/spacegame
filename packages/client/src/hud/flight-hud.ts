@@ -14,6 +14,7 @@ import {
   nearestDockableStation,
   shipPilot,
   shipStats,
+  SURVEY_CYCLE_SECONDS,
 } from '@spacegame/sim';
 import { boardPrompt, shipName } from '../ui.js';
 import { el, setAttr, setText, show, svg } from './dom.js';
@@ -230,6 +231,12 @@ export class FlightHud {
       } else if (s.moduleKind === 'tractor') {
         setText(tile.state, ship.tractorActive ? 'ON' : 'OFF');
         tile.root.classList.toggle('active', ship.tractorActive);
+      } else if (s.moduleKind === 'surveyScanner') {
+        // Ready, or seconds until the scanner has cycled.
+        const since = ship.survey ? (world.tick - ship.survey.tick) * world.dt : Infinity;
+        const wait = Math.ceil(SURVEY_CYCLE_SECONDS - since);
+        setText(tile.state, wait > 0 ? `${wait}s` : 'READY');
+        tile.root.classList.toggle('active', since < 1);
       } else {
         const charges = ship.weapons.find((w) => w.mountId === s.mountId)?.loaded ?? 0;
         setText(tile.state, String(charges));
@@ -289,7 +296,10 @@ export class FlightHud {
         tile.root.classList.toggle('active', engaging || defending);
       } else {
         const inGroup = state?.group === ship.fireGroup;
-        setText(tile.state, inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`);
+        // A mining laser says whether it is cutting what it touches.
+        const beam = spec.family === 'mining' ? ship.beams?.find((b) => b.mountId === mountId) : undefined;
+        const beamText = beam ? (beam.rockId === null ? 'NO ROCK' : beam.cutting ? 'CUTTING' : 'TOO HARD') : null;
+        setText(tile.state, beamText ?? (inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`));
         tile.root.classList.toggle('active', inGroup);
       }
     }
@@ -311,7 +321,7 @@ function gunName(weaponId: string): string {
 }
 
 /** Short names for module tiles. */
-const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE' };
+const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
 function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string, weaponId: string): WeaponTile {

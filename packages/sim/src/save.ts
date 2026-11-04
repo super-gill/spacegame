@@ -3,7 +3,8 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { screeAsteroids } from './asteroids.js';
+import { ROCK_FIELDS, rockMakeup, screeAsteroids } from './asteroids.js';
+import { seededRandom } from './random.js';
 import { starterBodies } from './bodies.js';
 import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
 import { idleThrusters } from './flight.js';
@@ -64,8 +65,10 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 6 (6f): ship systems. Hulls have slot budgets and fixed flight,
  *   pod bay and fire control mounts; armour moved to internal mounts.
  *   Version 5 saves migrate: see `migrate5to6`.
+ * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
+ *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -80,7 +83,36 @@ export const MIGRATIONS: Record<number, Migration> = {
   3: (world) => migrate3to4(world),
   4: (world) => migrate4to5(world),
   5: (world) => migrate5to6(world),
+  6: (world) => migrate6to7(world),
 };
+
+/**
+ * 6 to 7: mining part 1 (docs/mining.md). Each rock without contents is
+ * given what a rock of its size holds, seeded from its id so every load
+ * of the same save agrees, and a field: the first 120 the belt made are
+ * the ring's, the rest Ridge's, as `screeAsteroids` made them. Nothing
+ * else changes; the belt starts topping itself up from now on.
+ */
+export function migrate6to7(world: unknown): unknown {
+  if (!isRecord(world) || !Array.isArray(world['asteroids'])) return world;
+  const ring = ROCK_FIELDS[0]!.target;
+  const asteroids = world['asteroids'].map((a: unknown) => {
+    if (!isRecord(a) || isRecord(a['contents'])) return a;
+    const id = String(a['id'] ?? '');
+    const radius = typeof a['radius'] === 'number' ? a['radius'] : 20;
+    const n = Number(id.replace(/^rock-/, ''));
+    const field = Number.isFinite(n) && n > ring ? 'ridge' : 'ring';
+    return { ...a, ...rockMakeup(seededRandom(idSeed(id)), radius), field };
+  });
+  return { ...world, asteroids };
+}
+
+/** A seed from an id, FNV-1a. */
+function idSeed(id: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 0x01000193);
+  return h >>> 0;
+}
 
 /** The stock systems a ship is given free on new fixed mounts in `migrate5to6`, by mount type. */
 const STOCK_SYSTEMS: Partial<Record<MountType, string>> = {
@@ -461,7 +493,8 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   // Everything else about a station (where it is, its pads) stays as saved.
   const current = starterStations();
   const stations: Record<string, Station> = {};
-  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market } } : st;
+  // Ship mart stock too: what a starter station sells is design data.
+  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart] } : st;
   const loaded: World = {
       ...world,
       ships,

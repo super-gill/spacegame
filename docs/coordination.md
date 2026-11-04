@@ -158,6 +158,15 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Stats** (`ShipStats`): `flightControl` (0 to 1; 0 means no computer: manual, no mouse steering, no assist or brake), `turretControl`, `turretTracking`, `escapePod`, `tractorRange`, `tractorPull`, `afterburnerSpeed`, `afterburnerThrust`, `afterburnerDraw`; `shieldRegenDelay` now from the generator.
 - **Save format version 6** (`migrate5to6`): modules move to mounts that take them or to storage; stock flight computer, pod bay, fire control and a tractor fitted free.
 
+Mining part 1 contracts (on `main` from 4 November 2026; design in `docs/mining.md`):
+
+- **Ores** (`types.ts`, `goods.ts`): `GoodSpec.ore` (`OreSpec`: `tier`, `chance`, `share`, `minRadius`); `oreGoods(goods)` is the ore catalogue. `OreTier` is `common | middling | valuable | rare`.
+- **Rocks** (`types.ts`, `asteroids.ts`): `Asteroid` gains `contents`, `hardness`, `field` and `cut`; `World.rockfall`. `rockAt`, `oreLeft`, `bestTier`, `stepRockfall`, `ROCK_FIELDS`.
+- **Locks on rocks** (`locks.ts`): a lock's `targetId` may be a rock id. `weaponTarget` still returns ships only. `LockReadout.composition` (ores, total, hardness, radius) with the `composition` readout.
+- **Mining** (`mining.ts`, `combat.ts`): weapon family `mining` with `WeaponSpec.mining.strength` (`damage` is ore a second, `capacitorPerShot` capacitor a second); `isGun` is false for it. `FireResult.beams`, `cutRocks`, `surveyPulse`. `Ship.beams` (`MiningBeam`) and `Ship.survey` (`SurveyResult`). Module kind `surveyScanner`; stats `surveyRange`, `surveyCost`, `surveyGrade`.
+- **Events:** `surveyed`, `surveyRefused`, `miningTooHard`, `oreFreed`, `rockCrumbled`.
+- **Save format version 7** (`migrate6to7`).
+
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
@@ -273,6 +282,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: Mining: the full sequence (survey, analyse, break, cut, collect) only for big, rich rocks, and small ships work small rocks; charges are placed and set off by their tile; drones in part 2 as a general system that later grows into fighters, light mining craft working from a mother ship, and carriers; ores are an expandable catalogue; hulks get ore holds; rocks respawn over time; a big hulk must really make money. (Jason)
 - 2026-11-04: Electronic warfare waits for law (7), where NPCs can use it. Mining needs depth: field scans, rock scans, blasting with charges, lasers to free ore, collection by tractor or drones, and new ships; design pass before building. (Jason)
 
 - 2026-11-04: Slots the EVE way: optional kit (tractor, electronic warfare, interdiction, countermeasures and the like) competes for general mounts, and slots a pilot activates or assigns get a control on the HUD; basics every ship needs get fixed mounts; specialised hulls get dedicated mounts (a mining hull's mining laser mount). A slot-budget pass per hull class comes with 6f. Electronic warfare in or just after 6f; interdiction and warp disruption with the map (8). A mining slice comes straight after 6f, ahead of law (7) and the map (8). (Jason)
@@ -340,6 +350,7 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-04, lead (Lead 3): mining part 1 (`docs/mining.md`, "As built"). Rocks hold ore by an expandable catalogue (an ore is a good with an `ore` block), have a hardness from their size, crumble when mined out, and each field tops itself up every 20 seconds. Any computer locks a rock; the new Assay S mining computer reads its composition. Survey scanners pulse from a tile; mining lasers (fire group 3) cut rocks no harder than they are strong, freeing ore in canisters for the tractor. The prospector is sold at Ridge and Harbour. Save version 7. 354 sim and 25 client tests; play checked: survey, lock, cut and scoop from a prospector. **Lore asks:** names for Banded ore, Black ore and Glintstone (and gate-glass), the Rook and Rivet Prospector, Pick lasers, Dowser scanners and the Assay computer. **For the interface workstream:** survey highlights, beams, the rock target card and rock click-to-lock are lead stopgaps. Next: part 2 (charges, the hulk, drones, gate-glass, NPC miners).
 - 2026-11-04, lead (Lead 3): wrote the mining and drones design (`docs/mining.md`) for Jason's review: survey, analyse, break, cut, collect; finite rocks that respawn; a prospector and a hulk that must out-earn trading; drones as ships with a drone brain, launched from a bay, built to grow into fighters, heavy subcraft and carriers. **Lore asks:** three or four ore names and uses plus gate-glass; who builds the prospector, the hulk, mining lasers, survey scanners, mining computers, drones and mining charges; and names for the 6f modules (flight computers, pod bay, fire control, tractors, afterburners), all provisional now.
 
 - 2026-11-04, lead (Lead 3): **released 0.11.0** (release commit "feat: release ship systems (v0.11.0)"): 6f, plus more ammunition, gun and ammunition names on weapon tiles, and market prices refreshed on load. Jason played it and started a new game; his only feedback was the ammunition amount, now raised. Electronic warfare moved to law (7). Next: a mining design pass; Jason wants depth (field scans, rock scans, blasting, lasers, tractor or drone collection, new ships).

@@ -26,8 +26,8 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser). Swivels need no group |
-| Lock a ship | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Swivels need no group |
+| Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 
@@ -51,6 +51,8 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Fire the selected group | Space (hold) | Guns fire where the nose points: with a target, put the nose on the orange lead marker. Launchers fire at your active lock and need it complete |
 | Drop a countermeasure | C | Needs a dispenser. Chaff may draw radar missiles off, flares outshine your hull to heat seekers; decoys do both. Drop, then turn away |
 | Weapons hot / cold | H | Hot: turrets engage your target on their own when on aim and in range. Cold: they hold fire |
+| Mine | Hold fire with a mining laser's group selected | The laser cuts the rock its beam reaches if the rock is no harder than the laser is strong, freeing ore in canisters; scoop them with the tractor. Its tile says `CUTTING`, `TOO HARD` or `NO ROCK` |
+| Survey | Its tile's number | A survey scanner pulses: rocks in reach worth a look are outlined for a few seconds (amber rich, gold valuable, cyan rare). It cycles in 5 seconds and costs capacitor |
 | Tractor beam | R (hold) | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile leaves it running |
 | Afterburner | Shift (hold) | If one is fitted: a higher top speed and more main thrust while held, paid for from the capacitor; it will not light on an empty one |
 

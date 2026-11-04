@@ -261,6 +261,14 @@ export class Ui {
         this.showToast('Launchers need a complete lock to fire at.', 1500);
       } else if (e.type === 'munitionSpoofed') {
         this.showToast('Countermeasure drew a missile off.', 1500, 'info');
+      } else if (e.type === 'surveyed') {
+        this.showToast(e.found === 0 ? 'Survey: nothing but plain rock in reach.' : `Survey: ${e.found} rock${e.found === 1 ? '' : 's'} worth a look.`, 2000, 'info');
+      } else if (e.type === 'surveyRefused') {
+        this.showToast(e.reason === 'capacitor' ? 'Survey scanner: not enough capacitor.' : 'Survey scanner still cycling.', 1200);
+      } else if (e.type === 'miningTooHard') {
+        this.showToast('Too hard for your mining laser. Find a smaller rock, or a stronger laser.', 2000);
+      } else if (e.type === 'rockCrumbled') {
+        this.showToast('Rock mined out.', 1500, 'info');
       }
     }
   }

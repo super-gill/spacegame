@@ -35,6 +35,10 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
   }
   const stats = fitStats(cat, hull, fit);
   const docked = o.dockedAt != null;
+  const weapons = weaponStatesFor(cat, hull, fit, o.heading);
+  // Start on the lowest group that holds a fixed weapon, so a prospector's
+  // laser (group 3) is ready without a key press.
+  const fixedGroups = weapons.filter((w) => stats.weapons[w.mountId]?.kind === 'fixed').map((w) => w.group);
   return {
     id: o.id,
     hullId: hull.id,
@@ -52,13 +56,13 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
     shield: stats.shield,
     structure: stats.structure,
     shieldDelayTicks: 0,
-    weapons: weaponStatesFor(cat, hull, fit, o.heading),
+    weapons,
     tractorActive: false,
     hold: { ...(o.hold ?? {}) },
     locks: [],
     activeLock: null,
     capacitor: stats.capacitor,
-    fireGroup: 1,
+    fireGroup: fixedGroups.length > 0 ? Math.min(...fixedGroups) : 1,
     weaponsHot: false,
   };
 }
