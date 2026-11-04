@@ -1,13 +1,11 @@
-import type { Ship, World } from '@spacegame/sim';
+import type { NavReadout, Ship, World } from '@spacegame/sim';
 import {
   FLIGHT_MODE_LABELS,
   boardableShips,
   cargoUsed,
   distance,
   isEscapePod,
-  localFrame,
   nearestDockableStation,
-  relativeVelocity,
   shipPilot,
   shipStats,
 } from '@spacegame/sim';
@@ -44,6 +42,15 @@ const CAP_R = 54;
 /** Hull below these fractions turns to the caution, then the alarm colour. */
 const HULL_CAUTION = 0.5;
 const HULL_ALARM = 0.25;
+
+const NONE = '-';
+
+/** The frame speed is measured against, in words: `REL HARBOUR STATION`, `REL FIELDMARK`, `REL SYSTEM`. */
+function frameWords(world: World, nav: NavReadout): string {
+  const f = nav.frame;
+  const name = f.kind === 'station' ? world.stations[f.id]?.name : f.kind === 'body' ? world.bodies[f.id]?.name : undefined;
+  return name ? `REL ${name.toUpperCase()}` : 'REL SYSTEM';
+}
 
 interface WeaponTile {
   root: HTMLDivElement;
@@ -99,7 +106,6 @@ export class FlightHud {
       this.shieldLabel,
       this.hullLabel,
     );
-    setText(this.speedUnit, 'u/s');
 
     const chips = el('div', 'hud-chips');
     chips.append(this.modeChip, this.weaponsChip);
@@ -111,8 +117,12 @@ export class FlightHud {
     parent.append(this.root);
   }
 
-  /** Refresh. `ship` is null while the pilot has no ship. */
-  update(world: World, ship: Ship | null, fps: number): void {
+  /**
+   * Refresh. `ship` is null while the pilot has no ship. `nav` is the
+   * ship's `navReadout` (null without a nav computer): speed and frame
+   * are shown only through it, never worked out here.
+   */
+  update(world: World, ship: Ship | null, nav: NavReadout | null, fps: number): void {
     setText(this.debug, `${fps.toFixed(0)} fps · tick ${world.tick}`);
     show(this.status, ship !== null);
     show(this.cluster, ship !== null && ship.state === 'flying');
@@ -156,12 +166,10 @@ export class FlightHud {
     setAttr(this.hullArc, 'd', arcPath(MID, MID, HULL_R, hullF, RING_START, RING_SWEEP));
     const hullState = hullF < HULL_ALARM ? 'ring hull alarm' : hullF < HULL_CAUTION ? 'ring hull caution' : 'ring hull';
     setAttr(this.hullArc, 'class', hullState);
-    // Speed against the local frame: the station in dock range, else the body whose sphere you are in.
-    const rel = relativeVelocity(world, ship);
-    setText(this.speed, Math.hypot(rel.x, rel.y).toFixed(0));
-    const frame = localFrame(world, ship);
-    const frameName = frame.kind === 'station' ? world.stations[frame.id]?.name : frame.kind === 'body' ? world.bodies[frame.id]?.name : undefined;
-    setText(this.frameLine, frameName ? `REL ${frameName.toUpperCase()}` : 'REL SYSTEM');
+    // Speed and frame come from the nav computer; without one there is no speed reading.
+    setText(this.speed, nav ? nav.speed.toFixed(0) : NONE);
+    setText(this.speedUnit, nav ? 'u/s' : 'NO NAV');
+    setText(this.frameLine, nav ? frameWords(world, nav) : 'NO NAV COMPUTER');
     setText(this.shieldLabel, `SHD ${Math.ceil(ship.shield)}`);
     setText(this.hullLabel, `HUL ${Math.ceil(ship.structure)}`);
 

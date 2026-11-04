@@ -10,6 +10,8 @@
   --hostile: #e06c5a;
   --neutral: #8fa8c8;
   --alarm: #ff5c5c;
+  /* The Calder Watch flies the pirates' hull in Port Authority white. */
+  --watch: #f2f5f7;
   --panel: rgba(12, 24, 24, 0.6);
   --font: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 }
@@ -37,6 +39,11 @@ canvas#game {
 
 .hidden {
   display: none !important;
+}
+
+/* Hidden but still taking its place in the layout. */
+.invisible {
+  visibility: hidden;
 }
 
 /*
@@ -1030,4 +1037,66 @@ button:hover {
 
 .hud-target[data-stance='hostile'] .bar-fill.hull {
   background: var(--hostile);
+}
+
+.hud-target-extra,
+.hud-target-reads {
+  font-size: 11px;
+}
+
+.hud-target-reads {
+  color: var(--ink-dim);
+}
+
+.hud-target-grid .num.critical {
+  color: var(--alarm);
+}
+
+.hud-target[data-stance='watch'] .hud-target-stance,
+.hud-target[data-stance='watch'] .silhouette {
+  color: var(--watch);
+  stroke: var(--watch);
+}
+
+.hud-target[data-stance='empty'] .hud-target-stance,
+.hud-target[data-stance='unknown'] .hud-target-stance {
+  color: var(--ink-dim);
+}
+
+.hud-target[data-stance='empty'] .silhouette {
+  stroke: var(--ink-dim);
+  stroke-dasharray: 3 2;
+}
+
+.hud-lock[data-stance='watch'] {
+  color: var(--watch);
+}
+
+.hud-lock[data-stance='watch'] .silhouette {
+  stroke: var(--watch);
+}
+
+.hud-lock[data-stance='unknown'],
+.hud-lock[data-stance='empty'] {
+  color: var(--ink-dim);
+}
+
+/* Radar disc, bottom left. The disc takes clicks (to lock a contact). */
+.hud-radar {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.hud-radar-disc {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.hud-radar-caption {
+  font-size: 11px;
 }

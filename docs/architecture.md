@@ -101,14 +101,16 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `render/starfield.ts` | Infinite hashed parallax starfield |
 | `render/ship-art.ts` | Ships drawn from their fit: hull outline (dashed when empty), empty sockets (outfitting only), and each module's silhouette at its mount, tinted by its maker's race. Escape pods are drawn as orange lifeboats instead |
 | `render/ship-thumb.ts` | Small fixed-size ship drawings for the ship mart and Your ships lists |
-| `render/draw.ts` | Vector drawing of ships flying or on their pads (via `ship-art.ts`), empty ships faded, turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, landing pads, security zones, the escape pod beacon and off-screen markers |
+| `render/draw.ts` | Vector drawing of ships flying or on their pads (via `ship-art.ts`), empty ships faded, turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, landing pads, security zones, the escape pod beacon and off-screen marker (kept for the nav target) |
 | `market-panel.ts` | Station market table in the docked panel; reports trade clicks to `main.ts` |
 | `outfitting-panel.ts` | Outfitting tab in the docked panel: ship drawing with selectable mounts, now and after stats from `planRefit`, fit and remove; reports clicks to `main.ts` |
 | `ship-mart-panel.ts` | Ship mart tab in the docked panel: ships for sale with drawing, stats from `fitStats`, price, and Buy greyed with the `buyRefusal` reason; reports clicks to `main.ts` |
 | `your-ships-panel.ts` | Your ships tab in the docked panel: every ship the pilot owns, where it is, condition, cargo, and Board greyed with the `boardRefusal` reason; reports clicks to `main.ts` |
 | `ui.ts` | Docked panel tabs, the free Tern claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName`, `shipWhere` and `boardPrompt`, the words for a ship, where it is and what B would do |
-| `hud/flight-hud.ts` | The flight HUD (DOM and SVG over the canvas): ship, zone and wallet top left, the warning slot top centre, the status dial (shield and hull rings, a reserved capacitor ring, speed), flight mode and weapons chips, weapon tiles with reload rings, the dock and board prompt |
-| `hud/target-card.ts` | The target card on the right edge: stance, name, silhouette in its shield ring, shield and hull bars, range, closing speed |
+| `hud/flight-hud.ts` | The flight HUD (DOM and SVG over the canvas): ship, zone and wallet top left, the warning slot top centre, the status dial (shield and hull rings, a reserved capacitor ring, speed and frame from `navReadout`), flight mode and weapons chips, weapon tiles with reload rings, the dock and board prompt |
+| `hud/target-card.ts` | The lock strip and the target card on the right edge, drawn only from `lockReadout` (nothing until a lock completes, then only what the targeting computer reads) |
+| `hud/radar.ts` | The radar disc, bottom left (its own small canvas): north up, ships within sensor range styled by what locks have read, stations and bodies always, the screen's extent at the current zoom; clicking a contact locks it |
+| `hud/radar-geometry.ts` | Pure radar maths: placing points on the disc or its rim, what shows, picking the clicked contact, ring spacing. Tested |
 | `hud/geometry.ts` | Pure helpers for the HUD: arc paths for gauges, fractions, closing speed, reload progress, hull silhouettes. Tested in `geometry.test.ts` (`npm test` in `packages/client`) |
 | `hud/dom.ts` | DOM and SVG builders, and writers that touch the DOM only when a value changed |
 | `style.css` | Theme variables and overlay layout |
