@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "npm run dev --workspace=@spacegame/client",
     "build": "npm run build --workspace=@spacegame/sim && npm run build --workspace=@spacegame/client",
-    "test": "npm run test --workspace=@spacegame/sim",
+    "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
     "preview": "npm run preview --workspace=@spacegame/client"
   },

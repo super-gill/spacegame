@@ -102,7 +102,11 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `outfitting-panel.ts` | Outfitting tab in the docked panel: ship drawing with selectable mounts, now and after stats from `planRefit`, fit and remove; reports clicks to `main.ts` |
 | `ship-mart-panel.ts` | Ship mart tab in the docked panel: ships for sale with drawing, stats from `fitStats`, price, and Buy greyed with the `buyRefusal` reason; reports clicks to `main.ts` |
 | `your-ships-panel.ts` | Your ships tab in the docked panel: every ship the pilot owns, where it is, condition, cargo, and Board greyed with the `boardRefusal` reason; reports clicks to `main.ts` |
-| `ui.ts` | HUD text (including the escape pod line and the board prompt), docked panel tabs, the free Tern claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName` and `shipWhere`, the words for a ship and where it is |
+| `ui.ts` | Docked panel tabs, the free Tern claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName`, `shipWhere` and `boardPrompt`, the words for a ship, where it is and what B would do |
+| `hud/flight-hud.ts` | The flight HUD (DOM and SVG over the canvas): ship, zone and wallet top left, the warning slot top centre, the status dial (shield and hull rings, a reserved capacitor ring, speed), flight mode and weapons chips, weapon tiles with reload rings, the dock and board prompt |
+| `hud/target-card.ts` | The target card on the right edge: stance, name, silhouette in its shield ring, shield and hull bars, range, closing speed |
+| `hud/geometry.ts` | Pure helpers for the HUD: arc paths for gauges, fractions, closing speed, reload progress, hull silhouettes. Tested in `geometry.test.ts` (`npm test` in `packages/client`) |
+| `hud/dom.ts` | DOM and SVG builders, and writers that touch the DOM only when a value changed |
 | `style.css` | Theme variables and overlay layout |
 
 ### Rendering
