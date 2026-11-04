@@ -61,6 +61,7 @@ import {
   drawDecoy,
   drawMunition,
   drawProjectile,
+  drawShieldArc,
   drawShip,
   drawStation,
   drawTargetBracket,
@@ -684,6 +685,11 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
     const art = { hull, fit: ship.fit, modules: current.modules, manufacturers: current.manufacturers, weapons: ship.weapons, thrusters: ship.thrusters, stats };
     drawShip(ctx!, camera, shipView, art, labelShown(style, ship) ? style : { colour: style.colour, empty: style.empty === true });
+    // Shield cover with its open stern: yours always, others' only if your targeting computer reads their shield.
+    const reads = mine && ship.id !== mine.id && ship.state === 'flying' ? lockReadout(current, mine, ship.id) : null;
+    if (ship.state === 'flying' && (ship.id === mine?.id || reads?.condition?.shield === 'up' || reads?.combat)) {
+      drawShieldArc(ctx!, camera, shipView.position, shipView.heading, hull.radius, stats.shieldArc, stats.shield > 0 ? ship.shield / stats.shield : 0);
+    }
     if (hull.escapePod && ship.state === 'flying') drawPodBeacon(ctx!, camera, shipView.position, hull.radius, nowMs);
     // Health bars only for ships your targeting computer can read: a complete lock with combat readout.
     const read = mine && ship.state === 'flying' && ship.id !== mine.id ? lockReadout(current, mine, ship.id) : null;

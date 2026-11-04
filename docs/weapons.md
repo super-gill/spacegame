@@ -40,6 +40,17 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.
 - Ammunition decides the damage type (and for missiles the warhead). The weapon decides rate, range and tracking.
 - Resupply is at stations through the market, so running dry far from home is a real risk that energy weapons do not have.
 
+## Shield arcs
+
+Agreed with Jason, 4 November 2026, to break up head-on duelling.
+
+- **A shield covers the bow and both beams; the stern is open.** The main drive has to fire, and its wash cannot pass through a shield, so no ship under way can close its shield over the stern. A hit from outside the arc goes straight to armour and hull.
+- **Coverage is a property of the shield generator** (`ModuleSpec.shieldArc`, radians centred on the bow; `ShipStats.shieldArc` is the widest fitted). Stock generators cover 270 degrees, leaving a 90-degree stern quarter open (`STOCK_SHIELD_ARC`). Better generators may wrap further; none closes fully.
+- **Bastion mode (later, big ships only):** a line ship or capital can shut its drive down and close the shield all the way round, at the cost of not moving. It comes with the first hull of that size.
+- **NPCs fight for the stern:** pirates and the Watch hold off their target at their standoff but work their way round it towards its stern, a step at a time (`sternHoldPoint`), nose on the target throughout; a target that keeps turning its bow to them keeps them circling. Pirates cap their speed towards a station so a chase never carries them into its security zone (`keepOutOfZones`).
+- **Heat seekers** tend to arrive at the stern, where the engines are: the open quarter.
+- Later: hits that land past the shield damage the module nearest the impact (engines from astern, guns and sensors from ahead).
+
 ## Damage and defence
 
 - Every shot and warhead has a **damage type**: `kinetic` (rounds, railgun slugs), `thermal` (lasers, blaster plasma), `explosive` (warheads), `fragmentation` (frag warheads). The data carries all four.

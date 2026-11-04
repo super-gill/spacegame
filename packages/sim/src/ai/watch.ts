@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, awayFromStation, canAfford, holdLock, sternHoldPoint, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -130,8 +130,8 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       const t = target!;
       // Lock first: until the lock completes it does not know enough to shoot.
       const lockInput = holdLock(ship, stats, t.id);
-      const back = normalise(sub(ship.position, t.position));
-      const hold = add(t.position, scale(back, WATCH_TUNING.standoff));
+      // Work round to the pirate's stern, where its shield is open.
+      const hold = sternHoldPoint(ship, t, WATCH_TUNING.standoff);
       // Fight round stations, rocks and bodies, not through them.
       const waypoint = routeAround(ship, stats, hold, around);
       const desired = add(t.velocity, travelVelocity(ship, stats, waypoint, hold, stats.maxSpeed));

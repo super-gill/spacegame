@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
+import { arriveVelocity, canAfford, holdLock, plannedBraking, sternHoldPoint, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -94,6 +94,28 @@ export function inSecurityZone(world: World, point: Vec2, margin = 0): boolean {
 
 /** Extra room pirates give a security zone's edge when routing round it, units. */
 const ZONE_MARGIN = 100;
+
+/** The slowest a hunting pirate is held to near a zone, units/s, so it can still manoeuvre. */
+const ZONE_CRAWL = 40;
+
+/**
+ * `desired` with its speed towards the nearest station capped at what the
+ * pirate could still stop in before the security zone's edge (and its
+ * margin). Chasing a target that runs for a station, the target's own
+ * velocity must not carry the pirate in.
+ */
+function keepOutOfZones(world: World, ship: Ship, stats: ShipStats, desired: Vec2): Vec2 {
+  let nearest: { at: Vec2; room: number } | null = null;
+  for (const s of Object.values(world.stations)) {
+    const room = distance(ship.position, s.position) - s.securityRadius - ZONE_MARGIN;
+    if (!nearest || room < nearest.room) nearest = { at: s.position, room };
+  }
+  if (!nearest) return desired;
+  const towards = normalise(sub(nearest.at, ship.position));
+  const allowed = Math.max(ZONE_CRAWL, Math.sqrt(2 * plannedBraking(stats) * Math.max(0, nearest.room)));
+  const speed = desired.x * towards.x + desired.y * towards.y;
+  return speed > allowed ? sub(desired, scale(towards, speed - allowed)) : desired;
+}
 
 /**
  * What a pirate steers round on its way home: station hulls, bodies, and
@@ -187,10 +209,10 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       // Hold a point between pirate and target, `standoff` short of the target,
       // and match the target's velocity on top.
       const t = target!;
-      const back = normalise(sub(ship.position, t.position));
-      const holdPoint = add(t.position, scale(back, PIRATE_TUNING.standoff));
+      // Work round to the target's stern, where its shield is open.
+      const holdPoint = sternHoldPoint(ship, t, PIRATE_TUNING.standoff);
       const closing = travelVelocity(ship, stats, routeAround(ship, stats, holdPoint, around), holdPoint, stats.maxSpeed);
-      const desired = add(t.velocity, closing);
+      const desired = keepOutOfZones(world, ship, stats, add(t.velocity, closing));
 
       // Point the nose where the shots need to go, and fire when it is there.
       // Lock as it closes: its missiles need one, its guns do not.

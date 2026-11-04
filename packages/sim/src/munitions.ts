@@ -341,7 +341,7 @@ export function stepMunitions(
       if (distance(end, q.position) <= (hulls[q.hullId]?.radius ?? 0) + airframe.radius + MUNITION_PROXIMITY_FUSE) hitShip = q;
     }
     if (hitShip) {
-      damage.push({ shipId: hitShip.id, amount: m.damage, by: m.ownerShipId, cause: 'munition', type: m.damageType });
+      damage.push({ shipId: hitShip.id, amount: m.damage, by: m.ownerShipId, cause: 'munition', type: m.damageType, from: m.position });
       continue;
     }
     if (blocked) {

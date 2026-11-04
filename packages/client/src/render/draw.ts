@@ -342,6 +342,27 @@ export function drawDecoy(ctx: CanvasRenderingContext2D, camera: Camera, d: Deco
   ctx.restore();
 }
 
+/**
+ * Stopgap (lead): the shield as an arc round the hull, covering the bow
+ * and beams and leaving the stern open, brighter the fuller the shield.
+ * The interface workstream owns the real look.
+ */
+export function drawShieldArc(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, heading: number, hullRadius: number, arc: number, fraction: number): void {
+  if (arc <= 0 || fraction <= 0) return;
+  const c = camera.worldToScreen(at);
+  const r = (hullRadius + 7) * camera.zoom;
+  ctx.save();
+  ctx.strokeStyle = SHIELD_INK;
+  ctx.globalAlpha = 0.2 + 0.5 * fraction;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, r, heading - arc / 2, heading + arc / 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+const SHIELD_INK = '#7cc4ff';
+
 /** A wreck: the bare hull outline, dashed, fading out over its lifetime. */
 export function drawWreck(ctx: CanvasRenderingContext2D, camera: Camera, w: Wreck, hull: HullSpec, fade: number): void {
   const c = camera.worldToScreen(w.position);

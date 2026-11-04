@@ -107,7 +107,8 @@ describe('pirate', () => {
       ships: {
         ...w.ships,
         // Very tough, so the test is about the pirate's flying, not about who wins.
-        [shipId]: { ...w.ships[shipId]!, position: nearPirate(w), velocity: { x: 0, y: 0 }, flightMode: 'manual', shield: 1e6 },
+        // Hull as well as shield: the pirate works round to the open stern.
+        [shipId]: { ...w.ships[shipId]!, position: nearPirate(w), velocity: { x: 0, y: 0 }, flightMode: 'manual', shield: 1e6, structure: 1e6 },
         [TRADER]: { ...w.ships[TRADER]!, state: 'docked', dockedAt: 'station-harbour' },
       },
       npcs: { ...w.npcs, [TRADER]: { kind: 'trader', route: ['station-harbour'], leg: 0, waitTicks: 1e9 } },

@@ -158,7 +158,7 @@ describe('projectiles', () => {
   it('hits a ship in its path even if it would skip past it in one tick', () => {
     // 900 u/s covers 15 units per tick; start just before the hull edge so the path crosses it.
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, {}, FIXED_DT);
-    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon', type: 'kinetic' }]);
+    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon', type: 'kinetic', from: { x: 300, y: -25 } }]);
     expect(r.projectiles).toEqual([]);
   });
 

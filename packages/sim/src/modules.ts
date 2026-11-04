@@ -1,3 +1,4 @@
+import { STOCK_SHIELD_ARC } from './constants.js';
 import type { ModuleSpec } from './types.js';
 
 /**
@@ -128,6 +129,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'meridian',
     tags: ['shield'],
     stats: { shield: 120, shieldRegen: 6 },
+    // Bow and beams; the stern stays open for the drive.
+    shieldArc: STOCK_SHIELD_ARC,
     // Shields take heat well and shrapnel badly.
     resists: { thermal: 0.3, kinetic: 0.1, explosive: 0.15, fragmentation: 0 },
   },
@@ -144,6 +147,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'itoMarr',
     tags: ['shield'],
     stats: { shield: 260, shieldRegen: 9 },
+    shieldArc: STOCK_SHIELD_ARC,
     resists: { thermal: 0.35, kinetic: 0.1, explosive: 0.2, fragmentation: 0 },
   },
 

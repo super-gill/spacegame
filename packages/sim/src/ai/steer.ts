@@ -343,3 +343,21 @@ export function wantsCountermeasure(world: Pick<World, 'munitions'>, ship: Ship,
   if (!coming) return false;
   return ship.weapons.some((w) => stats.weapons[w.mountId]?.family === 'countermeasure' && w.loaded > 0 && w.cooldownTicks === 0);
 }
+
+/** How far round the target an NPC works its hold point each time it plans, radians: it circles rather than cutting across. */
+const STERN_STEP = 0.9;
+
+/**
+ * Where to hold off `target` while fighting it: `standoff` from it, worked
+ * round from where this ship is towards the target's stern, a step at a
+ * time. The shield's open stern is where a hit goes straight to the hull,
+ * so fighters circle for it rather than trading shots bow to bow; a target
+ * that turns to keep its bow on them keeps them circling. The NPC still
+ * points its nose at the target while it goes round (its guns are fixed).
+ */
+export function sternHoldPoint(ship: Ship, target: Ship, standoff: number): Vec2 {
+  const bearing = toAngle(sub(ship.position, target.position));
+  const toStern = angleDelta(bearing, target.heading + Math.PI);
+  const step = Math.max(-STERN_STEP, Math.min(STERN_STEP, toStern));
+  return add(target.position, scale(fromAngle(bearing + step), standoff));
+}

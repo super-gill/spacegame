@@ -44,7 +44,7 @@ export {
 } from './trade.js';
 export { buildShip } from './factory.js';
 export { lockSeconds, lockRefusal, stepLocks, isLocked, weaponTarget, activeTarget, lockReadout, type LockStep, type LockReadout } from './locks.js';
-export { applyDamage, fireWeapons, leadPoint, leadFor, loadedGoodOf, nextAmmo, stepProjectiles, regenerateShield } from './combat.js';
+export { applyDamage, shieldCovers, fireWeapons, leadPoint, leadFor, loadedGoodOf, nextAmmo, stepProjectiles, regenerateShield } from './combat.js';
 export { decoySignature, incomingMunitions, launchMunition, dropDecoy, stepMunitions, stepDecoys, spoofRadar, type MunitionHit } from './munitions.js';
 export { collideShips } from './collision.js';
 export {

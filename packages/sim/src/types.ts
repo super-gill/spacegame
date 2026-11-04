@@ -211,6 +211,13 @@ export interface ModuleSpec {
   startsLoadedWith?: string;
   /** Targeting computers only: what a lock shows (see `ReadoutKind`). */
   readouts?: ReadoutKind[];
+  /**
+   * Shield generators only: how wide the shield wraps round the hull,
+   * radians, centred on the bow. Never all the way round: the main drive
+   * has to fire through the stern, so the stern stays open (docs/weapons.md,
+   * "Shield arcs").
+   */
+  shieldArc?: number;
   /** Shield generators and armour: what they stop of each damage type. */
   resists?: Resistances;
   /**
@@ -357,6 +364,8 @@ export interface ShipStats {
   capacitorDraw: number;
   /** What the fitted shield generator stops of each damage type. */
   shieldResists: Resistances;
+  /** Width of the shield's cover, radians, centred on the bow: the widest fitted generator's. Zero with none. */
+  shieldArc: number;
   /** What the fitted armour stops of each damage type, applied to structure damage. */
   armourResists: Resistances;
 }
@@ -1057,7 +1066,8 @@ export type WorldEvent =
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */
   | { type: 'rammed'; shipId: string; by: string; speed: number }
   /** A ship took damage (after resistances). `by` is the ship responsible, or null for a station hull. */
-  | { type: 'damaged'; shipId: string; by: string | null; amount: number; cause: DamageCause }
+  /** `unshielded`: the hit came in through the open stern, past the shield. */
+  | { type: 'damaged'; shipId: string; by: string | null; amount: number; cause: DamageCause; unshielded?: true }
   /** A weapon ran dry: no rounds loaded and none in the hold. */
   | { type: 'outOfAmmo'; shipId: string; mountId: string }
   /** The capacitor is empty and an energy weapon could not fire. */

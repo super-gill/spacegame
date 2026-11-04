@@ -45,6 +45,8 @@ export interface Damage {
   cause: DamageCause;
   /** What the damage is done as. Impacts are kinetic. */
   type: DamageType;
+  /** Where the hit came from (a shot's or munition's last position), for the shield arc. Absent: from everywhere, the shield takes it. */
+  from?: Vec2;
 }
 
 function dot(a: Vec2, b: Vec2): number {
@@ -396,7 +398,7 @@ export function stepProjectiles(
       continue;
     }
     if (hitShip) {
-      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType });
+      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType, from: p.position });
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;
@@ -407,9 +409,26 @@ export function stepProjectiles(
 }
 
 
-/** What a hit of `amount` of `type` does to a ship: shields first through shield resistances, then structure through armour's. */
-export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: number, type: DamageType = 'kinetic'): Ship {
-  const shieldHit = amount * (1 - (stats.shieldResists[type] ?? 0));
+/**
+ * True if a hit arriving from `from` meets the shield: it covers
+ * `stats.shieldArc` centred on the bow, and the stern quarter outside it
+ * is open, because the main drive has to fire through it.
+ */
+export function shieldCovers(ship: Pick<Ship, 'position' | 'heading'>, stats: Pick<ShipStats, 'shieldArc'>, from: Vec2): boolean {
+  if (stats.shieldArc >= Math.PI * 2 - 1e-9) return true;
+  if (stats.shieldArc <= 0) return false;
+  const bearing = angleDelta(ship.heading, toAngle(sub(from, ship.position)));
+  return Math.abs(bearing) <= stats.shieldArc / 2;
+}
+
+/**
+ * What a hit of `amount` of `type` does to a ship: shields first through
+ * shield resistances, then structure through armour's. A hit from `from`
+ * outside the shield's arc (the open stern) skips the shield.
+ */
+export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: number, type: DamageType = 'kinetic', from?: Vec2): Ship {
+  const covered = !from || shieldCovers(ship, stats, from);
+  const shieldHit = covered ? amount * (1 - (stats.shieldResists[type] ?? 0)) : 0;
   const toShield = Math.min(ship.shield, shieldHit);
   // Whatever the shield did not stop goes on, in raw terms, to the hull.
   const through = shieldHit > 0 ? amount * (1 - toShield / shieldHit) : amount;

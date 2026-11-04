@@ -1,4 +1,4 @@
-import { SHIELD_REGEN_DELAY } from './constants.js';
+import { SHIELD_REGEN_DELAY, STOCK_SHIELD_ARC } from './constants.js';
 import type { HullBonus, HullSpec, ModuleSpec, MountPoint, ReadoutKind, Resistances, Ship, ShipStats, World } from './types.js';
 import type { ModuleStat } from './types.js';
 
@@ -94,6 +94,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   const readouts = new Set<ReadoutKind>();
   let capacitorDraw = 0;
   let shieldResists: Resistances = {};
+  let shieldArc = 0;
   let armourResists: Resistances = {};
 
   for (const mount of hull.mounts) {
@@ -109,6 +110,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     for (const r of module.readouts ?? []) readouts.add(r);
     // Only a module the full size of its mount draws on the capacitor (docs/weapons.md).
     if (module.capacitorDraw && module.size === mount.size) capacitorDraw += module.capacitorDraw;
+    if (module.kind === 'shieldGenerator') shieldArc = Math.max(shieldArc, module.shieldArc ?? STOCK_SHIELD_ARC);
     if (module.resists) {
       if (module.kind === 'shieldGenerator') shieldResists = bestOf(shieldResists, module.resists);
       if (module.kind === 'armour') armourResists = bestOf(armourResists, module.resists);
@@ -145,6 +147,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     capacitorRecharge: hull.capacitorRecharge,
     capacitorDraw,
     shieldResists,
+    shieldArc,
     armourResists,
   };
 }

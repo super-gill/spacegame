@@ -193,3 +193,10 @@ export const MUNITION_HIT_MARGIN = 3;
 
 /** Point defence engages munitions within this fraction of the swivel's range. */
 export const POINT_DEFENCE_RANGE_FRACTION = 1;
+
+/**
+ * How far a stock shield wraps round the hull, radians, centred on the
+ * bow: 270 degrees, leaving the stern quarter open for the main drive's
+ * wash (docs/weapons.md, "Shield arcs").
+ */
+export const STOCK_SHIELD_ARC = (3 * Math.PI) / 2;
