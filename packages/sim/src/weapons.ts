@@ -70,7 +70,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     turretTurnRate: 0,
     capacitorPerShot: 0,
     ammo: 'rounds',
-    magazine: 40,
+    magazine: 100,
     reloadSeconds: 4,
   }),
   ...family('artillery', 'Artillery', {
@@ -84,7 +84,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     turretTurnRate: 0,
     capacitorPerShot: 0,
     ammo: 'shells',
-    magazine: 8,
+    magazine: 20,
     reloadSeconds: 6,
   }),
 
@@ -132,7 +132,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     turretTurnRate: 0,
     capacitorPerShot: 1,
     ammo: 'charges',
-    magazine: 30,
+    magazine: 80,
     reloadSeconds: 4,
   }),
   ...family('railgun', 'Railgun', {
@@ -146,7 +146,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     turretTurnRate: 0,
     capacitorPerShot: 3,
     ammo: 'charges',
-    magazine: 12,
+    magazine: 40,
     reloadSeconds: 5,
   }),
 
@@ -163,22 +163,22 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     turretTurnRate: 4,
     capacitorPerShot: 0,
     ammo: 'rounds',
-    magazine: 60,
+    magazine: 200,
     reloadSeconds: 3,
   }),
 
   // Launchers: no capacitor, whole boxes of munitions. The munition
   // brings speed, turning and warhead; the launcher brings rate and how
   // many it holds. Range here is how far a missile flies before burning out.
-  'missile-launcher-s': launcher('missile-launcher-s', 'Missile launcher S', 'S', 'missile', 36, 2.5, 4, 8, 3800),
-  'missile-launcher-m': launcher('missile-launcher-m', 'Missile launcher M', 'M', 'missile', 72, 2.5, 8, 8, 3800),
-  'missile-launcher-l': launcher('missile-launcher-l', 'Missile launcher L', 'L', 'missile', 144, 2.5, 12, 8, 3800),
-  'torpedo-tube-m': launcher('torpedo-tube-m', 'Torpedo tube M', 'M', 'torpedo', 160, 6, 2, 12, 3400),
-  'torpedo-tube-l': launcher('torpedo-tube-l', 'Torpedo tube L', 'L', 'torpedo', 320, 6, 4, 12, 3400),
+  'missile-launcher-s': launcher('missile-launcher-s', 'Missile launcher S', 'S', 'missile', 36, 2.5, 8, 8, 3800),
+  'missile-launcher-m': launcher('missile-launcher-m', 'Missile launcher M', 'M', 'missile', 72, 2.5, 16, 8, 3800),
+  'missile-launcher-l': launcher('missile-launcher-l', 'Missile launcher L', 'L', 'missile', 144, 2.5, 24, 8, 3800),
+  'torpedo-tube-m': launcher('torpedo-tube-m', 'Torpedo tube M', 'M', 'torpedo', 160, 6, 4, 12, 3400),
+  'torpedo-tube-l': launcher('torpedo-tube-l', 'Torpedo tube L', 'L', 'torpedo', 320, 6, 8, 12, 3400),
 
   // Dispensers: a box of charges, one drop at a time.
-  'dispenser-s': dispenser('dispenser-s', 'Dispenser S', 'S', 6, 1),
-  'dispenser-m': dispenser('dispenser-m', 'Dispenser M', 'M', 12, 0.8),
+  'dispenser-s': dispenser('dispenser-s', 'Dispenser S', 'S', 12, 1),
+  'dispenser-m': dispenser('dispenser-m', 'Dispenser M', 'M', 24, 0.8),
 };
 
 function launcher(id: string, name: string, size: ModuleSize, slot: 'missile' | 'torpedo', damage: number, interval: number, magazine: number, reload: number, range: number): WeaponSpec {

@@ -157,7 +157,7 @@ describe('ammunition', () => {
     const stats = shipStats(w, s);
     let shots = 0;
     let dry = 0;
-    for (let i = 0; i < SECOND * 30; i++) {
+    for (let i = 0; i < SECOND * 90; i++) {
       const r = fireWeapons(s, stats, fire, () => null, FIXED_DT, i * 10, w);
       s = r.ship;
       shots += r.projectiles.length;

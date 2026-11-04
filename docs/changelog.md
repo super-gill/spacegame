@@ -11,6 +11,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Numbered tiles on the HUD: 1 to 9 select fire groups and switch modules.
 
 ### Changed
+- More ammunition: bigger boxes (rounds 100, shells 20, charges 40, missiles 8, chaff and flares 12) and bigger magazines, cheaper per shot. Boxes already in your hold count at the new size.
 - Armour fits internal slots; dispensers utility slots.
 - Save format version 6: saves upgrade automatically, with the new systems fitted free.
 
