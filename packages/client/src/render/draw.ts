@@ -1,4 +1,4 @@
-import type { HullSpec, Loot, Projectile, Ship, ShipStats, Station, Wreck } from '@spacegame/sim';
+import { padWorldPosition, type HullSpec, type Loot, type ModuleSize, type Projectile, type Ship, type ShipStats, type Station, type Wreck } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 import { drawShipArt, type ShipArt } from './ship-art.js';
 
@@ -21,6 +21,62 @@ const COLOUR = {
 export interface ShipStyle {
   colour: string;
   label?: string;
+  /** Nobody aboard: drawn faded with a dashed hull, so it reads as parked. */
+  empty?: boolean;
+}
+
+/**
+ * Side of the square landing frame drawn for each pad size, world units.
+ * A little smaller than twice the pad's reach from the station hull, so
+ * the frame sits clear of the hull and of its neighbours.
+ */
+const PAD_FRAME: Record<ModuleSize, number> = { S: 22, M: 34, L: 50, XL: 70 };
+
+/**
+ * A station's landing pads: a corner-bracket frame per pad, turned to the
+ * pad's facing, joined to the hull by a short gantry, with its size
+ * letter on the outer edge. Pads with a ship on them are drawn brighter.
+ */
+export function drawPads(ctx: CanvasRenderingContext2D, camera: Camera, station: Station, occupied: ReadonlySet<string>): void {
+  const z = camera.zoom;
+  for (const pad of station.pads) {
+    const c = camera.worldToScreen(padWorldPosition(station, pad));
+    const half = (PAD_FRAME[pad.size] / 2) * z;
+    const leg = half * 0.45;
+    const taken = occupied.has(pad.id);
+    const reach = Math.hypot(pad.position.x, pad.position.y) - station.radius;
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(pad.facing);
+    ctx.strokeStyle = taken ? COLOUR.ink : COLOUR.inkDim;
+    ctx.globalAlpha = taken ? 0.7 : 0.45;
+    ctx.lineWidth = 1;
+    // Gantry from the hull to the inner edge of the frame.
+    ctx.beginPath();
+    ctx.moveTo(-reach * z, 0);
+    ctx.lineTo(-half, 0);
+    ctx.stroke();
+    // Corner brackets.
+    ctx.beginPath();
+    for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]] as const) {
+      ctx.moveTo(sx * half, sy * (half - leg));
+      ctx.lineTo(sx * half, sy * half);
+      ctx.lineTo(sx * (half - leg), sy * half);
+    }
+    ctx.stroke();
+    if (z >= 0.6) {
+      ctx.rotate(-pad.facing);
+      ctx.fillStyle = COLOUR.inkDim;
+      ctx.font = '9px ui-monospace, Menlo, Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const out = half + 8;
+      ctx.fillText(pad.size, Math.cos(pad.facing) * out, Math.sin(pad.facing) * out);
+      ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
 }
 
 export interface ShipView {
@@ -79,25 +135,26 @@ export function drawStation(ctx: CanvasRenderingContext2D, camera: Camera, stati
 }
 
 /**
- * A ship in space: hull and fitted modules (see ship-art.ts), with an
- * optional label underneath. Docked ships are not drawn.
+ * A ship, in space or on a pad: hull and fitted modules (see
+ * ship-art.ts), with an optional label underneath. A docked ship's
+ * position is already its pad's, so it is drawn the same way.
  */
 export function drawShip(
   ctx: CanvasRenderingContext2D,
   camera: Camera,
   view: ShipView,
   art: Omit<ShipArt, 'colour' | 'heading'>,
-  docked: boolean,
   style: ShipStyle = { colour: COLOUR.inkBright },
 ): void {
-  if (docked) return;
   const c = camera.worldToScreen(view.position);
   ctx.save();
   ctx.translate(c.x, c.y);
   ctx.rotate(view.heading);
   ctx.scale(camera.zoom, camera.zoom);
-  drawShipArt(ctx, camera.zoom, { ...art, colour: style.colour, heading: view.heading });
+  if (style.empty) ctx.globalAlpha = EMPTY_ALPHA;
+  drawShipArt(ctx, camera.zoom, { ...art, colour: style.colour, heading: view.heading, dashedHull: style.empty === true });
   ctx.restore();
+  ctx.globalAlpha = 1;
 
   if (style.label) {
     ctx.fillStyle = style.colour;
@@ -132,6 +189,37 @@ export function drawVelocityVector(
 }
 
 export { COLOUR };
+
+/** How faded an empty ship is drawn. */
+const EMPTY_ALPHA = 0.55;
+
+/** One beacon flash cycle, ms. */
+const BEACON_PERIOD_MS = 1400;
+
+/**
+ * An escape pod's distress beacon: a light that blinks on the pod and a
+ * ring that pulses out from it, both in screen pixels so a pod stays
+ * findable even zoomed out, where its hull is only a few pixels wide.
+ */
+export function drawPodBeacon(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, radius: number, nowMs: number): void {
+  const c = camera.worldToScreen(at);
+  const t = (nowMs % BEACON_PERIOD_MS) / BEACON_PERIOD_MS;
+  const base = radius * camera.zoom + 4;
+  ctx.strokeStyle = COLOUR.flame;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.6 * (1 - t);
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, base + 22 * t, 0, Math.PI * 2);
+  ctx.stroke();
+  if (t < 0.18) {
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = COLOUR.flame;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
 
 /**
  * Marker at the screen edge pointing at something off screen, with a

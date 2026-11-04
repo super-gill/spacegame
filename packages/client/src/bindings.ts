@@ -1,3 +1,5 @@
+import { BOARD_MAX_RELATIVE_SPEED, BOARD_RANGE } from '@spacegame/sim';
+
 /**
  * Every control in the game, in one table.
  *
@@ -26,9 +28,10 @@ export type SimAction =
 /**
  * Actions the client handles itself. Target selection is worked out in
  * the client (it needs the camera and the pointer) and reaches the sim as
- * a `selectTarget` input.
+ * a `selectTarget` input. Boarding is a pilot command, like trading, not
+ * a flight input.
  */
-export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget';
+export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board';
 
 export type Action = SimAction | UiAction;
 
@@ -71,6 +74,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'tractor', codes: ['KeyR'], group: 'Weapons', label: 'Tractor beam', kind: 'hold', note: 'Pulls in nearby loot' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
+  { action: 'board', codes: ['KeyB'], group: 'Ships', label: 'Board your nearest empty ship', kind: 'press', note: `Docked at the same station, or in space within ${BOARD_RANGE} units, under ${BOARD_MAX_RELATIVE_SPEED} u/s relative` },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },
   { action: 'toggleMenu', codes: ['F2'], group: 'Interface', label: 'Menu: pilot name, settings, save', kind: 'press' },
 ];
@@ -78,6 +82,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 export const POINTER_CONTROLS: readonly PointerControl[] = [
   { input: 'Left click', group: 'Targeting', label: 'Click a ship to target it' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
+  { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Courier' },
   { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },
 ];
 

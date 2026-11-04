@@ -1,4 +1,13 @@
 import {
+  boardShip,
+  boardableShips,
+  buyShip,
+  claimStarterShip,
+  isEmptyShip,
+  isEscapePod,
+  STARTER_STATION_ID,
+  occupiedPads,
+  type WorldEvent,
   buyGood,
   createStarterWorld,
   fitModule,
@@ -38,6 +47,8 @@ import {
   drawLoot,
   drawOffscreenMarker,
   drawLeadMarker,
+  drawPads,
+  drawPodBeacon,
   drawProjectile,
   drawShip,
   drawStation,
@@ -48,7 +59,9 @@ import {
   type ShipStyle,
 } from './render/draw.js';
 import { drawStarfield } from './render/starfield.js';
-import { Ui, shipLabel } from './ui.js';
+import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
+import { Ui, shipLabel, shipName } from './ui.js';
+import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
 
 /**
  * Game loop.
@@ -79,12 +92,14 @@ const input = new InputController(
     else if (action === 'toggleMenu') menu.toggle();
     else if (action === 'cycleTarget') cycleTarget();
     else if (action === 'clearTarget') input.requestTarget(null);
+    else if (action === 'board') boardNearest();
   },
   (point) => clickTarget(point),
 );
 const ui = new Ui(
   () => input.requestToggleDock(),
   () => respawn(),
+  () => claimStarter(),
 );
 
 let me = loadLocalPilot();
@@ -92,6 +107,8 @@ const settings = loadSettings();
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
+const shipMart = new ShipMartPanel(document.getElementById('ship-mart-container')!, (loadoutId) => buy(loadoutId));
+const yourShips = new YourShipsPanel(document.getElementById('ships-container')!, (shipId) => board(shipId));
 
 const REFUSALS: Record<TradeRefusal, string> = {
   noShip: 'You have no ship.',
@@ -146,6 +163,51 @@ function refit(request: RefitRequest): void {
   }
 }
 
+/**
+ * After a pilot command that may have moved us into another ship: toast
+ * its event, and treat the new state as the previous one too so nothing
+ * interpolates from the old ship's place.
+ */
+function commanded(world: World, event: WorldEvent): void {
+  current = world;
+  previous = current;
+  ui.announce(current, event);
+}
+
+/** Pilot command: buy a ship from the ship mart where we are docked. */
+function buy(loadoutId: string): void {
+  const r = buyShip(current, me.id, loadoutId);
+  if (!r.ok) {
+    ui.notify(BUY_REFUSALS[r.reason], 'warn');
+    return;
+  }
+  commanded(r.world, r.event);
+}
+
+/** Pilot command: board a ship we own that nobody is flying. */
+function board(shipId: string): void {
+  const r = boardShip(current, me.id, shipId);
+  if (!r.ok) {
+    ui.notify(BOARD_REFUSALS[r.reason], 'warn');
+    return;
+  }
+  commanded(r.world, r.event);
+}
+
+/** B: board the nearest ship we could board right now, or say why nothing is in reach. */
+function boardNearest(): void {
+  const next = boardableShips(current, me.id)[0];
+  if (next) board(next.id);
+  else if (myShip(current)) ui.notify('No ship of yours in reach to board.', 'warn');
+}
+
+/** Pilot command: in a pod at Harbour, owning nothing, take the free starter Courier. */
+function claimStarter(): void {
+  const r = claimStarterShip(current, me.id);
+  if (!r.ok) return; // the button only shows when the claim would succeed
+  commanded(r.world, r.event);
+}
+
 // Start from the saved world if there is one. joinPilot leaves a returning
 // pilot exactly as they were, and gives a new one a starter ship.
 const stored = loadStoredWorld();
@@ -163,6 +225,8 @@ function replaceWorld(world: World): void {
   if (ship) camera.snapTo(ship.position);
   market.invalidate();
   outfitting.invalidate();
+  shipMart.invalidate();
+  yourShips.invalidate();
 }
 
 // Saving: autosave every few seconds and whenever the tab is hidden or closed.
@@ -220,17 +284,19 @@ function myShip(world: World): Ship | null {
   return pilotShip(world, me.id);
 }
 
-/** Where the camera looks while there is no ship to follow. */
-let lastSeen: Vec2 = myShip(current)!.position;
+/**
+ * Where the camera looks while there is no ship to follow. A pilot who
+ * lost their pod before the last save loads with no ship at all, so fall
+ * back to the station they will wake at.
+ */
+let lastSeen: Vec2 = myShip(current)?.position ?? current.stations[STARTER_STATION_ID]?.position ?? { x: 0, y: 0 };
 camera.snapTo(lastSeen);
 
 /** Pilot command: wake at Harbour after losing your escape pod. */
 function respawn(): void {
   const woke = wakePilot(current, me.id);
   if (!woke.ok) return;
-  current = woke.world;
-  ui.notify(woke.world.ships[woke.event.shipId]?.hullId === 'escape-pod' ? 'You wake at Harbour in a new escape pod. Your ships are where you left them.' : 'You wake at Harbour with a free Meridian Courier.');
-  previous = current;
+  commanded(woke.world, woke.event);
   const ship = myShip(current);
   if (ship) camera.snapTo(ship.position);
 }
@@ -370,8 +436,18 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
+  if (isEmptyShip(world, ship)) {
+    // Yours stand out from other pilots' parked ships.
+    if (ship.ownerId === me.id) return { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()} · EMPTY`, empty: true };
+    return { colour: COLOUR.inkDim, label: shipLabel(world, ship), empty: true };
+  }
   const label = shipLabel(world, ship);
   return label === 'UNKNOWN' ? { colour: COLOUR.ink } : { colour: COLOUR.ink, label };
+}
+
+/** Labels are a setting, except on your own empty ships, which you need to find. */
+function labelShown(style: ShipStyle, ship: Ship): boolean {
+  return settings.showLabels || (style.empty === true && ship.ownerId === me.id);
 }
 
 function render(alpha: number, frameSeconds: number, nowMs: number): void {
@@ -387,7 +463,10 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   drawStarfield(ctx!, camera);
 
   const near = mine ? nearestDockableStation(mine, current.stations) : null;
-  for (const station of Object.values(current.stations)) drawStation(ctx!, camera, station, near?.id === station.id);
+  for (const station of Object.values(current.stations)) {
+    drawStation(ctx!, camera, station, near?.id === station.id);
+    drawPads(ctx!, camera, station, occupiedPads(station, current.ships));
+  }
 
   // Wrecks fade over their last WRECK_FADE_SECONDS.
   for (const w of current.wrecks) {
@@ -398,15 +477,16 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, TRACTOR_RANGE, current.loot);
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
+  // Every ship, flying or docked: a docked ship's position is its pad.
   for (const ship of Object.values(current.ships)) {
-    if (ship.state !== 'flying') continue;
     const hull = current.hulls[ship.hullId]!;
     const stats = shipStats(current, ship);
     const style = shipStyle(current, ship, mine);
     const shipView = mine && ship.id === mine.id && view ? view : interpolate(ship, previous.ships[ship.id], alpha);
     const art = { hull, fit: ship.fit, modules: current.modules, manufacturers: current.manufacturers, weapons: ship.weapons, thrusters: ship.thrusters, stats };
-    drawShip(ctx!, camera, shipView, art, false, settings.showLabels ? style : { colour: style.colour });
-    if (!mine || ship.id !== mine.id) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
+    drawShip(ctx!, camera, shipView, art, labelShown(style, ship) ? style : { colour: style.colour, empty: style.empty === true });
+    if (hull.escapePod && ship.state === 'flying') drawPodBeacon(ctx!, camera, shipView.position, hull.radius, nowMs);
+    if (ship.state === 'flying' && (!mine || ship.id !== mine.id)) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
   }
 
   for (const p of current.projectiles) {
@@ -425,7 +505,8 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const ship of Object.values(current.ships)) {
     if ((mine && ship.id === mine.id) || ship.state !== 'flying') continue;
     const style = shipStyle(current, ship, mine);
-    drawOffscreenMarker(ctx!, camera, ship.position, style.label ?? 'SHIP', distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
+    const label = style.label ?? (isEscapePod(current, ship) ? 'POD' : 'SHIP');
+    drawOffscreenMarker(ctx!, camera, ship.position, label, distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 
   // Target bracket and, for fixed guns, the lead marker.
@@ -441,10 +522,14 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
 
   if (mine?.state === 'docked') {
     if (ui.dockTab === 'market') market.update(current, me.id);
-    else outfitting.update(current, me.id);
+    else if (ui.dockTab === 'outfitting') outfitting.update(current, me.id);
+    else if (ui.dockTab === 'shipMart') shipMart.update(current, me.id);
+    else yourShips.update(current, me.id);
   } else {
     market.invalidate();
     outfitting.invalidate();
+    shipMart.invalidate();
+    yourShips.invalidate();
   }
   ui.update(current, mine, fpsSmoothed);
 }

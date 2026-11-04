@@ -92,11 +92,14 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `controls-panel.ts` | Developer controls panel (F1), generated from `bindings.ts` |
 | `camera.ts` | World to screen mapping, smoothed follow |
 | `render/starfield.ts` | Infinite hashed parallax starfield |
-| `render/ship-art.ts` | Ships drawn from their fit: hull outline, empty sockets (outfitting only), and each module's silhouette at its mount, tinted by its maker's race |
-| `render/draw.ts` | Vector drawing of ships (via `ship-art.ts`), turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, security zones and off-screen markers |
+| `render/ship-art.ts` | Ships drawn from their fit: hull outline (dashed when empty), empty sockets (outfitting only), and each module's silhouette at its mount, tinted by its maker's race. Escape pods are drawn as orange lifeboats instead |
+| `render/ship-thumb.ts` | Small fixed-size ship drawings for the ship mart and Your ships lists |
+| `render/draw.ts` | Vector drawing of ships flying or on their pads (via `ship-art.ts`), empty ships faded, turrets, health bars, projectiles, wrecks, loot, tractor beam, explosions, stations, landing pads, security zones, the escape pod beacon and off-screen markers |
 | `market-panel.ts` | Station market table in the docked panel; reports trade clicks to `main.ts` |
 | `outfitting-panel.ts` | Outfitting tab in the docked panel: ship drawing with selectable mounts, now and after stats from `planRefit`, fit and remove; reports clicks to `main.ts` |
-| `ui.ts` | HUD text, docked panel, toasts (DOM, not canvas) |
+| `ship-mart-panel.ts` | Ship mart tab in the docked panel: ships for sale with drawing, stats from `fitStats`, price, and Buy greyed with the `buyRefusal` reason; reports clicks to `main.ts` |
+| `your-ships-panel.ts` | Your ships tab in the docked panel: every ship the pilot owns, where it is, condition, cargo, and Board greyed with the `boardRefusal` reason; reports clicks to `main.ts` |
+| `ui.ts` | HUD text (including the escape pod line and the board prompt), docked panel tabs, the free Courier claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName` and `shipWhere`, the words for a ship and where it is |
 | `style.css` | Theme variables and overlay layout |
 
 ### Rendering

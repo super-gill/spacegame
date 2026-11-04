@@ -311,6 +311,131 @@ button.link {
   padding: 2px 7px;
 }
 
+/*
+ * Ship mart and Your ships, inside the docked panel. Rows have a fixed
+ * height: the drawing is a fixed size and the reason line under each
+ * button is always there, empty or not, so a refusal coming or going
+ * never moves a button under the pointer.
+ */
+.ship-mart,
+.your-ships {
+  margin: 4px 0 16px;
+}
+
+.ship-mart table,
+.your-ships table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.ship-mart th,
+.your-ships th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 12px 6px 0;
+  border-bottom: 1px solid rgba(79, 122, 114, 0.4);
+}
+
+.ship-mart td,
+.your-ships td {
+  padding: 4px 12px 4px 0;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(79, 122, 114, 0.15);
+}
+
+.ship-mart .num,
+.your-ships .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ship-mart td.price {
+  color: var(--ink-bright);
+}
+
+.ship-mart td.thumb,
+.your-ships td.thumb {
+  width: 1%;
+  padding-right: 8px;
+}
+
+.ship-thumb {
+  display: block;
+}
+
+.ship-mart .ship-name,
+.your-ships .ship-name {
+  white-space: nowrap;
+  color: var(--ink-bright);
+}
+
+.ship-mart .muted-cell {
+  color: var(--ink-dim);
+  font-size: 12px;
+}
+
+.your-ships td.where {
+  font-size: 12px;
+}
+
+.your-ships tr.selected td {
+  background: rgba(159, 211, 199, 0.08);
+}
+
+.ship-mart td.actions,
+.your-ships td.actions {
+  width: 1%;
+  white-space: nowrap;
+  padding-right: 0;
+  text-align: right;
+}
+
+.ship-mart td.actions button,
+.your-ships td.actions button {
+  font-size: 12px;
+  padding: 2px 10px;
+}
+
+.ship-mart .refused,
+.your-ships .refused {
+  font-size: 11px;
+  line-height: 14px;
+  height: 14px;
+  margin-top: 2px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+.your-ships .aboard {
+  font-size: 12px;
+  padding: 3px 0;
+  color: var(--ink-bright);
+}
+
+.ship-mart .note,
+.your-ships .note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+/* In a pod: the free Courier, below Undock so nothing above it moves. */
+.pod-block {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(79, 122, 114, 0.4);
+}
+
+.pod-block p {
+  margin: 0 0 10px;
+  color: #ff7a2e;
+}
+
 button:disabled {
   opacity: 0.35;
   cursor: default;
