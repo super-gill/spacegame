@@ -35,6 +35,7 @@ const STAT_KEYS: ModuleStat[] = [
   'shieldRegen',
   'structure',
   'cargoCapacity',
+  'sensorRange',
 ];
 
 /** Whether a hull bonus applies to this module on this mount. */
@@ -68,6 +69,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     shieldRegen: 0,
     structure: hull.structure,
     cargoCapacity: 0,
+    sensorRange: hull.sensorRange,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -104,6 +106,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     cargoCapacity: Math.floor(totals.cargoCapacity + 1e-9),
     powerOutput: totals.powerOutput,
     powerDraw,
+    sensorRange: totals.sensorRange,
     weapons,
   };
 }

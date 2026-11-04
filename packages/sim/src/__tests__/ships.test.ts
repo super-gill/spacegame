@@ -13,6 +13,7 @@ import { length } from '../vec2.js';
 import { WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, STARTER_LOADOUT_ID } from '../world.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
+import { PIRATE_TUNING } from '../ai/index.js';
 
 /** Modular ships: catalogue integrity, derived stats, bonuses and fitting rules. */
 
@@ -404,5 +405,18 @@ describe('ships in the world', () => {
     expect(SAVE_VERSION).toBeGreaterThan(2); // migrates through every version since
     const r = deserializeWorld(v2);
     expect(r.ok && r.world.pilots['ana']).toEqual(w.pilots['ana']);
+  });
+});
+
+describe('sensor range', () => {
+  it('every hull has a positive base range, and stats carry it', () => {
+    for (const hull of Object.values(HULLS)) {
+      expect(hull.sensorRange, hull.id).toBeGreaterThan(0);
+      expect(fitStats(TEST_CATALOGUES, hull, {}).sensorRange, hull.id).toBe(hull.sensorRange);
+    }
+  });
+
+  it('a new pilot can see as far as a pirate can', () => {
+    expect(loadoutStats(STARTER_LOADOUT_ID).sensorRange).toBeGreaterThanOrEqual(PIRATE_TUNING.detectRange);
   });
 });

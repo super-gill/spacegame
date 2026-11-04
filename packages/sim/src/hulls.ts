@@ -41,6 +41,7 @@ export const HULLS: Record<string, HullSpec> = {
     outline: outline([[18, 0], [10, -8], [-12, -10], [-16, -6], [-16, 6], [-12, 10], [10, 8]]),
     maxSpeed: 340,
     maxTurnRate: 2.4, // about 140 degrees per second
+    sensorRange: 3000,
     mounts: [
       mount('w1', 'weapon', 'S', 14, 0, ['power']),
       mount('w2', 'weapon', 'S', 2, 0, ['power', 'fireControl']),
@@ -70,6 +71,7 @@ export const HULLS: Record<string, HullSpec> = {
     outline: outline([[24, 0], [-18.8, -10], [-24, -8.4], [-20.8, 0], [-24, 8.4], [-18.8, 10]]),
     maxSpeed: 320,
     maxTurnRate: 2.2,
+    sensorRange: 3500,
     mounts: [
       mount('w1', 'weapon', 'M', -5, -4.4, ['power']),
       mount('w2', 'weapon', 'M', -5, 4.4, ['power']),
@@ -109,6 +111,7 @@ export const HULLS: Record<string, HullSpec> = {
     ]),
     maxSpeed: 220,
     maxTurnRate: 1.2, // about 70 degrees per second
+    sensorRange: 2500,
     mounts: [
       mount('b1', 'bay', 'M', 10.2, -5.4, ['heavyLoad']),
       mount('b2', 'bay', 'M', 10.2, 5.4, ['heavyLoad']),
@@ -149,6 +152,7 @@ export const HULLS: Record<string, HullSpec> = {
     outline: outline([[18, 0], [6, -3], [-14, -3], [-10, 0], [-14, 3], [6, 3]]),
     maxSpeed: 350,
     maxTurnRate: 2.4,
+    sensorRange: 4000,
     mounts: [
       mount('w1', 'weapon', 'S', 12, 0, ['power']),
       mount('w2', 'weapon', 'S', 0, 0, ['power', 'fireControl']),
@@ -179,6 +183,7 @@ export const HULLS: Record<string, HullSpec> = {
     outline: outline([[9, 0], [5, -5], [-6, -5], [-8, -3], [-8, 3], [-6, 5], [5, 5]]),
     maxSpeed: 180,
     maxTurnRate: 2,
+    sensorRange: 1500,
     mounts: [
       mount('e1', 'engine', 'S', -8, 0, ['power'], AFT),
       mount('c1', 'core', 'S', -2, -2, ['power']),

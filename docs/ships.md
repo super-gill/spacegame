@@ -153,4 +153,4 @@ Planned 3 November 2026 with Jason's decisions. Sim side built 4 November 2026 (
 
 *Build order.* The lead builds the sim foundation first (ownership rules, pads and docking, buying, boarding, pods, the death flow, the save migration, all with tests and the new contracts in `docs/coordination.md`). Then a client workstream builds the ship mart screen, pads and docked ships on screen, the board key and prompt, and the pod's look.
 
-Later in milestone 6: oversized modules across two mounts, turret arcs from mount positions, fire groups, ammunition, power management in combat.
+Later in milestone 6 (6e, after the living system and the ship interface): a capacitor that energy weapons and shield recharge draw on, projectile guns and missiles on ammunition, missile launchers, fire groups, turret arcs from mount positions, oversized modules across two mounts. The capacitor is the power management: reactor output against draw stays the fitting limit, as EVE's powergrid is.

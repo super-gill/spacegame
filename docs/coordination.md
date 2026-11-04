@@ -14,7 +14,7 @@ Chats cannot message each other. This file, the branches and their commits are t
 
 ## Phases
 
-1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The 6b foundation (ownership, pads, ship mart, boarding, escape pods, save version 4) and its client landed in 0.8.0. The next milestone is 6c (see `docs/roadmap.md`); the lead plans its foundation with Jason before any 6c workstream opens.
+1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The 6b foundation (ownership, pads, ship mart, boarding, escape pods, save version 4) and its client landed in 0.8.0. Next: 6c, the living system (`docs/system.md`), built by the lead in two parts, with 6d (the ship interface) built alongside it by the interface workstream. 6e, weapons and the capacitor, follows.
 2. **Fan-out.** The lead opens workstreams for parts with clean boundaries, writes their briefs below, and Jason starts a chat for each one.
 3. **Integrate.** The lead merges branches, resolves conflicts, runs the full test suite and a headless play check, then releases.
 
@@ -91,6 +91,7 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Ship fit** (`types.ts`): `Ship.fit` maps mount id to module id; `WeaponState` is keyed by `mountId`.
 - **Pilot storage** (`types.ts`): `Pilot.storage` maps station id to module id to count.
 - **Save format** (`save.ts`): `SAVE_VERSION`. Only the lead bumps it.
+- **Sensor range** (`types.ts`, `stats.ts`): `HullSpec.sensorRange` and `ShipStats.sensorRange`, units; the `sensorRange` module stat for sensor modules later. A pilot is shown only the ships within their ship's sensor range; stations (and bodies, when they land) are always shown.
 
 6b contracts (on `main` from 4 November 2026):
 
@@ -110,12 +111,31 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 | Lore | `ws/lore` | `docs/lore.md` (new), `docs/races.md` | Open (long-lived) | "Brief: Lore" below |
 | 6b foundation | `main` (lead) | The 6b sim side | Closed, 0.8.0 | `docs/ships.md`, "6b" |
 | Ship mart | `ws/ship-mart` | 6b client: see brief | Closed, 0.8.0 | "Brief: Ship mart" below |
+| 6c foundation | `main` (lead) | The 6c sim, parts 1 and 2 | Open | `docs/system.md`, "Build order" |
+| Interface | `ws/interface` | `packages/client/`, `docs/controls.md` | Open (across 6c and 6d) | "Brief: Interface" below |
 
 6a was built whole by one chat before this process existed, so its planned workstreams (ship rendering, outfitting screen, catalogue) never opened.
 
 Candidates (not open yet):
 
 - **Catalogue and balance:** hull and module data, tuning against play. Not needed yet; balance is in the player's favour and that is fine for now.
+
+### Brief: Interface
+
+- **Goal:** the ship's interface and navigation. Flying should feel like flying a ship with instruments, Elite Dangerous for navigation and EVE for ship systems: gauges for shields, hull and (in 6e) capacitor, the modules you have fitted, a radar that shows only what your sensors can see, a nav target you fly to, a system map, and warnings that rise in steps. Then, as 6c lands, the planet, orbits and gravity on screen.
+- **Owns:** `packages/client/` (all of it) and `docs/controls.md`. May make mockups as design artifacts.
+- **Uses:** today's contracts, `ShipStats.sensorRange` (on `main` now), and the 6c contracts as the lead lands them (bodies, orbit and gravity helpers, path prediction). The lead names each new contract in this file and the log when it lands; rebase then.
+- **Deliver, in this order:**
+  1. **Mockups first, for Jason to judge, before any code.** The flight HUD (shield, hull, a reserved capacitor gauge, fitted modules and their state, target panel, warning area), the radar, the contacts list, the nav target and the system map. Jason dislikes Claude's default visual look; ask him what he likes in Elite and EVE before drawing, and offer two or three directions. Record his choice in the log.
+  2. The flight HUD and target panel, replacing today's text HUD.
+  3. The radar by sensor range. Ships beyond it are not drawn and get no edge markers; stations always do. This replaces today's markers for everything.
+  4. The contacts list (ships, stations, later bodies) and a nav target: one marker with distance and arrival time.
+  5. The system map: full screen, stations now, bodies and orbits when they land; never ships.
+  6. Warnings in tiers (advisory, caution, warning, alarm), starting with today's: hunted, too fast to dock, no free pad, an unflyable fit, a collision course with a station.
+  7. When 6c lands: bodies, orbits, the belt and moving stations drawn; the predicted path line; the gravity gauge and the gravity warnings in `docs/system.md`; apoapsis and periapsis.
+- **Out of scope:** any change in `packages/sim`; the capacitor itself (6e; leave its gauge as a slot). If the screens need something from the sim, add it to "Requests to the lead" and work round it.
+- **Note:** the lead may add a little client code while building 6c, so the game stays playable (for example a plain circle for a body). It will be in its own file where possible and named in the log; keep or replace it.
+- **Done when:** long-lived across 6c and 6d. Each stage ends with `npm test` and `npm run build` passing, a headless play check with real mouse clicks, `docs/controls.md` updated, a log entry with changelog lines, and a push to `ws/interface`. Tell Jason when a stage is worth merging.
 
 ### Brief: Lore
 
@@ -159,12 +179,16 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 - **Station functions on ships** (2026-11-03, later): bigger ships could carry station services such as outfitting; player stations, or station ships, may follow.
 - **Boarding abandoned ships** (2026-11-03): taking a ship nobody owns, or someone else's. Belongs with law (7) and salvage (9). Owning ships, swapping in space and pods are scheduled in 6b.
+- **Generated systems** (2026-11-04, later): systems generated once from a seed and stored in the world, the same shape as the hand-written starter system. Triaged to the map (8).
+- **Orbit assists and slingshot racing** (2026-11-04, later): an orbit hold autopilot, transfer and approach assists, and races that use slingshots round a system's planets. In `docs/system.md` under "Later".
 - **Hireable NPC agents** (2026-11-03, long term): pay a station for an escort; hire a pilot to fly another ship you own alongside you; later, a hired captain who takes one of your ships off to work a trade route or mine, building towards a fleet. Lead's notes: the sim already suits this, because NPCs fly through the same inputs as people and their brains are plain data, so a hired pilot is a brain attached to a ship a pilot owns. 6b should keep "who owns a ship" separate from "who is flying it" so this slots in later. Escorts need little more than today's AI; captains on routes need the economy (10), industry (9) and off-screen traffic (8) first.
 
 ## Decisions
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: The living system, in `docs/system.md`: orbits arrange the system (a star, planets, moons, stations in orbit, the belt), all on rails; each body has a sphere of influence with real inverse-square gravity, eased to zero at its edge, and flat space between spheres; ships inside a sphere are carried with the body, so free orbits and slingshots work; speed, assist and docking are relative to the local frame; full assist cancels gravity as far as thrust allows, while rotation assist and manual fly orbits; gravity warnings rise in tiers against the ship's own thrust; surface impact works like a station hull; no time warp, so orbits are tuned for play time; no in-system faster-than-light travel for now; sensors decide which ships you see; a third station near the planet's moon. (Jason)
+- 2026-11-04: New order for the rest of milestone 6: 6c the living system, 6d the ship interface and navigation (alongside 6c), 6e weapons and the capacitor. Energy weapons and shield recharge use a capacitor; projectile guns and missiles use ammunition. (Jason)
 - 2026-11-04: An empty ship of yours gets into space by stepping out: a key leaves you in a pod beside it, and the ship stays where it is, empty. (Jason)
 - 2026-11-04: Lore names are applied to the catalogue; the Sparrow is replaced by the Aurel Tacet with an "Aurel" maker entry. Catalogue ids keep their old wording so saves are untouched. (lore workstream, applied by the lead)
 - 2026-11-04: Pirates ignore escape pods; threats to pods are worked out later (shooting pods as a crime comes with law, 7). (Jason)
@@ -186,6 +210,7 @@ _None open._ Done on 2026-11-04: merged `ws/ship-mart` and `ws/lore`; applied th
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-04, lead (Lead 2): planned 6c to 6e with Jason; wrote `docs/system.md` (the living system) and the new roadmap rows. Added sensor range as a ship stat (`HullSpec.sensorRange`, `ShipStats.sensorRange`; Tern 3,000, Warrant 3,500, Manifest 2,500, Tacet 4,000, Ark 1,500), with tests. Opened the interface workstream. Next: 6c part 1.
 - 2026-11-04, lead (Lead 2): released 0.8.0, milestone 6b. Merged `ws/ship-mart` (the 6b client) and `ws/lore` (the naming table). Applied the lore names to every hull, module, maker and fit, ids unchanged; replaced the Sparrow with the sealed Aurel Tacet (`aurel-tacet`, `aurel-tacet-dev`) and added an `aurel` maker. Built stepping out on Jason's call: `stepOut` in the sim (the pod leaves gently off the ship's right side, in the pilot's flight mode), G pressed twice in the client, and the pod HUD line now says to board when a ship of yours is in reach. 188 tests. Play checked headless with real clicks and keys: buy a Warrant, board it docked, undock, step out, board back in space, and the save after. Closed the ship mart workstream; lore stays open. Next: plan 6c with Jason.
 - 2026-11-04, ship mart: built the 6b client on `ws/ship-mart`, client files only. Stations draw their landing pads (corner-bracket frames sized S, M, L, turned to each pad's facing, brighter when taken) and every docked ship sits on its pad, flown or empty. Empty ships are faded with a dashed hull; your own are labelled `YOUR <SHIP> · EMPTY` even with labels off and get edge markers. Escape pods draw as orange lifeboats with a blinking beacon ring, and the HUD's top line says you are in one. The docked panel has four tabs: Market, Outfitting, Ship mart (stations with one) and Your ships, at one fixed width so switching tabs never slides the tab row under the pointer (that already happened between Market and Outfitting in 0.7.2). Ship mart lists each ship with a drawing, size and role, speed, acceleration, shields, structure, cargo, DPS (from `fitStats`) and price, with Buy greyed and the `buyRefusal` reason under it. Your ships lists `ownedShips` with where each is, condition and cargo, and Board greyed with the `boardRefusal` reason. B boards the nearest of `boardableShips`; the HUD names it, or, for an empty ship of yours within 600 units in space, says close in or match speed. A pod docked at Harbour owning nothing gets "Claim a free Courier" at the bottom of the panel (below Undock, so it moves nothing). Toasts for buying, boarding, claiming and waking. Ships are called by hull and number (`Kessari Wedge #2`) as they have no names. Fixed a crash: reloading while between losing your pod and waking threw on start. Play checked headless with real mouse clicks: buy, see it on its pad, board docked, undock, board in space (from a seeded save, see Questions for Jason), lose a ship to a pod, dock the pod, claim the starter, wake after losing the pod; 26 checks, no page errors. `docs/controls.md` and `docs/architecture.md` updated. No sim changes; `npm test` 183 pass. Needs: Jason's answer on how an empty ship gets into space. Blocked: nothing. Changelog lines for 0.8.0: "Ship mart tab at Harbour: see each ship's stats and price, and buy"; "Your ships tab: every ship you own, where it is, and Board"; "Board your nearest empty ship with B; the HUD says when you can"; "Landing pads drawn round stations, with docked ships on them"; "Empty ships are drawn faded and dashed; yours are always labelled"; "Escape pods look like lifeboats, with a beacon, and the HUD says you are in one"; "Claim a free Courier from a pod at Harbour when you own no ships"; "The docked panel keeps one width, so tabs never move under the pointer"; "Fix a crash when loading a save made after losing your escape pod".
 - 2026-11-04, lore: added "Names" to `docs/lore.md`: a name for every hull, module, manufacturer and loadout, keyed by catalogue id, with a naming theme per maker. The Sparrow's replacement is the Aurel Tacet. Renamed the Ito-Marr reactor because "Lattice" now means the gate network. Filed a request for the lead to apply the names and add an Aurel manufacturer. Blocked: nothing. Changelog line: "Name every hull, module and fit from the lore".

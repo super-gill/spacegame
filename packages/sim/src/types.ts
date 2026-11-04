@@ -66,7 +66,9 @@ export type ModuleStat =
   | 'shield'
   | 'shieldRegen'
   | 'structure'
-  | 'cargoCapacity';
+  | 'cargoCapacity'
+  /** Detection range, units. Hulls have a base range; sensor modules (later) add to it. */
+  | 'sensorRange';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon';
@@ -142,6 +144,8 @@ export interface HullSpec {
   maxSpeed: number;
   /** Hard spin limit, rad/s, enforced in every flight mode. */
   maxTurnRate: number;
+  /** Base detection range of the bare hull, units. Sensor modules (later) add to it. */
+  sensorRange: number;
   mounts: MountPoint[];
   bonuses: HullBonus[];
   /** A sealed hull cannot be refitted or bought (the Aurel Tacet dev ship, escape pods). */
@@ -193,6 +197,11 @@ export interface ShipStats {
   cargoCapacity: number;
   powerOutput: number;
   powerDraw: number;
+  /**
+   * How far this ship can detect other ships, units. Ships beyond it are
+   * not shown to its pilot. Stations and bodies are always known.
+   */
+  sensorRange: number;
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
 }
