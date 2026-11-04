@@ -14,7 +14,7 @@ Chats cannot message each other. This file, the branches and their commits are t
 
 ## Phases
 
-1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The next foundation is 6b's sim side, planned in `docs/ships.md` under "6b".
+1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The 6b foundation (ownership, pads, ship mart, boarding, escape pods, save version 4) is on `main` since 4 November 2026, unreleased; 0.8.0 ships when the ship mart workstream merges.
 2. **Fan-out.** The lead opens workstreams for parts with clean boundaries, writes their briefs below, and Jason starts a chat for each one.
 3. **Integrate.** The lead merges branches, resolves conflicts, runs the full test suite and a headless play check, then releases.
 
@@ -92,19 +92,29 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Pilot storage** (`types.ts`): `Pilot.storage` maps station id to module id to count.
 - **Save format** (`save.ts`): `SAVE_VERSION`. Only the lead bumps it.
 
+6b contracts (on `main` from 4 November 2026):
+
+- **Owning versus flying** (`ownership.ts`): `Ship.ownerId` is who owns a ship; `Pilot.shipId` is the ship a pilot is aboard. Never read the owner as the pilot aboard. `pilotsAboard`, `shipPilot`, `isEmptyShip` (no pilot, no NPC brain), `isEscapePod`, `ownedShips` (pods left out). Empty ships get no input and coast.
+- **Pads** (`types.ts`, `docking.ts`): `Pad` (`id`, `size`, `position` offset from the station centre, `facing`), `Station.pads`, `Ship.padId` (set while docked, null otherwise). `padFits`, `freePadFor`, `occupiedPads`, `padWorldPosition`, `launchPoint`, `onPad`. Docking refuses with `noPad`. A docked ship's `position` is its pad's world position and its `heading` the pad's facing.
+- **Ship mart** (`types.ts`, `pilots.ts`): `HullSpec.price`, `Station.shipMart` (loadout ids; empty means no ship mart), `shipPrice`, `buyShip`, `buyRefusal`, `BuyRefusal`.
+- **Boarding** (`pilots.ts`): `boardShip`, `boardRefusal`, `boardableShips`, `BoardRefusal`; `BOARD_RANGE` and `BOARD_MAX_RELATIVE_SPEED` in `constants.ts`.
+- **Pods and waking** (`pilots.ts`): `HullSpec.escapePod`, the `escape-pod` hull and `ESCAPE_POD_LOADOUT_ID`; `wakePilot` (and `respawnPilot`, which returns only the world), `WakeRefusal`; `claimStarterShip`, `claimRefusal`, `ClaimRefusal`. Pilot commands return `CommandResult` (the world and an event, or the world and a reason).
+- **Events** (`types.ts`): `docked` carries `padId`; `dockRefused` may say `noPad`; new `shipBought`, `boarded`, `podEjected`, `pilotWoke`, `starterClaimed`. Each names its ship in `shipId` (for `podEjected` and `boarded`, the ship the pilot is now in; `from` is the one left).
+
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
 | --- | --- | --- | --- | --- |
 | 6a foundation | `main` (lead) | Everything in milestone 6a | Closed, 0.7.0 | `docs/ships.md`, "First build slice" |
 | Lore | `ws/lore` | `docs/lore.md` (new), `docs/races.md` | Open (long-lived) | "Brief: Lore" below |
+| 6b foundation | `main` (lead) | The 6b sim side | Done on `main`, unreleased | `docs/ships.md`, "6b" |
+| Ship mart | `ws/ship-mart` | 6b client: see brief | Open | "Brief: Ship mart" below |
 
 6a was built whole by one chat before this process existed, so its planned workstreams (ship rendering, outfitting screen, catalogue) never opened.
 
 Candidates (not open yet):
 
 - **Catalogue and balance:** hull and module data, tuning against play. Not needed yet; balance is in the player's favour and that is fine for now.
-- **Ship mart (6b client):** opens when the 6b sim foundation is on `main`. Owns the client only: the ship mart screen, pads and docked ships drawn, the board key and prompt, the pod's look. Uses the 6b contracts. The lead writes its brief at that point.
 
 ### Brief: Lore
 
@@ -119,11 +129,29 @@ Candidates (not open yet):
 - **Out of scope:** any code, catalogue data or numbers. Lore never sets a stat; if lore needs something mechanical (a race bonus, a station service), it goes to "Requests to the lead".
 - **Done when:** never fully; this is long-lived. Each session ends with a log entry and a push to `ws/lore`. Tell Jason when there is something worth merging, and he passes it to the lead.
 
+### Brief: Ship mart
+
+- **Goal:** everything 6b adds, playable. Docked at Harbour you can see the ships for sale with prices and buy one; your ships sit visibly on the station's pads; you can board one you own, docked or alongside in space, with a key and a clear prompt; a pod looks and reads like a pod; a pilot in a pod at Harbour who owns nothing can claim the free starter. After this, the lead releases 0.8.0.
+- **Owns:** `packages/client/` only: `index.html`, `style.css`, `main.ts`, `ui.ts`, `bindings.ts`, `controls-panel.ts`, `render/`, and a new panel file for the ship mart (and one for "your ships" if wanted). May touch `outfitting-panel.ts` and `market-panel.ts` only to fit a new tab into the docked panel. Updates `docs/controls.md` for any new key.
+- **Uses:** the 6b contracts above. The client never applies ownership, pad, boarding, buying or claiming rules itself: it asks `buyRefusal`, `boardRefusal`, `boardableShips` and `claimRefusal`, and calls the commands. Ships are drawn from their fit as now; a docked ship is drawn at its `position`, which is already its pad.
+- **Deliver:**
+  1. Pads drawn on stations (sized by `size`, at `padWorldPosition`, facing `facing`), and docked ships drawn on them, flown or empty. Today the client skips every ship that is not flying.
+  2. A ship mart tab in the docked panel at stations whose `shipMart` is not empty: each loadout's name, hull, size class, price (`shipPrice`) and a short read of its stats (`fitStats`), with Buy greyed and the reason shown when `buyRefusal` says no. Previews must never change layout (the 0.7.2 rule).
+  3. Your ships: a list, docked or not, of `ownedShips`, with where each is, so a pilot can find what they own. Board from the list when `boardRefusal` allows it.
+  4. A board key (B is free) and a prompt in flight naming the nearest ship in `boardableShips`, and the refusal when one is close but not boardable (too fast, too far).
+  5. Empty ships labelled as empty (`shipLabel` in `ui.ts` already does this) and drawn distinctly from flown ones.
+  6. The pod's look: it already draws from its hull outline and three modules; make it read as a lifeboat, not a tiny ship, and make the HUD say you are in a pod.
+  7. "Claim a free Courier" in the docked panel when `claimRefusal` is null.
+  8. Toasts for `shipBought`, `boarded`, `starterClaimed` and `pilotWoke`; the client already toasts `podEjected` and `noPad`.
+- **Out of scope:** any change in `packages/sim`. Selling ships, hired pilots, taking other people's ships. If the sim lacks something the screens need, add it to "Requests to the lead" and work round it.
+- **Done when:** `npm test` and `npm run build` pass; a headless play check with real mouse clicks covers buying, seeing the ship on its pad, boarding it docked, undocking, boarding back in space, losing a ship to a pod, docking the pod and claiming the starter; `docs/controls.md` updated; log entry with changelog lines; branch pushed.
+
 ## Questions for Jason
 
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
 - Navy duties.
+- Should pirates hunt escape pods? A pod carries nothing, so it is not piracy, but a pirate finishing you off is a threat that sticks. For now they leave pods alone (`PIRATE_TUNING.huntPods`); one line flips it. Shooting pods as a crime comes with law (7) either way.
 
 ## Ideas inbox
 
@@ -137,6 +165,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: Lore (from the lore chat): the core premise stands (the Aurel caged the Unsung by silencing the Lattice, and gate-waking undoes it); Hive Ossk grows every station's core and each race clads it; pilots can start as Oru, as human wards; all three routes to an Aurel ship stand, including the 604 AL sale; player organisations are "outfits"; the Unsung appear later as hostile ships in the Dark; pilots can gain standing with four pirate factions (Red Tithe, Null Ledger, Black Strike, Cutloose; not the Hiveless; the Hollow Choir only late); the starter sector stands. Follow-ups are on the roadmap: wards at character creation (11), pirate faction standing (7), the Unsung (8). (Jason)
 - 2026-11-03: 6b plan: board ships you own in space as well as docked; escape pods come in 6b; a free starter Courier only when you own no ship; empty ships stay where left and can be attacked. Full plan in `docs/ships.md`. (Jason)
 - 2026-11-03: The 0.7.0 calls stand: outfitting at Harbour only for now; the world aligns to the lore, so the Mule and Jackal stay gone (Aurel ships can serve as dev and test ships); the Spine's six bays; bonus values are a dial to tune later; names come from the lore, with module makers a mix of their own companies and hull makers. (Jason)
 - 2026-11-03: The lore workstream opens now, so the story defines the world. (Jason)
@@ -148,12 +177,13 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Contract changes, cross-workstream file changes, merges wanted. Newest first.
 
-- 2026-11-04, lore: please move the lore decisions in this branch's log entry into "Decisions". Three have mechanical follow-ups for whoever plans them, nothing needed now: the Oru as a starting race means wards (human pilots with Oru origin and standing) at character creation; pirate faction standing (Red Tithe, Null Ledger, Black Strike, Cutloose) needs the standing system to cover NPC factions, likely with law (7); the Unsung are a hostile NPC type in unknown space once the map (8) reaches it.
+_None open._ Done on 2026-11-04: the lore decisions are in "Decisions" and their three follow-ups (Oru wards, pirate faction standing, the Unsung) are on the roadmap under milestones 11, 7 and 8.
 
 ## Log
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-04, lead (Lead 2): built the 6b sim foundation on `main`: owning versus flying (`ownership.ts`), station pads and pad docking, hull prices and the ship mart, boarding docked and in space, escape pods with ejection, waking and the free starter claim (`pilots.ts`), station data in `stations.ts`, save version 4 with a migration from 3. 30 new tests (183 in all). Minimal client changes only: credits shown for the pilot flying, empty ships labelled, pod and noPad toasts, the death panel wakes you. Play checked headless: a version 3 save loads docked on a pad and undocks from it; losing a ship leaves you in a pod; losing the pod and waking puts you in a free Courier on a Harbour pad. Merged `ws/lore` (lore canon and Jason's lore decisions). Opened the ship mart workstream. `main` is not release-ready until it merges: a pilot in a pod has no way to claim the starter or board a ship yet. Changelog lines for 0.8.0: "Own several ships: buy them at Harbour's ship mart and board them docked or in space"; "Stations have landing pads; docking takes the smallest free pad that fits"; "Escape pods: lose your ship and get away in a pod; lose the pod and wake at Harbour"; "Save version 4: 0.7.x saves upgrade automatically".
 - 2026-11-04, lore: put the lore questions to Jason and recorded his answers in `docs/lore.md` and `docs/races.md`. Decisions (Jason): the core premise stands (the Aurel caged the Unsung by silencing the Lattice, and gate-waking undoes it); Hive Ossk grows every station's core and each race clads it; pilots can start as Oru, as human wards; all three routes to an Aurel ship stand, including the 604 AL sale; player organisations are "outfits"; the Unsung appear later as hostile ships in the Dark; pilots can gain standing with four pirate factions (not the Hiveless; the Hollow Choir only late); the starter sector stands. Removed the answered lore questions from "Questions for Jason". Next: the naming table. Changelog line: "Record lore decisions: wards, outfits, stations, Aurel ships, pirate standing".
 - 2026-11-03, lore: created `docs/lore.md` as canon from the claude.ai lore doc: premise, the Lattice, the Aurel and the Sundering, timeline, the six peoples, the Concord and navy service, manufacturer origins, six pirate factions, present-day tensions. Added the starter sector in lore terms (Calder system; Harbour a Concord free port; Ridge a Belt cooperative; the trader on a Tessaract contract; the pirate a Black Strike raider in a captured Kessari Wedge), marked proposed. Pointed `races.md` at `lore.md`. Needs: Jason's answers to the lore questions (being asked in the lore chat). Blocked: nothing. Changelog line: "Add lore.md, the game's canon setting and history".
 - 2026-11-03, lead: planned 6b with Jason (ownership, pads, ship mart, boarding, pods) in `docs/ships.md`. Lead handing over to a fresh lead chat to build it, because this one is long.

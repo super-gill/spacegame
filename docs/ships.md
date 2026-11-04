@@ -1,6 +1,6 @@
 # Ships and modules
 
-How ships are built. Status: agreed design, 3 November 2026. Slice 6a is in play from 0.7.0; 6b and the rest of milestone 6 are not built yet. See "First build slice".
+How ships are built. Status: agreed design, 3 November 2026. Slice 6a is in play from 0.7.0. 6b's sim side is on `main` (4 November 2026) and its client is with the ship mart workstream; the rest of milestone 6 is not built yet. See "First build slice".
 
 Related: [races.md](races.md) for races and manufacturers. Concept art lives on the "Spacegame ship concepts" design canvas; the full race and manufacturer design and the lore are in the "Spacegame: Races and Manufacturers" and "Spacegame: Lore of the Known Universe" docs.
 
@@ -118,7 +118,7 @@ Split in two so each half is playable:
 
 **6b: ships you own, pads, ship mart, boarding and pods (0.8.0)**
 
-Planned 3 November 2026 with Jason's decisions. Not built yet.
+Planned 3 November 2026 with Jason's decisions. Sim side built 4 November 2026 (`ownership.ts`, `pilots.ts`, `stations.ts`, pads in `docking.ts`); client in progress. Choices the build made where the plan was silent are listed at the end of this section.
 
 *Owning versus flying.* A ship's owner (`Ship.ownerId`) and whoever is flying it are separate facts. A pilot flies at most one ship (`Pilot.shipId`) and may own any number. A ship nobody is flying is **empty**; an NPC brain flying a pilot's ship is how hired pilots will work later, so nothing may assume "owner" means "pilot aboard".
 
@@ -135,6 +135,17 @@ Planned 3 November 2026 with Jason's decisions. Not built yet.
 *Losing everything.* When a pod is destroyed, the pilot wakes at Harbour Station: in a new pod docked there if they own any ship, or in a free starter Courier docked there if they own none. A pilot in a pod who owns no ship can also claim the free starter Courier while docked at Harbour. Owning other ships means fetching one.
 
 *Saves.* New save version with a migration: stations gain pads, docked ships are put on pads, everything else carries over.
+
+*As built.* Where the plan left a choice open, the sim does this:
+
+- Pads sit round the station rim facing outward. Harbour has ten (four S, three M, three L); Ridge has six (two of each). Docked ships face their pad's way and launch along it.
+- An empty ship takes no input: no flight assist, no guns, no tractor. A pilot stepping out leaves it with guns cold and no target.
+- Hull prices: Courier 1,500, Wedge 6,000, Spine 9,000 credits. With modules, the Courier starter costs 5,050, the Wedge raider 11,400 and the Spine trader 20,900.
+- Boarding in space: within 150 units, centre to centre, and 20 units/s relative speed.
+- A pod keeps 30% of the ship's velocity and is fired out to the ship's right at 30 units/s. It has 40 structure, no shield and a 180 units/s top speed.
+- Waking is the death panel's button, as respawning was, so the world never waits on it. A pilot wakes docked at Harbour, or just off it if every fitting pad is taken.
+- New pilots still arrive in space off Harbour, so their first act is flying and docking.
+- Pirates do not hunt pods, pending Jason's call (`PIRATE_TUNING.huntPods`).
 
 *Build order.* The lead builds the sim foundation first (ownership rules, pads and docking, buying, boarding, pods, the death flow, the save migration, all with tests and the new contracts in `docs/coordination.md`). Then a client workstream builds the ship mart screen, pads and docked ships on screen, the board key and prompt, and the pod's look.
 

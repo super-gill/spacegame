@@ -11,13 +11,13 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 4 Trade | Cargo hold, two stations with scripted prices, buy and sell UI | Done, 0.5.0 |
 | 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
 | 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Done, 0.7.0 |
-| 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | Next |
+| 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | In progress: sim foundation on `main`, ship mart client workstream open |
 | 6c Fit, continued | Oversized modules across two mounts, turret arcs, fire groups, ammunition, power management | |
-| 7 Law | Witnessed crime, reputation record, security response, bounties | |
-| 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic | |
+| 7 Law | Witnessed crime, reputation record, security response, bounties; standing with NPC factions, including the four pirate factions from the lore; shooting escape pods as a crime | |
+| 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic; the Unsung as hostile ships in unknown space | |
 | 9 Industry | Mining, salvage, drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
-| 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names | |
+| 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | |
 
 Version 1.0 is milestone 8 polished. Everything after that is content, plus the shared world.
 

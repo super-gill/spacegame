@@ -103,7 +103,7 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 ### Losing your ship
 
-- The pilot is left without a ship and can respawn in a new Meridian Courier, in the starter fit, at Harbour Station. Respawn is a pilot command, not a ship input, so it will work the same over a network.
+- The pilot gets away in an escape pod at the wreck. If the pod is destroyed too, they wake at Harbour Station: in a new pod if they own a ship anywhere, or in a free Meridian Courier if they own none. Waking is a pilot command, not a ship input, so it will work the same over a network. See `docs/ships.md`, 6b.
 - The ship's cargo is lost (part of it spills as loot, see Trade). Credits are kept. Insurance and other costs are open questions.
 
 ## Stations and security
