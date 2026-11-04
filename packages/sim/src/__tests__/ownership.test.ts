@@ -587,9 +587,9 @@ describe('save version 4', () => {
     expect(r.world.stations[HARBOUR]!.shipMart).toEqual(starterStations()[HARBOUR]!.shipMart);
     expect(r.world.stations[RIDGE]!.shipMart).toEqual([]);
     const docked = Object.values(r.world.ships).filter((s) => s.state === 'docked');
-    expect(docked.length).toBe(2); // Ana and the trader
+    expect(docked.length).toBe(4); // Ana, the two traders (one at Lantern Works) and the Watch
     for (const s of docked) expect(s.padId).not.toBeNull();
-    expect(new Set(docked.map((s) => s.padId)).size).toBe(2);
+    expect(new Set(docked.map((s) => `${s.dockedAt}/${s.padId}`)).size).toBe(4);
     expect(r.world.ships[me]!.position).not.toEqual(harbour.position);
     for (const s of Object.values(r.world.ships).filter((s) => s.state === 'flying')) expect(s.padId).toBeNull();
   });

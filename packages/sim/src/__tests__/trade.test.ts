@@ -68,9 +68,9 @@ describe('buying and selling', () => {
     const r = buyGood(w, 'ana', 'machinery', 5);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(credits(r.world)).toBe(STARTING_CREDITS - 5 * 70);
+    expect(credits(r.world)).toBe(STARTING_CREDITS - 5 * 78);
     expect(r.world.ships[me]!.hold['machinery']).toBe(5);
-    expect(r.event).toEqual({ type: 'traded', shipId: me, good: 'machinery', quantity: 5, unitPrice: 70, side: 'buy' });
+    expect(r.event).toEqual({ type: 'traded', shipId: me, good: 'machinery', quantity: 5, unitPrice: 78, side: 'buy' });
   });
 
   it('sells: receives the bid, empties the hold', () => {
@@ -92,13 +92,13 @@ describe('buying and selling', () => {
     w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, dockedAt: RIDGE, position: { ...w.stations[RIDGE]!.position } } } };
     const sold = sellGood(w, 'ana', 'machinery', 10);
     if (!sold.ok) throw new Error(sold.reason);
-    expect(credits(sold.world)).toBe(STARTING_CREDITS + 10 * (98 - 70));
+    expect(credits(sold.world)).toBe(STARTING_CREDITS + 10 * (98 - 78));
   });
 
   it('refuses, and changes nothing, when it cannot be done', () => {
     const { w, me } = dockedAt(HARBOUR);
     const cases: Array<[ReturnType<typeof buyGood>, string]> = [
-      [buyGood(w, 'ana', 'machinery', 100), 'credits'], // 7000 credits
+      [buyGood(w, 'ana', 'machinery', 100), 'credits'], // 7800 credits
       [buyGood(w, 'ana', 'food', starter.cargoCapacity + 1), 'space'],
       [buyGood(w, 'ana', 'scrap', 1), 'notTraded'], // Harbour does not sell scrap
       [buyGood(w, 'ana', 'food', 0), 'badQuantity'],
@@ -118,7 +118,7 @@ describe('buying and selling', () => {
 
   it('maxBuyable is limited by credits and by space', () => {
     const { w } = dockedAt(HARBOUR);
-    expect(maxBuyable(w, 'ana', 'machinery')).toBe(Math.floor(STARTING_CREDITS / 70)); // 14, credits bind
+    expect(maxBuyable(w, 'ana', 'machinery')).toBe(Math.floor(STARTING_CREDITS / 78)); // 12, credits bind
     expect(maxBuyable(w, 'ana', 'food')).toBe(starter.cargoCapacity); // 20, space binds
     expect(maxBuyable(w, 'ana', 'scrap')).toBe(0);
   });

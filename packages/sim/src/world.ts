@@ -6,9 +6,10 @@ import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
 import { issueShip, STARTER_LOADOUT_ID, STARTER_STATION_ID } from './pilots.js';
+import { screeAsteroids } from './asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
 import { pirateHome } from './rails.js';
-import { HARBOUR_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
+import { HARBOUR_ID, LANTERN_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
 import type { Pilot, Ship, ShipInput, Spawner, World } from './types.js';
 import { WEAPONS } from './weapons.js';
 
@@ -58,18 +59,31 @@ export function createStarterWorld(): World {
   const outpost = stations[RIDGE_ID]!;
 
   // The trader starts docked at Harbour and leaves after a short wait.
+  // Tessaract contract traders round the triangle: food and medicine from
+  // Harbour to the Ridge, ore from the Ridge to Lantern Works, machinery
+  // back out. Two of them, starting at opposite corners.
+  const works = stations[LANTERN_ID]!;
+  const triangle = [harbour.id, outpost.id, works.id];
   const trader: Spawner = {
     id: 'trader',
     loadoutId: 'tessaract-trader',
     position: { ...harbour.position },
     heading: -0.34,
     dockedAt: harbour.id,
-    brain: { kind: 'trader', route: [harbour.id, outpost.id], leg: 0, waitTicks: 3 * 60 },
-    hold: { food: 40, machinery: 15 }, // a prize worth a pirate's time
+    brain: { kind: 'trader', route: triangle, leg: 0, waitTicks: 3 * 60 },
+    hold: { food: 30, medicine: 10 }, // a prize worth a pirate's time
     respawnSeconds: 30,
     shipId: null,
     timerTicks: 0,
     spawned: 0,
+  };
+  const secondTrader: Spawner = {
+    ...trader,
+    id: 'trader-lantern',
+    position: { ...works.position },
+    dockedAt: works.id,
+    brain: { kind: 'trader', route: triangle, leg: 2, waitTicks: 20 * 60 },
+    hold: { machinery: 25 },
   };
 
   // The pirate lurks a little inward of Ridge, on the traders' way in,
@@ -101,18 +115,34 @@ export function createStarterWorld(): World {
     spawned: 0,
   };
 
+  // The Calder Watch flies a beat round all three stations, starting from Harbour.
+  const watch: Spawner = {
+    id: 'watch',
+    loadoutId: 'calder-watch',
+    position: { ...harbour.position },
+    heading: 0,
+    dockedAt: harbour.id,
+    brain: { kind: 'watch', beat: [harbour.id, works.id, harbour.id, outpost.id], leg: 0, mode: 'patrol', targetId: null, modeTicks: 0 },
+    hold: {},
+    respawnSeconds: 60,
+    shipId: null,
+    timerTicks: 0,
+    spawned: 0,
+  };
+
   const empty: World = {
     tick: 0,
     dt: FIXED_DT,
     pilots: {},
     ships: {},
     npcs: {},
-    spawners: [trader, pirate],
+    spawners: [trader, secondTrader, watch, pirate],
     projectiles: [],
     wrecks: [],
     loot: [],
     stations,
     bodies,
+    asteroids: screeAsteroids(),
     hulls: { ...HULLS },
     modules: { ...MODULES },
     loadouts: { ...LOADOUTS },

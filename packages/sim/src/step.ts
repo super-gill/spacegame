@@ -1,6 +1,7 @@
 import { thinkNpcs } from './ai/index.js';
 import { applyDamage, fireWeapons, regenerateShield, stepProjectiles, type Damage } from './combat.js';
-import { collideShips, collideWithStations, collideWithSurfaces, insideSurface } from './collision.js';
+import { asteroidStates } from './asteroids.js';
+import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
@@ -51,6 +52,10 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const rails = tickRails(world.bodies, world.tick, world.dt);
   const stationsNext = placeStations(world.bodies, world.stations, world.tick + 1, world.dt);
   const surfaces = surfacesNext(world.bodies, rails);
+  // The belt's rocks at the end of the tick: solid to ships and shots alike.
+  const rockStates = asteroidStates(world.bodies, world.asteroids, world.tick + 1, world.dt);
+  const rocks: Surface[] = world.asteroids.map((a, i) => ({ bodyId: a.id, position: rockStates[i]!.position, velocity: rockStates[i]!.velocity, radius: a.radius }));
+  const solid = [...surfaces, ...rocks];
 
   const npc = thinkNpcs(world);
   const events: WorldEvent[] = [...npc.events];
@@ -101,7 +106,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship), pull);
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
     const hulls = collideWithStations(flown, stats, stationsNext);
-    const ground = collideWithSurfaces(hulls.ship, stats, surfaces);
+    const ground = collideWithSurfaces(hulls.ship, stats, solid);
     const moved = { ship: ground.ship, events: [...hulls.events, ...ground.events], damage: [...hulls.damage, ...ground.damage] };
     events.push(...moved.events);
     damage.push(...moved.damage);
@@ -138,7 +143,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
 
   // 4. Projectiles already in flight move and hit; new ones start moving next tick.
   const shots = stepProjectiles(world.projectiles, ships, world.hulls, stationsNext, world.dt, rails.carryAt, rails.gravityAt);
-  shots.projectiles = shots.projectiles.filter((p) => !insideSurface(p.position, surfaces));
+  shots.projectiles = shots.projectiles.filter((p) => !insideSurface(p.position, solid));
   damage.push(...shots.damage);
 
   // 5. Apply damage in a fixed order and note who last hurt each ship.
@@ -154,6 +159,10 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // A pirate remembers who attacked it.
     const brain = npcs[d.shipId];
     if (brain?.kind === 'pirate' && d.by && d.by !== d.shipId) npcs[d.shipId] = { ...brain, provokedBy: d.by };
+    // The Watch turns on any pirate that shoots it.
+    if (brain?.kind === 'watch' && d.by && world.npcs[d.by]?.kind === 'pirate' && brain.mode !== 'engage') {
+      npcs[d.shipId] = { ...brain, mode: 'engage', targetId: d.by, modeTicks: 0 };
+    }
   }
 
   let next: World = {

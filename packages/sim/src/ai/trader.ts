@@ -1,9 +1,10 @@
 import { DOCK_MAX_SPEED } from '../constants.js';
 import type { ShipStats, Ship, ShipInput, TraderBrain, World } from '../types.js';
 import { speedRelativeTo } from '../docking.js';
+import { bodyPosition } from '../rails.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { obstacles, routeAround, steerToVelocity, travelVelocity } from './steer.js';
+import { obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
@@ -96,12 +97,19 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
     return { input: { ...emptyInput(), toggleDock: true }, brain: { ...brain, waitTicks: dwell } };
   }
 
-  // Aim for the point on the station's near side, just clear of the hull.
-  const fromStation = normalise(sub(ship.position, station.position));
-  const approach = add(station.position, scale(fromStation, station.radius + stats.radius + TRADER_TUNING.approachStandoff));
-  const waypoint = routeAround(ship, stats, approach, obstacles(world));
+  // Aim for the point on the station's near side, just clear of the hull,
+  // unless that side faces the body it orbits: then come in from outside.
+  const around = obstacles(world, stats);
+  const standoff = station.radius + stats.radius + TRADER_TUNING.approachStandoff;
+  let approach = add(station.position, scale(normalise(sub(ship.position, station.position)), standoff));
+  const parent = station.orbit ? bodyPosition(world, station.orbit.parent) : null;
+  const parentBody = station.orbit ? world.bodies[station.orbit.parent] : undefined;
+  if (parent && parentBody && parentBody.radius > 0 && distance(approach, parent) < station.orbit!.radius) {
+    approach = add(station.position, scale(normalise(sub(station.position, parent)), standoff));
+  }
+  const waypoint = routeAround(ship, stats, approach, around);
   const cruise = stats.maxSpeed * TRADER_TUNING.cruiseFraction;
   // Stations move: arrive at the approach point and end up moving with the station.
   const desired = add(station.velocity, travelVelocity(ship, stats, waypoint, approach, cruise));
-  return { input: defend(world, ship, steerToVelocity(ship, stats, desired)), brain };
+  return { input: defend(world, ship, steerSafely(ship, stats, desired, pullOn(world, ship))), brain };
 }

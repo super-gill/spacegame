@@ -1,6 +1,7 @@
 import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
-import { bodyStates, railTime } from '../rails.js';
+import { asteroidPositions } from '../asteroids.js';
+import { bodyStates, gravityAt, railTime } from '../rails.js';
 import type { ShipStats, Ship, ShipInput, World } from '../types.js';
 import { add, distance, fromAngle, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
@@ -108,6 +109,26 @@ export function arriveVelocity(ship: Ship, stats: ShipStats, point: Vec2, cruise
   return scale(normalise(offset), speed);
 }
 
+/** NPCs steer for the velocity gravity will have added over this long, seconds, so they do not sag. */
+const GRAVITY_LEAD_SECONDS = 0.5;
+/**
+ * NPCs route round a body at the distance where its gravity falls to this
+ * fraction of their own main thrust, if that is further out than its
+ * surface. A heavy freighter gives a star a wider berth than a courier.
+ */
+const GRAVITY_ROUTE_FRACTION = 0.3;
+/** NPCs route round a body at least this many times its radius from its centre. */
+const BODY_BERTH = 1.4;
+
+/**
+ * Steer like `steerToVelocity`, but leaning into gravity rather than
+ * sagging under it. `pull` is gravity where the ship is. (Routing round
+ * obstacles is done before this, in `routeAround`.)
+ */
+export function steerSafely(ship: Ship, stats: ShipStats, desired: Vec2, pull: Vec2, faceAt?: Vec2): ShipInput {
+  return steerToVelocity(ship, stats, sub(desired, scale(pull, GRAVITY_LEAD_SECONDS)), faceAt);
+}
+
 /**
  * Desired velocity towards `waypoint` on the way to `goal`: as fast as
  * `arriveVelocity` allows for the distance left to the goal (via the
@@ -129,18 +150,28 @@ export interface Obstacle {
 }
 
 /**
- * Every station hull and body surface as it stands at the start of this
- * tick. Bodies have no surface impact until 6c part 2, but NPCs fly round
- * them anyway, as a pilot would.
+ * Every station hull, body surface and asteroid as it stands at the start
+ * of this tick.
  */
-export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'tick' | 'dt'>): Obstacle[] {
+export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids' | 'tick' | 'dt'>, stats?: ShipStats): Obstacle[] {
   const out: Obstacle[] = Object.values(world.stations).map((s) => ({ position: s.position, radius: s.radius }));
+  for (const rock of asteroidPositions(world)) out.push({ position: rock.position, radius: rock.radius });
   const states = bodyStates(world.bodies, railTime(world.tick, world.dt));
+  const mainAccel = stats && stats.mass > 0 ? stats.mainThrust / stats.mass : 0;
   for (const id of Object.keys(world.bodies).sort()) {
     const body = world.bodies[id]!;
-    if (body.radius > 0) out.push({ position: states[id]!.position, radius: body.radius });
+    if (body.radius <= 0) continue;
+    // Keep out of the depth where gravity would beat the engine.
+    const deep = mainAccel > 0 && body.gravity > 0 ? Math.sqrt(body.gravity / (GRAVITY_ROUTE_FRACTION * mainAccel)) : 0;
+    // A body gets a wider berth than a hull: its pull bends a path towards it.
+    out.push({ position: states[id]!.position, radius: Math.min(Math.max(body.radius * BODY_BERTH, deep), body.sphere * 0.6 || body.radius) });
   }
   return out;
+}
+
+/** Gravity where the ship is, for steering. */
+export function pullOn(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship): Vec2 {
+  return gravityAt(world.bodies, bodyStates(world.bodies, railTime(world.tick, world.dt)), ship.position);
 }
 
 /**
@@ -156,15 +187,20 @@ export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, list: read
   if (pathLength < 1) return goal;
   const dir = scale(path, 1 / pathLength);
 
-  let nearestBlock: { obstacle: Obstacle; along: number } | null = null;
+  let nearestBlock: { obstacle: Obstacle; along: number; clearance: number } | null = null;
   for (const obstacle of list) {
-    const clearance = obstacle.radius + stats.radius + STATION_CLEARANCE;
-    if (distance(goal, obstacle.position) < clearance) continue; // goal is at this obstacle
+    const hullGap = obstacle.radius + stats.radius;
+    const toGoal = distance(goal, obstacle.position);
+    if (toGoal < hullGap) continue; // the goal is inside it: nothing to route round
+    // A goal close beside an obstacle (the near side of the station being
+    // docked at) shrinks the room kept from it, so the way in stays open
+    // without ever cutting through the hull.
+    const clearance = Math.min(hullGap + STATION_CLEARANCE, Math.max(hullGap + 5, toGoal - 5));
     const along = dot(sub(obstacle.position, ship.position), dir);
     if (along <= 0 || along >= pathLength) continue;
     const closest = add(ship.position, scale(dir, along));
     if (distance(closest, obstacle.position) >= clearance) continue;
-    if (!nearestBlock || along < nearestBlock.along) nearestBlock = { obstacle, along };
+    if (!nearestBlock || along < nearestBlock.along) nearestBlock = { obstacle, along, clearance };
   }
   if (!nearestBlock) return goal;
 
@@ -172,7 +208,7 @@ export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, list: read
   // along the tangent to a cushion round the obstacle, so the leg to the
   // waypoint itself never cuts through it. Inside the cushion, back out first.
   const { obstacle } = nearestBlock;
-  const cushion = obstacle.radius + stats.radius + STATION_CLEARANCE + 40;
+  const cushion = nearestBlock.clearance + 40;
   const side = { x: -dir.y, y: dir.x };
   const offsetSide = dot(sub(ship.position, obstacle.position), side) >= 0 ? 1 : -1;
   const out = sub(ship.position, obstacle.position);

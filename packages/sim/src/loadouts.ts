@@ -63,6 +63,25 @@ export const LOADOUTS: Record<string, Loadout> = {
       b1: 'meridian-pod-s',
     },
   },
+  'calder-watch': {
+    // The Calder Watch: a Port Authority Warrant fitted to police, not to
+    // raid. One heavy fixed gun, a full-size Marksman so it locks fast and
+    // reads what it locks, a medium shield and armour. No cargo.
+    id: 'calder-watch',
+    name: 'Kessari Warrant, Calder Watch',
+    hullId: 'kessari-wedge',
+    fit: {
+      r1: 'meridian-radar-s',
+      t1: 'paragon-computer-m',
+      n1: 'meridian-nav-s',
+      w1: 'union-autocannon-m',
+      e1: 'slagline-engine-m',
+      c1: 'slagline-thrusters-m',
+      c2: 'itomarr-reactor-m',
+      i1: 'itomarr-shield-m',
+      u1: 'cantorvell-armour-m',
+    },
+  },
   'aurel-tacet-dev': {
     id: 'aurel-tacet-dev',
     name: 'Aurel Tacet, test voice',

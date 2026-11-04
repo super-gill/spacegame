@@ -1,4 +1,4 @@
-import { bodyStates, navReadout, railTime, type Ship, type World } from '@spacegame/sim';
+import { asteroidPositions, bodyStates, navReadout, railTime, type Ship, type World } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 
 /**
@@ -55,6 +55,43 @@ export function drawBodies(ctx: CanvasRenderingContext2D, camera: Camera, world:
     ctx.font = '11px ui-monospace, monospace';
     ctx.textAlign = 'center';
     ctx.fillText(body.name.toUpperCase(), c.x, c.y + body.radius * camera.zoom + 16);
+  }
+  ctx.restore();
+}
+
+const ROCK_INK = 'rgba(176, 160, 132, 0.8)';
+
+/**
+ * Stopgap: the belt's asteroids as rough grey outlines, each a fixed
+ * lumpy shape from its id so it reads as a rock, not a circle. Only those
+ * near the screen are drawn.
+ */
+export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, world: World): void {
+  const margin = 120;
+  ctx.save();
+  ctx.strokeStyle = ROCK_INK;
+  ctx.fillStyle = '#0b0d0f';
+  ctx.lineWidth = 1;
+  for (const rock of asteroidPositions(world)) {
+    const c = camera.worldToScreen(rock.position);
+    const r = rock.radius * camera.zoom;
+    if (c.x < -margin - r || c.y < -margin - r || c.x > camera.viewportWidth + margin + r || c.y > camera.viewportHeight + margin + r) continue;
+    let seed = 0;
+    for (const ch of rock.id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+    ctx.beginPath();
+    const corners = 9;
+    for (let i = 0; i < corners; i++) {
+      seed = (seed * 1103515245 + 12345) >>> 0;
+      const wobble = 0.75 + ((seed >>> 8) % 1000) / 2000;
+      const a = (i / corners) * Math.PI * 2;
+      const x = c.x + Math.cos(a) * r * wobble;
+      const y = c.y + Math.sin(a) * r * wobble;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
   ctx.restore();
 }

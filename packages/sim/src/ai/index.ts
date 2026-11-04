@@ -2,6 +2,7 @@ import { shipStats } from '../stats.js';
 import type { Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { thinkPirate } from './pirate.js';
 import { thinkTrader } from './trader.js';
+import { thinkWatch } from './watch.js';
 
 /**
  * NPC decision making, run once per tick for every ship with a brain.
@@ -40,6 +41,11 @@ export function thinkNpcs(world: World): NpcDecisions {
       const t = thinkTrader(world, ship, stats, brain);
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
+    } else if (brain.kind === 'watch') {
+      const t = thinkWatch(world, ship, stats, brain);
+      inputs[shipId] = t.input;
+      npcs[shipId] = t.brain;
+      events.push(...t.events);
     } else {
       const t = thinkPirate(world, ship, stats, brain);
       inputs[shipId] = t.input;
@@ -53,3 +59,4 @@ export function thinkNpcs(world: World): NpcDecisions {
 
 export { PIRATE_TUNING, inSecurityZone } from './pirate.js';
 export { TRADER_TUNING } from './trader.js';
+export { WATCH_TUNING } from './watch.js';

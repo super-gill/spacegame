@@ -32,6 +32,9 @@ export const BELT_RING_RADIUS = 9000;
 /** The belt's turn, seconds. Ridge Outpost and the pirates' home turn with it. */
 export const BELT_PERIOD = 5400;
 
+/** The moon's gravitational parameter, units^3/s^2. Sets Lantern Works' period. */
+export const MOON_GRAVITY = 1.2e5;
+
 /** Where the moon orbits the planet, units from its centre. */
 const MOON_ORBIT_RADIUS = 2000;
 
@@ -59,7 +62,7 @@ export function starterBodies(): Record<string, Body> {
     radius: 400,
     gravity: PLANET_GRAVITY,
     // Holds Harbour's orbit, its security zone and the moon's sphere.
-    sphere: 2600,
+    sphere: 2700,
   };
   const moon: Body = {
     id: MOON_ID,
@@ -67,8 +70,9 @@ export function starterBodies(): Record<string, Body> {
     kind: 'moon',
     orbit: boundOrbit(PLANET_ID, PLANET_GRAVITY, MOON_ORBIT_RADIUS, Math.PI),
     radius: 150,
-    gravity: 1.2e5,
-    sphere: 450,
+    gravity: MOON_GRAVITY,
+    // Room for Lantern Works' orbit and its dock range, with a clear lane between station and surface.
+    sphere: 650,
   };
   const belt: Body = {
     id: BELT_ID,

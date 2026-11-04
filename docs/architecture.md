@@ -42,6 +42,8 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `world.ts` | World construction, pilots joining (`joinPilot`), lookups (`pilotShip`), starter sector spawners |
 | `stations.ts` | Starter system stations as data: orbits, markets, pads (`padRing`), ship mart stock; defaults for save migrations |
 | `bodies.ts` | Starter system bodies as data: Calder (star), planet, moon, belt; `boundOrbit` for orbits whose period comes from the parent's gravity |
+| `asteroids.ts` | The Scree's rocks: `screeAsteroids` (seeded, once), `asteroidStates`, `asteroidPositions` |
+| `random.ts` | `seededRandom` for content generated once from a seed; the running sim uses no randomness |
 | `nav.ts` | The nav computer: `navReadout` (frame, relative speed, gravity tier, orbit, predicted path), `predictPath`, `orbitElements`, `gravityTier` |
 | `locks.ts` | Target locks (from the fitted radar and targeting computer): `lockSeconds`, `lockRefusal`, `stepLocks` (inputs, progress, drops), `weaponTarget` and `activeTarget` for what turrets engage |
 | `rails.ts` | Rails, frames and gravity (`gravityAt`, `gravityFrom`, `gravityEase`, `surfacesNext`): body and station positions as pure functions of the tick (`bodyState`, `stationState`, `placeStations`, `circularPeriod`), carrying inside spheres (`tickRails`, `applyCarry`), the local frame (`localFrame`, `frameVelocity`, `relativeVelocity`), pirate homes on rails |
@@ -57,6 +59,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `factory.ts` | `buildShip`: the one place a ship is made from a hull and a fit (usually a loadout) |
 | `lifecycle.ts` | Destruction into wrecks, loot and escape pods, NPCs leaving, wreck drift, loot and tractor beam, spawners |
 | `ai/steer.ts` | NPC piloting: turn to a heading, steer to a velocity, arrive at a point, route round stations. Produces a `ShipInput` |
+| `ai/watch.ts` | The Calder Watch: patrol beat, lock to identify, engage pirates, hold fire for bystanders |
 | `ai/trader.ts` | Trader brain: station loop, docking and dwell |
 | `ai/pirate.ts` | Pirate brain: prowl, hunt, withdraw; security zone rules |
 | `ai/index.ts` | Runs every NPC brain against the start-of-tick world |

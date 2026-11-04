@@ -593,6 +593,19 @@ export interface Body {
 }
 
 /**
+ * A rock in a belt. On rails like everything else: it rides the belt's
+ * turn at its own radius and phase. Solid: ships bounce off it as off a
+ * station hull and shots stop on it, so the belt gives cover. Ore comes
+ * in milestone 9, read by a mining computer.
+ */
+export interface Asteroid {
+  id: string;
+  orbit: Orbit;
+  /** Units. */
+  radius: number;
+}
+
+/**
  * A person in the world. Pilots are what make the game multiplayer-ready:
  * the sim has no single "player", only pilots who each own ships and,
  * later, credits, cargo, reputation and a criminal record. Everything a
@@ -666,7 +679,7 @@ export interface ShipInput {
  * brain flies, so NPC state saves and loads with the world like anything
  * else. The behaviour lives in `ai/`.
  */
-export type NpcBrain = TraderBrain | PirateBrain;
+export type NpcBrain = TraderBrain | PirateBrain | WatchBrain;
 
 /** Flies a fixed loop of stations, docking at each for a while. */
 export interface TraderBrain {
@@ -677,6 +690,26 @@ export interface TraderBrain {
   leg: number;
   /** Ticks left to wait while docked. */
   waitTicks: number;
+}
+
+/**
+ * A local watch patrol (the Calder Watch): flies a beat just outside the
+ * stations' security zones and fights pirates it can see. It identifies
+ * contacts the way a pilot does, by locking them, and fires only once the
+ * lock has told it what it is looking at. It does not trouble pilots
+ * until law arrives (milestone 7). An ordinary, beatable ship.
+ */
+export interface WatchBrain {
+  kind: 'watch';
+  /** Station ids the beat runs past, in order. */
+  beat: string[];
+  /** Index into `beat` of the station it is heading for. */
+  leg: number;
+  mode: 'patrol' | 'engage';
+  /** The pirate being fought, in `engage`. */
+  targetId: string | null;
+  /** Ticks in the current mode, or left to hold at a beat point. */
+  modeTicks: number;
 }
 
 export type PirateMode = 'prowl' | 'hunt' | 'withdraw';
@@ -724,6 +757,8 @@ export interface World {
   stations: Record<string, Station>;
   /** The system's natural bodies, by id. Data, kept as saved. Empty in a flat sector. */
   bodies: Record<string, Body>;
+  /** The belts' rocks. Generated once from a seed when the world is made, then kept as saved. */
+  asteroids: Asteroid[];
   hulls: Record<string, HullSpec>;
   modules: Record<string, ModuleSpec>;
   loadouts: Record<string, Loadout>;
@@ -782,7 +817,7 @@ export type WorldEvent =
   | { type: 'lockRefused'; shipId: string; targetId: string; reason: LockRefusal }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
   | { type: 'collided'; shipId: string; stationId: string; speed: number }
-  /** A ship struck a body's surface. `speed` is the closing speed at impact, units/s. */
+  /** A ship struck a body's surface or an asteroid (`bodyId` is then the asteroid's id). `speed` is the closing speed at impact, units/s. */
   | { type: 'impacted'; shipId: string; bodyId: string; speed: number }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */
   | { type: 'rammed'; shipId: string; by: string; speed: number }

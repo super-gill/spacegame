@@ -62,7 +62,7 @@ import {
   drawWreck,
   type ShipStyle,
 } from './render/draw.js';
-import { bodyMarkers, drawBodies, drawNav } from './render/bodies.js';
+import { bodyMarkers, drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { FlightHud } from './hud/flight-hud.js';
@@ -502,6 +502,8 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
+  // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
+  if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: 'CALDER WATCH' };
   if (isEmptyShip(world, ship)) {
     // Yours stand out from other pilots' parked ships.
     if (ship.ownerId === me.id) return { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()} · EMPTY`, empty: true };
@@ -529,6 +531,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   drawStarfield(ctx!, camera);
 
   drawBodies(ctx!, camera, current, alpha);
+  drawAsteroids(ctx!, camera, current);
 
   // Stations move on rails: draw them between ticks like ships, so docked ships stay on their pads.
   const near = mine ? nearestDockableStation(mine, current.stations) : null;

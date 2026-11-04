@@ -73,10 +73,10 @@ describe('trader', () => {
     // No pirate, so this is purely about flying the route.
     const quiet = { ...createStarterWorld(), spawners: [] };
     const noPirate = { ...quiet, ships: { [TRADER]: quiet.ships[TRADER]! }, npcs: { [TRADER]: quiet.npcs[TRADER]! } };
-    run(noPirate, 120, (w) => {
+    run(noPirate, 240, (w) => {
       for (const e of w.events) if (e.type === 'docked' && e.shipId === TRADER) docks.push(e.stationId);
     });
-    expect(docks.slice(0, 2)).toEqual(['station-ridge', 'station-harbour']);
+    expect(docks.slice(0, 3)).toEqual(['station-ridge', 'station-lantern', 'station-harbour']);
   });
 
   it('never hits a station hull', () => {

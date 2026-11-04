@@ -17,10 +17,10 @@ import {
 } from '../rails.js';
 import { SAVE_FORMAT, SAVE_VERSION, deserializeWorld, serializeWorld } from '../save.js';
 import { stepShip } from '../ship.js';
-import { HARBOUR_ID, RIDGE_ID } from '../stations.js';
+import { HARBOUR_ID, LANTERN_ID, RIDGE_ID } from '../stations.js';
 import { stepWorld } from '../step.js';
 import type { PirateBrain, Ship, ShipInput, World } from '../types.js';
-import { add, distance, length, sub } from '../vec2.js';
+import { add, distance, length, normalise, scale, sub } from '../vec2.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
 import { TEST_STATS } from './fixtures.js';
 
@@ -212,14 +212,14 @@ describe('carrying', () => {
   it('carries loot and wrecks too', () => {
     let w = weightless(quiet()); // carrying alone; gravity is tested below
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
-    const at = add(planet.position, { x: -1500, y: 0 });
+    const at = add(planet.position, { x: -1100, y: 0 });
     w = {
       ...w,
       loot: [{ id: 'l1', item: 'scrap', amount: 1, position: at, velocity: planet.velocity, ticksLeft: 10_000 }],
       wrecks: [{ id: 'w1', hullId: 'meridian-courier', position: at, velocity: planet.velocity, heading: 0, angularVelocity: 0, ticksLeft: 10_000 }],
     };
     w = run(w, 30);
-    const want = add(bodyPosition(w, PLANET_ID), { x: -1500, y: 0 });
+    const want = add(bodyPosition(w, PLANET_ID), { x: -1100, y: 0 });
     expect(distance(w.loot[0]!.position, want)).toBeLessThan(1e-6);
     expect(distance(w.wrecks[0]!.position, want)).toBeLessThan(1e-6);
   });
@@ -252,7 +252,9 @@ describe('the local frame', () => {
     expect(localFrame(w, { position: away, dockedAt: null })).toMatchObject({ kind: 'body', id: PLANET_ID });
     expect(frameVelocity(w, { position: away, dockedAt: null })).toEqual(bodyVelocity(w, PLANET_ID));
     const moon = bodyPosition(w, MOON_ID);
-    expect(localFrame(w, { position: add(moon, { x: 200, y: 0 }), dockedAt: null })).toMatchObject({ kind: 'body', id: MOON_ID });
+    const works = w.stations['station-lantern']!.position;
+    const farSide = add(moon, scale(normalise(sub(moon, works)), 200)); // across the moon from Lantern Works
+    expect(localFrame(w, { position: farSide, dockedAt: null })).toMatchObject({ kind: 'body', id: MOON_ID });
     expect(localFrame(w, { position: { x: -6000, y: -6000 }, dockedAt: null })).toEqual({ kind: 'system', velocity: { x: 0, y: 0 } });
   });
 
@@ -275,7 +277,7 @@ describe('the local frame', () => {
     let w = joinPilot(quiet(), 'ana', 'Ana');
     const me = pilotShip(w, 'ana')!.id;
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
-    const away = add(planet.position, { x: -1500, y: 0 });
+    const away = add(planet.position, { x: -1100, y: 0 });
     w = put(w, { ...w.ships[me]!, position: away, velocity: add(planet.velocity, { x: 80, y: -40 }), flightMode: 'manual' });
     w = run(w, 5, () => ({ [me]: { ...emptyInput(), brake: true } }));
     expect(length(relativeVelocity(w, w.ships[me]!))).toBeLessThan(1e-6);
@@ -337,9 +339,10 @@ describe('NPCs in moving frames', () => {
     for (const id of pirates) delete ships[id];
     const calm: World = { ...start, ships, npcs: Object.fromEntries(Object.entries(start.npcs).filter(([id]) => !pirates.includes(id))), spawners: start.spawners.filter((sp) => sp.brain.kind !== 'pirate') };
     run(calm, 240, () => ({}), (x) => {
-      for (const e of x.events) if (e.type === 'docked' && e.shipId.startsWith('npc-trader')) docks.push(e.stationId);
+      for (const e of x.events) if (e.type === 'docked' && e.shipId === 'npc-trader-1') docks.push(e.stationId);
     });
-    expect(docks.slice(0, 3)).toEqual([RIDGE_ID, HARBOUR_ID, RIDGE_ID]);
+    // Round the triangle: Harbour, the Ridge, Lantern Works, and home.
+    expect(docks.slice(0, 3)).toEqual([RIDGE_ID, LANTERN_ID, HARBOUR_ID]);
   });
 
   it('a new pilot who waits off Harbour gets a pass inside dock range, clear of the hull', () => {

@@ -72,7 +72,7 @@ describe('gravity', () => {
 
   it('holds a free orbit for an hour of play with no thrust', () => {
     let x = quiet();
-    const r = 1500;
+    const r = 1100;
     const v = Math.sqrt(planet.gravity / r);
     x = nearPlanet(x, 'orbiter', { x: r, y: 0 }, { x: 0, y: v });
     let lowest = Infinity;
@@ -153,7 +153,7 @@ describe('the nav computer', () => {
 
   it('reads a circular orbit as one, and sees as far ahead as it is built to', () => {
     const planet = quiet().bodies[PLANET_ID]!;
-    const r = 1500;
+    const r = 1100;
     const x = nearPlanet(quiet(), 'orbiter', { x: r, y: 0 }, { x: 0, y: Math.sqrt(planet.gravity / r) });
     const nav = navReadout(x, x.ships['orbiter']!)!;
     expect(nav.orbit!.bodyId).toBe(PLANET_ID);

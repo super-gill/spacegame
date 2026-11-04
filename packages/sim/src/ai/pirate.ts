@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, obstacles, routeAround, steerToVelocity, travelVelocity, type Obstacle } from './steer.js';
+import { arriveVelocity, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -91,9 +91,9 @@ export function inSecurityZone(world: World, point: Vec2, margin = 0): boolean {
  * What a pirate steers round on its way home: station hulls, bodies, and
  * every station's security zone, which it will not cross.
  */
-function avoid(world: World): Obstacle[] {
+function avoid(world: World, around: readonly Obstacle[]): Obstacle[] {
   const zones = Object.values(world.stations).map((st) => ({ position: st.position, radius: st.securityRadius }));
-  return [...obstacles(world), ...zones];
+  return [...around, ...zones];
 }
 
 function switchMode(brain: PirateBrain, mode: PirateMode, extra: Partial<PirateBrain> = {}): PirateBrain {
@@ -116,7 +116,9 @@ function findTarget(world: World, self: Ship, sight: number): Ship | null {
   let bestDist = Infinity;
   for (const other of Object.values(world.ships)) {
     if (other.id === self.id || other.state !== 'flying') continue;
-    if (world.npcs[other.id]?.kind === 'pirate') continue;
+    // Pirates prey on traffic: their own kind and the Watch are not prey (they fight the Watch only if it starts it).
+    const kind = world.npcs[other.id]?.kind;
+    if (kind === 'pirate' || kind === 'watch') continue;
     if (!worthHunting(world, other)) continue;
     if (inSecurityZone(world, other.position, PIRATE_TUNING.zoneCaution)) continue;
     const d = distance(self.position, other.position);
@@ -149,6 +151,9 @@ function huntOver(world: World, self: Ship, stats: ShipStats, target: Ship | und
 }
 
 export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: PirateBrain): PirateThought {
+  // What is in the way, and gravity here, for every steering choice below.
+  const around = obstacles(world, stats);
+  const pull = pullOn(world, ship);
   const events: WorldEvent[] = [];
   let b: PirateBrain = {
     ...brain,
@@ -182,7 +187,7 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       // Point the nose where the shots need to go, and fire when it is there.
       const gun = Object.values(stats.weapons).find((w) => w.kind === 'fixed');
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
-      const input = steerToVelocity(ship, stats, desired, aimPoint);
+      const input = steerSafely(ship, stats, desired, pull, aimPoint);
       if (gun) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
@@ -201,7 +206,7 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     if (strongEnough && huntable(world, ship, attacker)) {
       events.push({ type: 'huntStarted', shipId: attacker.id, pirateId: ship.id });
       b = switchMode(b, 'hunt', { targetId: attacker.id, provokedBy: null });
-      return { input: steerToVelocity(ship, stats, attacker.velocity, attacker.position), brain: b, events };
+      return { input: steerSafely(ship, stats, attacker.velocity, pull, attacker.position), brain: b, events };
     }
     b = { ...b, provokedBy: null };
   }
@@ -210,26 +215,26 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     if (distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
       b = switchMode(b, 'prowl');
     } else {
-      const waypoint = routeAround(ship, stats, b.home, avoid(world));
+      const waypoint = routeAround(ship, stats, b.home, avoid(world, around));
       const desired = travelVelocity(ship, stats, waypoint, b.home, stats.maxSpeed * 0.7);
-      return { input: steerToVelocity(ship, stats, desired), brain: b, events };
+      return { input: steerSafely(ship, stats, desired, pull), brain: b, events };
     }
   }
 
   // Prowl. Too damaged to hunt and home: leave the sector to repair.
   if (!fitToFight && distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
-    return { input: steerToVelocity(ship, stats, { x: 0, y: 0 }), brain: b, events, depart: true };
+    return { input: steerSafely(ship, stats, { x: 0, y: 0 }, pull), brain: b, events, depart: true };
   }
   if (!fitToFight) {
-    const desired = travelVelocity(ship, stats, routeAround(ship, stats, b.home, avoid(world)), b.home, stats.maxSpeed * 0.7);
-    return { input: steerToVelocity(ship, stats, desired), brain: b, events };
+    const desired = travelVelocity(ship, stats, routeAround(ship, stats, b.home, avoid(world, around)), b.home, stats.maxSpeed * 0.7);
+    return { input: steerSafely(ship, stats, desired, pull), brain: b, events };
   }
   if (b.cooldownTicks === 0) {
     const target = findTarget(world, ship, stats.sensorRange);
     if (target) {
       events.push({ type: 'huntStarted', shipId: target.id, pirateId: ship.id });
       b = switchMode(b, 'hunt', { targetId: target.id });
-      return { input: steerToVelocity(ship, stats, target.velocity, target.position), brain: b, events };
+      return { input: steerSafely(ship, stats, target.velocity, pull, target.position), brain: b, events };
     }
   }
 
@@ -239,5 +244,5 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     b = { ...b, patrolIndex: (b.patrolIndex + 1) % PIRATE_TUNING.patrolPoints };
   }
   const desired = arriveVelocity(ship, stats, patrolPoint, stats.maxSpeed * PIRATE_TUNING.prowlFraction);
-  return { input: steerToVelocity(ship, stats, desired), brain: b, events };
+  return { input: steerSafely(ship, stats, desired, pull), brain: b, events };
 }

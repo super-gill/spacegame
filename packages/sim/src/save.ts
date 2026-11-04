@@ -3,6 +3,7 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
+import { screeAsteroids } from './asteroids.js';
 import { starterBodies } from './bodies.js';
 import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
 import { idleThrusters } from './flight.js';
@@ -192,6 +193,7 @@ export function migrate4to5(world: unknown): unknown {
     tick,
     dt,
     bodies: starterBodies(),
+    asteroids: screeAsteroids(),
     stations,
     ships,
     npcs: {},
@@ -337,12 +339,15 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const savedAt = typeof parsed['savedAt'] === 'string' ? parsed['savedAt'] : '';
   const ships: Record<string, Ship> = {};
   for (const [id, ship] of Object.entries(world.ships)) ships[id] = withLocks(ship);
+  // Version 5 worlds saved from main before the Scree had rocks get them now.
+  const asteroids = Array.isArray(world.asteroids) ? world.asteroids : screeAsteroids();
   return {
     ok: true,
     savedAt,
     world: {
       ...world,
       ships,
+      asteroids,
       hulls: { ...HULLS },
       modules: { ...MODULES },
       loadouts: { ...LOADOUTS },

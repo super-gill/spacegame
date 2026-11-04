@@ -168,7 +168,7 @@ export interface LockReadout {
     manufacturer: string;
     sizeClass: ModuleSize;
     /** Who flies it: a pilot, an NPC of this kind, or nobody. */
-    flownBy: 'pilot' | 'trader' | 'pirate' | 'nobody';
+    flownBy: 'pilot' | 'trader' | 'pirate' | 'watch' | 'nobody';
     escapePod: boolean;
   };
   motion?: {

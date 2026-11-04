@@ -1,4 +1,4 @@
-import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, PLANET_GRAVITY, PLANET_ID, boundOrbit, starterBodies } from './bodies.js';
+import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, MOON_GRAVITY, MOON_ID, PLANET_GRAVITY, PLANET_ID, boundOrbit, starterBodies } from './bodies.js';
 import { FIXED_DT } from './constants.js';
 import { placeStations } from './rails.js';
 import type { ModuleSize, Pad, Station } from './types.js';
@@ -43,6 +43,10 @@ export function padRing(stationRadius: number, sizes: readonly ModuleSize[], sta
 
 export const HARBOUR_ID = 'station-harbour';
 export const RIDGE_ID = 'station-ridge';
+export const LANTERN_ID = 'station-lantern';
+
+/** Lantern Works' orbit round Lantern, units from the moon's centre. */
+export const LANTERN_ORBIT_RADIUS = 420;
 
 /** Where on the belt Ridge Outpost is at tick 0, radians. Pirates lurk a little inward of it. */
 export const RIDGE_PHASE = 0.6;
@@ -58,11 +62,12 @@ export function harbourStation(): Station {
     radius: 90,
     dockRange: 220,
     securityRadius: 900,
-    // Food, machinery and medicine are cheap here, ore is wanted.
+    // Fieldmark's harvest and a Solace clinic make food and medicine
+    // cheap. Machinery comes in from Lantern Works, so it is middling.
     market: {
       food: { ask: 14, bid: 11 },
-      ore: { ask: 46, bid: 38 },
-      machinery: { ask: 70, bid: 60 },
+      ore: { ask: 40, bid: 30 },
+      machinery: { ask: 78, bid: 66 },
       medicine: { ask: 55, bid: 47 },
       scrap: { ask: null, bid: 7 },
     },
@@ -102,9 +107,39 @@ export function ridgeOutpost(): Station {
   };
 }
 
+/**
+ * A Corvane Heavy Industries foundry round Lantern, the ice moon: Ridge
+ * ore is smelted here, where ice for cooling is free. Wants ore and
+ * scrap, makes machinery cheap, pays dearly for food and medicine.
+ * Outfitting (Corvane's industrial modules, stocked from the general
+ * catalogue until Corvane has its own); no ship mart.
+ */
+export function lanternWorks(): Station {
+  return {
+    id: LANTERN_ID,
+    name: 'Lantern Works',
+    position: { x: 0, y: 0 },
+    velocity: { x: 0, y: 0 },
+    orbit: boundOrbit(MOON_ID, MOON_GRAVITY, LANTERN_ORBIT_RADIUS, 0),
+    radius: 70,
+    dockRange: 190,
+    securityRadius: 700,
+    market: {
+      food: { ask: 40, bid: 34 },
+      ore: { ask: 52, bid: 42 },
+      machinery: { ask: 48, bid: 40 },
+      medicine: { ask: 96, bid: 82 },
+      scrap: { ask: null, bid: 14 },
+    },
+    outfitting: true,
+    pads: padRing(70, ['L', 'M', 'S', 'L', 'M', 'S']),
+    shipMart: [],
+  };
+}
+
 /** Every station in the starter system, by id, placed where they are at `tick`. */
 export function starterStations(tick = 0, dt = FIXED_DT): Record<string, Station> {
-  const all = [harbourStation(), ridgeOutpost()];
+  const all = [harbourStation(), ridgeOutpost(), lanternWorks()];
   return placeStations(starterBodies(), Object.fromEntries(all.map((s) => [s.id, s])), tick, dt);
 }
 
