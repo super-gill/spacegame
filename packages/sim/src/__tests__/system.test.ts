@@ -16,6 +16,7 @@ import {
   stationState,
 } from '../rails.js';
 import { SAVE_FORMAT, SAVE_VERSION, deserializeWorld, serializeWorld } from '../save.js';
+import { navReadout } from '../nav.js';
 import { stepShip } from '../ship.js';
 import { HARBOUR_ID, LANTERN_ID, RIDGE_ID } from '../stations.js';
 import { stepWorld } from '../step.js';
@@ -357,8 +358,10 @@ describe('NPCs in moving frames', () => {
     const harbour = w.stations[HARBOUR_ID]!;
     expect(nearest).toBeLessThan(harbour.dockRange);
     expect(hit).toBe(false);
-    w = stepWorld(w, {});
-    expect(length(relativeVelocity(w, w.ships[me]!))).toBeLessThan(1e-6); // starts at rest in its frame
+    // Starts in orbit round the planet, so it holds its place on Harbour's path rather than falling.
+    const nav = navReadout(w, w.ships[me]!)!;
+    expect(nav.orbit?.bound).toBe(true);
+    expect(nav.orbit!.periapsisAltitude).toBeGreaterThan(0);
   });
 });
 

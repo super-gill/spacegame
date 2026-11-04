@@ -12,8 +12,8 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
 | 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Done, 0.7.0 |
 | 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | Done, 0.8.0 |
-| 6c Living system | A star system on rails: a star, a planet, a moon, the belt, stations in orbit; spheres of influence and real gravity with free orbits; tiered gravity warnings; sensor range; Calder Watch patrols that hunt pirates; more traders; a third station (see `docs/system.md`) | Built on `main`, release pending (0.9.0): part 1 (bodies, frames, moving stations, save 5) and part 2 (target locks, fitted sensors and nav computers, lock readouts, gravity, surfaces, Lantern Works, the Scree, the Calder Watch, the trade triangle) |
-| 6d Ship interface and navigation | Flight HUD with shield, hull and module gauges; radar and contacts by sensor range; nav target with distance and arrival time; system map; warnings; predicted path and orbit readouts. Everything shown about a ship or the system comes through the readouts (`lockReadout`, `navReadout`), the window rule. Mockups first | In progress: interface workstream; mockups and stage 2 (flight HUD, lock strip, target card) merged; next stage 3, the radar |
+| 6c Living system | A star system on rails: a star, a planet, a moon, the belt, stations in orbit; spheres of influence and real gravity with free orbits; tiered gravity warnings; sensor range; Calder Watch patrols that hunt pirates; more traders; a third station (see `docs/system.md`) | Done, 0.9.0 |
+| 6d Ship interface and navigation | Flight HUD with shield, hull and module gauges; radar and contacts by sensor range; nav target with distance and arrival time; system map; warnings; predicted path and orbit readouts. Everything shown about a ship or the system comes through the readouts (`lockReadout`, `navReadout`), the window rule. Mockups first | In progress: interface workstream; mockups, stage 2 (flight HUD, lock strip, target card) and stage 3 (radar) merged in 0.9.0; next stage 4, contacts and the nav target |
 | 6e Weapons and power | A capacitor that energy weapons, shield recharge and active systems (radar, computers) draw on; projectile guns, missiles and torpedoes on ammunition (missiles fast, cheap, light damage; torpedoes heavy, slow, massive damage) with guidance kinds; turrets as automatic CIWS (closest hostile missile, torpedo or ship, or an assigned lock); countermeasures (chaff, flares, decoys) as modules carrying a mix from different makers; systems assignable to locks; fire groups; turret arcs; modules across two mounts | Next to plan with Jason, while 6d runs |
 | 6f Ship systems | Every remaining capability becomes a fitted system with a cost: the tractor beam, turret fire control, shield recharge timing (from the shield generator), flight assist quality (from a flight computer), escape pods (from a pod bay). Possibly fuel: tanks as modules, one fuel for thrust and later faster-than-light travel, scooped from stars (Jason to decide whether fuel bites in-system now or waits for the map) | |
 | 7 Law | Witnessed crime, reputation record, security response that escalates (the local watch, then its reserve, then the holder's navy, thinner the farther out; all ordinary, beatable ships, no galactic police), bounties; standing with NPC factions, including the four pirate factions from the lore; shooting escape pods as a crime | |
@@ -28,12 +28,22 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 
 ## Plan from here (4 November 2026)
 
-1. Jason playtests `main`; the lead fixes what he finds and releases 0.9.0 (milestone 6c).
-2. The interface workstream carries on with 6d: stage 3 the radar (replacing the stopgap off-screen markers), then contacts and the nav target, the system map, warnings, and bodies, orbits and the path line. Its two readout follow-ups (target card through `lockReadout`, speed through `navReadout`) go first.
+1. 0.9.0 released (milestone 6c).
+2. The interface workstream carries on with 6d: stage 4 contacts and the nav target, then the system map, warnings, and bodies, orbits and the path line; ship labels in space onto lock identity.
 3. The lead plans 6e with Jason while 6d runs: missile guidance kinds, what the capacitor feeds, ammunition, countermeasures.
 4. Then 6e, then 6f, then law (7), then the map (8).
 
-## Known gaps in 0.8.0
+## Known gaps in 0.9.0
+
+- An empty ship left at rest inside a planet's or moon's sphere falls and hits the surface. Park in orbit, at a station or in open space; there is no orbit-hold autopilot yet.
+- The Calder Watch beats the raider easily. Pirates, the Watch and the traders are balanced by test and soak, not by play.
+- A ship parked beside Ridge drifts off it slowly, because the Scree has no gravity to hold an orbit; full assist holds you.
+- Bodies, orbits and the predicted path are drawn by the lead's stopgap in plain lines; the interface workstream's versions come with 6d.
+- Ship labels in space still name NPCs directly; the radar and the target card already follow the window rule.
+- Only Harbour has a ship mart. Lantern Works has outfitting but stocks the general catalogue; Corvane has no modules yet.
+- No sound, and no warning sounds for gravity.
+
+## Known gaps carried from 0.8.0
 
 - One world per browser. Several save slots would need a picker; export and import cover it for now.
 - Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ships stay where they were, empty). A way to carry your pilot over comes before the shared world.

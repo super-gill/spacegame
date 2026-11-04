@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { stepWorld } from '../step.js';
+import type { World } from '../types.js';
 import { PLANET_ID } from '../bodies.js';
 import { bodyPosition, frameVelocity, relativeVelocity } from '../rails.js';
 import { add, distance, length, sub } from '../vec2.js';
@@ -59,6 +60,13 @@ describe('joining', () => {
   });
 });
 
+/** The world after `ticks` ticks with no input at all. */
+function stepWorldFor(w: World, ticks: number): World {
+  let x = w;
+  for (let i = 0; i < ticks; i++) x = stepWorld(x, {});
+  return x;
+}
+
 describe('several pilots in one world', () => {
   it('each input only moves its own ship', () => {
     const start = joinPilot(joinPilot(createStarterWorld(), 'ana', 'Ana'), 'ben', 'Ben');
@@ -70,18 +78,25 @@ describe('several pilots in one world', () => {
       w = stepWorld(w, { [anaStart.id]: { ...emptyInput(), thrustForward: true } });
     }
 
-    // Ben is carried with the planet, so he keeps his place relative to it.
-    const planetMoved = sub(bodyPosition(w, PLANET_ID), bodyPosition(start, PLANET_ID));
-    expect(pilotShip(w, 'ana')!.position).not.toEqual(add(anaStart.position, planetMoved));
-    expect(distance(pilotShip(w, 'ben')!.position, add(benStart.position, planetMoved))).toBeLessThan(1e-6);
+    // Ben started in orbit round the planet and nobody touched his ship, so
+    // he is still on that orbit: the same distance from the planet.
+    const planetNow = bodyPosition(w, PLANET_ID);
+    const planetThen = bodyPosition(start, PLANET_ID);
+    // Ben stays on his orbit (same distance from the planet); Ana, who
+    // thrusted, has left hers: she is well off where coasting would have put her.
+    const benChange = Math.abs(distance(pilotShip(w, 'ben')!.position, planetNow) - distance(benStart.position, planetThen));
+    expect(benChange).toBeLessThan(5);
+    const coasting = stepWorldFor(start, SECOND);
+    expect(distance(pilotShip(w, 'ana')!.position, pilotShip(coasting, 'ana')!.position)).toBeGreaterThan(10);
+    expect(distance(pilotShip(w, 'ben')!.position, pilotShip(coasting, 'ben')!.position)).toBeLessThan(1e-6);
   });
 
   it('steps ships with no input under their own flight computer', () => {
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const id = pilotShip(w, 'ana')!.id;
-    const drift = add(frameVelocity(w, w.ships[id]!), { x: 50, y: 0 });
-    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, velocity: drift } } };
-    // Full assist with nobody at the controls eases the drift to a stop in the local frame.
+    // Out in flat space, with a drift: full assist with nobody at the
+    // controls eases the drift to a stop in the local frame.
+    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, position: { x: -7000, y: -7000 }, velocity: { x: 50, y: 0 } } } };
     for (let i = 0; i < SECOND * 10; i++) w = stepWorld(w, {});
     expect(length(relativeVelocity(w, pilotShip(w, 'ana')!))).toBeLessThan(1e-6);
   });

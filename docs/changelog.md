@@ -4,6 +4,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-04
+
+Milestone 6c: the living system. Calder is a star system that moves, and every capability and every readout comes from a system fitted to your ship.
+
+### Added
+- Calder is a star system: the star, the garden world Fieldmark, its ice moon Lantern and the asteroid belt the Scree, all moving on their orbits. Harbour Station orbits Fieldmark and Ridge Outpost turns with the Scree, so routes change length as they move.
+- Gravity. Planets and moons pull inside their sphere of influence; orbits are free, so a ship left coasting stays up; full assist hovers as far as your thrusters can, while rotation assist and manual fly orbits. Shots, loot and wrecks fall too. Hitting a planet hurts like hitting a station hull.
+- Speed, full assist, braking and docking are relative to the station or body you are near. A docked ship rides its pad as the station moves.
+- Lantern Works, a Corvane foundry round Lantern with outfitting: it wants ore, food and medicine and sells machinery cheap. Two Tessaract traders run the triangle between the three stations.
+- The Scree: 180 solid rocks that block shots and give cover, with Ridge's approach kept clear.
+- The Calder Watch patrols near the stations and fights pirates, and can lose. There is no Concord; law is local.
+- Target locks, EVE style: lock ships with a click, hold several, Tab switches the active one, Esc unlocks. Locking takes time; turrets fire only at a completed lock. Lock time depends on the target's hull: freighters lock fast, small and stealthy frames slowly.
+- Radars, targeting computers and nav computers are fitted systems. Range, lock count and lock speed come from what you fit; no radar sees nothing, no computer locks nothing. What a lock shows depends on your targeting computer: rough condition from a civil plotter, exact shields and guns from a Paragon Marksman, cargo from a Tessaract Tally. Your speed, orbit, gravity warnings and predicted path come from your nav computer; an Ito-Marr Chartvault sees two minutes ahead.
+- Sensor range as a ship stat: ships beyond it are not shown.
+- The flight HUD: a status dial with shield and hull rings and your speed, weapon tiles that show reloading, the zone and credits top left, a lock strip with a card per lock, and a target card for the active lock.
+- Radar: a north-up disc showing ships within your sensor range, stations and bodies always, and what the screen covers; click a contact to lock it. Off-screen markers are gone.
+- Zoom with the mouse wheel or = and -.
+- Names from the lore for Calder's bodies, Lantern Works, the Calder Watch and the new modules; `docs/lore.md` gains the Landfall Accord, local law and why ships are built from systems.
+
+### Changed
+- Turn with A and D, strafe with Q and E; the arrows still turn.
+- The old text readout is gone; position, heading and spin are no longer shown.
+- Health bars over ships show only for ships you have locked with a combat computer.
+- Harbour's machinery is dearer and its ore bid lower, so the trade triangle pays.
+- NPCs fly the living system: round planets, rocks and security zones, in and out of moving stations.
+- Save format version 5. Saves from 0.8.x upgrade automatically: pilots keep credits, storage and ships; docked ships stay on their pads; ships in space are towed to Harbour; old ships get the stock radar, plotter and nav computer free. Milestone 6c's later changes stayed inside version 5.
+
+### Known
+- An empty ship left at rest near a planet falls. Park in orbit, at a station or in open space.
+- The Calder Watch is strong against the raider; balance is by test, not yet by play.
+
 ## [0.8.0] - 2026-11-04
 
 Milestone 6b: ships you own.
