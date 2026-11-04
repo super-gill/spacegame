@@ -343,6 +343,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'meridian',
     tags: ['sensor'],
     stats: { maxLocks: 2, scanResolution: 1 },
+    // Civil: who it is, where it is going, and roughly how it is holding up.
+    readouts: ['identity', 'motion', 'condition'],
   },
   // Dedicated fire control: the same two locks, much faster.
   'paragon-computer-s': {
@@ -358,6 +360,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'paragon',
     tags: ['sensor'],
     stats: { maxLocks: 2, scanResolution: 1.6 },
+    // Combat: exact shields, structure and guns.
+    readouts: ['identity', 'motion', 'condition', 'combat'],
   },
   // More locks for a bigger ship, at a bigger power bill.
   'paragon-computer-m': {
@@ -373,5 +377,22 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'paragon',
     tags: ['sensor'],
     stats: { maxLocks: 4, scanResolution: 1.5 },
+    readouts: ['identity', 'motion', 'condition', 'combat'],
+  },
+  // Reads holds, not guns: customs officers, traders sizing up a market, and pirates choosing a prize.
+  'tessaract-scanner-s': {
+    id: 'tessaract-scanner-s',
+    name: 'Tessaract Manifest Reader S',
+    kind: 'targetingComputer',
+    size: 'S',
+    mounts: ['computer'],
+    needs: ['power'],
+    mass: 0.8,
+    power: 1.5,
+    price: 1200,
+    manufacturer: 'tessaract',
+    tags: ['sensor'],
+    stats: { maxLocks: 1, scanResolution: 0.8 },
+    readouts: ['identity', 'motion', 'cargo'],
   },
 };

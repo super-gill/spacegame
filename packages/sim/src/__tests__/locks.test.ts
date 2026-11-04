@@ -3,7 +3,7 @@ import { LOCK_BASE_SECONDS } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
-import { activeTarget, lockRefusal, lockSeconds, weaponTarget } from '../locks.js';
+import { activeTarget, lockReadout, lockRefusal, lockSeconds, weaponTarget } from '../locks.js';
 import { deserializeWorld, serializeWorld } from '../save.js';
 import { fitStats, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
@@ -254,5 +254,61 @@ describe('NPCs and saves', () => {
     expect(old.world.ships[me]!.locks).toEqual([]);
     expect(old.world.ships[me]!.activeLock).toBeNull();
     expect('targetId' in old.world.ships[me]!).toBe(false);
+  });
+});
+
+describe('what a lock tells you', () => {
+  /** Ana with a given computer, holding a complete lock on a damaged, laden raider 400 units off. */
+  function lockedWith(computer: string): { w: World; me: string } {
+    let { w, me } = open();
+    w = near(w, me, 'raider', { x: 400, y: 0 });
+    w = {
+      ...w,
+      ships: {
+        ...w.ships,
+        [me]: { ...w.ships[me]!, fit: { ...w.ships[me]!.fit, t1: computer }, locks: [{ targetId: 'raider', progress: 1 }], activeLock: 'raider' },
+        raider: { ...w.ships['raider']!, shield: 0, structure: 30, hold: { ore: 4 } },
+      },
+    };
+    return { w, me };
+  }
+
+  it('is nothing until the lock completes', () => {
+    let { w, me } = lockedWith('paragon-computer-s');
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, locks: [{ targetId: 'raider', progress: 0.5 }] } } };
+    expect(lockReadout(w, w.ships[me]!, 'raider')).toBeNull();
+  });
+
+  it('from a civil plotter: identity, motion and rough condition, no numbers or guns', () => {
+    const { w, me } = lockedWith('meridian-computer-s');
+    const r = lockReadout(w, w.ships[me]!, 'raider')!;
+    expect(r.identity?.hullName).toBe(HULLS['kessari-wedge']!.name);
+    expect(r.motion?.range).toBeCloseTo(400, 6);
+    expect(r.condition).toEqual({ shield: 'down', hull: 'critical' });
+    expect(r.combat).toBeUndefined();
+    expect(r.cargo).toBeUndefined();
+  });
+
+  it('from a fire director: exact shields, structure and guns', () => {
+    const { w, me } = lockedWith('paragon-computer-s');
+    const r = lockReadout(w, w.ships[me]!, 'raider')!;
+    expect(r.combat?.structure).toBe(30);
+    expect(r.combat?.weapons.length).toBeGreaterThan(0);
+    expect(r.combat?.fixedDps).toBeGreaterThan(0);
+    expect(r.cargo).toBeUndefined();
+  });
+
+  it('from a manifest reader: the hold, but not the guns', () => {
+    const { w, me } = lockedWith('tessaract-scanner-s');
+    const r = lockReadout(w, w.ships[me]!, 'raider')!;
+    expect(r.cargo?.hold).toEqual({ ore: 4 });
+    expect(r.combat).toBeUndefined();
+    expect(r.condition).toBeUndefined();
+  });
+
+  it('every targeting computer provides some readout, and the cheap one the least', () => {
+    const computers = Object.values(MODULES).filter((m) => m.kind === 'targetingComputer');
+    for (const m of computers) expect(m.readouts?.length, m.id).toBeGreaterThan(0);
+    expect(loadoutStats('meridian-starter').readouts).toEqual(['identity', 'motion', 'condition']);
   });
 });

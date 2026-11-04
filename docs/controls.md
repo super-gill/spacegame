@@ -26,7 +26,7 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Lock a ship | Left click on it | Locking takes a moment (the target panel shows LOCKING with a percentage); your ship's max locks limit how many you hold. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Lock a ship | Left click on it | Locking takes a moment (the target panel shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the panel shows once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 

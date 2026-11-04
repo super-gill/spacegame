@@ -1,7 +1,23 @@
 import { LOCK_BASE_SECONDS, LOCK_REFERENCE_SIGNATURE } from './constants.js';
+import { isEmptyShip } from './ownership.js';
 import { shipStats } from './stats.js';
-import type { LockLossReason, LockRefusal, Ship, ShipInput, ShipStats, TargetLock, WeaponState, World, WorldEvent } from './types.js';
-import { distance } from './vec2.js';
+import { cargoUsed } from './trade.js';
+import type {
+  LockLossReason,
+  LockRefusal,
+  ModuleSize,
+  ReadoutKind,
+  Ship,
+  ShipInput,
+  ShipStats,
+  TargetLock,
+  WeaponKind,
+  WeaponState,
+  World,
+  WorldEvent,
+} from './types.js';
+import { distance, length, sub, type Vec2 } from './vec2.js';
+import { weaponDps } from './weapons.js';
 
 /**
  * Target locks, in the spirit of EVE.
@@ -136,4 +152,100 @@ export function weaponTarget(world: Pick<World, 'ships'>, ship: Ship, weapon: Pi
 /** The ship of the complete active lock, or null. */
 export function activeTarget(world: Pick<World, 'ships'>, ship: Ship): Ship | null {
   return weaponTarget(world, ship, {});
+}
+
+/**
+ * What a complete lock tells its holder. Each part is present only if
+ * the holder's targeting computer provides that readout (`ReadoutKind`);
+ * the client shows exactly this and never reads the target ship itself,
+ * so what a pilot knows about a target comes from what they fitted.
+ */
+export interface LockReadout {
+  targetId: string;
+  identity?: {
+    hullId: string;
+    hullName: string;
+    manufacturer: string;
+    sizeClass: ModuleSize;
+    /** Who flies it: a pilot, an NPC of this kind, or nobody. */
+    flownBy: 'pilot' | 'trader' | 'pirate' | 'nobody';
+    escapePod: boolean;
+  };
+  motion?: {
+    range: number;
+    /** Positive when the gap is closing, units/s. */
+    closingSpeed: number;
+    relativeVelocity: Vec2;
+  };
+  condition?: {
+    shield: 'up' | 'down' | 'none';
+    hull: 'sound' | 'damaged' | 'critical';
+  };
+  combat?: {
+    shield: number;
+    maxShield: number;
+    structure: number;
+    maxStructure: number;
+    weapons: { mountId: string; name: string; kind: WeaponKind }[];
+    fixedDps: number;
+    turretDps: number;
+  };
+  cargo?: {
+    hold: Record<string, number>;
+    used: number;
+    capacity: number;
+  };
+}
+
+/** Hull above this fraction of its structure reads as sound; above CRITICAL_FRACTION, damaged. */
+const SOUND_FRACTION = 0.66;
+const CRITICAL_FRACTION = 0.33;
+
+/** The readout for `ship`'s complete lock on `targetId`, or null if it holds no complete lock on it. */
+export function lockReadout(world: World, ship: Ship, targetId: string): LockReadout | null {
+  if (!isLocked(ship, targetId)) return null;
+  const target = world.ships[targetId];
+  const hull = target ? world.hulls[target.hullId] : undefined;
+  if (!target || !hull) return null;
+  const mine = shipStats(world, ship);
+  const theirs = shipStats(world, target);
+  const has = (r: ReadoutKind): boolean => mine.readouts.includes(r);
+  const out: LockReadout = { targetId };
+
+  if (has('identity')) {
+    const brain = world.npcs[target.id];
+    const flownBy = brain ? brain.kind : isEmptyShip(world, target) ? 'nobody' : 'pilot';
+    out.identity = { hullId: hull.id, hullName: hull.name, manufacturer: hull.manufacturer, sizeClass: hull.sizeClass, flownBy, escapePod: hull.escapePod === true };
+  }
+  if (has('motion')) {
+    const gap = sub(target.position, ship.position);
+    const range = length(gap);
+    const relativeVelocity = sub(target.velocity, ship.velocity);
+    const closingSpeed = range > 0 ? -(gap.x * relativeVelocity.x + gap.y * relativeVelocity.y) / range : 0;
+    out.motion = { range, closingSpeed, relativeVelocity };
+  }
+  if (has('condition')) {
+    const fraction = theirs.structure > 0 ? target.structure / theirs.structure : 0;
+    out.condition = {
+      shield: theirs.shield <= 0 ? 'none' : target.shield > 0 ? 'up' : 'down',
+      hull: fraction > SOUND_FRACTION ? 'sound' : fraction > CRITICAL_FRACTION ? 'damaged' : 'critical',
+    };
+  }
+  if (has('combat')) {
+    const weapons = Object.entries(theirs.weapons).map(([mountId, w]) => ({ mountId, name: w.name, kind: w.kind }));
+    const dps = (kind: WeaponKind): number => Object.values(theirs.weapons).filter((w) => w.kind === kind).reduce((n, w) => n + weaponDps(w), 0);
+    out.combat = {
+      shield: target.shield,
+      maxShield: theirs.shield,
+      structure: target.structure,
+      maxStructure: theirs.structure,
+      weapons,
+      fixedDps: dps('fixed'),
+      turretDps: dps('turret'),
+    };
+  }
+  if (has('cargo')) {
+    out.cargo = { hold: { ...target.hold }, used: cargoUsed(target), capacity: theirs.cargoCapacity };
+  }
+  return out;
 }

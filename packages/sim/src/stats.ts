@@ -1,5 +1,5 @@
 import { SHIELD_REGEN_DELAY } from './constants.js';
-import type { HullBonus, HullSpec, ModuleSpec, MountPoint, Ship, ShipStats, World } from './types.js';
+import type { HullBonus, HullSpec, ModuleSpec, MountPoint, ReadoutKind, Ship, ShipStats, World } from './types.js';
 import type { ModuleStat } from './types.js';
 
 /**
@@ -24,6 +24,9 @@ import type { ModuleStat } from './types.js';
 
 /** The parts of a world stats are computed from. */
 export type Catalogues = Pick<World, 'hulls' | 'modules' | 'weapons' | 'goods'>;
+
+/** Readouts in a fixed order, so stats compare equal however the fit is ordered. */
+const READOUT_ORDER: ReadoutKind[] = ['identity', 'motion', 'condition', 'combat', 'cargo', 'composition'];
 
 const STAT_KEYS: ModuleStat[] = [
   'mainThrust',
@@ -79,6 +82,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
   const weapons: ShipStats['weapons'] = {};
+  const readouts = new Set<ReadoutKind>();
 
   for (const mount of hull.mounts) {
     const id = fit[mount.id];
@@ -90,6 +94,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
       const value = module.stats[stat];
       if (value) totals[stat] += value * multiplier(hull, stat, module, mount);
     }
+    for (const r of module.readouts ?? []) readouts.add(r);
     const weapon = module.weaponId ? cat.weapons[module.weaponId] : undefined;
     if (weapon) weapons[mount.id] = { ...weapon, damage: weapon.damage * multiplier(hull, 'damage', module, mount) };
   }
@@ -115,6 +120,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     maxLocks: Math.floor(totals.maxLocks + 1e-9),
     scanResolution: totals.scanResolution,
     signature: hull.signature,
+    readouts: READOUT_ORDER.filter((r) => readouts.has(r)),
     weapons,
   };
 }

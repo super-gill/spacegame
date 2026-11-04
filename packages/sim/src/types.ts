@@ -83,6 +83,21 @@ export type ModuleStat =
 export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon' | 'radar' | 'targetingComputer';
 
 /**
+ * What a locked target tells you, by kind of information. A targeting
+ * computer lists the readouts it provides; a lock shows only those
+ * (`lockReadout`). Information comes from systems like everything else:
+ * a combat computer reads shields and guns, a cargo scanner reads holds,
+ * a mining computer (milestone 9) will read rock.
+ * - `identity`: hull, maker, size class, who flies it.
+ * - `motion`: range, closing speed, relative velocity.
+ * - `condition`: coarse state: shields up or down, hull sound, damaged or critical.
+ * - `combat`: exact shield and structure, fitted weapons and damage per second.
+ * - `cargo`: what is in the hold and how full it is.
+ * - `composition`: what a rock is made of (milestone 9; nothing provides it yet).
+ */
+export type ReadoutKind = 'identity' | 'motion' | 'condition' | 'combat' | 'cargo' | 'composition';
+
+/**
  * A module: anything fitted to a mount. Data only.
  *
  * Brands differ only in trade-offs (mass, power, price, output), never in
@@ -108,6 +123,8 @@ export interface ModuleSpec {
   stats: Partial<Record<ModuleStat, number>>;
   /** Weapon modules only: the ballistic profile it fires, by weapon id. */
   weaponId?: string;
+  /** Targeting computers only: what a lock shows (see `ReadoutKind`). */
+  readouts?: ReadoutKind[];
 }
 
 /**
@@ -224,6 +241,8 @@ export interface ShipStats {
   scanResolution: number;
   /** How big this ship looks to other ships' sensors (`HullSpec.signature`). */
   signature: number;
+  /** What its locks show, from its targeting computer. Empty without one. */
+  readouts: ReadoutKind[];
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
 }

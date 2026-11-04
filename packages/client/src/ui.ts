@@ -12,6 +12,7 @@ import {
   isEscapePod,
   length,
   localFrame,
+  lockReadout,
   nearestDockableStation,
   ownedShips,
   relativeVelocity,
@@ -262,33 +263,44 @@ export class Ui {
     if (this.podText.textContent !== text) this.podText.textContent = text;
   }
 
-  /** Bottom-right readout for the selected target: who, how far, closing speed, shields and structure. */
+  /**
+   * Bottom-right readout for the active lock. It shows only what the
+   * ship's targeting computer reads (`lockReadout`): a civil plotter
+   * gives rough condition, a fire director exact shields and guns, a
+   * manifest reader the hold. While locking, only the progress.
+   */
   private updateTarget(world: World, ship: Ship | null): void {
-    const target = ship?.activeLock ? world.ships[ship.activeLock] : undefined;
     const lock = ship?.locks.find((l) => l.targetId === ship.activeLock);
-    const hull = target ? world.hulls[target.hullId] : undefined;
-    if (!ship || !target || !hull) {
+    if (!ship || !lock || !world.ships[lock.targetId]) {
       this.targetPanel.classList.add('hidden');
       return;
     }
-    const stats = shipStats(world, target);
-    const brain = world.npcs[target.id];
-    const who = brain ? brain.kind.toUpperCase() : shipLabel(world, target);
-    const range = distance(ship.position, target.position);
-    // Closing speed: positive when the gap is shrinking.
-    const dx = target.position.x - ship.position.x;
-    const dy = target.position.y - ship.position.y;
-    const rvx = target.velocity.x - ship.velocity.x;
-    const rvy = target.velocity.y - ship.velocity.y;
-    const closing = range > 0 ? -(dx * rvx + dy * rvy) / range : 0;
-    this.targetPanel.textContent = [
-      `TARGET ${who}  ${lock && lock.progress < 1 ? `LOCKING ${Math.floor(lock.progress * 100)}%` : 'LOCKED'}`,
-      `HULL   ${hull.name.toUpperCase()}`,
-      `RANGE  ${range.toFixed(0).padStart(5)}`,
-      `CLOSE  ${closing.toFixed(0).padStart(5)} u/s`,
-      `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `LOCKS ${ship.locks.length}/${shipStats(world, ship).maxLocks}  [Tab] next  [Esc] unlock`,
-    ].join('\n');
+    const footer = `LOCKS ${ship.locks.length}/${shipStats(world, ship).maxLocks}  [Tab] next  [Esc] unlock`;
+    const r = lockReadout(world, ship, lock.targetId);
+    const lines: string[] = [];
+    if (!r) {
+      lines.push(`LOCKING ${Math.floor(lock.progress * 100)}%`);
+    } else {
+      const who = r.identity ? (r.identity.escapePod ? 'POD' : r.identity.flownBy === 'nobody' ? 'EMPTY' : r.identity.flownBy.toUpperCase()) : 'CONTACT';
+      lines.push(`TARGET ${who}  LOCKED`);
+      if (r.identity) lines.push(`HULL   ${r.identity.hullName.toUpperCase()} (${r.identity.sizeClass})`);
+      if (r.motion) {
+        lines.push(`RANGE  ${r.motion.range.toFixed(0).padStart(5)}`);
+        lines.push(`CLOSE  ${r.motion.closingSpeed.toFixed(0).padStart(5)} u/s`);
+      }
+      if (r.combat) {
+        lines.push(`SHD ${Math.ceil(r.combat.shield).toString().padStart(3)}/${Math.round(r.combat.maxShield)}  HUL ${Math.ceil(r.combat.structure).toString().padStart(3)}/${Math.round(r.combat.maxStructure)}`);
+        lines.push(`GUNS   ${r.combat.weapons.length}  FIXED ${r.combat.fixedDps.toFixed(0)} dps  TURRET ${r.combat.turretDps.toFixed(0)} dps`);
+      } else if (r.condition) {
+        lines.push(`SHIELD ${r.condition.shield.toUpperCase()}  HULL ${r.condition.hull.toUpperCase()}`);
+      }
+      if (r.cargo) {
+        const goods = Object.entries(r.cargo.hold).filter(([, n]) => n > 0).map(([g, n]) => `${g} ${n}`).join(', ');
+        lines.push(`HOLD   ${r.cargo.used}/${r.cargo.capacity}${goods ? `  ${goods}` : '  empty'}`);
+      }
+    }
+    lines.push(footer);
+    this.targetPanel.textContent = lines.join('\n');
     this.targetPanel.classList.remove('hidden');
   }
 

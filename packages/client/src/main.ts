@@ -21,6 +21,7 @@ import {
   type TradeRefusal,
   joinPilot,
   leadPoint,
+  lockReadout,
   nearestDockableStation,
   pilotShip,
   wakePilot,
@@ -551,7 +552,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const art = { hull, fit: ship.fit, modules: current.modules, manufacturers: current.manufacturers, weapons: ship.weapons, thrusters: ship.thrusters, stats };
     drawShip(ctx!, camera, shipView, art, labelShown(style, ship) ? style : { colour: style.colour, empty: style.empty === true });
     if (hull.escapePod && ship.state === 'flying') drawPodBeacon(ctx!, camera, shipView.position, hull.radius, nowMs);
-    if (ship.state === 'flying' && (!mine || ship.id !== mine.id)) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
+    // Health bars only for ships your targeting computer can read: a complete lock with combat readout.
+    const read = mine && ship.state === 'flying' && ship.id !== mine.id ? lockReadout(current, mine, ship.id) : null;
+    if (read?.combat) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
   }
 
   for (const p of current.projectiles) {
