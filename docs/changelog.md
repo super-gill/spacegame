@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [0.9.0] - 2026-11-04
 
+Release commit `fac7702` on `main`. (Tags do not reach the remote through this session's git proxy; versions are identified by their release commits.)
+
 Milestone 6c: the living system. Calder is a star system that moves, and every capability and every readout comes from a system fitted to your ship.
 
 ### Added
