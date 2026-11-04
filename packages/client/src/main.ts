@@ -1,5 +1,8 @@
 import {
   boardShip,
+  stepOut,
+  stepOutRefusal,
+  type StepOutRefusal,
   boardableShips,
   buyShip,
   claimStarterShip,
@@ -93,6 +96,7 @@ const input = new InputController(
     else if (action === 'cycleTarget') cycleTarget();
     else if (action === 'clearTarget') input.requestTarget(null);
     else if (action === 'board') boardNearest();
+    else if (action === 'stepOut') stepOutPressed();
   },
   (point) => clickTarget(point),
 );
@@ -189,6 +193,39 @@ function board(shipId: string): void {
   const r = boardShip(current, me.id, shipId);
   if (!r.ok) {
     ui.notify(BOARD_REFUSALS[r.reason], 'warn');
+    return;
+  }
+  commanded(r.world, r.event);
+}
+
+/** Words for why the pilot cannot step out. */
+const STEP_OUT_REFUSALS: Record<StepOutRefusal, string> = {
+  noShip: 'You have no ship to step out of.',
+  docked: 'Docked: board another ship here instead, from Your ships.',
+  inPod: 'You are already in an escape pod.',
+};
+
+/** How long the second G press has to confirm stepping out, ms. */
+const STEP_OUT_CONFIRM_MS = 2000;
+let stepOutArmedAt = -Infinity;
+
+/** G: step out in a pod, after a second press to confirm. */
+function stepOutPressed(): void {
+  const reason = stepOutRefusal(current, me.id);
+  if (reason) {
+    ui.notify(STEP_OUT_REFUSALS[reason], 'warn');
+    return;
+  }
+  const now = performance.now();
+  if (now - stepOutArmedAt > STEP_OUT_CONFIRM_MS) {
+    stepOutArmedAt = now;
+    ui.notify('Press G again to step out. Your ship stays here, empty.', 'warn');
+    return;
+  }
+  stepOutArmedAt = -Infinity;
+  const r = stepOut(current, me.id);
+  if (!r.ok) {
+    ui.notify(STEP_OUT_REFUSALS[r.reason], 'warn');
     return;
   }
   commanded(r.world, r.event);

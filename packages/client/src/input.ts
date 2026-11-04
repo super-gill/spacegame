@@ -15,7 +15,7 @@ import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bi
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'clearTarget', 'board']);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'clearTarget', 'board', 'stepOut']);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {

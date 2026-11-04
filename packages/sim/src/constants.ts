@@ -135,3 +135,10 @@ export const POD_INHERIT_FRACTION = 0.3;
 
 /** An escape pod is fired out to the ship's right at this speed, units/s, clear of the wreck. */
 export const POD_EJECT_SPEED = 30;
+
+/**
+ * Stepping out: the pod leaves the ship's right side at this speed
+ * relative to the ship, units/s. Gentle, so the pod can turn round and
+ * board the ship again (under BOARD_MAX_RELATIVE_SPEED).
+ */
+export const POD_STEP_OUT_SPEED = 8;

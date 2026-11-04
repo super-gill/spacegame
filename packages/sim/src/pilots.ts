@@ -1,4 +1,4 @@
-import { BOARD_MAX_RELATIVE_SPEED, BOARD_RANGE, POD_EJECT_SPEED, POD_INHERIT_FRACTION } from './constants.js';
+import { BOARD_MAX_RELATIVE_SPEED, BOARD_RANGE, POD_EJECT_SPEED, POD_INHERIT_FRACTION, POD_STEP_OUT_SPEED } from './constants.js';
 import { freePadFor, onPad } from './docking.js';
 import { buildShip } from './factory.js';
 import { isEmptyShip, isEscapePod, ownedShips, vacated } from './ownership.js';
@@ -19,6 +19,8 @@ import { add, distance, fromAngle, length, scale, sub } from './vec2.js';
  *
  * The flow when things go wrong:
  *
+ *   step out        -> in space, the pilot leaves in a pod; the ship stays,
+ *                      empty, to be boarded again later
  *   ship destroyed  -> the pilot is ejected in a pod at the wreck
  *   pod destroyed   -> the pilot has no ship until they wake (`wakePilot`)
  *   wake            -> at Harbour, in a pod if they own a ship anywhere,
@@ -251,25 +253,84 @@ export function boardShip(world: World, pilotId: string, shipId: string): Comman
  * ship must already be gone from `world.ships`.
  */
 export function ejectPilot(world: World, pilotId: string, dead: Ship): { world: World; event: WorldEvent } {
+  const right = fromAngle(dead.heading + Math.PI / 2);
+  const deadRadius = world.hulls[dead.hullId]?.radius ?? 0;
+  const pod = launchPod(world, pilotId, dead, {
+    offset: deadRadius,
+    velocity: add(scale(dead.velocity, POD_INHERIT_FRACTION), scale(right, POD_EJECT_SPEED)),
+  });
+  return { world: pod.world, event: { type: 'podEjected', shipId: pod.podId, from: dead.id } };
+}
+
+/**
+ * A new pod for the pilot, off the right side of `from`, `offset` units
+ * from its centre, moving at `velocity`, with the pilot aboard. Leaves
+ * `from` alone: the caller decides what happens to it.
+ */
+function launchPod(
+  world: World,
+  pilotId: string,
+  from: Ship,
+  place: { offset: number; velocity: Ship['velocity'] },
+): { world: World; podId: string } {
   const pilot = world.pilots[pilotId]!;
   const loadout = loadoutOrThrow(world, ESCAPE_POD_LOADOUT_ID);
-  const deadRadius = world.hulls[dead.hullId]?.radius ?? 0;
-  const right = fromAngle(dead.heading + Math.PI / 2);
+  const right = fromAngle(from.heading + Math.PI / 2);
   const made = nextShip(world, pilot, loadout, {
-    position: add(dead.position, scale(right, deadRadius)),
-    heading: dead.heading,
+    position: add(from.position, scale(right, place.offset)),
+    heading: from.heading,
   });
-  const pod: Ship = {
-    ...made.ship,
-    velocity: add(scale(dead.velocity, POD_INHERIT_FRACTION), scale(right, POD_EJECT_SPEED)),
-  };
+  // The pilot keeps the flight mode they were using.
+  const pod: Ship = { ...made.ship, velocity: place.velocity, flightMode: from.flightMode };
   return {
+    podId: pod.id,
     world: {
       ...world,
       pilots: { ...world.pilots, [pilotId]: { ...made.pilot, shipId: pod.id } },
       ships: { ...world.ships, [pod.id]: pod },
     },
-    event: { type: 'podEjected', shipId: pod.id, from: dead.id },
+  };
+}
+
+export type StepOutRefusal =
+  | 'noShip' // the pilot is flying nothing
+  | 'docked' // docked: board another ship here instead
+  | 'inPod'; // already in a pod
+
+/** Why the pilot could not step out right now, or null if they could. */
+export function stepOutRefusal(world: World, pilotId: string): StepOutRefusal | null {
+  const pilot = world.pilots[pilotId];
+  const ship = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
+  if (!pilot || !ship) return 'noShip';
+  if (ship.state !== 'flying') return 'docked';
+  if (isEscapePod(world, ship)) return 'inPod';
+  return null;
+}
+
+/**
+ * Leave the ship you are flying, in space, in an escape pod. The ship
+ * stays exactly where it is, empty and coasting, guns cold; the pod
+ * leaves its right side gently, so it can come back and board it. A
+ * ship left moving keeps moving: slow down first to park it. This
+ * is how a ship of yours ends up empty in space: step out, fly the pod
+ * to a station, board another ship there, and come back for this one.
+ */
+export function stepOut(world: World, pilotId: string): CommandResult<StepOutRefusal> {
+  const reason = stepOutRefusal(world, pilotId);
+  if (reason) return { ok: false, world, reason };
+  const ship = world.ships[world.pilots[pilotId]!.shipId!]!;
+  const right = fromAngle(ship.heading + Math.PI / 2);
+  const podRadius = world.hulls[world.loadouts[ESCAPE_POD_LOADOUT_ID]?.hullId ?? '']?.radius ?? 0;
+  const shipRadius = world.hulls[ship.hullId]?.radius ?? 0;
+  const pod = launchPod(world, pilotId, ship, {
+    // Clear of the hull, so the two do not ram each other.
+    offset: shipRadius + podRadius + 4,
+    velocity: add(ship.velocity, scale(right, POD_STEP_OUT_SPEED)),
+  });
+  return {
+    ok: true,
+    world: { ...pod.world, ships: { ...pod.world.ships, [ship.id]: vacated(ship) } },
+    event: { type: 'steppedOut', shipId: pod.podId, from: ship.id },
   };
 }
 

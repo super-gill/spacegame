@@ -92,10 +92,13 @@ You can own several ships and fly one at a time. A ship you are not in is **empt
 | --- | --- | --- |
 | Board your nearest empty ship | B | Docked: any of your ships at the same station. In space: within 150 units and under 20 u/s relative to it |
 | Board a particular ship | Board button in Your ships | Docked only |
+| Step out in an escape pod | G, twice within 2 seconds | In space only. Your ship stays where it is, empty, and keeps any speed it had: slow down first to park it |
 | Buy a ship | Buy button in Ship mart | |
 | Claim a free Courier | Button at the bottom of the docked panel | Only in an escape pod docked at Harbour, owning no ships |
 
 In space, the HUD names the ship B would board (`BOARD <SHIP> [B]`). When one of yours is near (within 600 units) but not boardable yet, it says what to do: `CLOSE TO 150` with the gap, or `MATCH SPEED` with your speed relative to it. Boarding from an escape pod uses the pod up.
+
+To leave a ship of yours out in space, step out with G: you get a pod beside it, moving gently away, in the flight mode you were using. Fly the pod to a station, board another ship there, come back and board the first one with B.
 
 Ships have no names yet; each is called by its hull and its number among the ships you have been issued, such as `Kessari Wedge #2`.
 

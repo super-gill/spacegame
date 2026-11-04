@@ -15,6 +15,8 @@ import {
   claimRefusal,
   claimStarterShip,
   shipPrice,
+  stepOut,
+  stepOutRefusal,
   wakePilot,
 } from '../pilots.js';
 import { deserializeWorld, serializeWorld } from '../save.js';
@@ -473,6 +475,84 @@ describe('escape pods', () => {
     if (!r.ok) throw new Error(r.reason);
     expect(r.world.ships[podId]).toBeUndefined();
     expect(pilotShip(r.world, 'ana')!.id).toBe('spare');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('stepping out', () => {
+  it('leaves the ship empty where it is and puts the pilot in a pod beside it', () => {
+    let { w, me } = quietWorld();
+    const v = { x: 50, y: 0 };
+    w = put(w, { ...w.ships[me]!, position: { x: 3000, y: 3000 }, velocity: v, heading: 0, weaponsHot: true });
+    const r = stepOut(w, 'ana');
+    if (!r.ok) throw new Error(r.reason);
+    const pod = pilotShip(r.world, 'ana')!;
+    expect(pod.hullId).toBe('escape-pod');
+    expect(r.event).toEqual({ type: 'steppedOut', shipId: pod.id, from: me });
+    const left = r.world.ships[me]!;
+    expect(isEmptyShip(r.world, left)).toBe(true);
+    expect(left.position).toEqual({ x: 3000, y: 3000 });
+    expect(left.velocity).toEqual(v);
+    expect(left.weaponsHot).toBe(false);
+    // Still owned: stepping out is not giving it up.
+    expect(ownedShips(r.world, 'ana').map((s) => s.id)).toEqual([me]);
+  });
+
+  it('a ship left moving keeps moving; the pod keeps your flight mode', () => {
+    let { w, me } = quietWorld();
+    const v = { x: 50, y: 20 };
+    w = put(w, { ...w.ships[me]!, position: { x: 3000, y: 3000 }, velocity: v, flightMode: 'manual' });
+    const r = stepOut(w, 'ana');
+    if (!r.ok) throw new Error(r.reason);
+    expect(pilotShip(r.world, 'ana')!.flightMode).toBe('manual');
+    expect(run(r.world, SECOND).ships[me]!.velocity).toEqual(v);
+  });
+
+  it('the pod clears the hull and can board the ship again at once', () => {
+    let { w, me } = quietWorld();
+    w = put(w, { ...w.ships[me]!, position: { x: 3000, y: 3000 }, velocity: { x: 0, y: 0 } });
+    let r = stepOut(w, 'ana');
+    if (!r.ok) throw new Error(r.reason);
+    // A second of drifting apart: no ram, still in reach.
+    let next = run(r.world, SECOND);
+    expect(next.events.some((e) => e.type === 'rammed')).toBe(false);
+    expect(boardRefusal(next, 'ana', me)).toBeNull();
+    const back = boardShip(next, 'ana', me);
+    if (!back.ok) throw new Error(back.reason);
+    expect(pilotShip(back.world, 'ana')!.id).toBe(me);
+    expect(Object.values(back.world.ships).filter((s) => s.hullId === 'escape-pod')).toEqual([]);
+  });
+
+  it('the whole loop: step out, fly the pod home, board another ship there, come back', () => {
+    let { w, me } = quietWorld();
+    w = put(w, parked(w, spare(w, 'spare', 'kessari-raider', 'ana'), HARBOUR));
+    w = put(w, { ...w.ships[me]!, position: { x: 2000, y: 2000 }, velocity: { x: 0, y: 0 } });
+    let r = stepOut(w, 'ana');
+    if (!r.ok) throw new Error(r.reason);
+    // The pod reaches Harbour and docks (placed, as flying it here is not the point).
+    const pod = pilotShip(r.world, 'ana')!;
+    w = put(r.world, parked(r.world, pod, HARBOUR));
+    const toSpare = boardShip(w, 'ana', 'spare');
+    if (!toSpare.ok) throw new Error(toSpare.reason);
+    // Pod used up; the first ship still waits, empty, out at 2000, 2000.
+    expect(toSpare.world.ships[pod.id]).toBeUndefined();
+    expect(toSpare.world.ships[me]!.position).toEqual({ x: 2000, y: 2000 });
+    // Fly the Wedge out beside it (placed) and board across in space.
+    const spareOut = { ...toSpare.world.ships['spare']!, state: 'flying' as const, dockedAt: null, padId: null, position: { x: 2000, y: 2100 }, velocity: { x: 0, y: 0 } };
+    const back = boardShip(put(toSpare.world, spareOut), 'ana', me);
+    if (!back.ok) throw new Error(back.reason);
+    expect(pilotShip(back.world, 'ana')!.id).toBe(me);
+  });
+
+  it('refuses with a reason', () => {
+    const { w: docked } = anaDocked(HARBOUR);
+    expect(stepOutRefusal(docked, 'ana')).toBe('docked');
+    expect(stepOutRefusal(docked, 'nobody')).toBe('noShip');
+    let { w, me } = quietWorld();
+    w = destroy(put(w, { ...w.ships[me]!, position: { x: 3000, y: 3000 } }), me);
+    expect(stepOutRefusal(w, 'ana')).toBe('inPod');
+    expect(stepOut(w, 'ana')).toEqual({ ok: false, world: w, reason: 'inPod' });
   });
 });
 

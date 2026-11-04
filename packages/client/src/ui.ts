@@ -327,6 +327,11 @@ export class Ui {
           ? `Your ${shipName(world, left)} stays on its pad.`
           : `Your ${shipName(world, left)} is left drifting, empty.`;
       this.showToast(`Boarded your ${name}. ${after}`, 3000, 'info');
+    } else if (e.type === 'steppedOut') {
+      const left = world.ships[e.from];
+      const moving = left ? Math.hypot(left.velocity.x, left.velocity.y) : 0;
+      const where = left ? `Your ${shipName(world, left)} is left empty${moving >= 1 ? `, drifting at ${Math.round(moving)} u/s` : ' where it is'}.` : '';
+      this.showToast(`You step out in an escape pod. ${where} Press B beside it to board again.`, 3500, 'info');
     } else if (e.type === 'starterClaimed') {
       this.showToast(`You claim a free ${name}. Your escape pod is used up.`, 3000, 'info');
     } else if (e.type === 'pilotWoke') {

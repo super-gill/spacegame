@@ -579,6 +579,8 @@ export type WorldEvent =
   | { type: 'boarded'; shipId: string; from: string }
   /** The ship a pilot was flying was destroyed and they got away in the pod `shipId`. */
   | { type: 'podEjected'; shipId: string; from: string }
+  /** A pilot left `from` in space in the pod `shipId`; `from` is now empty where it was. */
+  | { type: 'steppedOut'; shipId: string; from: string }
   /**
    * A pilot with no ship woke at a station, aboard `shipId`: a pod if they
    * own a ship somewhere, a free starter if they own none.
