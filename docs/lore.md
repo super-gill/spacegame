@@ -306,6 +306,68 @@ Every capability comes from a fitted system, and what a pilot knows comes from a
 
 **For the build:** this lore never asks for a degraded or blurred view. The play area is the captain's window and must look good and show what is going on. What systems add is knowledge (names, numbers, composition, intent), not the ability to see.
 
+## Weapons and war
+
+How the peoples fight, in lore terms. The rules and numbers are in `weapons.md`; this section says who builds what and why.
+
+### Who leans to which weapon family
+
+| People | Family | Main maker | Why |
+| --- | --- | --- | --- |
+| Halcyon Dominion | Energy | Cantor-Vell Arms | Their lasers began as copies of Aurel emitters. A gun that never runs dry suits a people who think they are owed forever. |
+| Kessari Combine | Missile | Ito-Marr Dynamics (launchers), Kessari Orbital Defence (munitions and hulls) | Lock, fire, and let the contract do the work: the weapon of a people who pay for precision |
+| Free Belt Union | Projectile | Union Defence Works | Mining rigs became gunboats in the Strikes. Mass drivers need no reactor, and any Belter can make rounds. |
+| Vael Commonwealth | Hybrid | Commonwealth Fleet Works | Railguns reach farthest, so a navy that never fires first can still answer from range |
+| Oru Collective | None of the four | The hives | They fight with drones and fighters (later) |
+| Drifter Clans | None of the four | The clans | They run, hide and salvage rather than fight |
+
+Paragon Arms sells light guns of every family to anyone, never navy grade.
+
+### Swivels
+
+Turreted point defence guns are called **swivels** in the setting, after the small swivel guns of the age of sail. A swivel slews to meet incoming missiles and torpedoes by default, and turns on a ship when assigned to a lock. Pilots say "swivels up" for point defence on. "PDC" stays the technical term in the design docs.
+
+### Capacitors by hull
+
+Each shipwright builds its reactor and capacitor to its own idea of what a ship is for. The lead turns these into numbers.
+
+| Hull | Character | Why |
+| --- | --- | --- |
+| Meridian Tern | Small pool, steady recovery | Meridian builds for new pilots: it never strands them and never lets them show off |
+| Kessari Warrant | Tight pool, quick recovery | Built for toll duty: short, sharp exchanges with shields up, then breathe |
+| Tessaract Manifest | Deep pool, slow recovery | Freight reactors are big and lazy: plenty for shields on a long run, slow to refill after a fight |
+| Aurel Tacet | Vast and near-instant | The voice is the power and does not run dry. A dev ship, outside balance. |
+| Meridian Ark | A trickle | Enough for the beacon and a little shield, nothing more |
+
+### Hull classes
+
+Ships are classed on a ladder borrowed from the Covenant Fleet's old navy, which took it from the age of sail. The class says a ship's role and scale; module sizes (S, M, L, XL) still say only what fits a mount.
+
+| Class | What it is | Today's hulls |
+| --- | --- | --- |
+| Pod | A jolly boat: the lifeboat every licensed ship carries | Meridian Ark |
+| Cutter | Small, quick, lightly armed; couriers and starters | Meridian Tern |
+| Sloop | A small warship; patrol and escort | Kessari Warrant |
+| Brig | A heavier small warship | |
+| Frigate | The workhorse warship, fast enough to choose its fights | |
+| Ship of the line | Third and second rates: built to stand in a battle line | |
+| Capital | First-rates and flagships: squadrons, hangars and station services aboard | |
+| Merchantman | Trade and passengers, at any size | Tessaract Manifest |
+| Hulk | Industry at any size: mining barges, refineries, works ships | |
+
+The Aurel Tacet sits outside the ladder. Humans call any Aurel ship simply a **voice**.
+
+Each people has its own words for the top two rungs:
+
+| People | Ships of the line | Capitals |
+| --- | --- | --- |
+| Halcyon Dominion | Ships of the line (they kept the old navy words) | Cathedrals, the spired flagships of the Great Houses |
+| Kessari Combine | Arbiters | Tribunals |
+| Free Belt Union | Rigs, heavy mining rigs armed for war | Strikehalls, where the cooperatives meet and vote |
+| Vael Commonwealth | Custodians | Sanctuaries, hospital flagships |
+| Oru Collective | Broods | Seedhives |
+| Drifter Clans | None | Homeships: the old arks themselves |
+
 ## Manufacturers
 
 Specialities and navy roles are set in `races.md`. This section says where each maker came from and gives a hook for quests and contracts.
@@ -455,6 +517,7 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | Slagline Motors | Belter slang for running | Built so crews could outrun Kessari patrols |
 | Rook and Rivet | Salvager's shop talk | Its plate is cut from wrecks |
 | Union Defence Works | Strike words | The Belt Strikes' arsenal |
+| Commonwealth Fleet Works | Replies | Its ships have never fired first, so its guns are named as answers |
 | Paragon Arms | Plain trade names that promise fairness | Sells to anyone, and wants you to feel fine about it |
 | Aurel | Silent and musical terms given by human scholars | The Aurel share no names; humans name what they see |
 
@@ -463,10 +526,10 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | Id | Name | Maker | Lore |
 | --- | --- | --- | --- |
 | `meridian-courier` | Meridian Tern | Meridian Civil Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
-| `kessari-wedge` | Kessari Warrant | Kessari Orbital Defence | KOD's toll-gate frigate. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
+| `kessari-wedge` | Kessari Warrant | Kessari Orbital Defence | KOD's toll-gate sloop. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
 | `tessaract-spine` | Tessaract Manifest | Tessaract Logistics | The six-bay hauler on half the freight contracts in Accord space |
 | `escape-pod` | Meridian Ark | Meridian Civil Yards | The Landfall Accord requires every licensed ship to carry one. Pilots call it an ark because it brings you home the way the fleet brought everyone here. |
-| Sparrow's replacement | Aurel Tacet | Aurel (needs a new manufacturer entry, see below) | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Halcyon Cantors call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship, outside the economy and never issued. |
+| `aurel-tacet` | Aurel Tacet | Aurel | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Halcyon Cantors call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship, outside the economy and never issued. |
 
 ### Modules (`modules.ts`)
 
@@ -485,10 +548,10 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | `cantorvell-armour-m` | Cantor-Vell Vigil M | The armour the Cantors wore on gate-waking voyages |
 | `meridian-pod-s` | Meridian Carryall S | A small general cargo pod |
 | `tessaract-container-m` | Tessaract Standard M | The standard box every port in the Arm handles |
-| `paragon-pulse-s` | Paragon Fairshot S | Fixed pulse cannon |
-| `paragon-turret-s` | Paragon Watchman S | Light turret |
-| `union-autocannon-m` | Union Picket M | Named for the strike picket lines |
-| `paragon-turret-m` | Paragon Sentry M | Medium turret |
+| `paragon-pulse-s` | Paragon Fairshot S | Becomes an open-market pulse laser (energy) |
+| `paragon-turret-s` | Paragon Watchman S | Becomes a swivel (point defence) |
+| `union-autocannon-m` | Union Picket M | Named for the strike picket lines; the Picket line now runs S to L |
+| `paragon-turret-m` | Paragon Sentry M | Becomes a swivel (point defence) |
 
 New system modules (6c and 6d):
 
@@ -504,6 +567,42 @@ New system modules (6c and 6d):
 | `tessaract-scanner-s` | Tessaract Tally S | Was Manifest Reader, which clashed with the Tessaract Manifest hull; a tally clerk counts cargo |
 | `meridian-nav-s` | Meridian Wayfinder S | Unchanged |
 | `itomarr-nav-m` | Ito-Marr Chartvault M | Was Deep Reckoner; a store of charts |
+
+### Weapons and munitions (6e, ids for the lead to choose)
+
+Each gun has one name across sizes S, M and L.
+
+| Weapon | Family | Name | Note |
+| --- | --- | --- | --- |
+| Autocannon | Projectile | Union Picket S, M, L | Keeps today's Picket M |
+| Artillery | Projectile | Union Lockout S, M, L | The strike's heaviest answer |
+| Pulse laser | Energy | Cantor-Vell Verse S, M, L | Short, sung in bursts |
+| Beam laser | Energy | Cantor-Vell Litany S, M, L | One long prayer |
+| Pulse laser, open market | Energy | Paragon Fairshot S | Today's `paragon-pulse-s` |
+| Blaster | Hybrid | Commonwealth Retort S, M, L | A reply at point blank |
+| Railgun | Hybrid | Commonwealth Answer S, M, L | A reply from as far as anyone can shoot |
+| Missile launcher | Missile | Ito-Marr Magazine S, M, L | |
+| Torpedo tube | Missile | Ito-Marr Arsenal L | |
+| Swivel | Point defence | Paragon Watchman S, Paragon Sentry M | Today's turrets |
+
+Munitions are made by Kessari Orbital Defence and named in its legal voice. A munition's full name is the munition, then the warhead, then the guidance when it is not radar-homing.
+
+| Part | Name | Example |
+| --- | --- | --- |
+| Missile | KOD Summons: fast, cheap, light | |
+| Torpedo | KOD Foreclosure: heavy, slow, final | |
+| Fragmentation warhead | Scatter | Summons Scatter |
+| Explosive warhead | Breach | Foreclosure Breach |
+| Heat-seeking guidance | Heat | Summons Scatter Heat |
+
+### Countermeasures (6e part 2)
+
+| Name | Maker | Mix | Why |
+| --- | --- | --- | --- |
+| Ito-Marr Screen | Ito-Marr Dynamics | Mostly chaff, some flares | Ito-Marr builds the Kessari launchers, so it knows radar-homing missiles best |
+| Slagline Sparkler | Slagline Motors | Mostly flares; cheap | Belter fire-and-forget, sold by the crate |
+| Novum Ghost | Novum Systems | Mostly decoys, a little chaff | Kessari electronic warfare at its finest, and priced like it |
+| Paragon Fair Warning | Paragon Arms | Even chaff and flares, no decoys | Sold to anyone |
 
 ### Manufacturers (`manufacturers.ts`)
 
@@ -538,6 +637,13 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 Lore decisions by Jason, newest first.
 
+- 2026-11-04: Weapon families follow canon: Halcyon energy, Kessari missile, Free Belt projectile, Vael hybrid; the Oru and Drifters lean to none; Paragon sells light guns of every family.
+- 2026-11-04: Gun names: Union Picket and Lockout, Cantor-Vell Verse and Litany, Commonwealth Retort and Answer, Paragon Fairshot as the open-market pulse laser.
+- 2026-11-04: Missiles: Ito-Marr Magazine and Arsenal launchers; KOD Summons missiles and Foreclosure torpedoes; Scatter and Breach warheads; Heat for heat-seekers.
+- 2026-11-04: Capacitors: Tern small and steady, Warrant tight and quick, Manifest deep and slow, Tacet near-limitless, Ark a trickle.
+- 2026-11-04: Countermeasures: Ito-Marr Screen, Slagline Sparkler, Novum Ghost, Paragon Fair Warning.
+- 2026-11-04: Turreted point defence guns are swivels in the setting.
+- 2026-11-04: Hull classes keep the age-of-sail ladder, with merchantman for trade and passengers and hulk for industry; the Manifest is a merchantman. Each people names its line ships and capitals in its own words.
 - 2026-11-04: No Concord. The treaty is the Landfall Accord, with no ships of its own. Law is local and escalating: each holder polices its own space with ordinary, beatable ships, calling for more as needed. A deliberate departure from EVE.
 - 2026-11-04: Calder's bodies are Fieldmark (a farmed garden world), Lantern (its ice moon) and the Scree (the belt).
 - 2026-11-04: The third station is Lantern Works, a Corvane foundry round Lantern: wants ore and scrap, makes machinery cheap, has outfitting, no ship mart.
