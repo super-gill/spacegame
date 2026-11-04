@@ -68,7 +68,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'strafeLeft', codes: ['KeyQ'], group: 'Flight', label: 'Lateral thrust left', kind: 'hold' },
   { action: 'strafeRight', codes: ['KeyE'], group: 'Flight', label: 'Lateral thrust right', kind: 'hold' },
   { action: 'brake', codes: ['KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
-  { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire the selected group', kind: 'hold', note: 'Guns fire where the nose points; launchers fire at your active lock' },
+  { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire the selected group', kind: 'hold', note: 'Or hold the left mouse button, with mouse steering. Guns fire where the nose points; launchers fire at your active lock' },
   { action: 'launchCountermeasure', codes: ['KeyC'], group: 'Weapons', label: 'Drop a countermeasure', kind: 'press', note: 'Chaff draws radar missiles, flares heat seekers; needs a dispenser' },
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
   { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
@@ -89,7 +89,9 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 ];
 
 export const POINTER_CONTROLS: readonly PointerControl[] = [
-  { input: 'Left click', group: 'Targeting', label: 'Click a ship to lock it (locking takes a moment); click a locked ship to make it active' },
+  { input: 'Move the mouse', group: 'Flight', label: 'With mouse steering (the default), the nose follows the pointer. It holds its aim while the pointer is over a panel or card' },
+  { input: 'Left button (hold)', group: 'Weapons', label: 'With mouse steering, fires the selected group, like Space' },
+  { input: 'Right click', group: 'Targeting', label: 'With mouse steering, right-click a ship to lock it (locking takes a moment); right-click a locked ship to make it active. Without mouse steering, left click does this' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
   { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Tern' },
   { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },

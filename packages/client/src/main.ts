@@ -140,6 +140,7 @@ const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
 let me = loadLocalPilot();
 const settings = loadSettings();
 canvas.classList.toggle('mouse-steering', settings.mouseSteering);
+input.mouseSteering = settings.mouseSteering;
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
@@ -326,6 +327,7 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     settings.mouseSteering = on;
     saveSettings(settings);
     canvas.classList.toggle('mouse-steering', on);
+    input.mouseSteering = on;
   },
   saveNow() {
     saveNow();
@@ -518,7 +520,8 @@ function steer(sampled: ShipInput, ship: Ship): ShipInput {
     const at = camera.worldToScreen(ship.position);
     const dx = input.pointer.x - at.x;
     const dy = input.pointer.y - at.y;
-    if (Math.hypot(dx, dy) > AIM_DEAD_ZONE_PX) lastAim = Math.atan2(dy, dx);
+    // Over a panel or card the aim holds: reaching for the interface must not swing the ship.
+    if (input.pointerOnGame && Math.hypot(dx, dy) > AIM_DEAD_ZONE_PX) lastAim = Math.atan2(dy, dx);
   }
   return {
     ...sampled,

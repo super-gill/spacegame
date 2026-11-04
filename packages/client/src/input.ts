@@ -4,11 +4,13 @@ import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bi
 /**
  * Keyboard and mouse state, sampled once per sim tick into a ShipInput.
  *
- * Flying and shooting are keyboard only. The mouse is for choosing: a
- * left click on the game canvas is passed to `onCanvasClick` (main.ts uses
- * it to select a target), and clicks on UI buttons never reach it. The
- * pointer is never captured or hidden. Mouse buttons can still be bound in
- * bindings.ts as the codes `Mouse0` (left) and `Mouse2` (right).
+ * With mouse steering (the default) the pointer aims the nose (main.ts),
+ * the left button on the game fires the selected group and the right
+ * button chooses: it is passed to `onCanvasClick` (main.ts locks the ship
+ * under it). Without mouse steering the left button chooses and Space
+ * fires. Clicks on UI never reach the game. The pointer is never captured
+ * or hidden. Mouse buttons can still be bound in bindings.ts as the codes
+ * `Mouse0` (left) and `Mouse2` (right).
  *
  * `press` actions are latched between samples so a quick tap between two
  * ticks is never lost. Interface actions are not sent to the sim; they go
@@ -36,6 +38,16 @@ export class InputController {
   private readonly downCodes = new Set<string>();
   /** Pointer position in CSS pixels relative to the canvas, or null if it has not moved yet. */
   pointer: { x: number; y: number } | null = null;
+  /** False while the pointer is over a panel, card or button rather than space: mouse steering holds its aim then. */
+  pointerOnGame = true;
+  /**
+   * Mouse steering's button layout (settings.ts): the left button fires
+   * the selected group and the right button chooses (locks a ship). Off,
+   * the left button chooses and only Space fires.
+   */
+  mouseSteering = false;
+  /** Left button held on the game, with mouse steering: fire. */
+  private mouseFire = false;
 
   /** Target change to send with the next sample, or null for no change. */
   private pendingLock: Pick<ShipInput, 'lock' | 'unlock' | 'activateLock'> = { lock: null, unlock: null, activateLock: null };
@@ -94,7 +106,7 @@ export class InputController {
       brake: this.held.has('brake'),
       cycleFlightMode: this.latched.has('cycleFlightMode'),
       toggleDock: this.latched.has('toggleDock'),
-      fireFixed: this.held.has('fireFixed'),
+      fireFixed: this.held.has('fireFixed') || this.mouseFire,
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
       launchCountermeasure: this.latched.has('launchCountermeasure'),
       aimHeading: null, // mouse steering is added by main.ts, which knows the camera
@@ -143,23 +155,38 @@ export class InputController {
 
   private onKeyUp = (e: KeyboardEvent): void => this.release(e.code);
 
+  /**
+   * Buttons on the game itself (clicks on panels, cards and buttons never
+   * get here). With mouse steering the left button acts (fire) and the
+   * right button chooses; without it the left button chooses.
+   */
   private onMouseDown = (e: MouseEvent): void => {
     this.press(`Mouse${e.button}`);
-    if (e.button === 0) {
-      const rect = this.canvas.getBoundingClientRect();
-      this.onCanvasClick({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const rect = this.canvas.getBoundingClientRect();
+    const at = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    if (this.mouseSteering) {
+      if (e.button === 0) this.mouseFire = true;
+      else if (e.button === 2) this.onCanvasClick(at);
+    } else if (e.button === 0) {
+      this.onCanvasClick(at);
     }
   };
 
-  private onMouseUp = (e: MouseEvent): void => this.release(`Mouse${e.button}`);
+  private onMouseUp = (e: MouseEvent): void => {
+    this.release(`Mouse${e.button}`);
+    if (e.button === 0) this.mouseFire = false;
+  };
 
   private onMouseMove = (e: MouseEvent): void => {
     const rect = this.canvas.getBoundingClientRect();
     this.pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    // The HUD layer lets the pointer through to the canvas; anything else that catches it is interface.
+    this.pointerOnGame = e.target === this.canvas;
   };
 
   private onBlur = (): void => {
     this.downCodes.clear();
     this.held.clear();
+    this.mouseFire = false;
   };
 }

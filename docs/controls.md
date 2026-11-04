@@ -6,7 +6,7 @@ Press **F1** (or **`**) in game, or click **Controls** in the top right, to see 
 
 ## Flight
 
-**Mouse steering is on by default:** the nose follows the pointer (a crosshair over the game), turning as fast as the hull allows, and **A and D strafe** instead of spinning. Turn it off in the menu (F2, Controls) to steer with A and D as below. Clicking a ship still locks it; Space still fires.
+**Mouse steering is on by default:** the nose follows the pointer (a crosshair over the game), turning as fast as the hull allows, and **A and D strafe** instead of spinning. With it on, the **left button fires** the selected group (Space still does too) and the **right button chooses**: right-click a ship to lock it. While the pointer is over a panel, card or button the nose holds its aim, and clicks there never fire. Turn mouse steering off in the menu (F2, Controls) to steer with A and D as below; then the left button locks ships again and only Space fires.
 
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |
@@ -27,7 +27,7 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 | Action | Input | Notes |
 | --- | --- | --- |
 | Fire group | 1, 2, 3, 4 | Space fires the selected group; a new gun joins group 1, a new launcher group 2. Swivels and dispensers need no group |
-| Lock a ship | Left click on it | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Lock a ship | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 
