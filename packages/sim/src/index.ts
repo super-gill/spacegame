@@ -159,6 +159,8 @@ export {
   relativeVelocity,
   pirateHome,
   gravityAt,
+  setOrbitsMoving,
+  withOrbitMoving,
   gravityFrom,
   gravityEase,
   surfacesNext,

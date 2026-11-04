@@ -1,6 +1,7 @@
 import { GRAVITY_EASE_START } from './constants.js';
 import { nearestDockableStation } from './docking.js';
 import type { Body, Orbit, Ship, Station, World } from './types.js';
+import { wrapAngle } from './angle.js';
 import { add, distance, scale, sub, type Vec2 } from './vec2.js';
 
 /**
@@ -68,7 +69,7 @@ export function circularPeriod(gravity: number, radius: number): number {
  * within one period, so the angle stays exact however long the world runs.
  */
 export function orbitAngle(orbit: Orbit, time: number): number {
-  if (!Number.isFinite(orbit.period) || orbit.period <= 0) return orbit.phase;
+  if (orbit.frozen || !Number.isFinite(orbit.period) || orbit.period <= 0) return orbit.phase;
   const within = time % orbit.period;
   return orbit.phase + orbit.direction * ((2 * Math.PI * within) / orbit.period);
 }
@@ -78,7 +79,7 @@ export function orbitState(orbit: Orbit, parent: RailState, time: number): RailS
   const angle = orbitAngle(orbit, time);
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
-  const omega = Number.isFinite(orbit.period) && orbit.period > 0 ? (orbit.direction * 2 * Math.PI) / orbit.period : 0;
+  const omega = !orbit.frozen && Number.isFinite(orbit.period) && orbit.period > 0 ? (orbit.direction * 2 * Math.PI) / orbit.period : 0;
   const r = orbit.radius;
   return {
     position: add(parent.position, { x: r * cos, y: r * sin }),
@@ -316,4 +317,66 @@ export function pirateHome(world: Pick<World, 'bodies' | 'tick' | 'dt'>, home: V
   if (!homeOrbit) return home;
   const time = railTime(world.tick, world.dt);
   return orbitState(homeOrbit, bodyState(world.bodies, homeOrbit.parent, time), time).position;
+}
+
+// ---------------------------------------------------------------------------
+// Stopping and starting the orbits (`WorldRules.orbits`).
+
+/**
+ * `orbit` frozen where it stands at `time`, or set moving again from
+ * there: either way its angle at `time` does not change, so nothing jumps.
+ */
+export function withOrbitMoving(orbit: Orbit, moving: boolean, time: number): Orbit {
+  if (!orbit.frozen === moving) return orbit;
+  const angle = orbitAngle(orbit, time);
+  if (!moving) return { ...orbit, phase: angle, frozen: true };
+  const { frozen: _frozen, ...rest } = orbit;
+  // Moving again: pick the phase that puts it at `angle` at `time`.
+  const travelled = orbitAngle({ ...rest, phase: 0 }, time);
+  return { ...rest, phase: wrapAngle(angle - travelled) };
+}
+
+/**
+ * The world with every orbit stopped or started (bodies, stations, the
+ * belt's rocks, the pirate's home in its brain and spawner), and the rule
+ * set to match. Things in flight (ships, loot, wrecks) keep their motion
+ * relative to their local frame: stopping the orbits takes the frame's
+ * velocity out of theirs, starting them adds the new frame's back, so a
+ * ship at rest beside a station stays at rest beside it.
+ */
+export function setOrbitsMoving(world: World, moving: boolean): World {
+  if (world.rules.orbits === moving && allMatch(world, moving)) return world;
+  const time = railTime(world.tick, world.dt);
+  const turn = (o: Orbit): Orbit => withOrbitMoving(o, moving, time);
+  const frameBefore = (p: Vec2): Vec2 => frameVelocity(world, { position: p, dockedAt: null });
+
+  const bodies: World['bodies'] = {};
+  for (const [id, b] of Object.entries(world.bodies)) bodies[id] = b.orbit ? { ...b, orbit: turn(b.orbit) } : b;
+  const turnedStations: World['stations'] = {};
+  for (const [id, st] of Object.entries(world.stations)) turnedStations[id] = st.orbit ? { ...st, orbit: turn(st.orbit) } : st;
+  const stations = placeStations(bodies, turnedStations, world.tick, world.dt);
+  const asteroids = world.asteroids.map((a) => ({ ...a, orbit: turn(a.orbit) }));
+  const npcs: World['npcs'] = {};
+  for (const [id, brain] of Object.entries(world.npcs)) npcs[id] = brain.kind === 'pirate' && brain.homeOrbit ? { ...brain, homeOrbit: turn(brain.homeOrbit) } : brain;
+  const spawners = world.spawners.map((sp) => (sp.brain.kind === 'pirate' && sp.brain.homeOrbit ? { ...sp, brain: { ...sp.brain, homeOrbit: turn(sp.brain.homeOrbit) } } : sp));
+
+  const turned: World = { ...world, bodies, stations, asteroids, npcs, spawners, rules: { ...world.rules, orbits: moving } };
+  const frameAfter = (p: Vec2): Vec2 => frameVelocity(turned, { position: p, dockedAt: null });
+  const reframe = <T extends { position: Vec2; velocity: Vec2 }>(thing: T): T => ({ ...thing, velocity: add(sub(thing.velocity, frameBefore(thing.position)), frameAfter(thing.position)) });
+  const ships: World['ships'] = {};
+  for (const [id, sh] of Object.entries(world.ships)) {
+    if (sh.state === 'docked' && sh.dockedAt && stations[sh.dockedAt]) ships[id] = { ...sh, velocity: { ...stations[sh.dockedAt]!.velocity } };
+    else ships[id] = reframe(sh);
+  }
+  return { ...turned, ships, loot: world.loot.map(reframe), wrecks: world.wrecks.map(reframe) };
+}
+
+/** True if every orbit in the world already moves (or is frozen) as asked. */
+function allMatch(world: World, moving: boolean): boolean {
+  const ok = (o: Orbit | null | undefined): boolean => !o || !o.frozen === moving;
+  return (
+    Object.values(world.bodies).every((b) => ok(b.orbit)) &&
+    Object.values(world.stations).every((s) => ok(s.orbit)) &&
+    world.asteroids.every((a) => ok(a.orbit))
+  );
 }

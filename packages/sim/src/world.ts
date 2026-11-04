@@ -8,7 +8,7 @@ import { MODULES } from './modules.js';
 import { issueShip, STARTER_LOADOUT_ID, STARTER_STATION_ID } from './pilots.js';
 import { screeAsteroids } from './asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
-import { pirateHome } from './rails.js';
+import { pirateHome, setOrbitsMoving } from './rails.js';
 import { HARBOUR_ID, LANTERN_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
 import type { Pilot, Ship, ShipInput, Spawner, World, WorldRules } from './types.js';
 import { WEAPONS } from './weapons.js';
@@ -28,6 +28,7 @@ export function emptyInput(): ShipInput {
     fireFixed: false,
     selectGroup: null,
     launchCountermeasure: false,
+    aimHeading: null,
     lock: null,
     unlock: null,
     activateLock: null,
@@ -42,7 +43,7 @@ export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, res
 const PIRATE_HOME_INWARD = 1300;
 
 /** The rules a new world starts with: mechanics under trial, off (see `WorldRules`). */
-export const DEFAULT_RULES: WorldRules = { gravity: false };
+export const DEFAULT_RULES: WorldRules = { gravity: false, orbits: false };
 
 /**
  * The starter system, Calder (bodies.ts, stations.ts): a star, a planet
@@ -161,7 +162,8 @@ export function createStarterWorld(): World {
     events: [],
   };
   // Spawners with no ship and no timer spawn at once, so NPCs exist from tick 0.
-  return runSpawners(empty);
+  // Orbits start stopped unless the rules say otherwise (WorldRules.orbits).
+  return setOrbitsMoving(runSpawners(empty), DEFAULT_RULES.orbits);
 }
 
 /**

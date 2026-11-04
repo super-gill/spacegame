@@ -744,6 +744,11 @@ export interface Orbit {
   phase: number;
   /** 1 turns clockwise on screen (positive angles), -1 anticlockwise. */
   direction: 1 | -1;
+  /**
+   * Held still at `phase`: no motion, no velocity. Set for every orbit by
+   * the orbits rule (`WorldRules.orbits`, rails.ts `setOrbitsMoving`).
+   */
+  frozen?: boolean;
 }
 
 export type BodyKind = 'star' | 'planet' | 'moon' | 'belt';
@@ -828,6 +833,14 @@ export interface ShipInput {
   turnLeft: boolean;
   /** Fire rotation thrusters to add clockwise spin. */
   turnRight: boolean;
+  /**
+   * Mouse steering: the world bearing the pilot wants the nose on, or
+   * null. When set, the flight computer turns the hull to it and brakes
+   * into it with the rotation thrusters, in every flight mode, as
+   * Flatspace's gyro cursor does; held turn keys still win. NPCs leave it
+   * null and steer with the turn keys.
+   */
+  aimHeading: number | null;
   thrustForward: boolean;
   thrustReverse: boolean;
   strafeLeft: boolean;
@@ -937,6 +950,14 @@ export interface WorldRules {
    * solid surfaces either way.
    */
   gravity: boolean;
+  /**
+   * Bodies, stations, the belt's rocks and the pirate's home move on their
+   * orbits. Off by default since the 4 November 2026 playtest: with no
+   * gravity there was no natural way to match a moving station. Off,
+   * every orbit is frozen where it stands (`Orbit.frozen`); switch it
+   * only with rails.ts `setOrbitsMoving`, which keeps everything in place.
+   */
+  orbits: boolean;
 }
 
 export interface World {

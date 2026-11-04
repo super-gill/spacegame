@@ -7,14 +7,17 @@ import { LOADOUTS } from '../loadouts.js';
 import {
   bodyPosition,
   bodyState,
+  bodyStates,
   bodyVelocity,
   circularPeriod,
   frameVelocity,
   localFrame,
   railTime,
   relativeVelocity,
+  setOrbitsMoving,
   stationState,
 } from '../rails.js';
+import { asteroidPositions } from '../asteroids.js';
 import { SAVE_FORMAT, SAVE_VERSION, deserializeWorld, serializeWorld } from '../save.js';
 import { navReadout } from '../nav.js';
 import { stepShip } from '../ship.js';
@@ -42,9 +45,13 @@ function run(w: World, seconds: number, inputs: (w: World) => Record<string, Shi
   return x;
 }
 
-/** The starter system with no NPCs. */
+/**
+ * The starter system with no NPCs, orbits moving. Orbits are off by
+ * default since the 4 November playtest; this file tests the moving
+ * system, so it switches them on (`setOrbitsMoving`).
+ */
 function quiet(): World {
-  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+  return setOrbitsMoving({ ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] }, true);
 }
 
 /** The same with gravity switched off, to test carrying on its own. */
@@ -116,7 +123,7 @@ describe('rails', () => {
 });
 
 describe('the starter system', () => {
-  const w = createStarterWorld();
+  const w = setOrbitsMoving(createStarterWorld(), true);
 
   it('has a star, a planet, a moon and the belt', () => {
     const kinds = Object.values(w.bodies).map((b) => b.kind).sort();
@@ -363,7 +370,7 @@ describe('NPCs in moving frames', () => {
   });
 
   it('with gravity on, a new pilot starts in orbit round the planet, holding its place on the path', () => {
-    const w = joinPilot({ ...quiet(), rules: { gravity: true } }, 'ana', 'Ana');
+    const w = joinPilot({ ...quiet(), rules: { ...quiet().rules, gravity: true } }, 'ana', 'Ana');
     const nav = navReadout(w, pilotShip(w, 'ana')!)!;
     expect(nav.orbit?.bound).toBe(true);
     expect(nav.orbit!.periapsisAltitude).toBeGreaterThan(0);
@@ -371,6 +378,51 @@ describe('NPCs in moving frames', () => {
 
   it('starts new worlds with gravity off', () => {
     expect(createStarterWorld().rules.gravity).toBe(false);
+  });
+});
+
+describe('orbits stopped (the default)', () => {
+  it('holds every body, station and rock still where it starts', () => {
+    let w = createStarterWorld();
+    expect(w.rules.orbits).toBe(false);
+    const at = (x: World) => JSON.stringify([Object.values(x.stations).map((s) => s.position), bodyStates(x.bodies, railTime(x.tick, x.dt)), asteroidPositions(x).slice(0, 5)]);
+    const start = at(w);
+    for (let i = 0; i < 600; i++) w = stepWorld(w, {});
+    expect(at(w)).toBe(start);
+    for (const st of Object.values(w.stations)) expect(length(st.velocity)).toBe(0);
+  });
+
+  it('puts a new pilot just off Harbour at rest, clear of the planet, close enough to dock', () => {
+    const w = joinPilot(createStarterWorld(), 'ana', 'Ana');
+    const me = pilotShip(w, 'ana')!;
+    const harbour = w.stations[HARBOUR_ID]!;
+    const planet = bodyStates(w.bodies, railTime(w.tick, w.dt))[harbour.orbit!.parent]!.position;
+    expect(length(me.velocity)).toBe(0);
+    expect(distance(me.position, harbour.position)).toBeLessThan(harbour.securityRadius);
+    expect(distance(me.position, planet)).toBeGreaterThan(distance(harbour.position, planet));
+  });
+
+  it('starts and stops without anything jumping: a ship at rest beside a station stays beside it', () => {
+    let w = quiet();
+    const harbour = w.stations[HARBOUR_ID]!;
+    // Inside dock range, so Harbour is its frame.
+    const ship = coaster(w, 'c', { x: harbour.position.x + 150, y: harbour.position.y }, { ...harbour.velocity });
+    w = put(w, ship);
+    const stopped = setOrbitsMoving(w, false);
+    expect(stopped.stations[HARBOUR_ID]!.position).toEqual(harbour.position);
+    expect(length(stopped.ships['c']!.velocity)).toBeCloseTo(0, 6);
+    const again = setOrbitsMoving(stopped, true);
+    expect(again.stations[HARBOUR_ID]!.position.x).toBeCloseTo(harbour.position.x, 6);
+    expect(again.stations[HARBOUR_ID]!.position.y).toBeCloseTo(harbour.position.y, 6);
+    expect(again.ships['c']!.velocity.x).toBeCloseTo(harbour.velocity.x, 6);
+  });
+
+  it('stops the orbits of an older save, where they stand', () => {
+    const moving = quiet();
+    const { rules: _rules, ...older } = moving;
+    const r = deserializeWorld(serializeWorld(older as World, ''));
+    expect(r.ok && r.world.rules.orbits).toBe(false);
+    expect(r.ok && r.world.stations[HARBOUR_ID]!.position).toEqual(moving.stations[HARBOUR_ID]!.position);
   });
 });
 

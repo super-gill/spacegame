@@ -8,6 +8,7 @@
 export interface MenuActions {
   rename(name: string): void;
   setShowLabels(show: boolean): void;
+  setMouseSteering(on: boolean): void;
   saveNow(): void;
   exportSave(): void;
   importSave(file: File): void;
@@ -18,6 +19,8 @@ export interface MenuActions {
   spawnShip(loadoutId: string): void;
   /** Admin (testing): switch gravity on or off for the whole world. */
   setGravity(on: boolean): void;
+  /** Admin (testing): start or stop the orbits for the whole world. */
+  setOrbits(on: boolean): void;
 }
 
 /** A loadout the admin spawner offers. */
@@ -52,8 +55,17 @@ export class MenuPanel {
   private readonly labelsBox = el('input');
   private readonly savedLine = el('p', 'muted');
   private readonly gravityBox = el('input');
+  private readonly orbitsBox = el('input');
 
-  constructor(root: HTMLElement, openButton: HTMLButtonElement, name: string, showLabels: boolean, actions: MenuActions, spawnChoices: readonly SpawnChoice[]) {
+  constructor(
+    root: HTMLElement,
+    openButton: HTMLButtonElement,
+    name: string,
+    display: { showLabels: boolean; mouseSteering: boolean },
+    actions: MenuActions,
+    spawnChoices: readonly SpawnChoice[],
+  ) {
+    const showLabels = display.showLabels;
     this.panel.setAttribute('role', 'dialog');
     this.panel.setAttribute('aria-label', 'Menu');
     openButton.addEventListener('click', () => this.toggle());
@@ -88,6 +100,17 @@ export class MenuPanel {
     this.labelsBox.addEventListener('change', () => actions.setShowLabels(this.labelsBox.checked));
     labelRow.append(this.labelsBox, document.createTextNode(' Show ship labels'));
     this.panel.append(labelRow);
+
+    // Controls.
+    this.panel.append(el('h2', undefined, 'Controls'));
+    const steerRow = el('label', 'menu-row');
+    const steerBox = el('input');
+    steerBox.type = 'checkbox';
+    steerBox.checked = display.mouseSteering;
+    steerBox.addEventListener('change', () => actions.setMouseSteering(steerBox.checked));
+    steerRow.append(steerBox, document.createTextNode(' Steer with the mouse'));
+    this.panel.append(steerRow);
+    this.panel.append(el('p', 'muted', 'On: the nose follows the pointer and A and D strafe. Off: A and D spin the ship.'));
 
     // World.
     this.panel.append(el('h2', undefined, 'World'));
@@ -139,7 +162,12 @@ export class MenuPanel {
     this.gravityBox.addEventListener('change', () => actions.setGravity(this.gravityBox.checked));
     gravityRow.append(this.gravityBox, document.createTextNode(' Gravity: planets and the star pull ships, shots and loot'));
     this.panel.append(gravityRow);
-    this.panel.append(el('p', 'muted', 'Off by default. Bodies still orbit, carry what is near them and have solid surfaces either way. Saved with the world.'));
+    const orbitsRow = el('label', 'menu-row');
+    this.orbitsBox.type = 'checkbox';
+    this.orbitsBox.addEventListener('change', () => actions.setOrbits(this.orbitsBox.checked));
+    orbitsRow.append(this.orbitsBox, document.createTextNode(' Orbits: planets, moons and stations move'));
+    this.panel.append(orbitsRow);
+    this.panel.append(el('p', 'muted', 'Both off by default and saved with the world. Bodies keep their solid surfaces either way; switching orbits keeps everything where it is.'));
 
     root.append(this.panel);
   }
@@ -156,6 +184,11 @@ export class MenuPanel {
   /** Reflect the world's gravity rule (it changes with loads and imports too). */
   setGravity(on: boolean): void {
     if (this.gravityBox.checked !== on) this.gravityBox.checked = on;
+  }
+
+  /** Reflect the world's orbits rule. */
+  setOrbits(on: boolean): void {
+    if (this.orbitsBox.checked !== on) this.orbitsBox.checked = on;
   }
 
   setName(name: string): void {

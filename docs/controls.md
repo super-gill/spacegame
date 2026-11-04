@@ -6,7 +6,7 @@ Press **F1** (or **`**) in game, or click **Controls** in the top right, to see 
 
 ## Flight
 
-Flight is keyboard only. The mouse is reserved for targeting, interacting with objects and UI in later versions.
+**Mouse steering is on by default:** the nose follows the pointer (a crosshair over the game), turning as fast as the hull allows, and **A and D strafe** instead of spinning. Turn it off in the menu (F2, Controls) to steer with A and D as below. Clicking a ship still locks it; Space still fires.
 
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |

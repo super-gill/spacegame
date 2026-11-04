@@ -1,3 +1,4 @@
+import { angleDelta } from './angle.js';
 import { ASSIST_LINEAR_STRENGTH, ASSIST_ROTATION_STRENGTH, BRAKE_STRENGTH } from './constants.js';
 import type { FlightMode, ShipStats, ShipInput, Ship, Thrusters } from './types.js';
 import { fromAngle, rotate, type Vec2 } from './vec2.js';
@@ -76,6 +77,11 @@ function cancelAxis(
 
 const on = (held: boolean): number => (held ? 1 : 0);
 
+/** Mouse steering plans to stop using this fraction of the hull's rotation thrust, keeping some in hand. */
+const AIM_BRAKE_MARGIN = 0.8;
+/** Close to the aim, the wanted spin is at most this many times the angle left (per second), so it settles without hunting. */
+const AIM_SETTLE_RATE = 8;
+
 /**
  * Decide this tick's thruster throttles. Pure.
  *
@@ -126,7 +132,16 @@ export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput,
 
   // Rotation. Positive spin is clockwise on screen.
   const pilotRotating = input.turnLeft || input.turnRight;
-  if (input.brake || (rotationAssist && !pilotRotating)) {
+  if (!input.brake && !pilotRotating && input.aimHeading !== null && rotationAccel > 0) {
+    // Mouse steering: the spin that arrives at the aim with the hull able
+    // to stop there, no faster than the hull turns, then thrust towards it.
+    const error = angleDelta(ship.heading, input.aimHeading);
+    const arrive = Math.sqrt(2 * rotationAccel * AIM_BRAKE_MARGIN * Math.abs(error));
+    const wanted = Math.sign(error) * Math.min(stats.maxTurnRate, arrive, Math.abs(error) * AIM_SETTLE_RATE);
+    const c = cancelAxis(ship.angularVelocity - wanted, rotationAccel, rotationAccel, dt, 1);
+    out.rotateRight = c.plus;
+    out.rotateLeft = c.minus;
+  } else if (input.brake || (rotationAssist && !pilotRotating)) {
     const strength = input.brake ? BRAKE_STRENGTH : ASSIST_ROTATION_STRENGTH;
     const c = cancelAxis(ship.angularVelocity, rotationAccel, rotationAccel, dt, strength);
     out.rotateRight = c.plus;

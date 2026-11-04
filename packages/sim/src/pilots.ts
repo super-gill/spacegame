@@ -4,7 +4,7 @@ import { buildShip } from './factory.js';
 import { isEmptyShip, isEscapePod, ownedShips, vacated } from './ownership.js';
 import { HARBOUR_ID } from './stations.js';
 import type { Catalogues } from './stats.js';
-import { bodyState, frameVelocity, orbitAngle, railTime } from './rails.js';
+import { bodyState, frameVelocity, orbitAngle, railTime, setOrbitsMoving } from './rails.js';
 import type { Loadout, Pilot, Ship, Station, World, WorldEvent, WorldRules } from './types.js';
 import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
@@ -109,8 +109,12 @@ function loadoutOrThrow(world: World, id: string): Loadout {
  */
 function spawnPlace(world: World, station: Station, index: number): { position: Vec2; heading: number; velocity: Vec2 } {
   const orbit = station.orbit;
-  if (!orbit || orbit.radius <= 0) {
-    const angle = index * (Math.PI / 3);
+  if (!orbit || orbit.radius <= 0 || orbit.frozen) {
+    // Spread round it by pilot, starting on the side away from the body it
+    // sits by (if any), so nobody wakes up inside a planet.
+    const parentAt = orbit ? bodyState(world.bodies, orbit.parent, railTime(world.tick, world.dt)).position : null;
+    const away = parentAt && orbit!.radius > 0 ? toAngle(sub(station.position, parentAt)) : 0;
+    const angle = away + (index % 2 === 0 ? 1 : -1) * Math.ceil(index / 2) * (Math.PI / 4);
     const position = add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE));
     return { position, heading: angle + Math.PI, velocity: frameVelocity(world, { position, dockedAt: null }) };
   }
@@ -290,13 +294,13 @@ export function adminSpawnShip(world: World, pilotId: string, loadoutId: string)
   };
 }
 
-/** Admin: switch a world rule on or off (see `WorldRules`). */
+/** Admin: switch a world rule on or off (see `WorldRules`). Orbits start and stop without anything jumping. */
 export function adminSetRule(world: World, pilotId: string, rule: keyof WorldRules, on: boolean): CommandResult<AdminRefusal> {
   const pilot = world.pilots[pilotId];
   if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
   return {
     ok: true,
-    world: { ...world, rules: { ...world.rules, [rule]: on } },
+    world: rule === 'orbits' ? setOrbitsMoving(world, on) : { ...world, rules: { ...world.rules, [rule]: on } },
     event: { type: 'adminRuleChanged', shipId: pilot.shipId ?? '', rule, on },
   };
 }

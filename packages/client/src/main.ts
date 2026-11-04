@@ -139,6 +139,7 @@ const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
 
 let me = loadLocalPilot();
 const settings = loadSettings();
+canvas.classList.toggle('mouse-steering', settings.mouseSteering);
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
@@ -310,7 +311,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') saveNow();
 });
 
-const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, me.name, settings.showLabels, {
+const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, me.name, settings, {
   rename(name) {
     me = { ...me, name };
     saveLocalPilot(me);
@@ -320,6 +321,11 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
   setShowLabels(show) {
     settings.showLabels = show;
     saveSettings(settings);
+  },
+  setMouseSteering(on) {
+    settings.mouseSteering = on;
+    saveSettings(settings);
+    canvas.classList.toggle('mouse-steering', on);
   },
   saveNow() {
     saveNow();
@@ -347,6 +353,14 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
   },
   grantCredits(amount) {
     const r = adminGrantCredits(current, me.id, amount);
+    if (!r.ok) {
+      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
+      return;
+    }
+    commanded(r.world, r.event);
+  },
+  setOrbits(on) {
+    const r = adminSetRule(current, me.id, 'orbits', on);
     if (!r.ok) {
       ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
       return;
@@ -488,6 +502,34 @@ function resize(): void {
 window.addEventListener('resize', resize);
 resize();
 
+/** The bearing the pointer last asked for, kept while it sits on the ship itself. */
+let lastAim: number | null = null;
+/** Pointer this close to the ship (screen pixels) keeps the last aim rather than spinning on the spot. */
+const AIM_DEAD_ZONE_PX = 24;
+
+/**
+ * Mouse steering (settings.ts): the nose follows the pointer through
+ * `ShipInput.aimHeading`, and the turn keys strafe instead. Off, the
+ * input goes through as the keys made it.
+ */
+function steer(sampled: ShipInput, ship: Ship): ShipInput {
+  if (!settings.mouseSteering) return sampled;
+  if (input.pointer && ship.state === 'flying') {
+    const at = camera.worldToScreen(ship.position);
+    const dx = input.pointer.x - at.x;
+    const dy = input.pointer.y - at.y;
+    if (Math.hypot(dx, dy) > AIM_DEAD_ZONE_PX) lastAim = Math.atan2(dy, dx);
+  }
+  return {
+    ...sampled,
+    strafeLeft: sampled.strafeLeft || sampled.turnLeft,
+    strafeRight: sampled.strafeRight || sampled.turnRight,
+    turnLeft: false,
+    turnRight: false,
+    aimHeading: ship.state === 'flying' ? lastAim : null,
+  };
+}
+
 // Fixed-timestep accumulator.
 let accumulator = 0;
 let lastFrameMs = performance.now();
@@ -500,7 +542,7 @@ function tick(nowMs: number): void {
   const ship = myShip(current);
   const inputs: Record<string, ShipInput> = {};
   if (ship) {
-    inputs[ship.id] = input.sample();
+    inputs[ship.id] = steer(input.sample(), ship);
   } else {
     input.sample(); // drain latched presses so they do not fire on respawn
   }
@@ -542,6 +584,7 @@ function frame(nowMs: number): void {
   const ago = Math.round((nowMs - lastSaveMs) / 1000);
   menu.setSavedStatus(lastSaveOk ? `Saved ${ago} s ago, in this browser.` : 'Not saving: browser storage is not available.');
   menu.setGravity(current.rules.gravity);
+  menu.setOrbits(current.rules.orbits);
   accumulator += frameSeconds;
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 

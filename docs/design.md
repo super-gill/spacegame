@@ -30,7 +30,7 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
 - Brake overrides everything: it fires the relevant thrusters at full strength against velocity and spin on every axis, in every mode.
 - NPC ships use the same flight computer, so they fly by the same rules as the player.
 - Weapons come in two kinds (see Combat); the flight modes suit both. Fixed guns favour assisted flight; turrets free a pilot to fight while drifting in manual.
-- The mouse is deliberately not used for flight. It is reserved for targeting, interacting with objects (scooping, hailing, selecting) and turret aim.
+- **Mouse steering** (since the 4 November 2026 playtest, reversing the earlier keyboard-only rule): the nose follows the pointer, as Flatspace's gyro cursor did, because aiming fixed guns by spinning on keys was too hard. The flight computer turns the hull to the pointer's bearing (`ShipInput.aimHeading`) within the hull's own turn rate and rotation thrust, so a heavy hull still swings slowly. A and D strafe instead of spinning. Keyboard steering stays as a menu setting. Clicking still locks ships; Space still fires.
 - Thrust is relative to heading: main engine forward, retro reverse, lateral strafe.
 
 ## Multiplayer: the private-server model
@@ -67,14 +67,14 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 ## Docking
 
 - A station has a dock range. Inside it, with speed relative to the station below the docking limit, pressing dock sets the ship down on a free pad.
-- Stations move on their orbits. A docked ship rides its pad: it moves with the station and cannot be damaged (later: unless the station is under attack).
+- **Orbits are stopped by default** since the 4 November playtest (Jason): with gravity off there was no natural way to match a moving station. Bodies, stations, the belt's rocks and the pirate's home hold still where they start (`Orbit.frozen`); the Admin section's Orbits switch (`WorldRules.orbits`, rails.ts `setOrbitsMoving`) starts them again without anything jumping. With orbits on: stations move on their orbits. A docked ship rides its pad: it moves with the station and cannot be damaged (later: unless the station is under attack).
 - Undocking launches the ship from its pad along the pad's facing, moving with the station plus a small push.
 
 ## Combat
 
 ### Weapons
 
-- The mouse is for choosing, not shooting: click a ship to lock it (Tab switches locks, Esc unlocks). Flying and firing stay on the keyboard, so on bigger ships the pointer is free for other systems mid-fight.
+- The mouse points the nose and chooses: click a ship to lock it (Tab switches locks, Esc unlocks). Firing stays on Space for now; moving fire to the left button and locking to the right is an option to try.
 - **Weapons and power** are designed in [weapons.md](weapons.md): the capacitor is a hull property that energy and hybrid guns, shield recharge and full-size sensors draw on; guns come in families (projectile, energy, hybrid, and the swivels for point defence) that cost capacitor, ammunition or both; damage has a type and shields and armour resist by type; mounts have arcs; Space fires the selected fire group. Missiles and torpedoes need a lock, home on it and can be shot down by swivels or drawn off by countermeasures.
 - **Fixed** weapons fire along the ship's heading when you press Space. You aim by flying; with a target selected, a lead marker shows where to put the nose so shots meet it.
 - **Target locks**, as in EVE: locking a ship takes time, shorter with better scan resolution and against bigger ships (`lockSeconds`). A ship holds up to its `maxLocks` (hull now, sensor modules later), each inside sensor range; a lock drops when its target leaves range, docks or is destroyed, and all drop when you dock. One lock is active. Later (6e) each turret and other system can be assigned to a lock; fixed guns stay on the nose and need none.

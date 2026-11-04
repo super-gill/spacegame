@@ -63,8 +63,8 @@ export interface PointerControl {
 export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'thrustForward', codes: ['KeyW', 'ArrowUp'], group: 'Flight', label: 'Main engine', kind: 'hold' },
   { action: 'thrustReverse', codes: ['KeyS', 'ArrowDown'], group: 'Flight', label: 'Reverse thrust', kind: 'hold', note: 'Weaker than the main engine' },
-  { action: 'turnLeft', codes: ['KeyA', 'ArrowLeft'], group: 'Flight', label: 'Spin left', kind: 'hold' },
-  { action: 'turnRight', codes: ['KeyD', 'ArrowRight'], group: 'Flight', label: 'Spin right', kind: 'hold' },
+  { action: 'turnLeft', codes: ['KeyA', 'ArrowLeft'], group: 'Flight', label: 'Spin left', kind: 'hold', note: 'With mouse steering on (the default), strafes left instead: the nose follows the pointer' },
+  { action: 'turnRight', codes: ['KeyD', 'ArrowRight'], group: 'Flight', label: 'Spin right', kind: 'hold', note: 'With mouse steering on, strafes right instead' },
   { action: 'strafeLeft', codes: ['KeyQ'], group: 'Flight', label: 'Lateral thrust left', kind: 'hold' },
   { action: 'strafeRight', codes: ['KeyE'], group: 'Flight', label: 'Lateral thrust right', kind: 'hold' },
   { action: 'brake', codes: ['KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },

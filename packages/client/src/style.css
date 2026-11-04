@@ -1134,3 +1134,8 @@ button:hover {
 .hud-radar-caption {
   font-size: 11px;
 }
+
+/* Mouse steering: the pointer is the gyro cursor. */
+#game.mouse-steering {
+  cursor: crosshair;
+}

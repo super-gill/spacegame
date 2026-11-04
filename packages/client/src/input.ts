@@ -97,6 +97,7 @@ export class InputController {
       fireFixed: this.held.has('fireFixed'),
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
       launchCountermeasure: this.latched.has('launchCountermeasure'),
+      aimHeading: null, // mouse steering is added by main.ts, which knows the camera
       ...this.pendingLock,
       selectGroup: this.pendingGroup,
       tractor: this.held.has('tractor'),

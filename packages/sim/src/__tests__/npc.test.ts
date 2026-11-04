@@ -134,7 +134,8 @@ describe('pirate', () => {
     w = { ...w, ships: { ...w.ships, [shipId]: { ...w.ships[shipId]!, state: 'docked', dockedAt: 'station-harbour' } } };
     const next = stepWorld(w, {});
     expect(next.events).toContainEqual({ type: 'huntEnded', shipId, pirateId: PIRATE });
-    expect((next.npcs[PIRATE] as PirateBrain).mode).toBe('withdraw');
+    // It stops hunting: withdrawing, or already home and prowling again.
+    expect((next.npcs[PIRATE] as PirateBrain).mode).not.toBe('hunt');
   });
 
   it('does not hunt a ship inside station security', () => {

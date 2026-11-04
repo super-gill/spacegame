@@ -10,6 +10,7 @@ import { stepWorld } from '../step.js';
 import type { Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, length, type Vec2 } from '../vec2.js';
 import { createStarterWorld, emptyInput } from '../world.js';
+import { setOrbitsMoving } from '../rails.js';
 
 /** Gravity, surface impact and the nav computer (6c part 2). */
 
@@ -18,7 +19,8 @@ const SECOND = 60;
 function quiet(): World {
   // Gravity is a world rule, off by default since the 4 November playtest;
   // these tests are about the mechanic, so they switch it on.
-  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rules: { gravity: true } };
+  // Gravity's tests also need the orbits moving (stations orbit as ships would).
+  return setOrbitsMoving({ ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rules: { gravity: true, orbits: false } }, true);
 }
 
 function planetNow(w: World) {

@@ -42,6 +42,8 @@ It also means:
 - **Slingshots work.** Swing round a planet and leave its sphere, and you leave with the planet's velocity added to yours: you can gain or lose speed.
 - Your local frame's velocity is the reference for assist and readouts (principle 4).
 
+**Orbits stopped by default since 4 November 2026** (Jason: with gravity gone there was "no organic way to cancel out the speed difference" with a moving station). Every orbit (bodies, stations, the belt's rocks, the pirate's home) carries `frozen`, held at its phase with no velocity, so nothing carries anything and every frame is at rest. `WorldRules.orbits` and `setOrbitsMoving(world, on)` start and stop them, re-phasing each orbit so nothing jumps and taking the old frame's velocity out of (or the new one's into) ships, loot and wrecks in flight. Older saves load with their orbits stopped where they stood. New pilots wake 650 units off Harbour on the side away from the planet. The rest of this document describes the system with orbits on.
+
 ## Gravity
 
 **Off by default since 4 November 2026** (Jason, after playtesting: "a clash between the flat space idea and something trying to be more realistic"). It is a world rule, `World.rules.gravity`, saved with the world and switched in the F2 menu's Admin section. Off, nothing pulls: no gravity on ships, shots, loot or wrecks, no gravity tier or orbit in the nav readout (the path line still shows coasting and carrying), no gravity margin in NPC routing, and new pilots wait at rest in the planet's frame on Harbour's path instead of in orbit. Rails, carrying, station orbits and solid surfaces are unchanged. What follows describes the rule switched on.

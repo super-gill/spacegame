@@ -12,6 +12,7 @@ import { runSpawners } from './lifecycle.js';
 import { defaultPads, defaultShipMart, HARBOUR_ID, starterStations } from './stations.js';
 import type { Ship, Spawner, Station, World } from './types.js';
 import { add, fromAngle, scale } from './vec2.js';
+import { setOrbitsMoving } from './rails.js';
 import { createStarterWorld, DEFAULT_RULES } from './world.js';
 import { WEAPONS } from './weapons.js';
 
@@ -365,10 +366,7 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const projectiles = world.projectiles.map((p) => ({ ...p, damageType: p.damageType ?? 'kinetic' }));
   // Version 5 worlds saved from main before the Scree had rocks get them now.
   const asteroids = Array.isArray(world.asteroids) ? world.asteroids : screeAsteroids();
-  return {
-    ok: true,
-    savedAt,
-    world: {
+  const loaded: World = {
       ...world,
       ships,
       projectiles,
@@ -385,6 +383,8 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
       weapons: { ...WEAPONS },
       goods: { ...GOODS },
       events: [],
-    },
   };
+  // Worlds saved before the orbits rule had moving orbits: stop them where they stand.
+  const orbitsKnown = typeof (world.rules as Partial<World['rules']> | undefined)?.orbits === 'boolean';
+  return { ok: true, savedAt, world: orbitsKnown ? loaded : setOrbitsMoving({ ...loaded, rules: { ...loaded.rules, orbits: true } }, false) };
 }

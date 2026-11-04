@@ -38,7 +38,8 @@ describe('the Scree', () => {
 
   it('is stored in the world and saved with it', () => {
     const w = createStarterWorld();
-    expect(w.asteroids).toEqual(screeAsteroids());
+    // The same rocks, held still where they start (orbits are off by default).
+    expect(w.asteroids.map(({ orbit: { frozen, ...orbit }, ...a }) => ({ ...a, orbit, frozen }))).toEqual(screeAsteroids().map((a) => ({ ...a, frozen: true })));
     const r = deserializeWorld(serializeWorld(w, ''));
     if (!r.ok) throw new Error(r.reason);
     expect(r.world.asteroids).toEqual(w.asteroids);
