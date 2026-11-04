@@ -56,8 +56,9 @@ export const PIRATE_TUNING = {
   /** Fire only when the target is within this fraction of weapon range. */
   rangeFraction: 0.9,
   /**
-   * Whether pirates hunt escape pods. Off until Jason decides: a pod has
-   * no cargo, so hunting one is cruelty rather than piracy.
+   * Whether pirates hunt escape pods. Off by Jason's call (4 November
+   * 2026): a pod has no cargo, so hunting one is not piracy. Threats to
+   * pods are worked out later.
    */
   huntPods: false as boolean,
   /** Break off when structure falls below this fraction of the hull's maximum. */

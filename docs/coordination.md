@@ -151,7 +151,6 @@ Candidates (not open yet):
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
 - Navy duties.
-- Should pirates hunt escape pods? A pod carries nothing, so it is not piracy, but a pirate finishing you off is a threat that sticks. For now they leave pods alone (`PIRATE_TUNING.huntPods`); one line flips it. Shooting pods as a crime comes with law (7) either way.
 
 ## Ideas inbox
 
@@ -165,6 +164,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: Pirates ignore escape pods; threats to pods are worked out later (shooting pods as a crime comes with law, 7). (Jason)
 - 2026-11-04: Lore (from the lore chat): the core premise stands (the Aurel caged the Unsung by silencing the Lattice, and gate-waking undoes it); Hive Ossk grows every station's core and each race clads it; pilots can start as Oru, as human wards; all three routes to an Aurel ship stand, including the 604 AL sale; player organisations are "outfits"; the Unsung appear later as hostile ships in the Dark; pilots can gain standing with four pirate factions (Red Tithe, Null Ledger, Black Strike, Cutloose; not the Hiveless; the Hollow Choir only late); the starter sector stands. Follow-ups are on the roadmap: wards at character creation (11), pirate faction standing (7), the Unsung (8). (Jason)
 - 2026-11-03: 6b plan: board ships you own in space as well as docked; escape pods come in 6b; a free starter Courier only when you own no ship; empty ships stay where left and can be attacked. Full plan in `docs/ships.md`. (Jason)
 - 2026-11-03: The 0.7.0 calls stand: outfitting at Harbour only for now; the world aligns to the lore, so the Mule and Jackal stay gone (Aurel ships can serve as dev and test ships); the Spine's six bays; bonus values are a dial to tune later; names come from the lore, with module makers a mix of their own companies and hull makers. (Jason)

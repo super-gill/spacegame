@@ -145,7 +145,7 @@ Planned 3 November 2026 with Jason's decisions. Sim side built 4 November 2026 (
 - A pod keeps 30% of the ship's velocity and is fired out to the ship's right at 30 units/s. It has 40 structure, no shield and a 180 units/s top speed.
 - Waking is the death panel's button, as respawning was, so the world never waits on it. A pilot wakes docked at Harbour, or just off it if every fitting pad is taken.
 - New pilots still arrive in space off Harbour, so their first act is flying and docking.
-- Pirates do not hunt pods, pending Jason's call (`PIRATE_TUNING.huntPods`).
+- Pirates do not hunt pods (Jason, 4 November 2026; `PIRATE_TUNING.huntPods`). Threats to pods are worked out later.
 
 *Build order.* The lead builds the sim foundation first (ownership rules, pads and docking, buying, boarding, pods, the death flow, the save migration, all with tests and the new contracts in `docs/coordination.md`). Then a client workstream builds the ship mart screen, pads and docked ships on screen, the board key and prompt, and the pod's look.
 
