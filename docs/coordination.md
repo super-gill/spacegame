@@ -273,6 +273,8 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: Electronic warfare waits for law (7), where NPCs can use it. Mining needs depth: field scans, rock scans, blasting with charges, lasers to free ore, collection by tractor or drones, and new ships; design pass before building. (Jason)
+
 - 2026-11-04: Slots the EVE way: optional kit (tractor, electronic warfare, interdiction, countermeasures and the like) competes for general mounts, and slots a pilot activates or assigns get a control on the HUD; basics every ship needs get fixed mounts; specialised hulls get dedicated mounts (a mining hull's mining laser mount). A slot-budget pass per hull class comes with 6f. Electronic warfare in or just after 6f; interdiction and warp disruption with the map (8). A mining slice comes straight after 6f, ahead of law (7) and the map (8). (Jason)
 - 2026-11-04: Pirates not killing traders is left untuned for now (they lose to time and the Manifest's toughness; see weapons.md). (Jason)
 - 2026-11-04: Flight after the playtest: gravity and orbits off by default, kept as admin rules; the ship turns to the mouse (Flatspace's gyro cursor), left button fires, right button chooses; thrust only where the nose points by default (manoeuvring speed 0%); shields leave the stern open (the drive fires through it), bastion mode for big ships later. Fuel waits. Multiplayer slice parked until Jason's brother can play. (Jason)
@@ -337,6 +339,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): **released 0.11.0** (release commit "feat: release ship systems (v0.11.0)"): 6f, plus more ammunition, gun and ammunition names on weapon tiles, and market prices refreshed on load. Jason played it and started a new game; his only feedback was the ammunition amount, now raised. Electronic warfare moved to law (7). Next: a mining design pass; Jason wants depth (field scans, rock scans, blasting, lasers, tractor or drone collection, new ships).
 
 - 2026-11-04, lead (Lead 3): 6f stage 4: the tractor and the afterburner are modules (`stepLoot` reads each ship's tractor reach and pull; the afterburner lifts speed and thrust while `ShipInput.afterburner` is held and burns capacitor), and the activation tiles (`activationSlots`, `ShipInput.toggleModule`, `Ship.switchedOn`, `Ship.afterburning`; keys 1 to 9 replace the fire-group keys, Shift is the afterburner). `TRACTOR_RANGE` and `TRACTOR_PULL_SPEED` are gone. 333 sim and 25 client tests; play checked: tile 2 switches the tractor on, Shift burns. **For the interface workstream:** the tile row and the afterburner chip in `flight-hud.ts` are stopgaps to replace; the keys are in `bindings.ts`. 6f is built except electronic warfare.
 

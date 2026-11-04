@@ -4,16 +4,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-04
+
+Milestone 6f, ship systems: everything a ship does comes from something fitted, in slots budgeted by hull class. (Release commit recorded in `docs/coordination.md`.)
+
 ### Added
 - Ship systems: a flight computer, a pod bay and fire control are fitted systems. No flight computer means manual flight with no assist or mouse steering; a better one turns and settles faster. No pod bay means losing your ship leaves you with nothing. Fire control decides how many swivels you can run and how fast they track.
 - Slots by hull class: weapon, utility (active kit) and internal (passive kit) slots, with any gun or swivel in any weapon slot.
 - The tractor beam is a module (the starter has one); the afterburner is a module, held on Shift.
 - Numbered tiles on the HUD: 1 to 9 select fire groups and switch modules.
+- Weapon tiles name the gun and the ammunition it needs, so an empty gun says what to buy.
 
 ### Changed
 - More ammunition: bigger boxes (rounds 100, shells 20, charges 40, missiles 8, chaff and flares 12) and bigger magazines, cheaper per shot. Boxes already in your hold count at the new size.
 - Armour fits internal slots; dispensers utility slots.
-- Save format version 6: saves upgrade automatically, with the new systems fitted free.
+- Station prices refresh from the game's data when a save loads, so rebalanced prices reach old saves.
+- Save format version 6: saves upgrade automatically, with the new systems fitted free (a tractor too; an afterburner is a purchase).
+
+### Known
+- Electronic warfare is not built yet; it comes with law.
+- NPCs do not use afterburners.
+- The tile row and afterburner chip are plain stopgaps until the interface workstream's versions.
+- Module names for the new systems are provisional until the lore pass.
 
 ## [0.10.0] - 2026-11-04
 
