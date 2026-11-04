@@ -1,5 +1,5 @@
 import { thinkNpcs } from './ai/index.js';
-import { applyDamage, fireWeapons, regenerateShield, stepProjectiles, type Damage } from './combat.js';
+import { applyDamage, fireWeapons, rechargeCapacitor, regenerateShield, stepProjectiles, type Damage } from './combat.js';
 import { asteroidStates } from './asteroids.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
@@ -13,6 +13,24 @@ import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
 import type { Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
+
+/** Boxes of each ammunition an NPC keeps aboard. */
+const NPC_AMMO_BOXES = 4;
+
+/**
+ * An NPC ship at a dock with full magazines and its boxes of ammunition.
+ * Traders and the Watch pay for this off-screen; it is not a market trade.
+ */
+function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): Ship {
+  let hold = ship.hold;
+  const weapons = ship.weapons.map((w) => {
+    const spec = stats.weapons[w.mountId];
+    if (!spec?.ammo) return w;
+    if ((hold[spec.ammo] ?? 0) < NPC_AMMO_BOXES) hold = { ...hold, [spec.ammo]: NPC_AMMO_BOXES };
+    return w.loaded < spec.magazine ? { ...w, loaded: spec.magazine, reloadTicks: 0 } : w;
+  });
+  return hold === ship.hold && weapons.every((w, i) => w === ship.weapons[i]) ? ship : { ...ship, hold, weapons };
+}
 
 /**
  * Advance the world by exactly one fixed tick.
@@ -119,16 +137,26 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       targeted = { ...targeted, weaponsHot: !targeted.weaponsHot };
       events.push({ type: 'weaponsHotChanged', shipId: id, hot: targeted.weaponsHot });
     }
+    // Fire groups: a number key picks which fixed guns Space fires.
+    if (input.selectGroup !== null && input.selectGroup !== targeted.fireGroup && input.selectGroup >= 1 && input.selectGroup <= 4) {
+      targeted = { ...targeted, fireGroup: input.selectGroup };
+      events.push({ type: 'fireGroupChanged', shipId: id, group: input.selectGroup });
+    }
+
     const aimer = targeted;
-    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId);
+    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId, world);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
+    events.push(...fired.events);
 
-    ship = regenerateShield(fired.ship, stats, world.dt);
+    // The reactor refills the capacitor; shields recharge from it.
+    ship = regenerateShield(rechargeCapacitor(fired.ship, stats, world.dt), stats, world.dt);
     if (ship.state === 'docked') {
-      // Stations repair docked ships: shields at once, structure over time.
+      // Stations repair docked ships: shields and capacitor at once, structure over time.
       const structure = Math.min(stats.structure, ship.structure + DOCK_REPAIR_PER_SECOND * world.dt);
-      ship = { ...ship, shield: stats.shield, structure };
+      ship = { ...ship, shield: stats.shield, structure, capacitor: stats.capacitor };
+      // NPC crews restock their guns at the dock (their contracts cover it); pilots buy their own.
+      if (world.npcs[id]) ship = restockNpc(ship, stats, world);
     }
     // Docked ships ride their pads to where the station now is.
     ships[id] = ridePad({ ...ship, tractorActive: input.tractor && ship.state === 'flying' }, stationsNext);
@@ -152,7 +180,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   for (const d of damage) {
     const target = ships[d.shipId];
     if (!target || target.structure <= 0) continue;
-    ships[d.shipId] = applyDamage(target, shipStats(world, target), d.amount, world.dt);
+    ships[d.shipId] = applyDamage(target, shipStats(world, target), d.amount, world.dt, d.type);
     killers[d.shipId] = d.by;
     events.push({ type: 'damaged', shipId: d.shipId, by: d.by, amount: d.amount, cause: d.cause });
 

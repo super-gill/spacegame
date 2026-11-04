@@ -70,6 +70,9 @@ export function harbourStation(): Station {
       machinery: { ask: 78, bid: 66 },
       medicine: { ask: 55, bid: 47 },
       scrap: { ask: null, bid: 7 },
+      // Ammunition from the free port's dealers.
+      rounds: { ask: 32, bid: 20 },
+      charges: { ask: 44, bid: 28 },
     },
     outfitting: true,
     // Ten pads, sizes mixed so large hulls are never side by side.
@@ -100,6 +103,8 @@ export function ridgeOutpost(): Station {
       machinery: { ask: 112, bid: 98 },
       medicine: { ask: 86, bid: 75 },
       scrap: { ask: null, bid: 9 },
+      // Any Belter can make rounds.
+      rounds: { ask: 24, bid: 16 },
     },
     outfitting: false,
     pads: padRing(70, ['L', 'S', 'M', 'L', 'S', 'M']),
@@ -130,6 +135,10 @@ export function lanternWorks(): Station {
       machinery: { ask: 48, bid: 40 },
       medicine: { ask: 96, bid: 82 },
       scrap: { ask: null, bid: 14 },
+      // A foundry: every kind of ammunition, cheapest here.
+      rounds: { ask: 26, bid: 18 },
+      shells: { ask: 34, bid: 24 },
+      charges: { ask: 38, bid: 26 },
     },
     outfitting: true,
     pads: padRing(70, ['L', 'M', 'S', 'L', 'M', 'S']),

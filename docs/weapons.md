@@ -89,6 +89,20 @@ Hulls get a class on an age-of-sail ladder (`HullSpec.class`), separate from mod
 
 **Lore (lore workstream).** Names for the six guns and the two warheads in each maker's voice; which maker leans to which family; the character of each hull's capacitor; countermeasure brand mixes.
 
+## As built: part 1
+
+Choices the build made (Lead 3, 4 November 2026).
+
+- **Capacitor numbers:** Tern 80 (recharge peak 5/s), Warrant 90 (9/s), Manifest 160 (3/s), Tacet 1,000 (100/s), Ark 15 (1/s). Recharge follows EVE's curve: peak at about a quarter full, slowing to zero at full. Shield recharge spends 0.4 capacitor per shield point. Full-size radars, computers and nav computers drain 0.1 to 1.0 per second.
+- **Ammunition is boxed:** one unit of the good is a box (rounds 20, shells 4, charges 10), so a hold of 20 is not spent on bullets. Guns reload whole boxes from the hold over 3 to 6 seconds; a new pilot gets three boxes with the Tern. Harbour and the Ridge sell rounds, Lantern Works everything, and NPC crews restock at the dock off-screen.
+- **Guns:** the six families in S, M and L from one base profile each, doubling damage and capacitor per size. Today's fits map in: the Fairshot is a pulse laser (1.6 capacitor a shot), the Picket an autocannon on rounds, the Watchman and Sentry swivels on rounds (a Bulwark L exists). Lore names on the modules; the pulse, beam, blaster and railgun lines have no fits yet.
+- **Resistances:** shields stop 30 to 35% thermal, 10% kinetic, nothing from fragmentation; armour stops 25 to 30% kinetic, 35 to 40% fragmentation, 5% thermal. Layered defences take the stronger value, not the sum.
+- **Toughness went up about two and a half times** (hull structure, shield and armour modules) so a fight lasts long enough for the capacitor to matter. A new pilot flying straight at the raider wins in 8 to 15 seconds, runs the Tern's capacitor dry once, and limps home; pacing fire wins faster and cleaner. The raider gained armour. The Warrant keeps its plain damage bonus until missiles (part 2).
+- **Arcs:** the Tern's and Warrant's nose swivels cover 270 degrees (blind astern), the Manifest's single swivel the forward half: pirates learn to come from behind. The Tacet's is all round.
+- **NPC gunnery:** pirates and the Watch hold fire below 15% capacitor and open up again when it recovers; ammunition guns fire while loaded. Traders creep the last stretch into a station at docking speed, so a fast-moving Lantern Works does not run them down.
+- **Fire groups:** keys 1 to 4; every gun starts in group 1. Nothing assigns groups yet beyond that (outfitting, 6d).
+- **Client stopgaps** for the interface workstream: the capacitor fills the dial's inner ring (amber, red when low); weapon tiles show rounds loaded and boxes aboard or CAP, and the fire group; outfitting names the gun types and shows capacitor, recharge, drain and resistances.
+
 ## Later
 
 - A capacitor battery module (fitting polish).

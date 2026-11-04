@@ -52,7 +52,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `step.ts` | The tick, in a fixed order: stations move on rails; NPCs decide; ships dock, move against their local frame, are carried, bounce, fire, recharge, repair, ride pads; rams; projectiles; damage; destruction and departures; loot, wrecks, spawners |
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
 | `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
-| `weapons.ts` | Weapon catalogue (data) |
+| `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the swivel, each with capacitor cost, ammunition good and damage type |
 | `goods.ts` | Goods catalogue (data) |
 | `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |
 | `trade.ts` | Price source interface and scripted prices, cargo space used, buy and sell commands |

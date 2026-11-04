@@ -46,6 +46,12 @@ export interface MountPoint {
   /** Bearing the mount points along, radians, relative to the nose. */
   facing: number;
   services: MountService[];
+  /**
+   * Weapon mounts only: the arc a turreted weapon here can slew through,
+   * radians, centred on `facing`. Absent means all round. A fixed weapon
+   * fires along `facing` whatever the arc.
+   */
+  arc?: number;
 }
 
 export type RaceId = 'halcyon' | 'kessari' | 'freeBelt' | 'vael' | 'oru' | 'drifter' | 'aurel';
@@ -59,6 +65,31 @@ export interface ManufacturerSpec {
 
 /** The industry a hull is built for. Grows as industries arrive. */
 export type HullRole = 'civilian' | 'combat' | 'transport' | 'development';
+
+/**
+ * A hull's class on the age-of-sail ladder (docs/weapons.md, "Hull
+ * classes"). About role and scale, separate from module size, which is
+ * what fits a mount. Merchantmen (trade, passengers) and hulks
+ * (industry) come at any size; the Aurel are outside the ladder.
+ */
+export type HullClass = 'pod' | 'cutter' | 'sloop' | 'brig' | 'frigate' | 'lineShip' | 'capital' | 'merchantman' | 'hulk' | 'aurel';
+
+/**
+ * What a shot does its damage as. Defences resist each type differently
+ * (`ModuleSpec.resists`). Rounds and slugs are kinetic, lasers and plasma
+ * thermal, warheads explosive or fragmentation.
+ */
+export type DamageType = 'kinetic' | 'thermal' | 'explosive' | 'fragmentation';
+
+/** Fraction of each damage type a defence stops, 0 to 1. Missing types resist nothing. */
+export type Resistances = Partial<Record<DamageType, number>>;
+
+/**
+ * A weapon family (docs/weapons.md). Each has a character, and hulls
+ * carry bonuses to one. `pointDefence` is the swivels: multi-role
+ * turreted guns, worse than a fixed gun of their size at everything.
+ */
+export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence';
 
 /**
  * The module stats that add up across a fit. Each module contributes some
@@ -139,6 +170,14 @@ export interface ModuleSpec {
   weaponId?: string;
   /** Targeting computers only: what a lock shows (see `ReadoutKind`). */
   readouts?: ReadoutKind[];
+  /** Shield generators and armour: what they stop of each damage type. */
+  resists?: Resistances;
+  /**
+   * Steady capacitor draw while running, units per second, charged only
+   * when the module is the full size of its mount (docs/weapons.md, "The
+   * capacitor"). Radars and computers; zero or absent for the rest.
+   */
+  capacitorDraw?: number;
 }
 
 /**
@@ -184,6 +223,15 @@ export interface HullSpec {
   maxSpeed: number;
   /** Hard spin limit, rad/s, enforced in every flight mode. */
   maxTurnRate: number;
+  /** Where the hull sits on the age-of-sail ladder. */
+  class: HullClass;
+  /**
+   * The capacitor: the pool of energy the hull's design holds (units) and
+   * how fast the reactor refills it from empty (units per second at
+   * peak). A hull property: the shipwright's expertise, like structure.
+   */
+  capacitor: number;
+  capacitorRecharge: number;
   /**
    * How big the hull looks to sensors, units. Lock time against this hull
    * goes with the square root of LOCK_REFERENCE_SIGNATURE over it: big,
@@ -261,12 +309,22 @@ export interface ShipStats {
   navHorizon: number;
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
+  /** Capacitor pool and peak recharge, from the hull. */
+  capacitor: number;
+  capacitorRecharge: number;
+  /** Steady capacitor drain from full-size active sensors, units per second. */
+  capacitorDraw: number;
+  /** What the fitted shield generator stops of each damage type. */
+  shieldResists: Resistances;
+  /** What the fitted armour stops of each damage type, applied to structure damage. */
+  armourResists: Resistances;
 }
 
 /**
  * A tradeable good. Data only. Cargo adds `unitMass` per unit to the
  * ship's mass, so a loaded ship accelerates, turns and stops more slowly,
- * and rams harder.
+ * and rams harder. Ammunition is a good too: `ammo` says what a round
+ * does when a gun that loads it fires.
  */
 export interface GoodSpec {
   id: string;
@@ -274,6 +332,12 @@ export interface GoodSpec {
   unitMass: number;
   /** Reference price; station prices are set around it. */
   basePrice: number;
+  /**
+   * Ammunition only: one unit of the good is a box of `perUnit` rounds,
+   * the damage type (null: the gun's own) and a multiplier on the gun's
+   * damage. Guns load whole boxes.
+   */
+  ammo?: { perUnit: number; damageType: DamageType | null; damage: number };
 }
 
 /**
@@ -304,9 +368,22 @@ export interface WeaponSpec {
   id: string;
   name: string;
   kind: WeaponKind;
+  family: WeaponFamily;
   size: ModuleSize;
-  /** Damage per projectile. */
+  /** Damage per projectile. For ammunition-fed guns, the round may scale it. */
   damage: number;
+  /** What the damage is done as. Ammunition-fed guns take the round's type instead. */
+  damageType: DamageType;
+  /** Capacitor spent per shot. Zero for projectile guns and launchers. */
+  capacitorPerShot: number;
+  /**
+   * The good this gun loads, or null for an energy gun. Rounds come from
+   * the hold; `magazine` is how many a weapon holds at once and `reloadSeconds`
+   * how long a reload from the hold takes.
+   */
+  ammo: string | null;
+  magazine: number;
+  reloadSeconds: number;
   /** Seconds between shots. */
   fireInterval: number;
   /** Projectile speed relative to the firing ship, units/s. */
@@ -323,6 +400,12 @@ export interface WeaponState {
   mountId: string;
   /** Ticks until it can fire again. */
   cooldownTicks: number;
+  /** Rounds loaded now. Always full for energy guns. */
+  loaded: number;
+  /** Ticks left on a reload in progress, or 0. */
+  reloadTicks: number;
+  /** Fire group, 1 to 4. Space fires the selected group. */
+  group: number;
   /** World bearing the weapon points along, radians. Fixed weapons follow the heading. */
   aim: number;
   /**
@@ -353,6 +436,7 @@ export interface Projectile {
   position: Vec2;
   velocity: Vec2;
   damage: number;
+  damageType: DamageType;
   ticksLeft: number;
 }
 
@@ -481,6 +565,10 @@ export interface Ship {
    * weapons are hot, once it is complete. Always names one of `locks`.
    */
   activeLock: string | null;
+  /** Capacitor level now, 0 to `ShipStats.capacitor`. */
+  capacitor: number;
+  /** The fire group Space fires, 1 to 4. */
+  fireGroup: number;
   /** Turrets fire on their own at the active lock only while this is true. Fixed guns ignore it. */
   weaponsHot: boolean;
 }
@@ -656,8 +744,10 @@ export interface ShipInput {
   toggleDock: boolean;
   /** Edge-triggered: switch to the next flight mode. */
   cycleFlightMode: boolean;
-  /** Fire every fixed weapon. */
+  /** Fire every fixed weapon in the selected fire group. */
   fireFixed: boolean;
+  /** Edge-triggered: select this fire group (1 to 4), or null to leave it. */
+  selectGroup: number | null;
   /**
    * Edge-triggered: start locking this ship, or null. Refused (with a
    * `lockRefused` event) beyond sensor range, at max locks, or for a ship
@@ -821,8 +911,13 @@ export type WorldEvent =
   | { type: 'impacted'; shipId: string; bodyId: string; speed: number }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */
   | { type: 'rammed'; shipId: string; by: string; speed: number }
-  /** A ship took damage. `by` is the ship responsible, or null for a station hull. */
+  /** A ship took damage (after resistances). `by` is the ship responsible, or null for a station hull. */
   | { type: 'damaged'; shipId: string; by: string | null; amount: number; cause: DamageCause }
+  /** A weapon ran dry: no rounds loaded and none in the hold. */
+  | { type: 'outOfAmmo'; shipId: string; mountId: string }
+  /** The capacitor is empty and an energy weapon could not fire. */
+  | { type: 'capacitorEmpty'; shipId: string }
+  | { type: 'fireGroupChanged'; shipId: string; group: number }
   /** A ship was destroyed. `by` is the ship responsible, or null. */
   | { type: 'destroyed'; shipId: string; by: string | null }
   | { type: 'lootCollected'; shipId: string; item: string; amount: number }

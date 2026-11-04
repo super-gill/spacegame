@@ -56,6 +56,8 @@ interface WeaponTile {
   root: HTMLDivElement;
   reload: SVGPathElement;
   state: HTMLSpanElement;
+  /** What the gun runs on: rounds loaded and boxes aboard, or CAP. */
+  ammo: HTMLSpanElement;
 }
 
 export class FlightHud {
@@ -68,6 +70,7 @@ export class FlightHud {
   private readonly cluster = el('div', 'hud-cluster');
   private readonly prompt = el('div', 'hud-prompt');
   private readonly shieldArc = svg('path', { class: 'ring shield' });
+  private readonly capArc = svg('path', { class: 'ring cap' });
   private readonly hullArc = svg('path', { class: 'ring hull' });
   private readonly speed = svg('text', { x: MID, y: MID + 8, class: 'dial-speed', 'text-anchor': 'middle' });
   private readonly speedUnit = svg('text', { x: MID, y: MID + 26, class: 'dial-unit', 'text-anchor': 'middle' });
@@ -98,9 +101,9 @@ export class FlightHud {
       this.shieldArc,
       track(HULL_R),
       this.hullArc,
-      // Reserved for the capacitor (milestone 6e): drawn empty so the
-      // dial keeps its shape when it arrives.
+      // The capacitor (6e): the inner ring fills with the pool.
       svg('circle', { cx: MID, cy: MID, r: CAP_R, class: 'ring capacitor' }),
+      this.capArc,
       this.speed,
       this.speedUnit,
       this.shieldLabel,
@@ -163,6 +166,9 @@ export class FlightHud {
     const shieldF = fraction(ship.shield, stats.shield);
     const hullF = fraction(ship.structure, stats.structure);
     setAttr(this.shieldArc, 'd', arcPath(MID, MID, SHIELD_R, shieldF, RING_START, RING_SWEEP));
+    const capF = fraction(ship.capacitor, stats.capacitor);
+    setAttr(this.capArc, 'd', arcPath(MID, MID, CAP_R, capF, RING_START, RING_SWEEP));
+    this.capArc.classList.toggle('low', capF < 0.2);
     setAttr(this.hullArc, 'd', arcPath(MID, MID, HULL_R, hullF, RING_START, RING_SWEEP));
     const hullState = hullF < HULL_ALARM ? 'ring hull alarm' : hullF < HULL_CAUTION ? 'ring hull caution' : 'ring hull';
     setAttr(this.hullArc, 'class', hullState);
@@ -203,9 +209,22 @@ export class FlightHud {
       const state = ship.weapons.find((w) => w.mountId === mountId);
       const progress = state ? reloadProgress(state.cooldownTicks, spec.fireInterval, world.dt) : 1;
       setAttr(tile.reload, 'd', progress < 1 ? arcPath(14, 14, 12, progress, -90, 360) : '');
+      // Stopgap (lead, 6e): what the gun runs on. Rounds loaded and boxes
+      // in the hold for ammunition guns; the fire group for fixed guns.
+      if (spec.ammo && state) {
+        const boxes = ship.hold[spec.ammo] ?? 0;
+        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded} · ${boxes} BOX`);
+        tile.ammo.classList.toggle('low', state.loaded === 0 && boxes === 0);
+      } else {
+        setText(tile.ammo, spec.capacitorPerShot > 0 ? 'CAP' : '');
+      }
       if (spec.kind === 'turret') {
         setText(tile.state, engaging ? 'ENGAGING' : ship.weaponsHot ? 'AUTO' : 'COLD');
         tile.root.classList.toggle('active', engaging);
+      } else {
+        const inGroup = state?.group === ship.fireGroup;
+        setText(tile.state, inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`);
+        tile.root.classList.toggle('active', inGroup);
       }
     }
   }
@@ -223,8 +242,9 @@ function weaponTile(kind: 'fixed' | 'turret', name: string): WeaponTile {
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', kind === 'fixed' ? 'FIXED' : 'TURRET');
+  const label = el('span', 'hud-weapon-kind', kind === 'fixed' ? 'FIXED' : 'SWIVEL');
   const state = el('span', 'hud-weapon-key', kind === 'fixed' ? 'SPACE' : 'COLD');
-  root.append(icon, label, state);
-  return { root, reload, state };
+  const ammo = el('span', 'hud-weapon-ammo', '');
+  root.append(icon, label, state, ammo);
+  return { root, reload, state, ammo };
 }

@@ -91,10 +91,22 @@ const fixed1 = (n: number): string => (Math.round(n * 10) / 10).toString();
 export function moduleType(m: ModuleSpec, world: World): string {
   if (m.kind === 'weapon') {
     const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
-    return w?.kind === 'turret' ? 'Turret' : 'Fixed gun';
+    if (!w) return 'Weapon';
+    if (w.kind === 'turret') return 'Swivel';
+    return WEAPON_NAMES[w.id.replace(/-[sml]$/, '')] ?? 'Fixed gun';
   }
   return MODULE_TYPE_NAME[m.kind];
 }
+
+/** Plain names for the gun types, by weapon id stem. */
+const WEAPON_NAMES: Record<string, string> = {
+  autocannon: 'Autocannon',
+  artillery: 'Artillery',
+  'pulse-laser': 'Pulse laser',
+  'beam-laser': 'Beam laser',
+  blaster: 'Blaster',
+  railgun: 'Railgun',
+};
 
 const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = {
   engine: 'Engine',
@@ -128,7 +140,13 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
-  if (w) parts.push(`${w.kind} ${fixed1(weaponDps(w))} dps, range ${w.range}`);
+  if (w) {
+    parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
+    if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
+    if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
+  }
+  if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
+  if (m.capacitorDraw) parts.push(`draws ${fixed1(m.capacitorDraw)} cap/s at full size`);
   return parts.join('; ');
 }
 
@@ -170,6 +188,9 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Sensor range', value: (s) => s.sensorRange, format: (n) => (n > 0 ? `${n} u` : 'blind'), better: 'higher' },
   { label: 'Locks', value: (s) => s.maxLocks, format: (n) => String(n), better: 'higher' },
   { label: 'Lock speed', value: (s) => s.scanResolution, format: (n) => (n > 0 ? `${fixed1(n)}x` : 'none'), better: 'higher' },
+  { label: 'Capacitor', value: (s) => s.capacitor, format: (n) => String(Math.round(n)), better: 'higher' },
+  { label: 'Cap recharge', value: (s) => s.capacitorRecharge, format: (n) => `${fixed1(n)}/s`, better: 'higher' },
+  { label: 'Cap drain', value: (s) => s.capacitorDraw, format: (n) => `${fixed1(n)}/s`, better: 'lower' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
   { label: 'Fixed dps', value: (s) => dps(s, 'fixed'), format: fixed1, better: 'higher' },
   { label: 'Turret dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },

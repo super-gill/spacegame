@@ -57,6 +57,8 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
     hold: { ...(o.hold ?? {}) },
     locks: [],
     activeLock: null,
+    capacitor: stats.capacitor,
+    fireGroup: 1,
     weaponsHot: false,
   };
 }

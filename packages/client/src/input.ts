@@ -15,7 +15,7 @@ import { KEY_BINDINGS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bi
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut']);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', 'group1', 'group2', 'group3', 'group4']);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {
@@ -39,6 +39,8 @@ export class InputController {
 
   /** Target change to send with the next sample, or null for no change. */
   private pendingLock: Pick<ShipInput, 'lock' | 'unlock' | 'activateLock'> = { lock: null, unlock: null, activateLock: null };
+  /** Fire group to select with the next sample, or null. */
+  private pendingGroup: number | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -70,6 +72,11 @@ export class InputController {
     this.pendingLock = { ...this.pendingLock, activateLock: id };
   }
 
+  /** Select a fire group on the next tick. */
+  requestGroup(group: number): void {
+    this.pendingGroup = group;
+  }
+
   /** Drop the lock on a ship, on the next tick. */
   requestUnlock(id: string): void {
     this.pendingLock = { ...this.pendingLock, unlock: id };
@@ -90,10 +97,12 @@ export class InputController {
       fireFixed: this.held.has('fireFixed'),
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
       ...this.pendingLock,
+      selectGroup: this.pendingGroup,
       tractor: this.held.has('tractor'),
     };
     this.latched.clear();
     this.pendingLock = { lock: null, unlock: null, activateLock: null };
+    this.pendingGroup = null;
     return input;
   }
 

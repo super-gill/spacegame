@@ -60,6 +60,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       c1: 'slagline-thrusters-m',
       c2: 'meridian-reactor-s',
       i1: 'meridian-shield-s',
+      u1: 'rookrivet-armour-s',
       b1: 'meridian-pod-s',
     },
   },

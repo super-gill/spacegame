@@ -752,6 +752,27 @@ button:hover {
   stroke-dasharray: 6 4;
 }
 
+.hud-dial .ring.cap {
+  stroke: var(--warn);
+  stroke-width: 5;
+}
+
+.hud-dial .ring.cap.low {
+  stroke: var(--alarm);
+}
+
+.hud-weapon-ammo {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  margin-top: 2px;
+}
+
+.hud-weapon-ammo.low {
+  color: var(--alarm);
+}
+
 .dial-speed {
   fill: var(--ink-bright);
   font-size: 30px;

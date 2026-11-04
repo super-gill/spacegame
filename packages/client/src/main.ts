@@ -110,6 +110,10 @@ const input = new InputController(
     else if (action === 'clearTarget') unlockActive();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
+    else if (action === 'group1') input.requestGroup(1);
+    else if (action === 'group2') input.requestGroup(2);
+    else if (action === 'group3') input.requestGroup(3);
+    else if (action === 'group4') input.requestGroup(4);
     else if (action === 'zoomIn') camera.zoomBy(1);
     else if (action === 'zoomOut') camera.zoomBy(-1);
   },

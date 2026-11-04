@@ -87,6 +87,27 @@ function withLocks(ship: Ship): Ship {
 }
 
 /**
+ * A ship with 6e's power and guns in place: a full capacitor (the hull's,
+ * from the catalogue), fire group 1, and every weapon's magazine loaded.
+ * Version 5 worlds saved before 6e have none of these.
+ */
+function withPower(ship: Ship): Ship {
+  const hull = HULLS[ship.hullId];
+  const capacitor = typeof ship.capacitor === 'number' ? ship.capacitor : (hull?.capacitor ?? 0);
+  const weapons = (ship.weapons ?? []).map((w) => {
+    const moduleId = ship.fit[w.mountId];
+    const weapon = moduleId ? WEAPONS[MODULES[moduleId]?.weaponId ?? ''] : undefined;
+    return {
+      ...w,
+      loaded: typeof w.loaded === 'number' ? w.loaded : (weapon?.magazine ?? 0),
+      reloadTicks: w.reloadTicks ?? 0,
+      group: w.group ?? 1,
+    };
+  });
+  return { ...ship, capacitor, fireGroup: ship.fireGroup ?? 1, weapons };
+}
+
+/**
  * 0.9.0 makes sensing a fitted system: a hull with no radar sees nothing
  * and one with no targeting computer locks nothing. Ships from version 4
  * had neither (their hulls had built-in sensors), so they are given the
@@ -147,7 +168,7 @@ export function migrate4to5(world: unknown): unknown {
   // a towed ship never takes the pad a docked one was already on.
   const kept = Object.entries(world['ships'])
     .filter(([id, sh]) => isRecord(sh) && npcs[id] === undefined)
-    .map(([, sh]) => ({ ...withSensors(withLocks(sh as unknown as Ship)), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
+    .map(([, sh]) => ({ ...withPower(withSensors(withLocks(sh as unknown as Ship))), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
     .sort((a, b) => Number(b.state === 'docked') - Number(a.state === 'docked') || (a.id < b.id ? -1 : 1));
 
   const ships: Record<string, Ship> = {};
@@ -338,7 +359,8 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   if (!looksLikeWorld(world)) return { ok: false, reason: 'damaged' };
   const savedAt = typeof parsed['savedAt'] === 'string' ? parsed['savedAt'] : '';
   const ships: Record<string, Ship> = {};
-  for (const [id, ship] of Object.entries(world.ships)) ships[id] = withLocks(ship);
+  for (const [id, ship] of Object.entries(world.ships)) ships[id] = withPower(withLocks(ship));
+  const projectiles = world.projectiles.map((p) => ({ ...p, damageType: p.damageType ?? 'kinetic' }));
   // Version 5 worlds saved from main before the Scree had rocks get them now.
   const asteroids = Array.isArray(world.asteroids) ? world.asteroids : screeAsteroids();
   return {
@@ -347,6 +369,7 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
     world: {
       ...world,
       ships,
+      projectiles,
       asteroids,
       hulls: { ...HULLS },
       modules: { ...MODULES },

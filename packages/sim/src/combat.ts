@@ -1,6 +1,6 @@
 import { angleDelta, wrapAngle } from './angle.js';
-import { TURRET_FIRE_TOLERANCE } from './constants.js';
-import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, ShipStats, Station, WeaponState } from './types.js';
+import { SHIELD_CAPACITOR_PER_POINT, TURRET_FIRE_TOLERANCE } from './constants.js';
+import type { DamageCause, DamageType, HullSpec, MountPoint, Projectile, Ship, ShipInput, ShipStats, Station, WeaponState, World, WorldEvent } from './types.js';
 import type { Carry } from './rails.js';
 import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
@@ -23,6 +23,8 @@ export interface Damage {
   amount: number;
   by: string | null;
   cause: DamageCause;
+  /** What the damage is done as. Impacts are kinetic. */
+  type: DamageType;
 }
 
 function dot(a: Vec2, b: Vec2): number {
@@ -34,22 +36,41 @@ export interface FireResult {
   projectiles: Projectile[];
   /** Ids used, so the caller can advance the world's id counter. */
   idsUsed: number;
+  events: WorldEvent[];
+}
+
+/** The hull-space bearing of a world bearing, for arc checks. */
+function relativeBearing(ship: Ship, worldBearing: number): number {
+  return angleDelta(ship.heading, worldBearing);
+}
+
+/** True if a turret on `mount` can point along `worldBearing`. */
+export function withinArc(ship: Ship, mount: MountPoint, worldBearing: number): boolean {
+  if (mount.arc === undefined || mount.arc >= Math.PI * 2 - 1e-9) return true;
+  const off = angleDelta(mount.facing, relativeBearing(ship, worldBearing));
+  return Math.abs(off) <= mount.arc / 2;
 }
 
 /**
- * Turn turrets, count down cooldowns, and fire.
+ * Turn turrets, count down cooldowns and reloads, and fire.
  *
- * - Fixed weapons fire along the heading when the input asks.
- * - Turrets, while weapons are hot and have a locked target (`targetFor`
- *   gives each weapon's: its assigned lock or the active one), slew towards
- *   the point their shots need to lead to, no faster than their turn
- *   rate, and fire by themselves once within TURRET_FIRE_TOLERANCE of it
- *   and in range. A fast target crossing close by can outrun the slew:
- *   that is turret tracking.
+ * - Fixed weapons fire along the heading when the input asks, if they are
+ *   in the selected fire group.
+ * - Turrets (swivels), while weapons are hot and have a locked target
+ *   (`targetFor` gives each weapon's: its assigned lock or the active
+ *   one), slew towards the point their shots need to lead to, no faster
+ *   than their turn rate and never outside their mount's arc, and fire
+ *   by themselves once within TURRET_FIRE_TOLERANCE of it and in range.
+ *   A fast target crossing close by can outrun the slew: that is turret
+ *   tracking.
+ * - Every shot costs what its family costs (docs/weapons.md): capacitor
+ *   per shot for energy and hybrid guns, a round from the magazine for
+ *   ammunition-fed guns. An empty magazine reloads from the hold over
+ *   `reloadSeconds`; with no rounds in the hold the gun is dry.
  *
  * Each weapon fires as its mount's effective spec in `stats.weapons`, so
  * hull damage bonuses apply. New projectiles start at the hull edge along
- * the weapon's bearing.
+ * the weapon's bearing, carrying the round's damage type.
  */
 export function fireWeapons(
   ship: Ship,
@@ -58,15 +79,22 @@ export function fireWeapons(
   targetFor: (weapon: WeaponState) => Ship | null,
   dt: number,
   nextId: number,
+  world: Pick<World, 'goods' | 'hulls'> = { goods: {}, hulls: {} },
 ): FireResult {
-  if (ship.state !== 'flying') return { ship, projectiles: [], idsUsed: 0 };
+  if (ship.state !== 'flying') return { ship, projectiles: [], idsUsed: 0, events: [] };
 
   const projectiles: Projectile[] = [];
+  const events: WorldEvent[] = [];
   let idsUsed = 0;
+  let capacitor = ship.capacitor;
+  let hold = ship.hold;
+  let capacitorWarned = false;
+  const mounts = world.hulls[ship.hullId]?.mounts ?? [];
 
   const weapons = ship.weapons.map((w) => {
     const spec = stats.weapons[w.mountId];
     if (!spec) return w;
+    const mount = mounts.find((m) => m.id === w.mountId);
 
     let aim = ship.heading;
     let turretReady = false;
@@ -75,32 +103,90 @@ export function fireWeapons(
       const target = ship.weaponsHot ? targetFor(w) : null;
       if (target) {
         const wanted = toAngle(sub(leadPoint(ship, target, spec.projectileSpeed), ship.position));
-        const step = spec.turretTurnRate * dt;
-        aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
-        const onTarget = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE;
-        turretReady = onTarget && distance(ship.position, target.position) <= spec.range;
+        const canReach = !mount || withinArc(ship, mount, wanted);
+        if (canReach) {
+          const step = spec.turretTurnRate * dt;
+          aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
+          const onTarget = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE;
+          turretReady = onTarget && distance(ship.position, target.position) <= spec.range;
+        }
+      }
+    }
+
+    // Reloading: a magazine empties, then refills from the hold over time.
+    let loaded = w.loaded;
+    let reloadTicks = w.reloadTicks;
+    if (spec.ammo) {
+      if (reloadTicks > 0) {
+        reloadTicks--;
+        if (reloadTicks === 0) {
+          // Load whole boxes, as many as fit the magazine (at least one).
+          const perBox = world.goods[spec.ammo]?.ammo?.perUnit ?? 1;
+          const boxes = Math.max(1, Math.min(hold[spec.ammo] ?? 0, Math.floor(spec.magazine / perBox)));
+          const have = hold[spec.ammo] ?? 0;
+          const taken = Math.min(boxes, have);
+          loaded = taken * perBox;
+          const left = have - taken;
+          if (left > 0) hold = { ...hold, [spec.ammo]: left };
+          else {
+            const { [spec.ammo]: _gone, ...rest } = hold;
+            hold = rest;
+          }
+        }
+      } else if (loaded === 0 && (hold[spec.ammo] ?? 0) > 0) {
+        reloadTicks = Math.max(1, Math.round(spec.reloadSeconds / dt));
       }
     }
 
     let cooldownTicks = Math.max(0, w.cooldownTicks - 1);
-    const trigger = spec.kind === 'fixed' ? input.fireFixed : turretReady;
-    if (trigger && cooldownTicks === 0) {
+    const inGroup = spec.kind !== 'fixed' || w.group === ship.fireGroup;
+    const trigger = (spec.kind === 'fixed' ? input.fireFixed && inGroup : turretReady) && cooldownTicks === 0;
+    if (trigger) {
+      // Can it pay for the shot?
+      if (spec.capacitorPerShot > 0 && capacitor < spec.capacitorPerShot) {
+        if (!capacitorWarned) events.push({ type: 'capacitorEmpty', shipId: ship.id });
+        capacitorWarned = true;
+        return { ...w, aim, cooldownTicks, loaded, reloadTicks };
+      }
+      if (spec.ammo && loaded === 0) {
+        if (reloadTicks === 0) events.push({ type: 'outOfAmmo', shipId: ship.id, mountId: w.mountId });
+        return { ...w, aim, cooldownTicks, loaded, reloadTicks };
+      }
+      capacitor -= spec.capacitorPerShot;
+      const round = spec.ammo ? world.goods[spec.ammo]?.ammo : undefined;
+      if (spec.ammo) loaded--;
       const dir = fromAngle(aim);
       projectiles.push({
         id: `p${nextId + idsUsed}`,
         ownerShipId: ship.id,
         position: add(ship.position, scale(dir, stats.radius + 2)),
         velocity: add(ship.velocity, scale(dir, spec.projectileSpeed)),
-        damage: spec.damage,
+        damage: spec.damage * (round?.damage ?? 1),
+        damageType: round?.damageType ?? spec.damageType,
         ticksLeft: Math.round(spec.range / spec.projectileSpeed / dt),
       });
       idsUsed++;
       cooldownTicks = Math.round(spec.fireInterval / dt);
     }
-    return { ...w, aim, cooldownTicks };
+    return { ...w, aim, cooldownTicks, loaded, reloadTicks };
   });
 
-  return { ship: { ...ship, weapons }, projectiles, idsUsed };
+  return { ship: { ...ship, weapons, capacitor, hold }, projectiles, idsUsed, events };
+}
+
+/**
+ * The capacitor refills from the reactor each tick, fastest when it is
+ * low (as in EVE: peak rate at about a quarter full, slowing towards
+ * full), less the steady drain of full-size active sensors.
+ */
+export function rechargeCapacitor(ship: Ship, stats: ShipStats, dt: number): Ship {
+  if (stats.capacitor <= 0) return ship.capacitor === 0 ? ship : { ...ship, capacitor: 0 };
+  const fraction = Math.max(0, Math.min(1, ship.capacitor / stats.capacitor));
+  // EVE's curve: rate = peak * (sqrt(f) - f) * 2 ... normalised so the peak is `capacitorRecharge`.
+  const shape = Math.sqrt(fraction) - fraction;
+  const rate = stats.capacitorRecharge * shape * 4 + (fraction < 0.02 ? stats.capacitorRecharge * 0.5 : 0);
+  const next = Math.max(0, Math.min(stats.capacitor, ship.capacitor + (rate - stats.capacitorDraw) * dt));
+  return next === ship.capacitor ? ship : { ...ship, capacitor: next };
 }
 
 /**
@@ -173,7 +259,7 @@ export function stepProjectiles(
     }
 
     if (hitShip) {
-      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon' });
+      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType });
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;
@@ -183,10 +269,14 @@ export function stepProjectiles(
   return { projectiles: survivors, damage };
 }
 
-/** Apply damage to shields first, then structure. Resets the shield recharge delay. */
-export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: number): Ship {
-  const toShield = Math.min(ship.shield, amount);
-  const toStructure = amount - toShield;
+
+/** What a hit of `amount` of `type` does to a ship: shields first through shield resistances, then structure through armour's. */
+export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: number, type: DamageType = 'kinetic'): Ship {
+  const shieldHit = amount * (1 - (stats.shieldResists[type] ?? 0));
+  const toShield = Math.min(ship.shield, shieldHit);
+  // Whatever the shield did not stop goes on, in raw terms, to the hull.
+  const through = shieldHit > 0 ? amount * (1 - toShield / shieldHit) : amount;
+  const toStructure = through * (1 - (stats.armourResists[type] ?? 0));
   return {
     ...ship,
     shield: ship.shield - toShield,
@@ -195,11 +285,19 @@ export function applyDamage(ship: Ship, stats: ShipStats, amount: number, dt: nu
   };
 }
 
-/** Count down the recharge delay, then recharge shields towards full. */
+/**
+ * Count down the recharge delay, then recharge shields towards full,
+ * drawing SHIELD_CAPACITOR_PER_POINT from the capacitor for every point
+ * restored. With the capacitor empty, shields stay down.
+ */
 export function regenerateShield(ship: Ship, stats: ShipStats, dt: number): Ship {
   if (ship.shieldDelayTicks > 0) return { ...ship, shieldDelayTicks: ship.shieldDelayTicks - 1 };
   if (ship.shield >= stats.shield) return ship;
-  return { ...ship, shield: Math.min(stats.shield, ship.shield + stats.shieldRegen * dt) };
+  const wanted = Math.min(stats.shield - ship.shield, stats.shieldRegen * dt);
+  const affordable = stats.capacitor > 0 ? Math.min(wanted, ship.capacitor / SHIELD_CAPACITOR_PER_POINT) : wanted;
+  if (affordable <= 0) return ship;
+  const cost = stats.capacitor > 0 ? affordable * SHIELD_CAPACITOR_PER_POINT : 0;
+  return { ...ship, shield: ship.shield + affordable, capacitor: ship.capacitor - cost };
 }
 
 /** Damage from a change in velocity in an impact. Zero below the safe delta-v. */

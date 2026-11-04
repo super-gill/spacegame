@@ -66,7 +66,7 @@ describe('the Scree', () => {
     const rock = asteroidPositions(w)[0]!;
     const out = normalise(rock.position);
     const from = add(rock.position, scale(out, rock.radius + 100));
-    w = { ...w, projectiles: [{ id: 'p1', ownerShipId: 'x', position: from, velocity: scale(out, -600), damage: 10, ticksLeft: 120 }] };
+    w = { ...w, projectiles: [{ id: 'p1', ownerShipId: 'x', position: from, velocity: scale(out, -600), damage: 10, damageType: 'kinetic', ticksLeft: 120 }] };
     for (let i = 0; i < 30; i++) w = stepWorld(w, {});
     expect(w.projectiles).toEqual([]);
   });

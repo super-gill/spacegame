@@ -3,7 +3,7 @@ import { CARGO_SURVIVAL_FRACTION, FIXED_DT, STARTING_CREDITS } from '../constant
 import { cargoMass, shipStats } from '../stats.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { stepWorld } from '../step.js';
-import { buyGood, cargoFree, maxBuyable, sellGood, type PriceSource } from '../trade.js';
+import { buyGood, cargoFree, cargoUsed, maxBuyable, sellGood, type PriceSource } from '../trade.js';
 import type { World } from '../types.js';
 import { length } from '../vec2.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
@@ -117,9 +117,9 @@ describe('buying and selling', () => {
   });
 
   it('maxBuyable is limited by credits and by space', () => {
-    const { w } = dockedAt(HARBOUR);
+    const { w, me } = dockedAt(HARBOUR);
     expect(maxBuyable(w, 'ana', 'machinery')).toBe(Math.floor(STARTING_CREDITS / 78)); // 12, credits bind
-    expect(maxBuyable(w, 'ana', 'food')).toBe(starter.cargoCapacity); // 20, space binds
+    expect(maxBuyable(w, 'ana', 'food')).toBe(starter.cargoCapacity - cargoUsed(w.ships[me]!)); // space binds: the Registry's boxes of rounds take some
     expect(maxBuyable(w, 'ana', 'scrap')).toBe(0);
   });
 

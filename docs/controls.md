@@ -26,6 +26,7 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
+| Fire group | 1, 2, 3, 4 | Space fires the fixed guns in the selected group; a new gun joins group 1. Swivels need no group |
 | Lock a ship | Left click on it | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |

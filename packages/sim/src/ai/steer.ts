@@ -183,6 +183,29 @@ export function awayFromStation(world: Pick<World, 'bodies' | 'tick' | 'dt'>, sh
   return dot(out, upward) < 0 ? normalise(add(out, scale(upward, 2))) : out;
 }
 
+/**
+ * Gunnery discipline for NPCs with fixed guns (docs/weapons.md): fire
+ * only when the gun can pay. An energy gun holds fire once the capacitor
+ * is under a reserve, then opens up again when it has recovered, so an
+ * NPC fights in bursts like a pilot who watches the ring instead of
+ * clicking on an empty pool. An ammunition gun fires whenever loaded.
+ */
+export function canAfford(ship: Ship, stats: ShipStats, gun: { capacitorPerShot: number; ammo: string | null }, mountId: string): boolean {
+  if (gun.ammo) {
+    const state = ship.weapons.find((w) => w.mountId === mountId);
+    return !!state && state.loaded > 0;
+  }
+  if (gun.capacitorPerShot <= 0 || stats.capacitor <= 0) return true;
+  const fraction = ship.capacitor / stats.capacitor;
+  // Hysteresis: below the floor, wait until back above the ceiling.
+  const state = ship.weapons.find((w) => w.mountId === mountId);
+  const resting = state ? state.cooldownTicks === 0 && ship.capacitor < gun.capacitorPerShot * 2 : false;
+  return !resting && fraction > GUNNERY_RESERVE;
+}
+
+/** NPCs stop firing energy guns below this fraction of the capacitor, keeping some for shields. */
+const GUNNERY_RESERVE = 0.15;
+
 /** Gravity where the ship is, for steering. */
 export function pullOn(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship): Vec2 {
   return gravityAt(world.bodies, bodyStates(world.bodies, railTime(world.tick, world.dt)), ship.position);

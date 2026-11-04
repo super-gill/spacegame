@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, awayFromStation, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, awayFromStation, canAfford, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -137,14 +137,15 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       // Fight round stations, rocks and bodies, not through them.
       const waypoint = routeAround(ship, stats, hold, around);
       const desired = add(t.velocity, travelVelocity(ship, stats, waypoint, hold, stats.maxSpeed));
-      const gun = Object.values(stats.weapons).find((w) => w.kind === 'fixed');
+      const gunMount = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed');
+      const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
       const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...lockInput };
       input.toggleWeaponsHot = !ship.weaponsHot;
       if (gun && isLocked(ship, t.id)) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * WATCH_TUNING.rangeFraction;
-        input.fireFixed = aimError <= WATCH_TUNING.aimTolerance && inRange && !bystanderInLine(world, ship, t, gun.range);
+        input.fireFixed = aimError <= WATCH_TUNING.aimTolerance && inRange && !bystanderInLine(world, ship, t, gun.range) && canAfford(ship, stats, gun, gunMount![0]);
       }
       return { input, brain: b, events };
     }

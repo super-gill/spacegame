@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
+import { arriveVelocity, canAfford, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -188,13 +188,14 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       const desired = add(t.velocity, closing);
 
       // Point the nose where the shots need to go, and fire when it is there.
-      const gun = Object.values(stats.weapons).find((w) => w.kind === 'fixed');
+      const gunMount = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed');
+      const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
       const input = steerSafely(ship, stats, desired, pull, aimPoint);
       if (gun) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
-        input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange;
+        input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange && canAfford(ship, stats, gun, gunMount![0]);
       }
       return { input, brain: b, events };
     }

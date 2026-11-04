@@ -1,5 +1,5 @@
 import { SHIELD_REGEN_DELAY } from './constants.js';
-import type { HullBonus, HullSpec, ModuleSpec, MountPoint, ReadoutKind, Ship, ShipStats, World } from './types.js';
+import type { HullBonus, HullSpec, ModuleSpec, MountPoint, ReadoutKind, Resistances, Ship, ShipStats, World } from './types.js';
 import type { ModuleStat } from './types.js';
 
 /**
@@ -44,6 +44,13 @@ const STAT_KEYS: ModuleStat[] = [
   'navHorizon',
 ];
 
+/** Resistances layered: the stronger of each type wins (two armour plates do not stack). */
+function bestOf(a: Resistances, b: Resistances): Resistances {
+  const out: Resistances = { ...a };
+  for (const [type, value] of Object.entries(b) as [keyof Resistances, number][]) out[type] = Math.max(out[type] ?? 0, value);
+  return out;
+}
+
 /** Whether a hull bonus applies to this module on this mount. */
 export function bonusApplies(bonus: HullBonus, module: ModuleSpec, mount: MountPoint): boolean {
   if (module.size !== mount.size) return false;
@@ -85,6 +92,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   let powerDraw = 0;
   const weapons: ShipStats['weapons'] = {};
   const readouts = new Set<ReadoutKind>();
+  let capacitorDraw = 0;
+  let shieldResists: Resistances = {};
+  let armourResists: Resistances = {};
 
   for (const mount of hull.mounts) {
     const id = fit[mount.id];
@@ -97,6 +107,12 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
       if (value) totals[stat] += value * multiplier(hull, stat, module, mount);
     }
     for (const r of module.readouts ?? []) readouts.add(r);
+    // Only a module the full size of its mount draws on the capacitor (docs/weapons.md).
+    if (module.capacitorDraw && module.size === mount.size) capacitorDraw += module.capacitorDraw;
+    if (module.resists) {
+      if (module.kind === 'shieldGenerator') shieldResists = bestOf(shieldResists, module.resists);
+      if (module.kind === 'armour') armourResists = bestOf(armourResists, module.resists);
+    }
     const weapon = module.weaponId ? cat.weapons[module.weaponId] : undefined;
     if (weapon) weapons[mount.id] = { ...weapon, damage: weapon.damage * multiplier(hull, 'damage', module, mount) };
   }
@@ -125,6 +141,11 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     readouts: READOUT_ORDER.filter((r) => readouts.has(r)),
     navHorizon: totals.navHorizon,
     weapons,
+    capacitor: hull.capacitor,
+    capacitorRecharge: hull.capacitorRecharge,
+    capacitorDraw,
+    shieldResists,
+    armourResists,
   };
 }
 

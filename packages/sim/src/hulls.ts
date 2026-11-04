@@ -20,6 +20,15 @@ function mount(id: string, type: MountType, size: ModuleSize, x: number, y: numb
   return { id, type, size, position: { x, y }, facing, services };
 }
 
+/** A weapon mount with a turret arc: `arc` radians wide, centred on `facing`. */
+function gunMount(id: string, size: ModuleSize, x: number, y: number, services: MountService[], facing: number, arc: number): MountPoint {
+  return { ...mount(id, 'weapon', size, x, y, services, facing), arc };
+}
+
+const FULL_ARC = Math.PI * 2;
+const BROAD_ARC = Math.PI * 1.5; // 270 degrees: a blind spot behind
+const HALF_ARC = Math.PI; // the forward half
+
 function outline(points: ReadonlyArray<readonly [number, number]>): Vec2[] {
   return points.map(([x, y]) => ({ x, y }));
 }
@@ -35,19 +44,23 @@ export const HULLS: Record<string, HullSpec> = {
     role: 'civilian',
     sizeClass: 'S',
     mass: 5,
-    structure: 90,
+    structure: 220,
     price: 1500,
     radius: 18,
     outline: outline([[18, 0], [10, -8], [-12, -10], [-16, -6], [-16, 6], [-12, 10], [10, 8]]),
     maxSpeed: 340,
     maxTurnRate: 2.4, // about 140 degrees per second
     signature: 18,
+    class: 'cutter',
+    // Small pool, steady recovery: never strands a new pilot, never lets them show off.
+    capacitor: 80,
+    capacitorRecharge: 5,
     mounts: [
       mount('n1', 'nav', 'S', -1, 0, ['power']),
       mount('r1', 'radar', 'S', 8, -3, ['power']),
       mount('t1', 'computer', 'S', 8, 3, ['power']),
       mount('w1', 'weapon', 'S', 14, 0, ['power']),
-      mount('w2', 'weapon', 'S', 2, 0, ['power', 'fireControl']),
+      gunMount('w2', 'S', 2, 0, ['power', 'fireControl'], FORWARD, BROAD_ARC),
       mount('e1', 'engine', 'S', -16, 0, ['power'], AFT),
       mount('c1', 'core', 'S', -7, -4, ['power']),
       mount('c2', 'core', 'S', -7, 4, ['power']),
@@ -69,19 +82,23 @@ export const HULLS: Record<string, HullSpec> = {
     sizeClass: 'M',
     price: 6000,
     mass: 12,
-    structure: 110,
+    structure: 300,
     radius: 25,
     outline: outline([[24, 0], [-18.8, -10], [-24, -8.4], [-20.8, 0], [-24, 8.4], [-18.8, 10]]),
     maxSpeed: 320,
     maxTurnRate: 2.2,
     signature: 28,
+    class: 'sloop',
+    // Tight pool, quick recovery: short, sharp exchanges with shields up, then breathe.
+    capacitor: 90,
+    capacitorRecharge: 9,
     mounts: [
       mount('n1', 'nav', 'S', -2, 0, ['power']),
       mount('r1', 'radar', 'S', 15, -2, ['power']),
       mount('t1', 'computer', 'M', 15, 2, ['power']),
       mount('w1', 'weapon', 'M', -5, -4.4, ['power']),
       mount('w2', 'weapon', 'M', -5, 4.4, ['power']),
-      mount('w3', 'weapon', 'S', 8, 0, ['power', 'fireControl']),
+      gunMount('w3', 'S', 8, 0, ['power', 'fireControl'], FORWARD, BROAD_ARC),
       mount('e1', 'engine', 'M', -23, -4, ['power'], AFT),
       mount('e2', 'engine', 'M', -23, 4, ['power'], AFT),
       mount('c1', 'core', 'M', -11, -3, ['power']),
@@ -110,7 +127,7 @@ export const HULLS: Record<string, HullSpec> = {
     sizeClass: 'L',
     price: 9000,
     mass: 18,
-    structure: 220,
+    structure: 520,
     radius: 30,
     outline: outline([
       [27.8, 0], [22.6, -4], [18.2, -4], [18.2, -1.6], [-21.8, -1.6], [-21.8, -4.4], [-24.6, -4.4],
@@ -119,6 +136,10 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 220,
     maxTurnRate: 1.2, // about 70 degrees per second
     signature: 40,
+    class: 'merchantman',
+    // Deep pool, slow recovery: freight reactors are big and lazy.
+    capacitor: 160,
+    capacitorRecharge: 3,
     mounts: [
       mount('n1', 'nav', 'M', 16, 0, ['power']),
       mount('r1', 'radar', 'M', -8, 0, ['power']),
@@ -135,7 +156,8 @@ export const HULLS: Record<string, HullSpec> = {
       mount('c2', 'core', 'M', 20.4, 2, ['power']),
       mount('i1', 'internal', 'M', 24.5, 0, ['power']),
       mount('u1', 'utility', 'M', -23.2, 0, []),
-      mount('w1', 'weapon', 'S', 15, 0, ['power', 'fireControl']),
+      // One swivel forward: a pirate learns to come from behind.
+      gunMount('w1', 'S', 15, 0, ['power', 'fireControl'], FORWARD, HALF_ARC),
     ],
     bonuses: [
       { source: 'role', label: '+25% cargo from full-size containers', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
@@ -157,18 +179,22 @@ export const HULLS: Record<string, HullSpec> = {
     sizeClass: 'S',
     price: 0,
     mass: 5,
-    structure: 100,
+    structure: 260,
     radius: 18,
     outline: outline([[18, 0], [6, -3], [-14, -3], [-10, 0], [-14, 3], [6, 3]]),
     maxSpeed: 350,
     maxTurnRate: 2.4,
     signature: 12,
+    class: 'aurel',
+    // The voice is the power: vast and near-instant. A dev ship, outside balance.
+    capacitor: 1000,
+    capacitorRecharge: 100,
     mounts: [
       mount('n1', 'nav', 'M', -2, 0, ['power']),
       mount('r1', 'radar', 'S', 8, -3, ['power']),
       mount('t1', 'computer', 'S', 8, 3, ['power']),
       mount('w1', 'weapon', 'S', 12, 0, ['power']),
-      mount('w2', 'weapon', 'S', 0, 0, ['power', 'fireControl']),
+      gunMount('w2', 'S', 0, 0, ['power', 'fireControl'], FORWARD, FULL_ARC),
       mount('e1', 'engine', 'S', -8, 0, ['power'], AFT),
       mount('c1', 'core', 'S', -4, -4, ['power']),
       mount('c2', 'core', 'S', -4, 4, ['power']),
@@ -197,6 +223,10 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 180,
     maxTurnRate: 2,
     signature: 8,
+    class: 'pod',
+    // A trickle: enough for the beacon and a little shield.
+    capacitor: 15,
+    capacitorRecharge: 1,
     mounts: [
       mount('n1', 'nav', 'S', -3, 0, ['power']),
       mount('r1', 'radar', 'S', 2, 0, ['power']),

@@ -48,7 +48,7 @@ describe('save round trip', () => {
     if (!r.ok) throw new Error(r.reason);
     const back = load(serializeWorld(r.world, AT));
     expect(back.pilots['ana']!.credits).toBe(r.world.pilots['ana']!.credits);
-    expect(pilotShip(back, 'ana')!.hold).toEqual({ food: 7 });
+    expect(pilotShip(back, 'ana')!.hold).toEqual({ ...pilotShip(w, 'ana')!.hold, food: 7 });
   });
 
   it('records the format, version and time', () => {

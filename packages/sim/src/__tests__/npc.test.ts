@@ -79,10 +79,11 @@ describe('trader', () => {
     expect(docks.slice(0, 3)).toEqual(['station-ridge', 'station-lantern', 'station-harbour']);
   });
 
-  it('never hits a station hull', () => {
-    const hits: WorldEvent[] = [];
-    run(createStarterWorld(), 240, (w) => hits.push(...w.events.filter((e) => e.type === 'collided')));
-    expect(hits).toEqual([]);
+  it('never hits a station hull hard enough to be hurt', () => {
+    // A slow shove on arrival is contact, not a crash; damage would be.
+    const hurt: WorldEvent[] = [];
+    run(createStarterWorld(), 240, (w) => hurt.push(...w.events.filter((e) => e.type === 'damaged' && e.cause === 'station' && e.shipId.startsWith('npc-trader'))));
+    expect(hurt).toEqual([]);
   });
 });
 

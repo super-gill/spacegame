@@ -26,6 +26,7 @@ export function emptyInput(): ShipInput {
     toggleDock: false,
     cycleFlightMode: false,
     fireFixed: false,
+    selectGroup: null,
     lock: null,
     unlock: null,
     activateLock: null,
@@ -71,7 +72,7 @@ export function createStarterWorld(): World {
     heading: -0.34,
     dockedAt: harbour.id,
     brain: { kind: 'trader', route: triangle, leg: 0, waitTicks: 3 * 60 },
-    hold: { food: 30, medicine: 10 }, // a prize worth a pirate's time
+    hold: { food: 30, medicine: 10, rounds: 4 }, // a prize worth a pirate's time, and boxes of rounds for the swivel
     respawnSeconds: 30,
     shipId: null,
     timerTicks: 0,
@@ -83,7 +84,7 @@ export function createStarterWorld(): World {
     position: { ...works.position },
     dockedAt: works.id,
     brain: { kind: 'trader', route: triangle, leg: 2, waitTicks: 20 * 60 },
-    hold: { machinery: 25 },
+    hold: { machinery: 25, rounds: 4 },
   };
 
   // The pirate lurks a little inward of Ridge, on the traders' way in,
@@ -108,7 +109,7 @@ export function createStarterWorld(): World {
       patrolIndex: 0,
       provokedBy: null,
     },
-    hold: {},
+    hold: {}, // the raider's Fairshot runs on its capacitor
     respawnSeconds: 45,
     shipId: null,
     timerTicks: 0,
@@ -123,7 +124,7 @@ export function createStarterWorld(): World {
     heading: 0,
     dockedAt: harbour.id,
     brain: { kind: 'watch', beat: [harbour.id, works.id, harbour.id, outpost.id], leg: 0, mode: 'patrol', targetId: null, modeTicks: 0 },
-    hold: {},
+    hold: { rounds: 10 }, // boxes for the Picket
     respawnSeconds: 60,
     shipId: null,
     timerTicks: 0,

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION, STARTER_VS_RAIDER_MIN_EDGE, STARTING_CREDITS } from '../constants.js';
+import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION, STARTING_CREDITS } from '../constants.js';
+import { leadPoint } from '../combat.js';
+import { angleDelta } from '../angle.js';
 import { fitFee, fitModule, mountRefusal, planRefit, resaleValue, sellModule, storedCount, unfitModule, type FitResult } from '../fitting.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
@@ -9,7 +11,7 @@ import { deserializeWorld, SAVE_FORMAT, SAVE_VERSION } from '../save.js';
 import { fitStats, flightWarnings, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, World } from '../types.js';
-import { length } from '../vec2.js';
+import { distance, length, sub, toAngle } from '../vec2.js';
 import { WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, STARTER_LOADOUT_ID } from '../world.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
@@ -41,7 +43,7 @@ function dockedAt(stationId = HARBOUR, credits = STARTING_CREDITS): { w: World; 
     pilots: { ...w.pilots, ana: { ...w.pilots['ana']!, credits } },
     ships: {
       ...w.ships,
-      [me]: { ...w.ships[me]!, fit, structure: stats.structure, state: 'docked', dockedAt: st.id, position: { ...st.position } },
+      [me]: { ...w.ships[me]!, fit, hold: {}, structure: stats.structure, state: 'docked', dockedAt: st.id, position: { ...st.position } },
     },
   };
   return { w, me };
@@ -116,8 +118,8 @@ describe('derived stats', () => {
 
   it('gives each weapon mount its own effective weapon', () => {
     const s = loadoutStats(STARTER_LOADOUT_ID);
-    expect(s.weapons['w1']!.id).toBe('pulse-cannon');
-    expect(s.weapons['w2']!.id).toBe('light-turret');
+    expect(s.weapons['w1']!.id).toBe('pulse-laser-s');
+    expect(s.weapons['w2']!.id).toBe('swivel-s');
   });
 });
 
@@ -131,14 +133,16 @@ describe('hull bonuses', () => {
 
   it('a race bonus rewards the race tech: Kessari shields', () => {
     const fit = { c1: 'itomarr-reactor-m', i1: 'itomarr-shield-m' };
-    expect(fitStats(TEST_CATALOGUES, wedge, fit).shield).toBeCloseTo(110 * 1.2, 9);
-    expect(fitStats(TEST_CATALOGUES, courier, { c2: 'meridian-reactor-s', i1: 'meridian-shield-s' }).shield).toBe(50);
+    const m = MODULES['itomarr-shield-m']!.stats.shield!;
+    const s = MODULES['meridian-shield-s']!.stats.shield!;
+    expect(fitStats(TEST_CATALOGUES, wedge, fit).shield).toBeCloseTo(m * 1.2, 9);
+    expect(fitStats(TEST_CATALOGUES, courier, { c2: 'meridian-reactor-s', i1: 'meridian-shield-s' }).shield).toBe(s);
   });
 
   it('a combat hull adds damage to full-size weapons only', () => {
     const s = fitStats(TEST_CATALOGUES, wedge, { w1: 'union-autocannon-m', w2: 'paragon-pulse-s' });
-    expect(s.weapons['w1']!.damage).toBeCloseTo(WEAPONS['autocannon']!.damage * 1.15, 9);
-    expect(s.weapons['w2']!.damage).toBe(WEAPONS['pulse-cannon']!.damage);
+    expect(s.weapons['w1']!.damage).toBeCloseTo(WEAPONS['autocannon-m']!.damage * 1.15, 9);
+    expect(s.weapons['w2']!.damage).toBe(WEAPONS['pulse-laser-s']!.damage);
   });
 
   it('bonuses live on the hull: the same module is plain on another hull', () => {
@@ -326,7 +330,7 @@ describe('fitting', () => {
   it('removing armour takes the structure with it', () => {
     const { w } = dockedAt(HARBOUR, 100_000);
     const armoured = ok(fitModule(w, 'ana', 'u1', 'rookrivet-armour-s'));
-    const full = { ...armoured, ships: { ...armoured.ships, [myShip(armoured).id]: { ...myShip(armoured), structure: 130 } } };
+    const full = { ...armoured, ships: { ...armoured.ships, [myShip(armoured).id]: { ...myShip(armoured), structure: shipStats(armoured, myShip(armoured)).structure } } };
     const bare = ok(unfitModule(full, 'ana', 'u1'));
     expect(myShip(bare).structure).toBe(courier.structure);
   });
@@ -376,15 +380,35 @@ describe('ships in the world', () => {
     expect(flightWarnings(fitStats(TEST_CATALOGUES, courier, stripped))).toEqual(['noMainThrust', 'noTurning', 'noWeapons']);
   });
 
-  it('a new pilot outlasts the pirate raider', () => {
-    const toughness = (id: string) => {
-      const s = loadoutStats(id);
-      return s.shield + s.structure;
-    };
-    const dps = (id: string) => Object.values(loadoutStats(id).weapons).reduce((t, w) => t + weaponDps(w), 0);
-    const starterSurvives = toughness(STARTER_LOADOUT_ID) / dps('kessari-raider');
-    const raiderSurvives = toughness('kessari-raider') / dps(STARTER_LOADOUT_ID);
-    expect(starterSurvives / raiderSurvives).toBeGreaterThanOrEqual(STARTER_VS_RAIDER_MIN_EDGE);
+  it('a new pilot who fights back in the starter beats the raider, and feels the capacitor', () => {
+    // Ana flies at the real pirate AI straight: nose on the lead point, fire when on it.
+    let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
+    const me = pilotShip(w, 'ana')!.id;
+    const pir = Object.keys(w.npcs).find((id) => w.npcs[id]!.kind === 'pirate')!;
+    const p = w.ships[pir]!;
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: p.position.x + 400, y: p.position.y }, velocity: { ...p.velocity }, flightMode: 'rotation' } } };
+    let ranDry = false;
+    let seconds = 0;
+    for (let t = 0; t < SECOND * 120; t++) {
+      const mine = w.ships[me];
+      const foe = w.ships[pir];
+      if (!mine || !foe) break;
+      const gun = Object.values(shipStats(w, mine).weapons).find((x) => x.kind === 'fixed')!;
+      const want = toAngle(sub(leadPoint(mine, foe, gun.projectileSpeed), mine.position));
+      const err = angleDelta(mine.heading, want);
+      const d = distance(mine.position, foe.position);
+      w = stepWorld(w, {
+        [me]: { ...emptyInput(), turnLeft: err < -0.05, turnRight: err > 0.05, thrustForward: d > 350 && Math.abs(err) < 0.5, thrustReverse: d < 150, fireFixed: Math.abs(err) < 0.08 && d < gun.range * 0.9, lock: t === 0 ? pir : null, activateLock: t === 0 ? pir : null, toggleWeaponsHot: t === 0 },
+      });
+      if (w.events.some((e) => e.type === 'capacitorEmpty' && e.shipId === me)) ranDry = true;
+      seconds = t / SECOND;
+    }
+    expect(w.ships[me]).toBeDefined();
+    expect(w.ships[pir]).toBeUndefined();
+    // Long enough to matter, short enough to be a fight; and the pulse laser drains the pool at least once.
+    expect(seconds).toBeGreaterThan(5);
+    expect(seconds).toBeLessThan(40);
+    expect(ranDry).toBe(true);
   });
 
   it('only Harbour Station has outfitting', () => {

@@ -35,6 +35,9 @@ export const STARTER_STATION_ID = HARBOUR_ID;
 /** Loadout every new pilot is given, and the free starter: a Meridian Courier. */
 export const STARTER_LOADOUT_ID = 'meridian-starter';
 
+/** Boxes of rounds a new pilot's starter carries for its swivel. */
+const STARTER_ROUNDS = 3;
+
 /** The fixed fit every escape pod has. */
 export const ESCAPE_POD_LOADOUT_ID = 'escape-pod';
 
@@ -150,6 +153,8 @@ export function issueShip(world: World, pilotId: string, loadoutId: string, stat
   const index = Math.max(0, Object.keys(world.pilots).sort().indexOf(pilotId));
   const place = spawnPlace(world, station, index);
   const made = nextShip(world, pilot, loadout, place);
+  // The Registry issues a box of rounds for the swivel with the ship.
+  made.ship.hold = { ...made.ship.hold, ...(loadoutId === STARTER_LOADOUT_ID ? { rounds: STARTER_ROUNDS } : {}) };
   const pad = inSpace ? null : freePadFor(station, hull.sizeClass, world.ships);
   const ship = pad ? onPad(made.ship, station, pad) : { ...made.ship, velocity: place.velocity };
   return {

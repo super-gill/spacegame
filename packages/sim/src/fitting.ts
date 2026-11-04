@@ -87,7 +87,7 @@ function withStored(pilot: Pilot, stationId: string, moduleId: string, delta: nu
  * weapon starts ready, pointing along the heading.
  */
 export function weaponStatesFor(
-  cat: Pick<Catalogues, 'modules'>,
+  cat: Pick<Catalogues, 'modules'> & Partial<Pick<Catalogues, 'weapons'>>,
   hull: HullSpec,
   fit: Readonly<Record<string, string>>,
   heading: number,
@@ -98,7 +98,10 @@ export function weaponStatesFor(
     const id = fit[mount.id];
     if (!id || !cat.modules[id]?.weaponId) continue;
     const kept = previous && previous.fit[mount.id] === id ? previous.weapons.find((w) => w.mountId === mount.id) : undefined;
-    states.push(kept ?? { mountId: mount.id, cooldownTicks: 0, aim: heading });
+    // A new weapon starts loaded (the fitter loads it) in its default group:
+    // 1 for fixed guns, 2 for launchers later; turreted guns need none.
+    const weapon = cat.weapons?.[cat.modules[id]!.weaponId!];
+    states.push(kept ?? { mountId: mount.id, cooldownTicks: 0, aim: heading, loaded: weapon?.magazine ?? 0, reloadTicks: 0, group: 1 });
   }
   return states;
 }

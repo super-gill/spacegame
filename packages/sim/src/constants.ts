@@ -66,6 +66,9 @@ export const SHIP_RESTITUTION = 0.4;
 /** Structure repaired per second while docked at a station. Shields refill at once. */
 export const DOCK_REPAIR_PER_SECOND = 25;
 
+/** Capacitor spent for each point of shield restored. Shields are the capacitor's main steady customer. */
+export const SHIELD_CAPACITOR_PER_POINT = 0.4;
+
 /** A turret fires only when within this angle of its lead point, radians. About 5 degrees. */
 export const TURRET_FIRE_TOLERANCE = 0.08;
 
@@ -114,12 +117,6 @@ export const FIT_FEE_FRACTION = 0.05;
  */
 export const MODULE_RESALE_FRACTION = 0.5;
 
-/**
- * How much longer a new pilot in the starter fit survives the raider than
- * the raider survives them, at full damage output. Below this the first
- * pirate fight stops being winnable by a new player who fights back.
- */
-export const STARTER_VS_RAIDER_MIN_EDGE = 1.4;
 
 /**
  * Boarding in space: the ship being boarded must be within this distance

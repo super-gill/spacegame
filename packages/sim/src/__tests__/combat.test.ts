@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { PIRATE_TUNING } from '../ai/pirate.js';
 import { applyDamage, fireWeapons, regenerateShield, stepProjectiles } from '../combat.js';
 import { collideShips, collideWithStations } from '../collision.js';
-import { FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME, TRACTOR_RANGE } from '../constants.js';
+import { CARGO_SURVIVAL_FRACTION, FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME, TRACTOR_RANGE } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { shipStats } from '../stats.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { stepWorld } from '../step.js';
-import type { PirateBrain, Projectile, Ship, Station, World, WorldEvent } from '../types.js';
+import type { PirateBrain, Projectile, Ship, ShipStats, Station, World, WorldEvent } from '../types.js';
 import { distance, length, sub } from '../vec2.js';
 import { PLANET_ID } from '../bodies.js';
 import { bodyVelocity } from '../rails.js';
@@ -68,7 +68,7 @@ describe('firing', () => {
     expect(r.projectiles).toHaveLength(1);
     const p = r.projectiles[0]!;
     expect(p.velocity.x).toBeCloseTo(50, 9);
-    expect(p.velocity.y).toBeCloseTo(WEAPONS['pulse-cannon']!.projectileSpeed, 9);
+    expect(p.velocity.y).toBeCloseTo(WEAPONS['pulse-laser-s']!.projectileSpeed, 9);
   });
 
   it('respects the fire interval', () => {
@@ -79,7 +79,7 @@ describe('firing', () => {
       s = r.ship;
       shots += r.projectiles.length;
     }
-    const interval = WEAPONS['pulse-cannon']!.fireInterval;
+    const interval = WEAPONS['pulse-laser-s']!.fireInterval;
     expect(shots).toBeGreaterThanOrEqual(Math.floor(1 / interval) - 1);
     expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
   });
@@ -90,7 +90,7 @@ describe('firing', () => {
     const s = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
     const t = ship('t', 'sparrow', { position: { x: 0, y: 500 } });
     const r = fireWeapons(s, sparrow, emptyInput(), () => t, FIXED_DT, 1);
-    expect(turretAim(r.ship)).toBeCloseTo(WEAPONS['light-turret']!.turretTurnRate * FIXED_DT, 9);
+    expect(turretAim(r.ship)).toBeCloseTo(WEAPONS['swivel-s']!.turretTurnRate * FIXED_DT, 9);
     expect(r.projectiles).toEqual([]); // not on target yet
   });
 
@@ -149,6 +149,7 @@ describe('projectiles', () => {
     position: { x: 290, y: -200 },
     velocity: { x: 0, y: 900 },
     damage: 6,
+    damageType: 'kinetic',
     ticksLeft: 100,
     ...overrides,
   });
@@ -156,7 +157,7 @@ describe('projectiles', () => {
   it('hits a ship in its path even if it would skip past it in one tick', () => {
     // 900 u/s covers 15 units per tick; start just before the hull edge so the path crosses it.
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, {}, FIXED_DT);
-    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon' }]);
+    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon', type: 'kinetic' }]);
     expect(r.projectiles).toEqual([]);
   });
 
@@ -180,26 +181,45 @@ describe('projectiles', () => {
 });
 
 describe('damage and shields', () => {
+  /** The Tacet's stats with nothing resisting, so damage sums are plain. */
+  const bare: ShipStats = { ...sparrow, shieldResists: {}, armourResists: {} };
+
   it('takes damage on shields first, then structure', () => {
-    const s = applyDamage(ship('s'), sparrow, sparrow.shield + 10, FIXED_DT);
+    const s = applyDamage(ship('s'), bare, bare.shield + 10, FIXED_DT);
     expect(s.shield).toBe(0);
-    expect(s.structure).toBe(sparrow.structure - 10);
+    expect(s.structure).toBe(bare.structure - 10);
+  });
+
+  it('resists by damage type: shields stop heat, armour stops rounds', () => {
+    const shielded: ShipStats = { ...bare, shieldResists: { thermal: 0.5 }, armourResists: { kinetic: 0.5 } };
+    const heat = applyDamage(ship('s'), shielded, 20, FIXED_DT, 'thermal');
+    expect(heat.shield).toBe(bare.shield - 10);
+    const rounds = applyDamage({ ...ship('s'), shield: 0 }, shielded, 20, FIXED_DT, 'kinetic');
+    expect(rounds.structure).toBe(bare.structure - 10);
   });
 
   it('recharges shields only after the delay, and never structure', () => {
-    let s = applyDamage(ship('s'), sparrow, sparrow.shield + 10, FIXED_DT);
-    for (let i = 0; i < SECOND * (sparrow.shieldRegenDelay - 0.5); i++) s = regenerateShield(s, sparrow, FIXED_DT);
+    let s = applyDamage(ship('s'), bare, bare.shield + 10, FIXED_DT);
+    for (let i = 0; i < SECOND * (bare.shieldRegenDelay - 0.5); i++) s = regenerateShield(s, bare, FIXED_DT);
     expect(s.shield).toBe(0);
-    for (let i = 0; i < SECOND * 20; i++) s = regenerateShield(s, sparrow, FIXED_DT);
-    expect(s.shield).toBe(sparrow.shield);
-    expect(s.structure).toBe(sparrow.structure - 10);
+    for (let i = 0; i < SECOND * 60; i++) s = regenerateShield(s, bare, FIXED_DT);
+    expect(s.shield).toBe(bare.shield);
+    expect(s.structure).toBe(bare.structure - 10);
+  });
+
+  it('shield recharge draws on the capacitor, and stops when it is empty', () => {
+    const hit = applyDamage({ ...ship('s'), capacitor: 2 }, bare, 40, FIXED_DT);
+    let s = hit;
+    for (let i = 0; i < SECOND * 30; i++) s = regenerateShield(s, bare, FIXED_DT);
+    expect(s.shield).toBeLessThan(bare.shield);
+    expect(s.capacitor).toBeCloseTo(0, 6);
   });
 
   it('docked ships are repaired', () => {
     let { w, me } = quietWorld();
     const st = w.stations['station-harbour']!;
     w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'docked', dockedAt: st.id, structure: 10, shield: 0 } } };
-    for (let i = 0; i < SECOND * 10; i++) w = stepWorld(w, {});
+    for (let i = 0; i < SECOND * 20; i++) w = stepWorld(w, {});
     expect(w.ships[me]!.structure).toBe(starter.structure);
     expect(w.ships[me]!.shield).toBe(starter.shield);
   });
@@ -244,7 +264,7 @@ describe('ramming', () => {
 describe('destruction, loot and respawn', () => {
   function destroyMe(w: World, me: string): World {
     return stepWorld({ ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, shield: 0, structure: 0.01 } }, projectiles: [
-      { id: 'px', ownerShipId: 'nobody', position: { x: w.ships[me]!.position.x, y: w.ships[me]!.position.y - 10 }, velocity: { x: 0, y: 900 }, damage: 50, ticksLeft: 10 },
+      { id: 'px', ownerShipId: 'nobody', position: { x: w.ships[me]!.position.x, y: w.ships[me]!.position.y - 10 }, velocity: { x: 0, y: 900 }, damage: 50, damageType: 'kinetic', ticksLeft: 10 },
     ] }, {});
   }
 
@@ -255,7 +275,9 @@ describe('destruction, loot and respawn', () => {
     const pod = pilotShip(next, 'ana')!;
     expect(pod.hullId).toBe('escape-pod');
     expect(next.wrecks).toHaveLength(1);
-    expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(starter.mass * 0.5));
+    // Scrap from the hull, plus the surviving part of the starter's boxes of rounds.
+    const rounds = Math.floor(w.ships[me]!.hold['rounds']! * CARGO_SURVIVAL_FRACTION);
+    expect(next.loot.reduce((n, l) => n + l.amount, 0)).toBe(Math.round(starter.mass * 0.5) + rounds);
     expect(next.events).toContainEqual({ type: 'destroyed', shipId: me, by: 'nobody' });
   });
 
@@ -346,14 +368,22 @@ describe('NPC combat', () => {
     expect(hunted).toBe(true);
   });
 
-  it('a trader shoots back at a pirate hunting it', () => {
-    let w = createStarterWorld();
-    let traderHits = 0;
-    for (let i = 0; i < SECOND * 60; i++) {
-      w = stepWorld(w, {});
-      traderHits += w.events.filter((e) => e.type === 'damaged' && e.by?.startsWith('npc-trader')).length;
-    }
-    expect(traderHits).toBeGreaterThan(5);
+  it('a trader shoots back at a pirate ahead of it, but its swivel cannot cover its stern', () => {
+    // The Manifest's one swivel faces forward with a half-circle arc: a pirate ahead is engaged, one astern is in the blind spot.
+    const base = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+    const trader = buildShip(base, { id: 't', loadout: LOADOUTS['tessaract-trader']!, ownerId: null, position: { x: -7000, y: -7000 }, heading: 0, flightMode: 'manual' });
+    const shots = (where: { x: number; y: number }) => {
+      const foe = buildShip(base, { id: 'foe', loadout: LOADOUTS['kessari-raider']!, ownerId: null, position: { x: -7000 + where.x, y: -7000 + where.y }, heading: Math.PI, flightMode: 'manual' });
+      let w: World = { ...base, ships: { t: { ...trader, hold: { rounds: 4 }, weaponsHot: true, locks: [{ targetId: 'foe', progress: 1 }], activeLock: 'foe' }, foe: { ...foe, shield: 1e6, structure: 1e6 } } };
+      let fired = 0;
+      for (let i = 0; i < SECOND * 5; i++) {
+        w = stepWorld(w, {});
+        fired += w.events.filter((e) => e.type === 'damaged' && e.by === 't').length;
+      }
+      return fired;
+    };
+    expect(shots({ x: 300, y: 0 })).toBeGreaterThan(5); // ahead
+    expect(shots({ x: -300, y: 0 })).toBe(0); // astern
   });
 
   it('a badly damaged pirate goes home and leaves the sector, then a new one arrives', () => {

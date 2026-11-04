@@ -64,7 +64,7 @@ export function collideWithStations(ship: Ship, stats: ShipStats, stations: Reco
       }
       const deltaV = -into * (1 + HULL_RESTITUTION);
       const amount = impactDamage(deltaV, IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V);
-      if (amount > 0) damage.push({ shipId: s.id, amount, by: null, cause: 'station' });
+      if (amount > 0) damage.push({ shipId: s.id, amount, by: null, cause: 'station', type: 'kinetic' });
     }
     s = { ...s, position, velocity };
   }
@@ -105,7 +105,7 @@ export function collideWithSurfaces(ship: Ship, stats: ShipStats, surfaces: read
       velocity = add(body.velocity, add(scale(tangentPart, 1 - SURFACE_FRICTION), scale(normalPart, -SURFACE_RESTITUTION)));
       if (-into >= COLLISION_EVENT_MIN_SPEED) events.push({ type: 'impacted', shipId: s.id, bodyId: body.bodyId, speed: -into });
       const amount = impactDamage(-into * (1 + SURFACE_RESTITUTION), IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V);
-      if (amount > 0) damage.push({ shipId: s.id, amount, by: null, cause: 'surface' });
+      if (amount > 0) damage.push({ shipId: s.id, amount, by: null, cause: 'surface', type: 'kinetic' });
     }
     s = { ...s, position, velocity };
   }
@@ -174,8 +174,8 @@ export function collideShips(ships: Record<string, Ship>, statsFor: (ship: Ship)
         }
         const aDamage = impactDamage(aDeltaV, IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V);
         const bDamage = impactDamage(bDeltaV, IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V);
-        if (aDamage > 0) damage.push({ shipId: a.id, amount: aDamage, by: b.id, cause: 'ram' });
-        if (bDamage > 0) damage.push({ shipId: b.id, amount: bDamage, by: a.id, cause: 'ram' });
+        if (aDamage > 0) damage.push({ shipId: a.id, amount: aDamage, by: b.id, cause: 'ram', type: 'kinetic' });
+        if (bDamage > 0) damage.push({ shipId: b.id, amount: bDamage, by: a.id, cause: 'ram', type: 'kinetic' });
       }
 
       out[a.id] = { ...a, position: aPos, velocity: aVel };
