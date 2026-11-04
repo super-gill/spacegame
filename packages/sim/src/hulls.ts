@@ -42,6 +42,8 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 340,
     maxTurnRate: 2.4, // about 140 degrees per second
     sensorRange: 3000,
+    maxLocks: 2,
+    scanResolution: 1,
     mounts: [
       mount('w1', 'weapon', 'S', 14, 0, ['power']),
       mount('w2', 'weapon', 'S', 2, 0, ['power', 'fireControl']),
@@ -72,6 +74,8 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 320,
     maxTurnRate: 2.2,
     sensorRange: 3500,
+    maxLocks: 3,
+    scanResolution: 1.1,
     mounts: [
       mount('w1', 'weapon', 'M', -5, -4.4, ['power']),
       mount('w2', 'weapon', 'M', -5, 4.4, ['power']),
@@ -112,6 +116,8 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 220,
     maxTurnRate: 1.2, // about 70 degrees per second
     sensorRange: 2500,
+    maxLocks: 2,
+    scanResolution: 0.8,
     mounts: [
       mount('b1', 'bay', 'M', 10.2, -5.4, ['heavyLoad']),
       mount('b2', 'bay', 'M', 10.2, 5.4, ['heavyLoad']),
@@ -153,6 +159,8 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 350,
     maxTurnRate: 2.4,
     sensorRange: 4000,
+    maxLocks: 4,
+    scanResolution: 1.6,
     mounts: [
       mount('w1', 'weapon', 'S', 12, 0, ['power']),
       mount('w2', 'weapon', 'S', 0, 0, ['power', 'fireControl']),
@@ -184,6 +192,8 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 180,
     maxTurnRate: 2,
     sensorRange: 1500,
+    maxLocks: 1,
+    scanResolution: 0.6,
     mounts: [
       mount('e1', 'engine', 'S', -8, 0, ['power'], AFT),
       mount('c1', 'core', 'S', -2, -2, ['power']),

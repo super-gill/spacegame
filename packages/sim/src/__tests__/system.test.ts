@@ -325,7 +325,13 @@ describe('the local frame', () => {
 describe('NPCs in moving frames', () => {
   it('traders complete their loop between moving stations', () => {
     const docks: string[] = [];
-    run(createStarterWorld(), 240, () => ({}), (x) => {
+    // No pirates: this is about flying, not about who wins a fight.
+    const start = createStarterWorld();
+    const pirates = Object.keys(start.npcs).filter((id) => start.npcs[id]!.kind === 'pirate');
+    const ships = { ...start.ships };
+    for (const id of pirates) delete ships[id];
+    const calm: World = { ...start, ships, npcs: Object.fromEntries(Object.entries(start.npcs).filter(([id]) => !pirates.includes(id))), spawners: start.spawners.filter((sp) => sp.brain.kind !== 'pirate') };
+    run(calm, 240, () => ({}), (x) => {
       for (const e of x.events) if (e.type === 'docked' && e.shipId.startsWith('npc-trader')) docks.push(e.stationId);
     });
     expect(docks.slice(0, 3)).toEqual([RIDGE_ID, HARBOUR_ID, RIDGE_ID]);

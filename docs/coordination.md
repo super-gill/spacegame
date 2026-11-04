@@ -113,6 +113,16 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Pirate homes** (`types.ts`): `PirateBrain.homeOrbit`, optional. `pirateHome` gives where it is now.
 - **Save format:** `SAVE_VERSION` 5, `migrate4to5`. Version 5 stays open on `main` until 0.9.0 (end of 6c): target locks and part 2 land in it without another bump.
 
+6c part 2 contracts (on `main` from 4 November 2026):
+
+- **Target locks** (`types.ts`, `locks.ts`), replacing `Ship.targetId` and the `selectTarget` input:
+  - `Ship.locks` (`TargetLock`: `targetId`, `progress` 0 to 1, complete at 1), `Ship.activeLock` (a target ship id or null; always one of `locks`).
+  - Inputs `lock`, `unlock`, `activateLock` (ship ids or null, edge-triggered). A new lock becomes active only if none is; send `lock` and `activateLock` together to lock and activate in one go. Order in a tick: unlock, lock, activate.
+  - Stats `ShipStats.maxLocks` and `ShipStats.scanResolution`, from `HullSpec.maxLocks` and `HullSpec.scanResolution` (sensor modules add later). Tern 2 and 1.0, Warrant 3 and 1.1, Manifest 2 and 0.8, Tacet 4 and 1.6, Ark 1 and 0.6.
+  - `lockSeconds(stats, targetRadius)`, `lockRefusal(world, ship, targetId)` (`LockRefusal`: `invalid`, `already`, `maxLocks`, `outOfRange`, `docked`), `isLocked`, `activeTarget`, `weaponTarget`.
+  - Events `lockStarted`, `locked`, `lockLost` (`LockLossReason`: `unlocked`, `outOfRange`, `targetGone`, `docked`), `lockRefused`; `shipId` is the ship locking, `targetId` the target.
+  - **For 6e:** `WeaponState.lockTarget` (optional, a target ship id) points a weapon at a lock other than the active one; turrets already honour it, nothing sets it yet.
+
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
@@ -215,7 +225,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Contract changes, cross-workstream file changes, merges wanted. Newest first.
 
-- **Target locks** (2026-11-04, interface; Jason's design). **Accepted; the lead builds it in 6c part 2**, before gravity, inside save version 5 (still open, see Contracts), so no extra bump. The contract will be named here when it lands; until then keep showing `targetId` as the active lock. Replace the single `Ship.targetId` with EVE-style locks:
+- **Target locks** (2026-11-04, interface; Jason's design). **Done on `main`** in 6c part 2, inside save version 5: see "6c part 2 contracts". The lead put stopgap controls in the client (click locks or activates, Tab switches the active lock or locks the nearest ship with none, Esc unlocks; the target panel shows LOCKING n% and locks held); replace them freely. Replace the single `Ship.targetId` with EVE-style locks:
   - **Locks take time**, faster with better sensors and against bigger ships. A lock in progress is visible to the client (its progress, 0 to 1).
   - **Max locks is a ship stat**, from the hull and sensor modules, like `sensorRange` (for example a courier 2 or 3, bigger ships more).
   - A lock needs the target inside sensor range; it drops when the target leaves it, docks or is destroyed (as `targetId` drops today).
@@ -230,6 +240,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): built target locks on `main` (the interface request), the first piece of 6c part 2. `Ship.targetId` and the `selectTarget` input are gone; ships hold timed locks up to `maxLocks`, one active, and turrets fire only at a complete lock. Lock time is 2.5 s for a scan resolution 1 ship against a hull of radius 20, faster with better sensors and against bigger hulls (`locks.ts`). The trader now locks its hunter before its turrets open up (about 3 s), so it loses some fights it used to win; worth watching in play. Saves stay version 5: ships from saves without locks start with none. 231 tests. Client: stopgap lock controls in `main.ts`, `input.ts`, `ui.ts` and `bindings.ts` (see the request), `docs/controls.md` updated. Next: gravity. Changelog lines for 0.9.0: "Target locks: lock ships with a click, hold several, Tab switches the active one; locking takes time"; "Turrets fire only at a completed lock".
 
 - 2026-11-04, lead (Lead 3): built 6c part 1 on `main`, the living system without gravity. Bodies on rails (`bodies.ts`, `rails.ts`): Calder as a star with a planet, a moon and the belt. Harbour orbits the planet every two minutes at the period the planet's gravity gives; Ridge turns with the belt. Everything inside a body's sphere (ships, shots, loot, wrecks) is carried with it exactly; docked ships ride their pads; undocking launches with the station's velocity. Assist, brake, the speed limit, the docking check and NPC steering work against the local frame (`frameVelocity`). Traders loop between the moving stations in about a minute and a half; the pirate's home rides the belt inward of Ridge. Save version 5 with `migrate4to5`: pilots keep credits, storage and ships, docked ships stay on their pads, ships in space are towed to Harbour. Choices where the plan was silent are in `docs/system.md`, "As built: part 1" (the speed limit now keeps excess speed, so frame edges never jolt). 222 tests. Client stopgap, for the interface workstream to keep or replace: `render/bodies.ts` (plain circles, dashed spheres, the belt band, edge markers for bodies), stations drawn between ticks in `main.ts`, and the HUD's VEL line relative to the local frame and naming it in `ui.ts`. Merged `ws/interface` (docs only) and accepted its target lock request for part 2. Play checked headless: a fresh pilot waits, Harbour passes, F docks, the Undock button (real click) launches, thrust and coast in full assist; a version 4 save loads as version 5 with credits kept and the ship docked at Harbour; no page errors. Needs: names for the planet, moon and belt from the lore chat (placeholders Calder I, Calder Ia, Calder Belt). Next: 6c part 2, target locks first. Changelog lines for 0.9.0: "Calder is a star system: a planet, its moon and an asteroid belt, all moving on their orbits"; "Harbour Station orbits the planet and Ridge Outpost turns with the belt; routes change length as they move"; "Ships, shots, loot and wrecks near a body move with it"; "Speed, full assist, braking and docking work relative to the station or body you are near"; "Save version 5: 0.8.x saves upgrade automatically, with ships in space towed to Harbour".
 

@@ -26,9 +26,9 @@ export type SimAction =
   | 'tractor';
 
 /**
- * Actions the client handles itself. Target selection is worked out in
+ * Actions the client handles itself. Target locking is worked out in
  * the client (it needs the camera and the pointer) and reaches the sim as
- * a `selectTarget` input. Boarding is a pilot command, like trading, not
+ * `lock`, `unlock` and `activateLock` inputs. Boarding is a pilot command, like trading, not
  * a flight input.
  */
 export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut';
@@ -69,8 +69,8 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'brake', codes: ['KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
   { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire fixed guns', kind: 'hold', note: 'Fire where the nose points; follow the lead marker' },
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
-  { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next target', kind: 'press', note: 'Nearest first' },
-  { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Clear target', kind: 'press' },
+  { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
+  { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Unlock the active lock', kind: 'press' },
   { action: 'tractor', codes: ['KeyR'], group: 'Weapons', label: 'Tractor beam', kind: 'hold', note: 'Pulls in nearby loot' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
@@ -81,7 +81,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 ];
 
 export const POINTER_CONTROLS: readonly PointerControl[] = [
-  { input: 'Left click', group: 'Targeting', label: 'Click a ship to target it' },
+  { input: 'Left click', group: 'Targeting', label: 'Click a ship to lock it (locking takes a moment); click a locked ship to make it active' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
   { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Tern' },
   { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },

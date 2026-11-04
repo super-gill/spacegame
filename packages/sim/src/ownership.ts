@@ -62,7 +62,8 @@ export function vacated(ship: Ship): Ship {
   return {
     ...ship,
     weaponsHot: false,
-    targetId: null,
+    locks: [],
+    activeLock: null,
     tractorActive: false,
     thrusters: { main: 0, reverse: 0, strafeLeft: 0, strafeRight: 0, rotateLeft: 0, rotateRight: 0 },
   };

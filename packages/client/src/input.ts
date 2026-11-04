@@ -38,7 +38,7 @@ export class InputController {
   pointer: { x: number; y: number } | null = null;
 
   /** Target change to send with the next sample, or null for no change. */
-  private pendingTarget: { id: string | null } | null = null;
+  private pendingLock: Pick<ShipInput, 'lock' | 'unlock' | 'activateLock'> = { lock: null, unlock: null, activateLock: null };
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -60,12 +60,22 @@ export class InputController {
     this.latched.add('toggleDock');
   }
 
-  /** Select a target (or clear it with null) on the next tick. */
-  requestTarget(id: string | null): void {
-    this.pendingTarget = { id };
+  /** Start locking a ship and make it the active lock, on the next tick. */
+  requestLock(id: string): void {
+    this.pendingLock = { ...this.pendingLock, lock: id, activateLock: id };
   }
 
-  /** Build this tick's ShipInput. Consumes latched press actions and any pending target change. */
+  /** Make an existing lock the active one, on the next tick. */
+  requestActivate(id: string): void {
+    this.pendingLock = { ...this.pendingLock, activateLock: id };
+  }
+
+  /** Drop the lock on a ship, on the next tick. */
+  requestUnlock(id: string): void {
+    this.pendingLock = { ...this.pendingLock, unlock: id };
+  }
+
+  /** Build this tick's ShipInput. Consumes latched press actions and any pending lock change. */
   sample(): ShipInput {
     const input: ShipInput = {
       thrustForward: this.held.has('thrustForward'),
@@ -79,11 +89,11 @@ export class InputController {
       toggleDock: this.latched.has('toggleDock'),
       fireFixed: this.held.has('fireFixed'),
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
-      selectTarget: this.pendingTarget,
+      ...this.pendingLock,
       tractor: this.held.has('tractor'),
     };
     this.latched.clear();
-    this.pendingTarget = null;
+    this.pendingLock = { lock: null, unlock: null, activateLock: null };
     return input;
   }
 

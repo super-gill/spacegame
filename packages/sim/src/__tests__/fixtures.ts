@@ -13,7 +13,7 @@ import { WEAPONS } from '../weapons.js';
  */
 export const TEST_SHIP_COMBAT: Pick<
   Ship,
-  'fit' | 'shield' | 'structure' | 'shieldDelayTicks' | 'weapons' | 'tractorActive' | 'hold' | 'targetId' | 'weaponsHot'
+  'fit' | 'shield' | 'structure' | 'shieldDelayTicks' | 'weapons' | 'tractorActive' | 'hold' | 'locks' | 'activeLock' | 'weaponsHot'
 > = {
   fit: {},
   shield: 1000,
@@ -22,7 +22,8 @@ export const TEST_SHIP_COMBAT: Pick<
   weapons: [],
   tractorActive: false,
   hold: {},
-  targetId: null,
+  locks: [],
+  activeLock: null,
   weaponsHot: false,
 };
 

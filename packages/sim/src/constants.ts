@@ -127,6 +127,15 @@ export const STARTER_VS_RAIDER_MIN_EDGE = 1.4;
  */
 export const BOARD_RANGE = 150;
 
+/**
+ * Target locks. Seconds to lock a ship of hull radius
+ * LOCK_REFERENCE_RADIUS with scan resolution 1. Bigger ships lock faster
+ * (time goes with the square root of reference radius over target
+ * radius), better sensors faster (time divided by scan resolution).
+ */
+export const LOCK_BASE_SECONDS = 2.5;
+export const LOCK_REFERENCE_RADIUS = 20;
+
 /** Boarding in space: the two ships' relative speed may be at most this, units/s. */
 export const BOARD_MAX_RELATIVE_SPEED = 20;
 

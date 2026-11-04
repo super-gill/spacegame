@@ -294,7 +294,7 @@ describe('boarding', () => {
 
   it('moves the pilot between ships docked at the same station', () => {
     const { w, me, spareId } = withSpareDocked();
-    const before = { ...w.ships[me]!, weaponsHot: true, targetId: 'x' };
+    const before = { ...w.ships[me]!, weaponsHot: true, locks: [{ targetId: 'x', progress: 1 }], activeLock: 'x' };
     const r = boardShip(put(w, before), 'ana', spareId);
     if (!r.ok) throw new Error(r.reason);
     expect(r.event).toEqual({ type: 'boarded', shipId: spareId, from: me });
@@ -304,7 +304,8 @@ describe('boarding', () => {
     expect(left.padId).toBe(before.padId);
     expect(left.position).toEqual(before.position);
     expect(left.weaponsHot).toBe(false);
-    expect(left.targetId).toBeNull();
+    expect(left.locks).toEqual([]);
+    expect(left.activeLock).toBeNull();
     // And back again.
     expect(boardShip(r.world, 'ana', me).ok).toBe(true);
   });

@@ -51,18 +51,21 @@ function hunter(world: World, ship: Ship): Ship | null {
 }
 
 /**
- * Defence uses the same targeting a pilot does: select the hunter as the
- * target and switch weapons hot, and the turrets engage on their own.
- * When nobody is hunting it, the trader goes cold and clears its target.
+ * Defence uses the same locks a pilot does, and holds one: lock the
+ * hunter, make it active and switch weapons hot, and the turrets engage
+ * on their own once the lock completes. Any other lock is dropped first.
+ * When nobody is hunting it, the trader unlocks and goes cold.
  */
 function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
   const threat = hunter(world, ship);
-  const wantHot = threat !== null;
-  const wantTarget = threat?.id ?? null;
+  const stray = ship.locks.find((l) => l.targetId !== threat?.id);
+  const holding = threat ? ship.locks.some((l) => l.targetId === threat.id) : false;
   return {
     ...input,
-    selectTarget: ship.targetId !== wantTarget ? { id: wantTarget } : null,
-    toggleWeaponsHot: ship.weaponsHot !== wantHot,
+    unlock: stray?.targetId ?? null,
+    lock: threat && !holding && !stray ? threat.id : null,
+    activateLock: threat && holding && ship.activeLock !== threat.id ? threat.id : null,
+    toggleWeaponsHot: ship.weaponsHot !== (threat !== null),
   };
 }
 

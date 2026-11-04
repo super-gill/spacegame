@@ -56,7 +56,8 @@ export const SAVE_FORMAT = 'spacegame-world';
  *   Version 3 saves migrate: see `migrate3to4`.
  * - 5: 0.9.0, the living system. The world has bodies; stations ride
  *   orbits and carry their velocity; pirate brains may have a home on a
- *   rail. Version 4 saves migrate: see `migrate4to5`.
+ *   rail; ships hold target locks instead of one target. Version 4 saves
+ *   migrate: see `migrate4to5`.
  */
 export const SAVE_VERSION = 5;
 
@@ -73,6 +74,16 @@ export const MIGRATIONS: Record<number, Migration> = {
   3: (world) => migrate3to4(world),
   4: (world) => migrate4to5(world),
 };
+
+/**
+ * A ship with target locks in place of the old single target. Version 5
+ * worlds saved from `main` before locks landed (6c part 2, same version)
+ * have neither; their ships start with no locks.
+ */
+function withLocks(ship: Ship): Ship {
+  const { targetId: _old, ...rest } = ship as Ship & { targetId?: unknown };
+  return { ...rest, locks: Array.isArray(rest.locks) ? rest.locks : [], activeLock: rest.activeLock ?? null };
+}
 
 /** How far apart ships towed to Harbour with no free pad are left, units. */
 const TOW_SPACING = 60;
@@ -112,7 +123,7 @@ export function migrate4to5(world: unknown): unknown {
   // a towed ship never takes the pad a docked one was already on.
   const kept = Object.entries(world['ships'])
     .filter(([id, sh]) => isRecord(sh) && npcs[id] === undefined)
-    .map(([, sh]) => ({ ...(sh as unknown as Ship), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
+    .map(([, sh]) => ({ ...withLocks(sh as unknown as Ship), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
     .sort((a, b) => Number(b.state === 'docked') - Number(a.state === 'docked') || (a.id < b.id ? -1 : 1));
 
   const ships: Record<string, Ship> = {};
@@ -301,11 +312,14 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
 
   if (!looksLikeWorld(world)) return { ok: false, reason: 'damaged' };
   const savedAt = typeof parsed['savedAt'] === 'string' ? parsed['savedAt'] : '';
+  const ships: Record<string, Ship> = {};
+  for (const [id, ship] of Object.entries(world.ships)) ships[id] = withLocks(ship);
   return {
     ok: true,
     savedAt,
     world: {
       ...world,
+      ships,
       hulls: { ...HULLS },
       modules: { ...MODULES },
       loadouts: { ...LOADOUTS },

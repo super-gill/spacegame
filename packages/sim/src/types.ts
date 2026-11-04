@@ -68,7 +68,11 @@ export type ModuleStat =
   | 'structure'
   | 'cargoCapacity'
   /** Detection range, units. Hulls have a base range; sensor modules (later) add to it. */
-  | 'sensorRange';
+  | 'sensorRange'
+  /** How many ships it can hold locked at once. Hulls have a base; sensor modules (later) add to it. */
+  | 'maxLocks'
+  /** How fast it locks, as a multiplier: 1 is an ordinary hull, 2 locks in half the time. Sensor modules (later) add to it. */
+  | 'scanResolution';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon';
@@ -146,6 +150,10 @@ export interface HullSpec {
   maxTurnRate: number;
   /** Base detection range of the bare hull, units. Sensor modules (later) add to it. */
   sensorRange: number;
+  /** Ships the bare hull can hold locked at once. */
+  maxLocks: number;
+  /** Base lock speed multiplier (see `ModuleStat`). */
+  scanResolution: number;
   mounts: MountPoint[];
   bonuses: HullBonus[];
   /** A sealed hull cannot be refitted or bought (the Aurel Tacet dev ship, escape pods). */
@@ -202,6 +210,10 @@ export interface ShipStats {
    * not shown to its pilot. Stations and bodies are always known.
    */
   sensorRange: number;
+  /** Ships it can hold locked at once, whole. */
+  maxLocks: number;
+  /** Lock speed multiplier: lock time is divided by this (locks.ts). */
+  scanResolution: number;
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
 }
@@ -268,6 +280,24 @@ export interface WeaponState {
   cooldownTicks: number;
   /** World bearing the weapon points along, radians. Fixed weapons follow the heading. */
   aim: number;
+  /**
+   * The lock this weapon engages, by target ship id, or null or absent for
+   * the active lock. Turrets only; fixed guns stay on the nose. Nothing
+   * sets it yet: assigning systems to locks comes with 6e.
+   */
+  lockTarget?: string | null;
+}
+
+/**
+ * A target lock, held by the ship locking. Locking takes time (locks.ts):
+ * `progress` runs from 0 to 1 and the lock is complete at 1. Only
+ * complete locks can be fired on.
+ */
+export interface TargetLock {
+  /** The ship being locked. */
+  targetId: string;
+  /** 0 when started, 1 when locked. */
+  progress: number;
 }
 
 /** A shot in flight. */
@@ -395,9 +425,18 @@ export interface Ship {
   tractorActive: boolean;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
-  /** Ship currently selected as the target, or null. Turrets engage it while weapons are hot. */
-  targetId: string | null;
-  /** Turrets fire on their own at the target only while this is true. Fixed guns ignore it. */
+  /**
+   * Target locks, complete or in progress, oldest first. At most
+   * `ShipStats.maxLocks`. A lock drops when its target leaves sensor
+   * range, docks or is destroyed; all drop when this ship docks.
+   */
+  locks: TargetLock[];
+  /**
+   * Target ship id of the active lock, or null. Turrets engage it while
+   * weapons are hot, once it is complete. Always names one of `locks`.
+   */
+  activeLock: string | null;
+  /** Turrets fire on their own at the active lock only while this is true. Fixed guns ignore it. */
   weaponsHot: boolean;
 }
 
@@ -562,10 +601,15 @@ export interface ShipInput {
   /** Fire every fixed weapon. */
   fireFixed: boolean;
   /**
-   * Edge-triggered target change: `{ id }` selects that ship (or clears
-   * the target when `id` is null); null leaves the target as it is.
+   * Edge-triggered: start locking this ship, or null. Refused (with a
+   * `lockRefused` event) beyond sensor range, at max locks, or for a ship
+   * that cannot be locked. A new lock becomes active if none is.
    */
-  selectTarget: { id: string | null } | null;
+  lock: string | null;
+  /** Edge-triggered: drop the lock on this ship, or null. */
+  unlock: string | null;
+  /** Edge-triggered: make the lock on this ship the active one, or null. Ignored with no such lock. */
+  activateLock: string | null;
   /** Edge-triggered: switch weapons between hot and cold. */
   toggleWeaponsHot: boolean;
   /** Run the tractor beam to pull in nearby loot. */
@@ -649,6 +693,17 @@ export interface World {
 
 export type DamageCause = 'weapon' | 'ram' | 'station';
 
+/** Why a lock could not start. */
+export type LockRefusal =
+  | 'invalid' // no such ship, itself, or not flying
+  | 'already' // already locked or locking it
+  | 'maxLocks' // every lock slot in use
+  | 'outOfRange' // beyond this ship's sensor range
+  | 'docked'; // this ship is docked
+
+/** Why a lock was lost. */
+export type LockLossReason = 'unlocked' | 'outOfRange' | 'targetGone' | 'docked';
+
 export type WorldEvent =
   | { type: 'docked'; shipId: string; stationId: string; padId: string }
   | { type: 'undocked'; shipId: string; stationId: string }
@@ -671,6 +726,14 @@ export type WorldEvent =
   | { type: 'starterClaimed'; shipId: string; stationId: string }
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
   | { type: 'weaponsHotChanged'; shipId: string; hot: boolean }
+  /** `shipId` started locking `targetId`. */
+  | { type: 'lockStarted'; shipId: string; targetId: string }
+  /** `shipId` completed its lock on `targetId`. */
+  | { type: 'locked'; shipId: string; targetId: string }
+  /** `shipId` lost its lock on `targetId`: unlocked, out of sensor range, target gone or docked, or this ship docked. */
+  | { type: 'lockLost'; shipId: string; targetId: string; reason: LockLossReason }
+  /** `shipId` could not start a lock on `targetId`. */
+  | { type: 'lockRefused'; shipId: string; targetId: string; reason: LockRefusal }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
   | { type: 'collided'; shipId: string; stationId: string; speed: number }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */

@@ -1,4 +1,4 @@
-import type { BoardRefusal, Ship, Station, World, WorldEvent } from '@spacegame/sim';
+import type { BoardRefusal, LockRefusal, Ship, Station, World, WorldEvent } from '@spacegame/sim';
 import {
   BOARD_MAX_RELATIVE_SPEED,
   BOARD_RANGE,
@@ -27,6 +27,15 @@ import {
  */
 
 /** Why docking was refused, in words. */
+/** Why a lock could not start, in words. */
+const LOCK_REFUSALS: Record<LockRefusal, string> = {
+  invalid: 'Cannot lock that.',
+  already: 'Already locked.',
+  maxLocks: 'No lock slots free. Esc drops the active lock.',
+  outOfRange: 'Out of sensor range.',
+  docked: 'Cannot lock while docked.',
+};
+
 const DOCK_REFUSALS: Record<'tooFar' | 'tooFast' | 'noPad', string> = {
   tooFar: 'No station in range.',
   tooFast: 'Too fast to dock. Slow down.',
@@ -254,7 +263,8 @@ export class Ui {
 
   /** Bottom-right readout for the selected target: who, how far, closing speed, shields and structure. */
   private updateTarget(world: World, ship: Ship | null): void {
-    const target = ship?.targetId ? world.ships[ship.targetId] : undefined;
+    const target = ship?.activeLock ? world.ships[ship.activeLock] : undefined;
+    const lock = ship?.locks.find((l) => l.targetId === ship.activeLock);
     const hull = target ? world.hulls[target.hullId] : undefined;
     if (!ship || !target || !hull) {
       this.targetPanel.classList.add('hidden');
@@ -271,12 +281,12 @@ export class Ui {
     const rvy = target.velocity.y - ship.velocity.y;
     const closing = range > 0 ? -(dx * rvx + dy * rvy) / range : 0;
     this.targetPanel.textContent = [
-      `TARGET ${who}`,
+      `TARGET ${who}  ${lock && lock.progress < 1 ? `LOCKING ${Math.floor(lock.progress * 100)}%` : 'LOCKED'}`,
       `HULL   ${hull.name.toUpperCase()}`,
       `RANGE  ${range.toFixed(0).padStart(5)}`,
       `CLOSE  ${closing.toFixed(0).padStart(5)} u/s`,
       `SHD ${Math.ceil(target.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(target.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `[Tab] next  [Esc] clear`,
+      `LOCKS ${ship.locks.length}/${shipStats(world, ship).maxLocks}  [Tab] next  [Esc] unlock`,
     ].join('\n');
     this.targetPanel.classList.remove('hidden');
   }
@@ -312,6 +322,10 @@ export class Ui {
         this.showToast(`Collision at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'weaponsHotChanged') {
         this.showToast(e.hot ? 'Weapons hot' : 'Weapons cold', 1000, e.hot ? 'warn' : 'info');
+      } else if (e.type === 'lockRefused') {
+        this.showToast(LOCK_REFUSALS[e.reason], 1500);
+      } else if (e.type === 'lockLost' && e.reason !== 'unlocked') {
+        this.showToast(e.reason === 'outOfRange' ? 'Lock lost: out of sensor range.' : 'Lock lost.', 1500, 'info');
       } else if (e.type === 'lootCollected') {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
       }

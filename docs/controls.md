@@ -26,9 +26,9 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Target a ship | Left click on it | Clicking empty space leaves your target alone |
-| Next target | Tab | Nearest first, then outward; wraps round |
-| Clear target | Esc | |
+| Lock a ship | Left click on it | Locking takes a moment (the target panel shows LOCKING with a percentage); your ship's max locks limit how many you hold. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship |
+| Unlock | Esc | Drops the active lock; the next one takes over |
 
 The target gets corner brackets (white when cold, red when hot) and a readout bottom right: who it is, hull, range, closing speed, shields and structure. A target that docks or is destroyed is cleared.
 

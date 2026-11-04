@@ -1,6 +1,6 @@
 import { angleDelta, wrapAngle } from './angle.js';
 import { TURRET_FIRE_TOLERANCE } from './constants.js';
-import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, ShipStats, Station } from './types.js';
+import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, ShipStats, Station, WeaponState } from './types.js';
 import type { Carry } from './rails.js';
 import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
@@ -40,7 +40,8 @@ export interface FireResult {
  * Turn turrets, count down cooldowns, and fire.
  *
  * - Fixed weapons fire along the heading when the input asks.
- * - Turrets, while weapons are hot and there is a target, slew towards
+ * - Turrets, while weapons are hot and have a locked target (`targetFor`
+ *   gives each weapon's: its assigned lock or the active one), slew towards
  *   the point their shots need to lead to, no faster than their turn
  *   rate, and fire by themselves once within TURRET_FIRE_TOLERANCE of it
  *   and in range. A fast target crossing close by can outrun the slew:
@@ -54,7 +55,7 @@ export function fireWeapons(
   ship: Ship,
   stats: ShipStats,
   input: ShipInput,
-  target: Ship | null,
+  targetFor: (weapon: WeaponState) => Ship | null,
   dt: number,
   nextId: number,
 ): FireResult {
@@ -71,7 +72,8 @@ export function fireWeapons(
     let turretReady = false;
     if (spec.kind === 'turret') {
       aim = w.aim;
-      if (ship.weaponsHot && target) {
+      const target = ship.weaponsHot ? targetFor(w) : null;
+      if (target) {
         const wanted = toAngle(sub(leadPoint(ship, target, spec.projectileSpeed), ship.position));
         const step = spec.turretTurnRate * dt;
         aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));

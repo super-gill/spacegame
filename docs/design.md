@@ -73,11 +73,12 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 ### Weapons
 
-- The mouse is for choosing, not shooting: click a ship (or press Tab) to select it as your target. Flying and firing stay on the keyboard, so on bigger ships the pointer is free for other systems mid-fight.
+- The mouse is for choosing, not shooting: click a ship to lock it (Tab switches locks, Esc unlocks). Flying and firing stay on the keyboard, so on bigger ships the pointer is free for other systems mid-fight.
 - **Fixed** weapons fire along the ship's heading when you press Space. You aim by flying; with a target selected, a lead marker shows where to put the nose so shots meet it.
-- **Turrets** engage your selected target on their own while weapons are **hot** (H toggles hot and cold). They slew towards the target's lead point at a limited rate and fire once on aim and in range. A small, fast ship crossing close can outrun a turret's slew: that is tracking, and it is what stops big turret ships automatically beating small ones.
+- **Target locks**, as in EVE: locking a ship takes time, shorter with better scan resolution and against bigger ships (`lockSeconds`). A ship holds up to its `maxLocks` (hull now, sensor modules later), each inside sensor range; a lock drops when its target leaves range, docks or is destroyed, and all drop when you dock. One lock is active. Later (6e) each turret and other system can be assigned to a lock; fixed guns stay on the nose and need none.
+- **Turrets** engage your active lock, once complete, on their own while weapons are **hot** (H toggles hot and cold). They slew towards the target's lead point at a limited rate and fire once on aim and in range. A small, fast ship crossing close can outrun a turret's slew: that is tracking, and it is what stops big turret ships automatically beating small ones.
 - Weapons hot or cold exists so that selecting a ship never means shooting it. That matters once crime exists (milestone 7).
-- Targeting is ship state (`Ship.targetId`, `Ship.weaponsHot`), set through ship inputs, so NPCs use it the same way: a trader under attack targets the pirate and goes hot.
+- Locks are ship state (`Ship.locks`, `Ship.activeLock`, `Ship.weaponsHot`), set through ship inputs, so NPCs use them the same way: a trader under attack locks the pirate and goes hot, and its turrets open up once the lock completes.
 - **The rule:** at the same size, a fixed weapon always does more damage per second than a turret. Aiming with the hull is a skill and pays for it. A test enforces this across the whole weapon catalogue.
 - Weapons are data (`weapons.ts`) and reach a ship as weapon modules on its weapon mounts (see Ships). Each mount fires on its own cooldown. Sizes are S, M, L and XL, the same as mounts; a hull's role bonus to damage applies only to a weapon the full size of its mount.
 - Projectiles are real objects with travel time and range. They inherit the firing ship's velocity, so leading a moving target matters. Hits are tested along each shot's whole path through a tick, so fast shots cannot skip through small hulls. Stations block shots.

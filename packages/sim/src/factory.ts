@@ -55,7 +55,8 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
     weapons: weaponStatesFor(cat, hull, fit, o.heading),
     tractorActive: false,
     hold: { ...(o.hold ?? {}) },
-    targetId: null,
+    locks: [],
+    activeLock: null,
     weaponsHot: false,
   };
 }

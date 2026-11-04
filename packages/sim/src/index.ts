@@ -43,6 +43,7 @@ export {
   type TradeResult,
 } from './trade.js';
 export { buildShip } from './factory.js';
+export { lockSeconds, lockRefusal, stepLocks, isLocked, weaponTarget, activeTarget, type LockStep } from './locks.js';
 export { applyDamage, fireWeapons, leadPoint, stepProjectiles, regenerateShield } from './combat.js';
 export { collideShips } from './collision.js';
 export {

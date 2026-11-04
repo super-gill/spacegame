@@ -5,6 +5,7 @@ import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
+import { stepLocks, weaponTarget } from './locks.js';
 import { pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
@@ -101,18 +102,16 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     events.push(...moved.events);
     damage.push(...moved.damage);
 
-    // Targeting: apply any change, then drop a target that is gone, docked or ourselves.
-    let targeted = moved.ship;
-    if (input.selectTarget) targeted = { ...targeted, targetId: input.selectTarget.id };
+    // Locks: inputs, progress, and dropping those that no longer hold.
+    const locked = stepLocks(world, moved.ship, stats, input);
+    events.push(...locked.events);
+    let targeted = locked.ship;
     if (input.toggleWeaponsHot) {
       targeted = { ...targeted, weaponsHot: !targeted.weaponsHot };
       events.push({ type: 'weaponsHotChanged', shipId: id, hot: targeted.weaponsHot });
     }
-    const target = targeted.targetId ? world.ships[targeted.targetId] : undefined;
-    const validTarget = target && target.state === 'flying' && target.id !== id ? target : null;
-    if (targeted.targetId && !validTarget) targeted = { ...targeted, targetId: null };
-
-    const fired = fireWeapons(targeted, stats, input, validTarget, world.dt, nextEntityId);
+    const aimer = targeted;
+    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
 

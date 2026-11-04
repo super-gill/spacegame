@@ -95,7 +95,7 @@ const input = new InputController(
     if (action === 'toggleControls') controlsPanel.toggle();
     else if (action === 'toggleMenu') menu.toggle();
     else if (action === 'cycleTarget') cycleTarget();
-    else if (action === 'clearTarget') input.requestTarget(null);
+    else if (action === 'clearTarget') unlockActive();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
   },
@@ -346,14 +346,29 @@ function targetable(world: World, mine: Ship): Ship[] {
     .sort((a, b) => distance(mine.position, a.position) - distance(mine.position, b.position) || (a.id < b.id ? -1 : 1));
 }
 
-/** Tab: the next target outward from the current one, wrapping back to the nearest. */
+/**
+ * Tab: switch the active lock to the next one held. With no locks, lock
+ * the nearest ship instead. (Stopgap until the interface workstream's
+ * lock controls land.)
+ */
 function cycleTarget(): void {
   const mine = myShip(current);
   if (!mine) return;
-  const list = targetable(current, mine);
-  if (list.length === 0) return;
-  const at = list.findIndex((s) => s.id === mine.targetId);
-  input.requestTarget(list[(at + 1) % list.length]!.id);
+  if (mine.locks.length > 0) {
+    const at = mine.locks.findIndex((l) => l.targetId === mine.activeLock);
+    input.requestActivate(mine.locks[(at + 1) % mine.locks.length]!.targetId);
+    return;
+  }
+  const range = shipStats(current, mine).sensorRange;
+  const nearest = targetable(current, mine).find((s) => distance(mine.position, s.position) <= range);
+  if (nearest) input.requestLock(nearest.id);
+  else ui.notify('Nothing in sensor range to lock.');
+}
+
+/** Esc: drop the active lock. */
+function unlockActive(): void {
+  const mine = myShip(current);
+  if (mine?.activeLock) input.requestUnlock(mine.activeLock);
 }
 
 /** Left click: target the ship under the pointer, if any. Clicking empty space leaves the target alone. */
@@ -372,7 +387,10 @@ function clickTarget(point: { x: number; y: number }): void {
       bestDist = d;
     }
   }
-  if (best) input.requestTarget(best.id);
+  if (!best) return;
+  // Clicking a ship already locked makes it active; anything else starts a lock.
+  if (mine.locks.some((l) => l.targetId === best!.id)) input.requestActivate(best.id);
+  else input.requestLock(best.id);
 }
 
 /** Explosions are a client-side effect, started from `destroyed` events. */
@@ -559,8 +577,8 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     drawOffscreenMarker(ctx!, camera, ship.position, label, distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 
-  // Target bracket and, for fixed guns, the lead marker.
-  const target = mine?.targetId ? current.ships[mine.targetId] : undefined;
+  // Target bracket on the active lock (locking or locked) and, for fixed guns, the lead marker.
+  const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
