@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, awayFromStation, canAfford, holdLock, sternHoldPoint, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, attackRun, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -130,17 +130,15 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       const t = target!;
       // Lock first: until the lock completes it does not know enough to shoot.
       const lockInput = holdLock(ship, stats, t.id);
-      // Work round to the pirate's stern, where its shield is open.
-      const hold = sternHoldPoint(ship, t, WATCH_TUNING.standoff);
-      // Fight round stations, rocks and bodies, not through them.
-      const waypoint = routeAround(ship, stats, hold, around);
-      const desired = add(t.velocity, travelVelocity(ship, stats, waypoint, hold, stats.maxSpeed));
+      // Attack runs round stations, rocks and bodies, not through them.
       const gunMount = mainGun(stats);
       const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
-      const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...lockInput };
+      const plan = attackRun(world, ship, stats, t, aimPoint, gun ? gun.range * WATCH_TUNING.rangeFraction : 0, b.attack, around);
+      b = { ...b, attack: plan.state };
+      const input = { ...steerSafely(ship, stats, plan.desired, pull, plan.faceAt), ...lockInput };
       input.toggleWeaponsHot = !ship.weaponsHot;
-      if (gun && isLocked(ship, t.id)) {
+      if (gun && plan.attacking && isLocked(ship, t.id)) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * WATCH_TUNING.rangeFraction;
         input.fireFixed = aimError <= WATCH_TUNING.aimTolerance && inRange && !bystanderInLine(world, ship, t, gun.range) && canAfford(ship, stats, gun, gunMount![0]);
@@ -155,7 +153,8 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
   if (strongEnough) {
     const pirate = spotPirate(world, ship, stats);
     if (pirate) {
-      b = { ...b, mode: 'engage', targetId: pirate.id, modeTicks: 0 };
+      const { attack: _run, ...fresh } = b;
+      b = { ...fresh, mode: 'engage', targetId: pirate.id, modeTicks: 0 };
       return { input: { ...steerSafely(ship, stats, ship.velocity, pull), lock: pirate.id, activateLock: pirate.id }, brain: b, events };
     }
   }

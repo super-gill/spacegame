@@ -4,7 +4,7 @@ import { asteroidPositions } from '../asteroids.js';
 import { bodyStates, gravityAt, railTime } from '../rails.js';
 import { isLocked } from '../locks.js';
 import { incomingMunitions } from '../munitions.js';
-import type { ShipStats, Ship, ShipInput, Station, WeaponSpec, World } from '../types.js';
+import type { RunState, ShipStats, Ship, ShipInput, Station, WeaponSpec, World } from '../types.js';
 import { isGun } from '../weapons.js';
 import { add, distance, fromAngle, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
@@ -344,20 +344,78 @@ export function wantsCountermeasure(world: Pick<World, 'munitions'>, ship: Ship,
   return ship.weapons.some((w) => stats.weapons[w.mountId]?.family === 'countermeasure' && w.loaded > 0 && w.cooldownTicks === 0);
 }
 
-/** How far round the target an NPC works its hold point each time it plans, radians: it circles rather than cutting across. */
-const STERN_STEP = 0.9;
+export const RUN_TUNING = {
+  /** Break off an attack run this close to the target, units: early enough to pass clear, never ramming it. */
+  breakRange: 220,
+  /** Inside its guns' range, close no faster than this on the target, units/s: a firing window, not a flypast. */
+  firingClosingSpeed: 110,
+  /** Break off after this long on one run even if not that close, seconds. */
+  attackSeconds: 8,
+  /** Veer this far off the line to the target when breaking, radians: it passes the target's side, well clear. */
+  breakAngle: 1.0,
+  /** Extend at least this long before turning back, seconds. */
+  breakSeconds: 2,
+  /** ...and until at least this far from the target, units. */
+  extendRange: 550,
+  /** Turn back for another run after this long whatever the range, seconds. */
+  breakMaxSeconds: 5,
+  /** Extend at this share of top speed: fast enough to get clear, slow enough to turn back without a long loop. */
+  breakSpeedFraction: 0.65,
+};
+
+export interface RunPlan {
+  /** Velocity to steer for. */
+  desired: Vec2;
+  /** Where to point the nose; absent, the nose follows the velocity (breaking away). */
+  faceAt?: Vec2;
+  /** True on the attacking part of the run, when the guns may fire. */
+  attacking: boolean;
+  state: RunState;
+}
 
 /**
- * Where to hold off `target` while fighting it: `standoff` from it, worked
- * round from where this ship is towards the target's stern, a step at a
- * time. The shield's open stern is where a hit goes straight to the hull,
- * so fighters circle for it rather than trading shots bow to bow; a target
- * that turns to keep its bow on them keeps them circling. The NPC still
- * points its nose at the target while it goes round (its guns are fixed).
+ * Attack runs (4 November 2026). Ships cannot slide sideways at speed
+ * (`WorldRules.manoeuvreSpeed`), so fighters make passes, as in Flatspace:
+ *
+ * - attack: fly at the target nose-on, aiming at `aimPoint` and firing
+ *   (the caller decides when to fire), until close or the run has gone on
+ *   long enough;
+ * - break: veer off past the target's side and burn away with the nose
+ *   along the velocity, showing it a side and stern, until far enough
+ *   out; then turn back for the next run.
+ *
+ * Passes come from wherever the last one left off, so a target that just
+ * sits turning to face them still gets shots into its beams and stern.
  */
-export function sternHoldPoint(ship: Ship, target: Ship, standoff: number): Vec2 {
-  const bearing = toAngle(sub(ship.position, target.position));
-  const toStern = angleDelta(bearing, target.heading + Math.PI);
-  const step = Math.max(-STERN_STEP, Math.min(STERN_STEP, toStern));
-  return add(target.position, scale(fromAngle(bearing + step), standoff));
+export function attackRun(
+  world: Pick<World, 'dt'>,
+  ship: Ship,
+  stats: ShipStats,
+  target: Ship,
+  aimPoint: Vec2,
+  fireRange: number,
+  state: RunState | undefined,
+  around: Obstacle[],
+): RunPlan {
+  let s: RunState = state ? { ...state, runTicks: state.runTicks + 1 } : { run: 'attack', runTicks: 0, breakHeading: 0 };
+  const range = distance(ship.position, target.position);
+  const seconds = s.runTicks * world.dt;
+
+  if (s.run === 'attack' && (range <= RUN_TUNING.breakRange || seconds >= RUN_TUNING.attackSeconds)) {
+    // Pass the target on the side the ship is already drifting towards.
+    const toTarget = toAngle(sub(target.position, ship.position));
+    const rel = sub(ship.velocity, target.velocity);
+    const across = Math.cos(toTarget) * rel.y - Math.sin(toTarget) * rel.x;
+    s = { run: 'break', runTicks: 0, breakHeading: toTarget + (across >= 0 ? 1 : -1) * RUN_TUNING.breakAngle };
+  } else if (s.run === 'break' && ((seconds >= RUN_TUNING.breakSeconds && range >= RUN_TUNING.extendRange) || seconds >= RUN_TUNING.breakMaxSeconds)) {
+    s = { ...s, run: 'attack', runTicks: 0 };
+  }
+
+  if (s.run === 'break') {
+    const waypoint = routeAround(ship, stats, add(ship.position, scale(fromAngle(s.breakHeading), 600)), around);
+    return { desired: add(target.velocity, scale(normalise(sub(waypoint, ship.position)), stats.maxSpeed * RUN_TUNING.breakSpeedFraction)), attacking: false, state: s };
+  }
+  const waypoint = routeAround(ship, stats, target.position, around);
+  const closing = range <= fireRange ? Math.min(stats.maxSpeed, RUN_TUNING.firingClosingSpeed) : stats.maxSpeed;
+  return { desired: add(target.velocity, scale(normalise(sub(waypoint, ship.position)), closing)), faceAt: aimPoint, attacking: true, state: s };
 }

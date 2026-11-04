@@ -20,7 +20,7 @@ function quiet(): World {
   // Gravity is a world rule, off by default since the 4 November playtest;
   // these tests are about the mechanic, so they switch it on.
   // Gravity's tests also need the orbits moving (stations orbit as ships would).
-  return setOrbitsMoving({ ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rules: { gravity: true, orbits: false } }, true);
+  return setOrbitsMoving({ ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rules: { gravity: true, orbits: false, manoeuvreSpeed: 1 } }, true);
 }
 
 function planetNow(w: World) {

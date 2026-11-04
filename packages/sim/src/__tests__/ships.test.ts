@@ -383,12 +383,12 @@ describe('ships in the world', () => {
   });
 
   it('a new pilot who fights back in the starter beats the raider, and feels the capacitor', () => {
-    // Ana flies at the real pirate AI straight: nose on the lead point, fire when on it.
+    // Ana flies at the real pirate AI as the client flies by default: nose on the lead point by mouse, burn in when far, fire when on it.
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const me = pilotShip(w, 'ana')!.id;
     const pir = Object.keys(w.npcs).find((id) => w.npcs[id]!.kind === 'pirate')!;
     const p = w.ships[pir]!;
-    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: p.position.x + 400, y: p.position.y }, velocity: { ...p.velocity }, flightMode: 'rotation' } } };
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: p.position.x + 400, y: p.position.y }, velocity: { ...p.velocity } } } };
     let ranDry = false;
     let seconds = 0;
     for (let t = 0; t < SECOND * 120; t++) {
@@ -400,7 +400,7 @@ describe('ships in the world', () => {
       const err = angleDelta(mine.heading, want);
       const d = distance(mine.position, foe.position);
       w = stepWorld(w, {
-        [me]: { ...emptyInput(), turnLeft: err < -0.05, turnRight: err > 0.05, thrustForward: d > 350 && Math.abs(err) < 0.5, thrustReverse: d < 150, fireFixed: Math.abs(err) < 0.08 && d < gun.range * 0.9, lock: t === 0 ? pir : null, activateLock: t === 0 ? pir : null, toggleWeaponsHot: t === 0 },
+        [me]: { ...emptyInput(), aimHeading: want, thrustForward: d > 300 && Math.abs(err) < 0.5, fireFixed: Math.abs(err) < 0.08 && d < gun.range * 0.9, lock: t === 0 ? pir : null, activateLock: t === 0 ? pir : null, toggleWeaponsHot: t === 0 },
       });
       if (w.events.some((e) => e.type === 'capacitorEmpty' && e.shipId === me)) ranDry = true;
       seconds = t / SECOND;

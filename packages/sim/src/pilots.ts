@@ -295,13 +295,14 @@ export function adminSpawnShip(world: World, pilotId: string, loadoutId: string)
 }
 
 /** Admin: switch a world rule on or off (see `WorldRules`). Orbits start and stop without anything jumping. */
-export function adminSetRule(world: World, pilotId: string, rule: keyof WorldRules, on: boolean): CommandResult<AdminRefusal> {
+export function adminSetRule<K extends keyof WorldRules>(world: World, pilotId: string, rule: K, value: WorldRules[K]): CommandResult<AdminRefusal> {
   const pilot = world.pilots[pilotId];
   if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
+  if (typeof value === 'number' && !(value >= 0 && value <= 1)) return { ok: false, world, reason: 'badAmount' };
   return {
     ok: true,
-    world: rule === 'orbits' ? setOrbitsMoving(world, on) : { ...world, rules: { ...world.rules, [rule]: on } },
-    event: { type: 'adminRuleChanged', shipId: pilot.shipId ?? '', rule, on },
+    world: rule === 'orbits' ? setOrbitsMoving(world, value as boolean) : { ...world, rules: { ...world.rules, [rule]: value } },
+    event: { type: 'adminRuleChanged', shipId: pilot.shipId ?? '', rule, value },
   };
 }
 

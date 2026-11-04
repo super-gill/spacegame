@@ -39,6 +39,33 @@ function limitThrust(before: Vec2, after: Vec2, max: number): Vec2 {
   return len > cap ? scale(after, cap / len) : after;
 }
 
+/**
+ * The manoeuvring limit (`WorldRules.manoeuvreSpeed`): along the ship's
+ * own axes, thrust may push the forward component up to `max`, but the
+ * backward and sideways components only up to `share` of it. Like the
+ * speed limit it only stops thrust adding speed: a component already past
+ * its cap (a ship that turned while moving fast) keeps what it had, and
+ * only shrinks.
+ */
+function limitManoeuvre(before: Vec2, after: Vec2, heading: number, max: number, share: number): Vec2 {
+  if (share >= 1) return after;
+  const { forward, right } = shipAxes(heading);
+  const along = (v: Vec2, axis: Vec2): number => v.x * axis.x + v.y * axis.y;
+  const cap = (was: number, now: number, plus: number, minus: number): number => {
+    if (now > plus && now > was) return Math.max(was, plus);
+    if (now < -minus && now < was) return Math.min(was, -minus);
+    return now;
+  };
+  const side = max * share;
+  const af = along(after, forward);
+  const ar = along(after, right);
+  const f = cap(along(before, forward), af, Infinity, side);
+  const r = cap(along(before, right), ar, side, side);
+  // Nothing capped: hand back the velocity untouched, so rounding never creeps in.
+  if (f === af && r === ar) return after;
+  return add(scale(forward, f), scale(right, r));
+}
+
 function clamp(value: number, max: number): number {
   return Math.max(-max, Math.min(max, value));
 }
@@ -77,6 +104,7 @@ export function stepShip(
   dt: number,
   frame: Vec2 = { x: 0, y: 0 },
   gravity: Vec2 = { x: 0, y: 0 },
+  manoeuvreSpeed = 1,
 ): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
@@ -92,7 +120,8 @@ export function stepShip(
   // position, which keeps free orbits from gaining or losing energy.
   const before = sub(ship.velocity, frame);
   const after = add(before, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
-  const velocity = add(frame, settle(add(limitThrust(before, after, stats.maxSpeed), pull)));
+  const thrusted = limitManoeuvre(before, limitThrust(before, after, stats.maxSpeed), ship.heading, stats.maxSpeed, manoeuvreSpeed);
+  const velocity = add(frame, settle(add(thrusted, pull)));
 
   let angularVelocity = ship.angularVelocity + angularAcceleration(stats, thrusters) * dt;
   angularVelocity = clamp(angularVelocity, stats.maxTurnRate);

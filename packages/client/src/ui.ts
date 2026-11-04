@@ -274,7 +274,8 @@ export class Ui {
     const ship = world.ships[e.shipId];
     const name = ship ? shipName(world, ship) : 'ship';
     if (e.type === 'adminRuleChanged') {
-      this.showToast(`Admin: ${e.rule} ${e.on ? 'on' : 'off'}.`, 2000, 'info');
+      const value = typeof e.value === 'number' ? `${Math.round(e.value * 100)}%` : e.value ? 'on' : 'off';
+      this.showToast(`Admin: ${e.rule} ${value}.`, 2000, 'info');
     } else if (e.type === 'adminCreditsGranted') {
       this.showToast(`Admin: +${e.amount.toLocaleString('en-GB')} cr.`, 2000, 'info');
     } else if (e.type === 'adminShipSpawned') {

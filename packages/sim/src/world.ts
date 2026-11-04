@@ -43,7 +43,7 @@ export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, res
 const PIRATE_HOME_INWARD = 1300;
 
 /** The rules a new world starts with: mechanics under trial, off (see `WorldRules`). */
-export const DEFAULT_RULES: WorldRules = { gravity: false, orbits: false };
+export const DEFAULT_RULES: WorldRules = { gravity: false, orbits: false, manoeuvreSpeed: 0.2 };
 
 /**
  * The starter system, Calder (bodies.ts, stations.ts): a star, a planet

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PIRATE_TUNING } from '../ai/pirate.js';
-import { arriveVelocity, steerToVelocity, turnTowards } from '../ai/steer.js';
+import { RUN_TUNING, arriveVelocity, steerToVelocity, turnTowards } from '../ai/steer.js';
 import { FIXED_DT } from '../constants.js';
 import { idleThrusters } from '../flight.js';
 import { TEST_SHIP_COMBAT, loadoutStats } from './fixtures.js';
@@ -116,16 +116,23 @@ describe('pirate', () => {
     return { w, shipId };
   }
 
-  it('hunts a lone ship in the open and holds station off it', () => {
+  it('hunts a lone ship in the open with attack runs: in close, away past it, and back', () => {
     let { w, shipId } = lonePilotWorld();
     let started = false;
-    w = run(w, 20, (x) => {
+    let closest = Infinity;
+    let furthestAfterClose = 0;
+    let backIn = false;
+    w = run(w, 30, (x) => {
       if (x.events.some((e) => e.type === 'huntStarted' && e.shipId === shipId)) started = true;
+      const gap = distance(x.ships[PIRATE]!.position, x.ships[shipId]!.position);
+      closest = Math.min(closest, gap);
+      if (closest <= RUN_TUNING.breakRange + 20) furthestAfterClose = Math.max(furthestAfterClose, gap);
+      if (furthestAfterClose >= RUN_TUNING.extendRange - 100 && gap <= RUN_TUNING.breakRange + 40) backIn = true;
     });
     expect(started).toBe(true);
-    const gap = distance(w.ships[PIRATE]!.position, pilotShip(w, 'ana')!.position);
-    expect(gap).toBeGreaterThan(PIRATE_TUNING.standoff - 40);
-    expect(gap).toBeLessThan(PIRATE_TUNING.standoff + 40);
+    expect(closest).toBeLessThan(RUN_TUNING.breakRange + 20);
+    expect(furthestAfterClose).toBeGreaterThan(RUN_TUNING.extendRange - 100);
+    expect(backIn).toBe(true);
   });
 
   it('gives up when the target docks', () => {

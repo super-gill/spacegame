@@ -544,6 +544,11 @@ button:hover {
   padding: 5px 8px;
 }
 
+.menu-panel input[type='range'] {
+  flex: 1;
+  accent-color: var(--ink);
+}
+
 .menu-row button {
   white-space: nowrap;
 }

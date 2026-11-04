@@ -347,7 +347,8 @@ describe('NPC combat', () => {
       w = stepWorld(w, {});
       hits += w.events.filter((e) => e.type === 'damaged' && e.shipId === me && e.by === 'npc-pirate-1').length;
     }
-    expect(hits).toBeGreaterThan(10);
+    // Attack runs: it fires on the way in and breaks away, so hits come in bursts, two runs' worth here.
+    expect(hits).toBeGreaterThanOrEqual(8);
   });
 
   it('a pirate turns on whoever shoots it', () => {

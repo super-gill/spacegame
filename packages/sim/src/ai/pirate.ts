@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, canAfford, holdLock, plannedBraking, sternHoldPoint, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
+import { arriveVelocity, attackRun, canAfford, holdLock, plannedBraking, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -127,7 +127,9 @@ function avoid(world: World, around: readonly Obstacle[]): Obstacle[] {
 }
 
 function switchMode(brain: PirateBrain, mode: PirateMode, extra: Partial<PirateBrain> = {}): PirateBrain {
-  return { ...brain, mode, modeTicks: 0, ...extra };
+  // Every new mode starts any fight afresh, with an attack run.
+  const { attack: _run, ...rest } = brain;
+  return { ...rest, mode, modeTicks: 0, ...extra };
 }
 
 /**
@@ -209,18 +211,16 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       // Hold a point between pirate and target, `standoff` short of the target,
       // and match the target's velocity on top.
       const t = target!;
-      // Work round to the target's stern, where its shield is open.
-      const holdPoint = sternHoldPoint(ship, t, PIRATE_TUNING.standoff);
-      const closing = travelVelocity(ship, stats, routeAround(ship, stats, holdPoint, around), holdPoint, stats.maxSpeed);
-      const desired = keepOutOfZones(world, ship, stats, add(t.velocity, closing));
-
-      // Point the nose where the shots need to go, and fire when it is there.
-      // Lock as it closes: its missiles need one, its guns do not.
+      // Attack runs: in nose-on and firing, break away past it, come round
+      // again. Lock as it closes: its missiles need one, its guns do not.
       const gunMount = mainGun(stats);
       const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
-      const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...holdLock(ship, stats, t.id) };
-      if (gun) {
+      const plan = attackRun(world, ship, stats, t, aimPoint, gun ? gun.range * PIRATE_TUNING.rangeFraction : 0, b.attack, around);
+      b = { ...b, attack: plan.state };
+      const desired = keepOutOfZones(world, ship, stats, plan.desired);
+      const input = { ...steerSafely(ship, stats, desired, pull, plan.faceAt), ...holdLock(ship, stats, t.id) };
+      if (gun && plan.attacking) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
         input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange && canAfford(ship, stats, gun, gunMount![0]);

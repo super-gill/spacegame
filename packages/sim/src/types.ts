@@ -918,9 +918,25 @@ export interface WatchBrain {
   targetId: string | null;
   /** Ticks in the current mode, or left to hold at a beat point. */
   modeTicks: number;
+  /** Its attack run, while engaged. */
+  attack?: RunState;
 }
 
 export type PirateMode = 'prowl' | 'hunt' | 'withdraw';
+
+/**
+ * Where a fighting NPC is in its attack run (ai/steer.ts `attackRun`):
+ * coming in nose-on and firing, or breaking away past its target to come
+ * round again. Absent on brains saved before runs existed: they start on
+ * an attack.
+ */
+export interface RunState {
+  run: 'attack' | 'break';
+  /** Ticks into the current part of the run. */
+  runTicks: number;
+  /** World bearing it extends along while breaking, radians. */
+  breakHeading: number;
+}
 
 /** Patrols near a home point and hunts lone ships outside station security. */
 export interface PirateBrain {
@@ -943,6 +959,8 @@ export interface PirateBrain {
   patrolIndex: number;
   /** Ship that last shot or rammed this pirate. It will turn on them. */
   provokedBy: string | null;
+  /** Its attack run, while hunting. */
+  attack?: RunState;
 }
 
 /**
@@ -967,6 +985,16 @@ export interface WorldRules {
    * only with rails.ts `setOrbitsMoving`, which keeps everything in place.
    */
   orbits: boolean;
+  /**
+   * How fast thrust can push a ship sideways or backwards, as a share of
+   * its top speed (0 to 1). Forward, thrust reaches top speed as ever. At
+   * 0 the ship only flies where its nose points, as in Flatspace; at 1,
+   * any direction alike. Set by the 4 November 2026 playtest to stop
+   * ships holding their bows on each other while sliding round: to
+   * reposition, a ship has to turn and burn. Momentum is never cut, only
+   * thrust: a ship that turns at speed keeps its drift.
+   */
+  manoeuvreSpeed: number;
 }
 
 export interface World {
@@ -1035,7 +1063,7 @@ export type WorldEvent =
   /** Admin (testing): a ship from any loadout, free, docked here. */
   | { type: 'adminShipSpawned'; shipId: string; stationId: string; loadoutId: string }
   /** Admin (testing): a world rule switched. `shipId` is the pilot's ship, or empty. */
-  | { type: 'adminRuleChanged'; shipId: string; rule: keyof WorldRules; on: boolean }
+  | { type: 'adminRuleChanged'; shipId: string; rule: keyof WorldRules; value: boolean | number }
   /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */
   | { type: 'boarded'; shipId: string; from: string }
   /** The ship a pilot was flying was destroyed and they got away in the pod `shipId`. */

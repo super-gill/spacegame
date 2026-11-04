@@ -63,3 +63,39 @@ describe('mouse steering', () => {
     expect(after.heading).toBe(0);
   });
 });
+
+describe('manoeuvring speed (WorldRules.manoeuvreSpeed)', () => {
+  /** Fly with the limit at `share` for `seconds`. */
+  function flyAt(s: Ship, input: Partial<ShipInput>, seconds: number, share: number): Ship {
+    const stats = shipStats(w, s);
+    for (let i = 0; i < seconds * 60; i++) s = stepShip(s, stats, { ...emptyInput(), ...input }, DT, { x: 0, y: 0 }, { x: 0, y: 0 }, share);
+    return s;
+  }
+
+  it('lets thrust reach top speed forward but only its share sideways and backwards', () => {
+    const top = shipStats(w, tern('manual')).maxSpeed;
+    const forward = flyAt(tern('manual'), { thrustForward: true }, 10, 0.2);
+    const sideways = flyAt(tern('manual'), { strafeRight: true }, 10, 0.2);
+    const backwards = flyAt(tern('manual'), { thrustReverse: true }, 10, 0.2);
+    expect(Math.hypot(forward.velocity.x, forward.velocity.y)).toBeCloseTo(top, 3);
+    expect(Math.hypot(sideways.velocity.x, sideways.velocity.y)).toBeCloseTo(top * 0.2, 3);
+    expect(Math.hypot(backwards.velocity.x, backwards.velocity.y)).toBeCloseTo(top * 0.2, 3);
+  });
+
+  it('never cuts momentum: a ship that turns at speed keeps its drift', () => {
+    const fast = flyAt(tern('manual'), { thrustForward: true }, 10, 0.2);
+    const turned = { ...fast, heading: Math.PI / 2 };
+    const after = flyAt(turned, {}, 1, 0.2);
+    expect(after.velocity.x).toBeCloseTo(fast.velocity.x, 6);
+  });
+
+  it('at 0 a ship only thrusts where its nose points; at 1 every way alike', () => {
+    expect(Math.hypot(...Object.values(flyAt(tern('manual'), { strafeRight: true }, 3, 0).velocity))).toBe(0);
+    const top = shipStats(w, tern('manual')).maxSpeed;
+    expect(Math.hypot(...Object.values(flyAt(tern('manual'), { strafeRight: true }, 20, 1).velocity))).toBeCloseTo(top, 3);
+  });
+
+  it('starts new worlds at 20%', () => {
+    expect(w.rules.manoeuvreSpeed).toBe(0.2);
+  });
+});

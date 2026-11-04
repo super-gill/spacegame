@@ -362,6 +362,14 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     }
     commanded(r.world, r.event);
   },
+  setManoeuvreSpeed(share) {
+    const r = adminSetRule(current, me.id, 'manoeuvreSpeed', share);
+    if (!r.ok) {
+      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
+      return;
+    }
+    commanded(r.world, r.event);
+  },
   setOrbits(on) {
     const r = adminSetRule(current, me.id, 'orbits', on);
     if (!r.ok) {
@@ -589,6 +597,7 @@ function frame(nowMs: number): void {
   menu.setSavedStatus(lastSaveOk ? `Saved ${ago} s ago, in this browser.` : 'Not saving: browser storage is not available.');
   menu.setGravity(current.rules.gravity);
   menu.setOrbits(current.rules.orbits);
+  menu.setManoeuvreSpeed(current.rules.manoeuvreSpeed);
   accumulator += frameSeconds;
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 

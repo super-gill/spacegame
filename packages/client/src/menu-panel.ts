@@ -21,6 +21,8 @@ export interface MenuActions {
   setGravity(on: boolean): void;
   /** Admin (testing): start or stop the orbits for the whole world. */
   setOrbits(on: boolean): void;
+  /** Admin (testing): how fast thrust pushes ships sideways or backwards, 0 to 1 of top speed. */
+  setManoeuvreSpeed(share: number): void;
 }
 
 /** A loadout the admin spawner offers. */
@@ -56,6 +58,8 @@ export class MenuPanel {
   private readonly savedLine = el('p', 'muted');
   private readonly gravityBox = el('input');
   private readonly orbitsBox = el('input');
+  private readonly manoeuvreSlider = el('input');
+  private readonly manoeuvreValue = el('span');
 
   constructor(
     root: HTMLElement,
@@ -168,6 +172,17 @@ export class MenuPanel {
     orbitsRow.append(this.orbitsBox, document.createTextNode(' Orbits: planets, moons and stations move'));
     this.panel.append(orbitsRow);
     this.panel.append(el('p', 'muted', 'Both off by default and saved with the world. Bodies keep their solid surfaces either way; switching orbits keeps everything where it is.'));
+    const manoeuvreRow = el('label', 'menu-row');
+    this.manoeuvreSlider.type = 'range';
+    this.manoeuvreSlider.min = '0';
+    this.manoeuvreSlider.max = '100';
+    this.manoeuvreSlider.step = '5';
+    this.manoeuvreSlider.setAttribute('aria-label', 'Manoeuvring speed');
+    this.manoeuvreSlider.addEventListener('input', () => (this.manoeuvreValue.textContent = `${this.manoeuvreSlider.value}%`));
+    this.manoeuvreSlider.addEventListener('change', () => actions.setManoeuvreSpeed(Number(this.manoeuvreSlider.value) / 100));
+    manoeuvreRow.append(document.createTextNode('Manoeuvring speed '), this.manoeuvreSlider, this.manoeuvreValue);
+    this.panel.append(manoeuvreRow);
+    this.panel.append(el('p', 'muted', 'How fast thrust can push you sideways or backwards, as a share of top speed. 0% flies like Flatspace: only where the nose points. 100%: any direction alike. Default 20%.'));
 
     root.append(this.panel);
   }
@@ -184,6 +199,14 @@ export class MenuPanel {
   /** Reflect the world's gravity rule (it changes with loads and imports too). */
   setGravity(on: boolean): void {
     if (this.gravityBox.checked !== on) this.gravityBox.checked = on;
+  }
+
+  /** Reflect the world's manoeuvring speed (unless the slider is being dragged). */
+  setManoeuvreSpeed(share: number): void {
+    if (document.activeElement === this.manoeuvreSlider) return;
+    const percent = String(Math.round(share * 100));
+    if (this.manoeuvreSlider.value !== percent) this.manoeuvreSlider.value = percent;
+    this.manoeuvreValue.textContent = `${percent}%`;
   }
 
   /** Reflect the world's orbits rule. */

@@ -6,7 +6,7 @@ Press **F1** (or **`**) in game, or click **Controls** in the top right, to see 
 
 ## Flight
 
-**Mouse steering is on by default:** the nose follows the pointer (a crosshair over the game), turning as fast as the hull allows, and **A and D strafe** instead of spinning. With it on, the **left button fires** the selected group (Space still does too) and the **right button chooses**: right-click a ship to lock it. While the pointer is over a panel, card or button the nose holds its aim, and clicks there never fire. Turn mouse steering off in the menu (F2, Controls) to steer with A and D as below; then the left button locks ships again and only Space fires.
+**Mouse steering is on by default:** the nose follows the pointer (a crosshair over the game), turning as fast as the hull allows, and **A and D strafe** instead of spinning. Sideways and backwards thrust only reach 20% of top speed (Admin: manoeuvring speed): to reposition, turn and burn. With mouse steering on, the **left button fires** the selected group (Space still does too) and the **right button chooses**: right-click a ship to lock it. While the pointer is over a panel, card or button the nose holds its aim, and clicks there never fire. Turn mouse steering off in the menu (F2, Controls) to steer with A and D as below; then the left button locks ships again and only Space fires.
 
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |

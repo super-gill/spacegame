@@ -131,7 +131,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // sphere the ship started the tick in. Station hulls are where they
     // will be at the end of the tick, as the ship is.
     const pull = ship.state === 'flying' ? rails.gravityAt(ship.position) : { x: 0, y: 0 };
-    const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship), pull);
+    const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship), pull, world.rules.manoeuvreSpeed);
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
     const hulls = collideWithStations(flown, stats, stationsNext);
     const ground = collideWithSurfaces(hulls.ship, stats, solid);
@@ -217,7 +217,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     if (brain?.kind === 'pirate' && d.by && d.by !== d.shipId) npcs[d.shipId] = { ...brain, provokedBy: d.by };
     // The Watch turns on any pirate that shoots it.
     if (brain?.kind === 'watch' && d.by && world.npcs[d.by]?.kind === 'pirate' && brain.mode !== 'engage') {
-      npcs[d.shipId] = { ...brain, mode: 'engage', targetId: d.by, modeTicks: 0 };
+      const { attack: _run, ...fresh } = brain;
+      npcs[d.shipId] = { ...fresh, mode: 'engage', targetId: d.by, modeTicks: 0 };
     }
   }
 
