@@ -1,12 +1,23 @@
+import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, PLANET_GRAVITY, PLANET_ID, boundOrbit, starterBodies } from './bodies.js';
+import { FIXED_DT } from './constants.js';
+import { placeStations } from './rails.js';
 import type { ModuleSize, Pad, Station } from './types.js';
 import { fromAngle, scale } from './vec2.js';
 
 /**
- * The starter sector's stations, as data. Content, not engine: later
- * sectors will be data files. Save migrations read pad layouts and ship
- * mart stock from here too, so a station in an old save gains exactly
- * what a new world's copy has.
+ * The starter system's stations, as data. Content, not engine: later
+ * systems will be generated and stored. Save migrations read pad layouts
+ * and ship mart stock from here too, so a station in an old save gains
+ * exactly what a new world's copy has.
+ *
+ * Stations ride orbits (bodies.ts has what they orbit). The factories
+ * here give a station with its orbit and a placeholder position; place
+ * it with `placeStations` for the tick you need, as `starterStations`
+ * does for tick 0.
  */
+
+/** Harbour's orbit round the planet, units from its centre: a low orbit, two minutes round. */
+export const HARBOUR_ORBIT_RADIUS = 900;
 
 /** How far beyond the station hull a pad's centre sits, by pad size, units. */
 const PAD_REACH: Record<ModuleSize, number> = { S: 14, M: 22, L: 32, XL: 44 };
@@ -33,12 +44,17 @@ export function padRing(stationRadius: number, sizes: readonly ModuleSize[], sta
 export const HARBOUR_ID = 'station-harbour';
 export const RIDGE_ID = 'station-ridge';
 
-/** A busy farming and manufacturing hub, home of new pilots. Outfitting and a ship mart. */
+/** Where on the belt Ridge Outpost is at tick 0, radians. Pirates lurk a little inward of it. */
+export const RIDGE_PHASE = 0.6;
+
+/** A busy farming and manufacturing hub in low orbit round the planet, home of new pilots. Outfitting and a ship mart. */
 export function harbourStation(): Station {
   return {
     id: HARBOUR_ID,
     name: 'Harbour Station',
     position: { x: 0, y: 0 },
+    velocity: { x: 0, y: 0 },
+    orbit: boundOrbit(PLANET_ID, PLANET_GRAVITY, HARBOUR_ORBIT_RADIUS, -Math.PI / 2),
     radius: 90,
     dockRange: 220,
     securityRadius: 900,
@@ -57,12 +73,18 @@ export function harbourStation(): Station {
   };
 }
 
-/** A mining outpost. No outfitting, no ship mart. */
+/**
+ * A mining outpost on the belt, turning with it. No outfitting, no ship
+ * mart. The belt has no gravity, so its period is the belt's, not one
+ * worked out from gravity.
+ */
 export function ridgeOutpost(): Station {
   return {
     id: RIDGE_ID,
     name: 'Ridge Outpost',
-    position: { x: 4800, y: -1600 },
+    position: { x: 0, y: 0 },
+    velocity: { x: 0, y: 0 },
+    orbit: { parent: BELT_ID, radius: BELT_RING_RADIUS, period: BELT_PERIOD, phase: RIDGE_PHASE, direction: 1 },
     radius: 70,
     dockRange: 190,
     securityRadius: 700,
@@ -80,10 +102,10 @@ export function ridgeOutpost(): Station {
   };
 }
 
-/** Every station in the starter sector, by id. */
-export function starterStations(): Record<string, Station> {
+/** Every station in the starter system, by id, placed where they are at `tick`. */
+export function starterStations(tick = 0, dt = FIXED_DT): Record<string, Station> {
   const all = [harbourStation(), ridgeOutpost()];
-  return Object.fromEntries(all.map((s) => [s.id, s]));
+  return placeStations(starterBodies(), Object.fromEntries(all.map((s) => [s.id, s])), tick, dt);
 }
 
 /**

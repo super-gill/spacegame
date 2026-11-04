@@ -4,8 +4,9 @@ import { buildShip } from './factory.js';
 import { isEmptyShip, isEscapePod, ownedShips, vacated } from './ownership.js';
 import { HARBOUR_ID } from './stations.js';
 import type { Catalogues } from './stats.js';
-import type { Loadout, Pilot, Ship, World, WorldEvent } from './types.js';
-import { add, distance, fromAngle, length, scale, sub } from './vec2.js';
+import { frameVelocity, orbitAngle, railTime } from './rails.js';
+import type { Loadout, Pilot, Ship, Station, World, WorldEvent } from './types.js';
+import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
  * Pilot commands about ships: buying them, boarding them, getting out of
@@ -37,8 +38,15 @@ export const STARTER_LOADOUT_ID = 'meridian-starter';
 /** The fixed fit every escape pod has. */
 export const ESCAPE_POD_LOADOUT_ID = 'escape-pod';
 
-/** How far from the starter station a ship placed in space appears. */
+/** How far from the starter station a ship placed in space appears, units (along its orbit, if it has one). */
 const SPAWN_DISTANCE = 650;
+/** Each further pilot placed in space appears this much further along, units. */
+const SPAWN_SPACING = 250;
+/**
+ * How far outside a station's orbit ships are placed in space, units:
+ * inside its dock range when it passes, clear of its hull.
+ */
+const SPAWN_ORBIT_OFFSET = 170;
 
 /** Deterministic id for the `n`th ship issued to a pilot, counting from 1. */
 export function pilotShipId(pilotId: string, n: number): string {
@@ -83,9 +91,34 @@ function loadoutOrThrow(world: World, id: string): Loadout {
 }
 
 /**
+ * Where the `index`th pilot's ship appears in space near a station,
+ * facing it.
+ *
+ * A station on an orbit: on its path, a little way ahead of it and just
+ * outside the orbit, at rest in the local frame. The station comes to
+ * the ship and passes inside dock range, clear of the hull, so a new
+ * pilot who just waits can still dock. Each pilot is further ahead, so
+ * arrivals do not overlap.
+ *
+ * A station fixed in place: SPAWN_DISTANCE out, spread round it by pilot.
+ */
+function spawnPlace(world: World, station: Station, index: number): { position: Vec2; heading: number } {
+  const orbit = station.orbit;
+  if (!orbit || orbit.radius <= 0) {
+    const angle = index * (Math.PI / 3);
+    return { position: add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE)), heading: angle + Math.PI };
+  }
+  const now = orbitAngle(orbit, railTime(world.tick, world.dt));
+  const centre = sub(station.position, scale(fromAngle(now), orbit.radius));
+  const ahead = now + orbit.direction * ((SPAWN_DISTANCE + index * SPAWN_SPACING) / orbit.radius);
+  const position = add(centre, scale(fromAngle(ahead), orbit.radius + SPAWN_ORBIT_OFFSET));
+  return { position, heading: toAngle(sub(station.position, position)) };
+}
+
+/**
  * Put a pilot aboard a new ship from `loadoutId` at a station: docked on
- * a free pad that fits, or, if none is free, in space just off the
- * station facing it, spread round it by pilot so arrivals do not overlap.
+ * a free pad that fits, or, if none is free (or `inSpace`), in space near
+ * it (see `spawnPlace`), at rest in its local frame.
  */
 export function issueShip(world: World, pilotId: string, loadoutId: string, stationId: string, inSpace = false): { world: World; ship: Ship } {
   const station = world.stations[stationId];
@@ -94,14 +127,11 @@ export function issueShip(world: World, pilotId: string, loadoutId: string, stat
   const hull = world.hulls[loadout.hullId]!;
   const pilot = world.pilots[pilotId]!;
 
-  const index = Object.keys(world.pilots).sort().indexOf(pilotId);
-  const angle = Math.max(0, index) * (Math.PI / 3);
-  const made = nextShip(world, pilot, loadout, {
-    position: add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE)),
-    heading: angle + Math.PI, // facing the station
-  });
+  const index = Math.max(0, Object.keys(world.pilots).sort().indexOf(pilotId));
+  const place = spawnPlace(world, station, index);
+  const made = nextShip(world, pilot, loadout, place);
   const pad = inSpace ? null : freePadFor(station, hull.sizeClass, world.ships);
-  const ship = pad ? onPad(made.ship, station, pad) : made.ship;
+  const ship = pad ? onPad(made.ship, station, pad) : { ...made.ship, velocity: frameVelocity(world, made.ship) };
   return {
     ship,
     world: {
@@ -255,9 +285,12 @@ export function boardShip(world: World, pilotId: string, shipId: string): Comman
 export function ejectPilot(world: World, pilotId: string, dead: Ship): { world: World; event: WorldEvent } {
   const right = fromAngle(dead.heading + Math.PI / 2);
   const deadRadius = world.hulls[dead.hullId]?.radius ?? 0;
+  // The pod keeps part of the ship's motion relative to the local frame.
+  const frame = frameVelocity(world, dead);
+  const kept = add(frame, scale(sub(dead.velocity, frame), POD_INHERIT_FRACTION));
   const pod = launchPod(world, pilotId, dead, {
     offset: deadRadius,
-    velocity: add(scale(dead.velocity, POD_INHERIT_FRACTION), scale(right, POD_EJECT_SPEED)),
+    velocity: add(kept, scale(right, POD_EJECT_SPEED)),
   });
   return { world: pod.world, event: { type: 'podEjected', shipId: pod.podId, from: dead.id } };
 }

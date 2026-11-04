@@ -20,7 +20,7 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
 
 - Pure Newtonian, linear and rotational. Thrust adds velocity and spin. There is no drag: a ship left alone drifts and spins forever.
 - All accelerations are thrust divided by hull mass, so heavier hulls are slower to speed up, stop and turn with the same engines.
-- Top speed and top spin are hard limits per hull (`maxSpeed`, `maxTurnRate`), enforced by the physics in every mode. At the limit, thrust can still change the direction of travel but cannot add magnitude. They exist because unbounded speed breaks a 2D game: objects arrive before they render, collisions tunnel, and every AI and weapon system would have to cope.
+- Top speed and top spin are hard limits per hull (`maxSpeed`, `maxTurnRate`), enforced by the physics in every mode. Speed is measured against the local frame (see "The living system"). Thrust can never take you past the limit; at it, thrust can still change the direction of travel but cannot add magnitude. A ship already past it (carried across a frame edge, rammed, later flung by a slingshot) is not slowed by the limit: thrust can only turn that speed or bleed it off. They exist because unbounded speed breaks a 2D game: objects arrive before they render, collisions tunnel, and every AI and weapon system would have to cope.
 - A flight computer sits between the pilot and the thrusters. It turns input plus the ship's flight mode into thruster throttles; the physics applies them. Assist can only do what the real thrusters can, so a heavy hull is as slow to settle in assisted mode as it is by hand, and assist burns are visible.
 - Flight modes, cycled with Z, in the spirit of Elite Dangerous flight assist:
   - **Full assist** (default): cancels spin when no rotate key is held, and eases drift to a stop on any axis the pilot is not using, at half thruster strength (`ASSIST_LINEAR_STRENGTH`) so it feels like drag rather than a handbrake.
@@ -65,9 +65,9 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 ## Docking
 
-- A station has a dock range. Inside it, with speed below the docking limit, pressing dock parks the ship.
-- Docked ships do not move and cannot be damaged (later: unless the station is under attack).
-- Undocking places the ship just outside the station hull in the direction it is facing, with a small push.
+- A station has a dock range. Inside it, with speed relative to the station below the docking limit, pressing dock sets the ship down on a free pad.
+- Stations move on their orbits. A docked ship rides its pad: it moves with the station and cannot be damaged (later: unless the station is under attack).
+- Undocking launches the ship from its pad along the pad's facing, moving with the station plus a small push.
 
 ## Combat
 
@@ -123,6 +123,15 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 - A pirate below 60% structure will not start a hunt. When it gets home in that state it leaves the sector (no wreck) and its spawner sends a fresh one later. This is how pirates "repair" without a pirate base.
 - The pirate flies a Kessari Warrant in a cheap raider fit: one light gun in a medium mount, a small shield and a pod for loot. It has a lower top speed than the starter Tern (320 against 340), so a pilot who sees it coming can run for security. Fighting back should win: a test holds the starter's survival edge over the raider at 1.4 times or more.
 - All behaviour numbers are named in `PIRATE_TUNING` and `TRADER_TUNING`.
+## The living system
+
+Built in milestone 6c; the full design is [system.md](system.md).
+
+- A system is a star with planets, moons and an asteroid belt, all on circular orbits on rails: positions are pure functions of the tick. Stations orbit bodies the same way.
+- Each body has a sphere of influence. Ships, shots, loot and wrecks inside it are carried with the body; outside every sphere, space is flat.
+- Speed is relative to the local frame: the station whose dock range you are in, else the body whose sphere you are in, else the system. Full assist, brake, the docking check, the speed readout and NPC steering use it.
+- Gravity, surface impact and the warnings come in 6c part 2.
+
 ## World structure (planned)
 
 Map modelled on EVE's security bands: busy, well-policed core; unregulated low-security fringe; lawless null space; possibly unknown space beyond. Sectors are discrete and linked. NPC traffic exists abstractly in sectors the player is not in and is only instantiated when the player arrives.

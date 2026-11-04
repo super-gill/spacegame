@@ -40,10 +40,12 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `ship.ts` | Physics: applies throttles as acceleration, enforces hull speed and spin limits |
 | `docking.ts` | Dock range check, pads (`freePadFor`, `padWorldPosition`, `launchPoint`, `onPad`), dock and undock transitions |
 | `world.ts` | World construction, pilots joining (`joinPilot`), lookups (`pilotShip`), starter sector spawners |
-| `stations.ts` | Starter sector stations as data: markets, pads (`padRing`), ship mart stock; defaults for save migrations |
+| `stations.ts` | Starter system stations as data: orbits, markets, pads (`padRing`), ship mart stock; defaults for save migrations |
+| `bodies.ts` | Starter system bodies as data: Calder (star), planet, moon, belt; `boundOrbit` for orbits whose period comes from the parent's gravity |
+| `rails.ts` | Rails and frames: body and station positions as pure functions of the tick (`bodyState`, `stationState`, `placeStations`, `circularPeriod`), carrying inside spheres (`tickRails`, `applyCarry`), the local frame (`localFrame`, `frameVelocity`, `relativeVelocity`), pirate homes on rails |
 | `ownership.ts` | Owning versus flying: `pilotsAboard`, `shipPilot`, `isEmptyShip`, `isEscapePod`, `ownedShips` |
 | `pilots.ts` | Pilot ship commands: `buyShip`, `boardShip`, `wakePilot` (and `respawnPilot`), `claimStarterShip`, their `...Refusal` previews, pod ejection, ship prices |
-| `step.ts` | The tick, in a fixed order: NPCs decide; ships dock, move, bounce, fire, recharge, repair; rams; projectiles; damage; destruction and departures; loot, wrecks, spawners |
+| `step.ts` | The tick, in a fixed order: stations move on rails; NPCs decide; ships dock, move against their local frame, are carried, bounce, fire, recharge, repair, ride pads; rams; projectiles; damage; destruction and departures; loot, wrecks, spawners |
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
 | `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
 | `weapons.ts` | Weapon catalogue (data) |

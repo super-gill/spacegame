@@ -1,6 +1,6 @@
 # The system: bodies, orbits and gravity
 
-How a star system is built and how ships move through it. Status: agreed design, 4 November 2026, with Jason. Not built yet; milestone 6c builds it in two parts (see "Build order").
+How a star system is built and how ships move through it. Status: agreed design, 4 November 2026, with Jason. Milestone 6c builds it in two parts (see "Build order"); part 1 is on `main` (see "As built: part 1").
 
 Related: [ships.md](ships.md) for ships and fitting, [design.md](design.md) for flight, [lore.md](lore.md) for what the bodies are.
 
@@ -84,6 +84,23 @@ Sizes and periods are set during the build and tuned in play. The system is abou
 **6c part 2: gravity and life (lead).** Gravity with the eased edge; surface impact; gravity, orbit and path prediction helpers for the client; the belt's asteroids; the third station; Concord patrols; more traders on more routes.
 
 **Client (interface workstream).** Drawing bodies, orbits, the belt and moving stations; the predicted path line; the gravity gauge and warnings; the radar and system map. See "Brief: Interface" in `coordination.md`.
+
+## As built: part 1
+
+Choices the build made where the plan was silent (Lead 3, 4 November 2026).
+
+- **Data.** `World.bodies` holds `Body` records (`bodies.ts` for the starter system). A body's `orbit` names its parent; the star has none and sits at the origin. Stations carry `orbit` and `velocity`, and `Station.position` and `velocity` are kept equal to their rail at `World.tick`, so everything that reads a station's place reads one field.
+- **Carrying is exact.** Each tick, something inside a body's sphere moves by its normal step plus what the body's rail adds beyond its velocity, and its velocity changes by the body's change in velocity (`rails.ts`). A ship left alone keeps its offset from the body to floating-point accuracy. The innermost (smallest) sphere carries; a moon's carry already includes its planet's.
+- **The belt** is a body that sits on the star and only turns (`orbit.radius` 0), with a `ring`. It has no sphere and carries nothing. Ridge Outpost orbits it at the ring's radius with the belt's period: the belt has no gravity, so that period is free, and a ship parked beside Ridge slowly drifts off it (full assist holds it inside dock range). Revisit if that feels wrong in play.
+- **Speed limit.** Measured against the local frame. Thrust cannot take you past it, but excess speed is kept, so crossing into a moving frame (a station's dock range moving the other way, a sphere edge) never jolts you and slingshots can work. Rams past the limit are no longer clipped either; assist and brake bleed them off.
+- **Debris and pods** keep part of the ship's motion relative to its local frame, not the system.
+- **Pirates** can have a home on a rail (`PirateBrain.homeOrbit`). Calder's pirate lives 1,500 units inward of Ridge on the belt's turn, on the traders' way in, outside Ridge's security.
+- **New pilots in space** appear on Harbour's orbit a little ahead of it, just outside it, at rest in the planet's frame. Harbour comes to them and passes inside dock range, clear of the hull.
+- **Sizes.** Star radius 500, sphere 1,200. Planet at 4,500 from the star, 30 minutes round, radius 400, sphere 2,600. Harbour 900 from the planet, 2 minutes round. Moon 2,000 from the planet, about 6.6 minutes round, radius 150, sphere 450. Belt ring at 9,000 (1,400 wide), 90 minutes round. Harbour to Ridge runs 4,500 to 13,500 as they turn; the trader's loop takes about a minute and a half.
+- **NPCs** route round bodies as well as stations; a trader arrives at a station by adding the station's velocity to its approach.
+- **Save version 5** migrates version 4: pilots keep credits, storage and ships; docked ships stay on their pads; ships in space are towed to Harbour; NPCs, shots, wrecks and loot start fresh.
+- **Client stopgap:** `packages/client/src/render/bodies.ts` draws each body as a plain circle with its sphere dashed and the belt as a dashed band; stations are drawn between ticks; the HUD's speed is relative to the local frame and names it. The interface workstream owns all of it.
+- **Names** other than Calder (Calder I, Calder Ia, Calder Belt) are placeholders for the lore workstream.
 
 ## Later
 

@@ -2,7 +2,7 @@ import { REST_EPSILON } from './constants.js';
 import { wrapAngle } from './angle.js';
 import { computeThrusters, idleThrusters, shipAxes } from './flight.js';
 import type { ShipStats, ShipInput, Ship, Thrusters } from './types.js';
-import { add, length, scale, type Vec2 } from './vec2.js';
+import { add, length, scale, sub, type Vec2 } from './vec2.js';
 
 /**
  * Ship physics.
@@ -15,15 +15,28 @@ import { add, length, scale, type Vec2 } from './vec2.js';
  *   2. This module applies those throttles as accelerations (force / mass).
  *   3. The hull's hard limits on speed and spin are enforced.
  *
+ * Speed is measured against the ship's local frame (rails.ts), so the
+ * limit is relative to the station or body you are flying near. Thrust
+ * can never take you past the limit, but a ship already past it (carried
+ * across a frame edge, rammed, or later flung by a slingshot) is not
+ * slowed: thrust can only turn that speed or bleed it off. So crossing
+ * into a moving frame never jolts a ship, and slingshots can gain speed.
+ *
  * Linear thrust is applied along the heading the flight computer planned
  * with, before the heading is advanced, so assist and brake cancel drift
  * exactly instead of chasing a moving target.
  */
 
-/** Cap a vector's length. */
-function clampLength(v: Vec2, max: number): Vec2 {
-  const len = length(v);
-  return len > max ? scale(v, max / len) : v;
+/**
+ * The velocity after thrust, relative to the frame: `after`, unless that
+ * is past the limit, when it is cut back to the larger of the limit and
+ * the speed the ship already had. Thrust never adds speed past the limit.
+ */
+function limitThrust(before: Vec2, after: Vec2, max: number): Vec2 {
+  const len = length(after);
+  if (len <= max) return after;
+  const cap = Math.max(max, length(before));
+  return len > cap ? scale(after, cap / len) : after;
 }
 
 function clamp(value: number, max: number): number {
@@ -53,14 +66,18 @@ export function angularAcceleration(stats: ShipStats, t: Thrusters): number {
  *
  * `input` is null for an empty ship (nobody aboard): the flight computer
  * does not run, no thruster fires, and the ship coasts on its momentum.
+ * `frame` is the local frame's velocity (rails.ts `frameVelocity`).
+ * Carrying by a body is applied by the caller, after this.
  */
-export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput | null, dt: number): Ship {
+export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput | null, dt: number, frame: Vec2 = { x: 0, y: 0 }): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
-  const thrusters = input ? computeThrusters(ship, stats, input, dt) : idleThrusters();
+  const thrusters = input ? computeThrusters(ship, stats, input, dt, frame) : idleThrusters();
 
-  let velocity = add(ship.velocity, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
-  velocity = settle(clampLength(velocity, stats.maxSpeed));
+  // Work relative to the local frame, then back to system coordinates.
+  const before = sub(ship.velocity, frame);
+  const after = add(before, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
+  const velocity = add(frame, settle(limitThrust(before, after, stats.maxSpeed)));
 
   let angularVelocity = ship.angularVelocity + angularAcceleration(stats, thrusters) * dt;
   angularVelocity = clamp(angularVelocity, stats.maxTurnRate);

@@ -3,11 +3,15 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { UNDOCK_CLEARANCE } from './constants.js';
-import { freePadFor, onPad } from './docking.js';
-import { defaultPads, defaultShipMart } from './stations.js';
-import type { Ship, Station, World } from './types.js';
+import { starterBodies } from './bodies.js';
+import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
+import { idleThrusters } from './flight.js';
+import { freePadFor, launchPoint, onPad } from './docking.js';
+import { runSpawners } from './lifecycle.js';
+import { defaultPads, defaultShipMart, HARBOUR_ID, starterStations } from './stations.js';
+import type { Ship, Spawner, Station, World } from './types.js';
 import { add, fromAngle, scale } from './vec2.js';
+import { createStarterWorld } from './world.js';
 import { WEAPONS } from './weapons.js';
 
 /**
@@ -50,8 +54,11 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 4: 0.8.0, ships you own, pads, ship marts and escape pods. Stations
  *   carry pads and ship mart stock, ships the pad they are docked on.
  *   Version 3 saves migrate: see `migrate3to4`.
+ * - 5: 0.9.0, the living system. The world has bodies; stations ride
+ *   orbits and carry their velocity; pirate brains may have a home on a
+ *   rail. Version 4 saves migrate: see `migrate4to5`.
  */
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -64,7 +71,110 @@ export const MIGRATIONS: Record<number, Migration> = {
     return { ...world, pilots };
   },
   3: (world) => migrate3to4(world),
+  4: (world) => migrate4to5(world),
 };
+
+/** How far apart ships towed to Harbour with no free pad are left, units. */
+const TOW_SPACING = 60;
+
+/**
+ * 4 to 5: the flat sector becomes the Calder system.
+ *
+ * Every pilot keeps their credits, storage and ships; everything else
+ * starts fresh in the new system, at the saved tick:
+ *
+ * - The world gains the starter bodies. Harbour and Ridge are replaced by
+ *   their new copies on their orbits (same ids, pads, markets and ship
+ *   mart). Any other station is kept where it was, fixed in place.
+ * - Pilots' ships docked at a station stay on the same pad there (or the
+ *   smallest free pad that fits, if that one is gone or taken).
+ * - Pilots' ships in space, flown or empty, are towed to Harbour: set
+ *   down on a free pad that fits, or left at rest just off its pads if
+ *   none is free. Their old positions mean nothing in the new system.
+ * - NPC ships, their brains and spawners are replaced by the new
+ *   system's, which spawn at once. Projectiles, wrecks and loot in
+ *   flight are lost.
+ */
+export function migrate4to5(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['ships']) || !isRecord(world['stations'])) return world;
+  const tick = typeof world['tick'] === 'number' ? world['tick'] : 0;
+  const dt = typeof world['dt'] === 'number' ? world['dt'] : FIXED_DT;
+  const npcs = isRecord(world['npcs']) ? world['npcs'] : {};
+
+  const stations: Record<string, Station> = {};
+  for (const [id, st] of Object.entries(world['stations'])) {
+    if (isRecord(st)) stations[id] = { ...(st as unknown as Station), velocity: { x: 0, y: 0 }, orbit: null };
+  }
+  Object.assign(stations, starterStations(tick, dt));
+  const harbour = stations[HARBOUR_ID]!;
+
+  // Pilot-owned ships only; NPCs are replaced. Docked ships go first, so
+  // a towed ship never takes the pad a docked one was already on.
+  const kept = Object.entries(world['ships'])
+    .filter(([id, sh]) => isRecord(sh) && npcs[id] === undefined)
+    .map(([, sh]) => ({ ...(sh as unknown as Ship), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
+    .sort((a, b) => Number(b.state === 'docked') - Number(a.state === 'docked') || (a.id < b.id ? -1 : 1));
+
+  const ships: Record<string, Ship> = {};
+  let adrift = 0;
+  for (const ship of kept) {
+    const size = HULLS[ship.hullId]?.sizeClass ?? 'S';
+    const home = ship.state === 'docked' && ship.dockedAt ? stations[ship.dockedAt] : undefined;
+    if (home) {
+      const same = home.pads.find((p) => p.id === ship.padId);
+      const pad = (same && freePadFor({ ...home, pads: [same] }, size, ships)) ?? freePadFor(home, size, ships);
+      if (pad) {
+        ships[ship.id] = onPad(ship, home, pad);
+        continue;
+      }
+    }
+    // In space, or nowhere to put it: tow to Harbour.
+    const pad = freePadFor(harbour, size, ships);
+    if (pad) {
+      ships[ship.id] = onPad(ship, harbour, pad);
+      continue;
+    }
+    const near = harbour.pads[adrift % Math.max(1, harbour.pads.length)];
+    const at = near ? launchPoint(harbour, near) : add(harbour.position, scale(fromAngle(0), harbour.radius + UNDOCK_CLEARANCE));
+    const out = near ? fromAngle(near.facing) : fromAngle(0);
+    const position = add(at, scale(out, TOW_SPACING * Math.floor(adrift / Math.max(1, harbour.pads.length))));
+    adrift++;
+    ships[ship.id] = {
+      ...ship,
+      state: 'flying',
+      dockedAt: null,
+      padId: null,
+      position,
+      heading: near?.facing ?? 0,
+      velocity: { ...harbour.velocity },
+    };
+  }
+
+  // The new system's NPCs, spawned now at the saved tick.
+  const fresh = createStarterWorld();
+  const spawners: Spawner[] = fresh.spawners.map((sp) => ({ ...sp, shipId: null, timerTicks: 0, spawned: 0 }));
+  const migrated = {
+    ...(world as unknown as World),
+    tick,
+    dt,
+    bodies: starterBodies(),
+    stations,
+    ships,
+    npcs: {},
+    spawners,
+    projectiles: [],
+    wrecks: [],
+    loot: [],
+    hulls: { ...HULLS },
+    modules: { ...MODULES },
+    loadouts: { ...LOADOUTS },
+    manufacturers: { ...MANUFACTURERS },
+    weapons: { ...WEAPONS },
+    goods: { ...GOODS },
+    events: [],
+  };
+  return runSpawners(migrated);
+}
 
 /**
  * 3 to 4: pads and ship marts.
@@ -159,6 +269,7 @@ function looksLikeWorld(w: unknown): w is World {
     isRecord(w['ships']) &&
     isRecord(w['npcs']) &&
     isRecord(w['stations']) &&
+    isRecord(w['bodies']) &&
     Array.isArray(w['spawners']) &&
     Array.isArray(w['projectiles']) &&
     Array.isArray(w['wrecks']) &&

@@ -1,6 +1,7 @@
 import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
-import type { ShipStats, Ship, ShipInput, Station } from '../types.js';
+import { bodyStates, railTime } from '../rails.js';
+import type { ShipStats, Ship, ShipInput, World } from '../types.js';
 import { add, distance, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
 
@@ -16,6 +17,10 @@ import { emptyInput } from '../world.js';
  * NPCs fly in rotation-assist mode: releasing a rotate key stops the spin,
  * and drift is left to the steering here, which presses thrust keys to
  * pull the ship's velocity towards a desired velocity.
+ *
+ * Desired velocities are in system coordinates. To arrive at something
+ * that moves (a station on its orbit), add its velocity to the approach
+ * velocity: the ship then closes on it and ends up moving with it.
  */
 
 /** Velocity error (units/s) a steering axis tolerates before firing. Stops thruster chatter. */
@@ -103,34 +108,56 @@ export function arriveVelocity(ship: Ship, stats: ShipStats, point: Vec2, cruise
   return scale(normalise(offset), speed);
 }
 
+/** Something round to steer clear of: a station hull or a body's surface. */
+export interface Obstacle {
+  position: Vec2;
+  radius: number;
+}
+
 /**
- * If the straight line from the ship to `goal` passes through a station
- * hull, return a waypoint to one side of that station instead. Otherwise
- * return `goal` unchanged. Good enough for open space with a few
- * stations; real pathfinding can come with busier sectors.
+ * Every station hull and body surface as it stands at the start of this
+ * tick. Bodies have no surface impact until 6c part 2, but NPCs fly round
+ * them anyway, as a pilot would.
  */
-export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, stations: Record<string, Station>): Vec2 {
+export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'tick' | 'dt'>): Obstacle[] {
+  const out: Obstacle[] = Object.values(world.stations).map((s) => ({ position: s.position, radius: s.radius }));
+  const states = bodyStates(world.bodies, railTime(world.tick, world.dt));
+  for (const id of Object.keys(world.bodies).sort()) {
+    const body = world.bodies[id]!;
+    if (body.radius > 0) out.push({ position: states[id]!.position, radius: body.radius });
+  }
+  return out;
+}
+
+/**
+ * If the straight line from the ship to `goal` passes through an
+ * obstacle (a station hull or a body), return a waypoint to one side of
+ * it instead. Otherwise return `goal` unchanged. Good enough for open
+ * space with a few obstacles; real pathfinding can come with busier
+ * systems.
+ */
+export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, list: readonly Obstacle[]): Vec2 {
   const path = sub(goal, ship.position);
   const pathLength = length(path);
   if (pathLength < 1) return goal;
   const dir = scale(path, 1 / pathLength);
 
-  let nearestBlock: { station: Station; along: number } | null = null;
-  for (const station of Object.values(stations)) {
-    const clearance = station.radius + stats.radius + STATION_CLEARANCE;
-    if (distance(goal, station.position) < clearance) continue; // goal is at this station
-    const along = dot(sub(station.position, ship.position), dir);
+  let nearestBlock: { obstacle: Obstacle; along: number } | null = null;
+  for (const obstacle of list) {
+    const clearance = obstacle.radius + stats.radius + STATION_CLEARANCE;
+    if (distance(goal, obstacle.position) < clearance) continue; // goal is at this obstacle
+    const along = dot(sub(obstacle.position, ship.position), dir);
     if (along <= 0 || along >= pathLength) continue;
     const closest = add(ship.position, scale(dir, along));
-    if (distance(closest, station.position) >= clearance) continue;
-    if (!nearestBlock || along < nearestBlock.along) nearestBlock = { station, along };
+    if (distance(closest, obstacle.position) >= clearance) continue;
+    if (!nearestBlock || along < nearestBlock.along) nearestBlock = { obstacle, along };
   }
   if (!nearestBlock) return goal;
 
   // Go round on whichever side the ship is already offset towards.
-  const { station } = nearestBlock;
-  const clearance = station.radius + stats.radius + STATION_CLEARANCE;
+  const { obstacle } = nearestBlock;
+  const clearance = obstacle.radius + stats.radius + STATION_CLEARANCE;
   const side = { x: -dir.y, y: dir.x };
-  const offsetSide = dot(sub(ship.position, station.position), side) >= 0 ? 1 : -1;
-  return add(station.position, scale(side, offsetSide * (clearance + 40)));
+  const offsetSide = dot(sub(ship.position, obstacle.position), side) >= 0 ? 1 : -1;
+  return add(obstacle.position, scale(side, offsetSide * (clearance + 40)));
 }

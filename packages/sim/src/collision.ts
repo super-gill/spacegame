@@ -17,6 +17,8 @@ import { add, distance, scale, sub, type Vec2 } from './vec2.js';
  * each ship's own change in velocity (delta-v), see constants.ts:
  *
  * - Station hulls are immovable, so the ship takes the whole bounce.
+ *   Stations move on rails, so the bounce is worked out relative to the
+ *   station's own velocity.
  * - Between ships, momentum is shared by mass. In a ram the heavy ship's
  *   velocity barely changes and the light ship's changes a lot, so a big
  *   hull can ram a small one and walk away.
@@ -48,12 +50,13 @@ export function collideWithStations(ship: Ship, stats: ShipStats, stations: Reco
     const normal = d > 0 ? scale(sub(s.position, station.position), 1 / d) : { x: Math.cos(s.heading), y: Math.sin(s.heading) };
     const position = add(station.position, scale(normal, minDist));
 
-    const into = dot(s.velocity, normal); // negative when moving into the station
+    const relative = sub(s.velocity, station.velocity ?? { x: 0, y: 0 });
+    const into = dot(relative, normal); // negative when moving into the station
     let velocity = s.velocity;
     if (into < 0) {
       const normalPart = scale(normal, into);
-      const tangentPart = sub(s.velocity, normalPart);
-      velocity = add(scale(tangentPart, 1 - HULL_FRICTION), scale(normalPart, -HULL_RESTITUTION));
+      const tangentPart = sub(relative, normalPart);
+      velocity = add(station.velocity ?? { x: 0, y: 0 }, add(scale(tangentPart, 1 - HULL_FRICTION), scale(normalPart, -HULL_RESTITUTION)));
       if (-into >= COLLISION_EVENT_MIN_SPEED) {
         events.push({ type: 'collided', shipId: s.id, stationId: station.id, speed: -into });
       }

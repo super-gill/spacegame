@@ -10,7 +10,9 @@ import { shipStats } from '../stats.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { stepWorld } from '../step.js';
 import type { PirateBrain, Projectile, Ship, Station, World, WorldEvent } from '../types.js';
-import { distance, length } from '../vec2.js';
+import { distance, length, sub } from '../vec2.js';
+import { PLANET_ID } from '../bodies.js';
+import { bodyVelocity } from '../rails.js';
 import { WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
 
@@ -165,7 +167,7 @@ describe('projectiles', () => {
   });
 
   it('is absorbed by a station in the way', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, velocity: { x: 0, y: 0 }, orbit: null, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
     expect(r.damage).toEqual([]);
     expect(r.projectiles).toEqual([]);
@@ -231,7 +233,7 @@ describe('ramming', () => {
   });
 
   it('hitting a station hard hurts; touching it does not', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
+    const st: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, orbit: null, radius: 90, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
     const hard = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -200, y: 0 } }), sparrow, { st });
     const soft = collideWithStations(ship('s', 'sparrow', { position: { x: 100, y: 0 }, velocity: { x: -IMPACT_SAFE_DELTA_V / 2, y: 0 } }), sparrow, { st });
     expect(hard.damage[0]!.amount).toBeGreaterThan(0);
@@ -287,9 +289,10 @@ describe('destruction, loot and respawn', () => {
   it('loot out of tractor range stays put, and eventually drifts away for good', () => {
     let { w, me } = quietWorld();
     const pos = w.ships[me]!.position;
-    w = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 3, position: { x: pos.x + TRACTOR_RANGE + 100, y: pos.y }, velocity: { x: 0, y: 0 }, ticksLeft: 120 }] };
+    // At rest in the planet's frame: carried with it, never pulled.
+    w = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 3, position: { x: pos.x + TRACTOR_RANGE + 100, y: pos.y }, velocity: bodyVelocity(w, PLANET_ID), ticksLeft: 120 }] };
     w = stepWorld(w, { [me]: { ...emptyInput(), tractor: true } });
-    expect(length(w.loot[0]!.velocity)).toBe(0);
+    expect(length(sub(w.loot[0]!.velocity, bodyVelocity(w, PLANET_ID)))).toBeLessThan(1e-9);
     for (let i = 0; i < 200; i++) w = stepWorld(w, {});
     expect(w.loot).toEqual([]);
     expect(LOOT_LIFETIME).toBeGreaterThan(0);
@@ -334,7 +337,8 @@ describe('NPC combat', () => {
   it('a hunting pirate shoots its target', () => {
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const me = pilotShip(w, 'ana')!.id;
-    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: 2600, y: 400 }, shield: 1e6 } } };
+    const pirate = w.ships['npc-pirate-1']!.position;
+    w = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, position: { x: pirate.x + 300, y: pirate.y }, velocity: { x: 0, y: 0 }, shield: 1e6 } } };
     let hits = 0;
     for (let i = 0; i < SECOND * 15; i++) {
       w = stepWorld(w, {});

@@ -3,7 +3,8 @@ import { leadPoint } from '../combat.js';
 import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
-import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
+import { pirateHome } from '../rails.js';
+import { arriveVelocity, obstacles, routeAround, steerToVelocity } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -141,6 +142,8 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
   const events: WorldEvent[] = [];
   let b: PirateBrain = {
     ...brain,
+    // A home on a rail (a point on the belt) moves; follow it.
+    home: pirateHome(world, brain.home, brain.homeOrbit),
     modeTicks: brain.modeTicks + 1,
     cooldownTicks: Math.max(0, brain.cooldownTicks - 1),
   };
@@ -197,7 +200,7 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     if (distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
       b = switchMode(b, 'prowl');
     } else {
-      const waypoint = routeAround(ship, stats, b.home, world.stations);
+      const waypoint = routeAround(ship, stats, b.home, obstacles(world));
       const desired = arriveVelocity(ship, stats, waypoint, stats.maxSpeed * 0.7);
       return { input: steerToVelocity(ship, stats, desired), brain: b, events };
     }
@@ -208,7 +211,7 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     return { input: steerToVelocity(ship, stats, { x: 0, y: 0 }), brain: b, events, depart: true };
   }
   if (!fitToFight) {
-    const desired = arriveVelocity(ship, stats, routeAround(ship, stats, b.home, world.stations), stats.maxSpeed * 0.7);
+    const desired = arriveVelocity(ship, stats, routeAround(ship, stats, b.home, obstacles(world)), stats.maxSpeed * 0.7);
     return { input: steerToVelocity(ship, stats, desired), brain: b, events };
   }
   if (b.cooldownTicks === 0) {

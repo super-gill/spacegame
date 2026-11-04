@@ -63,6 +63,7 @@ export {
   SAVE_FORMAT,
   SAVE_VERSION,
   MIGRATIONS,
+  migrate4to5,
   type LoadRefusal,
   type LoadResult,
   type Migration,
@@ -89,6 +90,8 @@ export {
   padWorldPosition,
   launchPoint,
   onPad,
+  ridePad,
+  speedRelativeTo,
   type DockingView,
 } from './docking.js';
 export { pilotsAboard, shipPilot, isEmptyShip, isEscapePod, ownedShips } from './ownership.js';
@@ -112,4 +115,30 @@ export {
   type ClaimRefusal,
   type WakeRefusal,
 } from './pilots.js';
-export { starterStations, padRing, HARBOUR_ID, RIDGE_ID } from './stations.js';
+export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
+export { starterBodies, STAR_ID, PLANET_ID, MOON_ID, BELT_ID, BELT_RING_RADIUS, BELT_PERIOD } from './bodies.js';
+export {
+  railTime,
+  circularPeriod,
+  orbitAngle,
+  orbitState,
+  bodyState,
+  bodyStates,
+  stationState,
+  placeStations,
+  innermostBody,
+  carriesForTick,
+  tickRails,
+  applyCarry,
+  bodyPosition,
+  bodyVelocity,
+  sphereBodyAt,
+  localFrame,
+  frameVelocity,
+  relativeVelocity,
+  pirateHome,
+  type RailState,
+  type Carry,
+  type TickRails,
+  type LocalFrame,
+} from './rails.js';

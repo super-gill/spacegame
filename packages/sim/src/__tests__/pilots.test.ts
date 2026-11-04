@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { stepWorld } from '../step.js';
-import { distance } from '../vec2.js';
+import { PLANET_ID } from '../bodies.js';
+import { bodyPosition, frameVelocity, relativeVelocity } from '../rails.js';
+import { add, distance, length, sub } from '../vec2.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, starterShipId } from '../world.js';
 
 /**
@@ -59,7 +61,8 @@ describe('joining', () => {
 
 describe('several pilots in one world', () => {
   it('each input only moves its own ship', () => {
-    let w = joinPilot(joinPilot(createStarterWorld(), 'ana', 'Ana'), 'ben', 'Ben');
+    const start = joinPilot(joinPilot(createStarterWorld(), 'ana', 'Ana'), 'ben', 'Ben');
+    let w = start;
     const anaStart = pilotShip(w, 'ana')!;
     const benStart = pilotShip(w, 'ben')!;
 
@@ -67,17 +70,20 @@ describe('several pilots in one world', () => {
       w = stepWorld(w, { [anaStart.id]: { ...emptyInput(), thrustForward: true } });
     }
 
-    expect(pilotShip(w, 'ana')!.position).not.toEqual(anaStart.position);
-    expect(pilotShip(w, 'ben')!.position).toEqual(benStart.position);
+    // Ben is carried with the planet, so he keeps his place relative to it.
+    const planetMoved = sub(bodyPosition(w, PLANET_ID), bodyPosition(start, PLANET_ID));
+    expect(pilotShip(w, 'ana')!.position).not.toEqual(add(anaStart.position, planetMoved));
+    expect(distance(pilotShip(w, 'ben')!.position, add(benStart.position, planetMoved))).toBeLessThan(1e-6);
   });
 
   it('steps ships with no input under their own flight computer', () => {
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const id = pilotShip(w, 'ana')!.id;
-    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, velocity: { x: 50, y: 0 } } } };
-    // Full assist with nobody at the controls eases the drift to a stop.
+    const drift = add(frameVelocity(w, w.ships[id]!), { x: 50, y: 0 });
+    w = { ...w, ships: { ...w.ships, [id]: { ...w.ships[id]!, velocity: drift } } };
+    // Full assist with nobody at the controls eases the drift to a stop in the local frame.
     for (let i = 0; i < SECOND * 10; i++) w = stepWorld(w, {});
-    expect(pilotShip(w, 'ana')!.velocity).toEqual({ x: 0, y: 0 });
+    expect(length(relativeVelocity(w, pilotShip(w, 'ana')!))).toBeLessThan(1e-6);
   });
 
   it('events name the ship they concern', () => {

@@ -404,7 +404,22 @@ export interface Ship {
 export interface Station {
   id: string;
   name: string;
+  /**
+   * Where the station is at `World.tick`. Stations move on rails: this is
+   * worked out from `orbit` every tick (see rails.ts), never simulated,
+   * and kept here so everything that reads a station's place reads one
+   * field. A station with no orbit stays where it is.
+   */
   position: Vec2;
+  /** The station's velocity at `World.tick`, from its orbit. Zero with no orbit. */
+  velocity: Vec2;
+  /**
+   * The orbit the station rides, or null for a station fixed in place.
+   * Inside its parent's sphere of influence the period is the one the
+   * parent's gravity gives (`circularPeriod`), so a ship that matches the
+   * station's velocity is in the same orbit.
+   */
+  orbit: Orbit | null;
   radius: number;
   /** Ships inside this distance of the station centre may request docking. */
   dockRange: number;
@@ -430,8 +445,9 @@ export interface Station {
 }
 
 /**
- * A landing pad on a station. Stations do not turn, so a pad's position
- * and facing are fixed in the world once the station is placed.
+ * A landing pad on a station. Stations move but do not turn, so a pad's
+ * offset and facing are fixed; its place in the world is the station's
+ * position plus the offset, and a ship on it moves with the station.
  */
 export interface Pad {
   /** Unique within the station, e.g. `s1`. Ships record it in `padId`. */
@@ -442,6 +458,54 @@ export interface Pad {
   position: Vec2;
   /** Heading of a ship sitting on the pad, radians. Ships launch this way. */
   facing: number;
+}
+
+/**
+ * A circular orbit on rails. Whatever rides it is at `radius` from its
+ * parent's centre, at angle `phase + direction * 2 pi * time / period`,
+ * where time is `tick * dt` seconds. Position, velocity and acceleration
+ * are pure functions of the tick (rails.ts), so nothing on rails ever
+ * drifts, however long the world runs.
+ */
+export interface Orbit {
+  /** Body id this orbits round. */
+  parent: string;
+  /** Distance from the parent's centre, units. Zero sits on the parent and only turns. */
+  radius: number;
+  /** Seconds per revolution. */
+  period: number;
+  /** Angle at tick 0, radians. */
+  phase: number;
+  /** 1 turns clockwise on screen (positive angles), -1 anticlockwise. */
+  direction: 1 | -1;
+}
+
+export type BodyKind = 'star' | 'planet' | 'moon' | 'belt';
+
+/**
+ * A natural body: a star, planet, moon or asteroid belt. Bodies are on
+ * rails and arrange the system (see docs/system.md). Inside a body's
+ * sphere of influence, that body carries whatever is there: ships,
+ * projectiles, loot and wrecks get the body's own acceleration along its
+ * rail each tick, so they move with it. Gravity itself comes in 6c part 2.
+ */
+export interface Body {
+  id: string;
+  name: string;
+  kind: BodyKind;
+  /** The orbit it rides, or null for a body fixed at the system origin (the star). */
+  orbit: Orbit | null;
+  /** Surface radius, units. Zero for a belt. */
+  radius: number;
+  /** Gravitational parameter (G times mass), units^3/s^2. Zero for a belt. Used from 6c part 2. */
+  gravity: number;
+  /** Sphere of influence radius from the centre, units. Zero for a belt: it carries nothing. */
+  sphere: number;
+  /**
+   * Belts only: the ring of asteroids, centred on the body. The ring turns
+   * with the body's orbit angle. Asteroids come in 6c part 2.
+   */
+  ring?: { radius: number; width: number };
 }
 
 /**
@@ -531,7 +595,13 @@ export type PirateMode = 'prowl' | 'hunt' | 'withdraw';
 /** Patrols near a home point and hunts lone ships outside station security. */
 export interface PirateBrain {
   kind: 'pirate';
+  /** Where the patrol is centred. With `homeOrbit`, where it was last tick; the orbit wins. */
   home: Vec2;
+  /**
+   * A home that rides a rail, such as a point on the belt. Null or absent:
+   * `home` is fixed in space.
+   */
+  homeOrbit?: Orbit | null;
   mode: PirateMode;
   /** Ship being hunted, when mode is `hunt`. */
   targetId: string | null;
@@ -563,6 +633,8 @@ export interface World {
   /** Counter for unique ids of projectiles, wrecks and loot. */
   nextEntityId: number;
   stations: Record<string, Station>;
+  /** The system's natural bodies, by id. Data, kept as saved. Empty in a flat sector. */
+  bodies: Record<string, Body>;
   hulls: Record<string, HullSpec>;
   modules: Record<string, ModuleSpec>;
   loadouts: Record<string, Loadout>;

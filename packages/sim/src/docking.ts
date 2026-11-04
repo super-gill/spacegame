@@ -6,10 +6,13 @@ import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from
  * Docking rules.
  *
  * A ship may dock when it is inside a station's dock range, moving
- * slowly, and a pad its hull fits is free. It is set down on the smallest
+ * slowly relative to the station (stations move on rails), and a pad its
+ * hull fits is free. It is set down on the smallest
  * free pad that fits (ties go to the lowest pad id), facing the way the
- * pad faces. Undocking launches it from that pad: placed a little way out
- * along the pad's facing, with a gentle push.
+ * pad faces. A docked ship rides its pad: its position is the pad's and
+ * its velocity the station's, every tick. Undocking launches it from that
+ * pad: placed a little way out along the pad's facing, moving with the
+ * station plus a gentle push.
  */
 
 export interface DockAttempt {
@@ -56,7 +59,7 @@ export function launchPoint(station: Station, pad: Pad): Vec2 {
   return add(padWorldPosition(station, pad), scale(fromAngle(pad.facing), UNDOCK_CLEARANCE));
 }
 
-/** The ship set down on a pad: docked there, at rest, facing the pad's way. */
+/** The ship set down on a pad: docked there, moving with the station, facing the pad's way. */
 export function onPad(ship: Ship, station: Station, pad: Pad): Ship {
   return {
     ...ship,
@@ -65,13 +68,31 @@ export function onPad(ship: Ship, station: Station, pad: Pad): Ship {
     padId: pad.id,
     position: padWorldPosition(station, pad),
     heading: pad.facing,
-    velocity: { x: 0, y: 0 },
+    velocity: { ...station.velocity },
     angularVelocity: 0,
   };
 }
 
+/**
+ * A docked ship put back on its pad where the station now is. Ships that
+ * are not docked, or whose station or pad is gone, are returned as they
+ * are.
+ */
+export function ridePad(ship: Ship, stations: Record<string, Station>): Ship {
+  if (ship.state !== 'docked' || !ship.dockedAt) return ship;
+  const station = stations[ship.dockedAt];
+  const pad = station?.pads.find((p) => p.id === ship.padId);
+  if (!station || !pad) return ship;
+  return { ...ship, position: padWorldPosition(station, pad), velocity: { ...station.velocity } };
+}
+
+/** A ship's speed relative to a station, units/s. */
+export function speedRelativeTo(ship: Ship, station: Station): number {
+  return length(sub(ship.velocity, station.velocity));
+}
+
 /** Find the nearest station within dock range of the ship, if any. */
-export function nearestDockableStation(ship: Ship, stations: Record<string, Station>): Station | null {
+export function nearestDockableStation(ship: Pick<Ship, 'position'>, stations: Record<string, Station>): Station | null {
   let best: Station | null = null;
   let bestDist = Infinity;
   for (const station of Object.values(stations)) {
@@ -94,7 +115,7 @@ export function tryDock(ship: Ship, world: DockingView): DockAttempt {
   if (!station) {
     return { ship, event: { type: 'dockRefused', shipId: ship.id, reason: 'tooFar' } };
   }
-  if (length(ship.velocity) > DOCK_MAX_SPEED) {
+  if (speedRelativeTo(ship, station) > DOCK_MAX_SPEED) {
     return { ship, event: { type: 'dockRefused', shipId: ship.id, reason: 'tooFast' } };
   }
   const hull: HullSpec | undefined = world.hulls[ship.hullId];
@@ -119,7 +140,7 @@ export function undock(ship: Ship, stations: Record<string, Station>): DockAttem
   const facing = pad ? pad.facing : ship.heading;
   const outward = fromAngle(facing);
   const position = pad ? launchPoint(station, pad) : add(station.position, scale(outward, station.radius + UNDOCK_CLEARANCE));
-  const velocity = scale(outward, UNDOCK_PUSH_SPEED);
+  const velocity = add(station.velocity, scale(outward, UNDOCK_PUSH_SPEED));
 
   return {
     ship: { ...ship, state: 'flying', dockedAt: null, padId: null, heading: facing, position, velocity },

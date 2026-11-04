@@ -1,6 +1,7 @@
 import { angleDelta, wrapAngle } from './angle.js';
 import { TURRET_FIRE_TOLERANCE } from './constants.js';
 import type { DamageCause, HullSpec, Projectile, Ship, ShipInput, ShipStats, Station } from './types.js';
+import type { Carry } from './rails.js';
 import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
@@ -131,13 +132,16 @@ export function stepProjectiles(
   hulls: Record<string, HullSpec>,
   stations: Record<string, Station>,
   dt: number,
+  carryAt?: (point: Vec2) => Carry,
 ): ProjectileStep {
   const survivors: Projectile[] = [];
   const damage: Damage[] = [];
   const targets = Object.values(ships).filter((s) => s.state === 'flying');
 
   for (const p of projectiles) {
-    const travel = scale(p.velocity, dt);
+    // A shot inside a body's sphere is carried with the body like anything else.
+    const carry = carryAt?.(p.position);
+    const travel = carry ? add(scale(p.velocity, dt), carry.dx) : scale(p.velocity, dt);
     const len = Math.hypot(travel.x, travel.y);
     const dir = len > 0 ? scale(travel, 1 / len) : { x: 0, y: 0 };
 
@@ -167,7 +171,8 @@ export function stepProjectiles(
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;
-    survivors.push({ ...p, position: add(p.position, travel), ticksLeft: p.ticksLeft - 1 });
+    const velocity = carry ? add(p.velocity, carry.dv) : p.velocity;
+    survivors.push({ ...p, position: add(p.position, travel), velocity, ticksLeft: p.ticksLeft - 1 });
   }
   return { projectiles: survivors, damage };
 }

@@ -87,6 +87,12 @@ describe('trader', () => {
 });
 
 describe('pirate', () => {
+  /** A point in open space 300 units off the pirate. */
+  function nearPirate(w: World): { x: number; y: number } {
+    const p = w.ships[PIRATE]!.position;
+    return { x: p.x + 300, y: p.y };
+  }
+
   /** World with one pilot parked in the open lane, far from both stations. */
   function lonePilotWorld(): { w: World; shipId: string } {
     let w = joinPilot(createStarterWorld(), 'ana', 'Ana');
@@ -97,7 +103,7 @@ describe('pirate', () => {
       ships: {
         ...w.ships,
         // Very tough, so the test is about the pirate's flying, not about who wins.
-        [shipId]: { ...w.ships[shipId]!, position: { x: 2600, y: 400 }, flightMode: 'manual', shield: 1e6 },
+        [shipId]: { ...w.ships[shipId]!, position: nearPirate(w), velocity: { x: 0, y: 0 }, flightMode: 'manual', shield: 1e6 },
         [TRADER]: { ...w.ships[TRADER]!, state: 'docked', dockedAt: 'station-harbour' },
       },
       npcs: { ...w.npcs, [TRADER]: { kind: 'trader', route: ['station-harbour'], leg: 0, waitTicks: 1e9 } },

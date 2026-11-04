@@ -61,6 +61,7 @@ import {
   drawWreck,
   type ShipStyle,
 } from './render/draw.js';
+import { bodyMarkers, drawBodies } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { Ui, shipLabel, shipName } from './ui.js';
@@ -453,6 +454,10 @@ function frame(nowMs: number): void {
 }
 
 /** Interpolated position and heading of a ship, for drawing only; the sim is untouched. */
+function lerp(a: Vec2, b: Vec2, alpha: number): Vec2 {
+  return { x: a.x + (b.x - a.x) * alpha, y: a.y + (b.y - a.y) * alpha };
+}
+
 function interpolate(now: Ship, prev: Ship | undefined, alpha: number) {
   if (!prev) return { position: now.position, heading: now.heading };
   return {
@@ -499,10 +504,15 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   ctx!.fillRect(0, 0, camera.viewportWidth, camera.viewportHeight);
   drawStarfield(ctx!, camera);
 
+  drawBodies(ctx!, camera, current, alpha);
+
+  // Stations move on rails: draw them between ticks like ships, so docked ships stay on their pads.
   const near = mine ? nearestDockableStation(mine, current.stations) : null;
   for (const station of Object.values(current.stations)) {
-    drawStation(ctx!, camera, station, near?.id === station.id);
-    drawPads(ctx!, camera, station, occupiedPads(station, current.ships));
+    const prev = previous.stations[station.id];
+    const drawn = prev ? { ...station, position: lerp(prev.position, station.position, alpha) } : station;
+    drawStation(ctx!, camera, drawn, near?.id === station.id);
+    drawPads(ctx!, camera, drawn, occupiedPads(station, current.ships));
   }
 
   // Wrecks fade over their last WRECK_FADE_SECONDS.
@@ -535,7 +545,10 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
   for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
-  // Edge markers for anything off screen, so the sector is navigable.
+  // Edge markers for anything off screen, so the system is navigable.
+  for (const b of bodyMarkers(current)) {
+    drawOffscreenMarker(ctx!, camera, b.position, b.name.toUpperCase(), distance(eye, b.position), '#6f8f9a', b.radius);
+  }
   for (const station of Object.values(current.stations)) {
     drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(eye, station.position), COLOUR.ink, station.radius);
   }

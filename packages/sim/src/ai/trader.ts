@@ -1,15 +1,17 @@
 import { DOCK_MAX_SPEED } from '../constants.js';
 import type { ShipStats, Ship, ShipInput, TraderBrain, World } from '../types.js';
-import { add, distance, length, normalise, scale, sub } from '../vec2.js';
+import { speedRelativeTo } from '../docking.js';
+import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, routeAround, steerToVelocity } from './steer.js';
+import { arriveVelocity, obstacles, routeAround, steerToVelocity } from './steer.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
  *
  * Docked: count down, then undock and head for the next station.
- * Flying: approach the destination's near side, slow down, and dock once
- * inside dock range and below the docking speed limit. A refused dock
+ * Flying: approach the destination's near side, match its velocity (it
+ * moves on its orbit), and dock once inside dock range and below the
+ * docking speed limit relative to it. A refused dock
  * just means trying again next tick.
  *
  * Defence: while a pirate is hunting it, the trader keeps flying its
@@ -84,7 +86,7 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   }
 
   const inRange = distance(ship.position, station.position) <= station.dockRange;
-  const slowEnough = length(ship.velocity) <= DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction;
+  const slowEnough = speedRelativeTo(ship, station) <= DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction;
   if (inRange && slowEnough) {
     // Set the dwell now; if the dock is refused, the next tick tries again.
     const dwell = Math.round(TRADER_TUNING.dwellSeconds / world.dt);
@@ -94,8 +96,9 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   // Aim for the point on the station's near side, just clear of the hull.
   const fromStation = normalise(sub(ship.position, station.position));
   const approach = add(station.position, scale(fromStation, station.radius + stats.radius + TRADER_TUNING.approachStandoff));
-  const waypoint = routeAround(ship, stats, approach, world.stations);
+  const waypoint = routeAround(ship, stats, approach, obstacles(world));
   const cruise = stats.maxSpeed * TRADER_TUNING.cruiseFraction;
-  const desired = arriveVelocity(ship, stats, waypoint, cruise);
+  // Stations move: arrive at the approach point and end up moving with the station.
+  const desired = add(station.velocity, arriveVelocity(ship, stats, waypoint, cruise));
   return { input: defend(world, ship, steerToVelocity(ship, stats, desired)), brain };
 }

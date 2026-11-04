@@ -76,11 +76,19 @@ function cancelAxis(
 
 const on = (held: boolean): number => (held ? 1 : 0);
 
-/** Decide this tick's thruster throttles. Pure. */
-export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput, dt: number): Thrusters {
+/**
+ * Decide this tick's thruster throttles. Pure.
+ *
+ * `frame` is the velocity of the ship's local frame (rails.ts): assist
+ * and brake cancel motion relative to it, so full assist holds a ship
+ * still beside a moving station or in a moving body's sphere. Zero in
+ * flat space.
+ */
+export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput, dt: number, frame: Vec2 = { x: 0, y: 0 }): Thrusters {
   const { forward, right } = shipAxes(ship.heading);
-  const forwardSpeed = dot(ship.velocity, forward);
-  const rightSpeed = dot(ship.velocity, right);
+  const relative = { x: ship.velocity.x - frame.x, y: ship.velocity.y - frame.y };
+  const forwardSpeed = dot(relative, forward);
+  const rightSpeed = dot(relative, right);
 
   const mainAccel = stats.mainThrust / stats.mass;
   const reverseAccel = stats.reverseThrust / stats.mass;

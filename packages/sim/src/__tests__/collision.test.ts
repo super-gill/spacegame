@@ -7,7 +7,7 @@ import type { Ship, Station } from '../types.js';
 import { distance } from '../vec2.js';
 
 const hull = TEST_STATS;
-const station: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, radius: 90, dockRange: 220, securityRadius: 900, market: {}, outfitting: false, pads: [], shipMart: [] };
+const station: Station = { id: 'st', name: 'St', position: { x: 0, y: 0 }, velocity: { x: 0, y: 0 }, orbit: null, radius: 90, dockRange: 220, securityRadius: 900, market: {}, outfitting: false, pads: [], shipMart: [] };
 const stations = { st: station };
 
 function ship(overrides: Partial<Ship>): Ship {

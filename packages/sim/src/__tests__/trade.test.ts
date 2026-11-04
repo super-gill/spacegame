@@ -140,7 +140,7 @@ describe('cargo', () => {
     expect(shipStats(TEST_CATALOGUES, loaded).mass).toBeCloseTo(starter.mass + 6, 9);
 
     const fly = (shipHold: Record<string, number>) => {
-      let x: World = { ...w, ships: { ...w.ships, [me]: { ...empty, state: 'flying', dockedAt: null, position: { x: 3000, y: 3000 }, hold: shipHold } } };
+      let x: World = { ...w, ships: { ...w.ships, [me]: { ...empty, state: 'flying', dockedAt: null, padId: null, position: { x: 3000, y: 3000 }, velocity: { x: 0, y: 0 }, hold: shipHold } } };
       for (let i = 0; i < SECOND; i++) x = stepWorld(x, { [me]: { ...emptyInput(), thrustForward: true } });
       return length(x.ships[me]!.velocity);
     };

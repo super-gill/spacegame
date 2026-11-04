@@ -19,7 +19,7 @@ import {
   stepOutRefusal,
   wakePilot,
 } from '../pilots.js';
-import { deserializeWorld, serializeWorld } from '../save.js';
+import { deserializeWorld, migrate3to4, serializeWorld } from '../save.js';
 import { shipStats } from '../stats.js';
 import { starterStations } from '../stations.js';
 import { stepWorld } from '../step.js';
@@ -195,7 +195,7 @@ describe('pads', () => {
     st.pads.forEach((p, i) => {
       w = put(w, onPad(spare(w, `filler-${i}`, 'meridian-starter', null), st, p));
     });
-    w = put(w, { ...w.ships[me]!, position: { x: 100, y: 0 }, velocity: { x: 0, y: 0 } });
+    w = put(w, { ...w.ships[me]!, position: { x: st.position.x + 100, y: st.position.y }, velocity: { ...st.velocity } });
     const next = stepWorld(w, { [me]: { ...emptyInput(), toggleDock: true } });
     expect(next.events).toContainEqual({ type: 'dockRefused', shipId: me, reason: 'noPad' });
     expect(next.ships[me]!.state).toBe('flying');
@@ -205,8 +205,9 @@ describe('pads', () => {
     let { w, me } = quietWorld();
     w = joinPilot(w, 'ben', 'Ben');
     const ben = pilotShip(w, 'ben')!.id;
-    w = put(w, { ...w.ships[me]!, position: { x: 100, y: 0 }, velocity: { x: 0, y: 0 } });
-    w = put(w, { ...w.ships[ben]!, position: { x: -100, y: 0 }, velocity: { x: 0, y: 0 } });
+    const st = w.stations[HARBOUR]!;
+    w = put(w, { ...w.ships[me]!, position: { x: st.position.x + 100, y: st.position.y }, velocity: { ...st.velocity } });
+    w = put(w, { ...w.ships[ben]!, position: { x: st.position.x - 100, y: st.position.y }, velocity: { ...st.velocity } });
     const dock = { ...emptyInput(), toggleDock: true };
     const next = stepWorld(w, { [me]: dock, [ben]: dock });
     expect(next.ships[me]!.padId).not.toBeNull();
@@ -598,9 +599,9 @@ describe('save version 4', () => {
     for (let i = 0; i < 4; i++) {
       w = put(w, { ...spare(w, `big-${i}`, 'tessaract-trader', null), state: 'docked', dockedAt: RIDGE, padId: null, position: { ...ridge.position } });
     }
-    const r = deserializeWorld(asVersion3(w));
-    if (!r.ok) throw new Error(r.reason);
-    const big = [0, 1, 2, 3].map((i) => r.world.ships[`big-${i}`]!);
+    // This step alone: version 5 then tows ships in space to Harbour.
+    const v4 = migrate3to4(JSON.parse(asVersion3(w)).world) as World;
+    const big = [0, 1, 2, 3].map((i) => v4.ships[`big-${i}`]!);
     expect(big.filter((s) => s.state === 'docked').map((s) => s.padId)).toEqual(['l1', 'l2']);
     for (const s of big.filter((s) => s.state === 'flying')) {
       expect(Math.hypot(s.position.x - ridge.position.x, s.position.y - ridge.position.y)).toBeGreaterThan(ridge.radius);

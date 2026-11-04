@@ -32,7 +32,8 @@ describe('docking', () => {
     w.ships[SHIP] = {
       ...ship(w),
       position: { x: station.position.x + 100, y: station.position.y },
-      velocity: { x: DOCK_MAX_SPEED + 1, y: 0 },
+      // Too fast relative to the station, which is itself moving.
+      velocity: { x: station.velocity.x + DOCK_MAX_SPEED + 1, y: station.velocity.y },
       flightMode: 'manual',
     };
     const next = step(w, { toggleDock: true });
@@ -45,7 +46,7 @@ describe('docking', () => {
     w.ships[SHIP] = {
       ...ship(w),
       position: { x: station.position.x + 100, y: station.position.y },
-      velocity: { x: 0, y: 0 },
+      velocity: { ...station.velocity },
       heading: 0,
     };
 
@@ -53,15 +54,17 @@ describe('docking', () => {
     // The Courier is size S: the smallest free pad that fits is Harbour's first S pad.
     expect(docked.events[0]).toEqual({ type: 'docked', shipId: SHIP, stationId: station.id, padId: 's1' });
     const pad = station.pads.find((p) => p.id === 's1')!;
-    const padAt = { x: station.position.x + pad.position.x, y: station.position.y + pad.position.y };
+    // The ship rides its pad wherever the station is, at the station's velocity.
+    const padAt = (x: World) => ({ x: x.stations[station.id]!.position.x + pad.position.x, y: x.stations[station.id]!.position.y + pad.position.y });
     expect(ship(docked).state).toBe('docked');
     expect(ship(docked).padId).toBe('s1');
-    expect(ship(docked).position).toEqual(padAt);
+    expect(ship(docked).position).toEqual(padAt(docked));
+    expect(ship(docked).velocity).toEqual(docked.stations[station.id]!.velocity);
     expect(ship(docked).heading).toBe(pad.facing);
 
-    // Thrust while docked does nothing.
+    // Thrust while docked does nothing but ride the pad.
     const still = step(docked, { thrustForward: true });
-    expect(ship(still).position).toEqual(padAt);
+    expect(ship(still).position).toEqual(padAt(still));
 
     const undocked = step(still, { toggleDock: true });
     expect(undocked.events[0]).toEqual({ type: 'undocked', shipId: SHIP, stationId: station.id });
@@ -70,9 +73,12 @@ describe('docking', () => {
     expect(s.padId).toBeNull();
     // Launched out along the pad's facing, clear of the hull.
     const out = { x: Math.cos(pad.facing), y: Math.sin(pad.facing) };
-    const dist = Math.hypot(s.position.x - station.position.x, s.position.y - station.position.y);
+    const here = undocked.stations[station.id]!;
+    const dist = Math.hypot(s.position.x - here.position.x, s.position.y - here.position.y);
     expect(dist).toBeGreaterThan(station.radius + 18);
-    expect(s.velocity.x * out.x + s.velocity.y * out.y).toBeGreaterThan(0);
+    // Moving away from the station, relative to it.
+    const rel = { x: s.velocity.x - here.velocity.x, y: s.velocity.y - here.velocity.y };
+    expect(rel.x * out.x + rel.y * out.y).toBeGreaterThan(0);
   });
 
   it('is pure: the input world is not mutated', () => {

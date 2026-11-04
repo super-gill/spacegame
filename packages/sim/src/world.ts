@@ -6,7 +6,9 @@ import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
 import { issueShip, STARTER_LOADOUT_ID, STARTER_STATION_ID } from './pilots.js';
-import { HARBOUR_ID, RIDGE_ID, starterStations } from './stations.js';
+import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
+import { pirateHome } from './rails.js';
+import { HARBOUR_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
 import type { Pilot, Ship, ShipInput, Spawner, World } from './types.js';
 import { WEAPONS } from './weapons.js';
 
@@ -31,9 +33,14 @@ export function emptyInput(): ShipInput {
 
 export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
 
+/** How far inward of Ridge Outpost, towards the star, the pirate's home is, units. */
+const PIRATE_HOME_INWARD = 1500;
+
 /**
- * The starter sector: two stations, a trader running between them and a
- * pirate prowling the lane. No pilots; they are added with `joinPilot`.
+ * The starter system, Calder (bodies.ts, stations.ts): a star, a planet
+ * with Harbour Station in low orbit, a moon, and the belt with Ridge
+ * Outpost on it. A trader runs between the two stations and a pirate
+ * prowls inward of Ridge, riding the belt's turn. No pilots; they are added with `joinPilot`.
  * NPCs come from spawners, so a destroyed trader or pirate is replaced
  * after a while. This is content, not engine; later sectors will be data
  * files.
@@ -63,17 +70,21 @@ export function createStarterWorld(): World {
     spawned: 0,
   };
 
-  // The pirate lurks off the lane between the two stations, outside both zones.
-  const pirateHome = { x: 2600, y: -300 };
+  // The pirate lurks a little inward of Ridge, on the traders' way in,
+  // outside its security zone, and turns with the belt so it stays there.
+  const bodies = starterBodies();
+  const homeOrbit = { parent: BELT_ID, radius: BELT_RING_RADIUS - PIRATE_HOME_INWARD, period: BELT_PERIOD, phase: RIDGE_PHASE, direction: 1 as const };
+  const pirateHomeNow = pirateHome({ bodies, tick: 0, dt: FIXED_DT }, { x: 0, y: 0 }, homeOrbit);
   const pirate: Spawner = {
     id: 'pirate',
     loadoutId: 'kessari-raider',
-    position: pirateHome,
+    position: pirateHomeNow,
     heading: Math.PI,
     dockedAt: null,
     brain: {
       kind: 'pirate',
-      home: pirateHome,
+      home: pirateHomeNow,
+      homeOrbit,
       mode: 'prowl',
       targetId: null,
       modeTicks: 0,
@@ -99,6 +110,7 @@ export function createStarterWorld(): World {
     wrecks: [],
     loot: [],
     stations,
+    bodies,
     hulls: { ...HULLS },
     modules: { ...MODULES },
     loadouts: { ...LOADOUTS },

@@ -103,6 +103,16 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Pods and waking** (`pilots.ts`): `HullSpec.escapePod`, the `escape-pod` hull and `ESCAPE_POD_LOADOUT_ID`; `wakePilot` (and `respawnPilot`, which returns only the world), `WakeRefusal`; `claimStarterShip`, `claimRefusal`, `ClaimRefusal`. Pilot commands return `CommandResult` (the world and an event, or the world and a reason).
 - **Events** (`types.ts`): `docked` carries `padId`; `dockRefused` may say `noPad`; new `shipBought`, `boarded`, `podEjected`, `pilotWoke`, `starterClaimed`. Each names its ship in `shipId` (for `podEjected` and `boarded`, the ship the pilot is now in; `from` is the one left).
 
+6c part 1 contracts (on `main` from 4 November 2026):
+
+- **Bodies** (`types.ts`, `bodies.ts`): `Body` (`id`, `name`, `kind`: star, planet, moon or belt; `orbit` or null for the star at the origin; `radius`, the surface; `gravity`; `sphere`; belts have `ring` with `radius` and `width`), `World.bodies`. `Orbit` (`parent`, `radius`, `period`, `phase`, `direction`). Starter ids `STAR_ID`, `PLANET_ID`, `MOON_ID`, `BELT_ID`.
+- **Rails** (`rails.ts`): `railTime`, `orbitAngle`, `orbitState`, `bodyState`, `bodyStates`, `stationState`, `placeStations`, `circularPeriod`; for the client, `bodyPosition`, `bodyVelocity`, `sphereBodyAt`. Pure functions of the tick: draw anything on rails at any time, including between ticks, by passing a fractional tick to `railTime`.
+- **Moving stations** (`types.ts`): `Station.orbit`, `Station.velocity`; `Station.position` and `velocity` are always where the rail puts them at `World.tick`. A docked ship's `velocity` is its station's. `ridePad`, `speedRelativeTo` in `docking.ts`.
+- **Local frame** (`rails.ts`): `localFrame(world, ship)` (`station`, `body` or `system`, with its velocity), `frameVelocity`, `relativeVelocity`. Speed readouts, the docking check and assist all use it. Show speed relative to the frame, and say which frame.
+- **Carrying** (`rails.ts`): `tickRails`, `applyCarry`, `Carry`. The sim does this; the client never moves anything itself.
+- **Pirate homes** (`types.ts`): `PirateBrain.homeOrbit`, optional. `pirateHome` gives where it is now.
+- **Save format:** `SAVE_VERSION` 5, `migrate4to5`. Version 5 stays open on `main` until 0.9.0 (end of 6c): target locks and part 2 land in it without another bump.
+
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
@@ -111,7 +121,7 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 | Lore | `ws/lore` | `docs/lore.md` (new), `docs/races.md` | Open (long-lived) | "Brief: Lore" below |
 | 6b foundation | `main` (lead) | The 6b sim side | Closed, 0.8.0 | `docs/ships.md`, "6b" |
 | Ship mart | `ws/ship-mart` | 6b client: see brief | Closed, 0.8.0 | "Brief: Ship mart" below |
-| 6c foundation | `main` (lead) | The 6c sim, parts 1 and 2 | Open | `docs/system.md`, "Build order" |
+| 6c foundation | `main` (lead) | The 6c sim, parts 1 and 2 | Open; part 1 on `main` | `docs/system.md`, "Build order" |
 | Interface | `ws/interface` | `packages/client/`, `docs/controls.md` | Open (across 6c and 6d) | "Brief: Interface" below |
 
 6a was built whole by one chat before this process existed, so its planned workstreams (ship rendering, outfitting screen, catalogue) never opened.
@@ -172,6 +182,7 @@ Candidates (not open yet):
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
 - Navy duties.
+- **Body names** (for the lore chat): the planet, its moon and the belt in Calder. Placeholders: Calder I, Calder Ia, Calder Belt.
 
 ## Ideas inbox
 
@@ -204,7 +215,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Contract changes, cross-workstream file changes, merges wanted. Newest first.
 
-- **Target locks** (2026-11-04, interface; Jason's design). Replace the single `Ship.targetId` with EVE-style locks:
+- **Target locks** (2026-11-04, interface; Jason's design). **Accepted; the lead builds it in 6c part 2**, before gravity, inside save version 5 (still open, see Contracts), so no extra bump. The contract will be named here when it lands; until then keep showing `targetId` as the active lock. Replace the single `Ship.targetId` with EVE-style locks:
   - **Locks take time**, faster with better sensors and against bigger ships. A lock in progress is visible to the client (its progress, 0 to 1).
   - **Max locks is a ship stat**, from the hull and sensor modules, like `sensorRange` (for example a courier 2 or 3, bigger ships more).
   - A lock needs the target inside sensor range; it drops when the target leaves it, docks or is destroyed (as `targetId` drops today).
@@ -219,6 +230,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): built 6c part 1 on `main`, the living system without gravity. Bodies on rails (`bodies.ts`, `rails.ts`): Calder as a star with a planet, a moon and the belt. Harbour orbits the planet every two minutes at the period the planet's gravity gives; Ridge turns with the belt. Everything inside a body's sphere (ships, shots, loot, wrecks) is carried with it exactly; docked ships ride their pads; undocking launches with the station's velocity. Assist, brake, the speed limit, the docking check and NPC steering work against the local frame (`frameVelocity`). Traders loop between the moving stations in about a minute and a half; the pirate's home rides the belt inward of Ridge. Save version 5 with `migrate4to5`: pilots keep credits, storage and ships, docked ships stay on their pads, ships in space are towed to Harbour. Choices where the plan was silent are in `docs/system.md`, "As built: part 1" (the speed limit now keeps excess speed, so frame edges never jolt). 222 tests. Client stopgap, for the interface workstream to keep or replace: `render/bodies.ts` (plain circles, dashed spheres, the belt band, edge markers for bodies), stations drawn between ticks in `main.ts`, and the HUD's VEL line relative to the local frame and naming it in `ui.ts`. Merged `ws/interface` (docs only) and accepted its target lock request for part 2. Play checked headless: a fresh pilot waits, Harbour passes, F docks, the Undock button (real click) launches, thrust and coast in full assist; a version 4 save loads as version 5 with credits kept and the ship docked at Harbour; no page errors. Needs: names for the planet, moon and belt from the lore chat (placeholders Calder I, Calder Ia, Calder Belt). Next: 6c part 2, target locks first. Changelog lines for 0.9.0: "Calder is a star system: a planet, its moon and an asteroid belt, all moving on their orbits"; "Harbour Station orbits the planet and Ridge Outpost turns with the belt; routes change length as they move"; "Ships, shots, loot and wrecks near a body move with it"; "Speed, full assist, braking and docking work relative to the station or body you are near"; "Save version 5: 0.8.x saves upgrade automatically, with ships in space towed to Harbour".
 
 - 2026-11-04, interface: drew the mockups on the design canvas "Spacegame ship interface" (https://claude.ai/artifact/NoosM7fQKNPbkr3Cs3uEyX): the flight HUD in three looks, the radar with the contacts list, the system map and the warning tiers. No code yet. Jason's calls: from Elite, the radar disc, side panels, ship silhouettes and the nav compass; from EVE, the status dial, module row, overview table and target brackets; minimal edges, so only a small core is always on (status dial with shield and hull rings, the capacitor reserved as a ring for 6e, weapons beside it, the radar disc and nav compass) and the rest shows when it has something to show or on a key. **Look: keep today's teal**; colour themes may come later as a player option. **Only modules you can use go on the HUD**; everything else (fitted modules, power, mass, cargo, sensors) goes in a dismissable ship status window (proposed key I). Nav: select a station or body (on screen, in the contacts list on O, or on the system map on M) and press N; only the nav target keeps a marker (edge chevron with distance and arrival time); stations otherwise live on the radar, on its rim when out of range. **Target locks as in EVE**: timed, max locks a ship stat, click locks, Tab switches the active lock, Esc unlocks, turrets fire at the active lock; systems assignable to locks later. Filed as a request to the lead. Needs: the lead to build target locks (request above). Open with Jason: whether new pilots start with Harbour as nav target, your own ship on the system map, north-up or heading-up radar, warning sounds. Blocked: nothing; the HUD starts with today's single target. Changelog lines: none yet.
 

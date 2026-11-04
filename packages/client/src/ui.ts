@@ -11,8 +11,10 @@ import {
   isEmptyShip,
   isEscapePod,
   length,
+  localFrame,
   nearestDockableStation,
   ownedShips,
+  relativeVelocity,
   shipPilot,
   shipStats,
   sub,
@@ -172,7 +174,11 @@ export class Ui {
       .filter(([, n]) => n > 0)
       .map(([item, n]) => `${item} ${n}`)
       .join(', ');
-    const speed = Math.hypot(ship.velocity.x, ship.velocity.y);
+    // Speed against the local frame (6c): the station in dock range, else the body whose sphere you are in.
+    const frame = localFrame(world, ship);
+    const rel = relativeVelocity(world, ship);
+    const speed = Math.hypot(rel.x, rel.y);
+    const frameName = frame.kind === 'station' ? world.stations[frame.id]?.name : frame.kind === 'body' ? world.bodies[frame.id]?.name : undefined;
     const near = nearestDockableStation(ship, world.stations);
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
     const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
@@ -189,7 +195,7 @@ export class Ui {
       `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
       `CR  ${(pilot?.credits ?? 0).toLocaleString('en-GB')}`,
       `CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}${hold ? `  ${hold}` : ''}`,
-      `VEL ${speed.toFixed(0).padStart(4)} u/s`,
+      `VEL ${speed.toFixed(0).padStart(4)} u/s${frameName ? `  REL ${frameName.toUpperCase()}` : ''}`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
       `HDG ${((ship.heading * 180) / Math.PI).toFixed(0).padStart(4)}°`,
       `ROT ${((ship.angularVelocity * 180) / Math.PI).toFixed(0).padStart(4)}°/s`,

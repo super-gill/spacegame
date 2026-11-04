@@ -336,7 +336,7 @@ describe('fitting', () => {
     const fast = ok(fitModule(w, 'ana', 'e1', 'slagline-engine-s'));
     const speedAfterOneSecond = (world: World): number => {
       const me = myShip(world).id;
-      let x: World = { ...world, ships: { ...world.ships, [me]: { ...myShip(world), state: 'flying', dockedAt: null, position: { x: 3000, y: 3000 } } } };
+      let x: World = { ...world, ships: { ...world.ships, [me]: { ...myShip(world), state: 'flying', dockedAt: null, padId: null, position: { x: 3000, y: 3000 }, velocity: { x: 0, y: 0 } } } };
       for (let i = 0; i < SECOND; i++) x = stepWorld(x, { [me]: { ...emptyInput(), thrustForward: true } });
       return length(x.ships[me]!.velocity);
     };
@@ -347,7 +347,7 @@ describe('fitting', () => {
     const { w } = dockedAt();
     const noEngine = ok(unfitModule(w, 'ana', 'e1'));
     const me = myShip(noEngine).id;
-    let x: World = { ...noEngine, ships: { ...noEngine.ships, [me]: { ...myShip(noEngine), state: 'flying', dockedAt: null, position: { x: 3000, y: 3000 } } } };
+    let x: World = { ...noEngine, ships: { ...noEngine.ships, [me]: { ...myShip(noEngine), state: 'flying', dockedAt: null, padId: null, position: { x: 3000, y: 3000 }, velocity: { x: 0, y: 0 } } } };
     for (let i = 0; i < SECOND; i++) x = stepWorld(x, { [me]: { ...emptyInput(), thrustForward: true } });
     expect(length(x.ships[me]!.velocity)).toBe(0);
   });

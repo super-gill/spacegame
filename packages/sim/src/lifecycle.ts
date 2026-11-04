@@ -15,7 +15,8 @@ import { ejectPilot } from './pilots.js';
 import { fitStats, shipStats } from './stats.js';
 import { cargoFree } from './trade.js';
 import type { Loot, Ship, Spawner, World, WorldEvent, Wreck } from './types.js';
-import { add, distance, fromAngle, normalise, scale, sub } from './vec2.js';
+import { applyCarry, frameVelocity, pirateHome, type Carry } from './rails.js';
+import { add, distance, fromAngle, normalise, scale, sub, type Vec2 } from './vec2.js';
 
 /**
  * Things being made and unmade: destroyed ships become wrecks and loot,
@@ -61,6 +62,11 @@ export function destroyShips(world: World, killers: Record<string, string | null
   let nextId = world.nextEntityId;
 
   for (const ship of dead) {
+    // Debris keeps part of the ship's motion relative to its local frame,
+    // so a wreck near a moving station or in a moving body's sphere does
+    // not lose the frame's own motion.
+    const frame = frameVelocity(world, ship);
+    const keep = (fraction: number): Vec2 => add(frame, scale(sub(ship.velocity, frame), fraction));
     delete ships[ship.id];
     delete npcs[ship.id];
     events.push({ type: 'destroyed', shipId: ship.id, by: killers[ship.id] ?? null });
@@ -81,7 +87,7 @@ export function destroyShips(world: World, killers: Record<string, string | null
       id: `w${nextId++}`,
       hullId: ship.hullId,
       position: ship.position,
-      velocity: scale(ship.velocity, 0.6),
+      velocity: keep(0.6),
       heading: ship.heading,
       angularVelocity: ship.angularVelocity * 0.5 + 0.4,
       ticksLeft: Math.round(WRECK_LIFETIME / world.dt),
@@ -111,7 +117,7 @@ export function destroyShips(world: World, killers: Record<string, string | null
           item: good,
           amount,
           position: add(ship.position, scale(dir, 10)),
-          velocity: add(scale(ship.velocity, 0.6), scale(dir, LOOT_SCATTER_SPEED * (1 + g * 0.3))),
+          velocity: add(keep(0.6), scale(dir, LOOT_SCATTER_SPEED * (1 + g * 0.3))),
           ticksLeft: Math.round(LOOT_LIFETIME / world.dt),
         };
         loot.push(item);
@@ -158,16 +164,19 @@ export function departShips(world: World, shipIds: readonly string[]): Destructi
   };
 }
 
-/** Drift wrecks and remove those that have faded. */
-export function stepWrecks(wrecks: readonly Wreck[], dt: number): Wreck[] {
+/** Drift wrecks, carried by any body whose sphere they are in, and remove those that have faded. */
+export function stepWrecks(wrecks: readonly Wreck[], dt: number, carryAt?: (point: Vec2) => Carry): Wreck[] {
   return wrecks
     .filter((w) => w.ticksLeft > 1)
-    .map((w) => ({
-      ...w,
-      position: add(w.position, scale(w.velocity, dt)),
-      heading: w.heading + w.angularVelocity * dt,
-      ticksLeft: w.ticksLeft - 1,
-    }));
+    .map((w) => {
+      const moved = {
+        ...w,
+        position: add(w.position, scale(w.velocity, dt)),
+        heading: w.heading + w.angularVelocity * dt,
+        ticksLeft: w.ticksLeft - 1,
+      };
+      return carryAt ? applyCarry(moved, carryAt(w.position)) : moved;
+    });
 }
 
 export interface LootStep {
@@ -183,7 +192,7 @@ export interface LootStep {
  * hold does not pull; one with some space takes what fits and leaves the
  * rest of the canister floating.
  */
-export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
+export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (point: Vec2) => Carry): LootStep {
   const out: Loot[] = [];
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
@@ -226,12 +235,8 @@ export function stepLoot(world: World, ships: Record<string, Ship>): LootStep {
       velocity = add(puller.velocity, scale(towards, TRACTOR_PULL_SPEED));
     }
 
-    out.push({
-      ...item,
-      velocity,
-      position: add(item.position, scale(velocity, world.dt)),
-      ticksLeft: item.ticksLeft - 1,
-    });
+    const moved = { ...item, velocity, position: add(item.position, scale(velocity, world.dt)), ticksLeft: item.ticksLeft - 1 };
+    out.push(carryAt ? applyCarry(moved, carryAt(item.position)) : moved);
   }
   return { loot: out, ships: updated, events };
 }
@@ -241,11 +246,14 @@ function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
   const loadout = world.loadouts[sp.loadoutId];
   if (!loadout || !world.hulls[loadout.hullId]) return { world, spawner: sp };
   const id = `npc-${sp.id}-${sp.spawned + 1}`;
+  // A pirate whose home rides a rail spawns where its home is now.
+  const brain = sp.brain.kind === 'pirate' ? { ...sp.brain, home: pirateHome(world, sp.brain.home, sp.brain.homeOrbit) } : sp.brain;
+  const position = brain.kind === 'pirate' && brain.homeOrbit ? brain.home : sp.position;
   let ship: Ship = buildShip(world, {
     id,
     loadout,
     ownerId: null,
-    position: sp.position,
+    position,
     heading: sp.heading,
     flightMode: 'rotation', // NPC steering handles drift itself; see ai/steer.ts
     hold: sp.hold,
@@ -258,7 +266,7 @@ function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
     ship = onPad(ship, station, pad);
   }
   return {
-    world: { ...world, ships: { ...world.ships, [id]: ship }, npcs: { ...world.npcs, [id]: sp.brain } },
+    world: { ...world, ships: { ...world.ships, [id]: ship }, npcs: { ...world.npcs, [id]: brain } },
     spawner: { ...sp, shipId: id, spawned: sp.spawned + 1, timerTicks: 0 },
   };
 }
