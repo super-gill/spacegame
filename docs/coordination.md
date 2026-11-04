@@ -151,6 +151,13 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Events:** `munitionLaunched`, `launchRefused` (`noLock`), `munitionSpoofed` (to the decoy's owner), `munitionDestroyed` (`by` the shooter, or null when spent or burnt out), `countermeasureLaunched`; damage cause `munition`.
 - **Swivels** engage incoming munitions by themselves, hot or cold; the tile's state should say so.
 
+6f contracts (on `main` from 4 November 2026; design in `docs/ship-systems.md`):
+
+- **Mounts** (`types.ts`): `MountType` gains `flight`, `podBay` and `fireControl` (fixed, one each). The `fireControl` mount service is gone: any weapon mount takes a swivel. Hulls follow the class slot budget; armour moved from `utility` to `internal` mounts, dispensers to `utility` only.
+- **Module kinds**: `flightComputer`, `podBay`, `fireControl`, `tractor`, `afterburner`; `ModuleSpec.shieldRegenDelay` on shield generators.
+- **Stats** (`ShipStats`): `flightControl` (0 to 1; 0 means no computer: manual, no mouse steering, no assist or brake), `turretControl`, `turretTracking`, `escapePod`, `tractorRange`, `tractorPull`, `afterburnerSpeed`, `afterburnerThrust`, `afterburnerDraw`; `shieldRegenDelay` now from the generator.
+- **Save format version 6** (`migrate5to6`): modules move to mounts that take them or to storage; stock flight computer, pod bay, fire control and a tractor fitted free.
+
 ## Workstreams
 
 | Name | Branch | Owns | Status | Brief |
@@ -330,6 +337,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): 6f stages 1 to 3 (`docs/ship-systems.md`). Slot budgets by hull class; fixed flight, pod bay and fire-control mounts; armour is internal, active kit utility; swivels in any weapon mount. New modules (names provisional, **lore ask**): Meridian Helm, Paragon Helmsman and Ito-Marr Coxswain flight computers; Meridian Ark Bay; Paragon Director S and M; Meridian Gleaner and Tessaract Long Gleaner tractors; Slagline Kick and Ito-Marr Surge afterburners. Effects: no flight computer means manual flight and no mouse steering, a better one turns and settles faster; no pod bay means losing the ship leaves the pilot with nothing; fire control limits and speeds swivels; shield delay from the generator. The starter runs at 13 of 13 power; the raider got the medium reactor. Save version 6. 329 sim tests; 20-minute soak healthy. Next: the tractor and afterburner as modules, and the activation tiles.
 
 - 2026-11-04, lead (Lead 3): **released 0.10.0** (release commit "feat: release weapons, power and the new flight (v0.10.0)" on `main`): 6e plus the playtest's flight changes, shield arcs, attack runs and admin controls. Jason played and is happy with the feel; pirates not killing traders left untuned on his call. Recorded today's decisions (flight, slots the EVE way, electronic warfare in or after 6f, interdiction with the map, mining slice after 6f) and rewrote the roadmap's plan and known gaps. Saves stay at version 5. Next: a short 6f design pass with Jason.
 

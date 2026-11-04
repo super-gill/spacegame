@@ -69,6 +69,9 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   radar: 'Radar',
   computer: 'Targeting computer',
   nav: 'Navigation',
+  flight: 'Flight computer',
+  podBay: 'Pod bay',
+  fireControl: 'Fire control',
 };
 
 const INK = '#9fd3c7';
@@ -122,6 +125,11 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   targetingComputer: 'Targeting computer',
   navComputer: 'Nav computer',
   countermeasure: 'Countermeasure dispenser',
+  flightComputer: 'Flight computer',
+  podBay: 'Pod bay',
+  fireControl: 'Fire control',
+  tractor: 'Tractor beam',
+  afterburner: 'Afterburner',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -143,6 +151,12 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.sensorRange) parts.push(`sees ${s.sensorRange} u`);
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
+  if (s.flightControl) parts.push(`flight control ${Math.round(s.flightControl * 100)}%: mouse steering and assist`);
+  if (s.turretControl) parts.push(`directs ${s.turretControl} swivel${s.turretControl === 1 ? '' : 's'}, tracking ${fixed1(s.turretTracking ?? 1)}x`);
+  if (s.escapePod) parts.push('an escape pod: without one, losing the ship leaves you with nothing');
+  if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
+  if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
+  if (m.shieldRegenDelay) parts.push(`recharges ${fixed1(m.shieldRegenDelay)} s after a hit`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
   if (w && w.family === 'countermeasure') {
     // Dispensers: what they hold and what they come with.

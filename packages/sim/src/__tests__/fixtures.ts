@@ -39,4 +39,8 @@ export function loadoutStats(loadoutId: string): ShipStats {
 }
 
 /** Flight stats for physics tests: the Aurel Tacet development ship as built. */
-export const TEST_STATS: ShipStats = loadoutStats('aurel-tacet-dev');
+/**
+ * The Tacet's stats, with a perfect flight computer so flight tests measure
+ * the thrust logic itself; tests of the flight computer set their own.
+ */
+export const TEST_STATS: ShipStats = { ...loadoutStats('aurel-tacet-dev'), flightControl: 1 };

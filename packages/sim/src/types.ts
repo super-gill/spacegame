@@ -20,16 +20,24 @@ export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
  * computer every ship carries: it knows where you are, how fast you are
  * going against your frame, what gravity is doing and where you will be.
  */
-export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav';
+/**
+ * Mount types (docs/ship-systems.md). Budgeted by hull class: `weapon`,
+ * `utility` (active kit), `internal` (passive kit), `bay` (cargo). Fixed,
+ * one of each on every ship outside the budget: `nav`, `radar`,
+ * `computer` (targeting), `flight` (flight computer), `podBay`,
+ * `fireControl`, `engine` and `core` (reactor, thrusters).
+ */
+export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl';
 
 /**
  * What a mount point provides to the module on it. A module lists the
  * services it needs and fits only where they are all provided.
  * - `power`: a power feed. Anything that draws power needs it.
- * - `fireControl`: a fire control link. Turrets need it to track.
  * - `heavyLoad`: a hardpoint rated for heavy, dense loads.
+ * (Turrets no longer need a fire-control link on their mount: since 6f
+ * any weapon mount takes one, and a fire-control computer directs them.)
  */
-export type MountService = 'power' | 'fireControl' | 'heavyLoad';
+export type MountService = 'power' | 'heavyLoad';
 
 /**
  * A place on a hull a module can be fitted. Position and facing are in
@@ -150,7 +158,25 @@ export type ModuleStat =
   /** How fast it locks: 1 is an ordinary computer, 2 locks in half the time. Comes only from a targeting computer. */
   | 'scanResolution'
   /** How far ahead the navigation computer predicts your path, seconds. Comes only from a nav computer. */
-  | 'navHorizon';
+  | 'navHorizon'
+  /** How well the flight computer flies the hull, 0 to 1: mouse steering and assist. Zero: no computer, manual on the keys. */
+  | 'flightControl'
+  /** How many swivels the fire-control computer can direct at once. */
+  | 'turretControl'
+  /** Fire control's tracking: a multiplier on swivels' slew rate (best fitted, not summed). */
+  | 'turretTracking'
+  /** A pod bay: 1 if the ship carries an escape pod. */
+  | 'escapePod'
+  /** Tractor reach from the ship's centre, units. */
+  | 'tractorRange'
+  /** How fast the tractor draws loot in, units/s. */
+  | 'tractorPull'
+  /** Afterburner: extra speed cap while lit, as a share of top speed. */
+  | 'afterburnerSpeed'
+  /** Afterburner: extra main thrust while lit, as a share of main thrust. */
+  | 'afterburnerThrust'
+  /** Afterburner: capacitor burnt per second while lit. */
+  | 'afterburnerDraw';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -164,7 +190,12 @@ export type ModuleKind =
   | 'radar'
   | 'targetingComputer'
   | 'navComputer'
-  | 'countermeasure';
+  | 'countermeasure'
+  | 'flightComputer'
+  | 'podBay'
+  | 'fireControl'
+  | 'tractor'
+  | 'afterburner';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -218,6 +249,8 @@ export interface ModuleSpec {
    * "Shield arcs").
    */
   shieldArc?: number;
+  /** Shield generators only: seconds after a hit before the shield starts to recharge. */
+  shieldRegenDelay?: number;
   /** Shield generators and armour: what they stop of each damage type. */
   resists?: Resistances;
   /**
@@ -334,6 +367,22 @@ export interface ShipStats {
   /** Shield recharge, points per second, once recharging. */
   shieldRegen: number;
   /** Seconds after taking damage before shields start recharging. */
+  /** Flight computer quality, 0 to 1; 0 with none (manual on the keys, no mouse steering, no assist). */
+  flightControl: number;
+  /** Swivels fire control can direct; others stay idle. */
+  turretControl: number;
+  /** Multiplier on swivels' slew rate from fire control; 0 with none. */
+  turretTracking: number;
+  /** True with a pod bay: the pilot escapes in a pod when the ship is lost. */
+  escapePod: boolean;
+  /** Tractor reach, units; 0 with no tractor. */
+  tractorRange: number;
+  /** Tractor pull speed, units/s. */
+  tractorPull: number;
+  /** Afterburner effects while lit; zero with none. */
+  afterburnerSpeed: number;
+  afterburnerThrust: number;
+  afterburnerDraw: number;
   shieldRegenDelay: number;
   structure: number;
   cargoCapacity: number;

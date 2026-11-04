@@ -174,7 +174,8 @@ function turretAim(art: ShipArt, mount: MountPoint): number | null {
   const state = art.weapons?.find((w) => w.mountId === mount.id);
   const spec = art.stats?.weapons[mount.id];
   if (spec && spec.kind !== 'turret') return null;
-  if (!spec && !art.modules[art.fit[mount.id] ?? '']?.needs.includes('fireControl')) return null;
+  // No stats to hand (a thumbnail): draw the gun pointing ahead.
+  if (!spec) return null;
   return state ? state.aim - art.heading : mount.facing;
 }
 
@@ -307,6 +308,11 @@ function drawModule(
     case 'thrusters':
     case 'reactor':
     case 'shieldGenerator':
+    case 'flightComputer':
+    case 'podBay':
+    case 'fireControl':
+    case 'tractor':
+    case 'afterburner':
       // Internal module: a marker only. Reactors are a solid dot,
       // shield generators a ring, thruster packages an open square.
       ctx.beginPath();

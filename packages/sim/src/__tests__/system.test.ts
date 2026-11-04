@@ -462,8 +462,8 @@ describe('save version 5', () => {
     return { text: JSON.stringify({ ...env, format: SAVE_FORMAT, version: 4 }), harbourPad: pad.id };
   }
 
-  it('is the current version', () => {
-    expect(SAVE_VERSION).toBe(5);
+  it('migrates on to the current version', () => {
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(5);
   });
 
   it("keeps every pilot's credits, storage and ships", () => {

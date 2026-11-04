@@ -42,6 +42,14 @@ const STAT_KEYS: ModuleStat[] = [
   'maxLocks',
   'scanResolution',
   'navHorizon',
+  'flightControl',
+  'turretControl',
+  'escapePod',
+  'tractorRange',
+  'tractorPull',
+  'afterburnerSpeed',
+  'afterburnerThrust',
+  'afterburnerDraw',
 ];
 
 /** Resistances layered: the stronger of each type wins (two armour plates do not stack). */
@@ -87,6 +95,15 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     maxLocks: 0,
     scanResolution: 0,
     navHorizon: 0,
+    flightControl: 0,
+    turretControl: 0,
+    turretTracking: 0,
+    escapePod: 0,
+    tractorRange: 0,
+    tractorPull: 0,
+    afterburnerSpeed: 0,
+    afterburnerThrust: 0,
+    afterburnerDraw: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -95,6 +112,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   let capacitorDraw = 0;
   let shieldResists: Resistances = {};
   let shieldArc = 0;
+  let shieldRegenDelay = SHIELD_REGEN_DELAY;
+  let hasShieldGenerator = false;
+  let turretTracking = 0;
   let armourResists: Resistances = {};
 
   for (const mount of hull.mounts) {
@@ -110,7 +130,13 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     for (const r of module.readouts ?? []) readouts.add(r);
     // Only a module the full size of its mount draws on the capacitor (docs/weapons.md).
     if (module.capacitorDraw && module.size === mount.size) capacitorDraw += module.capacitorDraw;
-    if (module.kind === 'shieldGenerator') shieldArc = Math.max(shieldArc, module.shieldArc ?? STOCK_SHIELD_ARC);
+    if (module.kind === 'shieldGenerator') {
+      shieldArc = Math.max(shieldArc, module.shieldArc ?? STOCK_SHIELD_ARC);
+      // The quickest fitted generator sets the delay.
+      shieldRegenDelay = hasShieldGenerator ? Math.min(shieldRegenDelay, module.shieldRegenDelay ?? SHIELD_REGEN_DELAY) : (module.shieldRegenDelay ?? SHIELD_REGEN_DELAY);
+      hasShieldGenerator = true;
+    }
+    turretTracking = Math.max(turretTracking, module.stats.turretTracking ?? 0);
     if (module.resists) {
       if (module.kind === 'shieldGenerator') shieldResists = bestOf(shieldResists, module.resists);
       if (module.kind === 'armour') armourResists = bestOf(armourResists, module.resists);
@@ -130,7 +156,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     radius: hull.radius,
     shield: totals.shield,
     shieldRegen: totals.shieldRegen,
-    shieldRegenDelay: SHIELD_REGEN_DELAY,
+    shieldRegenDelay,
     structure: totals.structure,
     // Whole units only: every unit of cargo takes one unit of space.
     cargoCapacity: Math.floor(totals.cargoCapacity + 1e-9),
@@ -142,6 +168,16 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     signature: hull.signature,
     readouts: READOUT_ORDER.filter((r) => readouts.has(r)),
     navHorizon: totals.navHorizon,
+    // One flight computer flies the ship; a second adds nothing.
+    flightControl: Math.min(1, totals.flightControl),
+    turretControl: Math.floor(totals.turretControl + 1e-9),
+    turretTracking,
+    escapePod: totals.escapePod > 0,
+    tractorRange: totals.tractorRange,
+    tractorPull: totals.tractorPull,
+    afterburnerSpeed: totals.afterburnerSpeed,
+    afterburnerThrust: totals.afterburnerThrust,
+    afterburnerDraw: totals.afterburnerDraw,
     weapons,
     capacitor: hull.capacitor,
     capacitorRecharge: hull.capacitorRecharge,

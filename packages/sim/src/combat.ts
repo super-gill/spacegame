@@ -159,6 +159,16 @@ export function fireWeapons(
     return taken;
   };
 
+  // Fire control directs the first `turretControl` swivels, in mount order;
+  // the rest stay idle (docs/ship-systems.md).
+  const directed = new Set(
+    ship.weapons
+      .filter((w) => stats.weapons[w.mountId]?.kind === 'turret')
+      .map((w) => w.mountId)
+      .sort()
+      .slice(0, stats.turretControl),
+  );
+
   const weapons = ship.weapons.map((w) => {
     const spec = stats.weapons[w.mountId];
     if (!spec) return w;
@@ -167,7 +177,7 @@ export function fireWeapons(
     // Turrets: pick something to point at.
     let aim = ship.heading;
     let turretReady = false;
-    if (spec.kind === 'turret') {
+    if (spec.kind === 'turret' && directed.has(w.mountId)) {
       aim = w.aim;
       let quarry: { position: Vec2; velocity: Vec2 } | null = null;
       const assigned = w.lockTarget && isLocked(ship, w.lockTarget) ? targetFor(w) : null;
@@ -188,7 +198,7 @@ export function fireWeapons(
         const wanted = toAngle(sub(leadFor(ship.position, ship.velocity, quarry.position, quarry.velocity, spec.projectileSpeed), ship.position));
         const canReach = !mount || withinArc(ship, mount, wanted);
         if (canReach) {
-          const step = spec.turretTurnRate * dt;
+          const step = spec.turretTurnRate * Math.max(stats.turretTracking, 0) * dt;
           aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
           const onTarget = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE;
           turretReady = onTarget && distance(ship.position, quarry.position) <= spec.range;

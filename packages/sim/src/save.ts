@@ -10,7 +10,8 @@ import { idleThrusters } from './flight.js';
 import { freePadFor, launchPoint, onPad } from './docking.js';
 import { runSpawners } from './lifecycle.js';
 import { defaultPads, defaultShipMart, HARBOUR_ID, starterStations } from './stations.js';
-import type { Ship, Spawner, Station, World } from './types.js';
+import type { MountType, Pilot, Ship, Spawner, Station, World } from './types.js';
+import { mountRefusal, weaponStatesFor } from './fitting.js';
 import { add, fromAngle, scale } from './vec2.js';
 import { setOrbitsMoving } from './rails.js';
 import { createStarterWorld, DEFAULT_RULES } from './world.js';
@@ -60,8 +61,11 @@ export const SAVE_FORMAT = 'spacegame-world';
  *   orbits and carry their velocity; pirate brains may have a home on a
  *   rail; ships hold target locks instead of one target. Version 4 saves
  *   migrate: see `migrate4to5`.
+ * - 6 (6f): ship systems. Hulls have slot budgets and fixed flight,
+ *   pod bay and fire control mounts; armour moved to internal mounts.
+ *   Version 5 saves migrate: see `migrate5to6`.
  */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -75,7 +79,92 @@ export const MIGRATIONS: Record<number, Migration> = {
   },
   3: (world) => migrate3to4(world),
   4: (world) => migrate4to5(world),
+  5: (world) => migrate5to6(world),
 };
+
+/** The stock systems a ship is given free on new fixed mounts in `migrate5to6`, by mount type. */
+const STOCK_SYSTEMS: Partial<Record<MountType, string>> = {
+  flight: 'meridian-helm-s',
+  podBay: 'meridian-podbay-s',
+  fireControl: 'paragon-director-s',
+};
+
+/** The tractor every ship had built in until 6f, fitted free on a spare utility mount by `migrate5to6`. */
+const STOCK_TRACTOR = 'meridian-gleaner-s';
+
+/**
+ * 5 to 6: ship systems (6f, docs/ship-systems.md).
+ *
+ * For every ship, against its hull as it now is:
+ * - each module stays on its mount if the mount still takes it;
+ * - one that no longer fits there (armour from a utility mount, say)
+ *   moves to the first free mount of the same hull that takes it;
+ * - one with nowhere to go goes into its pilot's storage at the station
+ *   the ship is docked at, else at Harbour (NPC ships just drop it: their
+ *   spawners fit them afresh);
+ * - new fixed mounts get the stock flight computer, pod bay and fire
+ *   control free (a pod only has a flight mount), and a spare utility
+ *   mount gets the stock tractor, which every ship had built in before;
+ * - weapon states are rebuilt for the new fit, keeping those whose
+ *   mount and module did not change.
+ */
+export function migrate5to6(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['ships'])) return world;
+  const pilots: Record<string, Pilot> = isRecord(world['pilots']) ? { ...(world['pilots'] as Record<string, Pilot>) } : {};
+  const ships: Record<string, unknown> = {};
+  for (const [id, raw] of Object.entries(world['ships'])) {
+    if (!isRecord(raw)) {
+      ships[id] = raw;
+      continue;
+    }
+    const ship = raw as unknown as Ship;
+    const hull = HULLS[ship.hullId];
+    if (!hull) {
+      ships[id] = raw;
+      continue;
+    }
+    const oldFit = ship.fit ?? {};
+    const fit: Record<string, string> = {};
+    const homeless: string[] = [];
+    // Keep what still fits where it is.
+    for (const [mountId, moduleId] of Object.entries(oldFit)) {
+      const mount = hull.mounts.find((m) => m.id === mountId);
+      const module = MODULES[moduleId];
+      if (!module) continue;
+      if (mount && mountRefusal(mount, module) === null) fit[mountId] = moduleId;
+      else homeless.push(moduleId);
+    }
+    // Rehouse the rest on free mounts that take them.
+    const leftover: string[] = [];
+    for (const moduleId of homeless) {
+      const module = MODULES[moduleId]!;
+      const free = hull.mounts.find((m) => !fit[m.id] && mountRefusal(m, module) === null);
+      if (free) fit[free.id] = moduleId;
+      else leftover.push(moduleId);
+    }
+    // Stock systems on the new fixed mounts, and the tractor ships used to have built in.
+    for (const mount of hull.mounts) {
+      if (fit[mount.id]) continue;
+      const stock = STOCK_SYSTEMS[mount.type];
+      if (stock && MODULES[stock] && mountRefusal(mount, MODULES[stock]!) === null) fit[mount.id] = stock;
+    }
+    if (!hull.escapePod && !Object.values(fit).some((m) => MODULES[m]?.kind === 'tractor')) {
+      const spare = hull.mounts.find((m) => m.type === 'utility' && !fit[m.id] && mountRefusal(m, MODULES[STOCK_TRACTOR]!) === null);
+      if (spare) fit[spare.id] = STOCK_TRACTOR;
+    }
+    // What could not be rehoused goes to the owner's storage.
+    const owner = ship.ownerId ? pilots[ship.ownerId] : undefined;
+    if (owner && leftover.length > 0) {
+      const stationId = ship.state === 'docked' && ship.dockedAt ? ship.dockedAt : HARBOUR_ID;
+      const shelf = { ...(owner.storage?.[stationId] ?? {}) };
+      for (const moduleId of leftover) shelf[moduleId] = (shelf[moduleId] ?? 0) + 1;
+      pilots[owner.id] = { ...owner, storage: { ...(owner.storage ?? {}), [stationId]: shelf } };
+    }
+    const weapons = weaponStatesFor({ modules: MODULES, weapons: WEAPONS, goods: GOODS }, hull, fit, ship.heading ?? 0, { fit: oldFit, weapons: ship.weapons ?? [] });
+    ships[id] = { ...ship, fit, weapons };
+  }
+  return { ...world, ships, pilots };
+}
 
 /**
  * A ship with target locks in place of the old single target. Version 5

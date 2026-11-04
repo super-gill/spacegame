@@ -81,6 +81,8 @@ const on = (held: boolean): number => (held ? 1 : 0);
 const AIM_BRAKE_MARGIN = 0.8;
 /** Close to the aim, the wanted spin is at most this many times the angle left (per second), so it settles without hunting. */
 const AIM_SETTLE_RATE = 8;
+/** How far off the aim a flight computer of quality 0 would let the nose sit, radians; better ones hold tighter. */
+const AIM_SLACK = 0.1;
 
 /**
  * Decide this tick's thruster throttles. Pure.
@@ -101,15 +103,22 @@ export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput,
   const lateralAccel = stats.lateralThrust / stats.mass;
   const rotationAccel = stats.rotationThrust / stats.mass;
 
-  const linearAssist = ship.flightMode === 'assisted';
-  const rotationAssist = ship.flightMode === 'assisted' || ship.flightMode === 'rotation';
+  // The flight computer flies the assists, the brake and mouse steering
+  // (docs/ship-systems.md). Without one the ship is flown by hand: manual,
+  // whatever the mode says. A cheaper one holds less firmly.
+  const control = stats.flightControl;
+  const computer = control > 0;
+  const linearAssist = computer && ship.flightMode === 'assisted';
+  const rotationAssist = computer && (ship.flightMode === 'assisted' || ship.flightMode === 'rotation');
+  const firmness = 0.5 + 0.5 * control;
+  const brake = computer && input.brake;
 
   const out = idleThrusters();
 
   // Forward / back axis.
   const pilotForwardAxis = input.thrustForward || input.thrustReverse;
-  if (input.brake || (linearAssist && !pilotForwardAxis)) {
-    const strength = input.brake ? BRAKE_STRENGTH : ASSIST_LINEAR_STRENGTH;
+  if (brake || (linearAssist && !pilotForwardAxis)) {
+    const strength = (brake ? BRAKE_STRENGTH : ASSIST_LINEAR_STRENGTH) * firmness;
     const c = cancelAxis(forwardSpeed, mainAccel, reverseAccel, dt, strength);
     out.main = c.plus;
     out.reverse = c.minus;
@@ -120,8 +129,8 @@ export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput,
 
   // Lateral axis.
   const pilotLateralAxis = input.strafeLeft || input.strafeRight;
-  if (input.brake || (linearAssist && !pilotLateralAxis)) {
-    const strength = input.brake ? BRAKE_STRENGTH : ASSIST_LINEAR_STRENGTH;
+  if (brake || (linearAssist && !pilotLateralAxis)) {
+    const strength = (brake ? BRAKE_STRENGTH : ASSIST_LINEAR_STRENGTH) * firmness;
     const c = cancelAxis(rightSpeed, lateralAccel, lateralAccel, dt, strength);
     out.strafeRight = c.plus;
     out.strafeLeft = c.minus;
@@ -132,17 +141,22 @@ export function computeThrusters(ship: Ship, stats: ShipStats, input: ShipInput,
 
   // Rotation. Positive spin is clockwise on screen.
   const pilotRotating = input.turnLeft || input.turnRight;
-  if (!input.brake && !pilotRotating && input.aimHeading !== null && rotationAccel > 0) {
+  const aiming = computer && !brake && !pilotRotating && input.aimHeading !== null && rotationAccel > 0;
+  const aimError = aiming ? angleDelta(ship.heading, input.aimHeading!) : 0;
+  // A cheaper computer lets the nose sit a little off before it acts.
+  const slack = (1 - control) * AIM_SLACK;
+  if (aiming && Math.abs(aimError) > slack) {
     // Mouse steering: the spin that arrives at the aim with the hull able
-    // to stop there, no faster than the hull turns, then thrust towards it.
-    const error = angleDelta(ship.heading, input.aimHeading);
+    // to stop there, no faster than the computer will turn it, then thrust
+    // towards it.
+    const error = aimError;
     const arrive = Math.sqrt(2 * rotationAccel * AIM_BRAKE_MARGIN * Math.abs(error));
-    const wanted = Math.sign(error) * Math.min(stats.maxTurnRate, arrive, Math.abs(error) * AIM_SETTLE_RATE);
+    const wanted = Math.sign(error) * Math.min(stats.maxTurnRate * (0.55 + 0.45 * control), arrive, Math.abs(error) * AIM_SETTLE_RATE);
     const c = cancelAxis(ship.angularVelocity - wanted, rotationAccel, rotationAccel, dt, 1);
     out.rotateRight = c.plus;
     out.rotateLeft = c.minus;
-  } else if (input.brake || (rotationAssist && !pilotRotating)) {
-    const strength = input.brake ? BRAKE_STRENGTH : ASSIST_ROTATION_STRENGTH;
+  } else if (brake || aiming || (rotationAssist && !pilotRotating)) {
+    const strength = (brake ? BRAKE_STRENGTH : ASSIST_ROTATION_STRENGTH) * firmness;
     const c = cancelAxis(ship.angularVelocity, rotationAccel, rotationAccel, dt, strength);
     out.rotateRight = c.plus;
     out.rotateLeft = c.minus;

@@ -35,7 +35,9 @@ function dockedAt(stationId = HARBOUR, credits = STARTING_CREDITS): { w: World; 
   let w = joinPilot(base, 'ana', 'Ana');
   const me = pilotShip(w, 'ana')!.id;
   const st = w.stations[stationId]!;
-  const { u1: _armour, ...fit } = w.ships[me]!.fit;
+  // Strip the armour plate, the tractor and fire control so tests have a free
+  // internal slot and power to spare (the stock starter runs at full power).
+  const { i2: _armour, u1: _tractor, x1: _fireControl, ...fit } = w.ships[me]!.fit;
   const hull = HULLS[w.ships[me]!.hullId]!;
   const stats = fitStats(w, hull, fit);
   w = {
@@ -99,7 +101,7 @@ describe('derived stats', () => {
   });
 
   it('adds up mass, thrust, power and structure from the fit', () => {
-    const fit = { e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s', u1: 'rookrivet-armour-s' };
+    const fit = { e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s', i2: 'rookrivet-armour-s' };
     const s = fitStats(TEST_CATALOGUES, courier, fit);
     const parts = Object.values(fit).map((id) => MODULES[id]!);
     expect(s.mass).toBeCloseTo(courier.mass + parts.reduce((n, m) => n + m.mass, 0), 9);
@@ -159,7 +161,8 @@ describe('mount rules', () => {
   it('checks type, size and services', () => {
     expect(mountRefusal(at('meridian-courier', 'u1'), MODULES['meridian-engine-s']!)).toBe('wrongMount');
     expect(mountRefusal(at('meridian-courier', 'w1'), MODULES['union-autocannon-m']!)).toBe('tooBig');
-    expect(mountRefusal(at('meridian-courier', 'w1'), MODULES['paragon-turret-s']!)).toBe('missingService'); // no fire control
+    // Since 6f any weapon mount takes a swivel: fire control comes from a fire-control computer.
+    expect(mountRefusal(at('meridian-courier', 'w1'), MODULES['paragon-turret-s']!)).toBeNull();
     expect(mountRefusal(at('meridian-courier', 'w2'), MODULES['paragon-turret-s']!)).toBeNull();
     expect(mountRefusal(at('kessari-wedge', 'w1'), MODULES['paragon-pulse-s']!)).toBeNull(); // smaller fits
   });
@@ -175,15 +178,15 @@ describe('fitting', () => {
   it('buys a module it does not own, paying its price plus the fitting fee', () => {
     const { w } = dockedAt();
     const armour = MODULES['rookrivet-armour-s']!;
-    const r = fitModule(w, 'ana', 'u1', armour.id);
+    const r = fitModule(w, 'ana', 'i2', armour.id);
     const after = ok(r);
-    expect(myShip(after).fit['u1']).toBe(armour.id);
+    expect(myShip(after).fit['i2']).toBe(armour.id);
     expect(credits(after)).toBe(STARTING_CREDITS - armour.price - fitFee(armour));
     expect(shipStats(after, myShip(after)).structure).toBe(shipStats(w, myShip(w)).structure + armour.stats.structure!);
     expect(r.ok && r.event).toEqual({
       type: 'fitted',
       shipId: myShip(w).id,
-      mountId: 'u1',
+      mountId: 'i2',
       moduleId: armour.id,
       replaced: null,
       bought: true,
@@ -269,7 +272,6 @@ describe('fitting', () => {
     const cases: Array<[FitResult, string]> = [
       [fitModule(w, 'ana', 'u1', 'meridian-engine-s'), 'wrongMount'],
       [fitModule(w, 'ana', 'w1', 'union-autocannon-m'), 'tooBig'],
-      [fitModule(w, 'ana', 'w1', 'paragon-turret-s'), 'missingService'],
       [fitModule(w, 'ana', 'zz', 'meridian-pod-s'), 'unknownMount'],
       [fitModule(w, 'ana', 'u1', 'no-such-module'), 'unknownModule'],
       [fitModule(w, 'ana', 'e1', 'meridian-engine-s'), 'alreadyFitted'],
@@ -286,30 +288,30 @@ describe('fitting', () => {
   });
 
   it('refuses a fit that draws more power than the reactors make', () => {
-    // Starter: 9 of 10 power drawn. Make room, take a hungrier engine, then
-    // see that 10 of 10 fits and 11 of 10 does not.
+    // Stripped starter: 12 of 13 power drawn. Make room, take a hungrier engine,
+    // then see that 13 of 13 fits and 14 of 13 does not.
     const { w } = dockedAt(HARBOUR, 100_000);
-    const noShield = ok(unfitModule(w, 'ana', 'i1')); // draw 7 of 10
-    const kick = ok(fitModule(noShield, 'ana', 'e1', 'slagline-engine-s')); // draw 8
-    const back = fitModule(kick, 'ana', 'i1', 'meridian-shield-s'); // draw 10: allowed
+    const noShield = ok(unfitModule(w, 'ana', 'i1')); // draw 10 of 13
+    const kick = ok(fitModule(noShield, 'ana', 'e1', 'slagline-engine-s')); // draw 11
+    const back = fitModule(kick, 'ana', 'i1', 'meridian-shield-s'); // draw 13: allowed
     expect(back.ok).toBe(true);
     const thirsty = { ...kick.modules, 'meridian-shield-s': { ...kick.modules['meridian-shield-s']!, power: 3 } };
-    const r = fitModule({ ...kick, modules: thirsty }, 'ana', 'i1', 'meridian-shield-s'); // draw 11
+    const r = fitModule({ ...kick, modules: thirsty }, 'ana', 'i1', 'meridian-shield-s'); // draw 14
     expect(r.ok ? 'ok' : r.reason).toBe('power');
   });
 
   it('refuses when the pilot cannot pay', () => {
     const { w } = dockedAt(HARBOUR, 100);
-    const r = fitModule(w, 'ana', 'u1', 'rookrivet-armour-s');
+    const r = fitModule(w, 'ana', 'i2', 'rookrivet-armour-s');
     expect(r.ok ? 'ok' : r.reason).toBe('credits');
   });
 
   it('happens only while docked at a station with outfitting', () => {
     const ridge = dockedAt(RIDGE).w;
-    expect(planRefit(ridge, 'ana', 'u1', 'rookrivet-armour-s')).toEqual({ ok: false, reason: 'noOutfitting' });
+    expect(planRefit(ridge, 'ana', 'i2', 'rookrivet-armour-s')).toEqual({ ok: false, reason: 'noOutfitting' });
     const { w, me } = dockedAt();
     const flying = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'flying' as const, dockedAt: null } } };
-    expect(planRefit(flying, 'ana', 'u1', 'rookrivet-armour-s')).toEqual({ ok: false, reason: 'notDocked' });
+    expect(planRefit(flying, 'ana', 'i2', 'rookrivet-armour-s')).toEqual({ ok: false, reason: 'notDocked' });
   });
 
   it('a preview shows the stats after the change without making it', () => {
@@ -331,9 +333,9 @@ describe('fitting', () => {
 
   it('removing armour takes the structure with it', () => {
     const { w } = dockedAt(HARBOUR, 100_000);
-    const armoured = ok(fitModule(w, 'ana', 'u1', 'rookrivet-armour-s'));
+    const armoured = ok(fitModule(w, 'ana', 'i2', 'rookrivet-armour-s'));
     const full = { ...armoured, ships: { ...armoured.ships, [myShip(armoured).id]: { ...myShip(armoured), structure: shipStats(armoured, myShip(armoured)).structure } } };
-    const bare = ok(unfitModule(full, 'ana', 'u1'));
+    const bare = ok(unfitModule(full, 'ana', 'i2'));
     expect(myShip(bare).structure).toBe(courier.structure);
   });
 

@@ -59,7 +59,7 @@ describe('the catalogue', () => {
       const w = WEAPONS[m.weaponId!];
       expect(w, m.id).toBeDefined();
       expect(w!.size, m.id).toBe(m.size);
-      if (w!.kind === 'turret') expect(m.needs, `${m.id} needs fire control`).toContain('fireControl');
+      // Since 6f a swivel fits any weapon mount; a fire-control computer directs it.
     }
   });
 

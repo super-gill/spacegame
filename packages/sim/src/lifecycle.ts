@@ -71,12 +71,13 @@ export function destroyShips(world: World, killers: Record<string, string | null
     delete npcs[ship.id];
     events.push({ type: 'destroyed', shipId: ship.id, by: killers[ship.id] ?? null });
 
-    // Whoever was flying it: from a ship they get away in a pod; from a
-    // pod they are left with nothing until they wake at Harbour. Owners
-    // who were not aboard lose only the ship.
+    // Whoever was flying it: from a ship with a pod bay they get away in a
+    // pod; from a pod, or a ship without a pod bay (docs/ship-systems.md),
+    // they are left with nothing until they wake at Harbour. Owners who
+    // were not aboard lose only the ship.
     const pilotId = aboard[ship.id];
     if (pilotId) {
-      if (isEscapePod(world, ship)) {
+      if (isEscapePod(world, ship) || !shipStats(world, ship).escapePod) {
         pilots[pilotId] = { ...pilots[pilotId]!, shipId: null };
       } else {
         ejections.push({ pilotId, ship });
