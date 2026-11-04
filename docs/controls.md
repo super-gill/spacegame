@@ -32,8 +32,14 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 On the right edge, below the menu buttons:
 
-- **Lock strip:** a card per lock, with the ship's silhouette and range, a filling bar while it is still locking, and dashed `FREE` cards for your unused slots. The active lock is outlined. `LOCKS n/max` counts complete locks.
-- **Target card** for the active lock: hostile, neutral or pilot, `LOCKING n%` or `LOCKED`, its ship and who flies it, its silhouette inside its shield ring, shield and hull bars with values, range, and closing speed (positive while the gap shrinks).
+- **Lock strip:** a card per lock, a filling bar while it is still locking, and dashed `FREE` cards for your unused slots. Once locked, a card shows the ship's silhouette and range if your targeting computer reads them. The active lock is outlined. `LOCKS n/max` counts complete locks.
+- **Target card** for the active lock. Everything on it comes from your targeting computer, so nothing is known until the lock completes (`LOCKING n%`, `Locking…`). Then it shows only what your computer reads:
+  - identity: hostile, neutral, `CALDER WATCH`, pilot or empty; the hull, who flies it and its size; the hull's silhouette
+  - motion: range and closing speed (positive while the gap shrinks)
+  - condition: shields `UP`, `DOWN` or `NONE` and hull `SOUND`, `DAMAGED` or `CRITICAL`, in words
+  - combat (Marksman computers): exact shield and hull, as bars, numbers and the shield ring, and its weapons and damage per second
+  - cargo (Tally computers): what it carries
+  - The last line, `READS ...`, lists what your computer reads, so a blank is your computer's limit, not a fault.
 
 The active lock also gets corner brackets in space (white when cold, red when hot). A lock drops when its target leaves your sensor range, docks or is destroyed.
 
@@ -91,7 +97,7 @@ The docked panel has four tabs. It is the same width on every tab, so switching 
 
 ## Ships
 
-You can own several ships and fly one at a time. A ship you are not in is **empty**: it keeps whatever drift it had, takes no orders, and can be shot. Empty ships are drawn faded with a dashed hull; yours are labelled `YOUR <SHIP> · EMPTY` even with labels turned off, and get an edge marker when off screen.
+You can own several ships and fly one at a time. A ship you are not in is **empty**: it keeps whatever drift it had, takes no orders, and can be shot. Empty ships are drawn faded with a dashed hull; yours are labelled `YOUR <SHIP> · EMPTY` even with labels turned off, and always show on the radar, on its rim when out of range.
 
 | Action | Input | Notes |
 | --- | --- | --- |
@@ -135,18 +141,25 @@ The flight HUD sits at the screen edges and leaves the middle clear. Clicks go t
 
 **Bottom centre, in flight** (hidden while docked):
 
-- The status dial. The outer blue ring is your shields, the inner ring your structure (it turns amber below half and red below a quarter). The dashed ring inside is reserved for the capacitor. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). `SHD` and `HUL` values sit under the rings.
+- The status dial. The outer blue ring is your shields, the inner ring your structure (it turns amber below half and red below a quarter). The dashed ring inside is reserved for the capacitor. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). Both come from your nav computer; without one the dial shows `-` and `NO NAV COMPUTER`. `SHD` and `HUL` values sit under the rings.
 - Under the dial: the flight mode (`Z` to change) and weapons hot or cold (`H`).
 - Right of the dial: a tile for each weapon you have fitted. A fixed gun says `SPACE`; a turret says `COLD`, `AUTO` (hot, no complete active lock) or `ENGAGING`. A ring round the icon fills as the weapon reloads. Only modules you use in flight get a tile.
 - Above the dial: what you can do now, `DOCK <station> [F]` and the boarding prompt (see Ships).
 
-**Right edge:** the lock strip and target card while you hold a lock (see Targeting). Lock cards are the only part of the HUD that takes clicks.
+**Bottom left: the radar.** North up, your ship at the centre pointing where you face, the rim at your radar's sensor range (named under it, `RADAR 3,000 u`). It replaces the old off-screen markers.
+
+- Ships show only inside your sensor range, and none at all without a radar (`NO RADAR · CHARTS ONLY`). A ship nobody has identified is a small dot; once a lock reads its identity it is a diamond in its colour (red hostile, blue-grey trader, white Calder Watch). Your own ships always show, as dashed triangles, on the rim when out of range.
+- Stations (squares, with a short name) and bodies (circles, to scale; the belt as its band) are on the charts and always show, pinned to the rim when out of range.
+- The dashed box is what the screen shows at the current zoom.
+- The active lock has a bracket; other locks a ring that fills as they lock.
+- Click a ship on the radar to lock it, or to make it active if it is already locked.
+
+**Right edge:** the lock strip and target card while you hold a lock (see Targeting). Lock cards and the radar are the only parts of the HUD that take clicks.
 
 **Bottom right:** frame rate and sim tick, dim, for testing.
 
 ## On screen
 
-- Edge markers point at stations and ships that are off screen, with their distance.
 - Your ship is white. Traders are blue-grey, pirates red. NPC labels (`TRADER`, `PIRATE · HUNTING YOU`) are a development aid and may go later.
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
 - Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.

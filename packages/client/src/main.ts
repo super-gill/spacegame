@@ -7,7 +7,6 @@ import {
   buyShip,
   claimStarterShip,
   isEmptyShip,
-  isEscapePod,
   STARTER_STATION_ID,
   occupiedPads,
   type WorldEvent,
@@ -22,6 +21,7 @@ import {
   joinPilot,
   leadPoint,
   lockReadout,
+  navReadout,
   nearestDockableStation,
   pilotShip,
   wakePilot,
@@ -49,7 +49,6 @@ import {
   drawExplosion,
   drawHealthBars,
   drawLoot,
-  drawOffscreenMarker,
   drawLeadMarker,
   drawPads,
   drawPodBeacon,
@@ -62,10 +61,11 @@ import {
   drawWreck,
   type ShipStyle,
 } from './render/draw.js';
-import { bodyMarkers, drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
+import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { FlightHud } from './hud/flight-hud.js';
+import { Radar } from './hud/radar.js';
 import { TargetCard } from './hud/target-card.js';
 import { Ui, shipLabel, shipName } from './ui.js';
 import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
@@ -123,6 +123,7 @@ const ui = new Ui(
 const hudLayer = document.getElementById('hud-layer')!;
 const flightHud = new FlightHud(hudLayer);
 const targetCard = new TargetCard(hudLayer, (id) => input.requestActivate(id));
+const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
 
 let me = loadLocalPilot();
 const settings = loadSettings();
@@ -404,10 +405,15 @@ function clickTarget(point: { x: number; y: number }): void {
       bestDist = d;
     }
   }
-  if (!best) return;
-  // Clicking a ship already locked makes it active; anything else starts a lock.
-  if (mine.locks.some((l) => l.targetId === best!.id)) input.requestActivate(best.id);
-  else input.requestLock(best.id);
+  if (best) lockOrActivate(best.id);
+}
+
+/** A click on a ship, in space or on the radar: make it active if already locked, else start a lock. */
+function lockOrActivate(id: string): void {
+  const mine = myShip(current);
+  if (!mine) return;
+  if (mine.locks.some((l) => l.targetId === id)) input.requestActivate(id);
+  else input.requestLock(id);
 }
 
 /** Explosions are a client-side effect, started from `destroyed` events. */
@@ -587,28 +593,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
   for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
-  // Edge markers for anything off screen, so the system is navigable.
-  for (const b of bodyMarkers(current)) {
-    drawOffscreenMarker(ctx!, camera, b.position, b.name.toUpperCase(), distance(eye, b.position), '#6f8f9a', b.radius);
-  }
-  for (const station of Object.values(current.stations)) {
-    drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(eye, station.position), COLOUR.ink, station.radius);
-  }
-  // Ships off screen get a marker only if your radar shows them (or they
-  // are your own, which you know where you left). Who they are needs a
-  // lock that reads identity; otherwise they are just contacts. Stations
-  // and bodies are on the charts and always marked. The interface
-  // workstream's radar (stage 3) replaces all of this.
-  const sight = mine ? shipStats(current, mine).sensorRange : 0;
-  for (const ship of Object.values(current.ships)) {
-    if ((mine && ship.id === mine.id) || ship.state !== 'flying') continue;
-    const yours = ship.ownerId === me.id;
-    if (!yours && (!mine || distance(mine.position, ship.position) > sight)) continue;
-    const style = shipStyle(current, ship, mine);
-    const known = yours || (mine ? lockReadout(current, mine, ship.id)?.identity : undefined);
-    const label = known ? (style.label ?? (isEscapePod(current, ship) ? 'POD' : 'SHIP')) : 'CONTACT';
-    drawOffscreenMarker(ctx!, camera, ship.position, label, distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
-  }
+  // No edge markers: the radar (hud/radar.ts) shows what your sensors and charts know.
 
   // Target bracket on the active lock (locking or locked) and, for fixed guns, the lead marker.
   const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
@@ -633,8 +618,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     yourShips.invalidate();
   }
   ui.update(current, mine);
-  flightHud.update(current, mine, fpsSmoothed);
+  flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
   targetCard.update(current, mine);
+  radar.update(current, mine, me.id, camera, eye);
 }
 
 requestAnimationFrame(frame);

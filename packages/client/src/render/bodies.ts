@@ -96,20 +96,12 @@ export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, wor
   ctx.restore();
 }
 
-/** Where each body is now, for edge markers. Belts have no single point and are left out. */
-export function bodyMarkers(world: World): { name: string; position: { x: number; y: number }; radius: number }[] {
-  const states = bodyStates(world.bodies, railTime(world.tick, world.dt));
-  return Object.values(world.bodies)
-    .filter((b) => !b.ring && states[b.id])
-    .map((b) => ({ name: b.name, position: states[b.id]!.position, radius: b.radius }));
-}
-
 const PATH_INK = 'rgba(159, 211, 199, 0.55)';
 const PATH_WARN = '#e06c5a';
 
 /**
  * Stopgap: the nav computer's predicted path as a dotted line, and a
- * one-line orbit and gravity readout above the bottom-left corner. Drawn
+ * one-line orbit and gravity readout in the bottom-right corner. Drawn
  * only from `navReadout`, so a ship without a nav computer gets nothing.
  * The interface workstream's path line, gauge and warnings replace it.
  */
@@ -143,8 +135,9 @@ export function drawNav(ctx: CanvasRenderingContext2D, camera: Camera, world: Wo
   if (parts.length > 0) {
     ctx.fillStyle = path.impact || nav.gravity.tier === 'alarm' || nav.gravity.tier === 'warning' ? PATH_WARN : PATH_INK;
     ctx.font = '12px ui-monospace, monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(parts.join('  ·  '), 16, camera.viewportHeight - 16);
+    // Bottom right, above the frame counter: the radar has the bottom-left corner.
+    ctx.textAlign = 'right';
+    ctx.fillText(parts.join('  ·  '), camera.viewportWidth - 16, camera.viewportHeight - 34);
   }
   ctx.restore();
 }

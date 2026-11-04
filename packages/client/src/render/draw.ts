@@ -224,7 +224,8 @@ export function drawPodBeacon(ctx: CanvasRenderingContext2D, camera: Camera, at:
 /**
  * Marker at the screen edge pointing at something off screen, with a
  * label and distance. Draws nothing if any part of the object (a circle
- * of `radius` world units) is on screen.
+ * of `radius` world units) is on screen. The radar replaced the markers
+ * for everything; this stays for the nav target (stage 4).
  */
 export function drawOffscreenMarker(
   ctx: CanvasRenderingContext2D,
