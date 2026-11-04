@@ -2,7 +2,7 @@ import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
 import { asteroidPositions } from '../asteroids.js';
 import { bodyStates, gravityAt, railTime } from '../rails.js';
-import type { ShipStats, Ship, ShipInput, World } from '../types.js';
+import type { ShipStats, Ship, ShipInput, Station, World } from '../types.js';
 import { add, distance, fromAngle, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
 
@@ -118,7 +118,7 @@ const GRAVITY_LEAD_SECONDS = 0.5;
  */
 const GRAVITY_ROUTE_FRACTION = 0.3;
 /** NPCs route round a body at least this many times its radius from its centre. */
-const BODY_BERTH = 1.4;
+const BODY_BERTH = 1.6;
 
 /**
  * Steer like `steerToVelocity`, but leaning into gravity rather than
@@ -169,6 +169,20 @@ export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids'
   return out;
 }
 
+/**
+ * Which way to move off a station just left or brushed against: straight
+ * away from it, unless that leads towards the body it orbits, when the
+ * way out is away from the body instead.
+ */
+export function awayFromStation(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship, station: Station): Vec2 {
+  const out = normalise(sub(ship.position, station.position));
+  const parentId = station.orbit?.parent;
+  const parent = parentId ? world.bodies[parentId] : undefined;
+  if (!parentId || !parent || parent.radius <= 0) return out;
+  const upward = normalise(sub(station.position, bodyStates(world.bodies, railTime(world.tick, world.dt))[parentId]!.position));
+  return dot(out, upward) < 0 ? normalise(add(out, scale(upward, 2))) : out;
+}
+
 /** Gravity where the ship is, for steering. */
 export function pullOn(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship): Vec2 {
   return gravityAt(world.bodies, bodyStates(world.bodies, railTime(world.tick, world.dt)), ship.position);
@@ -217,13 +231,20 @@ export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, list: read
   // Already inside the cushion: slide round at the distance it has, or
   // back straight out if it is nearly touching.
   if (d <= hull + 10) return add(obstacle.position, scale(normalise(out), cushion + 60));
-  const r = Math.min(cushion, d * 0.95);
-  const tangent = Math.acos(r / d);
   const base = Math.atan2(out.y, out.x);
-  // Turning the outward bearing towards the chosen side gives that side's tangent point.
-  const turn = dot(fromAngle(base + tangent), side) * offsetSide > 0 ? tangent : -tangent;
-  return add(obstacle.position, scale(fromAngle(base + turn), r * TANGENT_MARGIN));
+  // Turning the outward bearing towards the chosen side.
+  const toward = (angle: number): number => (dot(fromAngle(base + angle), side) * offsetSide > 0 ? angle : -angle);
+  if (d < cushion) {
+    // Inside the cushion (gravity pulled it in, or it was launched there):
+    // climb back out while going round, never deeper.
+    return add(obstacle.position, scale(fromAngle(base + toward(INSIDE_CUSHION_STEP)), cushion * TANGENT_MARGIN));
+  }
+  const tangent = Math.acos(cushion / d);
+  return add(obstacle.position, scale(fromAngle(base + toward(tangent)), cushion * TANGENT_MARGIN));
 }
+
+/** A ship inside an obstacle's cushion aims this far round it (radians) and back out to the cushion. */
+const INSIDE_CUSHION_STEP = 0.5;
 
 /** Tangent waypoints sit this much beyond the cushion, so a ship cutting the corner still clears it. */
 const TANGENT_MARGIN = 1.08;

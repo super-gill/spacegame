@@ -87,12 +87,15 @@ export function inSecurityZone(world: World, point: Vec2, margin = 0): boolean {
   return Object.values(world.stations).some((s) => distance(point, s.position) < s.securityRadius + margin);
 }
 
+/** Extra room pirates give a security zone's edge when routing round it, units. */
+const ZONE_MARGIN = 100;
+
 /**
  * What a pirate steers round on its way home: station hulls, bodies, and
  * every station's security zone, which it will not cross.
  */
 function avoid(world: World, around: readonly Obstacle[]): Obstacle[] {
-  const zones = Object.values(world.stations).map((st) => ({ position: st.position, radius: st.securityRadius }));
+  const zones = Object.values(world.stations).map((st) => ({ position: st.position, radius: st.securityRadius + ZONE_MARGIN }));
   return [...around, ...zones];
 }
 
@@ -181,7 +184,7 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       const t = target!;
       const back = normalise(sub(ship.position, t.position));
       const holdPoint = add(t.position, scale(back, PIRATE_TUNING.standoff));
-      const closing = arriveVelocity(ship, stats, holdPoint, stats.maxSpeed);
+      const closing = travelVelocity(ship, stats, routeAround(ship, stats, holdPoint, around), holdPoint, stats.maxSpeed);
       const desired = add(t.velocity, closing);
 
       // Point the nose where the shots need to go, and fire when it is there.

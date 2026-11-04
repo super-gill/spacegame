@@ -91,6 +91,15 @@ const ctx = canvas.getContext('2d');
 if (!ctx) throw new Error('Canvas 2D not supported');
 
 const camera = new Camera();
+// The wheel zooms the view; it never scrolls the page.
+canvas.addEventListener(
+  'wheel',
+  (e) => {
+    e.preventDefault();
+    camera.zoomBy(e.deltaY < 0 ? 1 : -1);
+  },
+  { passive: false },
+);
 const controlsPanel = new ControlsPanel(document.body, document.getElementById('controls-button') as HTMLButtonElement);
 const input = new InputController(
   canvas,
@@ -101,6 +110,8 @@ const input = new InputController(
     else if (action === 'clearTarget') unlockActive();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
+    else if (action === 'zoomIn') camera.zoomBy(1);
+    else if (action === 'zoomOut') camera.zoomBy(-1);
   },
   (point) => clickTarget(point),
 );
@@ -525,6 +536,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   const eye = view?.position ?? lastSeen;
 
   camera.follow(eye, frameSeconds);
+  camera.easeZoom(frameSeconds);
 
   ctx!.fillStyle = '#05070a';
   ctx!.fillRect(0, 0, camera.viewportWidth, camera.viewportHeight);
@@ -582,10 +594,19 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const station of Object.values(current.stations)) {
     drawOffscreenMarker(ctx!, camera, station.position, station.name.toUpperCase(), distance(eye, station.position), COLOUR.ink, station.radius);
   }
+  // Ships off screen get a marker only if your radar shows them (or they
+  // are your own, which you know where you left). Who they are needs a
+  // lock that reads identity; otherwise they are just contacts. Stations
+  // and bodies are on the charts and always marked. The interface
+  // workstream's radar (stage 3) replaces all of this.
+  const sight = mine ? shipStats(current, mine).sensorRange : 0;
   for (const ship of Object.values(current.ships)) {
     if ((mine && ship.id === mine.id) || ship.state !== 'flying') continue;
+    const yours = ship.ownerId === me.id;
+    if (!yours && (!mine || distance(mine.position, ship.position) > sight)) continue;
     const style = shipStyle(current, ship, mine);
-    const label = style.label ?? (isEscapePod(current, ship) ? 'POD' : 'SHIP');
+    const known = yours || (mine ? lockReadout(current, mine, ship.id)?.identity : undefined);
+    const label = known ? (style.label ?? (isEscapePod(current, ship) ? 'POD' : 'SHIP')) : 'CONTACT';
     drawOffscreenMarker(ctx!, camera, ship.position, label, distance(eye, ship.position), style.colour, current.hulls[ship.hullId]?.radius ?? 0);
   }
 

@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, awayFromStation, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -134,7 +134,9 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       }
       const back = normalise(sub(ship.position, t.position));
       const hold = add(t.position, scale(back, WATCH_TUNING.standoff));
-      const desired = add(t.velocity, arriveVelocity(ship, stats, hold, stats.maxSpeed));
+      // Fight round stations, rocks and bodies, not through them.
+      const waypoint = routeAround(ship, stats, hold, around);
+      const desired = add(t.velocity, travelVelocity(ship, stats, waypoint, hold, stats.maxSpeed));
       const gun = Object.values(stats.weapons).find((w) => w.kind === 'fixed');
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
       const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...lockInput };
@@ -155,6 +157,13 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       b = { ...b, mode: 'engage', targetId: pirate.id, modeTicks: 0 };
       return { input: { ...steerSafely(ship, stats, ship.velocity, pull), lock: pirate.id, activateLock: pirate.id }, brain: b, events };
     }
+  }
+
+  // Close beside a station (just launched, or swept up by it): get clear
+  // first, moving with it, as traders do.
+  const crowding = Object.values(world.stations).find((st) => distance(ship.position, st.position) < st.radius + 260);
+  if (crowding) {
+    return { input: steerSafely(ship, stats, add(crowding.velocity, scale(awayFromStation(world, ship, crowding), 70)), pull), brain: b, events };
   }
 
   // Drop any locks left from a fight, and go cold.

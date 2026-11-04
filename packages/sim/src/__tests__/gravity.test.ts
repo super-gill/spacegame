@@ -45,11 +45,11 @@ describe('gravity', () => {
   const state = planetNow(w);
 
   it('pulls towards the centre by inverse square inside the sphere', () => {
-    const near = gravityFrom(planet, state, add(state.position, { x: 600, y: 0 }));
-    const far = gravityFrom(planet, state, add(state.position, { x: 1200, y: 0 }));
+    const near = gravityFrom(planet, state, add(state.position, { x: 800, y: 0 }));
+    const far = gravityFrom(planet, state, add(state.position, { x: 1600, y: 0 }));
     expect(near.x).toBeLessThan(0); // towards the planet
     expect(length(near) / length(far)).toBeCloseTo(4, 6);
-    expect(length(near)).toBeCloseTo(planet.gravity / (600 * 600), 9);
+    expect(length(near)).toBeCloseTo(planet.gravity / (800 * 800), 9);
   });
 
   it('eases smoothly to zero at the edge, and is zero outside', () => {
@@ -72,7 +72,7 @@ describe('gravity', () => {
 
   it('holds a free orbit for an hour of play with no thrust', () => {
     let x = quiet();
-    const r = 1100;
+    const r = 1600;
     const v = Math.sqrt(planet.gravity / r);
     x = nearPlanet(x, 'orbiter', { x: r, y: 0 }, { x: 0, y: v });
     let lowest = Infinity;
@@ -105,13 +105,13 @@ describe('gravity', () => {
   });
 
   it('full assist hovers against gravity; without it you fall', () => {
-    let x = nearPlanet(quiet(), 'hover', { x: 0, y: -1200 }, { x: 0, y: 0 }, 'meridian-starter', 'assisted');
-    x = nearPlanet(x, 'drop', { x: 0, y: 1200 }, { x: 0, y: 0 }, 'meridian-starter', 'rotation');
+    let x = nearPlanet(quiet(), 'hover', { x: 0, y: -1600 }, { x: 0, y: 0 }, 'meridian-starter', 'assisted');
+    x = nearPlanet(x, 'drop', { x: 0, y: 1600 }, { x: 0, y: 0 }, 'meridian-starter', 'rotation');
     const blank = emptyInput();
     x = run(x, 20, { hover: blank, drop: blank });
-    expect(Math.abs(distance(x.ships['hover']!.position, planetNow(x).position) - 1200)).toBeLessThan(10);
+    expect(Math.abs(distance(x.ships['hover']!.position, planetNow(x).position) - 1600)).toBeLessThan(10);
     expect(length(relativeVelocity(x, x.ships['hover']!))).toBeLessThan(2);
-    expect(distance(x.ships['drop']!.position, planetNow(x).position)).toBeLessThan(1100);
+    expect(distance(x.ships['drop']!.position, planetNow(x).position)).toBeLessThan(1500);
   });
 });
 
@@ -136,7 +136,7 @@ describe('surfaces', () => {
   it('loot that falls into a planet is gone', () => {
     const w = quiet();
     const p = planetNow(w);
-    let x: World = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 1, position: add(p.position, { x: 450, y: 0 }), velocity: p.velocity, ticksLeft: 10_000 }] };
+    let x: World = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 1, position: add(p.position, { x: 800, y: 0 }), velocity: p.velocity, ticksLeft: 10_000 }] };
     x = run(x, 15);
     expect(x.loot).toEqual([]);
   });
@@ -144,7 +144,7 @@ describe('surfaces', () => {
 
 describe('the nav computer', () => {
   it('without one, a pilot gets no navigation at all', () => {
-    let x = nearPlanet(quiet(), 'blind', { x: 1500, y: 0 }, { x: 0, y: 30 });
+    let x = nearPlanet(quiet(), 'blind', { x: 1600, y: 0 }, { x: 0, y: 30 });
     const ship = x.ships['blind']!;
     const fit = Object.fromEntries(Object.entries(ship.fit).filter(([m]) => m !== 'n1'));
     x = { ...x, ships: { ...x.ships, blind: { ...ship, fit } } };
@@ -153,7 +153,7 @@ describe('the nav computer', () => {
 
   it('reads a circular orbit as one, and sees as far ahead as it is built to', () => {
     const planet = quiet().bodies[PLANET_ID]!;
-    const r = 1100;
+    const r = 1600;
     const x = nearPlanet(quiet(), 'orbiter', { x: r, y: 0 }, { x: 0, y: Math.sqrt(planet.gravity / r) });
     const nav = navReadout(x, x.ships['orbiter']!)!;
     expect(nav.orbit!.bodyId).toBe(PLANET_ID);
@@ -172,7 +172,7 @@ describe('the nav computer', () => {
   });
 
   it('predicts a surface impact and how long until it', () => {
-    const x = nearPlanet(quiet(), 'faller', { x: 800, y: 0 }, { x: -60, y: 0 });
+    const x = nearPlanet(quiet(), 'faller', { x: 950, y: 0 }, { x: -60, y: 0 });
     const nav = navReadout(x, x.ships['faller']!)!;
     expect(nav.path.impact?.bodyId).toBe(PLANET_ID);
     expect(nav.path.impact!.seconds).toBeGreaterThan(1);
@@ -187,7 +187,7 @@ describe('the nav computer', () => {
     expect(gravityTier(70, 100, true)).toBe('warning');
     expect(gravityTier(110, 100, true)).toBe('alarm');
     // A loaded freighter feels the same pull as heavier than a light courier does.
-    const x = nearPlanet(nearPlanet(quiet(), 'tern', { x: 500, y: 0 }, { x: 0, y: 0 }), 'spine', { x: -500, y: 0 }, { x: 0, y: 0 }, 'tessaract-trader');
+    const x = nearPlanet(nearPlanet(quiet(), 'tern', { x: 800, y: 0 }, { x: 0, y: 0 }), 'spine', { x: -800, y: 0 }, { x: 0, y: 0 }, 'tessaract-trader');
     const loaded = { ...x.ships['spine']!, hold: { ore: 40 } };
     expect(navReadout(x, loaded)!.gravity.ratio).toBeGreaterThan(navReadout(x, x.ships['tern']!)!.gravity.ratio);
   });

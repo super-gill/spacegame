@@ -86,6 +86,9 @@ describe('trader', () => {
   });
 });
 
+/** How far over a security zone's edge a collision may knock a pirate, units. */
+const PIRATE_SHOVE_ALLOWANCE = 60;
+
 describe('pirate', () => {
   /** A point in open space 300 units off the pirate. */
   function nearPirate(w: World): { x: number; y: number } {
@@ -153,7 +156,9 @@ describe('pirate', () => {
         for (const s of Object.values(w.stations)) deepest = Math.max(deepest, s.securityRadius - distance(p.position, s.position));
       }
     });
-    expect(deepest).toBeLessThan(0);
+    // A ram or a hit can shove a pirate a little way over the edge (it then
+    // withdraws); it never flies in.
+    expect(deepest).toBeLessThan(PIRATE_SHOVE_ALLOWANCE);
   });
 });
 

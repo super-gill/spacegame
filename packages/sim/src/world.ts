@@ -37,7 +37,7 @@ export function emptyInput(): ShipInput {
 export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
 
 /** How far inward of Ridge Outpost, towards the star, the pirate's home is, units. */
-const PIRATE_HOME_INWARD = 1500;
+const PIRATE_HOME_INWARD = 1300;
 
 /**
  * The starter system, Calder (bodies.ts, stations.ts): a star, a planet

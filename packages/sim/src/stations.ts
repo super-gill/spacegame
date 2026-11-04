@@ -16,8 +16,8 @@ import { fromAngle, scale } from './vec2.js';
  * does for tick 0.
  */
 
-/** Harbour's orbit round the planet, units from its centre: a low orbit, two minutes round. */
-export const HARBOUR_ORBIT_RADIUS = 900;
+/** Harbour's orbit round the planet, units from its centre: a low orbit, a little over two minutes round. */
+export const HARBOUR_ORBIT_RADIUS = 1100;
 
 /** How far beyond the station hull a pad's centre sits, by pad size, units. */
 const PAD_REACH: Record<ModuleSize, number> = { S: 14, M: 22, L: 32, XL: 44 };
@@ -46,7 +46,7 @@ export const RIDGE_ID = 'station-ridge';
 export const LANTERN_ID = 'station-lantern';
 
 /** Lantern Works' orbit round Lantern, units from the moon's centre. */
-export const LANTERN_ORBIT_RADIUS = 420;
+export const LANTERN_ORBIT_RADIUS = 480;
 
 /** Where on the belt Ridge Outpost is at tick 0, radians. Pirates lurk a little inward of it. */
 export const RIDGE_PHASE = 0.6;

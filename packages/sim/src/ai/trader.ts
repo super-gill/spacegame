@@ -4,7 +4,7 @@ import { speedRelativeTo } from '../docking.js';
 import { bodyPosition } from '../rails.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { awayFromStation, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
@@ -30,6 +30,10 @@ export const TRADER_TUNING = {
   cruiseFraction: 0.8,
   /** How far outside the hull to aim the approach, units. */
   approachStandoff: 50,
+  /** After undocking, move this far clear of the station's hull before setting course, units. */
+  departureClearance: 260,
+  /** Speed away from the station while clearing it, units/s relative to it. */
+  departureSpeed: 70,
   /** Only request docking below this fraction of the docking speed limit. */
   dockSpeedFraction: 0.7,
 };
@@ -95,6 +99,16 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
     // Set the dwell now; if the dock is refused, the next tick tries again.
     const dwell = Math.round(TRADER_TUNING.dwellSeconds / world.dt);
     return { input: { ...emptyInput(), toggleDock: true }, brain: { ...brain, waitTicks: dwell } };
+  }
+
+  // Just undocked: stations move fast on their orbits, so first move
+  // clear of the one just left, keeping its velocity, before setting
+  // course. Otherwise the station runs the ship down from behind.
+  const leftId = brain.route[(brain.leg + brain.route.length - 1) % brain.route.length];
+  const left = leftId ? world.stations[leftId] : undefined;
+  if (left && left.id !== station.id && distance(ship.position, left.position) < left.radius + TRADER_TUNING.departureClearance) {
+    const desired = add(left.velocity, scale(awayFromStation(world, ship, left), TRADER_TUNING.departureSpeed));
+    return { input: defend(world, ship, steerSafely(ship, stats, desired, pullOn(world, ship))), brain };
   }
 
   // Aim for the point on the station's near side, just clear of the hull,

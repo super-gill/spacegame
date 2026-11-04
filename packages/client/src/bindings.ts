@@ -31,7 +31,7 @@ export type SimAction =
  * `lock`, `unlock` and `activateLock` inputs. Boarding is a pilot command, like trading, not
  * a flight input.
  */
-export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut';
+export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut' | 'zoomIn' | 'zoomOut';
 
 export type Action = SimAction | UiAction;
 
@@ -76,6 +76,8 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
   { action: 'board', codes: ['KeyB'], group: 'Ships', label: 'Board your nearest empty ship', kind: 'press', note: `Docked at the same station, or in space within ${BOARD_RANGE} units, under ${BOARD_MAX_RELATIVE_SPEED} u/s relative` },
   { action: 'stepOut', codes: ['KeyG'], group: 'Ships', label: 'Step out in an escape pod', kind: 'press', note: 'In space only. Press twice. Your ship stays where it is, empty; slow down first to park it' },
+  { action: 'zoomIn', codes: ['Equal', 'NumpadAdd'], group: 'Interface', label: 'Zoom in', kind: 'press', note: 'Or the mouse wheel' },
+  { action: 'zoomOut', codes: ['Minus', 'NumpadSubtract'], group: 'Interface', label: 'Zoom out', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },
   { action: 'toggleMenu', codes: ['F2'], group: 'Interface', label: 'Menu: pilot name, settings, save', kind: 'press' },
 ];
@@ -85,6 +87,7 @@ export const POINTER_CONTROLS: readonly PointerControl[] = [
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
   { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Tern' },
   { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },
+  { input: 'Mouse wheel', group: 'Interface', label: 'Zoom in and out' },
 ];
 
 const KEY_NAMES: Record<string, string> = {

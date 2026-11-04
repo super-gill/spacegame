@@ -212,14 +212,14 @@ describe('carrying', () => {
   it('carries loot and wrecks too', () => {
     let w = weightless(quiet()); // carrying alone; gravity is tested below
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
-    const at = add(planet.position, { x: -1100, y: 0 });
+    const at = add(planet.position, { x: -1600, y: 0 });
     w = {
       ...w,
       loot: [{ id: 'l1', item: 'scrap', amount: 1, position: at, velocity: planet.velocity, ticksLeft: 10_000 }],
       wrecks: [{ id: 'w1', hullId: 'meridian-courier', position: at, velocity: planet.velocity, heading: 0, angularVelocity: 0, ticksLeft: 10_000 }],
     };
     w = run(w, 30);
-    const want = add(bodyPosition(w, PLANET_ID), { x: -1100, y: 0 });
+    const want = add(bodyPosition(w, PLANET_ID), { x: -1600, y: 0 });
     expect(distance(w.loot[0]!.position, want)).toBeLessThan(1e-6);
     expect(distance(w.wrecks[0]!.position, want)).toBeLessThan(1e-6);
   });
@@ -277,7 +277,7 @@ describe('the local frame', () => {
     let w = joinPilot(quiet(), 'ana', 'Ana');
     const me = pilotShip(w, 'ana')!.id;
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
-    const away = add(planet.position, { x: -1100, y: 0 });
+    const away = add(planet.position, { x: -1600, y: 0 });
     w = put(w, { ...w.ships[me]!, position: away, velocity: add(planet.velocity, { x: 80, y: -40 }), flightMode: 'manual' });
     w = run(w, 5, () => ({ [me]: { ...emptyInput(), brake: true } }));
     expect(length(relativeVelocity(w, w.ships[me]!))).toBeLessThan(1e-6);
