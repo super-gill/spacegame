@@ -10,12 +10,12 @@ Flight is keyboard only. The mouse is reserved for targeting, interacting with o
 
 | Action | Primary | Alternate | Notes |
 | --- | --- | --- | --- |
-| Spin left | Q | Left arrow | Fires rotation thrusters anticlockwise |
-| Spin right | E | Right arrow | Fires rotation thrusters clockwise |
+| Spin left | A | Left arrow | Fires rotation thrusters anticlockwise |
+| Spin right | D | Right arrow | Fires rotation thrusters clockwise |
 | Main engine | W | Up arrow | Accelerates along the heading |
 | Reverse thrust | S | Down arrow | Weaker than main; useful for fine approach |
-| Strafe left | A | | Lateral thrust, does not change heading |
-| Strafe right | D | | |
+| Strafe left | Q | | Lateral thrust, does not change heading |
+| Strafe right | E | | |
 | Brake | X | | Fires thrusters against your velocity and spin until both stop. Works in every mode and overrides other flight keys |
 
 Thrust is relative to where the ship points, not where it is moving, so turning to face away from your drift and hitting W is how you slow down fast. Rotating never changes your velocity.
@@ -61,7 +61,7 @@ Fixed guns hit harder than turrets. Turrets let you fight while flying any direc
 
 The physics has no drag. What the ship does when you let go of the keys depends on the flight mode, shown under the status dial:
 
-| Mode | When you release Q/E | When you release the thrust keys |
+| Mode | When you release A/D | When you release the thrust keys |
 | --- | --- | --- |
 | Full assist (default) | Spin stops | Drift on that axis eases to a stop |
 | Rotation assist | Spin stops | You keep drifting |
