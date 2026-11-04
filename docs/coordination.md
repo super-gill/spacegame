@@ -282,6 +282,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: Mining: light ships get what they get (a laser frees a rock's ore in its mix); hulks choose their ore by breaking rocks and cutting pockets. The light ship's low earnings want a mechanic, not prices, since prices vary by station. (Jason)
 - 2026-11-04: Mining: the full sequence (survey, analyse, break, cut, collect) only for big, rich rocks, and small ships work small rocks; charges are placed and set off by their tile; drones in part 2 as a general system that later grows into fighters, light mining craft working from a mother ship, and carriers; ores are an expandable catalogue; hulks get ore holds; rocks respawn over time; a big hulk must really make money. (Jason)
 - 2026-11-04: Electronic warfare waits for law (7), where NPCs can use it. Mining needs depth: field scans, rock scans, blasting with charges, lasers to free ore, collection by tractor or drones, and new ships; design pass before building. (Jason)
 

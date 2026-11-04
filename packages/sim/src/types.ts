@@ -912,6 +912,8 @@ export interface Asteroid {
   hardness: number;
   /** Ore cut free but not yet released as a canister, units. Absent: none. */
   cut?: number;
+  /** Ore already released, by good id, so a laser keeps to the rock's mix. Absent: none yet. */
+  mined?: Record<string, number>;
   /** The field it belongs to, which tops it back up (`ROCK_FIELDS`). */
   field: string;
 }

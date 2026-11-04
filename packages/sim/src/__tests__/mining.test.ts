@@ -143,6 +143,13 @@ describe('mining lasers', () => {
     expect(oreInLoot(w)).toEqual({ ore: 12, glintstone: 3 });
   });
 
+  it("free ore in the rock's mix from the first canister: a light ship gets what it gets", () => {
+    const { events } = run(setup(testRock({ contents: { ore: 80, 'banded-ore': 20 } })), 30, { fireFixed: true });
+    const freed = events.filter((e): e is Extract<WorldEvent, { type: 'oreFreed' }> => e.type === 'oreFreed').slice(0, 5);
+    expect(freed).toHaveLength(5);
+    expect(freed.filter((e) => e.item === 'banded-ore')).toHaveLength(1);
+  });
+
   it('cut at the laser rate, paid from the capacitor', () => {
     const w0 = setup(testRock({ contents: { ore: 500 } }));
     const stats = shipStats(w0, w0.ships['s']!);

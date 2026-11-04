@@ -13,7 +13,10 @@ import { add, distance, fromAngle, scale, type Vec2 } from './vec2.js';
  * - A mining laser runs along the nose while its group fires. It cuts
  *   the first rock it reaches if the rock is no harder than the laser is
  *   strong, freeing ore in canisters of loot that the tractor scoops. A
- *   rock with nothing left crumbles away.
+ *   laser takes the rock as it comes: canisters follow the rock's mix,
+ *   so a light ship gets what it gets. Choosing an ore is for hulks
+ *   working the pockets charges expose (part 2). A rock with nothing
+ *   left crumbles away.
  */
 
 /** Ore in one canister, units. A rock's last canister holds whatever is left. */
@@ -91,15 +94,14 @@ export function cutRocks(
     // Cut, and release whole canisters as they come free.
     let cut = (rock.cut ?? 0) + beam.yield;
     let contents = rock.contents;
+    let mined = rock.mined ?? {};
     let left = oreLeft(rock);
     const point = add(beam.origin, scale(dir, reach));
     while (left > 0 && (cut >= CANISTER_UNITS || cut >= left)) {
-      // The ore with most left comes out next (ties by id), so a rock gives up its ore in proportion.
-      const [good] = Object.entries(contents)
-        .filter(([, q]) => q > 0)
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]!;
+      const good = nextOre(contents, mined);
       const amount = Math.min(CANISTER_UNITS, contents[good]!);
       contents = { ...contents, [good]: contents[good]! - amount };
+      mined = { ...mined, [good]: (mined[good] ?? 0) + amount };
       if (contents[good] === 0) {
         const { [good]: _gone, ...rest } = contents;
         contents = rest;
@@ -124,7 +126,7 @@ export function cutRocks(
       continue;
     }
     const { cut: _old, ...rest } = rock;
-    rocks[hit] = cut > 0 ? { ...rest, contents, cut } : { ...rest, contents };
+    rocks[hit] = cut > 0 ? { ...rest, contents, mined, cut } : { ...rest, contents, mined };
   }
 
   // Note what each ship's lasers are doing, for drawing; clear ships that stopped.
@@ -140,6 +142,28 @@ export function cutRocks(
     }
   }
   return { asteroids: rocks, ships: out ?? (ships as Record<string, Ship>), loot, events, idsUsed };
+}
+
+/**
+ * The ore the next canister holds: whichever is furthest behind its share
+ * of the rock as it was, so canisters follow the rock's mix from the
+ * first one (ties by id).
+ */
+function nextOre(contents: Readonly<Record<string, number>>, mined: Readonly<Record<string, number>>): string {
+  const ids = Object.keys(contents).filter((id) => contents[id]! > 0).sort();
+  const original = (id: string): number => (contents[id] ?? 0) + (mined[id] ?? 0);
+  const whole = Object.keys({ ...contents, ...mined }).reduce((n, id) => n + original(id), 0);
+  const taken = Object.values(mined).reduce((n, q) => n + q, 0) + CANISTER_UNITS;
+  let best = ids[0]!;
+  let owed = -Infinity;
+  for (const id of ids) {
+    const due = (original(id) / whole) * taken - (mined[id] ?? 0);
+    if (due > owed) {
+      owed = due;
+      best = id;
+    }
+  }
+  return best;
 }
 
 /**
