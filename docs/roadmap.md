@@ -11,7 +11,7 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 4 Trade | Cargo hold, two stations with scripted prices, buy and sell UI | Done, 0.5.0 |
 | 5 Persist | Save and load (browser storage plus file export), settings | Done, 0.6.0 |
 | 6a Modular ships | Hulls with mount points, modules, fitting rules, derived stats, fit-built visuals, outfitting screen; Meridian starter, Kessari wedge frigate, Tessaract hauler (see `docs/ships.md`) | Done, 0.7.0 |
-| 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | In progress: sim foundation on `main`, ship mart client workstream open |
+| 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | Done, 0.8.0 |
 | 6c Fit, continued | Oversized modules across two mounts, turret arcs, fire groups, ammunition, power management | |
 | 7 Law | Witnessed crime, reputation record, security response, bounties; standing with NPC factions, including the four pirate factions from the lore; shooting escape pods as a crime | |
 | 8 Map | Multiple sectors, jump links, security bands, abstract NPC traffic; the Unsung as hostile ships in unknown space | |
@@ -23,10 +23,10 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Known gaps in 0.7.2
+## Known gaps in 0.8.0
 
 - One world per browser. Several save slots would need a picker; export and import cover it for now.
-- Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ship stays, flown by nobody). A way to carry your pilot over comes before the shared world.
+- Your pilot identity is tied to this browser. Clearing site data makes you a new pilot in your own world (your old ships stay where they were, empty). A way to carry your pilot over comes before the shared world.
 
 - Station stock is unlimited and prices never move, so one profitable run can be repeated forever.
 - NPC traders do not actually buy or sell; they carry a fixed cargo.
@@ -40,6 +40,10 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 - No keyboard way to select mounts in the outfitting screen.
 - On screens 720 pixels tall the docked panel scrolls to reach the Undock button (F still undocks).
 - The new hulls, modules and fights are balanced on paper and by test, not yet by hand.
-- Module and hull names are placeholders.
+- Place and faction names in the lore (Calder, the Meridian Arm and others) are still placeholders; catalogue names are final.
+- Ships cannot be sold, and a ship mart's stock never runs out.
+- Ships have no names of their own; they are called by hull and number (`Kessari Warrant #2`).
+- Only Harbour has a ship mart, so every ship you buy starts there.
+- The Aurel Tacet is drawn as a single outline, not yet in the Aurel style of floating segments.
 - Fixed zoom.
 - Key bindings are not remappable.

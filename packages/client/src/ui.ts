@@ -180,7 +180,11 @@ export class Ui {
     const inPod = isEscapePod(world, ship);
     const lines = [
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
-      inPod ? '>> ESCAPE POD: DOCK AT A STATION' : `SHIP ${shipName(world, ship).toUpperCase()}`,
+      inPod
+        ? pilot && boardableShips(world, pilot.id).length > 0
+          ? '>> ESCAPE POD: BOARD YOUR SHIP [B]'
+          : '>> ESCAPE POD: DOCK AT A STATION'
+        : `SHIP ${shipName(world, ship).toUpperCase()}`,
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
       `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
       `CR  ${(pilot?.credits ?? 0).toLocaleString('en-GB')}`,

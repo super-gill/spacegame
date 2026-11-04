@@ -4,6 +4,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-04
+
+Milestone 6b: ships you own.
+
+### Added
+- Own several ships. Harbour's ship mart sells the Meridian Tern, the Kessari Warrant and the Tessaract Manifest; each shows its stats and price, and Buy says why when it cannot.
+- Your ships tab: every ship you own, where it is, its condition and cargo, and Board.
+- Board your nearest empty ship with B: docked at the same station, or in space within 150 units and under 20 u/s relative. The HUD says when you can, or what to do first.
+- Step out with G, pressed twice: you leave in an escape pod and your ship stays where it is, empty, to come back for.
+- Landing pads round stations (Harbour 10, Ridge 6). Docking takes the smallest free pad that fits the hull, and is refused when none does. Docked ships sit on their pads, flown or empty.
+- Escape pods. Lose your ship and you get away in a pod, a lifeboat with a beacon, and the HUD says you are in one. Lose the pod and you wake at Harbour: in a new pod if you own a ship, or in a free Meridian Tern if you own none. A pod at Harbour owning nothing can claim the free Tern.
+- Empty ships drift with whatever momentum they had, can be shot and destroyed, and are drawn faded and dashed; yours are always labelled. Pirates leave empty ships and pods alone.
+- Names from the lore for every hull, module, maker and fit. The Sparrow development ship is replaced by the Aurel Tacet.
+- `docs/lore.md`, the game's canon setting and history.
+
+### Changed
+- Undocking launches you from your pad, along its facing.
+- The docked panel keeps one width, so switching tabs never moves them under the pointer.
+- Save format version 4. Saves from 0.7.x upgrade automatically: stations gain pads and docked ships are set down on one.
+
+### Fixed
+- Loading a save made after losing your escape pod, and before waking, crashed on start.
+
 ## [0.7.2] - 2026-11-03
 
 ### Added

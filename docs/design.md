@@ -142,7 +142,7 @@ The full design is in [ships.md](ships.md). In play today (0.7.0):
 - **Loadouts** are named fits (`loadouts.ts`). New pilots get the starter; spawners name the loadout their NPC flies.
 - **The look is the fit.** A ship is drawn as its hull outline plus each module's universal silhouette at its mount. In flight, outlines keep friend-or-foe colours and modules are tinted by their maker's race.
 
-Still planned: ship mart and pads (6b); oversized modules across two mounts, turret arcs, fire groups, ammunition and power management (6c); drones as a module class.
+Still planned: oversized modules across two mounts, turret arcs, fire groups, ammunition and power management (6c); drones as a module class.
 
 ## Trade and economy
 
