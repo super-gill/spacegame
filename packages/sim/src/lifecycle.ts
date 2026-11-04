@@ -165,13 +165,15 @@ export function departShips(world: World, shipIds: readonly string[]): Destructi
 }
 
 /** Drift wrecks, carried by any body whose sphere they are in, and remove those that have faded. */
-export function stepWrecks(wrecks: readonly Wreck[], dt: number, carryAt?: (point: Vec2) => Carry): Wreck[] {
+export function stepWrecks(wrecks: readonly Wreck[], dt: number, carryAt?: (point: Vec2) => Carry, gravityAt?: (point: Vec2) => Vec2): Wreck[] {
   return wrecks
     .filter((w) => w.ticksLeft > 1)
     .map((w) => {
+      const velocity = gravityAt ? add(w.velocity, scale(gravityAt(w.position), dt)) : w.velocity;
       const moved = {
         ...w,
-        position: add(w.position, scale(w.velocity, dt)),
+        velocity,
+        position: add(w.position, scale(velocity, dt)),
         heading: w.heading + w.angularVelocity * dt,
         ticksLeft: w.ticksLeft - 1,
       };
@@ -192,7 +194,7 @@ export interface LootStep {
  * hold does not pull; one with some space takes what fits and leaves the
  * rest of the canister floating.
  */
-export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (point: Vec2) => Carry): LootStep {
+export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (point: Vec2) => Carry, gravityAt?: (point: Vec2) => Vec2): LootStep {
   const out: Loot[] = [];
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
@@ -217,7 +219,8 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
       }
     }
 
-    let velocity = item.velocity;
+    // Free loot falls; loot in a tractor beam goes where the beam takes it.
+    let velocity = gravityAt ? add(item.velocity, scale(gravityAt(item.position), world.dt)) : item.velocity;
     if (puller) {
       const radius = stats[puller.id]!.radius;
       if (best <= radius + SCOOP_DISTANCE) {

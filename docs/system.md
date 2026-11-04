@@ -102,6 +102,14 @@ Choices the build made where the plan was silent (Lead 3, 4 November 2026).
 - **Client stopgap:** `packages/client/src/render/bodies.ts` draws each body as a plain circle with its sphere dashed and the belt as a dashed band; stations are drawn between ticks; the HUD's speed is relative to the local frame and names it. The interface workstream owns all of it.
 - **Names** other than Calder (Calder I, Calder Ia, Calder Belt) are placeholders for the lore workstream.
 
+## As built: part 2 (so far)
+
+- **Gravity** acts only from the innermost body and is eased to zero from 75% of the sphere to its edge (smoothstep). Shots, loot and wrecks fall as ships do.
+- **Full assist** plans against the velocity gravity will give the ship by the end of the tick, so it hovers without sagging, as far as the thrusters allow.
+- **Surfaces** use the station-hull rule with their own restitution (0.3) and friction (0.2); damage cause `surface`. A fall from Harbour's height onto the planet bounces with light damage; a fast dive is fatal.
+- **The nav computer** is a fitted system (Jason: "fundamental, in every ship"): it is where speed, frame, gravity tier, orbit and the predicted path come from. Path points are every quarter second, relative to the body you start in, so a free orbit draws as a closed loop. The gravity tier compares the pull with the ship's own main acceleration, cargo included.
+- **Consequence:** an empty ship left at rest inside a sphere falls. Park in orbit, at a station, or in flat space.
+
 ## Later
 
 - Orbit hold autopilot, transfer and approach assists.

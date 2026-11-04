@@ -104,7 +104,7 @@ describe('derived stats', () => {
     expect(s.mainThrust).toBe(MODULES['meridian-engine-s']!.stats.mainThrust);
     expect(s.rotationThrust).toBe(MODULES['meridian-thrusters-s']!.stats.rotationThrust);
     expect(s.structure).toBe(courier.structure + MODULES['rookrivet-armour-s']!.stats.structure!);
-    expect(s.powerOutput).toBe(12);
+    expect(s.powerOutput).toBe(13);
     expect(s.powerDraw).toBe(3);
   });
 

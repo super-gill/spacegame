@@ -128,6 +128,21 @@ export const STARTER_VS_RAIDER_MIN_EDGE = 1.4;
 export const BOARD_RANGE = 150;
 
 /**
+ * Gravity eases from full strength to zero over the outer part of a
+ * body's sphere of influence, from this fraction of the sphere's radius
+ * to its edge, so crossing the edge never jolts a ship.
+ */
+export const GRAVITY_EASE_START = 0.75;
+
+/**
+ * Surface impacts. A body's surface is immovable like a station hull, so
+ * a ship takes the whole bounce; damage uses the same delta-v rule as
+ * hulls (IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V).
+ */
+export const SURFACE_RESTITUTION = 0.3;
+export const SURFACE_FRICTION = 0.2;
+
+/**
  * Target locks. Seconds for a targeting computer of scan resolution 1 to
  * lock a hull of signature LOCK_REFERENCE_SIGNATURE. Time is divided by
  * the computer's scan resolution, and goes with the square root of the

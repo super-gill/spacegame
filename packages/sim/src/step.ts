@@ -1,13 +1,13 @@
 import { thinkNpcs } from './ai/index.js';
 import { applyDamage, fireWeapons, regenerateShield, stepProjectiles, type Damage } from './combat.js';
-import { collideShips, collideWithStations } from './collision.js';
+import { collideShips, collideWithStations, collideWithSurfaces, insideSurface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { pilotsAboard } from './ownership.js';
-import { applyCarry, frameVelocity, placeStations, tickRails } from './rails.js';
+import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
 import type { Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
@@ -33,8 +33,8 @@ import { emptyInput } from './world.js';
  *      tick are worked out up front (rails.ts).
  *   1. NPCs decide, all from the start-of-tick world.
  *   2. Each ship docks or undocks, changes flight mode, moves against its
- *      local frame, is carried by the body whose sphere it is in, bounces
- *      off stations, fires, and recharges shields; docked ships are
+ *      local frame under gravity, is carried by the body whose sphere it
+ *      is in, bounces off stations and surfaces, fires, and recharges shields; docked ships are
  *      repaired and ride their pads.
  *   3. Ships collide with each other (rams).
  *   4. Projectiles fly (carried like ships) and hit.
@@ -50,6 +50,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   // 0. Rails: what carries what this tick, and where stations will be.
   const rails = tickRails(world.bodies, world.tick, world.dt);
   const stationsNext = placeStations(world.bodies, world.stations, world.tick + 1, world.dt);
+  const surfaces = surfacesNext(world.bodies, rails);
 
   const npc = thinkNpcs(world);
   const events: WorldEvent[] = [...npc.events];
@@ -96,9 +97,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // Fly against the local frame, then be carried by the body whose
     // sphere the ship started the tick in. Station hulls are where they
     // will be at the end of the tick, as the ship is.
-    const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship));
+    const pull = ship.state === 'flying' ? rails.gravityAt(ship.position) : { x: 0, y: 0 };
+    const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship), pull);
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
-    const moved = collideWithStations(flown, stats, stationsNext);
+    const hulls = collideWithStations(flown, stats, stationsNext);
+    const ground = collideWithSurfaces(hulls.ship, stats, surfaces);
+    const moved = { ship: ground.ship, events: [...hulls.events, ...ground.events], damage: [...hulls.damage, ...ground.damage] };
     events.push(...moved.events);
     damage.push(...moved.damage);
 
@@ -133,7 +137,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   damage.push(...rams.damage);
 
   // 4. Projectiles already in flight move and hit; new ones start moving next tick.
-  const shots = stepProjectiles(world.projectiles, ships, world.hulls, stationsNext, world.dt, rails.carryAt);
+  const shots = stepProjectiles(world.projectiles, ships, world.hulls, stationsNext, world.dt, rails.carryAt, rails.gravityAt);
+  shots.projectiles = shots.projectiles.filter((p) => !insideSurface(p.position, surfaces));
   damage.push(...shots.damage);
 
   // 5. Apply damage in a fixed order and note who last hurt each ship.
@@ -171,9 +176,15 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   events.push(...departure.events);
 
   // 6. Loot, wrecks, spawners.
-  const loot = stepLoot(next, next.ships, rails.carryAt);
+  const loot = stepLoot(next, next.ships, rails.carryAt, rails.gravityAt);
   events.push(...loot.events);
-  next = { ...next, ships: loot.ships, loot: loot.loot, wrecks: stepWrecks(next.wrecks, world.dt, rails.carryAt) };
+  // Loot and wrecks that fall into a surface are gone.
+  next = {
+    ...next,
+    ships: loot.ships,
+    loot: loot.loot.filter((l) => !insideSurface(l.position, surfaces)),
+    wrecks: stepWrecks(next.wrecks, world.dt, rails.carryAt, rails.gravityAt).filter((w) => !insideSurface(w.position, surfaces)),
+  };
   next = runSpawners(next);
 
   return { ...next, events };

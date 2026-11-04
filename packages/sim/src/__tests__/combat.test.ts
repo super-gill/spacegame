@@ -288,6 +288,8 @@ describe('destruction, loot and respawn', () => {
 
   it('loot out of tractor range stays put, and eventually drifts away for good', () => {
     let { w, me } = quietWorld();
+    // No gravity: this is about the tractor, not falling.
+    w = { ...w, bodies: Object.fromEntries(Object.entries(w.bodies).map(([id, b]) => [id, { ...b, gravity: 0 }])) };
     const pos = w.ships[me]!.position;
     // At rest in the planet's frame: carried with it, never pulled.
     w = { ...w, loot: [{ id: 'l1', item: 'scrap', amount: 3, position: { x: pos.x + TRACTOR_RANGE + 100, y: pos.y }, velocity: bodyVelocity(w, PLANET_ID), ticksLeft: 120 }] };

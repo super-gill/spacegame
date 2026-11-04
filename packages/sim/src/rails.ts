@@ -1,3 +1,4 @@
+import { GRAVITY_EASE_START } from './constants.js';
 import { nearestDockableStation } from './docking.js';
 import type { Body, Orbit, Ship, Station, World } from './types.js';
 import { add, distance, scale, sub, type Vec2 } from './vec2.js';
@@ -16,6 +17,9 @@ import { add, distance, scale, sub, type Vec2 } from './vec2.js';
  * by exactly what the body's own rail adds over that tick (`carryFor`).
  * Seen from the body, they move as if it stood still. Leaving a sphere
  * needs no change of frame, so there is never a jump.
+ *
+ * Inside a sphere the body also pulls (`gravityAt`): inverse-square,
+ * eased to zero at the sphere's edge. Only the innermost body pulls.
  *
  * The local frame (`frameVelocity`) is what speed is measured against:
  * the station whose dock range a ship is in, else the body whose sphere
@@ -147,6 +151,41 @@ export function innermostBody(
 }
 
 /**
+ * Gravity's acceleration on something at `point` from one body whose
+ * state is `state`: inverse-square towards its centre inside its sphere,
+ * eased smoothly to zero over the outer part of the sphere, zero outside.
+ * Closer than the surface it is held at surface strength (the surface
+ * stops you first).
+ */
+export function gravityFrom(body: Body, state: RailState, point: Vec2): Vec2 {
+  if (body.gravity <= 0 || body.sphere <= 0) return { x: 0, y: 0 };
+  const towards = sub(state.position, point);
+  const d = Math.hypot(towards.x, towards.y);
+  if (d >= body.sphere || d === 0) return { x: 0, y: 0 };
+  const r = Math.max(d, body.radius, 1);
+  const ease = gravityEase(d / body.sphere);
+  return scale(towards, (body.gravity / (r * r)) * ease / d);
+}
+
+/** 1 inside GRAVITY_EASE_START of the sphere, falling smoothly to 0 at its edge. */
+export function gravityEase(fraction: number): number {
+  if (fraction <= GRAVITY_EASE_START) return 1;
+  if (fraction >= 1) return 0;
+  const s = (fraction - GRAVITY_EASE_START) / (1 - GRAVITY_EASE_START);
+  return 1 - s * s * (3 - 2 * s);
+}
+
+/**
+ * Gravity at `point`: only the innermost body whose sphere holds it
+ * pulls (docs/system.md). Its parents' pull is what moves that body along
+ * its rail, and carrying already gives you that.
+ */
+export function gravityAt(bodies: Readonly<Record<string, Body>>, states: Readonly<Record<string, RailState>>, point: Vec2): Vec2 {
+  const body = innermostBody(bodies, states, point);
+  return body ? gravityFrom(body, states[body.id]!, point) : { x: 0, y: 0 };
+}
+
+/**
  * The carry each body gives over the tick from `tick` to `tick + 1`.
  *
  * Something inside the sphere moves with the body: seen from the body, it
@@ -179,21 +218,38 @@ export function carriesForTick(bodies: Readonly<Record<string, Body>>, tick: num
  */
 export interface TickRails {
   states: Record<string, RailState>;
+  /** Every body's state at the end of the tick. */
+  next: Record<string, RailState>;
   carries: Record<string, Carry>;
   carryAt(point: Vec2): Carry;
+  /** Gravity on something at `point` at the start of the tick. */
+  gravityAt(point: Vec2): Vec2;
 }
 
 export function tickRails(bodies: Readonly<Record<string, Body>>, tick: number, dt: number): TickRails {
   const states = bodyStates(bodies, railTime(tick, dt));
+  const next = bodyStates(bodies, railTime(tick + 1, dt));
   const carries = carriesForTick(bodies, tick, dt);
   return {
     states,
+    next,
     carries,
     carryAt(point: Vec2): Carry {
       const body = innermostBody(bodies, states, point);
       return body ? carries[body.id]! : NO_CARRY;
     },
+    gravityAt(point: Vec2): Vec2 {
+      return gravityAt(bodies, states, point);
+    },
   };
+}
+
+/** Every body with a surface, where it is at the end of the tick. */
+export function surfacesNext(bodies: Readonly<Record<string, Body>>, rails: TickRails): { bodyId: string; position: Vec2; velocity: Vec2; radius: number }[] {
+  return Object.keys(bodies)
+    .sort()
+    .filter((id) => bodies[id]!.radius > 0)
+    .map((id) => ({ bodyId: id, position: rails.next[id]!.position, velocity: rails.next[id]!.velocity, radius: bodies[id]!.radius }));
 }
 
 /** A position and velocity after carrying. */

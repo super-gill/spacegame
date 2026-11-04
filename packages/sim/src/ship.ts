@@ -66,18 +66,33 @@ export function angularAcceleration(stats: ShipStats, t: Thrusters): number {
  *
  * `input` is null for an empty ship (nobody aboard): the flight computer
  * does not run, no thruster fires, and the ship coasts on its momentum.
- * `frame` is the local frame's velocity (rails.ts `frameVelocity`).
- * Carrying by a body is applied by the caller, after this.
+ * `frame` is the local frame's velocity (rails.ts `frameVelocity`) and
+ * `gravity` the pull where the ship is (rails.ts `gravityAt`). Carrying by
+ * a body is applied by the caller, after this.
  */
-export function stepShip(ship: Ship, stats: ShipStats, input: ShipInput | null, dt: number, frame: Vec2 = { x: 0, y: 0 }): Ship {
+export function stepShip(
+  ship: Ship,
+  stats: ShipStats,
+  input: ShipInput | null,
+  dt: number,
+  frame: Vec2 = { x: 0, y: 0 },
+  gravity: Vec2 = { x: 0, y: 0 },
+): Ship {
   if (ship.state === 'docked') return { ...ship, thrusters: idleThrusters() };
 
-  const thrusters = input ? computeThrusters(ship, stats, input, dt, frame) : idleThrusters();
+  // The flight computer plans against where gravity will have taken the
+  // ship's velocity by the end of the tick, so full assist and brake hold
+  // it still against gravity as far as its thrusters can.
+  const pull = scale(gravity, dt);
+  const thrusters = input ? computeThrusters(ship, stats, input, dt, sub(frame, pull)) : idleThrusters();
 
   // Work relative to the local frame, then back to system coordinates.
+  // The speed limit caps thrust only; gravity is never capped, so a fall
+  // or a slingshot can take a ship past it. Velocity changes before
+  // position, which keeps free orbits from gaining or losing energy.
   const before = sub(ship.velocity, frame);
   const after = add(before, scale(linearAcceleration(stats, ship.heading, thrusters), dt));
-  const velocity = add(frame, settle(limitThrust(before, after, stats.maxSpeed)));
+  const velocity = add(frame, settle(add(limitThrust(before, after, stats.maxSpeed), pull)));
 
   let angularVelocity = ship.angularVelocity + angularAcceleration(stats, thrusters) * dt;
   angularVelocity = clamp(angularVelocity, stats.maxTurnRate);

@@ -67,6 +67,7 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   internal: 'Internal',
   radar: 'Radar',
   computer: 'Targeting computer',
+  nav: 'Navigation',
 };
 
 const INK = '#9fd3c7';
@@ -104,6 +105,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   cargoPod: 'Cargo',
   radar: 'Radar',
   targetingComputer: 'Targeting computer',
+  navComputer: 'Nav computer',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -123,6 +125,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.structure) parts.push(`structure +${s.structure}`);
   if (s.cargoCapacity) parts.push(`cargo ${s.cargoCapacity}`);
   if (s.sensorRange) parts.push(`sees ${s.sensorRange} u`);
+  if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
   if (w) parts.push(`${w.kind} ${fixed1(weaponDps(w))} dps, range ${w.range}`);

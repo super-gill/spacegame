@@ -43,6 +43,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 2.4, // about 140 degrees per second
     signature: 18,
     mounts: [
+      mount('n1', 'nav', 'S', -1, 0, ['power']),
       mount('r1', 'radar', 'S', 8, -3, ['power']),
       mount('t1', 'computer', 'S', 8, 3, ['power']),
       mount('w1', 'weapon', 'S', 14, 0, ['power']),
@@ -75,6 +76,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 2.2,
     signature: 28,
     mounts: [
+      mount('n1', 'nav', 'S', -2, 0, ['power']),
       mount('r1', 'radar', 'S', 15, -2, ['power']),
       mount('t1', 'computer', 'M', 15, 2, ['power']),
       mount('w1', 'weapon', 'M', -5, -4.4, ['power']),
@@ -118,6 +120,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 1.2, // about 70 degrees per second
     signature: 40,
     mounts: [
+      mount('n1', 'nav', 'M', 16, 0, ['power']),
       mount('r1', 'radar', 'M', -8, 0, ['power']),
       mount('t1', 'computer', 'S', 4, 0, ['power']),
       mount('b1', 'bay', 'M', 10.2, -5.4, ['heavyLoad']),
@@ -161,6 +164,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 2.4,
     signature: 12,
     mounts: [
+      mount('n1', 'nav', 'M', -2, 0, ['power']),
       mount('r1', 'radar', 'S', 8, -3, ['power']),
       mount('t1', 'computer', 'S', 8, 3, ['power']),
       mount('w1', 'weapon', 'S', 12, 0, ['power']),
@@ -194,6 +198,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxTurnRate: 2,
     signature: 8,
     mounts: [
+      mount('n1', 'nav', 'S', -3, 0, ['power']),
       mount('r1', 'radar', 'S', 2, 0, ['power']),
       mount('e1', 'engine', 'S', -8, 0, ['power'], AFT),
       mount('c1', 'core', 'S', -2, -2, ['power']),

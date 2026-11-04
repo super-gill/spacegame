@@ -46,6 +46,11 @@ function quiet(): World {
   return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
 }
 
+/** The same with gravity switched off, to test carrying on its own. */
+function weightless(w: World): World {
+  return { ...w, bodies: Object.fromEntries(Object.entries(w.bodies).map(([id, b]) => [id, { ...b, gravity: 0 }])) };
+}
+
 function put(w: World, ship: Ship): World {
   return { ...w, ships: { ...w.ships, [ship.id]: ship } };
 }
@@ -178,7 +183,7 @@ describe('the starter system', () => {
 
 describe('carrying', () => {
   it('keeps a ship left alone in the planet sphere at its offset from the planet', () => {
-    let w = quiet();
+    let w = weightless(quiet()); // carrying alone; gravity is tested below
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
     const offset = { x: 1500, y: 300 };
     w = put(w, coaster(w, 'drifter', add(planet.position, offset), planet.velocity));
@@ -189,7 +194,7 @@ describe('carrying', () => {
   });
 
   it("keeps a ship in the moon's sphere with the moon, not just the planet", () => {
-    let w = quiet();
+    let w = weightless(quiet()); // carrying alone; gravity is tested below
     const moon = bodyState(w.bodies, MOON_ID, railTime(w.tick, w.dt));
     const offset = { x: 0, y: -300 };
     w = put(w, coaster(w, 'drifter', add(moon.position, offset), moon.velocity));
@@ -205,7 +210,7 @@ describe('carrying', () => {
   });
 
   it('carries loot and wrecks too', () => {
-    let w = quiet();
+    let w = weightless(quiet()); // carrying alone; gravity is tested below
     const planet = bodyState(w.bodies, PLANET_ID, railTime(w.tick, w.dt));
     const at = add(planet.position, { x: -1500, y: 0 });
     w = {

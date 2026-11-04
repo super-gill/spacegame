@@ -6,6 +6,8 @@ import {
   IMPACT_DAMAGE_PER_DELTA_V,
   IMPACT_SAFE_DELTA_V,
   SHIP_RESTITUTION,
+  SURFACE_FRICTION,
+  SURFACE_RESTITUTION,
 } from './constants.js';
 import type { ShipStats, Ship, Station, WorldEvent } from './types.js';
 import { add, distance, scale, sub, type Vec2 } from './vec2.js';
@@ -67,6 +69,52 @@ export function collideWithStations(ship: Ship, stats: ShipStats, stations: Reco
     s = { ...s, position, velocity };
   }
   return { ship: s, events, damage };
+}
+
+/** A body's surface as it stands at the end of the tick: where it is and how it moves. */
+export interface Surface {
+  bodyId: string;
+  position: Vec2;
+  velocity: Vec2;
+  radius: number;
+}
+
+/**
+ * A ship against body surfaces: like a station hull, immovable, with the
+ * bounce worked out relative to the body's motion and damage by the
+ * ship's change in velocity. A slow touch bounces off; a fast one is
+ * fatal. Landing comes later.
+ */
+export function collideWithSurfaces(ship: Ship, stats: ShipStats, surfaces: readonly Surface[]): CollisionResult {
+  if (ship.state !== 'flying') return { ship, events: [], damage: [] };
+  let s = ship;
+  const events: WorldEvent[] = [];
+  const damage: Damage[] = [];
+  for (const body of surfaces) {
+    const minDist = body.radius + stats.radius;
+    const d = distance(s.position, body.position);
+    if (d >= minDist) continue;
+    const normal = d > 0 ? scale(sub(s.position, body.position), 1 / d) : { x: Math.cos(s.heading), y: Math.sin(s.heading) };
+    const position = add(body.position, scale(normal, minDist));
+    const relative = sub(s.velocity, body.velocity);
+    const into = dot(relative, normal);
+    let velocity = s.velocity;
+    if (into < 0) {
+      const normalPart = scale(normal, into);
+      const tangentPart = sub(relative, normalPart);
+      velocity = add(body.velocity, add(scale(tangentPart, 1 - SURFACE_FRICTION), scale(normalPart, -SURFACE_RESTITUTION)));
+      if (-into >= COLLISION_EVENT_MIN_SPEED) events.push({ type: 'impacted', shipId: s.id, bodyId: body.bodyId, speed: -into });
+      const amount = impactDamage(-into * (1 + SURFACE_RESTITUTION), IMPACT_SAFE_DELTA_V, IMPACT_DAMAGE_PER_DELTA_V);
+      if (amount > 0) damage.push({ shipId: s.id, amount, by: null, cause: 'surface' });
+    }
+    s = { ...s, position, velocity };
+  }
+  return { ship: s, events, damage };
+}
+
+/** True if `point` is inside any surface: projectiles, loot and wrecks there are gone. */
+export function insideSurface(point: Vec2, surfaces: readonly Surface[]): boolean {
+  return surfaces.some((b) => distance(point, b.position) < b.radius);
 }
 
 export interface ShipCollisionResult {

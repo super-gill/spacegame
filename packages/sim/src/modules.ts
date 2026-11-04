@@ -96,8 +96,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 350,
     manufacturer: 'meridian',
     tags: [],
-    // Enough for a light ship's guns, drives, shield and sensors.
-    stats: { powerOutput: 12 },
+    // Enough for a light ship's guns, drives, shield, sensors and nav computer.
+    stats: { powerOutput: 13 },
   },
   'itomarr-reactor-m': {
     id: 'itomarr-reactor-m',
@@ -394,5 +394,37 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['sensor'],
     stats: { maxLocks: 1, scanResolution: 0.8 },
     readouts: ['identity', 'motion', 'cargo'],
+  },
+
+  // Navigation computers: where you are, your speed against your frame, gravity, your orbit and your path ahead.
+  // Every ship has one: enough to see where you will be in the next few seconds.
+  'meridian-nav-s': {
+    id: 'meridian-nav-s',
+    name: 'Meridian Wayfinder S',
+    kind: 'navComputer',
+    size: 'S',
+    mounts: ['nav'],
+    needs: ['power'],
+    mass: 0.3,
+    power: 0.5,
+    price: 200,
+    manufacturer: 'meridian',
+    tags: ['nav'],
+    stats: { navHorizon: 20 },
+  },
+  // An explorer set: two minutes of path, for flying orbits and transfers.
+  'itomarr-nav-m': {
+    id: 'itomarr-nav-m',
+    name: 'Ito-Marr Deep Reckoner M',
+    kind: 'navComputer',
+    size: 'M',
+    mounts: ['nav'],
+    needs: ['power'],
+    mass: 2,
+    power: 2,
+    price: 2400,
+    manufacturer: 'itoMarr',
+    tags: ['nav'],
+    stats: { navHorizon: 120 },
   },
 };

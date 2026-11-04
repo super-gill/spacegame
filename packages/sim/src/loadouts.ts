@@ -12,6 +12,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     name: 'Meridian Tern, Registry issue',
     hullId: 'meridian-courier',
     fit: {
+      n1: 'meridian-nav-s',
       r1: 'meridian-radar-s',
       t1: 'meridian-computer-s',
       w1: 'paragon-pulse-s',
@@ -30,6 +31,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     name: 'Tessaract Manifest, Calder supply run',
     hullId: 'tessaract-spine',
     fit: {
+      n1: 'meridian-nav-s',
       r1: 'tessaract-radar-m',
       t1: 'meridian-computer-s',
       b1: 'tessaract-container-m',
@@ -50,6 +52,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     name: 'Kessari Warrant, Black Strike trophy',
     hullId: 'kessari-wedge',
     fit: {
+      n1: 'meridian-nav-s',
       r1: 'meridian-radar-s',
       t1: 'meridian-computer-s',
       w1: 'paragon-pulse-s',
@@ -65,6 +68,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     name: 'Aurel Tacet, test voice',
     hullId: 'aurel-tacet',
     fit: {
+      n1: 'meridian-nav-s',
       r1: 'meridian-radar-s',
       t1: 'meridian-computer-s',
       w1: 'paragon-pulse-s',
@@ -83,6 +87,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     name: 'Meridian Ark',
     hullId: 'escape-pod',
     fit: {
+      n1: 'meridian-nav-s',
       r1: 'meridian-beacon-s',
       e1: 'meridian-engine-s',
       c1: 'meridian-thrusters-s',

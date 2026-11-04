@@ -62,7 +62,7 @@ import {
   drawWreck,
   type ShipStyle,
 } from './render/draw.js';
-import { bodyMarkers, drawBodies } from './render/bodies.js';
+import { bodyMarkers, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { FlightHud } from './hud/flight-hud.js';
@@ -548,6 +548,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, TRACTOR_RANGE, current.loot);
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
+  if (mine) drawNav(ctx!, camera, current, mine, alpha);
   // Every ship, flying or docked: a docked ship's position is its pad.
   for (const ship of Object.values(current.ships)) {
     const hull = current.hulls[ship.hullId]!;

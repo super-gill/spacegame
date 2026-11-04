@@ -135,6 +135,7 @@ export function stepProjectiles(
   stations: Record<string, Station>,
   dt: number,
   carryAt?: (point: Vec2) => Carry,
+  gravityAt?: (point: Vec2) => Vec2,
 ): ProjectileStep {
   const survivors: Projectile[] = [];
   const damage: Damage[] = [];
@@ -142,8 +143,11 @@ export function stepProjectiles(
 
   for (const p of projectiles) {
     // A shot inside a body's sphere is carried with the body like anything else.
+    // Gravity bends it, velocity first, as for ships.
     const carry = carryAt?.(p.position);
-    const travel = carry ? add(scale(p.velocity, dt), carry.dx) : scale(p.velocity, dt);
+    const g = gravityAt?.(p.position);
+    const v = g ? add(p.velocity, scale(g, dt)) : p.velocity;
+    const travel = carry ? add(scale(v, dt), carry.dx) : scale(v, dt);
     const len = Math.hypot(travel.x, travel.y);
     const dir = len > 0 ? scale(travel, 1 / len) : { x: 0, y: 0 };
 
@@ -173,7 +177,7 @@ export function stepProjectiles(
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;
-    const velocity = carry ? add(p.velocity, carry.dv) : p.velocity;
+    const velocity = carry ? add(v, carry.dv) : v;
     survivors.push({ ...p, position: add(p.position, travel), velocity, ticksLeft: p.ticksLeft - 1 });
   }
   return { projectiles: survivors, damage };

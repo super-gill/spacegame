@@ -70,7 +70,19 @@ export {
   type Migration,
   type SaveEnvelope,
 } from './save.js';
-export { collideWithStations } from './collision.js';
+export { collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
+export {
+  navReadout,
+  predictPath,
+  orbitElements,
+  gravityTier,
+  GRAVITY_TIERS,
+  PATH_STEP_SECONDS,
+  type NavReadout,
+  type OrbitReadout,
+  type PathReadout,
+  type GravityTier,
+} from './nav.js';
 export { thinkNpcs, PIRATE_TUNING, TRADER_TUNING, inSecurityZone } from './ai/index.js';
 export { stepShip, linearAcceleration, angularAcceleration } from './ship.js';
 export {
@@ -138,6 +150,10 @@ export {
   frameVelocity,
   relativeVelocity,
   pirateHome,
+  gravityAt,
+  gravityFrom,
+  gravityEase,
+  surfacesNext,
   type RailState,
   type Carry,
   type TickRails,

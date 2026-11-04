@@ -89,8 +89,9 @@ function withLocks(ship: Ship): Ship {
  * 0.9.0 makes sensing a fitted system: a hull with no radar sees nothing
  * and one with no targeting computer locks nothing. Ships from version 4
  * had neither (their hulls had built-in sensors), so they are given the
- * stock sets free on their new sensor mounts: a pod its beacon, any other
- * ship Meridian's radar and plotter.
+ * stock sets free on their new sensor and nav mounts: a pod its beacon,
+ * any other ship Meridian's radar and plotter, and every ship Meridian's
+ * nav computer.
  */
 function withSensors(ship: Ship): Ship {
   const hull = HULLS[ship.hullId];
@@ -100,6 +101,7 @@ function withSensors(ship: Ship): Ship {
     if (fit[mount.id]) continue;
     if (mount.type === 'radar') fit[mount.id] = hull.escapePod ? 'meridian-beacon-s' : 'meridian-radar-s';
     if (mount.type === 'computer') fit[mount.id] = 'meridian-computer-s';
+    if (mount.type === 'nav') fit[mount.id] = 'meridian-nav-s';
   }
   return { ...ship, fit };
 }

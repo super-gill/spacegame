@@ -1,4 +1,4 @@
-import { bodyStates, railTime, type World } from '@spacegame/sim';
+import { bodyStates, navReadout, railTime, type Ship, type World } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 
 /**
@@ -65,4 +65,49 @@ export function bodyMarkers(world: World): { name: string; position: { x: number
   return Object.values(world.bodies)
     .filter((b) => !b.ring && states[b.id])
     .map((b) => ({ name: b.name, position: states[b.id]!.position, radius: b.radius }));
+}
+
+const PATH_INK = 'rgba(159, 211, 199, 0.55)';
+const PATH_WARN = '#e06c5a';
+
+/**
+ * Stopgap: the nav computer's predicted path as a dotted line, and a
+ * one-line orbit and gravity readout above the bottom-left corner. Drawn
+ * only from `navReadout`, so a ship without a nav computer gets nothing.
+ * The interface workstream's path line, gauge and warnings replace it.
+ */
+export function drawNav(ctx: CanvasRenderingContext2D, camera: Camera, world: World, ship: Ship, alpha: number): void {
+  const nav = navReadout(world, ship);
+  if (!nav || ship.state !== 'flying') return;
+  const path = nav.path;
+  const states = bodyStates(world.bodies, railTime(world.tick - 1 + alpha, world.dt));
+  const origin = path.relativeTo ? states[path.relativeTo]?.position : undefined;
+  ctx.save();
+  ctx.strokeStyle = path.impact ? PATH_WARN : PATH_INK;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 6]);
+  ctx.beginPath();
+  path.points.forEach((p, i) => {
+    const at = camera.worldToScreen(origin ? { x: origin.x + p.x, y: origin.y + p.y } : p);
+    if (i === 0) ctx.moveTo(at.x, at.y);
+    else ctx.lineTo(at.x, at.y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const parts: string[] = [];
+  if (nav.orbit) {
+    const pe = Math.round(nav.orbit.periapsisAltitude);
+    const ap = Number.isFinite(nav.orbit.apoapsisAltitude) && nav.orbit.bound ? Math.round(nav.orbit.apoapsisAltitude).toString() : 'ESCAPE';
+    parts.push(`PE ${pe}  AP ${ap}`);
+  }
+  if (nav.gravity.tier !== 'none') parts.push(`GRAVITY ${nav.gravity.tier.toUpperCase()} ${Math.round(nav.gravity.ratio * 100)}%`);
+  if (path.impact) parts.push(`IMPACT IN ${path.impact.seconds.toFixed(0)} s`);
+  if (parts.length > 0) {
+    ctx.fillStyle = path.impact || nav.gravity.tier === 'alarm' || nav.gravity.tier === 'warning' ? PATH_WARN : PATH_INK;
+    ctx.font = '12px ui-monospace, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(parts.join('  ·  '), 16, camera.viewportHeight - 16);
+  }
+  ctx.restore();
 }

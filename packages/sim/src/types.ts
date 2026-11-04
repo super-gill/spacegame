@@ -16,9 +16,11 @@ export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
 /**
  * `radar` and `computer` are the sensor mounts: one radar (what the ship
  * can see) and one targeting computer (what it can lock). A ship without
- * them sees nothing and locks nothing.
+ * them sees nothing and locks nothing. `nav` takes the navigation
+ * computer every ship carries: it knows where you are, how fast you are
+ * going against your frame, what gravity is doing and where you will be.
  */
-export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer';
+export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav';
 
 /**
  * What a mount point provides to the module on it. A module lists the
@@ -77,10 +79,22 @@ export type ModuleStat =
   /** How many ships it can hold locked at once. Comes only from a targeting computer. */
   | 'maxLocks'
   /** How fast it locks: 1 is an ordinary computer, 2 locks in half the time. Comes only from a targeting computer. */
-  | 'scanResolution';
+  | 'scanResolution'
+  /** How far ahead the navigation computer predicts your path, seconds. Comes only from a nav computer. */
+  | 'navHorizon';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
-export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon' | 'radar' | 'targetingComputer';
+export type ModuleKind =
+  | 'engine'
+  | 'thrusters'
+  | 'reactor'
+  | 'shieldGenerator'
+  | 'armour'
+  | 'cargoPod'
+  | 'weapon'
+  | 'radar'
+  | 'targetingComputer'
+  | 'navComputer';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -243,6 +257,8 @@ export interface ShipStats {
   signature: number;
   /** What its locks show, from its targeting computer. Empty without one. */
   readouts: ReadoutKind[];
+  /** Seconds of predicted path from its nav computer. Zero without one: no navigation readouts at all. */
+  navHorizon: number;
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
 }
@@ -720,7 +736,7 @@ export interface World {
   events: WorldEvent[];
 }
 
-export type DamageCause = 'weapon' | 'ram' | 'station';
+export type DamageCause = 'weapon' | 'ram' | 'station' | 'surface';
 
 /** Why a lock could not start. */
 export type LockRefusal =
@@ -766,6 +782,8 @@ export type WorldEvent =
   | { type: 'lockRefused'; shipId: string; targetId: string; reason: LockRefusal }
   /** A ship struck a station hull. `speed` is the closing speed at impact, units/s. */
   | { type: 'collided'; shipId: string; stationId: string; speed: number }
+  /** A ship struck a body's surface. `speed` is the closing speed at impact, units/s. */
+  | { type: 'impacted'; shipId: string; bodyId: string; speed: number }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */
   | { type: 'rammed'; shipId: string; by: string; speed: number }
   /** A ship took damage. `by` is the ship responsible, or null for a station hull. */
