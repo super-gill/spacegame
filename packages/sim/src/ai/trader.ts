@@ -3,7 +3,7 @@ import type { ShipStats, Ship, ShipInput, TraderBrain, World } from '../types.js
 import { speedRelativeTo } from '../docking.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, obstacles, routeAround, steerToVelocity } from './steer.js';
+import { obstacles, routeAround, steerToVelocity, travelVelocity } from './steer.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
@@ -102,6 +102,6 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   const waypoint = routeAround(ship, stats, approach, obstacles(world));
   const cruise = stats.maxSpeed * TRADER_TUNING.cruiseFraction;
   // Stations move: arrive at the approach point and end up moving with the station.
-  const desired = add(station.velocity, arriveVelocity(ship, stats, waypoint, cruise));
+  const desired = add(station.velocity, travelVelocity(ship, stats, waypoint, approach, cruise));
   return { input: defend(world, ship, steerToVelocity(ship, stats, desired)), brain };
 }

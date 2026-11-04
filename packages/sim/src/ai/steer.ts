@@ -2,7 +2,7 @@ import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
 import { bodyStates, railTime } from '../rails.js';
 import type { ShipStats, Ship, ShipInput, World } from '../types.js';
-import { add, distance, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
+import { add, distance, fromAngle, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
 
 /**
@@ -108,6 +108,20 @@ export function arriveVelocity(ship: Ship, stats: ShipStats, point: Vec2, cruise
   return scale(normalise(offset), speed);
 }
 
+/**
+ * Desired velocity towards `waypoint` on the way to `goal`: as fast as
+ * `arriveVelocity` allows for the distance left to the goal (via the
+ * waypoint), pointed at the waypoint. So a detour is flown through at
+ * speed instead of stopping at every waypoint, and the ship still stops at
+ * the goal itself.
+ */
+export function travelVelocity(ship: Ship, stats: ShipStats, waypoint: Vec2, goal: Vec2, cruise: number): Vec2 {
+  if (waypoint.x === goal.x && waypoint.y === goal.y) return arriveVelocity(ship, stats, goal, cruise);
+  const left = distance(ship.position, waypoint) + distance(waypoint, goal);
+  const speed = Math.min(cruise, Math.sqrt(2 * plannedBraking(stats) * left));
+  return scale(normalise(sub(waypoint, ship.position)), speed);
+}
+
 /** Something round to steer clear of: a station hull or a body's surface. */
 export interface Obstacle {
   position: Vec2;
@@ -154,10 +168,26 @@ export function routeAround(ship: Ship, stats: ShipStats, goal: Vec2, list: read
   }
   if (!nearestBlock) return goal;
 
-  // Go round on whichever side the ship is already offset towards.
+  // Go round on whichever side the ship is already offset towards, aiming
+  // along the tangent to a cushion round the obstacle, so the leg to the
+  // waypoint itself never cuts through it. Inside the cushion, back out first.
   const { obstacle } = nearestBlock;
-  const clearance = obstacle.radius + stats.radius + STATION_CLEARANCE;
+  const cushion = obstacle.radius + stats.radius + STATION_CLEARANCE + 40;
   const side = { x: -dir.y, y: dir.x };
   const offsetSide = dot(sub(ship.position, obstacle.position), side) >= 0 ? 1 : -1;
-  return add(obstacle.position, scale(side, offsetSide * (clearance + 40)));
+  const out = sub(ship.position, obstacle.position);
+  const d = length(out);
+  const hull = obstacle.radius + stats.radius;
+  // Already inside the cushion: slide round at the distance it has, or
+  // back straight out if it is nearly touching.
+  if (d <= hull + 10) return add(obstacle.position, scale(normalise(out), cushion + 60));
+  const r = Math.min(cushion, d * 0.95);
+  const tangent = Math.acos(r / d);
+  const base = Math.atan2(out.y, out.x);
+  // Turning the outward bearing towards the chosen side gives that side's tangent point.
+  const turn = dot(fromAngle(base + tangent), side) * offsetSide > 0 ? tangent : -tangent;
+  return add(obstacle.position, scale(fromAngle(base + turn), r * TANGENT_MARGIN));
 }
+
+/** Tangent waypoints sit this much beyond the cushion, so a ship cutting the corner still clears it. */
+const TANGENT_MARGIN = 1.08;

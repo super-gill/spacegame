@@ -91,7 +91,7 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Ship fit** (`types.ts`): `Ship.fit` maps mount id to module id; `WeaponState` is keyed by `mountId`.
 - **Pilot storage** (`types.ts`): `Pilot.storage` maps station id to module id to count.
 - **Save format** (`save.ts`): `SAVE_VERSION`. Only the lead bumps it.
-- **Sensor range** (`types.ts`, `stats.ts`): `HullSpec.sensorRange` and `ShipStats.sensorRange`, units; the `sensorRange` module stat for sensor modules later. A pilot is shown only the ships within their ship's sensor range; stations (and bodies, when they land) are always shown.
+- **Sensor range** (`types.ts`, `stats.ts`): `ShipStats.sensorRange`, units, from the fitted radar only (6c part 2; `HullSpec.sensorRange` is gone). Zero with no radar: show that pilot no ships at all. A pilot is shown only the ships within their ship's sensor range; stations and bodies are always shown.
 
 6b contracts (on `main` from 4 November 2026):
 
@@ -118,8 +118,9 @@ Changing any of these needs the lead. All live in `packages/sim/src` and are exp
 - **Target locks** (`types.ts`, `locks.ts`), replacing `Ship.targetId` and the `selectTarget` input:
   - `Ship.locks` (`TargetLock`: `targetId`, `progress` 0 to 1, complete at 1), `Ship.activeLock` (a target ship id or null; always one of `locks`).
   - Inputs `lock`, `unlock`, `activateLock` (ship ids or null, edge-triggered). A new lock becomes active only if none is; send `lock` and `activateLock` together to lock and activate in one go. Order in a tick: unlock, lock, activate.
-  - Stats `ShipStats.maxLocks` and `ShipStats.scanResolution`, from `HullSpec.maxLocks` and `HullSpec.scanResolution` (sensor modules add later). Tern 2 and 1.0, Warrant 3 and 1.1, Manifest 2 and 0.8, Tacet 4 and 1.6, Ark 1 and 0.6.
-  - `lockSeconds(stats, targetRadius)`, `lockRefusal(world, ship, targetId)` (`LockRefusal`: `invalid`, `already`, `maxLocks`, `outOfRange`, `docked`), `isLocked`, `activeTarget`, `weaponTarget`.
+  - Stats `ShipStats.maxLocks` and `ShipStats.scanResolution`, from the fitted targeting computer only (zero without one). `ShipStats.signature` from `HullSpec.signature`: how big the hull looks to sensors.
+  - `lockSeconds(stats, targetSignature)`, `lockRefusal(world, ship, targetId)` (`LockRefusal`: `invalid`, `already`, `noComputer`, `maxLocks`, `outOfRange`, `docked`), `isLocked`, `activeTarget`, `weaponTarget`.
+- **Sensor systems** (`types.ts`, `hulls.ts`, `modules.ts`): mount types `radar` and `computer` (one of each per hull; pods have a radar only), module kinds `radar` and `targetingComputer`. Radars: Meridian Lookout S (3,000), Ito-Marr Farsight S (4,200), Tessaract Traffic Array M (5,500), Meridian Lifeline S (pods, 1,200). Computers: Meridian Plotter S (2 locks, 1x), Paragon Fire Director S (2, 1.6x) and M (4, 1.5x). Names are placeholders for the lore chat.
   - Events `lockStarted`, `locked`, `lockLost` (`LockLossReason`: `unlocked`, `outOfRange`, `targetGone`, `docked`), `lockRefused`; `shipId` is the ship locking, `targetId` the target.
   - **For 6e:** `WeaponState.lockTarget` (optional, a target ship id) points a weapon at a lock other than the active one; turrets already honour it, nothing sets it yet.
 
@@ -192,6 +193,7 @@ Candidates (not open yet):
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
 
 - Navy duties.
+- **Sensor module names** (for the lore chat): two radars, a pod beacon and three targeting computers have placeholder names (see the sensor systems contract).
 - **Body names** (for the lore chat): the planet, its moon and the belt in Calder. Placeholders: Calder I, Calder Ia, Calder Belt.
 
 ## Ideas inbox
@@ -200,6 +202,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 - **Station functions on ships** (2026-11-03, later): bigger ships could carry station services such as outfitting; player stations, or station ships, may follow.
 - **Boarding abandoned ships** (2026-11-03): taking a ship nobody owns, or someone else's. Belongs with law (7) and salvage (9). Owning ships, swapping in space and pods are scheduled in 6b.
+- **Systems for every capability** (2026-11-04, 6e): the tractor beam as a fitted module; turret fire control from a system rather than mount wiring; shield recharge delay from the shield generator; flight assist quality from a flight computer; escape pods from a fitted pod bay. Also signature that systems change (hot engines, dampers) and sensor and computer draw on the capacitor. Lead's note: each needs a mount on every hull and a migration that fits stock parts, as sensors did.
 - **Generated systems** (2026-11-04, later): systems generated once from a seed and stored in the world, the same shape as the hand-written starter system. Triaged to the map (8).
 - **Orbit assists and slingshot racing** (2026-11-04, later): an orbit hold autopilot, transfer and approach assists, and races that use slingshots round a system's planets. In `docs/system.md` under "Later".
 - **Hireable NPC agents** (2026-11-03, long term): pay a station for an escort; hire a pilot to fly another ship you own alongside you; later, a hired captain who takes one of your ships off to work a trade route or mine, building towards a fleet. Lead's notes: the sim already suits this, because NPCs fly through the same inputs as people and their brains are plain data, so a hired pilot is a brain attached to a ship a pilot owns. 6b should keep "who owns a ship" separate from "who is flying it" so this slots in later. Escorts need little more than today's AI; captains on routes need the economy (10), industry (9) and off-screen traffic (8) first.
@@ -208,6 +211,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-04: **Systems all the way down** (design pillar 5): every capability comes from a fitted system with a cost (mass, power, later capacitor, a mount, money), so every limit has a reason and every gain a price. Sensors first: a radar gives sensor range and a separate targeting computer gives max locks and lock speed; a ship with neither sees no ships and locks nothing; lock time also depends on the target hull's signature. The other gaps (tractor beam, turret fire control, shield recharge delay, flight assist quality, escape pods) become fitted systems in 6e. (Jason)
 - 2026-11-04: The living system, in `docs/system.md`: orbits arrange the system (a star, planets, moons, stations in orbit, the belt), all on rails; each body has a sphere of influence with real inverse-square gravity, eased to zero at its edge, and flat space between spheres; ships inside a sphere are carried with the body, so free orbits and slingshots work; speed, assist and docking are relative to the local frame; full assist cancels gravity as far as thrust allows, while rotation assist and manual fly orbits; gravity warnings rise in tiers against the ship's own thrust; surface impact works like a station hull; no time warp, so orbits are tuned for play time; no in-system faster-than-light travel for now; sensors decide which ships you see; a third station near the planet's moon. (Jason)
 - 2026-11-04: New order for the rest of milestone 6: 6c the living system, 6d the ship interface and navigation (alongside 6c), 6e weapons and the capacitor. Energy weapons and shield recharge use a capacitor; projectile guns and missiles use ammunition. (Jason)
 - 2026-11-04: An empty ship of yours gets into space by stepping out: a key leaves you in a pod beside it, and the ship stays where it is, empty. (Jason)
@@ -240,6 +244,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): made sensing a fitted system, on Jason's systems principle. Hulls lost their built-in sensor range, max locks and lock speed and gained a `radar` mount, a `computer` mount and a `signature`. Seven sensor modules, each trading power, mass and price against range or lock speed; the Warrant gets +25% lock speed from a full-size computer. Every fit carries a Meridian radar and plotter (the trader a Tessaract traffic array; pods a beacon and no computer); Meridian's small reactor goes from 10 to 12 power so light ships can run them. Pirates notice only what their radar shows. Old saves get the stock sensors free. Also fixed NPC routing: detours aim along tangents and are flown through at speed instead of stopping at each waypoint (traders were creeping round the planet), and pirates going home route round security zones. 235 tests; 30 minutes of NPC play with traders looping and pirates never inside a zone. Outfitting shows sensor range, locks and lock speed; radars and computers are drawn on hulls. **For the interface workstream:** sensor range is now zero without a radar, so the radar must show no ships at all then. Changelog lines for 0.9.0: "Radars and targeting computers are fitted systems: range, lock count and lock speed come from what you fit"; "Lock time depends on the target's hull: freighters lock fast, small and stealthy frames slowly"; "NPCs fly round planets and security zones smoothly".
 
 - 2026-11-04, lead (Lead 3): built target locks on `main` (the interface request), the first piece of 6c part 2. `Ship.targetId` and the `selectTarget` input are gone; ships hold timed locks up to `maxLocks`, one active, and turrets fire only at a complete lock. Lock time is 2.5 s for a scan resolution 1 ship against a hull of radius 20, faster with better sensors and against bigger hulls (`locks.ts`). The trader now locks its hunter before its turrets open up (about 3 s), so it loses some fights it used to win; worth watching in play. Saves stay version 5: ships from saves without locks start with none. 231 tests. Client: stopgap lock controls in `main.ts`, `input.ts`, `ui.ts` and `bindings.ts` (see the request), `docs/controls.md` updated. Next: gravity. Changelog lines for 0.9.0: "Target locks: lock ships with a click, hold several, Tab switches the active one; locking takes time"; "Turrets fire only at a completed lock".
 

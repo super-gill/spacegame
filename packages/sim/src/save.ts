@@ -85,6 +85,25 @@ function withLocks(ship: Ship): Ship {
   return { ...rest, locks: Array.isArray(rest.locks) ? rest.locks : [], activeLock: rest.activeLock ?? null };
 }
 
+/**
+ * 0.9.0 makes sensing a fitted system: a hull with no radar sees nothing
+ * and one with no targeting computer locks nothing. Ships from version 4
+ * had neither (their hulls had built-in sensors), so they are given the
+ * stock sets free on their new sensor mounts: a pod its beacon, any other
+ * ship Meridian's radar and plotter.
+ */
+function withSensors(ship: Ship): Ship {
+  const hull = HULLS[ship.hullId];
+  if (!hull) return ship;
+  const fit = { ...ship.fit };
+  for (const mount of hull.mounts) {
+    if (fit[mount.id]) continue;
+    if (mount.type === 'radar') fit[mount.id] = hull.escapePod ? 'meridian-beacon-s' : 'meridian-radar-s';
+    if (mount.type === 'computer') fit[mount.id] = 'meridian-computer-s';
+  }
+  return { ...ship, fit };
+}
+
 /** How far apart ships towed to Harbour with no free pad are left, units. */
 const TOW_SPACING = 60;
 
@@ -97,6 +116,8 @@ const TOW_SPACING = 60;
  * - The world gains the starter bodies. Harbour and Ridge are replaced by
  *   their new copies on their orbits (same ids, pads, markets and ship
  *   mart). Any other station is kept where it was, fixed in place.
+ * - Pilots' ships gain the stock sensor sets on their new sensor mounts
+ *   (`withSensors`): sensing is now a fitted system.
  * - Pilots' ships docked at a station stay on the same pad there (or the
  *   smallest free pad that fits, if that one is gone or taken).
  * - Pilots' ships in space, flown or empty, are towed to Harbour: set
@@ -123,7 +144,7 @@ export function migrate4to5(world: unknown): unknown {
   // a towed ship never takes the pad a docked one was already on.
   const kept = Object.entries(world['ships'])
     .filter(([id, sh]) => isRecord(sh) && npcs[id] === undefined)
-    .map(([, sh]) => ({ ...withLocks(sh as unknown as Ship), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
+    .map(([, sh]) => ({ ...withSensors(withLocks(sh as unknown as Ship)), velocity: { x: 0, y: 0 }, angularVelocity: 0, thrusters: idleThrusters() }))
     .sort((a, b) => Number(b.state === 'docked') - Number(a.state === 'docked') || (a.id < b.id ? -1 : 1));
 
   const ships: Record<string, Ship> = {};

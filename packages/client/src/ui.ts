@@ -33,6 +33,7 @@ const LOCK_REFUSALS: Record<LockRefusal, string> = {
   already: 'Already locked.',
   maxLocks: 'No lock slots free. Esc drops the active lock.',
   outOfRange: 'Out of sensor range.',
+  noComputer: 'No targeting computer fitted.',
   docked: 'Cannot lock while docked.',
 };
 

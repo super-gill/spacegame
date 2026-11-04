@@ -190,7 +190,7 @@ function drawSocket(ctx: CanvasRenderingContext2D, px: (n: number) => number, mo
   ctx.setLineDash([px(2), px(2)]);
   ctx.beginPath();
   if (mount.type === 'bay') ctx.rect(-3.75 * k, -2 * k, 7.5 * k, 4 * k);
-  else if (mount.type === 'internal' || mount.type === 'core') ctx.rect(-1.4 * k, -1.4 * k, 2.8 * k, 2.8 * k);
+  else if (mount.type === 'internal' || mount.type === 'core' || mount.type === 'computer') ctx.rect(-1.4 * k, -1.4 * k, 2.8 * k, 2.8 * k);
   else ctx.arc(0, 0, socketRadius(mount), 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);
@@ -274,6 +274,26 @@ function drawModule(
         ctx.rect(-3 * k, -1 * k, 3.2 * k, 2 * k);
         ctx.rect(-0.2 * k, -1 * k, 3.2 * k, 2 * k);
       }, 0.35);
+      return;
+    case 'radar':
+      // Radar: a dish, an arc facing the way the mount faces.
+      ctx.lineWidth = px(1.2);
+      ctx.beginPath();
+      ctx.arc(-0.6 * k, 0, 1.6 * k, -Math.PI / 2.4, Math.PI / 2.4);
+      ctx.moveTo(-0.6 * k, 0);
+      ctx.lineTo(1.2 * k, 0);
+      ctx.stroke();
+      return;
+    case 'targetingComputer':
+      // Targeting computer: a box with crosshairs.
+      body(() => ctx.rect(-1.2 * k, -1.2 * k, 2.4 * k, 2.4 * k), 0.2);
+      ctx.lineWidth = px(0.8);
+      ctx.beginPath();
+      ctx.moveTo(-1.2 * k, 0);
+      ctx.lineTo(1.2 * k, 0);
+      ctx.moveTo(0, -1.2 * k);
+      ctx.lineTo(0, 1.2 * k);
+      ctx.stroke();
       return;
     case 'thrusters':
     case 'reactor':

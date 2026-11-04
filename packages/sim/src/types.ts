@@ -13,7 +13,12 @@ import type { Vec2 } from './vec2.js';
 export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
 
 /** What kind of module a mount point takes. */
-export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal';
+/**
+ * `radar` and `computer` are the sensor mounts: one radar (what the ship
+ * can see) and one targeting computer (what it can lock). A ship without
+ * them sees nothing and locks nothing.
+ */
+export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer';
 
 /**
  * What a mount point provides to the module on it. A module lists the
@@ -67,15 +72,15 @@ export type ModuleStat =
   | 'shieldRegen'
   | 'structure'
   | 'cargoCapacity'
-  /** Detection range, units. Hulls have a base range; sensor modules (later) add to it. */
+  /** Detection range, units. Comes only from a radar. */
   | 'sensorRange'
-  /** How many ships it can hold locked at once. Hulls have a base; sensor modules (later) add to it. */
+  /** How many ships it can hold locked at once. Comes only from a targeting computer. */
   | 'maxLocks'
-  /** How fast it locks, as a multiplier: 1 is an ordinary hull, 2 locks in half the time. Sensor modules (later) add to it. */
+  /** How fast it locks: 1 is an ordinary computer, 2 locks in half the time. Comes only from a targeting computer. */
   | 'scanResolution';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
-export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon';
+export type ModuleKind = 'engine' | 'thrusters' | 'reactor' | 'shieldGenerator' | 'armour' | 'cargoPod' | 'weapon' | 'radar' | 'targetingComputer';
 
 /**
  * A module: anything fitted to a mount. Data only.
@@ -148,12 +153,14 @@ export interface HullSpec {
   maxSpeed: number;
   /** Hard spin limit, rad/s, enforced in every flight mode. */
   maxTurnRate: number;
-  /** Base detection range of the bare hull, units. Sensor modules (later) add to it. */
-  sensorRange: number;
-  /** Ships the bare hull can hold locked at once. */
-  maxLocks: number;
-  /** Base lock speed multiplier (see `ModuleStat`). */
-  scanResolution: number;
+  /**
+   * How big the hull looks to sensors, units. Lock time against this hull
+   * goes with the square root of LOCK_REFERENCE_SIGNATURE over it: big,
+   * boxy freighters lock fast, small or stealthy frames slowly. A property
+   * of the frame's design; systems may change it later (hot engines,
+   * signature dampers).
+   */
+  signature: number;
   mounts: MountPoint[];
   bonuses: HullBonus[];
   /** A sealed hull cannot be refitted or bought (the Aurel Tacet dev ship, escape pods). */
@@ -206,14 +213,17 @@ export interface ShipStats {
   powerOutput: number;
   powerDraw: number;
   /**
-   * How far this ship can detect other ships, units. Ships beyond it are
-   * not shown to its pilot. Stations and bodies are always known.
+   * How far this ship can detect other ships, units, from its radar. No
+   * radar, zero: it sees no ships. Stations and bodies are always known
+   * (they are on the charts).
    */
   sensorRange: number;
-  /** Ships it can hold locked at once, whole. */
+  /** Ships it can hold locked at once, whole, from its targeting computer. No computer, zero. */
   maxLocks: number;
-  /** Lock speed multiplier: lock time is divided by this (locks.ts). */
+  /** Lock speed multiplier from its targeting computer: lock time is divided by this (locks.ts). */
   scanResolution: number;
+  /** How big this ship looks to other ships' sensors (`HullSpec.signature`). */
+  signature: number;
   /** Effective weapon on each weapon-bearing mount, hull bonuses applied. */
   weapons: Record<string, WeaponSpec>;
 }
@@ -698,7 +708,8 @@ export type LockRefusal =
   | 'invalid' // no such ship, itself, or not flying
   | 'already' // already locked or locking it
   | 'maxLocks' // every lock slot in use
-  | 'outOfRange' // beyond this ship's sensor range
+  | 'outOfRange' // beyond this ship's sensor range (no radar: everything is)
+  | 'noComputer' // no targeting computer fitted
   | 'docked'; // this ship is docked
 
 /** Why a lock was lost. */

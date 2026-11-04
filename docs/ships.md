@@ -54,7 +54,8 @@ A module has a type, a size, mass, power draw, the services it needs, a shape, i
 | Armour plating | utility | Plates on the hull | Structure |
 | Cargo pod | bay | Solid block with bands | Cargo space |
 | Passenger cabin | bay | Rounded block, rows of lit windows | Passenger berths |
-| Sensor | utility | Dish or antenna on a stalk | Detection range (later) |
+| Radar | radar | Dish facing the mount's way | Sensor range: what ships you can see (6c) |
+| Targeting computer | computer | Box with crosshairs | Max locks and lock speed (6c) |
 | Mining laser | weapon or utility | Concave emitter, dashed beam | Mining (milestone 9) |
 | Salvage arm | utility | Jointed arm with claw | Salvage (milestone 9) |
 | Hangar bay | bay | Open mouth | Drones and crewed craft (later) |

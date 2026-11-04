@@ -14,7 +14,8 @@ The reference is Flatspace: top-down, Newtonian drift, loot you have to scoop, a
 2. **One world, many jobs.** Industries bleed into each other. A miner carries cargo, a trader can be a target, a pirate becomes a bounty. No career classes.
 3. **Emergent crime.** Nothing auto-flags a crime. It only counts if it was witnessed, or a distress call reached someone in time. Reputation is a record, not a stat.
 4. **Data over code.** Hulls, modules, stations, sectors and economy tables are data files. Adding a ship should not need a code change.
-5. **A small shared world, in the browser.** Played solo or by a group of friends on one world, Minecraft style. Each pilot's progress is their own. No accounts, no central servers, no infrastructure run by us.
+5. **Systems all the way down.** Every capability comes from a system fitted to the ship, and every system has a cost: mass, power, later capacitor, a mount, money. So every limit has a reason you can change by refitting, and every gain is paid for somewhere else: a long-range radar draws more power; a cheap targeting computer locks slowly. Services come from a system that provides them, even when one module bundles several. Bare hulls have no built-in abilities beyond their frame.
+6. **A small shared world, in the browser.** Played solo or by a group of friends on one world, Minecraft style. Each pilot's progress is their own. No accounts, no central servers, no infrastructure run by us.
 
 ## Flight model
 
@@ -142,6 +143,7 @@ Map modelled on EVE's security bands: busy, well-policed core; unregulated low-s
 The full design is in [ships.md](ships.md). In play today (0.7.0):
 
 - **A hull is a frame.** Every bit of performance (thrust, turning, shields, structure beyond the hull's own, power, cargo, weapons) comes from modules fitted to its mount points. A bare hull cannot move.
+- **Sensing is fitted.** A radar sets how far you see ships; a targeting computer sets how many you can lock and how fast. No radar: you see no ships. No computer: you lock nothing. Lock time also depends on the target hull's signature: big freighters lock fast, small or stealthy frames slowly.
 - **Stats are derived, never stored.** Mass, thrusts, shields, structure, cargo space, power and weapons are worked out from hull, fit and cargo whenever they are needed (`shipStats`). A refit or a catalogue change applies at once.
 - **Fitting rules:** a module goes only on a mount of a type it lists, no bigger than the mount, where the mount provides every service it needs (power, fire control, heavy load). Total power draw must stay within reactor output, and the cargo aboard must still fit.
 - **Modules are owned.** Refitting is a pilot command while docked at a station with outfitting (Harbour has it; Ridge Outpost does not). Fitting a module you do not own buys it. Unfitting puts it in your storage at that station, and a module replaced by another goes there too. Fitting a module you have in storage there takes it out. Fitting and unfitting each cost a handling fee of 5% of the module's price (`FIT_FEE_FRACTION`), so swapping between owned modules is cheap but not free.

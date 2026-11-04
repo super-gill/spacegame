@@ -450,6 +450,20 @@ describe('save version 5', () => {
     expect(towed.velocity).toEqual(harbour.velocity);
   });
 
+  it('gives old ships the stock sensors, since hulls no longer have any built in', () => {
+    const env = JSON.parse(version4().text);
+    // Version 4 fits had no sensor mounts.
+    for (const s of Object.values(env.world.ships) as { fit: Record<string, string> }[]) {
+      delete s.fit['r1'];
+      delete s.fit['t1'];
+    }
+    const r = deserializeWorld(JSON.stringify(env));
+    if (!r.ok) throw new Error(r.reason);
+    const ana = pilotShip(r.world, 'ana')!;
+    expect(ana.fit['r1']).toBe('meridian-radar-s');
+    expect(ana.fit['t1']).toBe('meridian-computer-s');
+  });
+
   it('replaces NPCs with the new system and drops things in flight', () => {
     const r = deserializeWorld(version4().text);
     if (!r.ok) throw new Error(r.reason);

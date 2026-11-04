@@ -65,6 +65,8 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   engine: 'Engine',
   core: 'Core',
   internal: 'Internal',
+  radar: 'Radar',
+  computer: 'Targeting computer',
 };
 
 const INK = '#9fd3c7';
@@ -100,6 +102,8 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   shieldGenerator: 'Shield generator',
   armour: 'Armour',
   cargoPod: 'Cargo',
+  radar: 'Radar',
+  targetingComputer: 'Targeting computer',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -118,6 +122,8 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.shield) parts.push(`shield ${s.shield}, ${s.shieldRegen ?? 0}/s`);
   if (s.structure) parts.push(`structure +${s.structure}`);
   if (s.cargoCapacity) parts.push(`cargo ${s.cargoCapacity}`);
+  if (s.sensorRange) parts.push(`sees ${s.sensorRange} u`);
+  if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
   if (w) parts.push(`${w.kind} ${fixed1(weaponDps(w))} dps, range ${w.range}`);
   return parts.join('; ');
@@ -158,6 +164,9 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Shield regen', value: (s) => s.shieldRegen, format: (n) => `${fixed1(n)}/s`, better: 'higher' },
   { label: 'Structure', value: (s) => s.structure, format: (n) => fixed1(n), better: 'higher' },
   { label: 'Cargo', value: (s) => s.cargoCapacity, format: (n) => String(n), better: 'higher' },
+  { label: 'Sensor range', value: (s) => s.sensorRange, format: (n) => (n > 0 ? `${n} u` : 'blind'), better: 'higher' },
+  { label: 'Locks', value: (s) => s.maxLocks, format: (n) => String(n), better: 'higher' },
+  { label: 'Lock speed', value: (s) => s.scanResolution, format: (n) => (n > 0 ? `${fixed1(n)}x` : 'none'), better: 'higher' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
   { label: 'Fixed dps', value: (s) => dps(s, 'fixed'), format: fixed1, better: 'higher' },
   { label: 'Turret dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },

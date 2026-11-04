@@ -5,12 +5,13 @@ import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { activeTarget, lockRefusal, lockSeconds, weaponTarget } from '../locks.js';
 import { deserializeWorld, serializeWorld } from '../save.js';
-import { shipStats } from '../stats.js';
+import { fitStats, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add } from '../vec2.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
-import { loadoutStats } from './fixtures.js';
+import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
+import { MODULES } from '../modules.js';
 
 /** Target locks: timed, limited by a ship stat, one active, turrets on the active lock. */
 
@@ -51,12 +52,47 @@ describe('lock time', () => {
     expect(lockSeconds({ scanResolution: 1 }, 9)).toBeGreaterThan(LOCK_BASE_SECONDS);
   });
 
-  it('comes from the hull: every hull has max locks and a scan resolution', () => {
+  it('comes from the targeting computer: no computer, no locks', () => {
     for (const hull of Object.values(HULLS)) {
-      expect(hull.maxLocks).toBeGreaterThanOrEqual(1);
-      expect(hull.scanResolution).toBeGreaterThan(0);
+      const bare = fitStats(TEST_CATALOGUES, hull, {});
+      expect(bare.maxLocks, hull.id).toBe(0);
+      expect(lockSeconds(bare, 20), hull.id).toBe(Infinity);
     }
-    expect(loadoutStats('meridian-starter').maxLocks).toBe(HULLS['meridian-courier']!.maxLocks);
+    const cheap = fitStats(TEST_CATALOGUES, HULLS['meridian-courier']!, { t1: 'meridian-computer-s' });
+    const director = fitStats(TEST_CATALOGUES, HULLS['meridian-courier']!, { t1: 'paragon-computer-s' });
+    expect(cheap.maxLocks).toBe(2);
+    expect(lockSeconds(director, 20)).toBeLessThan(lockSeconds(cheap, 20));
+    // The dedicated computer costs more power and money for it.
+    expect(MODULES['paragon-computer-s']!.power).toBeGreaterThan(MODULES['meridian-computer-s']!.power);
+    expect(MODULES['paragon-computer-s']!.price).toBeGreaterThan(MODULES['meridian-computer-s']!.price);
+  });
+
+  it('depends on the target hull: big freighters lock fast, small and stealthy frames slowly', () => {
+    const s = loadoutStats('meridian-starter');
+    const at = (hull: string) => lockSeconds(s, HULLS[hull]!.signature);
+    expect(at('tessaract-spine')).toBeLessThan(at('kessari-wedge'));
+    expect(at('kessari-wedge')).toBeLessThan(at('meridian-courier'));
+    expect(at('meridian-courier')).toBeLessThan(at('aurel-tacet'));
+    expect(at('aurel-tacet')).toBeLessThan(at('escape-pod'));
+  });
+
+  it('a combat hull rewards a full-size computer with faster locks', () => {
+    const wedge = HULLS['kessari-wedge']!;
+    const small = fitStats(TEST_CATALOGUES, wedge, { t1: 'paragon-computer-s' });
+    const full = fitStats(TEST_CATALOGUES, wedge, { t1: 'paragon-computer-m' });
+    expect(full.scanResolution).toBeCloseTo(MODULES['paragon-computer-m']!.stats.scanResolution! * 1.25, 9);
+    expect(small.scanResolution).toBe(MODULES['paragon-computer-s']!.stats.scanResolution);
+  });
+});
+
+describe('sensors', () => {
+  it('a ship with no radar can lock nothing; one with no computer is refused', () => {
+    let { w, me } = open();
+    w = near(w, me, 'raider', { x: 300, y: 0 });
+    const blind = { ...w.ships[me]!, fit: Object.fromEntries(Object.entries(w.ships[me]!.fit).filter(([m]) => m !== 'r1')) };
+    expect(lockRefusal(w, blind, 'raider')).toBe('outOfRange');
+    const dumb = { ...w.ships[me]!, fit: Object.fromEntries(Object.entries(w.ships[me]!.fit).filter(([m]) => m !== 't1')) };
+    expect(lockRefusal(w, dumb, 'raider')).toBe('noComputer');
   });
 });
 
@@ -74,7 +110,7 @@ describe('locking', () => {
     expect(w.ships[me]!.activeLock).toBe('raider');
     expect(activeTarget(w, w.ships[me]!)).toBeNull(); // not complete yet
 
-    const seconds = lockSeconds(shipStats(w, w.ships[me]!), HULLS['kessari-wedge']!.radius);
+    const seconds = lockSeconds(shipStats(w, w.ships[me]!), HULLS['kessari-wedge']!.signature);
     w = runFor(w, me, seconds + 0.1, events);
     expect(events).toContainEqual({ type: 'locked', shipId: me, targetId: 'raider' });
     expect(w.ships[me]!.locks[0]!.progress).toBe(1);

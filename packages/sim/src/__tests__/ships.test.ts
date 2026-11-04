@@ -104,7 +104,7 @@ describe('derived stats', () => {
     expect(s.mainThrust).toBe(MODULES['meridian-engine-s']!.stats.mainThrust);
     expect(s.rotationThrust).toBe(MODULES['meridian-thrusters-s']!.stats.rotationThrust);
     expect(s.structure).toBe(courier.structure + MODULES['rookrivet-armour-s']!.stats.structure!);
-    expect(s.powerOutput).toBe(10);
+    expect(s.powerOutput).toBe(12);
     expect(s.powerDraw).toBe(3);
   });
 
@@ -409,11 +409,13 @@ describe('ships in the world', () => {
 });
 
 describe('sensor range', () => {
-  it('every hull has a positive base range, and stats carry it', () => {
+  it('comes only from a fitted radar: a bare hull sees nothing', () => {
     for (const hull of Object.values(HULLS)) {
-      expect(hull.sensorRange, hull.id).toBeGreaterThan(0);
-      expect(fitStats(TEST_CATALOGUES, hull, {}).sensorRange, hull.id).toBe(hull.sensorRange);
+      expect(fitStats(TEST_CATALOGUES, hull, {}).sensorRange, hull.id).toBe(0);
+      expect(hull.mounts.filter((m) => m.type === 'radar'), hull.id).toHaveLength(1);
     }
+    const radar = MODULES['meridian-radar-s']!;
+    expect(fitStats(TEST_CATALOGUES, courier, { r1: radar.id }).sensorRange).toBe(radar.stats.sensorRange);
   });
 
   it('a new pilot can see as far as a pirate can', () => {

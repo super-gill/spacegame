@@ -71,9 +71,10 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     shieldRegen: 0,
     structure: hull.structure,
     cargoCapacity: 0,
-    sensorRange: hull.sensorRange,
-    maxLocks: hull.maxLocks,
-    scanResolution: hull.scanResolution,
+    // Sensing comes only from fitted systems: a bare hull is blind.
+    sensorRange: 0,
+    maxLocks: 0,
+    scanResolution: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -113,6 +114,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     sensorRange: totals.sensorRange,
     maxLocks: Math.floor(totals.maxLocks + 1e-9),
     scanResolution: totals.scanResolution,
+    signature: hull.signature,
     weapons,
   };
 }

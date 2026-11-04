@@ -42,7 +42,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `world.ts` | World construction, pilots joining (`joinPilot`), lookups (`pilotShip`), starter sector spawners |
 | `stations.ts` | Starter system stations as data: orbits, markets, pads (`padRing`), ship mart stock; defaults for save migrations |
 | `bodies.ts` | Starter system bodies as data: Calder (star), planet, moon, belt; `boundOrbit` for orbits whose period comes from the parent's gravity |
-| `locks.ts` | Target locks: `lockSeconds`, `lockRefusal`, `stepLocks` (inputs, progress, drops), `weaponTarget` and `activeTarget` for what turrets engage |
+| `locks.ts` | Target locks (from the fitted radar and targeting computer): `lockSeconds`, `lockRefusal`, `stepLocks` (inputs, progress, drops), `weaponTarget` and `activeTarget` for what turrets engage |
 | `rails.ts` | Rails and frames: body and station positions as pure functions of the tick (`bodyState`, `stationState`, `placeStations`, `circularPeriod`), carrying inside spheres (`tickRails`, `applyCarry`), the local frame (`localFrame`, `frameVelocity`, `relativeVelocity`), pirate homes on rails |
 | `ownership.ts` | Owning versus flying: `pilotsAboard`, `shipPilot`, `isEmptyShip`, `isEscapePod`, `ownedShips` |
 | `pilots.ts` | Pilot ship commands: `buyShip`, `boardShip`, `wakePilot` (and `respawnPilot`), `claimStarterShip`, their `...Refusal` previews, pod ejection, ship prices |

@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, obstacles, routeAround, steerToVelocity } from './steer.js';
+import { arriveVelocity, obstacles, routeAround, steerToVelocity, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -87,6 +87,15 @@ export function inSecurityZone(world: World, point: Vec2, margin = 0): boolean {
   return Object.values(world.stations).some((s) => distance(point, s.position) < s.securityRadius + margin);
 }
 
+/**
+ * What a pirate steers round on its way home: station hulls, bodies, and
+ * every station's security zone, which it will not cross.
+ */
+function avoid(world: World): Obstacle[] {
+  const zones = Object.values(world.stations).map((st) => ({ position: st.position, radius: st.securityRadius }));
+  return [...obstacles(world), ...zones];
+}
+
 function switchMode(brain: PirateBrain, mode: PirateMode, extra: Partial<PirateBrain> = {}): PirateBrain {
   return { ...brain, mode, modeTicks: 0, ...extra };
 }
@@ -101,8 +110,8 @@ function worthHunting(world: World, ship: Ship): boolean {
   return PIRATE_TUNING.huntPods || !isEscapePod(world, ship);
 }
 
-/** Nearest ship worth hunting, or null. Ties break on id so the choice is deterministic. */
-function findTarget(world: World, self: Ship): Ship | null {
+/** Nearest ship worth hunting that its radar can see, or null. Ties break on id so the choice is deterministic. */
+function findTarget(world: World, self: Ship, sight: number): Ship | null {
   let best: Ship | null = null;
   let bestDist = Infinity;
   for (const other of Object.values(world.ships)) {
@@ -111,7 +120,8 @@ function findTarget(world: World, self: Ship): Ship | null {
     if (!worthHunting(world, other)) continue;
     if (inSecurityZone(world, other.position, PIRATE_TUNING.zoneCaution)) continue;
     const d = distance(self.position, other.position);
-    if (d > PIRATE_TUNING.detectRange) continue;
+    // It can only notice what its radar shows it.
+    if (d > Math.min(PIRATE_TUNING.detectRange, sight)) continue;
     if (d < bestDist || (d === bestDist && best && other.id < best.id)) {
       best = other;
       bestDist = d;
@@ -200,8 +210,8 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     if (distance(ship.position, b.home) < PIRATE_TUNING.homeArrival) {
       b = switchMode(b, 'prowl');
     } else {
-      const waypoint = routeAround(ship, stats, b.home, obstacles(world));
-      const desired = arriveVelocity(ship, stats, waypoint, stats.maxSpeed * 0.7);
+      const waypoint = routeAround(ship, stats, b.home, avoid(world));
+      const desired = travelVelocity(ship, stats, waypoint, b.home, stats.maxSpeed * 0.7);
       return { input: steerToVelocity(ship, stats, desired), brain: b, events };
     }
   }
@@ -211,11 +221,11 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     return { input: steerToVelocity(ship, stats, { x: 0, y: 0 }), brain: b, events, depart: true };
   }
   if (!fitToFight) {
-    const desired = arriveVelocity(ship, stats, routeAround(ship, stats, b.home, obstacles(world)), stats.maxSpeed * 0.7);
+    const desired = travelVelocity(ship, stats, routeAround(ship, stats, b.home, avoid(world)), b.home, stats.maxSpeed * 0.7);
     return { input: steerToVelocity(ship, stats, desired), brain: b, events };
   }
   if (b.cooldownTicks === 0) {
-    const target = findTarget(world, ship);
+    const target = findTarget(world, ship, stats.sensorRange);
     if (target) {
       events.push({ type: 'huntStarted', shipId: target.id, pirateId: ship.id });
       b = switchMode(b, 'hunt', { targetId: target.id });

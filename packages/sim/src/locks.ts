@@ -1,4 +1,4 @@
-import { LOCK_BASE_SECONDS, LOCK_REFERENCE_RADIUS } from './constants.js';
+import { LOCK_BASE_SECONDS, LOCK_REFERENCE_SIGNATURE } from './constants.js';
 import { shipStats } from './stats.js';
 import type { LockLossReason, LockRefusal, Ship, ShipInput, ShipStats, TargetLock, WeaponState, World, WorldEvent } from './types.js';
 import { distance } from './vec2.js';
@@ -6,10 +6,13 @@ import { distance } from './vec2.js';
 /**
  * Target locks, in the spirit of EVE.
  *
- * - A ship holds up to `ShipStats.maxLocks` locks, complete or in
- *   progress. Locking takes time: `lockSeconds`, shorter with better
- *   scan resolution and against bigger ships.
- * - A lock needs its target inside this ship's sensor range. It drops
+ * - Locks come from the targeting computer: it sets how many a ship can
+ *   hold (`maxLocks`) and how fast it locks (`scanResolution`). No
+ *   computer, no locks.
+ * - Locking takes time: `lockSeconds`, shorter with a better computer
+ *   and against a target with a bigger signature (`HullSpec.signature`).
+ * - A lock needs its target inside this ship's radar range: no radar,
+ *   nothing to lock. It drops
  *   when the target leaves range, docks or is destroyed; every lock drops
  *   when this ship docks.
  * - One lock is active. Turrets engage the active lock, once complete,
@@ -21,11 +24,14 @@ import { distance } from './vec2.js';
  * `unlock` and `activateLock`. NPCs lock the same way, and take as long.
  */
 
-/** Seconds for a ship with these stats to lock a target of hull radius `targetRadius`. */
-export function lockSeconds(stats: Pick<ShipStats, 'scanResolution'>, targetRadius: number): number {
-  const resolution = Math.max(stats.scanResolution, 1e-6);
-  const radius = Math.max(targetRadius, 1);
-  return (LOCK_BASE_SECONDS / resolution) * Math.sqrt(LOCK_REFERENCE_RADIUS / radius);
+/**
+ * Seconds for a ship with these stats to lock a target of signature
+ * `targetSignature`. Infinite with no targeting computer.
+ */
+export function lockSeconds(stats: Pick<ShipStats, 'scanResolution'>, targetSignature: number): number {
+  if (stats.scanResolution <= 0) return Infinity;
+  const signature = Math.max(targetSignature, 1);
+  return (LOCK_BASE_SECONDS / stats.scanResolution) * Math.sqrt(LOCK_REFERENCE_SIGNATURE / signature);
 }
 
 /** True if the ship holds a complete lock on `targetId`. */
@@ -40,6 +46,7 @@ export function lockRefusal(world: Pick<World, 'ships' | 'hulls' | 'modules' | '
   if (!target || target.id === ship.id || target.state !== 'flying') return 'invalid';
   if (ship.locks.some((l) => l.targetId === targetId)) return 'already';
   const stats = shipStats(world, ship);
+  if (stats.maxLocks <= 0) return 'noComputer';
   if (ship.locks.length >= stats.maxLocks) return 'maxLocks';
   if (distance(ship.position, target.position) > stats.sensorRange) return 'outOfRange';
   return null;
@@ -103,8 +110,8 @@ export function stepLocks(
       continue;
     }
     const target = world.ships[lock.targetId]!;
-    const radius = world.hulls[target.hullId]?.radius ?? LOCK_REFERENCE_RADIUS;
-    const progress = Math.min(1, lock.progress + world.dt / lockSeconds(stats, radius));
+    const signature = world.hulls[target.hullId]?.signature ?? LOCK_REFERENCE_SIGNATURE;
+    const progress = Math.min(1, lock.progress + world.dt / lockSeconds(stats, signature));
     if (progress >= 1) events.push({ type: 'locked', shipId: ship.id, targetId: lock.targetId });
     kept.push({ ...lock, progress });
   }
