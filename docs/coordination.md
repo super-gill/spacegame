@@ -192,6 +192,17 @@ Candidates (not open yet):
 - **Out of scope:** any change in `packages/sim`. Selling ships, hired pilots, taking other people's ships. If the sim lacks something the screens need, add it to "Requests to the lead" and work round it.
 - **Done when:** `npm test` and `npm run build` pass; a headless play check with real mouse clicks covers buying, seeing the ship on its pad, boarding it docked, undocking, boarding back in space, losing a ship to a pod, docking the pod and claiming the starter; `docs/controls.md` updated; log entry with changelog lines; branch pushed.
 
+### Lore: 6c part 2 asks (2026-11-04)
+
+The lead is building the rest of 6c part 2 (the belt's asteroids, Concord patrols, more traders) and needs these from the lore workstream. Names only, plus who and why; the lead turns them into data. Put Jason's answers in `docs/lore.md` and list them in your log entry.
+
+1. **Bodies:** names for Calder's planet, its moon and the asteroid belt (placeholders Calder I, Calder Ia, Calder Belt). What the planet is like (inhabited, a gas giant, a garden world, a dead rock), in a line or two.
+2. **The third station,** in orbit round the moon: its name, who runs it, what it is for, and what its market should lean towards (what it makes cheap, what it wants), in words, not prices. Whether it has outfitting or a ship mart. It must make Calder's trade triangle worth flying.
+3. **Concord patrols:** who flies them in Calder (Port Authority, Concord navy, a contracted outfit), what they call themselves, and which existing hull they fly (Meridian Tern, Kessari Warrant, Tessaract Manifest). They hunt pirates, not pilots, until law arrives in milestone 7.
+4. **The belt:** what Calder's rocks are (the Ridge Collective mines them), for flavour now and ore types in milestone 9.
+5. **Module names** for the new systems, in each maker's naming theme: the radars (Meridian Lookout S, Ito-Marr Farsight S, Tessaract Traffic Array M, Meridian Lifeline S for pods), targeting computers (Meridian Plotter S, Paragon Fire Director S and M, Tessaract Manifest Reader S) and nav computers (Meridian Wayfinder S, Ito-Marr Deep Reckoner M). Keep or replace each.
+6. **Lore hooks** for Jason's systems principle: every capability comes from a fitted system, and what you know comes from a system reading it (the window rule). Anything in the setting that explains why ships are built this way is welcome.
+
 ## Questions for Jason
 
 Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
@@ -254,6 +265,8 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-04, lead (Lead 3): asked the lore workstream for 6c part 2 (see "Lore: 6c part 2 asks"): body names, the third station, who flies Concord patrols, the belt's rocks, names for the new sensor and nav modules. The lead carries on with asteroids and patrols using placeholders.
 
 - 2026-11-04, lead (Lead 3): built gravity and the nav computer (6c part 2). Inverse-square gravity from the innermost body, eased to zero over the outer quarter of each sphere; ships, shots, loot and wrecks fall; velocity before position, and a free orbit holds within 2% for an hour of play (test). Full assist hovers against gravity (the flight computer plans against where gravity will take the ship this tick); gravity is never capped by the speed limit. Body surfaces bounce and damage like station hulls (`impacted`, cause `surface`); loot, wrecks and shots that reach one are gone. Every hull gains a `nav` mount; every stock fit a Meridian Wayfinder (20 s path), explorers a Deep Reckoner (120 s); old saves get the Wayfinder free; Meridian's small reactor goes to 13 power to run it. `navReadout` gives frame, speed, gravity tier against main thrust, orbit and the predicted path with any surface impact. Merged `ws/interface` stage 2 (the flight HUD) and made the root `npm test` run the client's tests. 253 sim and 16 client tests. Soak: 30 minutes of NPC play, traders loop, pirates never inside a zone; traders die to pirates more often than before (5 in 30 minutes against 2), worth watching. Play checked: hovering in full assist off Harbour, then switching to rotation assist and falling, with the stopgap path line and `PE`/`AP`/gravity line drawn from `navReadout`. Consequence for Jason: an empty ship left at rest near a planet now falls and hits the surface; park in orbit or at a station. Still to do in part 2: the belt's asteroids, the third station, Concord patrols, more traders. Changelog lines for 0.9.0: "Gravity: planets and moons pull, orbits are free, and full assist hovers as far as your thrusters can"; "Hitting a planet hurts like hitting a station hull"; "Nav computers: your speed, orbit, gravity warnings and predicted path come from the one you fit; explorers can fit one that sees two minutes ahead".
 
