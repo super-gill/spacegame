@@ -53,6 +53,20 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [weapons.md](weapon
 
 More modules draw more power, so reactors start to matter and fitting becomes a trade-off. That is intended; a dedicated fitting-tuning pass comes later. Saves give existing ships the stock systems free on their new slots, as they did for sensors.
 
+## As built (4 November 2026)
+
+- **Slots:** the Tern, Warrant and Manifest follow the budget; the Tacet (sealed, dev) has the fixed system mounts and a second internal mount for an extra reactor; pods have only a flight mount. Fixed system mounts are sized by hull (small on the Tern, medium on the Warrant and Manifest).
+- **Modules** (names provisional, a lore ask): flight computers Meridian Helm S (60%), Paragon Helmsman S (85%), Ito-Marr Coxswain M (100%); Meridian Ark Bay S; Paragon Director S (one swivel, tracking 1x) and M (three, 1.25x); tractors Meridian Gleaner S (220 units, 120 u/s) and Tessaract Long Gleaner M (400, 180); afterburners Slagline Kick S (+50% top speed, +80% thrust, 9 capacitor a second) and Ito-Marr Surge M (+60%, +100%, 14). Afterburners draw no reactor power: they pay from the capacitor.
+- **Flight computer effects:** with none, assist, the brake and mouse steering do nothing (manual on the keys). Quality q scales how firmly assist and the brake hold (50% to 100%), how fast the nose turns to the mouse (55% to 100% of the hull's turn rate), and how far off the aim it lets the nose sit before acting (up to 0.1 radians at q 0).
+- **Pod bay:** without one, losing the ship leaves the pilot without a ship until they wake at Harbour, as after losing a pod.
+- **Fire control:** directs the first swivels in mount order up to its count; the rest stay idle. Tracking multiplies swivel slew rate.
+- **Shields:** the Ito-Marr Bastion recharges 2.2 seconds after a hit, against 3 for civil generators.
+- **Power:** the starter runs at 13 of 13; upgrading anything now means giving something up. The raider moved to the medium reactor to fit its systems.
+- **Stock fits:** the starter carries a helm, a director, a pod bay, a Gleaner and a Kick (its armour moved to an internal mount); traders a helm, director, pod bay and chaff screen; the Watch a helm, pod bay and chaff; the raider a helm and pod bay.
+- **Tiles:** `activationSlots` lists fire groups that hold a gun or launcher, then tractors and dispensers on utility mounts; number keys 1 to 9 press them (`ShipInput.toggleModule` for modules). Shift holds the afterburner (`ShipInput.afterburner`); `Ship.switchedOn` and `Ship.afterburning` carry the state. The HUD row is a lead stopgap above the weapon tiles.
+- **Saves:** format version 6 (`migrate5to6`): modules move to mounts that take them or into storage; stock flight computer, pod bay, fire control and a tractor are fitted free.
+- **NPCs** do not use afterburners yet.
+
 ## Later
 
 - **Signatures** (Jason): anything hot or energetic flares a ship's signature (afterburners, hot engines, firing); dampers lower it. It matters most with stealth, and waits until then.

@@ -4,6 +4,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- Ship systems: a flight computer, a pod bay and fire control are fitted systems. No flight computer means manual flight with no assist or mouse steering; a better one turns and settles faster. No pod bay means losing your ship leaves you with nothing. Fire control decides how many swivels you can run and how fast they track.
+- Slots by hull class: weapon, utility (active kit) and internal (passive kit) slots, with any gun or swivel in any weapon slot.
+- The tractor beam is a module (the starter has one); the afterburner is a module, held on Shift.
+- Numbered tiles on the HUD: 1 to 9 select fire groups and switch modules.
+
+### Changed
+- Armour fits internal slots; dispensers utility slots.
+- Save format version 6: saves upgrade automatically, with the new systems fitted free.
+
 ## [0.10.0] - 2026-11-04
 
 Milestone 6e, weapons and power, and the flight that playtesting settled. (Release commit recorded in `docs/coordination.md`; tags do not reach the remote through this session's git proxy.)

@@ -1,4 +1,5 @@
 import {
+  activationSlots,
   adminGrantCredits,
   adminSpawnShip,
   adminSetRule,
@@ -34,7 +35,6 @@ import {
   flightWarnings,
   shipStats,
   stepWorld,
-  TRACTOR_RANGE,
   wrapAngle,
   type Ship,
   type ShipInput,
@@ -48,6 +48,7 @@ import { MenuPanel } from './menu-panel.js';
 import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWorld, storeWorld } from './persistence.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
+import { SLOT_ACTIONS } from './bindings.js';
 import { MarketPanel, type TradeRequest } from './market-panel.js';
 import { FIT_REFUSALS, FLIGHT_WARNINGS, OutfittingPanel, type RefitRequest } from './outfitting-panel.js';
 import {
@@ -119,10 +120,7 @@ const input = new InputController(
     else if (action === 'clearTarget') unlockActive();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
-    else if (action === 'group1') input.requestGroup(1);
-    else if (action === 'group2') input.requestGroup(2);
-    else if (action === 'group3') input.requestGroup(3);
-    else if (action === 'group4') input.requestGroup(4);
+    else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
     else if (action === 'zoomIn') camera.zoomBy(1);
     else if (action === 'zoomOut') camera.zoomBy(-1);
   },
@@ -399,6 +397,19 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
   .filter((l) => !current.hulls[l.hullId]?.escapePod)
   .map((l) => ({ id: l.id, name: l.name }))
   .sort((a, b) => a.name.localeCompare(b.name)));
+
+/**
+ * A numbered activation tile was pressed (sim `activationSlots`): select
+ * a fire group, or switch a module on or off (a dispenser drops a charge).
+ */
+function pressTile(index: number): void {
+  const ship = myShip(current);
+  if (!ship) return;
+  const slot = activationSlots(current, ship)[index];
+  if (!slot) return;
+  if (slot.kind === 'group') input.requestGroup(slot.group);
+  else input.requestToggleModule(slot.mountId);
+}
 
 /** Why an admin command was refused, for the pilot. */
 const ADMIN_REFUSALS: Record<AdminRefusal, string> = {
@@ -682,7 +693,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (hull) drawWreck(ctx!, camera, w, hull, Math.min(1, (w.ticksLeft * current.dt) / WRECK_FADE_SECONDS));
   }
   for (const l of current.loot) drawLoot(ctx!, camera, l);
-  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, TRACTOR_RANGE, current.loot);
+  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, current.loot);
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
   if (mine) drawNav(ctx!, camera, current, mine, alpha);

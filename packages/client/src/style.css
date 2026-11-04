@@ -836,6 +836,48 @@ button:hover {
   padding-bottom: 30px;
 }
 
+/* Stopgap (lead, 6f): numbered activation tiles above the weapon tiles. */
+.hud-kit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hud-slots {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.hud-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--ink-dim);
+  background: var(--panel);
+  font-size: 10px;
+  color: var(--ink);
+}
+
+.hud-slot.active {
+  border-color: var(--ink-bright);
+  color: var(--ink-bright);
+}
+
+.hud-slot.burner.active {
+  border-color: var(--warn, #e0a458);
+  color: var(--warn, #e0a458);
+}
+
+.hud-slot-key {
+  color: var(--ink-bright);
+}
+
+.hud-slot-state {
+  color: var(--ink-dim);
+}
+
 .hud-weapon {
   width: 62px;
   height: 62px;

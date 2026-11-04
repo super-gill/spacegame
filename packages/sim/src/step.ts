@@ -9,6 +9,7 @@ import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
+import { isSwitchedOn } from './systems.js';
 import { pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
@@ -131,7 +132,13 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // sphere the ship started the tick in. Station hulls are where they
     // will be at the end of the tick, as the ship is.
     const pull = ship.state === 'flying' ? rails.gravityAt(ship.position) : { x: 0, y: 0 };
-    const stepped = stepShip(ship, stats, given, world.dt, frameVelocity(world, ship), pull, world.rules.manoeuvreSpeed);
+    // The afterburner, held: a higher speed cap and more main thrust this
+    // tick, paid for from the capacitor; it will not light on an empty one.
+    const burnCost = stats.afterburnerDraw * world.dt;
+    const lit = !!given?.afterburner && ship.state === 'flying' && stats.afterburnerSpeed > 0 && ship.capacitor >= burnCost;
+    const flightStats = lit ? { ...stats, maxSpeed: stats.maxSpeed * (1 + stats.afterburnerSpeed), mainThrust: stats.mainThrust * (1 + stats.afterburnerThrust) } : stats;
+    const burnt = stepShip(ship, flightStats, given, world.dt, frameVelocity(world, ship), pull, world.rules.manoeuvreSpeed);
+    const stepped = lit ? { ...burnt, capacitor: burnt.capacitor - burnCost, afterburning: true } : burnt.afterburning ? { ...burnt, afterburning: false } : burnt;
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
     const hulls = collideWithStations(flown, stats, stationsNext);
     const ground = collideWithSurfaces(hulls.ship, stats, solid);
@@ -146,6 +153,16 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     if (input.toggleWeaponsHot) {
       targeted = { ...targeted, weaponsHot: !targeted.weaponsHot };
       events.push({ type: 'weaponsHotChanged', shipId: id, hot: targeted.weaponsHot });
+    }
+    // Switching a module on or off from its tile (a tractor). A dispenser's
+    // tile fires it instead: fireWeapons reads the same input.
+    if (input.toggleModule) {
+      const moduleId = targeted.fit[input.toggleModule];
+      if (moduleId && world.modules[moduleId]?.kind === 'tractor') {
+        const on = isSwitchedOn(targeted, input.toggleModule);
+        const switchedOn = on ? (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) : [...(targeted.switchedOn ?? []), input.toggleModule];
+        targeted = { ...targeted, switchedOn };
+      }
     }
     // Fire groups: a number key picks which fixed guns Space fires.
     if (input.selectGroup !== null && input.selectGroup !== targeted.fireGroup && input.selectGroup >= 1 && input.selectGroup <= 4) {
@@ -172,7 +189,9 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       if (world.npcs[id]) ship = restockNpc(ship, stats, world);
     }
     // Docked ships ride their pads to where the station now is.
-    ships[id] = ridePad({ ...ship, tractorActive: input.tractor && ship.state === 'flying' }, stationsNext);
+    // The tractor runs while R is held or its module is switched on, if one is fitted.
+    const tractorOn = input.tractor || (ship.switchedOn ?? []).some((m) => world.modules[ship.fit[m] ?? '']?.kind === 'tractor');
+    ships[id] = ridePad({ ...ship, tractorActive: tractorOn && ship.state === 'flying' && stats.tractorRange > 0 }, stationsNext);
   }
 
   // 3. Rams.

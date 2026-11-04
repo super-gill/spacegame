@@ -704,6 +704,10 @@ export interface Ship {
   weapons: WeaponState[];
   /** True on ticks the tractor beam is running. */
   tractorActive: boolean;
+  /** Utility mounts whose module is switched on (a tractor left running). Absent: none. */
+  switchedOn?: string[];
+  /** True on ticks the afterburner is lit. Absent: not lit. */
+  afterburning?: boolean;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
   /**
@@ -915,6 +919,14 @@ export interface ShipInput {
   selectGroup: number | null;
   /** Edge-triggered: drop a charge from every countermeasure dispenser that has one. */
   launchCountermeasure: boolean;
+  /**
+   * Edge-triggered: switch the active module on this mount on or off (a
+   * tractor), or fire it once (a dispenser drops a charge). Null for
+   * none. The HUD's numbered tiles send this (`activationSlots`).
+   */
+  toggleModule: string | null;
+  /** Held: light the afterburner, if one is fitted and the capacitor can pay. */
+  afterburner: boolean;
   /**
    * Edge-triggered: start locking this ship, or null. Refused (with a
    * `lockRefused` event) beyond sensor range, at max locks, or for a ship

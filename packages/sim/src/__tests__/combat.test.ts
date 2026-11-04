@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { PIRATE_TUNING } from '../ai/pirate.js';
 import { applyDamage, fireWeapons, regenerateShield, stepProjectiles } from '../combat.js';
 import { collideShips, collideWithStations } from '../collision.js';
-import { CARGO_SURVIVAL_FRACTION, FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME, TRACTOR_RANGE } from '../constants.js';
+import { CARGO_SURVIVAL_FRACTION, FIXED_DT, IMPACT_SAFE_DELTA_V, LOOT_LIFETIME } from '../constants.js';
+import { MODULES } from '../modules.js';
+
+/** The starter's tractor reach (a Meridian Gleaner). */
+const TRACTOR_RANGE = MODULES['meridian-gleaner-s']!.stats.tractorRange!;
 import { buildShip } from '../factory.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';

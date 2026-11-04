@@ -29,6 +29,8 @@ export function emptyInput(): ShipInput {
     selectGroup: null,
     launchCountermeasure: false,
     aimHeading: null,
+    toggleModule: null,
+    afterburner: false,
     lock: null,
     unlock: null,
     activateLock: null,

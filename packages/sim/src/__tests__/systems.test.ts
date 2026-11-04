@@ -7,6 +7,7 @@ import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { stepShip } from '../ship.js';
 import { stepWorld } from '../step.js';
+import { activationSlots } from '../systems.js';
 import { MODULES } from '../modules.js';
 import { SAVE_FORMAT, deserializeWorld } from '../save.js';
 import { shipStats } from '../stats.js';
@@ -191,5 +192,59 @@ describe('shield timing', () => {
     const civil = shipStats(w, starter(w));
     const military = shipStats(w, buildShip(w, { id: 'x', loadout: LOADOUTS['calder-watch']!, ownerId: null, position: { x: 0, y: 0 }, heading: 0, flightMode: 'assisted' }));
     expect(military.shieldRegenDelay).toBeLessThan(civil.shieldRegenDelay);
+  });
+});
+
+describe('active modules', () => {
+  /** A world with one starter flying in open space. */
+  function solo(fit: Record<string, string | null> = {}, extra: Partial<Ship> = {}): { w: World; id: string } {
+    const w0 = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+    const s = { ...starter(w0, fit), ...extra };
+    return { w: { ...w0, ships: { [s.id]: s } }, id: s.id };
+  }
+
+  it('lists group tiles first, then the active utility modules in mount order', () => {
+    const { w, id } = solo({ u2: 'paragon-fairwarning-s' });
+    const ship = { ...w.ships[id]!, weapons: w.ships[id]!.weapons.map((x) => (x.mountId === 'w1' ? { ...x, group: 2 } : x)) };
+    expect(activationSlots(w, ship)).toEqual([
+      { kind: 'group', group: 2 },
+      { kind: 'module', mountId: 'u1', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
+      { kind: 'module', mountId: 'u2', moduleId: 'paragon-fairwarning-s', moduleKind: 'countermeasure' },
+    ]);
+  });
+
+  it('the tractor needs a tractor module; its tile leaves it running', () => {
+    const none = solo({ u1: null });
+    expect(stepWorld(none.w, { [none.id]: { ...emptyInput(), tractor: true } }).ships[none.id]!.tractorActive).toBe(false);
+    const { w, id } = solo();
+    let x = stepWorld(w, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    expect(x.ships[id]!.tractorActive).toBe(true);
+    x = stepWorld(x, { [id]: emptyInput() });
+    expect(x.ships[id]!.tractorActive).toBe(true);
+    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    expect(x.ships[id]!.tractorActive).toBe(false);
+  });
+
+  it('a dispenser tile drops a charge from that dispenser', () => {
+    const { w, id } = solo({ u2: 'paragon-fairwarning-s' });
+    const x = stepWorld(w, { [id]: { ...emptyInput(), toggleModule: 'u2' } });
+    expect(x.events.some((e) => e.type === 'countermeasureLaunched' && e.mountId === 'u2')).toBe(true);
+  });
+
+  it('the afterburner, held, lifts the speed cap and burns capacitor; it will not light on an empty one', () => {
+    const run = (input: Partial<ShipInput>, extra: Partial<Ship> = {}): Ship => {
+      const { w, id } = solo({}, { flightMode: 'manual', ...extra });
+      let x = w;
+      for (let i = 0; i < 60 * 12; i++) x = stepWorld(x, { [id]: { ...emptyInput(), thrustForward: true, ...input } });
+      return x.ships[id]!;
+    };
+    const plain = run({});
+    const burning = run({ afterburner: true });
+    const speed = (s: Ship) => Math.hypot(s.velocity.x, s.velocity.y);
+    expect(speed(burning)).toBeGreaterThan(speed(plain) * 1.2);
+    expect(burning.capacitor).toBeLessThan(plain.capacitor);
+    // On an empty capacitor it will not light (the reactor's trickle may let it sputter later).
+    const { w, id } = solo({}, { capacitor: 0 });
+    expect(stepWorld(w, { [id]: { ...emptyInput(), afterburner: true } }).ships[id]!.afterburning).toBeFalsy();
   });
 });

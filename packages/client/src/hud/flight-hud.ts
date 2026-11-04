@@ -3,6 +3,8 @@ import {
   FLIGHT_MODE_LABELS,
   boardableShips,
   cargoUsed,
+  ACTIVATION_KEYS,
+  activationSlots,
   distance,
   goodsFitting,
   incomingMunitions,
@@ -84,6 +86,11 @@ export class FlightHud {
   private readonly modeChip = el('span', 'hud-chip');
   private readonly weaponsChip = el('span', 'hud-chip');
   private readonly weapons = el('div', 'hud-weapons');
+  /** Stopgap (lead, 6f): the numbered activation tiles and the afterburner, above the weapon tiles. */
+  private readonly slots = el('div', 'hud-slots');
+  private slotKey = '';
+  private slotTiles: { root: HTMLDivElement; label: HTMLSpanElement; state: HTMLSpanElement }[] = [];
+  private readonly burner = el('div', 'hud-slot burner');
   private readonly debug = el('div', 'hud-debug');
   private weaponTiles = new Map<string, WeaponTile>();
   private weaponKey = '';
@@ -118,7 +125,9 @@ export class FlightHud {
     chips.append(this.modeChip, this.weaponsChip);
     const centre = el('div', 'hud-dial-column');
     centre.append(dial, this.frameLine, chips);
-    this.cluster.append(centre, this.weapons);
+    const kit = el('div', 'hud-kit');
+    kit.append(this.slots, this.weapons);
+    this.cluster.append(centre, kit);
 
     this.root.append(this.status, this.alert, this.prompt, this.cluster, this.debug);
     parent.append(this.root);
@@ -188,6 +197,49 @@ export class FlightHud {
     this.weaponsChip.classList.toggle('hot', ship.weaponsHot);
 
     this.updateWeapons(world, ship);
+    this.updateSlots(world, ship);
+  }
+
+  /**
+   * The activation tiles (sim `activationSlots`): number, what it is, and
+   * its state: the selected fire group, a tractor on or off, a
+   * dispenser's charges. The afterburner shows as SHIFT, lit while burning.
+   */
+  private updateSlots(world: World, ship: Ship): void {
+    const slots = activationSlots(world, ship).slice(0, ACTIVATION_KEYS);
+    const key = slots.map((s) => (s.kind === 'group' ? `g${s.group}` : `${s.mountId}:${s.moduleId}`)).join('|');
+    if (key !== this.slotKey) {
+      this.slotKey = key;
+      this.slots.replaceChildren();
+      this.slotTiles = slots.map((s, i) => {
+        const root = el('div', 'hud-slot');
+        const label = el('span', 'hud-slot-label', s.kind === 'group' ? `G${s.group}` : SLOT_NAMES[s.moduleKind] ?? s.moduleKind.toUpperCase());
+        const state = el('span', 'hud-slot-state', '');
+        root.append(el('span', 'hud-slot-key', String(i + 1)), label, state);
+        this.slots.append(root);
+        return { root, label, state };
+      });
+      this.slots.append(this.burner);
+    }
+    slots.forEach((s, i) => {
+      const tile = this.slotTiles[i]!;
+      if (s.kind === 'group') {
+        const selected = ship.fireGroup === s.group;
+        setText(tile.state, selected ? 'FIRE' : '');
+        tile.root.classList.toggle('active', selected);
+      } else if (s.moduleKind === 'tractor') {
+        setText(tile.state, ship.tractorActive ? 'ON' : 'OFF');
+        tile.root.classList.toggle('active', ship.tractorActive);
+      } else {
+        const charges = ship.weapons.find((w) => w.mountId === s.mountId)?.loaded ?? 0;
+        setText(tile.state, String(charges));
+        tile.root.classList.toggle('active', false);
+      }
+    });
+    const stats = shipStats(world, ship);
+    show(this.burner, stats.afterburnerSpeed > 0);
+    setText(this.burner, ship.afterburning ? 'SHIFT · BURN' : 'SHIFT · AB');
+    this.burner.classList.toggle('active', ship.afterburning === true);
   }
 
   /** One tile per weapon mount, rebuilt only when the fit changes. */
@@ -247,6 +299,9 @@ function shortGoodName(name: string): string {
   const words = name.replace(/\s*\(.*\)\s*$/, '').split(/\s+/);
   return (words[words.length - 1] ?? name).toUpperCase();
 }
+
+/** Short names for module tiles. */
+const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
 function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string): WeaponTile {

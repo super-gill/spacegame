@@ -24,6 +24,7 @@ export type SimAction =
   | 'fireFixed'
   | 'toggleWeaponsHot'
   | 'launchCountermeasure'
+  | 'afterburner'
   | 'tractor';
 
 /**
@@ -32,7 +33,27 @@ export type SimAction =
  * `lock`, `unlock` and `activateLock` inputs. Boarding is a pilot command, like trading, not
  * a flight input.
  */
-export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut' | 'zoomIn' | 'zoomOut' | 'group1' | 'group2' | 'group3' | 'group4';
+export type UiAction =
+  | 'toggleControls'
+  | 'toggleMenu'
+  | 'cycleTarget'
+  | 'clearTarget'
+  | 'board'
+  | 'stepOut'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'slot1'
+  | 'slot2'
+  | 'slot3'
+  | 'slot4'
+  | 'slot5'
+  | 'slot6'
+  | 'slot7'
+  | 'slot8'
+  | 'slot9';
+
+/** The activation tile actions, in key order (sim `activationSlots`). */
+export const SLOT_ACTIONS: readonly UiAction[] = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'slot6', 'slot7', 'slot8', 'slot9'];
 
 export type Action = SimAction | UiAction;
 
@@ -73,15 +94,21 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
   { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
   { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Unlock the active lock', kind: 'press' },
-  { action: 'tractor', codes: ['KeyR'], group: 'Weapons', label: 'Tractor beam', kind: 'hold', note: 'Pulls in nearby loot' },
+  { action: 'tractor', codes: ['KeyR'], group: 'Systems', label: 'Tractor beam', kind: 'hold', note: 'If one is fitted: pulls in nearby loot while held; its tile leaves it running' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
   { action: 'board', codes: ['KeyB'], group: 'Ships', label: 'Board your nearest empty ship', kind: 'press', note: `Docked at the same station, or in space within ${BOARD_RANGE} units, under ${BOARD_MAX_RELATIVE_SPEED} u/s relative` },
   { action: 'stepOut', codes: ['KeyG'], group: 'Ships', label: 'Step out in an escape pod', kind: 'press', note: 'In space only. Press twice. Your ship stays where it is, empty; slow down first to park it' },
-  { action: 'group1', codes: ['Digit1'], group: 'Weapons', label: 'Fire group 1', kind: 'press', note: 'New guns join group 1' },
-  { action: 'group2', codes: ['Digit2'], group: 'Weapons', label: 'Fire group 2', kind: 'press', note: 'New launchers join group 2' },
-  { action: 'group3', codes: ['Digit3'], group: 'Weapons', label: 'Fire group 3', kind: 'press' },
-  { action: 'group4', codes: ['Digit4'], group: 'Weapons', label: 'Fire group 4', kind: 'press' },
+  { action: 'slot1', codes: ['Digit1'], group: 'Systems', label: 'Tile 1', kind: 'press', note: 'The numbered tiles on the HUD: fire groups first (selects the group the fire button fires), then active modules (switches a tractor on or off, drops a charge)' },
+  { action: 'slot2', codes: ['Digit2'], group: 'Systems', label: 'Tile 2', kind: 'press' },
+  { action: 'slot3', codes: ['Digit3'], group: 'Systems', label: 'Tile 3', kind: 'press' },
+  { action: 'slot4', codes: ['Digit4'], group: 'Systems', label: 'Tile 4', kind: 'press' },
+  { action: 'slot5', codes: ['Digit5'], group: 'Systems', label: 'Tile 5', kind: 'press' },
+  { action: 'slot6', codes: ['Digit6'], group: 'Systems', label: 'Tile 6', kind: 'press' },
+  { action: 'slot7', codes: ['Digit7'], group: 'Systems', label: 'Tile 7', kind: 'press' },
+  { action: 'slot8', codes: ['Digit8'], group: 'Systems', label: 'Tile 8', kind: 'press' },
+  { action: 'slot9', codes: ['Digit9'], group: 'Systems', label: 'Tile 9', kind: 'press' },
+  { action: 'afterburner', codes: ['ShiftLeft', 'ShiftRight'], group: 'Systems', label: 'Afterburner', kind: 'hold', note: 'If one is fitted: a higher top speed and more thrust while held, paid for from the capacitor' },
   { action: 'zoomIn', codes: ['Equal', 'NumpadAdd'], group: 'Interface', label: 'Zoom in', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'zoomOut', codes: ['Minus', 'NumpadSubtract'], group: 'Interface', label: 'Zoom out', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },

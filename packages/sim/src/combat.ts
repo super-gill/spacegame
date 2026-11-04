@@ -232,7 +232,7 @@ export function fireWeapons(
     const inGroup = w.group === ship.fireGroup;
     const trigger =
       spec.family === 'countermeasure'
-        ? input.launchCountermeasure && !dropped
+        ? (input.launchCountermeasure && !dropped) || input.toggleModule === w.mountId
         : spec.kind === 'fixed'
           ? input.fireFixed && inGroup
           : turretReady;

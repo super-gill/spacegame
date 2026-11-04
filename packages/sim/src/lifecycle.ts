@@ -4,8 +4,6 @@ import {
   MAX_LOOT_CANISTERS,
   SCOOP_DISTANCE,
   SCRAP_PER_MASS,
-  TRACTOR_PULL_SPEED,
-  TRACTOR_RANGE,
   WRECK_LIFETIME,
 } from './constants.js';
 import { freePadFor, onPad } from './docking.js';
@@ -200,7 +198,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
   // Cargo capacity and hull radius do not change mid-tick, so look them up once.
-  const stats: Record<string, { cargoCapacity: number; radius: number }> = {};
+  const stats: Record<string, { cargoCapacity: number; radius: number; tractorRange: number; tractorPull: number }> = {};
   for (const s of Object.values(ships)) if (world.hulls[s.hullId]) stats[s.id] = shipStats(world, s);
   const beams = Object.values(ships)
     .filter((s) => s.tractorActive && s.state === 'flying' && stats[s.id] && cargoFree(s, stats[s.id]!) > 0)
@@ -209,12 +207,13 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
   for (const item of world.loot) {
     if (item.ticksLeft <= 1) continue;
 
+    // Each beam reaches as far as its fitted tractor (docs/ship-systems.md).
     let puller: Ship | null = null;
-    let best = TRACTOR_RANGE;
+    let best = Infinity;
     for (const s of beams) {
       if (cargoFree(updated[s.id]!, stats[s.id]!) <= 0) continue; // filled up this tick
       const d = distance(s.position, item.position);
-      if (d <= best) {
+      if (d <= stats[s.id]!.tractorRange && d <= best) {
         best = d;
         puller = s;
       }
@@ -236,7 +235,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
         continue;
       }
       const towards = normalise(sub(puller.position, item.position));
-      velocity = add(puller.velocity, scale(towards, TRACTOR_PULL_SPEED));
+      velocity = add(puller.velocity, scale(towards, stats[puller.id]!.tractorPull));
     }
 
     const moved = { ...item, velocity, position: add(item.position, scale(velocity, world.dt)), ticksLeft: item.ticksLeft - 1 };

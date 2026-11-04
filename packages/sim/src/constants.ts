@@ -72,10 +72,6 @@ export const SHIELD_CAPACITOR_PER_POINT = 0.4;
 /** A turret fires only when within this angle of its lead point, radians. About 5 degrees. */
 export const TURRET_FIRE_TOLERANCE = 0.08;
 
-/** Tractor beam reach from the ship centre, units. */
-export const TRACTOR_RANGE = 260;
-/** Speed loot is pulled towards the ship, relative to it, units/s. */
-export const TRACTOR_PULL_SPEED = 140;
 /** Loot this close to the hull edge is scooped into the hold, units. */
 export const SCOOP_DISTANCE = 14;
 

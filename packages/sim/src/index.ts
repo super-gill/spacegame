@@ -60,6 +60,7 @@ export {
   STARTER_LOADOUT_ID,
 } from './world.js';
 export { stepWorld } from './step.js';
+export { activationSlots, isSwitchedOn, ACTIVATION_KEYS, type ActivationSlot } from './systems.js';
 export {
   serializeWorld,
   deserializeWorld,
