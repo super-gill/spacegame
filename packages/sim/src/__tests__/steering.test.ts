@@ -95,7 +95,7 @@ describe('manoeuvring speed (WorldRules.manoeuvreSpeed)', () => {
     expect(Math.hypot(...Object.values(flyAt(tern('manual'), { strafeRight: true }, 20, 1).velocity))).toBeCloseTo(top, 3);
   });
 
-  it('starts new worlds at 20%', () => {
-    expect(w.rules.manoeuvreSpeed).toBe(0.2);
+  it('starts new worlds at 0%: ships thrust only where the nose points', () => {
+    expect(w.rules.manoeuvreSpeed).toBe(0);
   });
 });

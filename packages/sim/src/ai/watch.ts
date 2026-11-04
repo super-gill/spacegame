@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, attackRun, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, attackRun, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, flightOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -106,7 +106,7 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
   const events: WorldEvent[] = [];
   let b: WatchBrain = { ...brain, modeTicks: brain.modeTicks + 1 };
   const around = obstacles(world, stats);
-  const pull = pullOn(world, ship);
+  const pull = flightOn(world, ship);
 
   // Docked: a short wait on the pad, then out to start the beat.
   if (ship.state === 'docked') {

@@ -4,7 +4,7 @@ import { speedRelativeTo } from '../docking.js';
 import { bodyPosition } from '../rails.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { awayFromStation, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { awayFromStation, obstacles, flightOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
@@ -110,7 +110,7 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   const left = leftId ? world.stations[leftId] : undefined;
   if (left && left.id !== station.id && distance(ship.position, left.position) < left.radius + TRADER_TUNING.departureClearance) {
     const desired = add(left.velocity, scale(awayFromStation(world, ship, left), TRADER_TUNING.departureSpeed));
-    return { input: defend(world, ship, steerSafely(ship, stats, desired, pullOn(world, ship))), brain };
+    return { input: defend(world, ship, steerSafely(ship, stats, desired, flightOn(world, ship))), brain };
   }
 
   // Aim for the point on the station's near side, just clear of the hull,
@@ -134,5 +134,5 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   // station may be coming towards the ship.
   const near = distance(ship.position, station.position) < station.dockRange + TRADER_TUNING.creepMargin;
   const desired = add(station.velocity, travelVelocity(ship, stats, waypoint, approach, near ? DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction : cruise));
-  return { input: defend(world, ship, steerSafely(ship, stats, desired, pullOn(world, ship))), brain };
+  return { input: defend(world, ship, steerSafely(ship, stats, desired, flightOn(world, ship))), brain };
 }

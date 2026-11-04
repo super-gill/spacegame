@@ -74,15 +74,29 @@ export function turnTowards(ship: Ship, stats: ShipStats, target: number): Pick<
  * if given), so the strong main engine does most of the work, and the
  * thrusters on each axis fire to close whatever error remains.
  */
-export function steerToVelocity(ship: Ship, stats: ShipStats, desired: Vec2, faceAt?: Vec2): ShipInput {
+export function steerToVelocity(ship: Ship, stats: ShipStats, desired: Vec2, faceAt?: Vec2, manoeuvreSpeed = 1): ShipInput {
   const input = emptyInput();
+  const error = sub(desired, ship.velocity);
 
+  // With little sideways or backwards thrust (`WorldRules.manoeuvreSpeed`)
+  // the side thrusters can only slow a drift, never make one: the nose
+  // has to go where the velocity must change, and the main engine burns.
+  // Fighting, the nose stays on the target while the ship's line is good
+  // and leaves it to put the line right when it is not.
+  const pointAndBurn = manoeuvreSpeed < POINT_AND_BURN_BELOW;
   let targetHeading = ship.heading;
-  if (faceAt) targetHeading = toAngle(sub(faceAt, ship.position));
-  else if (length(desired) > MIN_SPEED_TO_FACE) targetHeading = toAngle(desired);
+  if (faceAt) {
+    const aim = toAngle(sub(faceAt, ship.position));
+    const { forward: aimAhead, right: aimAcross } = shipAxes(aim);
+    const offLine = Math.abs(dot(error, aimAcross)) > AIM_LINE_ERROR_SPEED || dot(error, aimAhead) < -AIM_LINE_ERROR_SPEED;
+    targetHeading = pointAndBurn && offLine ? toAngle(error) : aim;
+  } else if (pointAndBurn && length(error) > LINE_ERROR_SPEED) {
+    targetHeading = toAngle(error);
+  } else if (length(desired) > MIN_SPEED_TO_FACE) {
+    targetHeading = toAngle(desired);
+  }
   Object.assign(input, turnTowards(ship, stats, targetHeading));
 
-  const error = sub(desired, ship.velocity);
   const { forward, right } = shipAxes(ship.heading);
   const errForward = dot(error, forward);
   const errRight = dot(error, right);
@@ -93,6 +107,13 @@ export function steerToVelocity(ship: Ship, stats: ShipStats, desired: Vec2, fac
   input.strafeLeft = errRight < -VELOCITY_DEADBAND;
   return input;
 }
+
+/** Below this manoeuvring speed (share of top speed) NPCs point and burn instead of sliding. */
+const POINT_AND_BURN_BELOW = 0.5;
+/** A velocity error bigger than this (units/s) off the nose's line is put right by turning to it and burning. */
+const LINE_ERROR_SPEED = 45;
+/** Aiming at something, the nose leaves it to put the line right only past this error, units/s: guns first. */
+const AIM_LINE_ERROR_SPEED = 160;
 
 /** Deceleration (units/s^2) the hull can plan on when stopping head-on with its retro engine. */
 export function plannedBraking(stats: ShipStats): number {
@@ -128,8 +149,19 @@ const BODY_BERTH = 1.6;
  * sagging under it. `pull` is gravity where the ship is. (Routing round
  * obstacles is done before this, in `routeAround`.)
  */
-export function steerSafely(ship: Ship, stats: ShipStats, desired: Vec2, pull: Vec2, faceAt?: Vec2): ShipInput {
-  return steerToVelocity(ship, stats, sub(desired, scale(pull, GRAVITY_LEAD_SECONDS)), faceAt);
+export function steerSafely(ship: Ship, stats: ShipStats, desired: Vec2, flight: FlightConditions, faceAt?: Vec2): ShipInput {
+  return steerToVelocity(ship, stats, sub(desired, scale(flight.pull, GRAVITY_LEAD_SECONDS)), faceAt, flight.manoeuvreSpeed);
+}
+
+/** What NPC steering needs to know about where and how it flies: gravity here, and the manoeuvring rule. */
+export interface FlightConditions {
+  pull: Vec2;
+  manoeuvreSpeed: number;
+}
+
+/** The flight conditions for `ship` now (`pullOn` and `WorldRules.manoeuvreSpeed`). */
+export function flightOn(world: Pick<World, 'bodies' | 'tick' | 'dt' | 'rules'>, ship: Ship): FlightConditions {
+  return { pull: pullOn(world, ship), manoeuvreSpeed: world.rules.manoeuvreSpeed };
 }
 
 /**
