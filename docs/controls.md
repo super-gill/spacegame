@@ -63,20 +63,49 @@ Assists fire the ship's real thrusters, so you will see the flames, and a heavie
 | Action | Key | Notes |
 | --- | --- | --- |
 | Dock | F | Only when the HUD shows `DOCK <station>`; you must be inside the dashed range ring and slower than the docking speed limit |
-| Undock | F or the Undock button | Places you just outside the station facing the way you were |
+| Undock | F or the Undock button | Launches you from your pad, out along the way the pad faces |
 | Trade | Buttons in the Market tab | Buy 1, Buy max (as many as your credits and hold allow), Sell 1, Sell all |
 | Select a mount | Click it in the Outfitting tab, on the drawing or in the mount list | Lists the modules that fit it |
 | Preview a module | Hover it | Shows stats after the change beside stats now, even for a change that would be refused |
 | Fit or unfit | Buttons in the Outfitting tab | Fit takes the module from your storage here if you have one, otherwise buys it; either way there is a 5% handling fee, plus 5% on anything it replaces. Unfit moves the module to storage here for the 5% fee |
 | Sell a stored module | Sell button under Stored here | Pays half its price |
 
-If docking is refused a message says why: too far, or too fast.
+If docking is refused a message says why: too far, too fast, or no free pad here fits your hull.
 
-The docked panel has two tabs.
+Docking sets you down on the smallest free landing pad that fits your hull. Pads are the corner-bracket frames round each station, marked S, M or L; one with a ship on it is drawn brighter.
+
+The docked panel has four tabs. It is the same width on every tab, so switching never moves the tabs under the pointer.
 
 **Market** lists each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
 
 **Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Each module shows what it is (engine, reactor and so on) beside its brand name. If the fit shown cannot thrust forward or cannot turn, a warning says so, and undocking in that ship repeats it. Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
+
+**Ship mart** (only at stations that sell ships; Harbour does, Ridge Outpost does not) lists each ship for sale with a drawing, its size class and role, top speed, acceleration, shields, structure, cargo space, weapon damage per second and price, with your credits and free pads at the top. **Buy** puts the ship on a free pad here, empty; you stay in the ship you are in. When you cannot buy it the button is greyed and the reason shows under it: not enough credits, or no free pad here fits it.
+
+**Your ships** lists every ship you own, wherever it is: docked (which station and pad, or "Here"), or in space (how far from the nearest station). It shows each one's shields and structure as a percentage, and its cargo. The one you are in says Aboard. **Board** moves you into another of your ships docked at the same station; for any other the button is greyed with the reason.
+
+## Ships
+
+You can own several ships and fly one at a time. A ship you are not in is **empty**: it keeps whatever drift it had, takes no orders, and can be shot. Empty ships are drawn faded with a dashed hull; yours are labelled `YOUR <SHIP> · EMPTY` even with labels turned off, and get an edge marker when off screen.
+
+| Action | Input | Notes |
+| --- | --- | --- |
+| Board your nearest empty ship | B | Docked: any of your ships at the same station. In space: within 150 units and under 20 u/s relative to it |
+| Board a particular ship | Board button in Your ships | Docked only |
+| Buy a ship | Buy button in Ship mart | |
+| Claim a free Courier | Button at the bottom of the docked panel | Only in an escape pod docked at Harbour, owning no ships |
+
+In space, the HUD names the ship B would board (`BOARD <SHIP> [B]`). When one of yours is near (within 600 units) but not boardable yet, it says what to do: `CLOSE TO 150` with the gap, or `MATCH SPEED` with your speed relative to it. Boarding from an escape pod uses the pod up.
+
+Ships have no names yet; each is called by its hull and its number among the ships you have been issued, such as `Kessari Wedge #2`.
+
+## Escape pods
+
+When your ship is destroyed you get away in an escape pod: a small orange lifeboat with a blinking beacon. The HUD's top line reads `>> ESCAPE POD: DOCK AT A STATION`. Fly it to a station and dock as normal.
+
+In a pod at Harbour, if you own no ships, the bottom of the docked panel offers **Claim a free Courier**. If you still own a ship it tells you to fetch it (see Your ships) or buy another.
+
+If your pod is destroyed too, a panel offers **Wake at Harbour**: in a new pod if you own a ship anywhere, or in a free Meridian Courier if you own none.
 
 ## Interface
 
@@ -92,6 +121,7 @@ While you are typing in a text box (the pilot name), keys go to the box, not the
 Bottom left, top to bottom:
 
 - `!! PIRATE ON YOUR TAIL` while a pirate is hunting you
+- `SHIP` the ship you are in, or `>> ESCAPE POD: DOCK AT A STATION` in a pod
 - `ZONE` the station security zone you are in, or `OPEN SPACE`
 - `SHD` shields and `HUL` structure, current and maximum
 - `CR` your credits
@@ -103,6 +133,7 @@ Bottom left, top to bottom:
 - `FLT` current flight mode
 - `WPN` weapons hot or cold
 - `DOCK <station> [F]` when docking is available
+- `BOARD <ship>` when one of your empty ships is near: `[B]` when you can board it, otherwise what to do first
 - frame rate and sim tick
 
 ## On screen
@@ -112,4 +143,6 @@ Bottom left, top to bottom:
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
 - Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.
 - Loot canisters are small orange diamonds. Wrecks are dashed outlines that fade.
-- When your ship is destroyed a panel offers **Respawn** in a new Meridian Courier at Harbour Station.
+- Stations have landing pads round the rim. Docked ships, yours and others, sit on them.
+- Empty ships are faded with a dashed hull. Escape pods are orange with a blinking beacon ring.
+- When your escape pod is destroyed a panel offers **Wake at Harbour** (see Escape pods).

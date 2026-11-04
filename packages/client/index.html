@@ -16,10 +16,18 @@
       <div class="dock-tabs" role="tablist" aria-label="Station services">
         <button id="tab-market" class="dock-tab" type="button" role="tab" aria-selected="true">Market</button>
         <button id="tab-outfitting" class="dock-tab" type="button" role="tab" aria-selected="false">Outfitting</button>
+        <button id="tab-ship-mart" class="dock-tab" type="button" role="tab" aria-selected="false">Ship mart</button>
+        <button id="tab-ships" class="dock-tab" type="button" role="tab" aria-selected="false">Your ships</button>
       </div>
       <div id="market-container"></div>
       <div id="outfitting-container" class="hidden"></div>
+      <div id="ship-mart-container" class="hidden"></div>
+      <div id="ships-container" class="hidden"></div>
       <button id="undock-button" type="button">Undock [F]</button>
+      <div id="pod-block" class="pod-block hidden">
+        <p id="pod-text"></p>
+        <button id="claim-button" type="button" class="hidden">Claim a free Courier</button>
+      </div>
     </div>
     <div id="death-panel" class="dock-panel hidden">
       <h1>Escape pod destroyed</h1>

@@ -24,6 +24,8 @@ export const RACE_COLOUR: Record<RaceId, string> = {
 };
 
 const FLAME = '#e0a458';
+/** Lifeboat orange, for escape pods. */
+const POD_ORANGE = '#ff7a2e';
 const SOCKET = '#6f8580';
 
 /** How much bigger each size class draws than S. */
@@ -47,6 +49,8 @@ export interface ShipArt {
   showMounts?: boolean;
   /** Outfitting view: mount to ring. */
   highlightMount?: string | null;
+  /** Draw the hull outline dashed: an empty ship, nobody aboard. */
+  dashedHull?: boolean;
 }
 
 /** Fill colour for a module: its maker's race, or the line colour for multi-race makers. */
@@ -62,18 +66,26 @@ export function drawShipArt(ctx: CanvasRenderingContext2D, scale: number, art: S
   ctx.lineCap = 'round';
 
   if (art.thrusters) drawThrust(ctx, px, art);
+  if (art.hull.escapePod) {
+    drawPod(ctx, px, art);
+    return;
+  }
 
-  // Hull.
+  // Hull. Callers set the overall alpha (an empty ship is faded), so
+  // fills multiply it rather than replace it.
+  const alpha = ctx.globalAlpha;
   ctx.beginPath();
   art.hull.outline.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.closePath();
   ctx.fillStyle = art.colour;
-  ctx.globalAlpha = 0.06;
+  ctx.globalAlpha = alpha * 0.06;
   ctx.fill();
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = alpha;
   ctx.strokeStyle = art.colour;
   ctx.lineWidth = px(1.5);
+  if (art.dashedHull) ctx.setLineDash([px(4), px(3)]);
   ctx.stroke();
+  ctx.setLineDash([]);
 
   for (const mount of art.hull.mounts) {
     const id = art.fit[mount.id];
@@ -98,6 +110,63 @@ export function drawShipArt(ctx: CanvasRenderingContext2D, scale: number, art: S
     }
     ctx.restore();
   }
+}
+
+/**
+ * An escape pod reads as a lifeboat, not a small ship: a capsule in
+ * lifeboat orange with two hazard bands and a round viewport at the
+ * nose. Its fitted parts are sealed and not drawn, apart from the
+ * nozzle at the stern. The distress beacon is drawn by the caller in
+ * screen space (`drawPodBeacon`), so it shows at any zoom.
+ */
+function drawPod(ctx: CanvasRenderingContext2D, px: (n: number) => number, art: ShipArt): void {
+  const alpha = ctx.globalAlpha;
+  const outline = art.hull.outline;
+  const trace = (): void => {
+    ctx.beginPath();
+    outline.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+    ctx.closePath();
+  };
+  // Orange body.
+  trace();
+  ctx.fillStyle = POD_ORANGE;
+  ctx.globalAlpha = alpha * 0.4;
+  ctx.fill();
+  // Hazard bands, clipped to the hull.
+  ctx.save();
+  trace();
+  ctx.clip();
+  ctx.strokeStyle = POD_ORANGE;
+  ctx.globalAlpha = alpha * 0.9;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  for (const x of [-4, -0.5]) {
+    ctx.moveTo(x, -6);
+    ctx.lineTo(x + 2.5, 6);
+  }
+  ctx.stroke();
+  ctx.restore();
+  // Outline.
+  ctx.globalAlpha = alpha;
+  trace();
+  ctx.strokeStyle = art.colour;
+  ctx.lineWidth = px(1.5);
+  if (art.dashedHull) ctx.setLineDash([px(4), px(3)]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // Viewport.
+  ctx.beginPath();
+  ctx.arc(5, 0, 1.8, 0, Math.PI * 2);
+  ctx.fillStyle = art.colour;
+  ctx.fill();
+  // Stern nozzle.
+  const stern = Math.min(...outline.map((p) => p.x));
+  ctx.beginPath();
+  ctx.moveTo(stern, -2);
+  ctx.lineTo(stern - 2, -2.6);
+  ctx.lineTo(stern - 2, 2.6);
+  ctx.lineTo(stern, 2);
+  ctx.stroke();
 }
 
 /** Hull-space aim of the turret on this mount, or null if it is not a turret. */
@@ -140,13 +209,15 @@ function drawModule(
   const fill = moduleFill(art, module);
   ctx.strokeStyle = art.colour;
   ctx.lineWidth = px(1.2);
+  // The caller's alpha (an empty ship is faded) scales every fill.
+  const base = ctx.globalAlpha;
   const body = (draw: () => void, alpha = 0.3): void => {
     ctx.beginPath();
     draw();
     ctx.fillStyle = fill;
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = base * alpha;
     ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = base;
     ctx.stroke();
   };
   const kind: ModuleKind = module.kind;
@@ -188,14 +259,14 @@ function drawModule(
     case 'cargoPod':
       // Cargo pod: a solid block with bands.
       body(() => ctx.rect(-3.75 * k, -2 * k, 7.5 * k, 4 * k), 0.4);
-      ctx.globalAlpha = 0.7;
+      ctx.globalAlpha = base * 0.7;
       ctx.beginPath();
       ctx.moveTo(-1.25 * k, -2 * k);
       ctx.lineTo(-1.25 * k, 2 * k);
       ctx.moveTo(1.25 * k, -2 * k);
       ctx.lineTo(1.25 * k, 2 * k);
       ctx.stroke();
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = base;
       return;
     case 'armour':
       // Armour: overlapping plates.

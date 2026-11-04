@@ -1,5 +1,22 @@
-import type { Ship, Station, World, WorldEvent } from '@spacegame/sim';
-import { FLIGHT_MODE_LABELS, cargoUsed, distance, nearestDockableStation, shipPilot, shipStats } from '@spacegame/sim';
+import type { BoardRefusal, Ship, Station, World, WorldEvent } from '@spacegame/sim';
+import {
+  BOARD_MAX_RELATIVE_SPEED,
+  BOARD_RANGE,
+  FLIGHT_MODE_LABELS,
+  boardRefusal,
+  boardableShips,
+  cargoUsed,
+  claimRefusal,
+  distance,
+  isEmptyShip,
+  isEscapePod,
+  length,
+  nearestDockableStation,
+  ownedShips,
+  shipPilot,
+  shipStats,
+  sub,
+} from '@spacegame/sim';
 
 /**
  * DOM overlay: HUD text, docked panel, death panel and transient toasts.
@@ -26,6 +43,78 @@ export function shipLabel(world: World, ship: Ship): string {
   return owner ? `EMPTY · ${owner.name.toUpperCase()}` : 'UNKNOWN';
 }
 
+/**
+ * A ship's name for people: its hull, and its number in the owner's
+ * sequence so two of the same hull can be told apart ("Kessari Wedge #3").
+ * Ships have no names of their own yet.
+ */
+export function shipName(world: World, ship: Ship): string {
+  const hull = world.hulls[ship.hullId]?.name ?? 'Ship';
+  const n = /-(\d+)$/.exec(ship.id)?.[1];
+  return n ? `${hull} #${n}` : hull;
+}
+
+/** Distances in "where" text are rounded to this, so drifting ships do not redraw lists every frame. */
+const WHERE_ROUNDING = 50;
+
+/**
+ * Where a ship is, in words: on which pad of which station, or in space
+ * and how far from the nearest station. `hereShipId` is the ship the
+ * reader is in; ships docked at the same station read "Here".
+ */
+export function shipWhere(world: World, ship: Ship, hereShipId: string | null): string {
+  if (ship.state === 'docked' && ship.dockedAt) {
+    const station = world.stations[ship.dockedAt];
+    const pad = ship.padId ? `, pad ${ship.padId.toUpperCase()}` : '';
+    const here = hereShipId ? world.ships[hereShipId] : undefined;
+    if (here && here.state === 'docked' && here.dockedAt === ship.dockedAt) return `Here${pad}`;
+    return `Docked at ${station?.name ?? 'a station'}${pad}`;
+  }
+  if (ship.id === hereShipId) return 'In flight';
+  let nearest: Station | null = null;
+  for (const s of Object.values(world.stations)) {
+    if (!nearest || distance(ship.position, s.position) < distance(ship.position, nearest.position)) nearest = s;
+  }
+  if (!nearest) return 'In space';
+  const d = Math.round(distance(ship.position, nearest.position) / WHERE_ROUNDING) * WHERE_ROUNDING;
+  return `In space, ${d.toLocaleString('en-GB')} from ${nearest.name}`;
+}
+
+/** How far out the HUD starts naming an empty ship of yours you cannot board yet. */
+export const BOARD_PROMPT_RANGE = BOARD_RANGE * 4;
+
+/** HUD words for why the nearest ship of yours cannot be boarded yet. */
+const BOARD_PROMPT_REASONS: Partial<Record<BoardRefusal, (gap: number, relative: number) => string>> = {
+  tooFar: (gap) => `CLOSE TO ${BOARD_RANGE} (${Math.round(gap)})`,
+  tooFast: (_gap, relative) => `MATCH SPEED (${Math.round(relative)}/${BOARD_MAX_RELATIVE_SPEED} u/s)`,
+};
+
+/**
+ * The HUD's boarding line: the ship B would board, or, in space, the
+ * nearest empty ship of yours within BOARD_PROMPT_RANGE and why it cannot
+ * be boarded yet. Empty when there is nothing to say.
+ */
+export function boardPrompt(world: World, pilotId: string, ship: Ship): string {
+  const ready = boardableShips(world, pilotId)[0];
+  if (ready) return `BOARD ${shipName(world, ready).toUpperCase()}  [B]`;
+  if (ship.state !== 'flying') return '';
+  let near: Ship | null = null;
+  for (const s of ownedShips(world, pilotId)) {
+    if (s.id === ship.id || s.state !== 'flying' || !isEmptyShip(world, s)) continue;
+    if (!near || distance(ship.position, s.position) < distance(ship.position, near.position)) near = s;
+  }
+  if (!near) return '';
+  const gap = distance(ship.position, near.position);
+  if (gap > BOARD_PROMPT_RANGE) return '';
+  const reason = boardRefusal(world, pilotId, near.id);
+  const say = reason ? BOARD_PROMPT_REASONS[reason] : undefined;
+  if (!say) return '';
+  return `BOARD ${shipName(world, near).toUpperCase()}: ${say(gap, length(sub(ship.velocity, near.velocity)))}`;
+}
+
+/** Which station service the docked panel shows. */
+export type DockTab = 'market' | 'outfitting' | 'shipMart' | 'ships';
+
 function must<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing element #${id}`);
@@ -38,22 +127,35 @@ export class Ui {
   private readonly dockPanel = must<HTMLDivElement>('dock-panel');
   private readonly dockStationName = must<HTMLHeadingElement>('dock-station-name');
   private readonly undockButton = must<HTMLButtonElement>('undock-button');
-  private readonly marketTab = must<HTMLButtonElement>('tab-market');
-  private readonly outfittingTab = must<HTMLButtonElement>('tab-outfitting');
-  private readonly marketContainer = must<HTMLDivElement>('market-container');
-  private readonly outfittingContainer = must<HTMLDivElement>('outfitting-container');
+  private readonly tabs: Record<DockTab, HTMLButtonElement> = {
+    market: must<HTMLButtonElement>('tab-market'),
+    outfitting: must<HTMLButtonElement>('tab-outfitting'),
+    shipMart: must<HTMLButtonElement>('tab-ship-mart'),
+    ships: must<HTMLButtonElement>('tab-ships'),
+  };
+  private readonly containers: Record<DockTab, HTMLDivElement> = {
+    market: must<HTMLDivElement>('market-container'),
+    outfitting: must<HTMLDivElement>('outfitting-container'),
+    shipMart: must<HTMLDivElement>('ship-mart-container'),
+    ships: must<HTMLDivElement>('ships-container'),
+  };
+  private readonly podBlock = must<HTMLDivElement>('pod-block');
+  private readonly podText = must<HTMLParagraphElement>('pod-text');
+  private readonly claimButton = must<HTMLButtonElement>('claim-button');
   /** Which station service the docked panel shows. */
-  dockTab: 'market' | 'outfitting' = 'market';
+  dockTab: DockTab = 'market';
   private readonly deathPanel = must<HTMLDivElement>('death-panel');
   private readonly respawnButton = must<HTMLButtonElement>('respawn-button');
   private readonly toast = must<HTMLDivElement>('toast');
   private toastTimer: number | null = null;
 
-  constructor(onUndock: () => void, onRespawn: () => void) {
+  constructor(onUndock: () => void, onRespawn: () => void, onClaim: () => void) {
     this.undockButton.addEventListener('click', onUndock);
     this.respawnButton.addEventListener('click', onRespawn);
-    this.marketTab.addEventListener('click', () => (this.dockTab = 'market'));
-    this.outfittingTab.addEventListener('click', () => (this.dockTab = 'outfitting'));
+    this.claimButton.addEventListener('click', onClaim);
+    for (const [tab, button] of Object.entries(this.tabs) as [DockTab, HTMLButtonElement][]) {
+      button.addEventListener('click', () => (this.dockTab = tab));
+    }
   }
 
   /** Refresh the HUD. `ship` is null while the pilot has no ship (destroyed). */
@@ -74,11 +176,14 @@ export class Ui {
     const near = nearestDockableStation(ship, world.stations);
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
     const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
+    const pilot = shipPilot(world, ship.id);
+    const inPod = isEscapePod(world, ship);
     const lines = [
       hunted ? '!! PIRATE ON YOUR TAIL' : '',
+      inPod ? '>> ESCAPE POD: DOCK AT A STATION' : `SHIP ${shipName(world, ship).toUpperCase()}`,
       `ZONE ${secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE'}`,
       `SHD ${Math.ceil(ship.shield).toString().padStart(3)}/${Math.round(stats.shield)}  HUL ${Math.ceil(ship.structure).toString().padStart(3)}/${Math.round(stats.structure)}`,
-      `CR  ${(shipPilot(world, ship.id)?.credits ?? 0).toLocaleString('en-GB')}`,
+      `CR  ${(pilot?.credits ?? 0).toLocaleString('en-GB')}`,
       `CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}${hold ? `  ${hold}` : ''}`,
       `VEL ${speed.toFixed(0).padStart(4)} u/s`,
       `POS ${ship.position.x.toFixed(0).padStart(6)} ${ship.position.y.toFixed(0).padStart(6)}`,
@@ -87,6 +192,7 @@ export class Ui {
       `FLT ${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()}  [Z]`,
       `WPN ${ship.weaponsHot ? 'HOT' : 'COLD'}  [H]`,
       near && ship.state === 'flying' ? `DOCK ${near.name.toUpperCase()}  [F]` : '',
+      pilot ? boardPrompt(world, pilot.id, ship) : '',
       `${fps.toFixed(0)} fps  tick ${world.tick}`,
     ];
     this.hud.textContent = lines.filter(Boolean).join('\n');
@@ -96,18 +202,44 @@ export class Ui {
     if (docked && ship.dockedAt) {
       const station: Station | undefined = world.stations[ship.dockedAt];
       this.dockStationName.textContent = station?.name ?? 'Station';
-      // Outfitting only where the station offers it.
-      const canRefit = station?.outfitting ?? false;
-      if (!canRefit) this.dockTab = 'market';
-      this.outfittingTab.disabled = !canRefit;
-      this.outfittingTab.title = canRefit ? '' : 'No outfitting at this station';
-      const onMarket = this.dockTab === 'market';
-      this.marketTab.setAttribute('aria-selected', String(onMarket));
-      this.outfittingTab.setAttribute('aria-selected', String(!onMarket));
-      this.marketContainer.classList.toggle('hidden', !onMarket);
-      this.outfittingContainer.classList.toggle('hidden', onMarket);
-      this.dockPanel.classList.toggle('wide', !onMarket);
+      // Outfitting and the ship mart only where the station offers them.
+      const offers: Record<DockTab, boolean> = {
+        market: true,
+        outfitting: station?.outfitting ?? false,
+        shipMart: (station?.shipMart.length ?? 0) > 0,
+        ships: true,
+      };
+      if (!offers[this.dockTab]) this.dockTab = 'market';
+      this.tabs.outfitting.title = offers.outfitting ? '' : 'No outfitting at this station';
+      this.tabs.shipMart.title = offers.shipMart ? '' : 'No ship mart at this station';
+      for (const tab of Object.keys(this.tabs) as DockTab[]) {
+        this.tabs[tab].disabled = !offers[tab];
+        this.tabs[tab].setAttribute('aria-selected', String(tab === this.dockTab));
+        this.containers[tab].classList.toggle('hidden', tab !== this.dockTab);
+      }
+      // One width on every tab: the panel is centred, so a width change
+      // would slide the tab row sideways under the pointer.
+      this.dockPanel.classList.add('wide');
+      this.updatePodBlock(world, pilot?.id ?? null, inPod);
     }
+  }
+
+  /**
+   * Bottom of the docked panel, below Undock so it never moves anything
+   * above it: in a pod, either the free Courier claim or why there is
+   * none here.
+   */
+  private updatePodBlock(world: World, pilotId: string | null, inPod: boolean): void {
+    const refusal = pilotId ? claimRefusal(world, pilotId) : 'noShip';
+    this.podBlock.classList.toggle('hidden', !inPod);
+    this.claimButton.classList.toggle('hidden', refusal !== null);
+    const text =
+      refusal === null
+        ? 'You own no ships. Harbour will give you a Meridian Courier for free.'
+        : refusal === 'ownsShips'
+          ? 'You still own a ship, so there is no free Courier. Find it under Your ships and fetch it, or buy another.'
+          : 'The free Courier is given at Harbour Station, to pilots who own no ships.';
+    if (this.podText.textContent !== text) this.podText.textContent = text;
   }
 
   /** Bottom-right readout for the selected target: who, how far, closing speed, shields and structure. */
@@ -173,6 +305,38 @@ export class Ui {
       } else if (e.type === 'lootCollected') {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
       }
+    }
+  }
+
+  /**
+   * Toast the event a pilot command returned: buying, boarding, claiming
+   * the free starter, waking. These come from commands, not from a tick,
+   * so they never appear in `world.events`.
+   */
+  announce(world: World, e: WorldEvent): void {
+    const ship = world.ships[e.shipId];
+    const name = ship ? shipName(world, ship) : 'ship';
+    if (e.type === 'shipBought') {
+      const pad = ship?.padId ? ` It is on pad ${ship.padId.toUpperCase()}.` : '';
+      this.showToast(`Bought a ${name} for ${e.price.toLocaleString('en-GB')} cr.${pad}`, 3000, 'info');
+    } else if (e.type === 'boarded') {
+      const left = world.ships[e.from];
+      const after = !left
+        ? 'Your escape pod is used up.'
+        : left.state === 'docked'
+          ? `Your ${shipName(world, left)} stays on its pad.`
+          : `Your ${shipName(world, left)} is left drifting, empty.`;
+      this.showToast(`Boarded your ${name}. ${after}`, 3000, 'info');
+    } else if (e.type === 'starterClaimed') {
+      this.showToast(`You claim a free ${name}. Your escape pod is used up.`, 3000, 'info');
+    } else if (e.type === 'pilotWoke') {
+      this.showToast(
+        ship && isEscapePod(world, ship)
+          ? 'You wake at Harbour in a new escape pod. Your ships are where you left them.'
+          : `You wake at Harbour with a free ${name}.`,
+        3500,
+        'info',
+      );
     }
   }
 
