@@ -14,10 +14,11 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 6b Ships you own | Owning several ships, station pads, ship mart, boarding ships you own (docked or in space), escape pods (see `docs/ships.md`) | Done, 0.8.0 |
 | 6c Living system | A star system on rails: a star, a planet, a moon, the belt, stations in orbit; spheres of influence and real gravity with free orbits; tiered gravity warnings; sensor range; Calder Watch patrols that hunt pirates; more traders; a third station (see `docs/system.md`) | Done, 0.9.0. Gravity and orbits are now off by default after playtesting (4 November); both stay as admin switches (`WorldRules`) |
 | 6d Ship interface and navigation | Flight HUD with shield, hull and module gauges; radar and contacts by sensor range; nav target with distance and arrival time; system map; warnings; predicted path and orbit readouts. Everything shown about a ship or the system comes through the readouts (`lockReadout`, `navReadout`), the window rule. Mockups first | In progress: interface workstream; mockups, stage 2 (flight HUD, lock strip, target card) and stage 3 (radar) merged in 0.9.0; next stage 4, contacts and the nav target. With gravity and orbits off, the orbit readouts and gravity warnings drop down the list; an aim reticle for mouse steering, munition warnings and the shield arc on the HUD move up |
-| 6e Weapons and power | The capacitor as a hull property, drained by energy and hybrid weapons, shield recharge and full-size sensors; four weapon families (projectile, energy, hybrid, missile) with short and long guns, ammunition as goods, damage types and resistances; hull bonuses by family; arcs and blind spots; fire groups; missiles and torpedoes with guidance and warheads; turrets as PDCs doing point defence by default; countermeasures (see `docs/weapons.md`) | Done on `main`, ships in 0.10.0. Then, from playtesting: shield arcs with an open stern and NPCs that fight for it (weapons.md, "Shield arcs") |
-| 6f Ship systems | Every remaining capability becomes a fitted system with a cost: the tractor beam, turret fire control, shield recharge timing (from the shield generator), flight assist quality (from a flight computer), escape pods (from a pod bay). Possibly fuel: tanks as modules, one fuel for thrust and later faster-than-light travel, scooped from stars (Jason to decide whether fuel bites in-system now or waits for the map) | |
+| 6e Weapons and power | The capacitor as a hull property, drained by energy and hybrid weapons, shield recharge and full-size sensors; four weapon families (projectile, energy, hybrid, missile) with short and long guns, ammunition as goods, damage types and resistances; hull bonuses by family; arcs and blind spots; fire groups; missiles and torpedoes with guidance and warheads; turrets as PDCs doing point defence by default; countermeasures (see `docs/weapons.md`) | Done, 0.10.0. Then, from playtesting: shield arcs with an open stern and NPCs that fight for it (weapons.md, "Shield arcs") |
+| 6f Ship systems | Every remaining capability becomes a fitted system with a cost: the tractor beam, turret fire control, shield recharge timing (from the shield generator), flight assist quality (from a flight computer), escape pods (from a pod bay). A slot pass per hull class, the EVE way: optional kit competes for general mounts and activated slots get HUD controls; basics get fixed mounts; specialised hulls dedicated ones. Electronic warfare in or just after. Fuel waits | Next |
+| 9a Mining (from 9) | A first industry slice, brought forward: a mining laser (on a mining hull's dedicated mount, or a general one), ore from the Scree's rocks, rock composition from a mining computer, ore to sell | After 6f |
 | 7 Law | Witnessed crime, reputation record, security response that escalates (the local watch, then its reserve, then the holder's navy, thinner the farther out; all ordinary, beatable ships, no galactic police), bounties; standing with NPC factions, including the four pirate factions from the lore; shooting escape pods as a crime | |
-| 8 Map | Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; fuel and star scooping if not in 6f; the Unsung as hostile ships in unknown space | |
+| 8 Map | Interdiction and warp disruption with faster-than-light travel. Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; fuel and star scooping if not in 6f; the Unsung as hostile ships in unknown space | |
 | 9 Industry | Mining (starting in the Scree; ore read by a mining computer, gate-glass as a rare find), salvage (read by a salvage scanner), drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
 | 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | |
@@ -26,16 +27,25 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Plan from here (4 November 2026, evening)
+## Plan from here (after 0.10.0)
 
-1. 6e is built, and playtesting changed the feel: gravity and orbits off by default (admin switches keep them), mouse steering with the left button firing and the right button locking, and shield arcs so fights move. Admin controls in the F2 menu (credits, any ship, the rules) for testing.
-2. **0.10.0** after Jason has played the shield arcs and mouse firing: everything since 0.9.0.
-3. The interface workstream carries on with 6d (stage 4 contacts and the nav target, then the aim reticle, munition warnings and shield arcs on the HUD).
-4. **Next build: 6f, ship systems.** Fuel waits (Jason: "fuel can wait for now"), with the map (8) at the latest.
-5. **Shared world, early slice (parked):** a host program on Jason's PC and a join mode, so his brother can play over Tailscale. Estimated three to five hours; parked until his brother can get to his PC. Brought forward from milestone 11 when it is picked up.
-6. Then law (7), then the map (8).
+1. **0.10.0 released:** 6e, and the flight that playtesting settled (see the changelog).
+2. The interface workstream carries on with 6d: stage 4 contacts and the nav target, then the aim reticle, munition warnings and shield arcs on the HUD.
+3. **Next build: 6f, ship systems**, with a short design pass with Jason first: the slot pass per hull class, then each capability as a fitted system.
+4. **Then the mining slice (9a)**, ahead of law and the map.
+5. Then law (7), then the map (8).
+6. **Shared world, early slice (parked):** a host program on Jason's PC and a join mode, so his brother can play over Tailscale. Estimated three to five hours; picked up when his brother can play.
 
-## Known gaps in 0.9.0
+## Known gaps in 0.10.0
+
+- Pirates rarely destroy traders: their hunts start close to Ridge and the Manifest outlasts the time they get (left untuned on purpose, see weapons.md).
+- Ships that cannot sidestep sometimes bump each other at low speed in fights.
+- The stopgap HUD shows munitions, decoys, the inbound warning and shield arcs in plain lines; the interface workstream's versions come with 6d.
+- Launchers load the munition already in them, else the cheapest that fits; there is no picker yet. Dispensers drop one kind of charge at a time.
+- No hull is big enough for bastion mode yet.
+- Admin controls (credits, any ship, the rules) are open to anyone playing; fine on one machine, to be host-only in a shared world.
+
+## Known gaps carried from 0.9.0
 
 (With gravity and orbits off by default, the gaps about falling into planets, drifting off Ridge and gravity sounds only apply when they are switched back on.)
 

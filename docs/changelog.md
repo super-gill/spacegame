@@ -4,6 +4,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-04
+
+Milestone 6e, weapons and power, and the flight that playtesting settled. (Release commit recorded in `docs/coordination.md`; tags do not reach the remote through this session's git proxy.)
+
+### Added
+- The capacitor: energy guns, shield recharge and full-size sensors draw on your hull's pool, which the reactor refills fastest when it is low. The dial's inner ring shows it.
+- Six gun types in three sizes across projectile (autocannon, artillery), energy (pulse and beam lasers) and hybrid (blaster, railgun) families, plus swivels.
+- Ammunition is cargo: buy boxes of rounds, shells and charges, reload from the hold, run dry.
+- Damage types: shields resist heat, armour resists rounds and shrapnel.
+- Firing arcs and blind spots: the Manifest cannot shoot behind itself.
+- Fire groups on 1 to 4; new guns join group 1, launchers group 2.
+- Missiles and torpedoes: launchers fire at your active lock; radar seekers follow it, heat seekers chase the hottest thing ahead. A Tern can outrun a torpedo.
+- Swivels shoot down missiles coming for you by themselves, hot or cold.
+- Countermeasures: chaff, flares and decoys from four makers, dropped with C. Chaff may draw radar missiles off; flares outshine a small hull.
+- Shields cover the bow and beams only; the stern is open, because the drive fires through it. Hits from behind go straight to the hull, and your shield is drawn as an arc round your ship.
+- Admin (testing) in the F2 menu: grant credits, spawn any ship (the Aurel Tacet included), and switch gravity, orbits and manoeuvring speed.
+- Suns are drawn in amber with a glow.
+
+### Changed
+- The ship turns to face the mouse, as in Flatspace; A and D strafe. The left button fires the selected group, the right button locks. Keyboard steering is a menu setting.
+- Ships thrust only where the nose points: side and reverse thrusters only slow a drift. To reposition or stop, turn and burn.
+- Gravity is off and the planets, moons and stations hold still. Bodies keep their solid surfaces and still carry what is near them.
+- Pirates and the Calder Watch fly attack runs: in firing, away past you, and back round. Pirates open with missiles; the Watch carries them too; traders carry chaff.
+- Ships are tougher and fights last longer.
+- The Warrant's hull bonus is now to missiles.
+- New pilots start just off Harbour, at rest.
+- Saves stay at format version 5. Worlds from 0.9.0 load with gravity off and their orbits stopped where they stood, with nothing in flight lost.
+
+### Known
+- Pirates rarely destroy traders yet.
+- Ships bump each other at low speed now and then in fights.
+
 ## [0.9.0] - 2026-11-04
 
 Release commit `fac7702` on `main`. (Tags do not reach the remote through this session's git proxy; versions are identified by their release commits.)
