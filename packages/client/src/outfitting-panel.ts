@@ -11,13 +11,16 @@ import {
   weaponDps,
   type FitRefusal,
   type FlightWarning,
+  type HullClass,
   type HullSpec,
   type ModuleSpec,
   type MountPoint,
   type MountType,
   type ShipStats,
+  type WeaponSpec,
   type World,
 } from '@spacegame/sim';
+import { swivelCoverage } from './hud/weapon-readout.js';
 import { RACE_COLOUR, drawShipArt } from './render/ship-art.js';
 
 /**
@@ -25,7 +28,10 @@ import { RACE_COLOUR, drawShipArt } from './render/ship-art.js';
  *
  * Left: the ship as fitted, with empty mounts as dashed sockets; click a
  * mount (there or in the list) to select it. Right: the ship's derived
- * stats. Below: the modules that physically fit the selected mount, each
+ * stats. Weapon mounts show their reach on the drawing: a wedge for each
+ * swivel's arc, a line for each fixed gun, dashed for an empty mount
+ * that could take one, with the swivels' coverage and blind sectors in
+ * words underneath. Below: the modules that physically fit the selected mount, each
  * with how many you own here and what fitting it costs (the handling fee,
  * plus the price if you do not own one), then the modules you have in
  * storage at this station, which you can sell. Pointing at a
@@ -71,6 +77,23 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
 };
 
 const INK = '#9fd3c7';
+const HOSTILE = '#e06c5a';
+/** Length of a weapon's reach on the drawing, pixels. */
+const REACH_PX = 78;
+
+/** Hull classes in words (docs/weapons.md, "Hull classes"). */
+const CLASS_NAME: Record<HullClass, string> = {
+  pod: 'Pod',
+  cutter: 'Cutter',
+  sloop: 'Sloop',
+  brig: 'Brig',
+  frigate: 'Frigate',
+  lineShip: 'Ship of the line',
+  capital: 'Capital',
+  merchantman: 'Merchantman',
+  hulk: 'Hulk',
+  aurel: 'Aurel',
+};
 const PREVIEW_W = 360;
 const PREVIEW_H = 230;
 /** Pixels of slop round a mount when clicking it in the drawing. */
@@ -140,14 +163,46 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
-  if (w) {
-    parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
-    if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
-    if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
-  }
+  if (w) parts.push(...describeGun(w, world));
   if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
   if (m.capacitorDraw) parts.push(`draws ${fixed1(m.capacitorDraw)} cap/s at full size`);
   return parts.join('; ');
+}
+
+/**
+ * A gun in a few plain phrases: damage per second (and sustained, over
+ * reloads), range, what it does damage as, and what it spends:
+ * rounds from the hold, capacitor, or both (docs/weapons.md).
+ */
+export function describeGun(w: WeaponSpec, world: World): string[] {
+  const round = w.ammo ? world.goods[w.ammo] : undefined;
+  const type = round?.ammo?.damageType ?? w.damageType;
+  const parts: string[] = [];
+  const burst = weaponDps(w);
+  const sustained = sustainedDps(w, round?.ammo?.damage ?? 1);
+  parts.push(sustained < burst - 0.05 ? `${fixed1(burst)} dps (${fixed1(sustained)} sustained)` : `${fixed1(burst)} dps`);
+  parts.push(`range ${Math.round(w.range)}`);
+  parts.push(type);
+  if (w.ammo) parts.push(`${w.magazine}-shot magazine of ${(round?.name ?? w.ammo).replace(/ \(.*\)$/, '').toLowerCase()}, ${fixed1(w.reloadSeconds)} s reload`);
+  if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap a shot (${fixed1(w.capacitorPerShot / w.fireInterval)}/s firing)`);
+  else parts.push('no capacitor');
+  return parts;
+}
+
+/** Damage per second over a whole magazine and its reload; the plain rate for guns with no magazine. */
+export function sustainedDps(w: WeaponSpec, roundDamage = 1): number {
+  const perShot = w.damage * roundDamage;
+  if (!w.ammo || w.magazine <= 0) return perShot / w.fireInterval;
+  return (perShot * w.magazine) / (w.magazine * w.fireInterval + w.reloadSeconds);
+}
+
+/** Capacitor spent per second with every gun firing flat out. */
+const capFiring = (s: ShipStats): number => Object.values(s.weapons).reduce((n, w) => n + w.capacitorPerShot / w.fireInterval, 0);
+
+/** Degrees round the hull your swivels can reach, from the fit's weapons. */
+function swivelDegrees(s: ShipStats, hull: HullSpec | null): number {
+  if (!hull) return 0;
+  return swivelCoverage(hull.mounts.filter((m) => s.weapons[m.id]?.kind === 'turret')).degrees;
 }
 
 /** CSS class for an "after" value: better, worse or unchanged. */
@@ -164,7 +219,7 @@ function compareClass(row: StatRow, a: number, b: number, diff: boolean): 'bette
  */
 interface StatRow {
   label: string;
-  value: (s: ShipStats) => number;
+  value: (s: ShipStats, hull: HullSpec | null) => number;
   format: (n: number) => string;
   better: 'higher' | 'lower' | 'budget';
 }
@@ -191,14 +246,17 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Capacitor', value: (s) => s.capacitor, format: (n) => String(Math.round(n)), better: 'higher' },
   { label: 'Cap recharge', value: (s) => s.capacitorRecharge, format: (n) => `${fixed1(n)}/s`, better: 'higher' },
   { label: 'Cap drain', value: (s) => s.capacitorDraw, format: (n) => `${fixed1(n)}/s`, better: 'lower' },
+  { label: 'Cap firing', value: capFiring, format: (n) => (n > 0 ? `${fixed1(n)}/s` : 'none'), better: 'lower' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
   { label: 'Fixed dps', value: (s) => dps(s, 'fixed'), format: fixed1, better: 'higher' },
-  { label: 'Turret dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },
+  { label: 'Swivel dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },
+  { label: 'Swivel cover', value: swivelDegrees, format: (n) => `${Math.round(n)}°`, better: 'higher' },
 ];
 
 export class OutfittingPanel {
   private readonly root: HTMLDivElement;
   private readonly canvas: HTMLCanvasElement;
+  private readonly coverageLine: HTMLParagraphElement;
   private readonly statsBox: HTMLDivElement;
   private readonly mountsBox: HTMLDivElement;
   private readonly storageBox: HTMLDivElement;
@@ -218,8 +276,11 @@ export class OutfittingPanel {
     const top = el('div', 'outfitting-top');
     this.canvas = el('canvas', 'outfitting-preview');
     this.canvas.addEventListener('click', (e) => this.clickDrawing(e));
+    this.coverageLine = el('p', 'outfitting-coverage');
+    const drawing = el('div', 'outfitting-drawing');
+    drawing.append(this.canvas, this.coverageLine);
     this.statsBox = el('div', 'outfitting-stats');
-    top.append(this.canvas, this.statsBox);
+    top.append(drawing, this.statsBox);
     this.mountsBox = el('div', 'outfitting-mounts');
     this.modulesBox = el('div', 'outfitting-modules');
     this.storageBox = el('div', 'outfitting-storage');
@@ -291,7 +352,8 @@ export class OutfittingPanel {
       after = fitStats(world, hull, changed, cargoMass(ship, world.goods));
     }
     this.drawShip(world, hull, fit);
-    this.renderStats(now, after);
+    this.renderCoverage(world, hull, fit);
+    this.renderStats(now, after, hull);
   }
 
   private drawShip(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
@@ -314,7 +376,69 @@ export class OutfittingPanel {
       showMounts: true,
       highlightMount: this.selected,
     });
+    this.drawReach(ctx, world, hull, fit, scale);
     ctx.restore();
+  }
+
+  /**
+   * Each weapon mount's reach, drawn from the mount in hull space (the nose
+   * points right): a filled wedge for a swivel's arc, a line for a fixed
+   * gun, dashed for an empty mount by what it could take.
+   */
+  private drawReach(ctx: CanvasRenderingContext2D, world: World, hull: HullSpec, fit: Readonly<Record<string, string>>, scale: number): void {
+    const reach = REACH_PX / scale;
+    ctx.lineWidth = 1 / scale;
+    for (const mount of hull.mounts) {
+      if (mount.type !== 'weapon') continue;
+      const module = fit[mount.id] ? world.modules[fit[mount.id]!] : undefined;
+      const gun = module?.weaponId ? world.weapons[module.weaponId] : undefined;
+      const swivelMount = mount.services.includes('fireControl');
+      const selected = mount.id === this.selected;
+      const { x, y } = mount.position;
+      ctx.strokeStyle = HOSTILE;
+      ctx.fillStyle = HOSTILE;
+      ctx.setLineDash(gun ? [] : [3 / scale, 3 / scale]);
+      ctx.globalAlpha = gun ? (selected ? 0.9 : 0.6) : 0.35;
+      if (gun?.kind === 'fixed' || (!gun && !swivelMount)) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(mount.facing) * reach, y + Math.sin(mount.facing) * reach);
+        ctx.stroke();
+        continue;
+      }
+      const arc = mount.arc ?? Math.PI * 2;
+      ctx.beginPath();
+      if (arc >= Math.PI * 2 - 1e-6) ctx.arc(x, y, reach, 0, Math.PI * 2);
+      else {
+        ctx.moveTo(x, y);
+        ctx.arc(x, y, reach, mount.facing - arc / 2, mount.facing + arc / 2);
+        ctx.closePath();
+      }
+      if (gun) {
+        ctx.globalAlpha = selected ? 0.22 : 0.12;
+        ctx.fill();
+        ctx.globalAlpha = selected ? 0.9 : 0.6;
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+  }
+
+  /** The swivels' coverage in words under the drawing. */
+  private renderCoverage(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
+    const swivels = hull.mounts.filter((m) => {
+      const module = fit[m.id] ? world.modules[fit[m.id]!] : undefined;
+      return module?.weaponId !== undefined && world.weapons[module.weaponId]?.kind === 'turret';
+    });
+    const c = swivelCoverage(swivels);
+    const text =
+      swivels.length === 0
+        ? 'No swivels: nothing covers you but the guns you point.'
+        : c.blind.length === 0
+          ? 'Swivels cover all round.'
+          : `Swivels cover ${c.degrees}°. Blind ${c.blind.join(' and ')}.`;
+    this.coverageLine.textContent = text;
   }
 
   /** Pixels per world unit that fit the whole hull, mounts included, in the drawing. */
@@ -345,7 +469,7 @@ export class OutfittingPanel {
     if (best) this.select(best.id);
   }
 
-  private renderStats(now: ShipStats, after: ShipStats | null): void {
+  private renderStats(now: ShipStats, after: ShipStats | null, hull: HullSpec): void {
     const table = el('table');
     const head = el('tr');
     // The After column is always there, empty until something is pointed
@@ -354,10 +478,10 @@ export class OutfittingPanel {
     table.append(head);
     for (const row of STAT_ROWS) {
       const tr = el('tr');
-      const a = row.value(now);
+      const a = row.value(now, hull);
       tr.append(el('td', undefined, row.label), el('td', 'num', row.format(a)));
       if (after) {
-        const b = row.value(after);
+        const b = row.value(after, hull);
         const diff = Math.abs(b - a) > 1e-6;
         tr.append(el('td', `num ${compareClass(row, a, b, diff)}`, row.format(b)));
       } else {
@@ -381,7 +505,7 @@ export class OutfittingPanel {
     const box = this.mountsBox;
     box.replaceChildren();
     const maker = world.manufacturers[hull.manufacturer]?.name ?? hull.manufacturer;
-    box.append(el('h2', undefined, `${hull.name} · ${maker} · ${hull.role}`));
+    box.append(el('h2', undefined, `${hull.name} · ${maker} · ${CLASS_NAME[hull.class]} · ${hull.role}`));
     if (hull.sealed) box.append(el('p', 'muted', FIT_REFUSALS.sealed));
     if (hull.bonuses.length) box.append(el('p', 'bonuses', `Bonuses: ${hull.bonuses.map((b) => b.label).join('; ')}.`));
 

@@ -26,8 +26,8 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Fire group | 1, 2, 3, 4 | Space fires the fixed guns in the selected group; a new gun joins group 1. Swivels need no group |
-| Lock a ship | Left click on it | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
+| Fire group | 1, 2, 3, 4 | Space fires the fixed guns in the selected group; a new gun joins group 1. Swivels need no group. Assigning guns to other groups comes with outfitting work later; until then groups 2 to 4 are empty (the HUD says `GROUP 2 EMPTY`) |
+| Lock a ship | Left click on it, on the radar, or on its row in the contacts list | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 
@@ -49,10 +49,18 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Action | Key | Notes |
 | --- | --- | --- |
 | Fire fixed guns | Space (hold) | Fires where the nose points. With a target, put the nose on the orange lead marker |
-| Weapons hot / cold | H | Hot: turrets engage your target on their own when on aim and in range. Cold: they hold fire |
+| Weapons hot / cold | H | Hot: swivels engage your active lock on their own when it is inside their arc and in range, and their arcs show round your ship. Cold: they hold fire |
 | Tractor beam | R (hold) | Pulls nearby loot in and scoops it into your hold |
 
-Fixed guns hit harder than turrets. Turrets let you fight while flying any direction, but a fast target close in can outrun them.
+Fixed guns hit harder than swivels (the in-world word for turrets). Swivels let you fight while flying any direction, but only inside their mount's arc: most hulls are blind somewhere, often astern, and a fast target close in can outrun the slew.
+
+Every gun spends something (`docs/weapons.md`):
+
+- **Projectile guns** (autocannon, artillery) and swivels fire rounds or shells, bought by the box at stations and carried in your hold. A gun reloads whole boxes from the hold when its magazine runs out, which takes a few seconds.
+- **Energy guns** (pulse and beam lasers) spend capacitor per shot and never run dry, but an empty capacitor stops them.
+- **Hybrid guns** (blaster, railgun) need both charges and a little capacitor.
+
+A toast says when the capacitor is empty or a gun is out of ammunition.
 
 ## Flight computer
 
@@ -90,7 +98,13 @@ The docked panel has four tabs. It is the same width on every tab, so switching 
 
 **Market** lists each good the station trades, what it charges you (Buy at), what it pays you (Sell at), and how many you have aboard, with your credits and cargo space at the top. A dash means the station does not trade that good in that direction.
 
-**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Each module shows what it is (engine, reactor and so on) beside its brand name. If the fit shown cannot thrust forward or cannot turn, a warning says so, and undocking in that ship repeats it. Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
+**Outfitting** (only at stations that offer it; Harbour does, Ridge Outpost does not) shows your ship with its mounts, its stats, and the module on each mount. Empty mounts are dashed sockets. The heading names the hull, its maker, its class (cutter, sloop, merchantman and so on) and its role.
+
+The drawing shows each weapon mount's reach: a red wedge for a swivel's arc, a line for a fixed gun, dashed for an empty mount by what it could take. Under it, the swivels' coverage in words (`Swivels cover 270°. Blind astern.`). The stats include the capacitor (size, recharge, steady drain from full-size sensors, and `Cap firing`, what every gun firing flat out would spend per second, to set against the recharge), swivel damage per second and `Swivel cover` in degrees.
+
+Each gun on offer says its damage per second (and sustained, over its reloads, for magazine guns), range, damage type, what it loads, magazine and reload time, and its capacitor cost per shot and per second firing, or `no capacitor`.
+
+Select a mount to see what fits it, how many of each you have stored here, and what fitting it costs; a module that cannot be fitted says why (wrong mount type, too big, missing service, not enough power, not enough credits). Each module shows what it is (engine, reactor and so on) beside its brand name. If the fit shown cannot thrust forward or cannot turn, a warning says so, and undocking in that ship repeats it. Below that, **Stored here** lists the modules you own in storage at this station. There is no keyboard way to select mounts yet.
 
 **Ship mart** (only at stations that sell ships; Harbour does, Ridge Outpost does not) lists each ship for sale with a drawing, its size class and role, top speed, acceleration, shields, structure, cargo space, weapon damage per second and price, with your credits and free pads at the top. **Buy** puts the ship on a free pad here, empty; you stay in the ship you are in. When you cannot buy it the button is greyed and the reason shows under it: not enough credits, or no free pad here fits it.
 
@@ -122,10 +136,33 @@ In a pod at Harbour, if you own no ships, the bottom of the docked panel offers 
 
 If your pod is destroyed too, a panel offers **Wake at Harbour**: in a new pod if you own a ship anywhere, or in a free Meridian Tern if you own none.
 
+## Navigation
+
+You fly to a **nav target**: one station or body, and the only thing in space with a marker. New pilots start with Harbour as their nav target, and waking at Harbour sets it again.
+
+| Action | Input | Notes |
+| --- | --- | --- |
+| Select a station or body | Click it in the contacts list, on the radar, or in space | The contacts row is highlighted and the radar rings it |
+| Set nav target | N | Makes the selection your nav target. N on your nav target clears it |
+| Select and set in one go | Double-click a station or body in the contacts list | |
+| Contacts list | O | Shows or hides it |
+
+- **Nav marker:** a diamond round the target when it is on screen, with its distance and arrival time; a double chevron near the screen edge, pointing at it, with its name, distance and arrival time when it is off screen. The edge marker keeps clear of the HUD.
+- **Top left** repeats it: `NAV HARBOUR STATION · 2.4k u · 1:20`. Distance is to the station's hull or the body's surface; the arrival time is at your current closing speed, `-` when you are not closing. Both come from your nav computer: without one you get the name and marker only (`NO NAV COMPUTER`).
+- The nav target is kept for your pilot in this browser.
+
+**Contacts list (O),** bottom right: everything your charts and sensors know, nearest first, like EVE's overview. Each row has a mark, its type (`STN`, `BODY`, `BELT`, `SHIP`, `YOURS`), its name and its distance.
+
+- Stations and bodies are on the charts and always listed. `◆` marks the nav target.
+- Ships are listed only inside your sensor range, as `Contact` until a lock reads who they are; then by hull and who flies it (`Tessaract Manifest · TRADER`), in their colour. `[ ]` marks a ship you have locked. Click a ship row to lock it, or to make it active.
+- Your own ships are always listed.
+- At most 24 rows; the farthest drop off.
+
 ## Interface
 
 | Action | Key | Notes |
 | --- | --- | --- |
+| Contacts list | O | Shows or hides it (see Navigation) |
 | Zoom in and out | Mouse wheel, or = and - | Between about half and one and a half times; eases rather than jumps |
 | Show or hide the controls panel | F1 | Also `, or click Controls in the top right |
 | Show or hide the menu | F2 | Also the Menu button. Pilot name, show or hide ship labels, Save now, Export save, Import save, New game |
@@ -136,15 +173,20 @@ While you are typing in a text box (the pilot name), keys go to the box, not the
 
 The flight HUD sits at the screen edges and leaves the middle clear. Clicks go through it to the game.
 
-**Top left:** the ship you are in (`ESCAPE POD · DOCK AT A STATION` in a pod, or `· BOARD YOUR SHIP [B]` when one of yours is in reach), the security zone or `OPEN SPACE`, then your credits and cargo space used.
+**Top left:** the ship you are in (`ESCAPE POD · DOCK AT A STATION` in a pod, or `· BOARD YOUR SHIP [B]` when one of yours is in reach), the security zone or `OPEN SPACE`, your credits and cargo space used, then your nav target (see Navigation).
 
 **Top centre:** the warning in force. Today that is `CAUTION · PIRATE HUNTING YOU`; warnings in tiers, with sounds, are coming.
 
 **Bottom centre, in flight** (hidden while docked):
 
-- The status dial. The outer blue ring is your shields, the inner ring your structure (it turns amber below half and red below a quarter). The dashed ring inside is reserved for the capacitor. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). Both come from your nav computer; without one the dial shows `-` and `NO NAV COMPUTER`. `SHD` and `HUL` values sit under the rings.
-- Under the dial: the flight mode (`Z` to change) and weapons hot or cold (`H`).
-- Right of the dial: a tile for each weapon you have fitted. A fixed gun says `SPACE`; a turret says `COLD`, `AUTO` (hot, no complete active lock) or `ENGAGING`. A ring round the icon fills as the weapon reloads. Only modules you use in flight get a tile.
+- The status dial. The outer blue ring is your shields, the next your structure (it turns amber below half and red below a quarter). The segmented ring inside is your capacitor, with `CAP n%` above the speed: pale straw while there is plenty, amber below a quarter, red once it cannot pay for a shot of your hungriest gun. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). Both come from your nav computer; without one the dial shows `-` and `NO NAV COMPUTER`. `SHD` and `HUL` values sit under the rings.
+- Under the dial: the flight mode (`Z` to change), weapons hot or cold (`H`), and the fire group Space fires (`GROUP 1 · 1-4`, amber `GROUP 2 EMPTY` when no gun is in it).
+- Right of the dial: a tile for each weapon you have fitted, named by type (`AUTOCANNON`, `PULSE`, `SWIVEL`). Only modules you use in flight get a tile.
+  - A ring round the icon fills between shots.
+  - The bar and words under the name are what it runs on. Ammunition guns: rounds loaded, then the spare rounds in your hold (`32 +60`), the bar the magazine; `RELOAD` while a reload fills the bar; amber when the magazine is nearly empty with nothing spare; red `DRY` when there is none at all. Energy guns: the shots your capacitor can pay for (`24 SHOTS`), the bar the capacitor; red `NO CAP` when it cannot pay for one. A hybrid gun shows `NO CAP` whatever it has loaded.
+  - A fixed gun shows its fire group in the corner and `SPACE` (outlined) when it is in the selected group, else `GROUP n`.
+  - A swivel shows `COLD`, `AUTO` (hot, no complete active lock), `ENGAGING` (outlined red), `BLIND` (amber: the lock is outside its arc), `TOO FAR` (beyond its range) or `HOLD` (it cannot pay for a shot).
+  - A tile outlined red cannot fire: dry or out of capacitor.
 - Above the dial: what you can do now, `DOCK <station> [F]` and the boarding prompt (see Ships).
 
 **Bottom left: the radar.** North up, your ship at the centre pointing where you face, the rim at your radar's sensor range (named under it, `RADAR 3,000 u`). It replaces the old off-screen markers.
@@ -153,17 +195,18 @@ The flight HUD sits at the screen edges and leaves the middle clear. Clicks go t
 - Stations (squares, with a short name) and bodies (circles, to scale; the belt as its band) are on the charts and always show, pinned to the rim when out of range.
 - The dashed box is what the screen shows at the current zoom.
 - The active lock has a bracket; other locks a ring that fills as they lock.
-- Click a ship on the radar to lock it, or to make it active if it is already locked.
+- Click a ship on the radar to lock it, or to make it active if it is already locked. Click a station or body to select it for N; the nav target wears a diamond, the selection a dashed ring.
 
-**Right edge:** the lock strip and target card while you hold a lock (see Targeting). Lock cards and the radar are the only parts of the HUD that take clicks.
+**Right edge:** the lock strip and target card while you hold a lock (see Targeting). Lock cards, the radar and the contacts list are the only parts of the HUD that take clicks.
 
-**Bottom right:** frame rate and sim tick, dim, for testing.
+**Bottom right:** the contacts list when open (O), and under it the frame rate and sim tick, dim, for testing.
 
 ## On screen
 
-- Your ship is white. Traders are blue-grey, pirates red. NPC labels (`TRADER`, `PIRATE · HUNTING YOU`) are a development aid and may go later.
+- Your ship is white. Other ships are plain until a lock reads who flies them: then traders are blue-grey, pirates red, the Calder Watch white, and with labels on (Menu) they are named `TRADER`, `PIRATE`, `CALDER WATCH` or the pilot. Your own ships are always labelled.
+- With weapons hot, thin red arcs round your ship show where your swivels can reach; the gap is your blind sector.
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
-- Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.
+- Ships your targeting computer reads in full show shield (top) and structure (bottom) bars. Your shots are white; other shots take their ship's colour, plain until a lock identifies it.
 - Loot canisters are small orange diamonds. Wrecks are dashed outlines that fade.
 - Stations have landing pads round the rim. Docked ships, yours and others, sit on them.
 - Empty ships are faded with a dashed hull. Escape pods are orange with a blinking beacon ring.

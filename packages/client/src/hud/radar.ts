@@ -3,6 +3,7 @@ import { bodyPosition, distance, lockReadout, shipStats } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 import { el, setText } from './dom.js';
 import { pickContact, radarPoint, radarShows, ringStep, type RadarHit } from './radar-geometry.js';
+import { sameTarget, type NavTarget } from './nav-target.js';
 import { readoutStance, type TargetStance } from './target-card.js';
 
 /**
@@ -19,7 +20,9 @@ import { readoutStance, type TargetStance } from './target-card.js';
  * - Locks: a bracket on the active lock, a ring on the others.
  *
  * Clicking a ship contact locks it (or makes it active if already
- * locked), like clicking it in space.
+ * locked), like clicking it in space. Clicking a station or body selects
+ * it, for N to make it the nav target. The nav target wears a diamond,
+ * the selection a ring.
  */
 
 const SIZE = 220;
@@ -56,10 +59,16 @@ export class Radar {
   private readonly caption = el('div', 'hud-dim hud-radar-caption');
   private readonly ctx: CanvasRenderingContext2D;
   private hits: RadarHit[] = [];
+  /** Stations and bodies on the disc, keyed `station:id` or `body:id`. */
+  private chartHits: RadarHit[] = [];
   private dpr = 1;
 
-  /** `onPick` is called with a ship id when a contact is clicked. */
-  constructor(parent: HTMLElement, private readonly onPick: (shipId: string) => void) {
+  /** `onPick` gets a ship id when a contact is clicked; `onChart` a station or body. */
+  constructor(
+    parent: HTMLElement,
+    private readonly onPick: (shipId: string) => void,
+    private readonly onChart: (target: NavTarget) => void,
+  ) {
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', 'Radar: north up, your ship at the centre');
     this.root.append(this.canvas, this.caption);
@@ -67,8 +76,17 @@ export class Radar {
     this.ctx = this.canvas.getContext('2d')!;
     this.canvas.addEventListener('click', (e) => {
       const r = this.canvas.getBoundingClientRect();
-      const id = pickContact(this.hits, { x: e.clientX - r.left - MID, y: e.clientY - r.top - MID }, CLICK_SLOP_PX);
-      if (id) this.onPick(id);
+      const at = { x: e.clientX - r.left - MID, y: e.clientY - r.top - MID };
+      const id = pickContact(this.hits, at, CLICK_SLOP_PX);
+      if (id) {
+        this.onPick(id);
+        return;
+      }
+      const chart = pickContact(this.chartHits, at, CLICK_SLOP_PX);
+      if (chart) {
+        const [kind, ...rest] = chart.split(':');
+        this.onChart({ kind: kind === 'station' ? 'station' : 'body', id: rest.join(':') });
+      }
     });
     this.resize();
   }
@@ -81,8 +99,19 @@ export class Radar {
     this.canvas.style.height = `${SIZE}px`;
   }
 
-  /** Redraw. `ship` is null while the pilot has no ship; `pilotId` picks out your own ships. */
-  update(world: World, ship: Ship | null, pilotId: string, camera: Camera, at: { x: number; y: number }): void {
+  /**
+   * Redraw. `ship` is null while the pilot has no ship; `pilotId` picks out
+   * your own ships; `selected` and `nav` are marked.
+   */
+  update(
+    world: World,
+    ship: Ship | null,
+    pilotId: string,
+    camera: Camera,
+    at: { x: number; y: number },
+    selected: NavTarget | null = null,
+    nav: NavTarget | null = null,
+  ): void {
     this.root.classList.toggle('hidden', ship === null);
     if (!ship) return;
     if (Math.max(1, Math.round(window.devicePixelRatio || 1)) !== this.dpr) this.resize();
@@ -156,12 +185,16 @@ export class Radar {
     ctx.setLineDash([]);
     ctx.restore();
 
-    // Bodies beyond the disc: a small circle on the rim.
+    // Bodies beyond the disc: a small circle on the rim. Every solid body
+    // is clickable at its centre (or its rim pin).
+    this.chartHits = [];
     for (const body of Object.values(world.bodies)) {
       if (body.ring) continue;
       const c = bodyPosition(world, body.id);
-      if (distance(c, at) - body.radius <= range) continue;
       const p = radarPoint(at, c, range, DISC);
+      this.chartHits.push({ id: `body:${body.id}`, x: p.x, y: p.y });
+      this.markChart(p, { kind: 'body', id: body.id }, selected, nav);
+      if (distance(c, at) - body.radius <= range) continue;
       ctx.strokeStyle = C.body;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
@@ -173,6 +206,8 @@ export class Radar {
     ctx.font = '10px "IBM Plex Mono", ui-monospace, monospace';
     for (const station of Object.values(world.stations)) {
       const p = radarPoint(at, station.position, range, DISC);
+      this.chartHits.push({ id: `station:${station.id}`, x: p.x, y: p.y });
+      this.markChart(p, { kind: 'station', id: station.id }, selected, nav);
       ctx.fillStyle = C.panel;
       ctx.strokeStyle = C.ink;
       ctx.lineWidth = 1.4;
@@ -255,6 +290,31 @@ export class Radar {
     ctx.textAlign = 'center';
     ctx.fillText('N', 0, -DISC + 12);
     ctx.restore();
+  }
+
+  /** The nav target's diamond and the selection's ring round a station or body. */
+  private markChart(p: { x: number; y: number }, target: NavTarget, selected: NavTarget | null, nav: NavTarget | null): void {
+    const ctx = this.ctx;
+    if (sameTarget(target, nav)) {
+      ctx.strokeStyle = C.bright;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - 9);
+      ctx.lineTo(p.x + 9, p.y);
+      ctx.lineTo(p.x, p.y + 9);
+      ctx.lineTo(p.x - 9, p.y);
+      ctx.closePath();
+      ctx.stroke();
+    }
+    if (sameTarget(target, selected)) {
+      ctx.strokeStyle = C.ink;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
   }
 }
 

@@ -60,6 +60,17 @@ export function readoutStance(read: LockReadout | null): TargetStance {
   return read?.identity ? FLOWN_BY_STANCE[read.identity.flownBy] : 'unknown';
 }
 
+/**
+ * Who flies a ship, in a word, as your targeting computer reads it: PIRATE,
+ * TRADER, CALDER WATCH, PILOT, EMPTY. Null until a lock reads its identity.
+ * For labels in space and the contacts list.
+ */
+export function readoutWho(read: LockReadout | null): string | null {
+  if (!read?.identity) return null;
+  const by = read.identity.flownBy;
+  return by === 'watch' ? 'CALDER WATCH' : by === 'nobody' ? 'EMPTY' : FLOWN_BY_WORDS[by];
+}
+
 /** One lock's card in the strip. */
 interface LockChip {
   root: HTMLButtonElement;

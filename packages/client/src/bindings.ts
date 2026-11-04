@@ -31,7 +31,7 @@ export type SimAction =
  * `lock`, `unlock` and `activateLock` inputs. Boarding is a pilot command, like trading, not
  * a flight input.
  */
-export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut' | 'zoomIn' | 'zoomOut' | 'group1' | 'group2' | 'group3' | 'group4';
+export type UiAction = 'toggleControls' | 'toggleMenu' | 'cycleTarget' | 'clearTarget' | 'board' | 'stepOut' | 'zoomIn' | 'zoomOut' | 'group1' | 'group2' | 'group3' | 'group4' | 'toggleContacts' | 'setNav';
 
 export type Action = SimAction | UiAction;
 
@@ -80,6 +80,8 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'group2', codes: ['Digit2'], group: 'Weapons', label: 'Fire group 2', kind: 'press' },
   { action: 'group3', codes: ['Digit3'], group: 'Weapons', label: 'Fire group 3', kind: 'press' },
   { action: 'group4', codes: ['Digit4'], group: 'Weapons', label: 'Fire group 4', kind: 'press' },
+  { action: 'toggleContacts', codes: ['KeyO'], group: 'Navigation', label: 'Contacts list', kind: 'press', note: 'Stations, bodies and the ships your sensors see, nearest first' },
+  { action: 'setNav', codes: ['KeyN'], group: 'Navigation', label: 'Set nav target', kind: 'press', note: 'Flies you to the station or body selected in the contacts list or on the radar; again to clear' },
   { action: 'zoomIn', codes: ['Equal', 'NumpadAdd'], group: 'Interface', label: 'Zoom in', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'zoomOut', codes: ['Minus', 'NumpadSubtract'], group: 'Interface', label: 'Zoom out', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'toggleControls', codes: ['F1', 'Backquote'], group: 'Interface', label: 'Show / hide this panel', kind: 'press' },

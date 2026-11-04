@@ -50,10 +50,12 @@ import {
   drawHealthBars,
   drawLoot,
   drawLeadMarker,
+  drawNavMarker,
   drawPads,
   drawPodBeacon,
   drawProjectile,
   drawShip,
+  drawSwivelArcs,
   drawStation,
   drawTargetBracket,
   drawTractor,
@@ -64,9 +66,11 @@ import {
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
+import { ContactsPanel } from './hud/contacts.js';
 import { FlightHud } from './hud/flight-hud.js';
+import { DEFAULT_NAV, formatDistance, formatEta, navFix, navTargetState, sameTarget, type NavTarget } from './hud/nav-target.js';
 import { Radar } from './hud/radar.js';
-import { TargetCard } from './hud/target-card.js';
+import { TargetCard, readoutStance, readoutWho, type TargetStance } from './hud/target-card.js';
 import { Ui, shipLabel, shipName } from './ui.js';
 import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
 
@@ -114,6 +118,8 @@ const input = new InputController(
     else if (action === 'group2') input.requestGroup(2);
     else if (action === 'group3') input.requestGroup(3);
     else if (action === 'group4') input.requestGroup(4);
+    else if (action === 'toggleContacts') contacts.toggle();
+    else if (action === 'setNav') setNavPressed();
     else if (action === 'zoomIn') camera.zoomBy(1);
     else if (action === 'zoomOut') camera.zoomBy(-1);
   },
@@ -127,10 +133,85 @@ const ui = new Ui(
 const hudLayer = document.getElementById('hud-layer')!;
 const flightHud = new FlightHud(hudLayer);
 const targetCard = new TargetCard(hudLayer, (id) => input.requestActivate(id));
-const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
+const radar = new Radar(
+  hudLayer,
+  (id) => lockOrActivate(id),
+  (target) => select(target),
+);
+const contacts = new ContactsPanel(hudLayer, {
+  onShip: (id) => lockOrActivate(id),
+  onSelect: (target) => select(target),
+  onNav: (target) => {
+    select(target);
+    setNav(target);
+  },
+});
 
 let me = loadLocalPilot();
 const settings = loadSettings();
+
+/**
+ * Navigation (interface stage 4). `selected` is the station or body picked
+ * in the contacts list or on the radar; N makes it the nav target, the one
+ * thing in space with a marker. Client state, kept per pilot in this
+ * browser; new pilots and waking pilots fly to Harbour.
+ */
+let selected: NavTarget | null = null;
+let navTarget: NavTarget | null = loadNav(me.id);
+
+function navKey(pilotId: string): string {
+  return `spacegame.nav.${pilotId}`;
+}
+
+function loadNav(pilotId: string): NavTarget | null {
+  try {
+    const raw = localStorage.getItem(navKey(pilotId));
+    if (raw === null) return DEFAULT_NAV;
+    const parsed = JSON.parse(raw) as NavTarget | null;
+    return parsed && (parsed.kind === 'station' || parsed.kind === 'body') && typeof parsed.id === 'string' ? parsed : null;
+  } catch {
+    return DEFAULT_NAV;
+  }
+}
+
+function setNav(target: NavTarget | null): void {
+  navTarget = target;
+  try {
+    localStorage.setItem(navKey(me.id), JSON.stringify(target));
+  } catch {
+    // Private windows can refuse storage; the target still holds for this session.
+  }
+}
+
+function select(target: NavTarget): void {
+  selected = target;
+}
+
+/** The nav target in words for the HUD: name, distance and arrival time when a nav computer reads them. */
+function navLine(mine: Ship | null): string {
+  if (!mine || !navTarget) return 'NO NAV TARGET · N';
+  const fix = navFix(current, mine, navTarget);
+  if (!fix) return 'NO NAV TARGET · N';
+  if (!navReadout(current, mine)) return `NAV ${fix.name.toUpperCase()} · NO NAV COMPUTER`;
+  return `NAV ${fix.name.toUpperCase()} · ${formatDistance(fix.clearance)} · ${formatEta(fix.eta)}`;
+}
+
+/** N: fly to the selection; on the current nav target, clear it. */
+function setNavPressed(): void {
+  const pick = selected;
+  if (!pick) {
+    ui.notify('Select a station or body first: in the contacts list (O) or on the radar.');
+    return;
+  }
+  if (sameTarget(pick, navTarget)) {
+    setNav(null);
+    ui.notify('Nav target cleared.');
+    return;
+  }
+  setNav(pick);
+  const name = navTargetState(current, pick)?.name ?? 'target';
+  ui.notify(`Nav target: ${name}`);
+}
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
@@ -357,6 +438,9 @@ function respawn(): void {
   const woke = wakePilot(current, me.id);
   if (!woke.ok) return;
   commanded(woke.world, woke.event);
+  // Waking pilots fly to Harbour again.
+  selected = null;
+  setNav(DEFAULT_NAV);
   const ship = myShip(current);
   if (ship) camera.snapTo(ship.position);
 }
@@ -409,7 +493,28 @@ function clickTarget(point: { x: number; y: number }): void {
       bestDist = d;
     }
   }
-  if (best) lockOrActivate(best.id);
+  if (best) {
+    lockOrActivate(best.id);
+    return;
+  }
+  // No ship there: a station or body under the pointer is selected, for N.
+  for (const station of Object.values(current.stations)) {
+    const p = camera.worldToScreen(station.position);
+    if (Math.hypot(p.x - point.x, p.y - point.y) <= station.radius * camera.zoom + CLICK_SLOP_PX) {
+      select({ kind: 'station', id: station.id });
+      return;
+    }
+  }
+  for (const body of Object.values(current.bodies)) {
+    if (body.ring) continue;
+    const at = navTargetState(current, { kind: 'body', id: body.id });
+    if (!at) continue;
+    const p = camera.worldToScreen(at.position);
+    if (Math.hypot(p.x - point.x, p.y - point.y) <= body.radius * camera.zoom) {
+      select({ kind: 'body', id: body.id });
+      return;
+    }
+  }
 }
 
 /** A click on a ship, in space or on the radar: make it active if already locked, else start a lock. */
@@ -514,24 +619,38 @@ function interpolate(now: Ship, prev: Ship | undefined, alpha: number) {
   };
 }
 
-/** Colour and label for a ship, from who flies it. Labels are a dev aid for now. */
+/** Ship colours by what your targeting computer reads of who flies them. */
+const STANCE_COLOUR: Record<TargetStance, string> = {
+  hostile: COLOUR.hostile,
+  neutral: COLOUR.neutral,
+  // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
+  watch: '#f2f5f7',
+  pilot: COLOUR.ink,
+  empty: COLOUR.inkDim,
+  unknown: COLOUR.ink,
+};
+
+/**
+ * Colour and label for a ship. Jason's window rule: the window shows where
+ * a ship is and how it moves; who flies it is known only once a lock reads
+ * its identity, so an unidentified ship is plain ink with no label. Your own
+ * ships you always know.
+ */
 function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
   if (mine && ship.id === mine.id) return { colour: COLOUR.inkBright };
-  const brain = world.npcs[ship.id];
-  if (brain?.kind === 'pirate') {
-    const hunting = brain.mode === 'hunt' ? (mine && brain.targetId === mine.id ? ' · HUNTING YOU' : ' · HUNTING') : '';
-    return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
+  const empty = isEmptyShip(world, ship);
+  if (ship.ownerId === me.id) {
+    return empty
+      ? { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()} · EMPTY`, empty: true }
+      : { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()}` };
   }
-  if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
-  // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
-  if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: 'CALDER WATCH' };
-  if (isEmptyShip(world, ship)) {
-    // Yours stand out from other pilots' parked ships.
-    if (ship.ownerId === me.id) return { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()} · EMPTY`, empty: true };
-    return { colour: COLOUR.inkDim, label: shipLabel(world, ship), empty: true };
-  }
-  const label = shipLabel(world, ship);
-  return label === 'UNKNOWN' ? { colour: COLOUR.ink } : { colour: COLOUR.ink, label };
+  const read = mine && ship.state === 'flying' && mine.locks.some((l) => l.targetId === ship.id) ? lockReadout(world, mine, ship.id) : null;
+  const who = readoutWho(read);
+  const colour = STANCE_COLOUR[readoutStance(read)];
+  if (!who) return { colour, empty };
+  // Another pilot's ship reads as that pilot, once identified.
+  const label = read?.identity?.flownBy === 'pilot' ? shipLabel(world, ship) : who;
+  return { colour, label, empty };
 }
 
 /** Labels are a setting, except on your own empty ships, which you need to find. */
@@ -573,6 +692,13 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, TRACTOR_RANGE, current.loot);
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
+  if (mine && view && mine.weaponsHot && mine.state === 'flying') {
+    // Where your swivels can reach: the gap is your blind sector.
+    const hull = current.hulls[mine.hullId]!;
+    const specs = shipStats(current, mine).weapons;
+    const arcs = hull.mounts.filter((m) => specs[m.id]?.kind === 'turret').map((m) => ({ facing: m.facing, arc: m.arc ?? Math.PI * 2 }));
+    drawSwivelArcs(ctx!, camera, view.position, view.heading, hull.radius, arcs);
+  }
   if (mine) drawNav(ctx!, camera, current, mine, alpha);
   // Every ship, flying or docked: a docked ship's position is its pad.
   for (const ship of Object.values(current.ships)) {
@@ -588,16 +714,34 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (read?.combat) drawHealthBars(ctx!, camera, ship, stats, shipView.position);
   }
 
+  const shotColours = new Map<string, string>();
   for (const p of current.projectiles) {
     const isMine = mine && p.ownerShipId === mine.id;
-    const shooterBrain = current.npcs[p.ownerShipId];
-    drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' ? COLOUR.hostile : COLOUR.neutral);
+    // Shots take the colour of the shooter as your computer reads it.
+    const shooter = current.ships[p.ownerShipId];
+    let colour = COLOUR.neutral;
+    if (isMine) colour = COLOUR.inkBright;
+    else if (shooter) {
+      colour = shotColours.get(shooter.id) ?? shipStyle(current, shooter, mine).colour;
+      shotColours.set(shooter.id, colour);
+    }
+    drawProjectile(ctx!, camera, p, colour);
   }
 
   explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
   for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
-  // No edge markers: the radar (hud/radar.ts) shows what your sensors and charts know.
+  // The nav target is the one marker in space; everything else is on the radar.
+  // Distance and arrival time come from the nav computer: without one, the marker only.
+  if (mine && navTarget && mine.state === 'flying') {
+    const fix = navFix(current, mine, navTarget);
+    if (fix) {
+      const nav = navReadout(current, mine);
+      const reading = nav ? `${formatDistance(fix.clearance)} · ${formatEta(fix.eta)}` : '';
+      const far = reading ? `${fix.name.toUpperCase()} · ${reading}` : fix.name.toUpperCase();
+      drawNavMarker(ctx!, camera, fix.position, fix.radius, reading ? `NAV · ${reading}` : 'NAV', far, COLOUR.inkBright);
+    }
+  }
 
   // Target bracket on the active lock (locking or locked) and, for fixed guns, the lead marker.
   const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
@@ -622,9 +766,10 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     yourShips.invalidate();
   }
   ui.update(current, mine);
-  flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
+  flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed, navLine(mine));
   targetCard.update(current, mine);
-  radar.update(current, mine, me.id, camera, eye);
+  radar.update(current, mine, me.id, camera, eye, selected, navTarget);
+  contacts.update(current, mine, me.id, selected, navTarget);
 }
 
 requestAnimationFrame(frame);

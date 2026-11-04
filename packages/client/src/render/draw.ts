@@ -222,57 +222,87 @@ export function drawPodBeacon(ctx: CanvasRenderingContext2D, camera: Camera, at:
 }
 
 /**
- * Marker at the screen edge pointing at something off screen, with a
- * label and distance. Draws nothing if any part of the object (a circle
- * of `radius` world units) is on screen. The radar replaced the markers
- * for everything; this stays for the nav target (stage 4).
+ * The nav target's marker. On screen: a diamond round the target, clear
+ * of its hull (`radius` world units), with `near` under it (the target
+ * names itself). Off screen: a double chevron near the screen edge
+ * pointing at it, with `far` beside it. The edge keeps clear of the HUD:
+ * more room at the top for the status and at the bottom for the dial.
+ * The one marker in space (Jason's call): everything else is on the radar.
  */
-export function drawOffscreenMarker(
+export function drawNavMarker(
   ctx: CanvasRenderingContext2D,
   camera: Camera,
   target: { x: number; y: number },
-  label: string,
-  distance: number,
+  radius: number,
+  near: string,
+  far: string,
   colour: string,
-  radius = 0,
 ): void {
   const p = camera.worldToScreen(target);
   const w = camera.viewportWidth;
   const h = camera.viewportHeight;
-  const margin = 28;
-  // Any part of the object on screen counts as visible.
-  const r = radius * camera.zoom;
-  if (p.x >= -r && p.x <= w + r && p.y >= -r && p.y <= h + r) return;
+  ctx.font = '11px "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace';
+  ctx.fillStyle = colour;
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1.5;
 
-  // Clamp the direction from screen centre onto an inset rectangle.
+  const r = radius * camera.zoom;
+  if (p.x >= -r && p.x <= w + r && p.y >= -r && p.y <= h + r) {
+    // On screen: a diamond just outside the hull, the label under it.
+    const d = Math.min(r + 14, Math.max(w, h));
+    if (p.x >= 0 && p.x <= w && p.y >= 0 && p.y <= h) {
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - d);
+      ctx.lineTo(p.x + d, p.y);
+      ctx.lineTo(p.x, p.y + d);
+      ctx.lineTo(p.x - d, p.y);
+      ctx.closePath();
+      ctx.globalAlpha = 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.textAlign = 'center';
+      ctx.fillText(near, p.x, Math.min(h - 8, p.y + d + 16));
+    }
+    return;
+  }
+
+  // Off screen: follow the bearing from your ship (the screen centre) out to
+  // an inset rectangle that keeps the marker off the HUD.
   const cx = w / 2;
   const cy = h / 2;
+  const left = Math.min(60, cx - 10);
+  const right = w - Math.min(60, cx - 10);
+  const top = Math.min(110, cy - 10);
+  // The dial and its tiles stand about 240px tall at the bottom centre.
+  const bottom = h - Math.min(260, cy - 10);
   const dx = p.x - cx;
   const dy = p.y - cy;
-  const scale = Math.min((cx - margin) / Math.abs(dx || 1e-9), (cy - margin) / Math.abs(dy || 1e-9));
-  const mx = cx + dx * scale;
-  const my = cy + dy * scale;
-  const angle = Math.atan2(dy, dx);
+  const kx = dx > 0 ? (right - cx) / dx : dx < 0 ? (left - cx) / dx : Infinity;
+  const ky = dy > 0 ? (bottom - cy) / dy : dy < 0 ? (top - cy) / dy : Infinity;
+  const k = Math.min(kx, ky);
+  const mx = cx + dx * k;
+  const my = cy + dy * k;
 
   ctx.save();
   ctx.translate(mx, my);
-  ctx.rotate(angle);
-  ctx.strokeStyle = colour;
-  ctx.lineWidth = 1.5;
+  ctx.rotate(Math.atan2(dy, dx));
   ctx.beginPath();
-  ctx.moveTo(8, 0);
-  ctx.lineTo(-4, -6);
-  ctx.lineTo(-4, 6);
-  ctx.closePath();
+  ctx.moveTo(-6, -9);
+  ctx.lineTo(4, 0);
+  ctx.lineTo(-6, 9);
+  ctx.moveTo(-12, -9);
+  ctx.lineTo(-2, 0);
+  ctx.lineTo(-12, 9);
   ctx.stroke();
   ctx.restore();
 
-  ctx.fillStyle = colour;
-  ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
-  ctx.textAlign = mx > cx ? 'right' : 'left';
-  const tx = mx + (mx > cx ? -14 : 14);
-  const ty = my + (my > cy ? -10 : 18);
-  ctx.fillText(`${label} ${Math.round(distance)}`, tx, ty);
+  // Beside the chevron, on the inside: centred above or below it near the
+  // top and bottom middle, to its left or right elsewhere.
+  const middle = Math.abs(mx - cx) < 120;
+  ctx.textAlign = middle ? 'center' : mx > cx ? 'right' : 'left';
+  const tx = middle ? mx : mx + (mx > cx ? -20 : 20);
+  const ty = middle ? my + (my > cy ? -18 : 26) : my + 4;
+  ctx.fillText(far, tx, ty);
 }
 
 /** A projectile: a short streak behind it along its velocity. */
@@ -412,4 +442,33 @@ export function drawLeadMarker(ctx: CanvasRenderingContext2D, camera: Camera, le
   ctx.beginPath();
   ctx.arc(l.x, l.y, 1.5, 0, Math.PI * 2);
   ctx.fill();
+}
+
+/**
+ * Swivel coverage round your own ship while weapons are hot: a thin arc
+ * per swivel at a little beyond the hull, so the blind sector shows
+ * where it is in space. `arcs` are hull-space (facing, width) pairs;
+ * a width of a full turn or more draws a whole ring.
+ */
+export function drawSwivelArcs(
+  ctx: CanvasRenderingContext2D,
+  camera: Camera,
+  at: { x: number; y: number },
+  heading: number,
+  radius: number,
+  arcs: readonly { facing: number; arc: number }[],
+): void {
+  if (arcs.length === 0) return;
+  const c = camera.worldToScreen(at);
+  const r = radius * camera.zoom + 18;
+  ctx.strokeStyle = COLOUR.hostile;
+  ctx.globalAlpha = 0.35;
+  ctx.lineWidth = 2;
+  for (const a of arcs) {
+    ctx.beginPath();
+    if (a.arc >= Math.PI * 2 - 1e-6) ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+    else ctx.arc(c.x, c.y, r, heading + a.facing - a.arc / 2, heading + a.facing + a.arc / 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
 }

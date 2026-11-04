@@ -7,6 +7,8 @@
   --warn: #e0a458;
   --faint: #1f3532;
   --shield: #7cc8ff;
+  /* The capacitor: pale straw, apart from amber (caution) and red (alarm). */
+  --cap: #e6dfa8;
   --hostile: #e06c5a;
   --neutral: #8fa8c8;
   --alarm: #ff5c5c;
@@ -127,8 +129,18 @@ canvas#game {
   align-items: flex-start;
 }
 
-.outfitting-preview {
+.outfitting-drawing {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.outfitting-coverage {
+  margin: 0;
+  max-width: 360px;
+  font-size: 11px;
+  color: var(--ink-dim);
 }
 
 /* Takes the rest of the row, so long warnings wrap inside the panel. */
@@ -746,31 +758,33 @@ button:hover {
   stroke: var(--alarm);
 }
 
-.hud-dial .ring.capacitor {
+.hud-dial .ring.cap-seg {
   stroke: var(--faint);
-  stroke-width: 5;
-  stroke-dasharray: 6 4;
+  stroke-width: 6;
 }
 
-.hud-dial .ring.cap {
+.hud-dial .ring.cap-seg.lit {
+  stroke: var(--cap);
+}
+
+.hud-dial .ring.cap-seg.lit.low {
   stroke: var(--warn);
-  stroke-width: 5;
 }
 
-.hud-dial .ring.cap.low {
+.hud-dial .ring.cap-seg.lit.empty {
   stroke: var(--alarm);
 }
 
-.hud-weapon-ammo {
-  display: block;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  color: var(--ink-dim);
-  margin-top: 2px;
+.dial-label.cap {
+  fill: var(--cap);
 }
 
-.hud-weapon-ammo.low {
-  color: var(--alarm);
+.dial-label.cap.low {
+  fill: var(--warn);
+}
+
+.dial-label.cap.empty {
+  fill: var(--alarm);
 }
 
 .dial-speed {
@@ -807,6 +821,11 @@ button:hover {
   white-space: nowrap;
 }
 
+.hud-chip.caution {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
 .hud-chip.hot {
   border-color: var(--hostile);
   color: var(--hostile);
@@ -819,9 +838,10 @@ button:hover {
 }
 
 .hud-weapon {
-  width: 62px;
-  height: 62px;
-  border: 1px solid var(--ink-dim);
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border: 1px solid var(--faint);
   background: var(--panel);
   display: flex;
   flex-direction: column;
@@ -843,8 +863,85 @@ button:hover {
   stroke-width: 2;
 }
 
+.hud-weapon.armed {
+  border-color: var(--ink);
+}
+
+.hud-weapon.armed .hud-weapon-key {
+  color: var(--ink-bright);
+}
+
 .hud-weapon.active {
   border-color: var(--hostile);
+}
+
+.hud-weapon.blind {
+  border-color: var(--warn);
+}
+
+.hud-weapon.blind .hud-weapon-key {
+  color: var(--warn);
+}
+
+.hud-weapon.cannot {
+  border-color: var(--alarm);
+}
+
+.hud-weapon.cannot .icon {
+  stroke: var(--ink-dim);
+}
+
+/* Fire group in the tile's corner. */
+.hud-weapon-group {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 9px;
+  color: var(--ink-dim);
+}
+
+.hud-weapon.armed .hud-weapon-group {
+  color: var(--ink-bright);
+}
+
+/* What the gun runs on: a bar (magazine, reload or capacitor) and words. */
+.hud-weapon-supply {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  gap: 1px;
+  font-size: 9px;
+  color: var(--ink-dim);
+}
+
+.hud-weapon-supply .bar {
+  --fill: 1;
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, var(--ink) calc(var(--fill) * 100%), var(--faint) 0);
+}
+
+.hud-weapon-supply.reload .bar {
+  background: linear-gradient(to right, var(--ink-dim) calc(var(--fill) * 100%), var(--faint) 0);
+}
+
+.hud-weapon.energy .hud-weapon-supply .bar {
+  background: linear-gradient(to right, var(--cap) calc(var(--fill) * 100%), var(--faint) 0);
+}
+
+.hud-weapon-supply.low {
+  color: var(--warn);
+}
+
+.hud-weapon-supply.low .bar {
+  background: linear-gradient(to right, var(--warn) calc(var(--fill) * 100%), var(--faint) 0);
+}
+
+.hud-weapon-supply.dry,
+.hud-weapon-supply.starved {
+  color: var(--alarm);
 }
 
 .hud-weapon.active .hud-weapon-kind {
@@ -1120,4 +1217,108 @@ button:hover {
 
 .hud-radar-caption {
   font-size: 11px;
+}
+
+/* Nav target line, top left: brighter than the rest of the status block. */
+.hud-nav {
+  color: var(--ink-bright);
+  margin-top: 4px;
+}
+
+/* Contacts list (O), bottom right, above the stopgap nav readout. Takes clicks. */
+.hud-contacts {
+  position: absolute;
+  right: 16px;
+  bottom: 64px;
+  width: 300px;
+  max-height: 36vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--faint);
+  background: var(--panel);
+  pointer-events: auto;
+  font-size: 11px;
+}
+
+.hud-contacts-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.hud-contacts-head .hud-dim {
+  font-size: 10px;
+}
+
+.hud-contacts-list {
+  overflow-y: auto;
+}
+
+.hud-contact {
+  display: grid;
+  grid-template-columns: 22px 40px 1fr 62px;
+  align-items: baseline;
+  width: 100%;
+  padding: 3px 8px;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hud-contact:hover,
+.hud-contact:focus-visible {
+  background: rgba(159, 211, 199, 0.08);
+  outline: none;
+}
+
+.hud-contact.selected {
+  border-left-color: var(--ink);
+  background: rgba(159, 211, 199, 0.12);
+}
+
+.hud-contact .mark {
+  color: var(--ink-bright);
+}
+
+.hud-contact .type {
+  color: var(--ink-dim);
+  font-size: 10px;
+}
+
+.hud-contact .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud-contact .dist {
+  text-align: right;
+  color: var(--ink-dim);
+}
+
+.hud-contact.nav .name {
+  color: var(--ink-bright);
+}
+
+.hud-contact.hostile .name,
+.hud-contact.hostile .mark {
+  color: var(--hostile);
+}
+
+.hud-contact.neutral .name {
+  color: var(--neutral);
+}
+
+.hud-contact.watch .name {
+  color: var(--watch);
+}
+
+.hud-contact.empty .name,
+.hud-contact.unknown .name {
+  color: var(--ink-dim);
 }

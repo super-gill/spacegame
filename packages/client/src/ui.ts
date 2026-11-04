@@ -220,6 +220,17 @@ export class Ui {
     if (this.podText.textContent !== text) this.podText.textContent = text;
   }
 
+  /** When each repeating toast was last shown, so one held trigger does not flood the screen. */
+  private readonly lastShown = new Map<string, number>();
+
+  /** True if the toast `key` was not shown in the last few seconds; marks it shown. */
+  private notTooOften(key: string, ms = 3000): boolean {
+    const now = performance.now();
+    if (now - (this.lastShown.get(key) ?? -Infinity) < ms) return false;
+    this.lastShown.set(key, now);
+    return true;
+  }
+
   /**
    * Toasts for events involving this pilot's ship: things that happened to
    * it (`shipId`) or that it caused (`by`).
@@ -257,6 +268,13 @@ export class Ui {
         this.showToast(e.reason === 'outOfRange' ? 'Lock lost: out of sensor range.' : 'Lock lost.', 1500, 'info');
       } else if (e.type === 'lootCollected') {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
+      } else if (e.type === 'capacitorEmpty') {
+        // The sim says so on every shot it refuses; say it once in a while.
+        if (this.notTooOften('capacitorEmpty')) this.showToast('Capacitor empty: energy guns cannot fire.', 1500);
+      } else if (e.type === 'outOfAmmo') {
+        if (this.notTooOften(`outOfAmmo:${e.mountId}`)) this.showToast(`Out of ammunition on ${e.mountId.toUpperCase()}. Buy more at a station.`, 2000);
+      } else if (e.type === 'fireGroupChanged') {
+        this.showToast(`Fire group ${e.group}`, 900, 'info');
       }
     }
   }

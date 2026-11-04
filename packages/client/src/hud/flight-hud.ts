@@ -1,4 +1,4 @@
-import type { NavReadout, Ship, World } from '@spacegame/sim';
+import type { NavReadout, Ship, WeaponSpec, World } from '@spacegame/sim';
 import {
   FLIGHT_MODE_LABELS,
   boardableShips,
@@ -12,16 +12,18 @@ import {
 import { boardPrompt, shipName } from '../ui.js';
 import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, reloadProgress } from './geometry.js';
+import { arcCovers, capacitorTone, gunSupply, gunWord, litSegments } from './weapon-readout.js';
 
 /**
  * The flight HUD: the always-on instruments at the screen edges.
  *
- * - Top left: which ship you are in, the zone, credits and cargo.
- * - Bottom centre: the status dial (shield and hull rings round your
- *   speed against your local frame, with the capacitor ring reserved
- *   for milestone 6e), the frame named under it, the flight mode and weapons state, and a tile per weapon. Only modules
- *   you use in flight get a place here; the rest belong in the ship
- *   status window.
+ * - Top left: which ship you are in, the zone, credits and cargo, and the
+ *   nav target with its distance and arrival time (from the nav computer).
+ * - Bottom centre: the status dial (shield and hull rings, the
+ *   capacitor as a segmented inner ring, and your speed against your
+ *   local frame), the frame named under it, the flight mode, weapons and
+ *   fire group, and a tile per weapon. Only modules you use in flight get
+ *   a place here; the rest belong in the ship status window.
  * - Above the dial: what you can do right now (dock, board).
  * - Top centre: the one warning in force (a placeholder until warning
  *   tiers land).
@@ -38,6 +40,9 @@ const MID = DIAL / 2;
 const SHIELD_R = 84;
 const HULL_R = 72;
 const CAP_R = 54;
+/** The capacitor ring is cut into segments, EVE style, so a shot's cost is visible as a step. */
+const CAP_SEGMENTS = 20;
+const CAP_GAP_DEG = 3;
 
 /** Hull below these fractions turns to the caution, then the alarm colour. */
 const HULL_CAUTION = 0.5;
@@ -54,10 +59,14 @@ function frameWords(world: World, nav: NavReadout): string {
 
 interface WeaponTile {
   root: HTMLDivElement;
+  /** Cooldown between shots, round the icon. */
   reload: SVGPathElement;
+  group: HTMLSpanElement;
   state: HTMLSpanElement;
-  /** What the gun runs on: rounds loaded and boxes aboard, or CAP. */
-  ammo: HTMLSpanElement;
+  /** What the gun runs on: magazine or capacitor as a bar, with words. Absent for a gun that spends nothing. */
+  supply: HTMLSpanElement | null;
+  supplyBar: HTMLSpanElement;
+  supplyText: HTMLSpanElement;
 }
 
 export class FlightHud {
@@ -66,11 +75,13 @@ export class FlightHud {
   private readonly shipLine = el('div', 'hud-ship');
   private readonly zoneLine = el('div', 'hud-dim');
   private readonly walletLine = el('div', 'hud-dim');
+  private readonly navLine = el('div', 'hud-nav');
   private readonly alert = el('div', 'hud-alert caution hidden');
   private readonly cluster = el('div', 'hud-cluster');
   private readonly prompt = el('div', 'hud-prompt');
   private readonly shieldArc = svg('path', { class: 'ring shield' });
-  private readonly capArc = svg('path', { class: 'ring cap' });
+  private readonly capSegments: SVGPathElement[] = [];
+  private readonly capLabel = svg('text', { x: MID, y: MID - 24, class: 'dial-label cap', 'text-anchor': 'middle' });
   private readonly hullArc = svg('path', { class: 'ring hull' });
   private readonly speed = svg('text', { x: MID, y: MID + 8, class: 'dial-speed', 'text-anchor': 'middle' });
   private readonly speedUnit = svg('text', { x: MID, y: MID + 26, class: 'dial-unit', 'text-anchor': 'middle' });
@@ -79,13 +90,14 @@ export class FlightHud {
   private readonly frameLine = el('div', 'hud-frame');
   private readonly modeChip = el('span', 'hud-chip');
   private readonly weaponsChip = el('span', 'hud-chip');
+  private readonly groupChip = el('span', 'hud-chip');
   private readonly weapons = el('div', 'hud-weapons');
   private readonly debug = el('div', 'hud-debug');
   private weaponTiles = new Map<string, WeaponTile>();
   private weaponKey = '';
 
   constructor(parent: HTMLElement) {
-    this.status.append(this.shipLine, this.zoneLine, this.walletLine);
+    this.status.append(this.shipLine, this.zoneLine, this.walletLine, this.navLine);
 
     const dial = svg('svg', {
       width: DIAL,
@@ -101,9 +113,8 @@ export class FlightHud {
       this.shieldArc,
       track(HULL_R),
       this.hullArc,
-      // The capacitor (6e): the inner ring fills with the pool.
-      svg('circle', { cx: MID, cy: MID, r: CAP_R, class: 'ring capacitor' }),
-      this.capArc,
+      ...this.buildCapacitor(),
+      this.capLabel,
       this.speed,
       this.speedUnit,
       this.shieldLabel,
@@ -111,7 +122,7 @@ export class FlightHud {
     );
 
     const chips = el('div', 'hud-chips');
-    chips.append(this.modeChip, this.weaponsChip);
+    chips.append(this.modeChip, this.weaponsChip, this.groupChip);
     const centre = el('div', 'hud-dial-column');
     centre.append(dial, this.frameLine, chips);
     this.cluster.append(centre, this.weapons);
@@ -120,12 +131,22 @@ export class FlightHud {
     parent.append(this.root);
   }
 
+  /** The capacitor ring: CAP_SEGMENTS short arcs over the same sweep as the other rings. */
+  private buildCapacitor(): SVGPathElement[] {
+    const step = RING_SWEEP / CAP_SEGMENTS;
+    for (let i = 0; i < CAP_SEGMENTS; i++) {
+      const d = arcPath(MID, MID, CAP_R, 1, RING_START + i * step + CAP_GAP_DEG / 2, step - CAP_GAP_DEG);
+      this.capSegments.push(svg('path', { class: 'ring cap-seg', d }));
+    }
+    return this.capSegments;
+  }
+
   /**
    * Refresh. `ship` is null while the pilot has no ship. `nav` is the
    * ship's `navReadout` (null without a nav computer): speed and frame
    * are shown only through it, never worked out here.
    */
-  update(world: World, ship: Ship | null, nav: NavReadout | null, fps: number): void {
+  update(world: World, ship: Ship | null, nav: NavReadout | null, fps: number, navTarget = ''): void {
     setText(this.debug, `${fps.toFixed(0)} fps · tick ${world.tick}`);
     show(this.status, ship !== null);
     show(this.cluster, ship !== null && ship.state === 'flying');
@@ -148,6 +169,7 @@ export class FlightHud {
     this.shipLine.classList.toggle('pod', inPod);
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
     setText(this.zoneLine, secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE');
+    setText(this.navLine, ship.state === 'flying' ? navTarget : '');
     setText(this.walletLine, `CR ${(pilot?.credits ?? 0).toLocaleString('en-GB')} · CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}`);
 
     // Top centre: until warning tiers land, the one warning there is.
@@ -166,9 +188,15 @@ export class FlightHud {
     const shieldF = fraction(ship.shield, stats.shield);
     const hullF = fraction(ship.structure, stats.structure);
     setAttr(this.shieldArc, 'd', arcPath(MID, MID, SHIELD_R, shieldF, RING_START, RING_SWEEP));
+    // Capacitor: lit segments for the pool, amber below a quarter, red when
+    // the hungriest gun can no longer pay for a shot.
     const capF = fraction(ship.capacitor, stats.capacitor);
-    setAttr(this.capArc, 'd', arcPath(MID, MID, CAP_R, capF, RING_START, RING_SWEEP));
-    this.capArc.classList.toggle('low', capF < 0.2);
+    const hungriest = Math.max(0, ...Object.values(stats.weapons).map((w) => w.capacitorPerShot));
+    const tone = capacitorTone(ship.capacitor, stats.capacitor, hungriest);
+    const lit = litSegments(capF, CAP_SEGMENTS);
+    this.capSegments.forEach((seg, i) => setAttr(seg, 'class', i < lit ? `ring cap-seg lit ${tone}` : 'ring cap-seg'));
+    setText(this.capLabel, `CAP ${Math.round(capF * 100)}%`);
+    setAttr(this.capLabel, 'class', `dial-label cap ${tone}`);
     setAttr(this.hullArc, 'd', arcPath(MID, MID, HULL_R, hullF, RING_START, RING_SWEEP));
     const hullState = hullF < HULL_ALARM ? 'ring hull alarm' : hullF < HULL_CAUTION ? 'ring hull caution' : 'ring hull';
     setAttr(this.hullArc, 'class', hullState);
@@ -182,13 +210,20 @@ export class FlightHud {
     setText(this.modeChip, `${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()} · Z`);
     setText(this.weaponsChip, ship.weaponsHot ? 'WEAPONS HOT · H' : 'WEAPONS COLD · H');
     this.weaponsChip.classList.toggle('hot', ship.weaponsHot);
+    // The fire group Space fires, and whether any gun is in it.
+    const fixedInGroup = ship.weapons.some((w) => w.group === ship.fireGroup && stats.weapons[w.mountId]?.kind === 'fixed');
+    const hasFixed = Object.values(stats.weapons).some((w) => w.kind === 'fixed');
+    setText(this.groupChip, hasFixed && !fixedInGroup ? `GROUP ${ship.fireGroup} EMPTY · 1-4` : `GROUP ${ship.fireGroup} · 1-4`);
+    this.groupChip.classList.toggle('caution', hasFixed && !fixedInGroup);
+    show(this.groupChip, hasFixed);
 
     this.updateWeapons(world, ship);
   }
 
   /** One tile per weapon mount, rebuilt only when the fit changes. */
   private updateWeapons(world: World, ship: Ship): void {
-    const specs = shipStats(world, ship).weapons;
+    const stats = shipStats(world, ship);
+    const specs = stats.weapons;
     const mounts = Object.keys(specs).sort();
     const key = mounts.map((m) => `${m}:${specs[m]!.id}`).join('|');
     if (key !== this.weaponKey) {
@@ -196,44 +231,68 @@ export class FlightHud {
       this.weapons.replaceChildren();
       this.weaponTiles = new Map();
       for (const mountId of mounts) {
-        const tile = weaponTile(specs[mountId]!.kind, specs[mountId]!.name);
+        const tile = weaponTile(specs[mountId]!);
         this.weaponTiles.set(mountId, tile);
         this.weapons.append(tile.root);
       }
     }
-    // Turrets fire only at a complete active lock.
+    // Swivels fire only at a complete lock, and only within their mount's arc.
     const active = ship.locks.find((l) => l.targetId === ship.activeLock);
-    const engaging = ship.weaponsHot && active !== undefined && active.progress >= 1;
+    const target = active && active.progress >= 1 ? world.ships[active.targetId] : undefined;
+    const hull = world.hulls[ship.hullId];
     for (const [mountId, tile] of this.weaponTiles) {
       const spec = specs[mountId]!;
       const state = ship.weapons.find((w) => w.mountId === mountId);
       const progress = state ? reloadProgress(state.cooldownTicks, spec.fireInterval, world.dt) : 1;
       setAttr(tile.reload, 'd', progress < 1 ? arcPath(14, 14, 12, progress, -90, 360) : '');
-      // Stopgap (lead, 6e): what the gun runs on. Rounds loaded and boxes
-      // in the hold for ammunition guns; the fire group for fixed guns.
-      if (spec.ammo && state) {
-        const boxes = ship.hold[spec.ammo] ?? 0;
-        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded} · ${boxes} BOX`);
-        tile.ammo.classList.toggle('low', state.loaded === 0 && boxes === 0);
-      } else {
-        setText(tile.ammo, spec.capacitorPerShot > 0 ? 'CAP' : '');
+
+      // What it runs on: rounds loaded and spare, or shots the capacitor can pay for.
+      const boxes = spec.ammo ? (ship.hold[spec.ammo] ?? 0) : 0;
+      const round = spec.ammo ? world.goods[spec.ammo] : undefined;
+      const supply = gunSupply(spec, state ?? { loaded: 0, reloadTicks: 0 }, boxes, round, ship.capacitor, stats.capacitor, world.dt);
+      if (tile.supply) {
+        setText(tile.supplyText, supply.text);
+        tile.supplyBar.style.setProperty('--fill', supply.fill.toFixed(3));
+        setAttr(tile.supply, 'class', `hud-weapon-supply ${supply.tone}`);
       }
+      const cannot = supply.tone === 'dry' || supply.tone === 'starved';
+
+      const group = state?.group ?? 1;
+      setText(tile.group, String(group));
       if (spec.kind === 'turret') {
-        setText(tile.state, engaging ? 'ENGAGING' : ship.weaponsHot ? 'AUTO' : 'COLD');
+        const mount = hull?.mounts.find((m) => m.id === mountId);
+        const bearing = target ? Math.atan2(target.position.y - ship.position.y, target.position.x - ship.position.x) - ship.heading : 0;
+        const blind = target !== undefined && mount !== undefined && !arcCovers(mount, bearing);
+        const far = target !== undefined && distance(ship.position, target.position) > spec.range;
+        const engaging = ship.weaponsHot && target !== undefined && !blind && !far && !cannot;
+        // COLD, AUTO (hot, waiting for a lock), BLIND (lock outside its arc),
+        // TOO FAR (beyond its range), ENGAGING, or HOLD (cannot pay for a shot).
+        setText(tile.state, !ship.weaponsHot ? 'COLD' : !target ? 'AUTO' : blind ? 'BLIND' : far ? 'TOO FAR' : engaging ? 'ENGAGING' : 'HOLD');
         tile.root.classList.toggle('active', engaging);
+        tile.root.classList.toggle('armed', false);
+        tile.root.classList.toggle('blind', ship.weaponsHot && blind);
+        tile.group.classList.add('hidden');
       } else {
-        const inGroup = state?.group === ship.fireGroup;
-        setText(tile.state, inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`);
-        tile.root.classList.toggle('active', inGroup);
+        const inGroup = group === ship.fireGroup;
+        setText(tile.state, inGroup ? 'SPACE' : `GROUP ${group}`);
+        tile.root.classList.toggle('armed', inGroup);
+        tile.root.classList.toggle('active', false);
       }
+      tile.root.classList.toggle('cannot', cannot);
     }
   }
 }
 
-/** A weapon tile: icon with a reload ring, its kind, and how it fires. */
-function weaponTile(kind: 'fixed' | 'turret', name: string): WeaponTile {
-  const root = el('div', `hud-weapon ${kind}`);
-  root.title = name;
+/**
+ * A weapon tile: the fire group in the corner, an icon with the cooldown
+ * ring, the gun type, what it runs on (a bar and words), and how it fires.
+ */
+function weaponTile(spec: WeaponSpec): WeaponTile {
+  const kind = spec.kind;
+  // Energy guns draw their bar from the capacitor, in its colour.
+  const root = el('div', `hud-weapon ${kind}${!spec.ammo && spec.capacitorPerShot > 0 ? ' energy' : ''}`);
+  root.title = spec.name;
+  const group = el('span', 'hud-weapon-group', '1');
   const icon = svg('svg', { width: 28, height: 28, viewBox: '0 0 28 28', 'aria-hidden': 'true' });
   if (kind === 'fixed') {
     icon.append(svg('path', { d: 'M14 6 V20 M10 11 L14 6 L18 11 M9 23 H19', class: 'icon' }));
@@ -242,9 +301,13 @@ function weaponTile(kind: 'fixed' | 'turret', name: string): WeaponTile {
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', kind === 'fixed' ? 'FIXED' : 'SWIVEL');
+  const label = el('span', 'hud-weapon-kind', gunWord(spec));
+  const supply = el('span', 'hud-weapon-supply');
+  const supplyBar = el('span', 'bar');
+  const supplyText = el('span', 'words');
+  supply.append(supplyBar, supplyText);
+  const spends = spec.ammo !== null || spec.capacitorPerShot > 0;
   const state = el('span', 'hud-weapon-key', kind === 'fixed' ? 'SPACE' : 'COLD');
-  const ammo = el('span', 'hud-weapon-ammo', '');
-  root.append(icon, label, state, ammo);
-  return { root, reload, state, ammo };
+  root.append(group, icon, label, ...(spends ? [supply] : []), state);
+  return { root, reload, group, state, supply: spends ? supply : null, supplyBar, supplyText };
 }
