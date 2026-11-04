@@ -264,7 +264,7 @@ describe('ship mart', () => {
     const rich = 1_000_000;
     expect(buyRefusal(quietWorld().w, 'ana', 'meridian-starter')).toBe('notDocked');
     expect(buyRefusal(anaDocked(RIDGE, rich).w, 'ana', 'meridian-starter')).toBe('noShipMart');
-    expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'ana', 'sparrow-dev')).toBe('notSold');
+    expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'ana', 'aurel-tacet-dev')).toBe('notSold');
     expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'ana', 'escape-pod')).toBe('notSold');
     expect(buyRefusal(anaDocked(HARBOUR, 10).w, 'ana', 'meridian-starter')).toBe('credits');
     expect(buyRefusal(anaDocked(HARBOUR, rich).w, 'nobody', 'meridian-starter')).toBe('noShip');

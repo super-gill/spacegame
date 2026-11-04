@@ -13,7 +13,7 @@ const stations = { st: station };
 function ship(overrides: Partial<Ship>): Ship {
   return {
     id: 's',
-    hullId: 'sparrow',
+    hullId: 'aurel-tacet',
     ownerId: null,
     position: { x: 200, y: 0 },
     velocity: { x: 0, y: 0 },

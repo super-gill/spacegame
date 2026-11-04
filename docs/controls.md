@@ -94,21 +94,21 @@ You can own several ships and fly one at a time. A ship you are not in is **empt
 | Board a particular ship | Board button in Your ships | Docked only |
 | Step out in an escape pod | G, twice within 2 seconds | In space only. Your ship stays where it is, empty, and keeps any speed it had: slow down first to park it |
 | Buy a ship | Buy button in Ship mart | |
-| Claim a free Courier | Button at the bottom of the docked panel | Only in an escape pod docked at Harbour, owning no ships |
+| Claim a free Tern | Button at the bottom of the docked panel | Only in an escape pod docked at Harbour, owning no ships |
 
 In space, the HUD names the ship B would board (`BOARD <SHIP> [B]`). When one of yours is near (within 600 units) but not boardable yet, it says what to do: `CLOSE TO 150` with the gap, or `MATCH SPEED` with your speed relative to it. Boarding from an escape pod uses the pod up.
 
 To leave a ship of yours out in space, step out with G: you get a pod beside it, moving gently away, in the flight mode you were using. Fly the pod to a station, board another ship there, come back and board the first one with B.
 
-Ships have no names yet; each is called by its hull and its number among the ships you have been issued, such as `Kessari Wedge #2`.
+Ships have no names yet; each is called by its hull and its number among the ships you have been issued, such as `Kessari Warrant #2`.
 
 ## Escape pods
 
 When your ship is destroyed you get away in an escape pod: a small orange lifeboat with a blinking beacon. The HUD's top line reads `>> ESCAPE POD: DOCK AT A STATION`. Fly it to a station and dock as normal.
 
-In a pod at Harbour, if you own no ships, the bottom of the docked panel offers **Claim a free Courier**. If you still own a ship it tells you to fetch it (see Your ships) or buy another.
+In a pod at Harbour, if you own no ships, the bottom of the docked panel offers **Claim a free Tern**. If you still own a ship it tells you to fetch it (see Your ships) or buy another.
 
-If your pod is destroyed too, a panel offers **Wake at Harbour**: in a new pod if you own a ship anywhere, or in a free Meridian Courier if you own none.
+If your pod is destroyed too, a panel offers **Wake at Harbour**: in a new pod if you own a ship anywhere, or in a free Meridian Tern if you own none.
 
 ## Interface
 

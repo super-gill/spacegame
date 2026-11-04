@@ -238,7 +238,7 @@ function boardNearest(): void {
   else if (myShip(current)) ui.notify('No ship of yours in reach to board.', 'warn');
 }
 
-/** Pilot command: in a pod at Harbour, owning nothing, take the free starter Courier. */
+/** Pilot command: in a pod at Harbour, owning nothing, take the free starter Tern. */
 function claimStarter(): void {
   const r = claimStarterShip(current, me.id);
   if (!r.ok) return; // the button only shows when the claim would succeed

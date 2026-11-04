@@ -20,7 +20,7 @@ const angularAccel = hull.rotationThrust / hull.mass;
 function ship(overrides: Partial<Ship> = {}, mode: FlightMode = 'manual'): Ship {
   return {
     id: 's',
-    hullId: 'sparrow',
+    hullId: 'aurel-tacet',
     position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
     heading: 0,

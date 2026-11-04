@@ -14,4 +14,6 @@ export const MANUFACTURERS: Record<string, ManufacturerSpec> = {
   rookRivet: { id: 'rookRivet', name: 'Rook and Rivet', race: 'freeBelt' },
   unionDefence: { id: 'unionDefence', name: 'Union Defence Works', race: 'freeBelt' },
   cantorVell: { id: 'cantorVell', name: 'Cantor-Vell Arms', race: 'halcyon' },
+  // The Aurel have no manufacturers: the Chorus shapes every ship. Every hull needs a maker, so this is simply "Aurel".
+  aurel: { id: 'aurel', name: 'Aurel', race: 'aurel' },
 };

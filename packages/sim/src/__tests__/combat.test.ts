@@ -16,7 +16,7 @@ import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } fr
 
 const SECOND = 60;
 /** Short names for the loadouts these tests build ships from. */
-const FITS = { sparrow: 'sparrow-dev', hauler: 'tessaract-trader', starter: 'meridian-starter', raider: 'kessari-raider' } as const;
+const FITS = { sparrow: 'aurel-tacet-dev', hauler: 'tessaract-trader', starter: 'meridian-starter', raider: 'kessari-raider' } as const;
 const sparrow = loadoutStats(FITS.sparrow);
 const hauler = loadoutStats(FITS.hauler);
 const starter = loadoutStats(FITS.starter);
@@ -53,7 +53,7 @@ describe('weapon catalogue', () => {
     }
   });
 
-  it('the Sparrow carries one fixed gun and one turret', () => {
+  it('the Aurel Tacet carries one fixed gun and one turret', () => {
     const s = ship('s');
     expect(s.weapons.map((w) => sparrow.weapons[w.mountId]!.kind).sort()).toEqual(['fixed', 'turret']);
   });

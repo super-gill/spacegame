@@ -83,7 +83,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
 export const POINTER_CONTROLS: readonly PointerControl[] = [
   { input: 'Left click', group: 'Targeting', label: 'Click a ship to target it' },
   { input: 'Click', group: 'Station', label: 'Undock button (when docked)' },
-  { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Courier' },
+  { input: 'Click', group: 'Ships', label: 'Ship mart and Your ships tabs (when docked): buy, board, claim the free Tern' },
   { input: 'Click', group: 'Interface', label: 'Controls and Menu buttons, top right' },
 ];
 

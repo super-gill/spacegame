@@ -99,9 +99,13 @@ A ship's performance is computed from its hull plus its fit (plus cargo mass), n
 - Navy hulls need standing and a licence with that race (see races.md).
 - New pilots start in a Meridian Civil Yards starter ship.
 
-## The Sparrow
+## The Aurel Tacet
 
-The Sparrow is now a development ship: complete, unrefittable, outside the normal economy. It stays in the code for testing.
+The Aurel Tacet (`aurel-tacet`) is the development and test ship: complete, sealed, unrefittable, outside the normal economy, and never issued. It replaced the Sparrow in 0.8.0 and flies the same, so tests that lean on it keep their meaning. Its drawing is a single outline for now; the Aurel look (floating segments, pale white, cyan glow, see `races.md`) is a client job for later.
+
+## Names
+
+Every hull, module, manufacturer and loadout is named from the lore; the table is in `lore.md` under "Names". Catalogue ids did not change when names were applied (saves refer to ids), so the ids still read `meridian-courier`, `kessari-wedge` and so on. In play: Meridian Tern (`meridian-courier`), Kessari Warrant (`kessari-wedge`), Tessaract Manifest (`tessaract-spine`), Meridian Ark (`escape-pod`). Plans below written before the naming pass use the old names.
 
 ## First build slice
 

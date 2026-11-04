@@ -40,7 +40,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'slagline-engine-m': {
     id: 'slagline-engine-m',
-    name: 'Slagline Surge M',
+    name: 'Slagline Runner M',
     kind: 'engine',
     size: 'M',
     mounts: ['engine'],
@@ -70,7 +70,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'slagline-thrusters-m': {
     id: 'slagline-thrusters-m',
-    name: 'Slagline Vector M',
+    name: 'Slagline Jink M',
     kind: 'thrusters',
     size: 'M',
     mounts: ['core'],
@@ -100,7 +100,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'itomarr-reactor-m': {
     id: 'itomarr-reactor-m',
-    name: 'Ito-Marr Lattice M',
+    name: 'Ito-Marr Reservoir M',
     kind: 'reactor',
     size: 'M',
     mounts: ['core', 'internal'],
@@ -146,7 +146,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Armour plating: structure.
   'rookrivet-armour-s': {
     id: 'rookrivet-armour-s',
-    name: 'Rook and Rivet Plate S',
+    name: 'Rook and Rivet Patchplate S',
     kind: 'armour',
     size: 'S',
     mounts: ['utility'],
@@ -160,7 +160,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'cantorvell-armour-m': {
     id: 'cantorvell-armour-m',
-    name: 'Cantor-Vell Bulwark M',
+    name: 'Cantor-Vell Vigil M',
     kind: 'armour',
     size: 'M',
     mounts: ['utility'],
@@ -176,7 +176,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Cargo pods.
   'meridian-pod-s': {
     id: 'meridian-pod-s',
-    name: 'Meridian Pod S',
+    name: 'Meridian Carryall S',
     kind: 'cargoPod',
     size: 'S',
     mounts: ['bay'],
@@ -190,7 +190,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'tessaract-container-m': {
     id: 'tessaract-container-m',
-    name: 'Tessaract Container M',
+    name: 'Tessaract Standard M',
     kind: 'cargoPod',
     size: 'M',
     mounts: ['bay'],
@@ -206,7 +206,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Weapons.
   'paragon-pulse-s': {
     id: 'paragon-pulse-s',
-    name: 'Paragon Pulse Cannon S',
+    name: 'Paragon Fairshot S',
     kind: 'weapon',
     size: 'S',
     mounts: ['weapon'],
@@ -221,7 +221,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'paragon-turret-s': {
     id: 'paragon-turret-s',
-    name: 'Paragon Light Turret S',
+    name: 'Paragon Watchman S',
     kind: 'weapon',
     size: 'S',
     mounts: ['weapon'],
@@ -236,7 +236,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'union-autocannon-m': {
     id: 'union-autocannon-m',
-    name: 'Union Autocannon M',
+    name: 'Union Picket M',
     kind: 'weapon',
     size: 'M',
     mounts: ['weapon'],
@@ -251,7 +251,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'paragon-turret-m': {
     id: 'paragon-turret-m',
-    name: 'Paragon Turret M',
+    name: 'Paragon Sentry M',
     kind: 'weapon',
     size: 'M',
     mounts: ['weapon'],

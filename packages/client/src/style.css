@@ -424,7 +424,7 @@ button.link {
   color: var(--ink-dim);
 }
 
-/* In a pod: the free Courier, below Undock so nothing above it moves. */
+/* In a pod: the free Tern, below Undock so nothing above it moves. */
 .pod-block {
   margin-top: 14px;
   padding-top: 12px;

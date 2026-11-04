@@ -29,7 +29,7 @@ export const HULLS: Record<string, HullSpec> = {
     // Civilian starter. Light, forgiving, a little of everything and room
     // for one upgrade (the empty armour mount).
     id: 'meridian-courier',
-    name: 'Meridian Courier',
+    name: 'Meridian Tern',
     race: null,
     manufacturer: 'meridian',
     role: 'civilian',
@@ -58,7 +58,7 @@ export const HULLS: Record<string, HullSpec> = {
     // Kessari Orbital Defence frigate: two medium gun mounts forward of the
     // wing roots, a light turret on the nose, twin engines.
     id: 'kessari-wedge',
-    name: 'Kessari Wedge',
+    name: 'Kessari Warrant',
     race: 'kessari',
     manufacturer: 'kessariOrbital',
     role: 'combat',
@@ -94,7 +94,7 @@ export const HULLS: Record<string, HullSpec> = {
     // bays, twin engines. Best hauler there is full; handles far better
     // half loaded.
     id: 'tessaract-spine',
-    name: 'Tessaract Spine',
+    name: 'Tessaract Manifest',
     race: 'kessari',
     manufacturer: 'tessaract',
     role: 'transport',
@@ -130,20 +130,23 @@ export const HULLS: Record<string, HullSpec> = {
     ],
   },
 
-  sparrow: {
-    // Development ship: complete, sealed, outside the economy. Kept for
-    // testing; nobody is issued one.
-    id: 'sparrow',
-    name: 'Sparrow',
-    race: null,
-    manufacturer: 'meridian',
+  'aurel-tacet': {
+    // Development and test ship: a living Aurel ship whose voice has never
+    // sung to anyone (docs/lore.md, "Names"). Complete, sealed, outside
+    // the economy; nobody is issued one. Aurel ships are floating
+    // segments: a long keel and two vanes, with gaps between. Flies like
+    // the Sparrow it replaced, so tests that lean on it keep their meaning.
+    id: 'aurel-tacet',
+    name: 'Aurel Tacet',
+    race: 'aurel',
+    manufacturer: 'aurel',
     role: 'development',
     sizeClass: 'S',
     price: 0,
     mass: 5,
     structure: 100,
     radius: 18,
-    outline: outline([[18, 0], [-12.6, -11.7], [-7.2, 0], [-12.6, 11.7]]),
+    outline: outline([[18, 0], [6, -3], [-14, -3], [-10, 0], [-14, 3], [6, 3]]),
     maxSpeed: 350,
     maxTurnRate: 2.4,
     mounts: [
@@ -164,7 +167,7 @@ export const HULLS: Record<string, HullSpec> = {
     // destroyed the pilot is ejected in it. Sealed: it cannot be bought,
     // sold or refitted. Slow and fragile, enough to limp home on.
     id: 'escape-pod',
-    name: 'Escape pod',
+    name: 'Meridian Ark',
     race: null,
     manufacturer: 'meridian',
     role: 'civilian',

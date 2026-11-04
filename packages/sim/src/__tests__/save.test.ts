@@ -63,8 +63,8 @@ describe('save round trip', () => {
 describe('loading applies current catalogues', () => {
   it('replaces saved hull stats with the ones in the code', () => {
     const w = createStarterWorld();
-    const tampered = { ...w, hulls: { ...w.hulls, sparrow: { ...w.hulls['sparrow']!, maxSpeed: 99999 } } };
-    expect(load(serializeWorld(tampered, AT)).hulls['sparrow']!.maxSpeed).toBe(HULLS['sparrow']!.maxSpeed);
+    const tampered = { ...w, hulls: { ...w.hulls, 'aurel-tacet': { ...w.hulls['aurel-tacet']!, maxSpeed: 99999 } } };
+    expect(load(serializeWorld(tampered, AT)).hulls['aurel-tacet']!.maxSpeed).toBe(HULLS['aurel-tacet']!.maxSpeed);
   });
 });
 

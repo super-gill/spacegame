@@ -35,5 +35,5 @@ export function loadoutStats(loadoutId: string): ShipStats {
   return fitStats(TEST_CATALOGUES, HULLS[loadout.hullId]!, loadout.fit);
 }
 
-/** Flight stats for physics tests: the Sparrow development ship as built. */
-export const TEST_STATS: ShipStats = loadoutStats('sparrow-dev');
+/** Flight stats for physics tests: the Aurel Tacet development ship as built. */
+export const TEST_STATS: ShipStats = loadoutStats('aurel-tacet-dev');

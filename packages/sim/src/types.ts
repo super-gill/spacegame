@@ -144,7 +144,7 @@ export interface HullSpec {
   maxTurnRate: number;
   mounts: MountPoint[];
   bonuses: HullBonus[];
-  /** A sealed hull cannot be refitted or bought (the Sparrow dev ship, escape pods). */
+  /** A sealed hull cannot be refitted or bought (the Aurel Tacet dev ship, escape pods). */
   sealed?: boolean;
   /**
    * Price of the bare frame at a ship mart, credits. A ship's price is

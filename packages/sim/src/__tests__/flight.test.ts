@@ -16,7 +16,7 @@ const SECOND = 60;
 function ship(mode: FlightMode, overrides: Partial<Ship> = {}): Ship {
   return {
     id: 's',
-    hullId: 'sparrow',
+    hullId: 'aurel-tacet',
     position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
     heading: 0,

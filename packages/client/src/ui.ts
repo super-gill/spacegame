@@ -45,7 +45,7 @@ export function shipLabel(world: World, ship: Ship): string {
 
 /**
  * A ship's name for people: its hull, and its number in the owner's
- * sequence so two of the same hull can be told apart ("Kessari Wedge #3").
+ * sequence so two of the same hull can be told apart ("Kessari Warrant #3").
  * Ships have no names of their own yet.
  */
 export function shipName(world: World, ship: Ship): string {
@@ -226,7 +226,7 @@ export class Ui {
 
   /**
    * Bottom of the docked panel, below Undock so it never moves anything
-   * above it: in a pod, either the free Courier claim or why there is
+   * above it: in a pod, either the free Tern claim or why there is
    * none here.
    */
   private updatePodBlock(world: World, pilotId: string | null, inPod: boolean): void {
@@ -235,10 +235,10 @@ export class Ui {
     this.claimButton.classList.toggle('hidden', refusal !== null);
     const text =
       refusal === null
-        ? 'You own no ships. Harbour will give you a Meridian Courier for free.'
+        ? 'You own no ships. Harbour will give you a Meridian Tern for free.'
         : refusal === 'ownsShips'
-          ? 'You still own a ship, so there is no free Courier. Find it under Your ships and fetch it, or buy another.'
-          : 'The free Courier is given at Harbour Station, to pilots who own no ships.';
+          ? 'You still own a ship, so there is no free Tern. Find it under Your ships and fetch it, or buy another.'
+          : 'The free Tern is given at Harbour Station, to pilots who own no ships.';
     if (this.podText.textContent !== text) this.podText.textContent = text;
   }
 

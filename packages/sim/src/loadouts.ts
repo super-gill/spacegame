@@ -9,7 +9,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // Armoured so a new pilot outlasts the raider the way the old Sparrow
     // outlasted the Jackal: 180 HP and 70 dps against 160 HP and 50 dps.
     id: 'meridian-starter',
-    name: 'Meridian Courier, starter fit',
+    name: 'Meridian Tern, Registry issue',
     hullId: 'meridian-courier',
     fit: {
       w1: 'paragon-pulse-s',
@@ -25,7 +25,7 @@ export const LOADOUTS: Record<string, Loadout> = {
   'tessaract-trader': {
     // Four of six bays: a working trader that still handles.
     id: 'tessaract-trader',
-    name: 'Tessaract Spine, trader fit',
+    name: 'Tessaract Manifest, Calder supply run',
     hullId: 'tessaract-spine',
     fit: {
       b1: 'tessaract-container-m',
@@ -43,7 +43,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // A stripped frigate on cheap parts: one light gun in a medium mount,
     // a small shield, a pod for loot. Quick, not tough.
     id: 'kessari-raider',
-    name: 'Kessari Wedge, raider fit',
+    name: 'Kessari Warrant, Black Strike trophy',
     hullId: 'kessari-wedge',
     fit: {
       w1: 'paragon-pulse-s',
@@ -54,10 +54,10 @@ export const LOADOUTS: Record<string, Loadout> = {
       b1: 'meridian-pod-s',
     },
   },
-  'sparrow-dev': {
-    id: 'sparrow-dev',
-    name: 'Sparrow, development fit',
-    hullId: 'sparrow',
+  'aurel-tacet-dev': {
+    id: 'aurel-tacet-dev',
+    name: 'Aurel Tacet, test voice',
+    hullId: 'aurel-tacet',
     fit: {
       w1: 'paragon-pulse-s',
       w2: 'paragon-turret-s',
@@ -72,7 +72,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // The fixed fit every pod has: a small engine and thrusters, power for
     // them, nothing else. No guns, no cargo, no shield.
     id: 'escape-pod',
-    name: 'Escape pod',
+    name: 'Meridian Ark',
     hullId: 'escape-pod',
     fit: {
       e1: 'meridian-engine-s',

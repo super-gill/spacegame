@@ -257,7 +257,7 @@ describe('fitting', () => {
 
   it('refuses, and changes nothing, when a rule is broken', () => {
     const { w } = dockedAt();
-    const sealed = { ...w, ships: { ...w.ships, [myShip(w).id]: { ...myShip(w), hullId: 'sparrow' } } };
+    const sealed = { ...w, ships: { ...w.ships, [myShip(w).id]: { ...myShip(w), hullId: 'aurel-tacet' } } };
     const laden = { ...w, ships: { ...w.ships, [myShip(w).id]: { ...myShip(w), hold: { food: 5 } } } };
     const cases: Array<[FitResult, string]> = [
       [fitModule(w, 'ana', 'u1', 'meridian-engine-s'), 'wrongMount'],

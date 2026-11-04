@@ -93,7 +93,7 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 ### Collisions and ramming
 
 - Damage from any impact comes from the ship's own change in velocity (delta-v), above a safe threshold. Gentle bumps do nothing.
-- Ship to ship collisions conserve momentum and share it by mass. In a ram the heavy ship's velocity barely changes and the light ship's changes a lot, so a big hull can ram a small one and walk away. A loaded Tessaract Spine ramming a Meridian Courier takes a fraction of the damage it deals.
+- Ship to ship collisions conserve momentum and share it by mass. In a ram the heavy ship's velocity barely changes and the light ship's changes a lot, so a big hull can ram a small one and walk away. A loaded Tessaract Manifest ramming a Meridian Tern takes a fraction of the damage it deals.
 - Station hulls are immovable, so a ship that hits one takes the whole bounce.
 
 ### Loot
@@ -103,7 +103,7 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 
 ### Losing your ship
 
-- The pilot gets away in an escape pod at the wreck. If the pod is destroyed too, they wake at Harbour Station: in a new pod if they own a ship anywhere, or in a free Meridian Courier if they own none. Waking is a pilot command, not a ship input, so it will work the same over a network. See `docs/ships.md`, 6b.
+- The pilot gets away in an escape pod at the wreck. If the pod is destroyed too, they wake at Harbour Station: in a new pod if they own a ship anywhere, or in a free Meridian Tern if they own none. Waking is a pilot command, not a ship input, so it will work the same over a network. See `docs/ships.md`, 6b.
 - The ship's cargo is lost (part of it spills as loot, see Trade). Credits are kept. Insurance and other costs are open questions.
 
 ## Stations and security
@@ -117,11 +117,11 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 - NPCs fly through exactly the same flight computer and physics as pilots. Their brains produce a `ShipInput` each tick, the same keys a person would press, so they have no extra thrust and can be outflown. They fly in rotation-assist mode and steer their own drift.
 - Brains are plain data on the world (`World.npcs`), so NPC state saves with everything else. Every brain decides from the start-of-tick world, so the order they think in never changes the outcome, and the whole sim stays deterministic.
 - NPCs come from **spawners** (`World.spawners`). A spawner keeps one NPC in the world and replaces it a while after it is destroyed or leaves (trader 30 s, pirate 45 s).
-- **Trader**: flies a loop of stations, docking at each for a while. Routes round station hulls rather than through them. If a pirate hunts it, it keeps to its route and fires its turret at the pirate when in range. It never chases. It flies a Tessaract Spine with four of its six bays fitted, carrying food and machinery.
+- **Trader**: flies a loop of stations, docking at each for a while. Routes round station hulls rather than through them. If a pirate hunts it, it keeps to its route and fires its turret at the pirate when in range. It never chases. It flies a Tessaract Manifest with four of its six bays fitted, carrying food and machinery.
 - **Pirate**: prowls a loop near a home point off the trade lane. It hunts the nearest flying ship in detection range (1400) that is well outside every security zone, closes in and holds about 160 units off it, leads the target and fires its fixed gun when its nose is on the lead point. It breaks off if the target docks, gets close to a security zone, gets more than 2200 away, after 45 seconds, or when its own structure drops below 25%; then it goes home and waits 20 seconds before hunting again. It treats each security zone as 300 units bigger than it is, so it turns away before crossing the edge.
 - A pirate that is shot or rammed turns on whoever did it (outside security), even while cooling down.
 - A pirate below 60% structure will not start a hunt. When it gets home in that state it leaves the sector (no wreck) and its spawner sends a fresh one later. This is how pirates "repair" without a pirate base.
-- The pirate flies a Kessari Wedge in a cheap raider fit: one light gun in a medium mount, a small shield and a pod for loot. It has a lower top speed than the starter Courier (320 against 340), so a pilot who sees it coming can run for security. Fighting back should win: a test holds the starter's survival edge over the raider at 1.4 times or more.
+- The pirate flies a Kessari Warrant in a cheap raider fit: one light gun in a medium mount, a small shield and a pod for loot. It has a lower top speed than the starter Tern (320 against 340), so a pilot who sees it coming can run for security. Fighting back should win: a test holds the starter's survival edge over the raider at 1.4 times or more.
 - All behaviour numbers are named in `PIRATE_TUNING` and `TRADER_TUNING`.
 ## World structure (planned)
 
@@ -137,8 +137,8 @@ The full design is in [ships.md](ships.md). In play today (0.7.0):
 - **Modules are owned.** Refitting is a pilot command while docked at a station with outfitting (Harbour has it; Ridge Outpost does not). Fitting a module you do not own buys it. Unfitting puts it in your storage at that station, and a module replaced by another goes there too. Fitting a module you have in storage there takes it out. Fitting and unfitting each cost a handling fee of 5% of the module's price (`FIT_FEE_FRACTION`), so swapping between owned modules is cheap but not free.
 - **Storage is per station** and belongs to the pilot (`Pilot.storage`), so it survives losing a ship. A stored module is only reachable at the station it is stored at. Stored modules can be sold back to the station for half their price (`MODULE_RESALE_FRACTION`). Storage has the same shape as a cargo hold (item id to count) so that modules can later be carried and traded like goods.
 - Shields and structure are capped to the new maximum after a refit; armour added while docked repairs up over time.
-- **Bonuses live on hulls**, from their role and their race, and apply only to modules the full size of their mount. Today: Meridian Courier +25% cargo from pods; Kessari Wedge +15% weapon damage and +20% shield; Tessaract Spine +25% cargo and +20% shield.
-- **Hulls today:** Meridian Courier (civilian starter), Kessari Wedge (frigate, the pirate's hull), Tessaract Spine (hauler, the trader's hull), and the Sparrow, a sealed development hull that cannot be refitted.
+- **Bonuses live on hulls**, from their role and their race, and apply only to modules the full size of their mount. Today: Meridian Tern +25% cargo from pods; Kessari Warrant +15% weapon damage and +20% shield; Tessaract Manifest +25% cargo and +20% shield.
+- **Hulls today:** Meridian Tern (civilian starter), Kessari Warrant (frigate, the pirate's hull), Tessaract Manifest (hauler, the trader's hull), and the Aurel Tacet, a sealed development hull that cannot be refitted.
 - **Loadouts** are named fits (`loadouts.ts`). New pilots get the starter; spawners name the loadout their NPC flies.
 - **The look is the fit.** A ship is drawn as its hull outline plus each module's universal silhouette at its mount. In flight, outlines keep friend-or-foe colours and modules are tinted by their maker's race.
 
@@ -147,7 +147,7 @@ Still planned: ship mart and pads (6b); oversized modules across two mounts, tur
 ## Trade and economy
 
 - **Goods** are data (`goods.ts`): scrap, food, ore, machinery, medicine. Each unit takes one unit of cargo space and adds its `unitMass` to the ship.
-- **Cargo has mass.** A full hold makes a ship slower to accelerate, turn and stop, and makes it ram harder. A starter Courier with a full hold of ore is noticeably slower to stop. NPCs plan with their loaded mass too.
+- **Cargo has mass.** A full hold makes a ship slower to accelerate, turn and stop, and makes it ram harder. A starter Tern with a full hold of ore is noticeably slower to stop. NPCs plan with their loaded mass too.
 - **Prices** are per station, from the pilot's point of view: `ask` is what the station charges you, `bid` what it pays you. A station may not trade a good in one or both directions. Prices are read through a `PriceSource`, so the scripted tables can be swapped for a supply and demand sim (milestone 10) without touching trade rules or the market screen. Stock is unlimited for now.
 - Today's stations: Harbour (farming and manufacturing) sells food, machinery and medicine cheaply and wants ore; Ridge Outpost (mining) sells ore cheaply and pays well for everything else. Both buy scrap. Tests enforce that no station pays more for a good than it charges, and that each direction between them has a profitable run.
 - **Credits belong to the pilot**, so they survive losing a ship. **Cargo belongs to the ship.** New pilots start with 1,000 credits.

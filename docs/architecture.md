@@ -30,7 +30,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `types.ts` | All world state types and the `ShipInput` contract |
 | `vec2.ts`, `angle.ts` | Maths helpers, immutable |
 | `constants.ts` | Tuning constants |
-| `hulls.ts` | Hull catalogue (data): frame mass, structure, outline, flight limits, mount points and bonuses. Meridian Courier, Kessari Wedge, Tessaract Spine, Sparrow (sealed dev hull) |
+| `hulls.ts` | Hull catalogue (data): frame mass, structure, outline, flight limits, mount points and bonuses. Meridian Tern, Kessari Warrant, Tessaract Manifest, Aurel Tacet (sealed dev hull) |
 | `modules.ts` | Module catalogue (data): type, size, mounts it fits, services it needs, mass, power, price, maker, stats |
 | `loadouts.ts` | Named fits (data): the starter, NPC fits, the dev fit |
 | `manufacturers.ts` | Manufacturer catalogue (data): name and race |
@@ -99,7 +99,7 @@ Two world references are kept, `previous` and `current`. Because `stepWorld` ret
 | `outfitting-panel.ts` | Outfitting tab in the docked panel: ship drawing with selectable mounts, now and after stats from `planRefit`, fit and remove; reports clicks to `main.ts` |
 | `ship-mart-panel.ts` | Ship mart tab in the docked panel: ships for sale with drawing, stats from `fitStats`, price, and Buy greyed with the `buyRefusal` reason; reports clicks to `main.ts` |
 | `your-ships-panel.ts` | Your ships tab in the docked panel: every ship the pilot owns, where it is, condition, cargo, and Board greyed with the `boardRefusal` reason; reports clicks to `main.ts` |
-| `ui.ts` | HUD text (including the escape pod line and the board prompt), docked panel tabs, the free Courier claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName` and `shipWhere`, the words for a ship and where it is |
+| `ui.ts` | HUD text (including the escape pod line and the board prompt), docked panel tabs, the free Tern claim, death panel, toasts for world events and pilot command results (DOM, not canvas). Also `shipName` and `shipWhere`, the words for a ship and where it is |
 | `style.css` | Theme variables and overlay layout |
 
 ### Rendering
