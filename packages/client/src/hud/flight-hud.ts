@@ -14,6 +14,7 @@ import {
   nearestDockableStation,
   shipPilot,
   shipStats,
+  holdCapacity,
   SURVEY_CYCLE_SECONDS,
 } from '@spacegame/sim';
 import { boardPrompt, shipName } from '../ui.js';
@@ -162,7 +163,7 @@ export class FlightHud {
     this.shipLine.classList.toggle('pod', inPod);
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
     setText(this.zoneLine, secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE');
-    setText(this.walletLine, `CR ${(pilot?.credits ?? 0).toLocaleString('en-GB')} · CARGO ${cargoUsed(ship)}/${stats.cargoCapacity}`);
+    setText(this.walletLine, `CR ${(pilot?.credits ?? 0).toLocaleString('en-GB')} · CARGO ${cargoUsed(ship)}/${holdCapacity(stats)}`);
 
     // Top centre: until warning tiers land, the one warning there is.
     const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
@@ -230,9 +231,14 @@ export class FlightHud {
         tile.root.classList.toggle('active', selected);
       } else if (s.moduleKind === 'tractor') {
         // A tractor with nowhere to put things pulls nothing.
-        const full = cargoUsed(ship) >= shipStats(world, ship).cargoCapacity;
+        const full = cargoUsed(ship) >= holdCapacity(shipStats(world, ship));
         setText(tile.state, ship.tractorActive ? (full ? 'HOLD FULL' : 'ON') : 'OFF');
         tile.root.classList.toggle('active', ship.tractorActive);
+      } else if (s.moduleKind === 'oreHopper') {
+        // The hopper's filter: the one ore the tractor leaves behind.
+        const eject = ship.hopperEject;
+        setText(tile.state, eject ? `DROP ${(world.goods[eject]?.name ?? eject).toUpperCase()}` : 'TAKE ALL');
+        tile.root.classList.toggle('active', Boolean(eject));
       } else if (s.moduleKind === 'surveyScanner') {
         // Ready, or seconds until the scanner has cycled.
         const since = ship.survey ? (world.tick - ship.survey.tick) * world.dt : Infinity;
@@ -300,7 +306,7 @@ export class FlightHud {
         const inGroup = state?.group === ship.fireGroup;
         // A mining laser says whether it is cutting what it touches.
         const beam = spec.family === 'mining' ? ship.beams?.find((b) => b.mountId === mountId) : undefined;
-        const beamText = beam ? (beam.rockId === null ? 'NO ROCK' : beam.cutting ? 'CUTTING' : 'TOO HARD') : null;
+        const beamText = beam ? (beam.rockId === null ? 'NO ROCK' : beam.cutting ? (beam.onSeam ? 'ON SEAM' : 'CUTTING') : 'TOO HARD') : null;
         setText(tile.state, beamText ?? (inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`));
         tile.root.classList.toggle('active', inGroup);
       }
@@ -323,7 +329,7 @@ function gunName(weaponId: string): string {
 }
 
 /** Short names for module tiles. */
-const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY' };
+const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY', oreHopper: 'HOPPER' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
 function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string, weaponId: string): WeaponTile {

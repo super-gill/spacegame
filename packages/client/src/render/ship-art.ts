@@ -313,6 +313,7 @@ function drawModule(
     case 'fireControl':
     case 'tractor':
     case 'surveyScanner':
+    case 'oreHopper':
     case 'afterburner':
       // Internal module: a marker only. Reactors are a solid dot,
       // shield generators a ring, thruster packages an open square.

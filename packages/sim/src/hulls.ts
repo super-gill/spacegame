@@ -233,8 +233,7 @@ export const HULLS: Record<string, HullSpec> = {
     ],
     bonuses: [
       { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' },
-      // A cutter's pod, but a miner's hold: 40 units from the 16-unit Carryall.
-      { source: 'role', label: '+150% cargo from full-size pods', stat: 'cargoCapacity', amount: 1.5, kind: 'cargoPod' },
+      { source: 'role', label: '+25% cargo from full-size pods', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
     ],
   },
 

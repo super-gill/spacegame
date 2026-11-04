@@ -52,6 +52,9 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Drop a countermeasure | C | Needs a dispenser. Chaff may draw radar missiles off, flares outshine your hull to heat seekers; decoys do both. Drop, then turn away |
 | Weapons hot / cold | H | Hot: turrets engage your target on their own when on aim and in range. Cold: they hold fire |
 | Mine | Hold fire with a mining laser's group selected | The laser cuts the rock its beam reaches if the rock is no harder than the laser is strong, freeing ore in canisters; scoop them with the tractor. Its tile says `CUTTING`, `TOO HARD` or `NO ROCK` |
+| Seams | Lock a rock with a mining computer | A gold arc on the rock's edge marks its seam: cut there and the laser tile says `ON SEAM`, half as fast again |
+| Ore hopper filter | Its tile's number | Cycles the one ore your tractor leaves in space: `TAKE ALL`, then each ore in turn |
+| Drop an ore cache | J | Leaves the ore aboard, and loose ore near you, as a cache that lasts an hour, ringed in space and shown on your radar. Anyone can take it. Switches your tractor off so it is not scooped straight back |
 | Survey | Its tile's number | A survey scanner pulses: rocks in reach worth a look are outlined for a few seconds (amber rich, gold valuable, cyan rare). It cycles in 5 seconds and costs capacitor |
 | Tractor beam | R (hold) | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile leaves it running |
 | Afterburner | Shift (hold) | If one is fitted: a higher top speed and more main thrust while held, paid for from the capacitor; it will not light on an empty one |

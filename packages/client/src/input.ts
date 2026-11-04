@@ -122,6 +122,7 @@ export class InputController {
       ...this.pendingLock,
       selectGroup: this.pendingGroup,
       tractor: this.held.has('tractor'),
+      dropCache: this.latched.has('dropCache'),
     };
     this.latched.clear();
     this.pendingLock = { lock: null, unlock: null, activateLock: null };

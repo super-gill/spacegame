@@ -97,6 +97,8 @@ export const LOADOUTS: Record<string, Loadout> = {
       c1: 'meridian-thrusters-s',
       c2: 'meridian-reactor-s',
       i1: 'meridian-shield-s',
+      // A hopper instead of armour: 40 more units for ore.
+      i2: 'rookrivet-hopper-s',
       u1: 'meridian-gleaner-s',
       u2: 'rookrivet-survey-s',
       b1: 'meridian-pod-s',

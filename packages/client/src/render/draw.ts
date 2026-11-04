@@ -384,9 +384,17 @@ export function drawWreck(ctx: CanvasRenderingContext2D, camera: Camera, w: Wrec
 }
 
 /** A loot canister: a small diamond. */
-export function drawLoot(ctx: CanvasRenderingContext2D, camera: Camera, l: Loot): void {
+export function drawLoot(ctx: CanvasRenderingContext2D, camera: Camera, l: Loot, yourCache = false): void {
   const c = camera.worldToScreen(l.position);
   const r = 5 * camera.zoom;
+  if (l.cache) {
+    // Part of a cache: a ring round it, bright if it is yours.
+    ctx.strokeStyle = yourCache ? COLOUR.inkBright : COLOUR.inkDim;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r + 4, 0, Math.PI * 2);
+    ctx.stroke();
+  }
   ctx.strokeStyle = COLOUR.warn;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -445,6 +453,19 @@ export function drawMiningBeam(ctx: CanvasRenderingContext2D, camera: Camera, fr
     ctx.arc(b.x, b.y, 2.5 + Math.sin(nowMs / 30) * 1, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.restore();
+}
+
+/** Stopgap (lead, mining): a locked rock's seam, as a bright arc on its edge. */
+export function drawSeam(ctx: CanvasRenderingContext2D, camera: Camera, centre: { x: number; y: number }, radius: number, bearing: number, halfArc: number): void {
+  const c = camera.worldToScreen(centre);
+  ctx.save();
+  ctx.strokeStyle = '#ffd95e';
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, radius * camera.zoom + 3, bearing - halfArc, bearing + halfArc);
+  ctx.stroke();
   ctx.restore();
 }
 

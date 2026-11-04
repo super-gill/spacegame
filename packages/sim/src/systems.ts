@@ -8,7 +8,8 @@ import { isGun } from './weapons.js';
  * One row of numbered tiles on the HUD, in this order: a tile per fire
  * group that has a gun, launcher or mining laser in it, lowest group
  * first; then a tile per active module on a utility mount (tractor,
- * dispenser, survey scanner), in mount order. Number keys 1 to 9 press
+ * dispenser, survey scanner), in mount order, then per ore hopper (its
+ * filter). Number keys 1 to 9 press
  * them: a group tile selects the group (the fire button fires it); a
  * module tile switches the module on or off, or fires it once (a
  * dispenser, a survey pulse) (`ShipInput.toggleModule`). The afterburner
@@ -20,6 +21,8 @@ import { isGun } from './weapons.js';
 
 /** Module kinds that get a numbered tile. */
 const ACTIVATED: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['tractor', 'countermeasure', 'surveyScanner']);
+/** Module kinds on internal mounts that still get a tile (a setting to change in flight). */
+const ACTIVATED_INTERNAL: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['oreHopper']);
 
 /** How many tiles have number keys. */
 export const ACTIVATION_KEYS = 9;
@@ -39,11 +42,15 @@ export function activationSlots(cat: Catalogues, ship: Ship): ActivationSlot[] {
     if (spec && spec.kind === 'fixed' && (isGun(spec) || spec.family === 'missile' || spec.family === 'mining')) groups.add(w.group);
   }
   const out: ActivationSlot[] = [...groups].sort((a, b) => a - b).map((group) => ({ kind: 'group', group }));
-  for (const mount of hull.mounts) {
-    if (mount.type !== 'utility') continue;
-    const moduleId = ship.fit[mount.id];
-    const module = moduleId ? cat.modules[moduleId] : undefined;
-    if (module && ACTIVATED.has(module.kind)) out.push({ kind: 'module', mountId: mount.id, moduleId: module.id, moduleKind: module.kind });
+  // Utility modules first, then internal ones with a setting (an ore hopper's filter).
+  for (const type of ['utility', 'internal'] as const) {
+    for (const mount of hull.mounts) {
+      if (mount.type !== type) continue;
+      const moduleId = ship.fit[mount.id];
+      const module = moduleId ? cat.modules[moduleId] : undefined;
+      if (!module || !(type === 'utility' ? ACTIVATED : ACTIVATED_INTERNAL).has(module.kind)) continue;
+      out.push({ kind: 'module', mountId: mount.id, moduleId: module.id, moduleKind: module.kind });
+    }
   }
   return out;
 }

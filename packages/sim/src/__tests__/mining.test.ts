@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { ROCK_FIELDS, ROCKFALL_SECONDS, oreLeft, rockAt, rockMakeup, screeAsteroids, stepRockfall } from '../asteroids.js';
+import { ROCK_FIELDS, ROCKFALL_SECONDS, oreLeft, rockAt, rockMakeup, rockSeam, screeAsteroids, stepRockfall } from '../asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from '../bodies.js';
 import { FIXED_DT } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { GOODS, oreGoods } from '../goods.js';
 import { LOADOUTS } from '../loadouts.js';
 import { lockReadout, lockRefusal } from '../locks.js';
-import { CANISTER_UNITS, SURVEY_CYCLE_SECONDS } from '../mining.js';
+import { CACHE_LIFETIME, CANISTER_UNITS, ORE_LOOT_LIFETIME, SEAM_HALF_ARC, SURVEY_CYCLE_SECONDS, cutRate } from '../mining.js';
+import { holdCapacity, holdSpaceFor } from '../trade.js';
+import { angleDelta } from '../angle.js';
 import { seededRandom } from '../random.js';
 import { SAVE_FORMAT, deserializeWorld, serializeWorld } from '../save.js';
 import { stepWorld } from '../step.js';
@@ -34,10 +36,11 @@ function testRock(over: Partial<Asteroid> = {}): Asteroid {
 }
 
 /** A quiet world with one rock and a prospector 100 units short of it, nose on. The belt does not top itself up. */
-function setup(rock: Asteroid = testRock(), loadoutId = 'rookrivet-prospector'): World {
+function setup(rock: Asteroid = testRock(), loadoutId = 'rookrivet-prospector', side = PHASE): World {
   const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [rock], rockfall: { made: 0, timerTicks: 1e9 } };
   const at = rockAt(base, rock.id)!.position;
-  const dir = { x: Math.cos(PHASE), y: Math.sin(PHASE) };
+  // `side`: the bearing from the rock to the ship; the ship faces the rock.
+  const dir = { x: Math.cos(side), y: Math.sin(side) };
   // Approach along the ring's radius, from outside.
   const gap = rock.radius + 100;
   const ship = buildShip(base, {
@@ -45,7 +48,7 @@ function setup(rock: Asteroid = testRock(), loadoutId = 'rookrivet-prospector'):
     loadout: LOADOUTS[loadoutId]!,
     ownerId: null,
     position: { x: at.x + dir.x * gap, y: at.y + dir.y * gap },
-    heading: PHASE + Math.PI,
+    heading: side + Math.PI,
     flightMode: 'assisted',
   });
   return { ...base, ships: { s: ship } };
@@ -116,7 +119,7 @@ describe('locking a rock', () => {
     w = run(w, 1, { lock: 'r1' }).w;
     w = run(w, 2).w;
     const reading = lockReadout(w, w.ships['s']!, 'r1')!;
-    expect(reading.composition).toEqual({ ores: { ore: 12, glintstone: 3 }, total: 15, hardness: 0.2, radius: 20 });
+    expect(reading.composition).toEqual({ ores: { ore: 12, glintstone: 3 }, total: 15, hardness: 0.2, radius: 20, seam: rockSeam('r1') });
     expect(reading.motion!.range).toBeGreaterThan(100);
 
     // A civil plotter locks it too, but sees only where it is.
@@ -157,7 +160,8 @@ describe('mining lasers', () => {
     const { w } = run(w0, 8, { fireFixed: true });
     const rock = w.asteroids.find((a) => a.id === 'r1')!;
     const taken = 500 - oreLeft(rock);
-    expect(taken + (rock.cut ?? 0)).toBeCloseTo(laser.damage * 8, 0);
+    const seam = w.ships['s']!.beams![0]!.onSeam ? 1.5 : 1;
+    expect(taken + (rock.cut ?? 0)).toBeCloseTo(laser.damage * cutRate(0.45, 0.2) * seam * 8, 0);
     // The prospector's role bonus is in the laser's rate.
     expect(laser.damage).toBeCloseTo(w0.weapons['mining-laser-s']!.damage * 1.25);
     expect(w.ships['s']!.beams?.[0]).toMatchObject({ mountId: 'w1', rockId: 'r1', cutting: true });
@@ -182,6 +186,100 @@ describe('mining lasers', () => {
     const { w } = run(setup(), 25, { fireFixed: true, tractor: true });
     expect(w.ships['s']!.hold).toMatchObject({ ore: 12, glintstone: 3 });
     expect(w.loot).toHaveLength(0);
+  });
+});
+
+describe('making the light ship pay', () => {
+  it('soft rock cuts faster: twice the rate on the softest, the plain rate at the laser\'s limit', () => {
+    expect(cutRate(0.45, 0.45)).toBe(1);
+    expect(cutRate(0.45, 0)).toBe(2);
+    expect(cutRate(0.45, 0.2)).toBeGreaterThan(cutRate(0.45, 0.4));
+  });
+
+  it("a beam on the rock's seam cuts half as fast again as one on the far side", () => {
+    const seam = rockSeam('r1');
+    const rock = testRock({ contents: { ore: 500 } });
+    const onSeam = run(setup(rock, 'rookrivet-prospector', seam), 4, { fireFixed: true }).w;
+    const offSeam = run(setup(rock, 'rookrivet-prospector', seam + Math.PI), 4, { fireFixed: true }).w;
+    expect(onSeam.ships['s']!.beams![0]!.onSeam).toBe(true);
+    expect(offSeam.ships['s']!.beams![0]!.onSeam).toBeUndefined();
+    const taken = (w: World): number => 500 - oreLeft(w.asteroids[0]!) + (w.asteroids[0]!.cut ?? 0);
+    expect(taken(onSeam) / taken(offSeam)).toBeCloseTo(1.5, 1);
+    expect(Math.abs(angleDelta(seam, seam + SEAM_HALF_ARC / 2))).toBeLessThan(SEAM_HALF_ARC);
+  });
+
+  it('freed ore stays where it was cut, and lasts ten minutes', () => {
+    const { w } = run(setup(testRock({ contents: { ore: 500 } })), 8, { fireFixed: true });
+    expect(w.loot.length).toBeGreaterThan(0);
+    for (const l of w.loot) {
+      expect(Math.hypot(l.velocity.x, l.velocity.y)).toBeLessThan(1e-6);
+      expect(l.ticksLeft).toBeGreaterThan(ORE_LOOT_LIFETIME / FIXED_DT - 10 * SECOND);
+    }
+  });
+
+  it('an ore hopper adds space only ore may use', () => {
+    const ship = setup().ships['s']!;
+    const stats = shipStats(createStarterWorld(), ship);
+    expect(stats.oreCapacity).toBe(40);
+    expect(holdCapacity(stats)).toBe(stats.cargoCapacity + 40);
+    const full = { ...ship, hold: { ore: stats.cargoCapacity + 40 } };
+    expect(holdSpaceFor(full, stats, GOODS, 'ore')).toBe(0);
+    const someOre = { ...ship, hold: { ore: 30 } };
+    expect(holdSpaceFor(someOre, stats, GOODS, 'food')).toBe(stats.cargoCapacity);
+    expect(holdSpaceFor(someOre, stats, GOODS, 'ore')).toBe(stats.cargoCapacity + 10);
+  });
+
+  it("the hopper's tile cycles its filter, and the tractor leaves that ore behind", () => {
+    let w = setup(testRock({ contents: { ore: 12, glintstone: 3 } }));
+    w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'i2' } });
+    expect(w.ships['s']!.hopperEject).toBe('banded-ore');
+    expect(w.events).toContainEqual({ type: 'hopperFilterChanged', shipId: 's', eject: 'banded-ore' });
+    w = { ...w, ships: { s: { ...w.ships['s']!, hopperEject: 'ore' } } };
+    w = run(w, 40, { fireFixed: true, tractor: true }).w;
+    expect(w.ships['s']!.hold).toEqual({ glintstone: 3 });
+    expect(oreInLoot(w)).toEqual({ ore: 12 });
+  });
+
+  it('with no room, the tractor parks canisters beside the ship instead of scooping them', () => {
+    let w = setup(testRock({ contents: { ore: 500 } }));
+    const stats = shipStats(w, w.ships['s']!);
+    w = { ...w, ships: { s: { ...w.ships['s']!, hold: { ore: holdCapacity(stats) } } } };
+    w = run(w, 20, { fireFixed: true, tractor: true }).w;
+    expect(w.loot.length).toBeGreaterThan(0);
+    for (const l of w.loot) expect(Math.hypot(l.position.x - w.ships['s']!.position.x, l.position.y - w.ships['s']!.position.y)).toBeLessThanOrEqual(stats.radius + 45);
+  });
+
+  it('a cache takes the ore aboard and the loose ore nearby, and lasts an hour', () => {
+    let w = setup(testRock({ contents: { ore: 500 } }));
+    w = run(w, 10, { fireFixed: true }).w;
+    const loose = oreInLoot(w)['ore'] ?? 0;
+    w = { ...w, ships: { s: { ...w.ships['s']!, hold: { ore: 20, food: 5 } } } };
+    w = stepWorld(w, { s: { ...emptyInput(), dropCache: true } });
+    expect(w.ships['s']!.hold).toEqual({ food: 5 });
+    expect(w.events).toContainEqual({ type: 'cacheDropped', shipId: 's', units: 20 + loose });
+    const cached = w.loot.filter((l) => l.cache);
+    expect(cached.reduce((n, l) => n + l.amount, 0)).toBe(20 + loose);
+    for (const l of cached) {
+      expect(l.cache).toEqual({ ownerId: 's' });
+      expect(l.ticksLeft).toBeGreaterThan(CACHE_LIFETIME / FIXED_DT - SECOND);
+    }
+    expect(CACHE_LIFETIME).toBe(3600);
+  });
+
+  it('dropping a cache switches a running tractor off, so it is not scooped straight back up', () => {
+    let w = setup(testRock({ contents: { ore: 500 } }));
+    w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'u1' } });
+    expect(w.ships['s']!.switchedOn).toEqual(['u1']);
+    w = { ...w, ships: { s: { ...w.ships['s']!, hold: { ore: 20 } } } };
+    w = stepWorld(w, { s: { ...emptyInput(), dropCache: true } });
+    w = run(w, 5).w;
+    expect(w.ships['s']!.switchedOn).toEqual([]);
+    expect(w.ships['s']!.hold['ore'] ?? 0).toBe(0);
+  });
+
+  it('nothing to cache, no cache', () => {
+    const w = stepWorld(setup(), { s: { ...emptyInput(), dropCache: true } });
+    expect(w.events.some((e) => e.type === 'cacheDropped')).toBe(false);
   });
 });
 
@@ -269,6 +367,7 @@ describe('the prospector', () => {
       { kind: 'group', group: 3 },
       { kind: 'module', mountId: 'u1', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
       { kind: 'module', mountId: 'u2', moduleId: 'rookrivet-survey-s', moduleKind: 'surveyScanner' },
+      { kind: 'module', mountId: 'i2', moduleId: 'rookrivet-hopper-s', moduleKind: 'oreHopper' },
     ]);
   });
 

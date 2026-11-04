@@ -25,7 +25,8 @@ export type SimAction =
   | 'toggleWeaponsHot'
   | 'launchCountermeasure'
   | 'afterburner'
-  | 'tractor';
+  | 'tractor'
+  | 'dropCache';
 
 /**
  * Actions the client handles itself. Target locking is worked out in
@@ -108,6 +109,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'slot7', codes: ['Digit7'], group: 'Systems', label: 'Tile 7', kind: 'press' },
   { action: 'slot8', codes: ['Digit8'], group: 'Systems', label: 'Tile 8', kind: 'press' },
   { action: 'slot9', codes: ['Digit9'], group: 'Systems', label: 'Tile 9', kind: 'press' },
+  { action: 'dropCache', codes: ['KeyJ'], group: 'Systems', label: 'Drop an ore cache', kind: 'press', note: 'Leaves the ore aboard, and loose ore canisters near you, as a cache that lasts an hour and shows on your radar. Anyone can scoop it' },
   { action: 'afterburner', codes: ['ShiftLeft', 'ShiftRight'], group: 'Systems', label: 'Afterburner', kind: 'hold', note: 'If one is fitted: a higher top speed and more thrust while held, paid for from the capacitor' },
   { action: 'zoomIn', codes: ['Equal', 'NumpadAdd'], group: 'Interface', label: 'Zoom in', kind: 'press', note: 'Or the mouse wheel' },
   { action: 'zoomOut', codes: ['Minus', 'NumpadSubtract'], group: 'Interface', label: 'Zoom out', kind: 'press', note: 'Or the mouse wheel' },

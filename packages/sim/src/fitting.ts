@@ -1,7 +1,7 @@
 import { goodsFitting } from './goods.js';
 import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION } from './constants.js';
 import { cargoMass, fitStats, type Catalogues } from './stats.js';
-import { cargoUsed } from './trade.js';
+import { holdFits } from './trade.js';
 import type { HullSpec, ModuleSpec, MountPoint, Pilot, Ship, ShipStats, WeaponState, World, WorldEvent } from './types.js';
 
 /**
@@ -185,7 +185,7 @@ export function planRefit(world: World, pilotId: string, mountId: string, module
 
   const stats = fitStats(world, hull, fit, cargoMass(ship, world.goods));
   if (stats.powerDraw > stats.powerOutput) return { ok: false, reason: 'power' };
-  if (cargoUsed(ship) > stats.cargoCapacity) return { ok: false, reason: 'cargo' };
+  if (!holdFits(ship, stats, world.goods)) return { ok: false, reason: 'cargo' };
 
   const stationId = ship.dockedAt;
   const fromStorage = module ? storedCount(pilot, stationId, module.id) > 0 : false;

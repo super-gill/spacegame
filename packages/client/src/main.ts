@@ -29,6 +29,8 @@ import {
   isGun,
   lockReadout,
   cargoUsed,
+  holdCapacity,
+  SEAM_HALF_ARC,
   rockAt,
   asteroidPositions,
   navReadout,
@@ -70,6 +72,7 @@ import {
   drawStation,
   drawTargetBracket,
   drawMiningBeam,
+  drawSeam,
   drawTractor,
   drawVelocityVector,
   drawWreck,
@@ -710,9 +713,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const hull = current.hulls[w.hullId];
     if (hull) drawWreck(ctx!, camera, w, hull, Math.min(1, (w.ticksLeft * current.dt) / WRECK_FADE_SECONDS));
   }
-  for (const l of current.loot) drawLoot(ctx!, camera, l);
+  for (const l of current.loot) drawLoot(ctx!, camera, l, l.cache !== undefined && l.cache.ownerId === me.id);
   // The tractor's reach and pull lines, only while there is room in the hold to pull into.
-  const holdFull = mine ? cargoUsed(mine) >= shipStats(current, mine).cargoCapacity : false;
+  const holdFull = mine ? cargoUsed(mine) >= holdCapacity(shipStats(current, mine)) : false;
   if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, holdFull ? [] : current.loot);
   if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
   wasHoldFull = holdFull;
@@ -781,7 +784,12 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
   // A locked rock gets the bracket too.
   const lockedRock = mine?.activeLock && !target ? rockAt(current, mine.activeLock) : null;
-  if (lockedRock) drawTargetBracket(ctx!, camera, lockedRock.position, lockedRock.rock.radius, false);
+  if (lockedRock) {
+    drawTargetBracket(ctx!, camera, lockedRock.position, lockedRock.rock.radius, false);
+    // Its seam, if your mining computer reads it: aim the beam there for half as much ore again.
+    const seam = mine ? lockReadout(current, mine, lockedRock.rock.id)?.composition?.seam : undefined;
+    if (seam !== undefined) drawSeam(ctx!, camera, lockedRock.position, lockedRock.rock.radius, seam, SEAM_HALF_ARC);
+  }
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);

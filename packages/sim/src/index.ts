@@ -37,6 +37,9 @@ export {
   maxBuyable,
   cargoUsed,
   cargoFree,
+  holdCapacity,
+  holdSpaceFor,
+  holdFits,
   scriptedPrices,
   type PriceSource,
   type TradeRefusal,
@@ -136,8 +139,8 @@ export {
   type WakeRefusal,
 } from './pilots.js';
 export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, LANTERN_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
-export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
-export { cutRocks, surveyPulse, CANISTER_UNITS, SURVEY_CYCLE_SECONDS, SURVEY_SHOW_SECONDS } from './mining.js';
+export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, rockSeam, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
+export { cutRocks, cutRate, dropCache, nextHopperFilter, surveyPulse, CACHE_LIFETIME, CANISTER_UNITS, ORE_LOOT_LIFETIME, SEAM_HALF_ARC, SEAM_MULTIPLIER, SOFT_ROCK_BONUS, SURVEY_CYCLE_SECONDS, SURVEY_SHOW_SECONDS } from './mining.js';
 export { seededRandom } from './random.js';
 export { starterBodies, STAR_ID, PLANET_ID, MOON_ID, BELT_ID, BELT_RING_RADIUS, BELT_PERIOD } from './bodies.js';
 export {

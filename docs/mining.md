@@ -65,8 +65,9 @@ Built as a general system so later kinds slot in without rework.
 3. Drones come in part 2, built as a general system.
 4. Ores are an expandable catalogue, so more can be added later.
 5. Hulks get ore holds.
-6. Light ships get what they get: a laser takes a rock's mix. Hulks choose their ore, by breaking rocks open and cutting the pockets (part 2).
-7. Rocks respawn over time; a big hulk must really make money; drones will matter in most industries (fighters, light mining craft that strip a field from a mother ship, carriers), so the system must be easy to add to.
+6. A light ship should earn more by playing it well, not by better prices: soft rock cuts faster, seams, an ore hopper with one ore filter, caches to collect later (which pirates and other players can find). Loose ore stays put; a tractor with no room parks canisters. Caches last an hour.
+7. Light ships get what they get: a laser takes a rock's mix. Hulks choose their ore, by breaking rocks open and cutting the pockets (part 2).
+8. Rocks respawn over time; a big hulk must really make money; drones will matter in most industries (fighters, light mining craft that strip a field from a mother ship, carriers), so the system must be easy to add to.
 
 ## As built: part 1 (4 November 2026)
 
@@ -81,4 +82,12 @@ Built as a general system so later kinds slot in without rework.
 - **Prices:** Lantern Works pays best for every ore; Ridge buys cheaply (the real money is a long haul away). A prospector's hold of nickel-iron is worth about 1,700 at Lantern, of glintstone about 7,600, so the survey matters.
 - **Client stopgaps (lead):** click a rock to lock it; the target card reads rock (ores, hardness, whether your laser cuts it); survey highlights outline rocks in amber (rich), gold (valuable) or cyan (rare) and the pulse ring spreads; mining beams flicker orange while cutting, dashed grey when not; tiles show SURVEY with its cycle and the laser's CUTTING or TOO HARD; the tractor tile says HOLD FULL, a toast says so once, and the tractor's lines stop, when there is no room left.
 - **Saves:** format version 7 (`migrate6to7`): existing rocks are given contents and a field, seeded from their ids. Starter stations' ship marts refresh on load, like their markets.
+- **Light ship mechanics** (after Jason's playtest: the light ship earned too little, and the fix should be a mechanic, not prices):
+  - **Soft rock cuts faster:** the rate is multiplied by 1 plus how far the laser's strength exceeds the rock's hardness, as a share of the strength (`cutRate`): twice the rate on the softest rock, the plain rate at the laser's limit.
+  - **Seams:** every rock has a seam, a fixed bearing from its centre (from its id, `rockSeam`). A beam biting within 0.45 radians of it frees ore 1.5 times as fast. The mining computer's composition readout gives the seam, drawn as a gold arc on the locked rock; the laser tile says ON SEAM.
+  - **Ore hopper** (internal, kind `oreHopper`): hold space only ore may use (`oreCapacity`; Rook and Rivet Hopper S 40, M 100). Ore fills hopper space first, then ordinary cargo (`holdSpaceFor`). Its tile cycles a filter through the ore catalogue: the one ore this ship's tractor leaves in space (`Ship.hopperEject`). The prospector carries a Hopper S instead of armour: 60 units for ore.
+  - **Freed ore stays put:** canisters sit at rest beside the rock and last 10 minutes. With the gravity rule off, loose loot slows to rest against its frame (2-second time constant).
+  - **Parking:** a tractor with no room still catches canisters and holds them just off the hull instead of scooping them.
+  - **Caches** (J): the ore aboard goes out of the stern, and loose ore canisters within 200 units (or tractor reach) join it. A cache lasts an hour (Jason), shows on its owner's radar as amber squares and in space with a ring, and anyone can scoop it; taking someone else's becomes theft with law (7). Dropping one switches a running tractor off, or it would scoop the cache straight back. Pirates do not hunt caches until NPC miners exist (part 2).
+  - Typical numbers: soft rock off the seam about 1.7 ore a second, on the seam about 2.5; 60 units in 25 to 35 seconds. A hold of nickel-iron is worth about 2,500 at Lantern.
 - **Not yet:** NPC miners, charges, the hulk, drones, gate-glass (part 2).

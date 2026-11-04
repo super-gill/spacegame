@@ -245,6 +245,10 @@ export class Ui {
         this.showToast('Pirate closing in. Run for station security.', 3000);
       } else if (e.type === 'huntEnded') {
         this.showToast('The pirate has broken off.', 2000, 'info');
+      } else if (e.type === 'cacheDropped') {
+        this.showToast(`Cache left: ${e.units} units of ore. It lasts an hour and shows on your radar.`, 2500, 'info');
+      } else if (e.type === 'hopperFilterChanged') {
+        this.showToast(e.eject ? `Hopper: leaving ${e.eject} behind.` : 'Hopper: taking everything.', 1500, 'info');
       } else if (e.type === 'collided') {
         this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'rammed') {

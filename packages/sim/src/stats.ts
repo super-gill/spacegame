@@ -50,6 +50,7 @@ const STAT_KEYS: ModuleStat[] = [
   'afterburnerSpeed',
   'afterburnerThrust',
   'afterburnerDraw',
+  'oreCapacity',
 ];
 
 /** Resistances layered: the stronger of each type wins (two armour plates do not stack). */
@@ -107,6 +108,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     surveyRange: 0,
     surveyCost: 0,
     surveyGrade: 0,
+    oreCapacity: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -191,6 +193,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     surveyRange: survey.range,
     surveyCost: survey.cost,
     surveyGrade: survey.grade,
+    oreCapacity: Math.floor(totals.oreCapacity + 1e-9),
     weapons,
     capacitor: hull.capacitor,
     capacitorRecharge: hull.capacitorRecharge,

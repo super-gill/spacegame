@@ -204,7 +204,9 @@ export type ModuleStat =
   /** Survey scanner: capacitor spent per pulse. */
   | 'surveyCost'
   /** Survey scanner: 1 tells rich rocks from common ones; 2 names the best tier a rock holds. */
-  | 'surveyGrade';
+  | 'surveyGrade'
+  /** Ore hopper: hold space only ore may use, units. */
+  | 'oreCapacity';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -224,7 +226,8 @@ export type ModuleKind =
   | 'fireControl'
   | 'tractor'
   | 'afterburner'
-  | 'surveyScanner';
+  | 'surveyScanner'
+  | 'oreHopper';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -416,6 +419,8 @@ export interface ShipStats {
   surveyRange: number;
   surveyCost: number;
   surveyGrade: number;
+  /** Hold space only ore may use, from ore hoppers (and later ore holds), on top of `cargoCapacity`. */
+  oreCapacity: number;
   shieldRegenDelay: number;
   structure: number;
   cargoCapacity: number;
@@ -654,6 +659,12 @@ export interface Loot {
   position: Vec2;
   velocity: Vec2;
   ticksLeft: number;
+  /**
+   * Part of a cache someone left (docs/mining.md, "Caches"): it lasts
+   * longer and shows on its owner's radar. Anyone can still scoop it.
+   * `ownerId` is the pilot, or the ship for an NPC. Absent: plain loot.
+   */
+  cache?: { ownerId: string };
 }
 
 /**
@@ -759,6 +770,11 @@ export interface Ship {
   beams?: MiningBeam[];
   /** The last survey pulse, which the HUD shows for a few seconds (docs/mining.md). Absent: none yet. */
   survey?: SurveyResult;
+  /**
+   * An ore hopper's filter: the one ore this ship's tractor leaves in
+   * space instead of scooping. Absent or null: it takes everything.
+   */
+  hopperEject?: string | null;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
   /**
@@ -927,6 +943,8 @@ export interface MiningBeam {
   length: number;
   rockId: string | null;
   cutting: boolean;
+  /** True while it bites the rock's seam, for half as much ore again. */
+  onSeam?: boolean;
 }
 
 /** What a survey pulse found: each rock in reach that is worth reporting, and what the scanner could tell. */
@@ -1039,6 +1057,11 @@ export interface ShipInput {
   toggleWeaponsHot: boolean;
   /** Run the tractor beam to pull in nearby loot. */
   tractor: boolean;
+  /**
+   * Edge-triggered: drop the ore aboard as a cache, and mark the loose ore
+   * canisters near the ship as part of it (docs/mining.md, "Caches").
+   */
+  dropCache: boolean;
 }
 
 /**
@@ -1283,6 +1306,10 @@ export type WorldEvent =
   | { type: 'miningTooHard'; shipId: string; rockId: string }
   /** A mining laser freed a canister of ore. */
   | { type: 'oreFreed'; shipId: string; rockId: string; item: string; amount: number }
+  /** A ship left a cache of `units` units of ore (its hold's and loose canisters nearby). */
+  | { type: 'cacheDropped'; shipId: string; units: number }
+  /** An ore hopper's filter changed: the ore the tractor now leaves behind, or null for none. */
+  | { type: 'hopperFilterChanged'; shipId: string; eject: string | null }
   /** A rock was mined out and crumbled; `shipId` mined the last of it. */
   | { type: 'rockCrumbled'; shipId: string; rockId: string }
   /** A trade completed while docked. `unitPrice` is per unit, in credits. */

@@ -1,8 +1,9 @@
-import { bestTier, oreLeft } from './asteroids.js';
+import { bestTier, oreLeft, rockSeam } from './asteroids.js';
+import { oreGoods } from './goods.js';
 import { segmentHitsCircle, type BeamShot } from './combat.js';
-import { LOOT_LIFETIME } from './constants.js';
 import type { Asteroid, GoodSpec, Loot, MiningBeam, Ship, ShipStats, SurveyResult, WorldEvent } from './types.js';
-import { add, distance, fromAngle, scale, type Vec2 } from './vec2.js';
+import { angleDelta } from './angle.js';
+import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2.js';
 
 /**
  * Mining, part 1 (docs/mining.md): surveying the belt and cutting ore.
@@ -21,12 +22,80 @@ import { add, distance, fromAngle, scale, type Vec2 } from './vec2.js';
 
 /** Ore in one canister, units. A rock's last canister holds whatever is left. */
 export const CANISTER_UNITS = 5;
-/** Freed ore drifts off the rock towards the laser at this speed, units/s. */
-const ORE_DRIFT_SPEED = 14;
+/** Seconds a canister of freed ore lasts loose in space: long enough to fill up, sell and come back. */
+export const ORE_LOOT_LIFETIME = 600;
+/**
+ * Soft rock cuts faster: the rate is multiplied by 1 plus this times how
+ * far the laser's strength exceeds the rock's hardness, as a share of the
+ * strength. The softest rock cuts at twice the rate; rock at the
+ * laser's limit at the plain rate.
+ */
+export const SOFT_ROCK_BONUS = 1;
+/** Every rock has a seam: a beam biting within this angle of it, radians, frees ore SEAM_MULTIPLIER times as fast. */
+export const SEAM_HALF_ARC = 0.45;
+export const SEAM_MULTIPLIER = 1.5;
 /** Seconds a survey scanner takes to cycle between pulses. */
 export const SURVEY_CYCLE_SECONDS = 5;
 /** Seconds the HUD keeps a survey's findings lit. */
 export const SURVEY_SHOW_SECONDS = 8;
+
+/** Seconds a cache lasts: long enough for a mining run and a trip to sell. */
+export const CACHE_LIFETIME = 3600;
+/** Loose ore canisters this close to a ship dropping a cache join it, units (or its tractor's reach, if longer). */
+export const CACHE_GATHER_RANGE = 200;
+
+/**
+ * Drop a cache (docs/mining.md, "Caches"): the ore aboard goes out of the
+ * stern as one canister per ore, and loose ore canisters near the ship
+ * join the cache. Cached loot lasts `CACHE_LIFETIME` and shows on its
+ * owner's radar; anyone can still scoop it. Returns the ship with its ore
+ * gone, the new canisters, the ids of loose canisters marked, and the
+ * event (null if there was nothing to cache).
+ */
+export function dropCache(
+  ship: Ship,
+  stats: Pick<ShipStats, 'radius' | 'tractorRange'>,
+  ownerId: string,
+  loot: readonly Loot[],
+  goods: Readonly<Record<string, GoodSpec>>,
+  frame: Vec2,
+  dt: number,
+  nextId: number,
+): { ship: Ship; added: Loot[]; marked: Set<string>; idsUsed: number; event: WorldEvent | null } {
+  const cache = { ownerId };
+  const ticksLeft = Math.round(CACHE_LIFETIME / dt);
+  const stern = add(ship.position, scale(fromAngle(ship.heading), -(stats.radius + 12)));
+  const added: Loot[] = [];
+  let hold = ship.hold;
+  let units = 0;
+  for (const good of Object.keys(ship.hold).sort()) {
+    const amount = ship.hold[good]!;
+    if (!goods[good]?.ore || amount <= 0) continue;
+    const { [good]: _gone, ...rest } = hold;
+    hold = rest;
+    // Fanned out a little so the canisters do not sit on one another.
+    const spread = fromAngle(ship.heading + Math.PI + (added.length - 1) * 0.5);
+    added.push({ id: `l${nextId + added.length}`, item: good, amount, position: add(stern, scale(spread, 6 * added.length)), velocity: frame, ticksLeft, cache });
+    units += amount;
+  }
+  const reach = Math.max(CACHE_GATHER_RANGE, stats.tractorRange);
+  const marked = new Set<string>();
+  for (const l of loot) {
+    if (!goods[l.item]?.ore || distance(l.position, ship.position) > reach) continue;
+    marked.add(l.id);
+    units += l.amount;
+  }
+  if (units === 0) return { ship, added, marked, idsUsed: 0, event: null };
+  return { ship: hold === ship.hold ? ship : { ...ship, hold }, added, marked, idsUsed: added.length, event: { type: 'cacheDropped', shipId: ship.id, units } };
+}
+
+/** The ore an ore hopper's filter leaves behind after `current`, cycling through the ore catalogue and back to none. */
+export function nextHopperFilter(current: string | null | undefined, goods: Readonly<Record<string, GoodSpec>>): string | null {
+  const ores = oreGoods(goods).map((g) => g.id);
+  if (!current) return ores[0] ?? null;
+  const at = ores.indexOf(current);
+  return at < 0 || at === ores.length - 1 ? null : ores[at + 1]!;
+}
 
 export interface CutResult {
   asteroids: Asteroid[];
@@ -75,8 +144,8 @@ export function cutRocks(
       }
     }
 
-    const record = (rockId: string | null, cutting: boolean): void => {
-      (drawn[beam.shipId] ??= []).push({ mountId: beam.mountId, bearing: beam.bearing, length: reach, rockId, cutting });
+    const record = (rockId: string | null, cutting: boolean, onSeam = false): void => {
+      (drawn[beam.shipId] ??= []).push({ mountId: beam.mountId, bearing: beam.bearing, length: reach, rockId, cutting, ...(onSeam ? { onSeam } : {}) });
     };
     if (hit < 0) {
       record(null, false);
@@ -89,14 +158,17 @@ export function cutRocks(
       if (was?.rockId !== rock.id) events.push({ type: 'miningTooHard', shipId: beam.shipId, rockId: rock.id });
       continue;
     }
-    record(rock.id, true);
+    // Where the beam bites: on the seam, the rock gives up its ore half as fast again.
+    const point = add(beam.origin, scale(dir, reach));
+    const onSeam = Math.abs(angleDelta(rockSeam(rock.id), toAngle(sub(point, places[hit]!.position)))) <= SEAM_HALF_ARC;
+    record(rock.id, true, onSeam);
 
     // Cut, and release whole canisters as they come free.
-    let cut = (rock.cut ?? 0) + beam.yield;
+    const rate = cutRate(beam.strength, rock.hardness) * (onSeam ? SEAM_MULTIPLIER : 1);
+    let cut = (rock.cut ?? 0) + beam.yield * rate;
     let contents = rock.contents;
     let mined = rock.mined ?? {};
     let left = oreLeft(rock);
-    const point = add(beam.origin, scale(dir, reach));
     while (left > 0 && (cut >= CANISTER_UNITS || cut >= left)) {
       const good = nextOre(contents, mined);
       const amount = Math.min(CANISTER_UNITS, contents[good]!);
@@ -113,8 +185,9 @@ export function cutRocks(
         item: good,
         amount,
         position: point,
-        velocity: add(places[hit]!.velocity, scale(dir, -ORE_DRIFT_SPEED)),
-        ticksLeft: Math.round(LOOT_LIFETIME / dt),
+        // At rest beside the rock, where the laser freed it.
+        velocity: places[hit]!.velocity,
+        ticksLeft: Math.round(ORE_LOOT_LIFETIME / dt),
       });
       events.push({ type: 'oreFreed', shipId: beam.shipId, rockId: rock.id, item: good, amount });
     }
@@ -142,6 +215,12 @@ export function cutRocks(
     }
   }
   return { asteroids: rocks, ships: out ?? (ships as Record<string, Ship>), loot, events, idsUsed };
+}
+
+/** How much faster than its plain rate a laser of this strength cuts rock this hard (1 at its limit). */
+export function cutRate(strength: number, hardness: number): number {
+  if (strength <= 0) return 0;
+  return 1 + SOFT_ROCK_BONUS * Math.max(0, strength - hardness) / strength;
 }
 
 /**

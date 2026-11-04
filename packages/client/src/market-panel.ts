@@ -1,4 +1,4 @@
-import { cargoUsed, maxBuyable, scriptedPrices, shipStats, type World } from '@spacegame/sim';
+import { cargoUsed, holdCapacity, maxBuyable, scriptedPrices, shipStats, type World } from '@spacegame/sim';
 
 /**
  * Station market, shown inside the docked panel.
@@ -44,7 +44,7 @@ export class MarketPanel {
     if (signature === this.signature) return;
     this.signature = signature;
 
-    const capacity = shipStats(world, ship).cargoCapacity;
+    const capacity = holdCapacity(shipStats(world, ship));
     this.root.replaceChildren();
 
     const summary = el('div', 'market-summary');

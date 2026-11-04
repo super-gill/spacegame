@@ -3,7 +3,7 @@ import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor
 import { goodsFitting } from './goods.js';
 import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
 import { asteroidStates, stepRockfall } from './asteroids.js';
-import { cutRocks, surveyPulse } from './mining.js';
+import { CACHE_LIFETIME, cutRocks, dropCache, nextHopperFilter, surveyPulse } from './mining.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
@@ -15,7 +15,7 @@ import { pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
-import type { Decoy, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
+import type { Decoy, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /** Boxes of each ammunition an NPC keeps aboard. */
@@ -93,6 +93,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const newMunitions: Munition[] = [];
   const newDecoys: Decoy[] = [];
   const beams: BeamShot[] = [];
+  const cacheLoot: Loot[] = [];
+  const cacheMarks = new Map<string, string>();
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
   const aboard = pilotsAboard(world);
@@ -167,6 +169,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
         targeted = pulse.ship;
         events.push(pulse.event);
       }
+      // An ore hopper's tile cycles its filter: the one ore the tractor leaves behind.
+      if (moduleId && world.modules[moduleId]?.kind === 'oreHopper') {
+        const eject = nextHopperFilter(targeted.hopperEject, world.goods);
+        targeted = { ...targeted, hopperEject: eject };
+        events.push({ type: 'hopperFilterChanged', shipId: id, eject });
+      }
       if (moduleId && world.modules[moduleId]?.kind === 'tractor') {
         const on = isSwitchedOn(targeted, input.toggleModule);
         const switchedOn = on ? (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) : [...(targeted.switchedOn ?? []), input.toggleModule];
@@ -177,6 +185,21 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     if (input.selectGroup !== null && input.selectGroup !== targeted.fireGroup && input.selectGroup >= 1 && input.selectGroup <= 4) {
       targeted = { ...targeted, fireGroup: input.selectGroup };
       events.push({ type: 'fireGroupChanged', shipId: id, group: input.selectGroup });
+    }
+
+    // Drop a cache: the ore aboard, and loose ore canisters nearby.
+    if (input.dropCache && targeted.state === 'flying') {
+      const owner = aboard[id] ?? targeted.ownerId ?? id;
+      const dropped = dropCache(targeted, stats, owner, world.loot, world.goods, frameVelocity(world, targeted), world.dt, nextEntityId);
+      targeted = dropped.ship;
+      // A tractor left running would scoop the cache straight back up: dropping one switches it off.
+      if (dropped.event && targeted.switchedOn?.some((m) => world.modules[targeted.fit[m] ?? '']?.kind === 'tractor')) {
+        targeted = { ...targeted, switchedOn: targeted.switchedOn.filter((m) => world.modules[targeted.fit[m] ?? '']?.kind !== 'tractor') };
+      }
+      nextEntityId += dropped.idsUsed;
+      cacheLoot.push(...dropped.added);
+      for (const lootId of dropped.marked) cacheMarks.set(lootId, owner);
+      if (dropped.event) events.push(dropped.event);
     }
 
     const aimer = targeted;
@@ -260,7 +283,15 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   let next: World = {
     ...world,
     asteroids: cut.asteroids,
-    loot: [...world.loot, ...cut.loot],
+    // Marked canisters join their cache and last as long.
+    loot: [
+      ...world.loot.map((l) => {
+        const owner = cacheMarks.get(l.id);
+        return owner ? { ...l, cache: { ownerId: owner }, ticksLeft: Math.max(l.ticksLeft, Math.round(CACHE_LIFETIME / world.dt)) } : l;
+      }),
+      ...cacheLoot,
+      ...cut.loot,
+    ],
     tick: world.tick + 1,
     stations: stationsNext,
     ships,

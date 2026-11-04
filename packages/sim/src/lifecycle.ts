@@ -11,8 +11,8 @@ import { buildShip } from './factory.js';
 import { isEscapePod, pilotsAboard } from './ownership.js';
 import { ejectPilot } from './pilots.js';
 import { fitStats, shipStats } from './stats.js';
-import { cargoFree } from './trade.js';
-import type { Loot, Ship, Spawner, World, WorldEvent, Wreck } from './types.js';
+import { holdSpaceFor } from './trade.js';
+import type { Loot, Ship, ShipStats, Spawner, World, WorldEvent, Wreck } from './types.js';
 import { applyCarry, frameVelocity, pirateHome, type Carry } from './rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, type Vec2 } from './vec2.js';
 
@@ -186,23 +186,33 @@ export interface LootStep {
   events: WorldEvent[];
 }
 
+/** Loose loot comes to rest against its local frame with this time constant, seconds, so nothing wanders off. */
+export const LOOT_SETTLE_SECONDS = 2;
+/** A tractor with no room parks loot this far beyond the hull, units, and holds it there. */
+export const TRACTOR_PARK_GAP = 40;
+
 /**
  * Drift loot, pull it towards ships running a tractor beam, and scoop
- * anything that reaches a hull into that ship's hold. When two beams
- * reach the same canister, the nearer ship wins it. A ship with a full
- * hold does not pull; one with some space takes what fits and leaves the
- * rest of the canister floating.
+ * anything that reaches a hull into that ship's hold (`holdSpaceFor`, so
+ * ore can use an ore hopper's space). When two beams reach the same
+ * canister, the nearer ship wins it. A ship with no room for a canister
+ * still catches it and parks it just off the hull, held there while the
+ * beam runs (docs/mining.md); one with some room takes what fits and
+ * parks the rest. A ship's ore hopper filter leaves that ore alone
+ * entirely. With the gravity rule off, free loot slows to rest against
+ * its local frame.
  */
 export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (point: Vec2) => Carry, gravityAt?: (point: Vec2) => Vec2): LootStep {
   const out: Loot[] = [];
   const updated: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
-  // Cargo capacity and hull radius do not change mid-tick, so look them up once.
-  const stats: Record<string, { cargoCapacity: number; radius: number; tractorRange: number; tractorPull: number }> = {};
+  // Hold size and hull radius do not change mid-tick, so look them up once.
+  const stats: Record<string, ShipStats> = {};
   for (const s of Object.values(ships)) if (world.hulls[s.hullId]) stats[s.id] = shipStats(world, s);
   const beams = Object.values(ships)
-    .filter((s) => s.tractorActive && s.state === 'flying' && stats[s.id] && cargoFree(s, stats[s.id]!) > 0)
+    .filter((s) => s.tractorActive && s.state === 'flying' && stats[s.id])
     .sort((a, b) => (a.id < b.id ? -1 : 1));
+  const settle = Math.exp(-world.dt / LOOT_SETTLE_SECONDS);
 
   for (const item of world.loot) {
     if (item.ticksLeft <= 1) continue;
@@ -211,7 +221,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     let puller: Ship | null = null;
     let best = Infinity;
     for (const s of beams) {
-      if (cargoFree(updated[s.id]!, stats[s.id]!) <= 0) continue; // filled up this tick
+      if (s.hopperEject === item.item) continue; // filtered out: left where it is
       const d = distance(s.position, item.position);
       if (d <= stats[s.id]!.tractorRange && d <= best) {
         best = d;
@@ -219,26 +229,34 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
       }
     }
 
-    // Free loot falls; loot in a tractor beam goes where the beam takes it.
+    // Free loot falls and settles; loot in a tractor beam goes where the beam takes it.
     let velocity = gravityAt ? add(item.velocity, scale(gravityAt(item.position), world.dt)) : item.velocity;
+    let remaining = item;
     if (puller) {
       const radius = stats[puller.id]!.radius;
-      if (best <= radius + SCOOP_DISTANCE) {
-        const current = updated[puller.id]!;
-        const taken = Math.min(item.amount, cargoFree(current, stats[current.id]!));
+      const current = updated[puller.id]!;
+      const room = holdSpaceFor(current, stats[current.id]!, world.goods, item.item);
+      if (room > 0 && best <= radius + SCOOP_DISTANCE) {
+        const taken = Math.min(item.amount, room);
         const hold = { ...current.hold, [item.item]: (current.hold[item.item] ?? 0) + taken };
         updated[puller.id] = { ...current, hold };
         events.push({ type: 'lootCollected', shipId: puller.id, item: item.item, amount: taken });
         if (taken === item.amount) continue;
-        // Hold is now full: the rest stays where it is.
-        out.push({ ...item, amount: item.amount - taken, velocity: puller.velocity, ticksLeft: item.ticksLeft - 1 });
-        continue;
+        // The hold is now full: the rest is parked like any canister there is no room for.
+        remaining = { ...item, amount: item.amount - taken };
       }
       const towards = normalise(sub(puller.position, item.position));
-      velocity = add(puller.velocity, scale(towards, stats[puller.id]!.tractorPull));
+      // No room: hold it just off the hull instead of scooping it.
+      const parked = room <= 0 || remaining !== item;
+      velocity = parked && best <= radius + TRACTOR_PARK_GAP ? puller.velocity : add(puller.velocity, scale(towards, stats[puller.id]!.tractorPull));
+    } else if (!world.rules.gravity) {
+      // In flat space loose loot comes to rest; with gravity on it falls as it should.
+      // The frame as it was when this velocity was set: the start of the tick (the world passed in has already ticked).
+      const frame = frameVelocity({ ...world, tick: world.tick - 1 }, { position: item.position, dockedAt: null });
+      velocity = add(frame, scale(sub(velocity, frame), settle));
     }
 
-    const moved = { ...item, velocity, position: add(item.position, scale(velocity, world.dt)), ticksLeft: item.ticksLeft - 1 };
+    const moved = { ...remaining, velocity, position: add(item.position, scale(velocity, world.dt)), ticksLeft: item.ticksLeft - 1 };
     out.push(carryAt ? applyCarry(moved, carryAt(item.position)) : moved);
   }
   return { loot: out, ships: updated, events };

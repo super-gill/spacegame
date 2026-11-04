@@ -1,4 +1,4 @@
-import { boardRefusal, cargoUsed, ownedShips, shipStats, type BoardRefusal, type World } from '@spacegame/sim';
+import { boardRefusal, cargoUsed, holdCapacity, ownedShips, shipStats, type BoardRefusal, type World } from '@spacegame/sim';
 import { shipThumb } from './render/ship-thumb.js';
 import { shipName, shipWhere } from './ui.js';
 
@@ -63,7 +63,7 @@ export class YourShipsPanel {
         ship: s,
         where: shipWhere(world, s, pilot.shipId),
         condition: `${Math.round((100 * s.shield) / Math.max(1, stats.shield))}% / ${Math.round((100 * s.structure) / stats.structure)}%`,
-        cargo: `${cargoUsed(s)} / ${stats.cargoCapacity}`,
+        cargo: `${cargoUsed(s)} / ${holdCapacity(stats)}`,
         refusal: s.id === pilot.shipId ? null : boardRefusal(world, pilotId, s.id),
         aboard: s.id === pilot.shipId,
       };

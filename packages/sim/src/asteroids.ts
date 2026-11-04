@@ -144,6 +144,13 @@ export function rockAt(world: Pick<World, 'bodies' | 'asteroids' | 'tick' | 'dt'
   return { rock, position: s.position, velocity: s.velocity };
 }
 
+/** The world bearing of a rock's seam from its centre: fixed for the rock, from its id. Rocks do not turn. */
+export function rockSeam(rockId: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < rockId.length; i++) h = Math.imul(h ^ rockId.charCodeAt(i), 0x01000193);
+  return ((h >>> 0) / 4294967296) * Math.PI * 2 - Math.PI;
+}
+
 /** Units of ore left in a rock. */
 export function oreLeft(rock: Pick<Asteroid, 'contents'>): number {
   return Object.values(rock.contents).reduce((n, q) => n + q, 0);

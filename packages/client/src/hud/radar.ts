@@ -185,6 +185,15 @@ export class Radar {
       ctx.fillText(label, p.x + (p.x > 30 ? -7 : 7), p.y - 6);
     }
 
+    // Your caches: small amber squares, wherever they are.
+    ctx.strokeStyle = '#e8b04a';
+    ctx.lineWidth = 1;
+    for (const l of world.loot) {
+      if (l.cache?.ownerId !== pilotId) continue;
+      const p = radarPoint(at, l.position, range, DISC);
+      ctx.strokeRect(p.x - 2.5, p.y - 2.5, 5, 5);
+    }
+
     // Ships.
     this.hits = [];
     const locked = new Map(ship.locks.map((l) => [l.targetId, l]));

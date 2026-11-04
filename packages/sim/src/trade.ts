@@ -1,5 +1,5 @@
 import { shipStats } from './stats.js';
-import type { MarketEntry, Ship, ShipStats, World, WorldEvent } from './types.js';
+import type { GoodSpec, MarketEntry, Ship, ShipStats, World, WorldEvent } from './types.js';
 
 /**
  * Trade: cargo, prices, and buying and selling while docked.
@@ -32,9 +32,42 @@ export function cargoUsed(ship: Ship): number {
   return Object.values(ship.hold).reduce((n, q) => n + q, 0);
 }
 
-/** Free cargo space, given the ship's stats (its cargo pods decide capacity). */
+/** Free cargo space, given the ship's stats (its cargo pods decide capacity). Ignores ore-only space: see `holdSpaceFor`. */
 export function cargoFree(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity'>): number {
   return Math.max(0, stats.cargoCapacity - cargoUsed(ship));
+}
+
+/** All the hold space a ship has: cargo plus ore-only space. */
+export function holdCapacity(stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapacity'>): number {
+  return stats.cargoCapacity + (stats.oreCapacity ?? 0);
+}
+
+/**
+ * Room for more of `goodId`. Ore fills the ore-only space (an ore hopper)
+ * first and then ordinary cargo space; anything else has ordinary cargo
+ * space only, less any ore that has spilled into it.
+ */
+export function holdSpaceFor(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapacity'>, goods: Readonly<Record<string, GoodSpec>>, goodId: string): number {
+  let ore = 0;
+  let other = 0;
+  for (const [id, q] of Object.entries(ship.hold)) {
+    if (goods[id]?.ore) ore += q;
+    else other += q;
+  }
+  const oreSpace = stats.oreCapacity ?? 0;
+  const general = Math.max(0, stats.cargoCapacity - other - Math.max(0, ore - oreSpace));
+  return goods[goodId]?.ore ? general + Math.max(0, oreSpace - ore) : general;
+}
+
+/** True if everything aboard fits the hold these stats give (after a refit, say). */
+export function holdFits(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapacity'>, goods: Readonly<Record<string, GoodSpec>>): boolean {
+  let ore = 0;
+  let other = 0;
+  for (const [id, q] of Object.entries(ship.hold)) {
+    if (goods[id]?.ore) ore += q;
+    else other += q;
+  }
+  return other + Math.max(0, ore - (stats.oreCapacity ?? 0)) <= stats.cargoCapacity;
 }
 
 export type TradeRefusal =
@@ -66,7 +99,7 @@ export function maxBuyable(world: World, pilotId: string, goodId: string, prices
   const ask = prices.quote(world, d.stationId, goodId)?.ask;
   const pilot = world.pilots[pilotId];
   if (ask == null || ask <= 0 || !pilot) return 0;
-  return Math.min(Math.floor(pilot.credits / ask), cargoFree(d.ship, shipStats(world, d.ship)));
+  return Math.min(Math.floor(pilot.credits / ask), holdSpaceFor(d.ship, shipStats(world, d.ship), world.goods, goodId));
 }
 
 /** Buy `quantity` units of a good from the station the pilot is docked at. All or nothing. */
@@ -80,7 +113,7 @@ export function buyGood(world: World, pilotId: string, goodId: string, quantity:
   const pilot = world.pilots[pilotId]!;
   const cost = ask * quantity;
   if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
-  if (quantity > cargoFree(d.ship, shipStats(world, d.ship))) return { ok: false, world, reason: 'space' };
+  if (quantity > holdSpaceFor(d.ship, shipStats(world, d.ship), world.goods, goodId)) return { ok: false, world, reason: 'space' };
 
   const hold = { ...d.ship.hold, [goodId]: (d.ship.hold[goodId] ?? 0) + quantity };
   return {

@@ -1,4 +1,4 @@
-import { oreLeft, rockAt } from './asteroids.js';
+import { oreLeft, rockAt, rockSeam } from './asteroids.js';
 import { LOCK_BASE_SECONDS, LOCK_REFERENCE_SIGNATURE } from './constants.js';
 import { isEmptyShip } from './ownership.js';
 import { shipStats } from './stats.js';
@@ -214,13 +214,15 @@ export interface LockReadout {
   /**
    * A locked rock, read by a mining computer: the ore it holds by good id
    * (whole units), how much in all, how hard it is (0 to 1; a laser needs
-   * that strength) and its size.
+   * that strength), its size, and the world bearing of its seam from its
+   * centre (a beam biting there cuts half as fast again).
    */
   composition?: {
     ores: Record<string, number>;
     total: number;
     hardness: number;
     radius: number;
+    seam: number;
   };
 }
 
@@ -244,7 +246,7 @@ export function lockReadout(world: World, ship: Ship, targetId: string): LockRea
       out.motion = { range, closingSpeed, relativeVelocity };
     }
     if (mine.readouts.includes('composition')) {
-      out.composition = { ores: { ...rock.rock.contents }, total: oreLeft(rock.rock), hardness: rock.rock.hardness, radius: rock.rock.radius };
+      out.composition = { ores: { ...rock.rock.contents }, total: oreLeft(rock.rock), hardness: rock.rock.hardness, radius: rock.rock.radius, seam: rockSeam(rock.rock.id) };
     }
     return out;
   }

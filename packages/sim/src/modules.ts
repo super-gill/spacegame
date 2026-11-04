@@ -818,6 +818,37 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'mining-laser-m',
   },
+  // Ore hoppers (internal): hold space only ore may use, and a filter set
+  // from its tile for the one ore the tractor leaves behind. Fitting one
+  // costs an armour or shield slot.
+  'rookrivet-hopper-s': {
+    id: 'rookrivet-hopper-s',
+    name: 'Rook and Rivet Hopper S',
+    kind: 'oreHopper',
+    size: 'S',
+    mounts: ['internal'],
+    needs: [],
+    mass: 1,
+    power: 0,
+    price: 1100,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: { oreCapacity: 40 },
+  },
+  'rookrivet-hopper-m': {
+    id: 'rookrivet-hopper-m',
+    name: 'Rook and Rivet Hopper M',
+    kind: 'oreHopper',
+    size: 'M',
+    mounts: ['internal'],
+    needs: [],
+    mass: 2.5,
+    power: 0,
+    price: 2600,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: { oreCapacity: 100 },
+  },
   // Survey scanners (utility, active): a pulse that lights up rocks worth a look.
   'rookrivet-survey-s': {
     id: 'rookrivet-survey-s',
