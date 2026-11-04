@@ -5,7 +5,7 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
-import { arriveVelocity, awayFromStation, canAfford, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { arriveVelocity, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
  * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
@@ -15,8 +15,8 @@ import { arriveVelocity, awayFromStation, canAfford, obstacles, pullOn, routeAro
  *   on the side facing the next station on the beat, hold there a while,
  *   then move on. Look for pirates on its own radar.
  * - engage: lock the pirate (that is how it knows what it is looking at),
- *   then close and fight with its fixed guns, nose on the lead point, as
- *   a pilot would. Give up if the pirate gets too far from the beat, out
+ *   launch missiles from range, then close and fight with its fixed guns,
+ *   nose on the lead point, as a pilot would. Give up if the pirate gets too far from the beat, out
  *   of radar range, or is gone; break off when badly hurt.
  *
  * It is an ordinary ship flown by ordinary rules: it can lose. It does not
@@ -46,6 +46,11 @@ export const WATCH_TUNING = {
   lineOfFireMargin: 40,
   /** Break off below this fraction of structure. */
   breakOffFraction: 0.3,
+  /** Launch missiles at targets between these ranges, units. */
+  missileMinRange: 350,
+  missileMaxRange: 2200,
+  /** Launch with the nose within this of the target, radians. */
+  missileAimTolerance: 0.5,
 };
 
 export interface WatchThought {
@@ -124,20 +129,13 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
     } else {
       const t = target!;
       // Lock first: until the lock completes it does not know enough to shoot.
-      const lockInput: Partial<ShipInput> = {};
-      if (!ship.locks.some((l) => l.targetId === t.id)) {
-        const stray = ship.locks.find((l) => l.targetId !== t.id);
-        if (stray && ship.locks.length >= stats.maxLocks) lockInput.unlock = stray.targetId;
-        else lockInput.lock = t.id;
-      } else if (ship.activeLock !== t.id) {
-        lockInput.activateLock = t.id;
-      }
+      const lockInput = holdLock(ship, stats, t.id);
       const back = normalise(sub(ship.position, t.position));
       const hold = add(t.position, scale(back, WATCH_TUNING.standoff));
       // Fight round stations, rocks and bodies, not through them.
       const waypoint = routeAround(ship, stats, hold, around);
       const desired = add(t.velocity, travelVelocity(ship, stats, waypoint, hold, stats.maxSpeed));
-      const gunMount = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed');
+      const gunMount = mainGun(stats);
       const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
       const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...lockInput };
@@ -147,6 +145,8 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
         const inRange = distance(ship.position, t.position) <= gun.range * WATCH_TUNING.rangeFraction;
         input.fireFixed = aimError <= WATCH_TUNING.aimTolerance && inRange && !bystanderInLine(world, ship, t, gun.range) && canAfford(ship, stats, gun, gunMount![0]);
       }
+      // Missiles from further out; they home, so a bystander is less of a worry.
+      Object.assign(input, missileInputs(ship, stats, t, WATCH_TUNING.missileMinRange, WATCH_TUNING.missileMaxRange, WATCH_TUNING.missileAimTolerance));
       return { input, brain: b, events };
     }
   }

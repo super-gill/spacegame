@@ -2,7 +2,10 @@ import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
 import { asteroidPositions } from '../asteroids.js';
 import { bodyStates, gravityAt, railTime } from '../rails.js';
-import type { ShipStats, Ship, ShipInput, Station, World } from '../types.js';
+import { isLocked } from '../locks.js';
+import { incomingMunitions } from '../munitions.js';
+import type { ShipStats, Ship, ShipInput, Station, WeaponSpec, World } from '../types.js';
+import { isGun } from '../weapons.js';
 import { add, distance, fromAngle, length, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { emptyInput } from '../world.js';
 
@@ -171,8 +174,10 @@ export function obstacles(world: Pick<World, 'stations' | 'bodies' | 'asteroids'
 
 /**
  * Which way to move off a station just left or brushed against: straight
- * away from it, unless that leads towards the body it orbits, when the
- * way out is away from the body instead.
+ * away from it, unless that leads towards the body it orbits. Then lean
+ * away from the body as well, never so far that the way leads back into
+ * the hull: from the planet-facing side, first slip round the hull
+ * sideways (still edging out) until there is room to climb.
  */
 export function awayFromStation(world: Pick<World, 'bodies' | 'tick' | 'dt'>, ship: Ship, station: Station): Vec2 {
   const out = normalise(sub(ship.position, station.position));
@@ -180,8 +185,18 @@ export function awayFromStation(world: Pick<World, 'bodies' | 'tick' | 'dt'>, sh
   const parent = parentId ? world.bodies[parentId] : undefined;
   if (!parentId || !parent || parent.radius <= 0) return out;
   const upward = normalise(sub(station.position, bodyStates(world.bodies, railTime(world.tick, world.dt))[parentId]!.position));
-  return dot(out, upward) < 0 ? normalise(add(out, scale(upward, 2))) : out;
+  const facing = dot(out, upward);
+  if (facing >= 0) return out;
+  // Mildly towards the body: climbing as well still leads away from the hull.
+  if (facing >= -STEEP_PAD) return normalise(add(out, scale(upward, 2)));
+  // Steeply towards it: round the hull's side first.
+  const side = sub(out, scale(upward, facing));
+  const sideways = length(side) > 1e-6 ? normalise(side) : { x: -upward.y, y: upward.x };
+  return normalise(add(sideways, scale(out, 0.3)));
 }
+
+/** A pad facing the body more steeply than this (cosine) leaves sideways first. */
+const STEEP_PAD = 0.3;
 
 /**
  * Gunnery discipline for NPCs with fixed guns (docs/weapons.md): fire
@@ -271,3 +286,59 @@ const INSIDE_CUSHION_STEP = 0.5;
 
 /** Tangent waypoints sit this much beyond the cushion, so a ship cutting the corner still clears it. */
 const TANGENT_MARGIN = 1.08;
+
+/**
+ * Lock inputs that get and hold a complete, active lock on `targetId`:
+ * drop a stray lock if the computer is full, lock, then make it active.
+ * Missiles need this; fixed guns do not.
+ */
+export function holdLock(ship: Ship, stats: ShipStats, targetId: string): Partial<ShipInput> {
+  if (!ship.locks.some((l) => l.targetId === targetId)) {
+    const stray = ship.locks.find((l) => l.targetId !== targetId);
+    if (stray && ship.locks.length >= stats.maxLocks) return { unlock: stray.targetId };
+    return { lock: targetId };
+  }
+  return ship.activeLock !== targetId ? { activateLock: targetId } : {};
+}
+
+/** The fixed gun an NPC aims its nose with: the first fixed mount that is a gun, not a launcher. */
+export function mainGun(stats: ShipStats): [string, WeaponSpec] | null {
+  const found = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed' && isGun(w));
+  return found ?? null;
+}
+
+/** NPC guns sit in this group; launchers in their own (`weaponStatesFor`). */
+const NPC_GUN_GROUP = 1;
+
+/**
+ * Whether to launch at `target` this tick, and the inputs that do it:
+ * a loaded, cooled launcher, a complete lock, the target between
+ * `minRange` and `maxRange`, and the nose within `aimTolerance` of it (a
+ * missile turns, but not from behind). Launching selects the launcher's
+ * group for the tick; otherwise the guns' group is put back, so the
+ * caller's `fireFixed` fires guns.
+ */
+export function missileInputs(ship: Ship, stats: ShipStats, target: Ship, minRange: number, maxRange: number, aimTolerance: number): Partial<ShipInput> {
+  const back: Partial<ShipInput> = ship.fireGroup !== NPC_GUN_GROUP ? { selectGroup: NPC_GUN_GROUP } : {};
+  if (!isLocked(ship, target.id)) return back;
+  const range = distance(ship.position, target.position);
+  if (range < minRange || range > maxRange) return back;
+  if (Math.abs(angleDelta(ship.heading, toAngle(sub(target.position, ship.position)))) > aimTolerance) return back;
+  const ready = ship.weapons.find((w) => {
+    const spec = stats.weapons[w.mountId];
+    return spec?.family === 'missile' && w.loaded > 0 && w.cooldownTicks === 0 && w.reloadTicks === 0;
+  });
+  if (!ready) return back;
+  return { selectGroup: ready.group, fireFixed: true };
+}
+
+/** NPCs drop a countermeasure when a munition coming for them is this close, units. */
+const COUNTERMEASURE_RANGE = 700;
+
+/** True if an NPC should drop a countermeasure now: something is coming and a dispenser is ready. */
+export function wantsCountermeasure(world: Pick<World, 'munitions'>, ship: Ship, stats: ShipStats): boolean {
+  if (ship.state !== 'flying') return false;
+  const coming = incomingMunitions(world.munitions, ship.id).some((m) => distance(m.position, ship.position) <= COUNTERMEASURE_RANGE);
+  if (!coming) return false;
+  return ship.weapons.some((w) => stats.weapons[w.mountId]?.family === 'countermeasure' && w.loaded > 0 && w.cooldownTicks === 0);
+}

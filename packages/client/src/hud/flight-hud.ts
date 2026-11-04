@@ -1,10 +1,14 @@
-import type { NavReadout, Ship, World } from '@spacegame/sim';
+import type { NavReadout, Ship, WeaponFamily, World } from '@spacegame/sim';
 import {
   FLIGHT_MODE_LABELS,
   boardableShips,
   cargoUsed,
   distance,
+  goodsFitting,
+  incomingMunitions,
   isEscapePod,
+  isGun,
+  loadedGoodOf,
   nearestDockableStation,
   shipPilot,
   shipStats,
@@ -196,7 +200,7 @@ export class FlightHud {
       this.weapons.replaceChildren();
       this.weaponTiles = new Map();
       for (const mountId of mounts) {
-        const tile = weaponTile(specs[mountId]!.kind, specs[mountId]!.name);
+        const tile = weaponTile(specs[mountId]!.kind, specs[mountId]!.family, specs[mountId]!.name);
         this.weaponTiles.set(mountId, tile);
         this.weapons.append(tile.root);
       }
@@ -209,18 +213,26 @@ export class FlightHud {
       const state = ship.weapons.find((w) => w.mountId === mountId);
       const progress = state ? reloadProgress(state.cooldownTicks, spec.fireInterval, world.dt) : 1;
       setAttr(tile.reload, 'd', progress < 1 ? arcPath(14, 14, 12, progress, -90, 360) : '');
-      // Stopgap (lead, 6e): what the gun runs on. Rounds loaded and boxes
-      // in the hold for ammunition guns; the fire group for fixed guns.
+      // Stopgap (lead, 6e): what the weapon runs on. Rounds loaded and
+      // boxes in the hold that fit it; for launchers and dispensers, which
+      // munition or charge is loaded. The fire group for fixed guns.
       if (spec.ammo && state) {
-        const boxes = ship.hold[spec.ammo] ?? 0;
-        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded} · ${boxes} BOX`);
+        const boxes = goodsFitting(world.goods, spec.ammo).reduce((n, g) => n + (ship.hold[g.id] ?? 0), 0);
+        const good = loadedGoodOf(state, spec, world.goods);
+        const what = !isGun(spec) && good ? ` ${shortGoodName(world.goods[good]?.name ?? good)}` : '';
+        setText(tile.ammo, state.reloadTicks > 0 ? 'RELOADING' : `${state.loaded}${what} · ${boxes} BOX`);
         tile.ammo.classList.toggle('low', state.loaded === 0 && boxes === 0);
       } else {
         setText(tile.ammo, spec.capacitorPerShot > 0 ? 'CAP' : '');
       }
-      if (spec.kind === 'turret') {
-        setText(tile.state, engaging ? 'ENGAGING' : ship.weaponsHot ? 'AUTO' : 'COLD');
-        tile.root.classList.toggle('active', engaging);
+      if (spec.family === 'countermeasure') {
+        setText(tile.state, 'C');
+        tile.root.classList.toggle('active', false);
+      } else if (spec.kind === 'turret') {
+        // Swivels shoot down munitions coming for you whether hot or cold.
+        const defending = incomingMunitions(world.munitions, ship.id).length > 0;
+        setText(tile.state, defending ? 'DEFENDING' : engaging ? 'ENGAGING' : ship.weaponsHot ? 'AUTO' : 'PD');
+        tile.root.classList.toggle('active', engaging || defending);
       } else {
         const inGroup = state?.group === ship.fireGroup;
         setText(tile.state, inGroup ? `SPACE · G${state?.group ?? 1}` : `G${state?.group ?? 1}`);
@@ -230,8 +242,14 @@ export class FlightHud {
   }
 }
 
+/** The short name of an ammunition good for a tile: 'KOD Summons Breach (box of 4)' is BREACH. */
+function shortGoodName(name: string): string {
+  const words = name.replace(/\s*\(.*\)\s*$/, '').split(/\s+/);
+  return (words[words.length - 1] ?? name).toUpperCase();
+}
+
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
-function weaponTile(kind: 'fixed' | 'turret', name: string): WeaponTile {
+function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string): WeaponTile {
   const root = el('div', `hud-weapon ${kind}`);
   root.title = name;
   const icon = svg('svg', { width: 28, height: 28, viewBox: '0 0 28 28', 'aria-hidden': 'true' });
@@ -242,8 +260,8 @@ function weaponTile(kind: 'fixed' | 'turret', name: string): WeaponTile {
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', kind === 'fixed' ? 'FIXED' : 'SWIVEL');
-  const state = el('span', 'hud-weapon-key', kind === 'fixed' ? 'SPACE' : 'COLD');
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : kind === 'fixed' ? 'FIXED' : 'SWIVEL');
+  const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : kind === 'fixed' ? 'SPACE' : 'PD');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);
   return { root, reload, state, ammo };

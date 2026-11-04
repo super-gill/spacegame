@@ -1,5 +1,7 @@
 import { thinkNpcs } from './ai/index.js';
-import { applyDamage, fireWeapons, rechargeCapacitor, regenerateShield, stepProjectiles, type Damage } from './combat.js';
+import { applyDamage, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type Damage } from './combat.js';
+import { goodsFitting } from './goods.js';
+import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
 import { asteroidStates } from './asteroids.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
@@ -11,7 +13,7 @@ import { pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
-import type { Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
+import type { Decoy, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /** Boxes of each ammunition an NPC keeps aboard. */
@@ -26,8 +28,12 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
   const weapons = ship.weapons.map((w) => {
     const spec = stats.weapons[w.mountId];
     if (!spec?.ammo) return w;
-    if ((hold[spec.ammo] ?? 0) < NPC_AMMO_BOXES) hold = { ...hold, [spec.ammo]: NPC_AMMO_BOXES };
-    return w.loaded < spec.magazine ? { ...w, loaded: spec.magazine, reloadTicks: 0 } : w;
+    // Whatever it was using, else the cheapest that fits.
+    const current = loadedGoodOf(w, spec, world.goods);
+    const good = current && world.goods[current]?.ammo?.fits === spec.ammo ? current : (goodsFitting(world.goods, spec.ammo)[0]?.id ?? null);
+    if (!good) return w;
+    if ((hold[good] ?? 0) < NPC_AMMO_BOXES) hold = { ...hold, [good]: NPC_AMMO_BOXES };
+    return w.loaded < spec.magazine || w.loadedGood !== good ? { ...w, loaded: spec.magazine, loadedGood: good, reloadTicks: 0 } : w;
   });
   return hold === ship.hold && weapons.every((w, i) => w === ship.weapons[i]) ? ship : { ...ship, hold, weapons };
 }
@@ -56,7 +62,9 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  *      is in, bounces off stations and surfaces, fires, and recharges shields; docked ships are
  *      repaired and ride their pads.
  *   3. Ships collide with each other (rams).
- *   4. Projectiles fly (carried like ships) and hit.
+ *   4. Projectiles fly (carried like ships) and hit ships or munitions;
+ *      countermeasures drift and burn, fresh ones may draw radar seekers;
+ *      munitions take their hits, steer and strike (munitions.ts).
  *   5. All damage from this tick is applied; destroyed ships become
  *      wrecks and loot; NPCs that chose to leave the sector go.
  *   6. Loot is pulled in and scooped, wrecks drift (both carried),
@@ -79,6 +87,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const events: WorldEvent[] = [...npc.events];
   const damage: Damage[] = [];
   const newProjectiles: Projectile[] = [];
+  const newMunitions: Munition[] = [];
+  const newDecoys: Decoy[] = [];
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
   const aboard = pilotsAboard(world);
@@ -144,9 +154,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     }
 
     const aimer = targeted;
-    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId, world);
+    const threats = incomingMunitions(world.munitions, id);
+    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId, world, threats);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
+    newMunitions.push(...fired.munitions);
+    newDecoys.push(...fired.decoys);
     events.push(...fired.events);
 
     // The reactor refills the capacitor; shields recharge from it.
@@ -169,10 +182,22 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   events.push(...rams.events);
   damage.push(...rams.damage);
 
-  // 4. Projectiles already in flight move and hit; new ones start moving next tick.
-  const shots = stepProjectiles(world.projectiles, ships, world.hulls, stationsNext, world.dt, rails.carryAt, rails.gravityAt);
+  // 4. Projectiles already in flight move and hit ships or munitions; new ones start moving next tick.
+  const munitionRadius = (m: Munition): number => world.goods[m.goodId]?.munition?.radius ?? 2;
+  const shots = stepProjectiles(world.projectiles, ships, world.hulls, stationsNext, world.dt, rails.carryAt, rails.gravityAt, world.munitions, munitionRadius);
   shots.projectiles = shots.projectiles.filter((p) => !insideSurface(p.position, solid));
   damage.push(...shots.damage);
+
+  // Countermeasures drift and burn; ones dropped this tick may draw radar
+  // seekers. Then munitions take their hits, steer, and strike.
+  const decoys = [...stepDecoys(world.decoys, world.dt, rails.carryAt), ...newDecoys];
+  const spoofed = spoofRadar(world.munitions, newDecoys, ships, world.hulls, world.goods);
+  events.push(...spoofed.events);
+  const frameAt = (point: { x: number; y: number }) => frameVelocity(world, { position: point, dockedAt: null });
+  const guided = stepMunitions(spoofed.munitions, shots.munitionHits, decoys, ships, world.hulls, stationsNext, world.goods, world.dt, frameAt, rails.carryAt);
+  events.push(...guided.events);
+  damage.push(...guided.damage);
+  const munitions = guided.munitions.filter((m) => !insideSurface(m.position, solid));
 
   // 5. Apply damage in a fixed order and note who last hurt each ship.
   const killers: Record<string, string | null> = {};
@@ -200,6 +225,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     ships,
     npcs,
     projectiles: [...shots.projectiles, ...newProjectiles],
+    munitions: [...munitions, ...newMunitions],
+    decoys,
     nextEntityId,
     events,
   };

@@ -14,7 +14,7 @@ export { HULLS } from './hulls.js';
 export { MODULES } from './modules.js';
 export { LOADOUTS } from './loadouts.js';
 export { MANUFACTURERS } from './manufacturers.js';
-export { WEAPONS, weaponDps } from './weapons.js';
+export { WEAPONS, weaponDps, isGun } from './weapons.js';
 export { fitStats, shipStats, cargoMass, bonusApplies, flightWarnings, type Catalogues, type FlightWarning } from './stats.js';
 export {
   fitModule,
@@ -30,7 +30,7 @@ export {
   type FitResult,
   type RefitPlan,
 } from './fitting.js';
-export { GOODS } from './goods.js';
+export { GOODS, goodsFitting } from './goods.js';
 export {
   buyGood,
   sellGood,
@@ -44,7 +44,8 @@ export {
 } from './trade.js';
 export { buildShip } from './factory.js';
 export { lockSeconds, lockRefusal, stepLocks, isLocked, weaponTarget, activeTarget, lockReadout, type LockStep, type LockReadout } from './locks.js';
-export { applyDamage, fireWeapons, leadPoint, stepProjectiles, regenerateShield } from './combat.js';
+export { applyDamage, fireWeapons, leadPoint, leadFor, loadedGoodOf, nextAmmo, stepProjectiles, regenerateShield } from './combat.js';
+export { decoySignature, incomingMunitions, launchMunition, dropDecoy, stepMunitions, stepDecoys, spoofRadar, type MunitionHit } from './munitions.js';
 export { collideShips } from './collision.js';
 export {
   createStarterWorld,

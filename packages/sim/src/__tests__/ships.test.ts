@@ -69,7 +69,7 @@ describe('catalogues', () => {
   it('every module has a known maker, and every weapon module a known weapon', () => {
     for (const m of Object.values(MODULES)) {
       expect(MANUFACTURERS[m.manufacturer], m.id).toBeDefined();
-      if (m.kind === 'weapon') expect(WEAPONS[m.weaponId ?? ''], m.id).toBeDefined();
+      if (m.kind === 'weapon' || m.kind === 'countermeasure') expect(WEAPONS[m.weaponId ?? ''], m.id).toBeDefined();
       else expect(m.weaponId, m.id).toBeUndefined();
     }
   });
@@ -139,10 +139,12 @@ describe('hull bonuses', () => {
     expect(fitStats(TEST_CATALOGUES, courier, { c2: 'meridian-reactor-s', i1: 'meridian-shield-s' }).shield).toBe(s);
   });
 
-  it('a combat hull adds damage to full-size weapons only', () => {
-    const s = fitStats(TEST_CATALOGUES, wedge, { w1: 'union-autocannon-m', w2: 'paragon-pulse-s' });
-    expect(s.weapons['w1']!.damage).toBeCloseTo(WEAPONS['autocannon-m']!.damage * 1.15, 9);
-    expect(s.weapons['w2']!.damage).toBe(WEAPONS['pulse-laser-s']!.damage);
+  it('the Warrant adds damage to full-size launchers only: its family is missiles', () => {
+    const s = fitStats(TEST_CATALOGUES, wedge, { w1: 'itomarr-magazine-m', w2: 'itomarr-magazine-s' });
+    expect(s.weapons['w1']!.damage).toBeCloseTo(WEAPONS['missile-launcher-m']!.damage * 1.25, 9);
+    expect(s.weapons['w2']!.damage).toBe(WEAPONS['missile-launcher-s']!.damage); // undersized
+    const guns = fitStats(TEST_CATALOGUES, wedge, { w1: 'union-autocannon-m' });
+    expect(guns.weapons['w1']!.damage).toBe(WEAPONS['autocannon-m']!.damage); // not its family
   });
 
   it('bonuses live on the hull: the same module is plain on another hull', () => {

@@ -14,8 +14,14 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  *   little capacitor.
  * - point defence: swivels, turreted and multi-role, worse than a fixed
  *   gun of their size at everything (the standing rule, enforced by a
- *   test). Point defence against munitions comes in part 2.
- * Missiles and torpedoes are part 2.
+ *   test). With no ship to shoot at they shoot down incoming munitions
+ *   by themselves (combat.ts).
+ * - missile: launchers (Ito-Marr Magazine) and torpedo tubes (Arsenal).
+ *   No capacitor; they load munition goods, which bring their own
+ *   airframe and warhead (goods.ts). `damage` here is the warhead base
+ *   the good scales. They need a complete lock to fire.
+ * - countermeasure: dispensers. Not guns at all, but they load boxes and
+ *   drop charges by the same machinery. Fire on `launchCountermeasure`.
  *
  * Each size roughly doubles the one below in damage per shot and in
  * capacitor or round cost, a little less in damage per second, so bigger
@@ -160,7 +166,39 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     magazine: 60,
     reloadSeconds: 3,
   }),
+
+  // Launchers: no capacitor, whole boxes of munitions. The munition
+  // brings speed, turning and warhead; the launcher brings rate and how
+  // many it holds. Range here is how far a missile flies before burning out.
+  'missile-launcher-s': launcher('missile-launcher-s', 'Missile launcher S', 'S', 'missile', 36, 2.5, 4, 8, 3800),
+  'missile-launcher-m': launcher('missile-launcher-m', 'Missile launcher M', 'M', 'missile', 72, 2.5, 8, 8, 3800),
+  'missile-launcher-l': launcher('missile-launcher-l', 'Missile launcher L', 'L', 'missile', 144, 2.5, 12, 8, 3800),
+  'torpedo-tube-m': launcher('torpedo-tube-m', 'Torpedo tube M', 'M', 'torpedo', 160, 6, 2, 12, 3400),
+  'torpedo-tube-l': launcher('torpedo-tube-l', 'Torpedo tube L', 'L', 'torpedo', 320, 6, 4, 12, 3400),
+
+  // Dispensers: a box of charges, one drop at a time.
+  'dispenser-s': dispenser('dispenser-s', 'Dispenser S', 'S', 6, 1),
+  'dispenser-m': dispenser('dispenser-m', 'Dispenser M', 'M', 12, 0.8),
 };
+
+function launcher(id: string, name: string, size: ModuleSize, slot: 'missile' | 'torpedo', damage: number, interval: number, magazine: number, reload: number, range: number): WeaponSpec {
+  return {
+    id, name, size, kind: 'fixed', family: 'missile', damage, damageType: 'explosive', fireInterval: interval,
+    projectileSpeed: slot === 'missile' ? 420 : 210, range, turretTurnRate: 0, capacitorPerShot: 0, ammo: slot, magazine, reloadSeconds: reload,
+  };
+}
+
+function dispenser(id: string, name: string, size: ModuleSize, magazine: number, interval: number): WeaponSpec {
+  return {
+    id, name, size, kind: 'fixed', family: 'countermeasure', damage: 0, damageType: 'kinetic', fireInterval: interval,
+    projectileSpeed: 0, range: 0, turretTurnRate: 0, capacitorPerShot: 0, ammo: 'countermeasure', magazine, reloadSeconds: 4,
+  };
+}
+
+/** True for a weapon that fires a shot: a gun, not a launcher or a dispenser. */
+export function isGun(w: Pick<WeaponSpec, 'family'>): boolean {
+  return w.family !== 'missile' && w.family !== 'countermeasure';
+}
 
 /** Damage per second of a weapon held on target, with its base ammunition. */
 export function weaponDps(w: WeaponSpec): number {

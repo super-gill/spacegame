@@ -13,7 +13,7 @@ import type { PirateBrain, Projectile, Ship, ShipStats, Station, World, WorldEve
 import { distance, length, sub } from '../vec2.js';
 import { PLANET_ID } from '../bodies.js';
 import { bodyVelocity } from '../rails.js';
-import { WEAPONS, weaponDps } from '../weapons.js';
+import { isGun, WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
 
 const SECOND = 60;
@@ -46,9 +46,10 @@ function quietWorld(): { w: World; me: string } {
 }
 
 describe('weapon catalogue', () => {
-  it('fixed weapons always out-damage turrets of the same size', () => {
+  it('fixed guns always out-damage turrets of the same size', () => {
     const all = Object.values(WEAPONS);
-    for (const fixed of all.filter((w) => w.kind === 'fixed')) {
+    // Launchers and dispensers are fixed but not guns: the rule is about guns.
+    for (const fixed of all.filter((w) => w.kind === 'fixed' && isGun(w))) {
       for (const turret of all.filter((w) => w.kind === 'turret' && w.size === fixed.size)) {
         expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turret));
       }

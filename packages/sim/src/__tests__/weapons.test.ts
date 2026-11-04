@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { applyDamage, fireWeapons, rechargeCapacitor, withinArc } from '../combat.js';
 import { FIXED_DT, SHIELD_CAPACITOR_PER_POINT } from '../constants.js';
 import { buildShip } from '../factory.js';
-import { GOODS } from '../goods.js';
+import { GOODS, goodsFitting } from '../goods.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { MODULES } from '../modules.js';
@@ -10,7 +10,7 @@ import { deserializeWorld, serializeWorld } from '../save.js';
 import { fitStats, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, ShipInput, World } from '../types.js';
-import { WEAPONS, weaponDps } from '../weapons.js';
+import { isGun, WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput } from '../world.js';
 import { TEST_CATALOGUES } from './fixtures.js';
 
@@ -41,14 +41,14 @@ describe('the catalogue', () => {
     for (const w of Object.values(WEAPONS)) {
       if (w.family === 'energy') expect(w.ammo).toBeNull();
       if (w.family === 'projectile') expect(w.capacitorPerShot).toBe(0);
-      if (w.ammo) expect(GOODS[w.ammo]?.ammo, `${w.id} loads a real good`).toBeDefined();
+      if (w.ammo) expect(goodsFitting(GOODS, w.ammo).length, `${w.id} loads a real good`).toBeGreaterThan(0);
     }
   });
 
   it('keeps the rule: at every size, every fixed gun out-damages the swivel', () => {
     for (const size of ['S', 'M', 'L'] as const) {
       const swivel = Object.values(WEAPONS).find((w) => w.kind === 'turret' && w.size === size)!;
-      for (const gun of Object.values(WEAPONS).filter((w) => w.kind === 'fixed' && w.size === size)) {
+      for (const gun of Object.values(WEAPONS).filter((w) => w.kind === 'fixed' && isGun(w) && w.size === size)) {
         expect(weaponDps(gun), `${gun.id} vs ${swivel.id}`).toBeGreaterThan(weaponDps(swivel));
       }
     }

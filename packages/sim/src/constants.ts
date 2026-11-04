@@ -164,3 +164,32 @@ export const POD_EJECT_SPEED = 30;
  * board the ship again (under BOARD_MAX_RELATIVE_SPEED).
  */
 export const POD_STEP_OUT_SPEED = 8;
+
+// Munitions and countermeasures (docs/weapons.md, part 2; munitions.ts).
+
+/** How quickly a munition reaches its speed: this many times its speed per second. */
+export const MUNITION_ACCELERATION = 2;
+
+/** A munition bursts this close to the hull of the ship it is homing on, units. */
+export const MUNITION_PROXIMITY_FUSE = 6;
+
+/** A heat seeker sees things within this angle either side of its nose, radians. About 50 degrees. */
+export const HEAT_SEEKER_CONE = 0.87;
+
+/** How far a heat seeker sees, units. */
+export const HEAT_SEEKER_RANGE = 1200;
+
+/** Chaff or a decoy draws radar seekers chasing its owner within this distance of it, units. */
+export const RADAR_SPOOF_RANGE = 1500;
+
+/** A munition chasing a decoy is spent when it gets this close, units. */
+export const DECOY_FUSE = 10;
+
+/** A dropped countermeasure leaves its ship this fast, astern, units/s. */
+export const DECOY_DROP_SPEED = 40;
+
+/** Shots hit a munition within this margin of its body: point defence fuzes, units. */
+export const MUNITION_HIT_MARGIN = 3;
+
+/** Point defence engages munitions within this fraction of the swivel's range. */
+export const POINT_DEFENCE_RANGE_FRACTION = 1;

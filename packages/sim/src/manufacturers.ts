@@ -10,6 +10,7 @@ export const MANUFACTURERS: Record<string, ManufacturerSpec> = {
   kessariOrbital: { id: 'kessariOrbital', name: 'Kessari Orbital Defence', race: 'kessari' },
   itoMarr: { id: 'itoMarr', name: 'Ito-Marr Dynamics', race: 'kessari' },
   tessaract: { id: 'tessaract', name: 'Tessaract Logistics', race: 'kessari' },
+  novum: { id: 'novum', name: 'Novum Systems', race: 'kessari' },
   slagline: { id: 'slagline', name: 'Slagline Motors', race: 'freeBelt' },
   rookRivet: { id: 'rookRivet', name: 'Rook and Rivet', race: 'freeBelt' },
   unionDefence: { id: 'unionDefence', name: 'Union Defence Works', race: 'freeBelt' },

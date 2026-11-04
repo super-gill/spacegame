@@ -75,7 +75,7 @@ Networking, the server process, join and leave UI, and choosing a pilot name. Th
 ### Weapons
 
 - The mouse is for choosing, not shooting: click a ship to lock it (Tab switches locks, Esc unlocks). Flying and firing stay on the keyboard, so on bigger ships the pointer is free for other systems mid-fight.
-- **Weapons and power** are designed in [weapons.md](weapons.md): the capacitor is a hull property that energy and hybrid guns, shield recharge and full-size sensors draw on; guns come in families (projectile, energy, hybrid, and the swivels for point defence) that cost capacitor, ammunition or both; damage has a type and shields and armour resist by type; mounts have arcs; Space fires the selected fire group.
+- **Weapons and power** are designed in [weapons.md](weapons.md): the capacitor is a hull property that energy and hybrid guns, shield recharge and full-size sensors draw on; guns come in families (projectile, energy, hybrid, and the swivels for point defence) that cost capacitor, ammunition or both; damage has a type and shields and armour resist by type; mounts have arcs; Space fires the selected fire group. Missiles and torpedoes need a lock, home on it and can be shot down by swivels or drawn off by countermeasures.
 - **Fixed** weapons fire along the ship's heading when you press Space. You aim by flying; with a target selected, a lead marker shows where to put the nose so shots meet it.
 - **Target locks**, as in EVE: locking a ship takes time, shorter with better scan resolution and against bigger ships (`lockSeconds`). A ship holds up to its `maxLocks` (hull now, sensor modules later), each inside sensor range; a lock drops when its target leaves range, docks or is destroyed, and all drop when you dock. One lock is active. Later (6e) each turret and other system can be assigned to a lock; fixed guns stay on the nose and need none.
 - **Turrets** engage your active lock, once complete, on their own while weapons are **hot** (H toggles hot and cold). They slew towards the target's lead point at a limited rate and fire once on aim and in range. A small, fast ship crossing close can outrun a turret's slew: that is tracking, and it is what stops big turret ships automatically beating small ones.
@@ -160,7 +160,7 @@ The full design is in [ships.md](ships.md). In play today (0.7.0):
 
 How the star system is built (bodies on rails, gravity, orbits, detection) is in `docs/system.md`.
 
-Still planned: oversized modules across two mounts, turret arcs, fire groups, ammunition and power management (6c); drones as a module class.
+Still planned: oversized modules across two mounts; drones as a module class. (Arcs, fire groups, ammunition, the capacitor and munitions arrived in 6e, see weapons.md.)
 
 ## Trade and economy
 

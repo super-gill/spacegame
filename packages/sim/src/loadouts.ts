@@ -26,7 +26,8 @@ export const LOADOUTS: Record<string, Loadout> = {
     },
   },
   'tessaract-trader': {
-    // Four of six bays: a working trader that still handles.
+    // Four of six bays: a working trader that still handles. A swivel
+    // forward and a chaff screen aft.
     id: 'tessaract-trader',
     name: 'Tessaract Manifest, Calder supply run',
     hullId: 'tessaract-spine',
@@ -43,11 +44,13 @@ export const LOADOUTS: Record<string, Loadout> = {
       c2: 'itomarr-reactor-m',
       i1: 'itomarr-shield-m',
       w1: 'paragon-turret-s',
+      u1: 'itomarr-screen-m',
     },
   },
   'kessari-raider': {
     // A stripped frigate on cheap parts: one light gun in a medium mount,
-    // a small shield, a pod for loot. Quick, not tough.
+    // a small launcher with one box of missiles (it never docks to buy
+    // more), a small shield, a pod for loot. Quick, not tough.
     id: 'kessari-raider',
     name: 'Kessari Warrant, Black Strike trophy',
     hullId: 'kessari-wedge',
@@ -56,6 +59,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       r1: 'meridian-radar-s',
       t1: 'meridian-computer-s',
       w1: 'paragon-pulse-s',
+      w2: 'itomarr-magazine-s',
       e1: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
       c2: 'meridian-reactor-s',
@@ -66,8 +70,9 @@ export const LOADOUTS: Record<string, Loadout> = {
   },
   'calder-watch': {
     // The Calder Watch: a Port Authority Warrant fitted to police, not to
-    // raid. One heavy fixed gun, a full-size Marksman so it locks fast and
-    // reads what it locks, a medium shield and armour. No cargo.
+    // raid. One heavy fixed gun and a Magazine for the hull's missile
+    // bonus, a full-size Marksman so it locks fast and reads what it
+    // locks, a medium shield and armour, chaff. No cargo.
     id: 'calder-watch',
     name: 'Kessari Warrant, Calder Watch',
     hullId: 'kessari-wedge',
@@ -76,11 +81,13 @@ export const LOADOUTS: Record<string, Loadout> = {
       t1: 'paragon-computer-m',
       n1: 'meridian-nav-s',
       w1: 'union-autocannon-m',
+      w2: 'itomarr-magazine-m',
       e1: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
       c2: 'itomarr-reactor-m',
       i1: 'itomarr-shield-m',
       u1: 'cantorvell-armour-m',
+      u2: 'paragon-fairwarning-s',
     },
   },
   'aurel-tacet-dev': {

@@ -4,7 +4,7 @@ import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
 import { pirateHome } from '../rails.js';
-import { arriveVelocity, canAfford, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
+import { arriveVelocity, canAfford, holdLock, mainGun, missileInputs, obstacles, pullOn, routeAround, steerSafely, travelVelocity, type Obstacle } from './steer.js';
 
 /**
  * Pirate: patrols near a home point and hunts lone ships.
@@ -72,6 +72,11 @@ export const PIRATE_TUNING = {
   engageStructureFraction: 0.6,
   /** Distance from a patrol point at which the next one is chosen, units. */
   patrolPointReached: 120,
+  /** Launch missiles at targets between these ranges, units: open from range, then close to guns. */
+  missileMinRange: 400,
+  missileMaxRange: 1800,
+  /** Launch with the nose within this of the target, radians. */
+  missileAimTolerance: 0.5,
 };
 
 export interface PirateThought {
@@ -188,15 +193,17 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       const desired = add(t.velocity, closing);
 
       // Point the nose where the shots need to go, and fire when it is there.
-      const gunMount = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed');
+      // Lock as it closes: its missiles need one, its guns do not.
+      const gunMount = mainGun(stats);
       const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
-      const input = steerSafely(ship, stats, desired, pull, aimPoint);
+      const input = { ...steerSafely(ship, stats, desired, pull, aimPoint), ...holdLock(ship, stats, t.id) };
       if (gun) {
         const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
         input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange && canAfford(ship, stats, gun, gunMount![0]);
       }
+      Object.assign(input, missileInputs(ship, stats, t, PIRATE_TUNING.missileMinRange, PIRATE_TUNING.missileMaxRange, PIRATE_TUNING.missileAimTolerance));
       return { input, brain: b, events };
     }
   }

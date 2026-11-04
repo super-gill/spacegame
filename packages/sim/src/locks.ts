@@ -17,7 +17,7 @@ import type {
   WorldEvent,
 } from './types.js';
 import { distance, length, sub, type Vec2 } from './vec2.js';
-import { weaponDps } from './weapons.js';
+import { isGun, weaponDps } from './weapons.js';
 
 /**
  * Target locks, in the spirit of EVE.
@@ -233,7 +233,7 @@ export function lockReadout(world: World, ship: Ship, targetId: string): LockRea
   }
   if (has('combat')) {
     const weapons = Object.entries(theirs.weapons).map(([mountId, w]) => ({ mountId, name: w.name, kind: w.kind }));
-    const dps = (kind: WeaponKind): number => Object.values(theirs.weapons).filter((w) => w.kind === kind).reduce((n, w) => n + weaponDps(w), 0);
+    const dps = (kind: WeaponKind): number => Object.values(theirs.weapons).filter((w) => w.kind === kind && isGun(w)).reduce((n, w) => n + weaponDps(w), 0);
     out.combat = {
       shield: target.shield,
       maxShield: theirs.shield,

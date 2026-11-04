@@ -73,6 +73,10 @@ export function harbourStation(): Station {
       // Ammunition from the free port's dealers.
       rounds: { ask: 32, bid: 20 },
       charges: { ask: 44, bid: 28 },
+      // Missiles and countermeasures: the everyday kinds.
+      'summons-breach': { ask: 140, bid: 90 },
+      chaff: { ask: 70, bid: 40 },
+      flares: { ask: 70, bid: 40 },
     },
     outfitting: true,
     // Ten pads, sizes mixed so large hulls are never side by side.
@@ -139,6 +143,14 @@ export function lanternWorks(): Station {
       rounds: { ask: 26, bid: 18 },
       shells: { ask: 34, bid: 24 },
       charges: { ask: 38, bid: 26 },
+      // Munitions too: KOD's whole range passes through the Works.
+      'summons-breach': { ask: 125, bid: 85 },
+      'summons-scatter': { ask: 125, bid: 85 },
+      'summons-heat': { ask: 160, bid: 105 },
+      'foreclosure-breach': { ask: 330, bid: 220 },
+      chaff: { ask: 62, bid: 36 },
+      flares: { ask: 62, bid: 36 },
+      decoys: { ask: 210, bid: 140 },
     },
     outfitting: true,
     pads: padRing(70, ['L', 'M', 'S', 'L', 'M', 'S']),

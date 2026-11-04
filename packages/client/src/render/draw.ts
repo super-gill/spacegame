@@ -1,4 +1,4 @@
-import { padWorldPosition, type HullSpec, type Loot, type ModuleSize, type Projectile, type Ship, type ShipStats, type Station, type Wreck } from '@spacegame/sim';
+import { padWorldPosition, type Decoy, type HullSpec, type Loot, type ModuleSize, type Munition, type Projectile, type Ship, type ShipStats, type Station, type Wreck } from '@spacegame/sim';
 import type { Camera } from '../camera.js';
 import { drawShipArt, type ShipArt } from './ship-art.js';
 
@@ -286,6 +286,60 @@ export function drawProjectile(ctx: CanvasRenderingContext2D, camera: Camera, p:
   ctx.moveTo(head.x, head.y);
   ctx.lineTo(head.x - (p.velocity.x / speed) * tail, head.y - (p.velocity.y / speed) * tail);
   ctx.stroke();
+}
+
+/**
+ * Stopgap (lead, 6e part 2): a missile or torpedo as a small dart along
+ * its heading with an exhaust streak; torpedoes drawn larger. The
+ * interface workstream owns the real look.
+ */
+export function drawMunition(ctx: CanvasRenderingContext2D, camera: Camera, m: Munition, torpedo: boolean, colour: string): void {
+  const c = camera.worldToScreen(m.position);
+  const z = Math.max(camera.zoom, 0.6);
+  const len = (torpedo ? 12 : 7) * z;
+  const half = (torpedo ? 3.5 : 2.2) * z;
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(m.heading);
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(len / 2, 0);
+  ctx.lineTo(-len / 2, -half);
+  ctx.lineTo(-len / 2, half);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.strokeStyle = COLOUR.flame;
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(-len / 2, 0);
+  ctx.lineTo(-len / 2 - len * 1.4, 0);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Stopgap: a countermeasure as a flickering point that fades as it burns. */
+export function drawDecoy(ctx: CanvasRenderingContext2D, camera: Camera, d: Decoy, nowMs: number): void {
+  const c = camera.worldToScreen(d.position);
+  const life = d.lifetimeTicks > 0 ? d.ticksLeft / d.lifetimeTicks : 0;
+  const flicker = 0.6 + 0.4 * Math.sin(nowMs / 40 + d.position.x);
+  const heat = d.spoofs.includes('heat');
+  ctx.save();
+  ctx.globalAlpha = Math.max(0.15, life) * flicker;
+  ctx.fillStyle = heat ? COLOUR.flame : COLOUR.inkBright;
+  ctx.strokeStyle = ctx.fillStyle;
+  const r = (heat ? 3 : 2) + life * 2;
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+  ctx.fill();
+  if (!heat) {
+    // Chaff: a little scatter of glints round it.
+    for (let i = 0; i < 4; i++) {
+      const a = i * 1.7 + d.ticksLeft * 0.05;
+      ctx.fillRect(c.x + Math.cos(a) * r * 2.5, c.y + Math.sin(a) * r * 2.5, 1.5, 1.5);
+    }
+  }
+  ctx.restore();
 }
 
 /** A wreck: the bare hull outline, dashed, fading out over its lifetime. */

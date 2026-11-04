@@ -89,7 +89,45 @@ export type Resistances = Partial<Record<DamageType, number>>;
  * carry bonuses to one. `pointDefence` is the swivels: multi-role
  * turreted guns, worse than a fixed gun of their size at everything.
  */
-export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence';
+export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence' | 'countermeasure';
+
+/** How a munition finds its target (docs/weapons.md, "Missiles and torpedoes"). */
+export type Guidance = 'radar' | 'heat';
+
+/**
+ * A munition good: what a launcher fires. The box's `ammo` block gives
+ * the warhead (damage type and a multiplier on the launcher's damage);
+ * this block gives the airframe. Missiles are fast and nimble, torpedoes
+ * slow and heavy. Both can be shot down: they have a signature to track
+ * and a little structure.
+ */
+export interface MunitionSpec {
+  class: 'missile' | 'torpedo';
+  guidance: Guidance;
+  /** Flight speed, units/s, in the local frame. */
+  speed: number;
+  /** How fast it can turn, rad/s. */
+  turnRate: number;
+  /** Seconds of flight before it burns out. */
+  lifetimeSeconds: number;
+  /** Hull radius for hits, units. */
+  radius: number;
+  /** How it looks to sensors and seekers. */
+  signature: number;
+  /** Damage it takes before it is destroyed. */
+  structure: number;
+}
+
+/**
+ * A countermeasure good: what a dispenser drops. A decoy draws seekers of
+ * the guidance kinds it spoofs while it burns, brightest when fresh.
+ */
+export interface DecoySpec {
+  spoofs: Guidance[];
+  /** Apparent signature when fresh; fades to nothing over its life. */
+  signature: number;
+  lifetimeSeconds: number;
+}
 
 /**
  * The module stats that add up across a fit. Each module contributes some
@@ -125,7 +163,8 @@ export type ModuleKind =
   | 'weapon'
   | 'radar'
   | 'targetingComputer'
-  | 'navComputer';
+  | 'navComputer'
+  | 'countermeasure';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -166,8 +205,10 @@ export interface ModuleSpec {
   manufacturer: string;
   tags: string[];
   stats: Partial<Record<ModuleStat, number>>;
-  /** Weapon modules only: the ballistic profile it fires, by weapon id. */
+  /** Weapon and countermeasure modules only: the profile it fires, by weapon id. */
   weaponId?: string;
+  /** Dispensers only: the good a new one comes loaded with (its maker's mix). */
+  startsLoadedWith?: string;
   /** Targeting computers only: what a lock shows (see `ReadoutKind`). */
   readouts?: ReadoutKind[];
   /** Shield generators and armour: what they stop of each damage type. */
@@ -334,10 +375,16 @@ export interface GoodSpec {
   basePrice: number;
   /**
    * Ammunition only: one unit of the good is a box of `perUnit` rounds,
-   * the damage type (null: the gun's own) and a multiplier on the gun's
-   * damage. Guns load whole boxes.
+   * the damage type (null: the gun's own), a multiplier on the gun's
+   * damage, and the ammunition slot the box fits (`WeaponSpec.ammo`:
+   * rounds, shells, charges, missile, torpedo, chaff, flare, decoy), so
+   * several goods can feed one launcher. Guns load whole boxes.
    */
-  ammo?: { perUnit: number; damageType: DamageType | null; damage: number };
+  ammo?: { perUnit: number; damageType: DamageType | null; damage: number; fits: string };
+  /** Missiles and torpedoes: the airframe. Present only on munition goods. */
+  munition?: MunitionSpec;
+  /** Chaff, flares and decoys: what a dropped charge does. Present only on countermeasure goods. */
+  decoy?: DecoySpec;
 }
 
 /**
@@ -377,9 +424,11 @@ export interface WeaponSpec {
   /** Capacitor spent per shot. Zero for projectile guns and launchers. */
   capacitorPerShot: number;
   /**
-   * The good this gun loads, or null for an energy gun. Rounds come from
-   * the hold; `magazine` is how many a weapon holds at once and `reloadSeconds`
-   * how long a reload from the hold takes.
+   * The ammunition slot this gun loads (any good whose `ammo.fits` names
+   * it), or null for an energy gun. Rounds come from the hold; `magazine`
+   * is how many a weapon holds at once and `reloadSeconds` how long a
+   * reload from the hold takes. Launchers load munition goods,
+   * dispensers countermeasure goods, by the same machinery.
    */
   ammo: string | null;
   magazine: number;
@@ -402,9 +451,11 @@ export interface WeaponState {
   cooldownTicks: number;
   /** Rounds loaded now. Always full for energy guns. */
   loaded: number;
+  /** The good in the magazine (its warhead or decoy), or null or absent for energy guns and empty magazines. */
+  loadedGood?: string | null;
   /** Ticks left on a reload in progress, or 0. */
   reloadTicks: number;
-  /** Fire group, 1 to 4. Space fires the selected group. */
+  /** Fire group, 1 to 4. Space fires the selected group. Launchers default to 2. */
   group: number;
   /** World bearing the weapon points along, radians. Fixed weapons follow the heading. */
   aim: number;
@@ -438,6 +489,49 @@ export interface Projectile {
   damage: number;
   damageType: DamageType;
   ticksLeft: number;
+}
+
+/**
+ * A missile or torpedo in flight (docs/weapons.md). Launched at a locked
+ * ship, it steers itself: radar-homing while the launcher's lock holds,
+ * heat-seeking towards the hottest signature near its target, so chaff,
+ * flares, decoys and the wrong ship can draw it. It has structure and
+ * can be shot down; point defence does that by itself. Moves in the
+ * local frame like a projectile.
+ */
+export interface Munition {
+  id: string;
+  ownerShipId: string;
+  /** The good it was fired as; its spec gives speed, turning and warhead. */
+  goodId: string;
+  /** The ship it was launched at. Null once it has lost its target and flies straight. */
+  targetId: string | null;
+  /** What it is homing on now: a ship id, a decoy id, or null (straight). */
+  homingOn: string | null;
+  guidance: Guidance;
+  position: Vec2;
+  velocity: Vec2;
+  heading: number;
+  damage: number;
+  damageType: DamageType;
+  structure: number;
+  ticksLeft: number;
+}
+
+/**
+ * A dropped countermeasure: chaff, a flare or a decoy, drifting where it
+ * was dropped and fading over its life. Munitions whose guidance it
+ * spoofs may home on it instead of its owner.
+ */
+export interface Decoy {
+  id: string;
+  ownerShipId: string;
+  goodId: string;
+  spoofs: Guidance[];
+  position: Vec2;
+  velocity: Vec2;
+  ticksLeft: number;
+  lifetimeTicks: number;
 }
 
 /** What is left of a destroyed ship. Drifts and fades. Salvage comes later. */
@@ -748,6 +842,8 @@ export interface ShipInput {
   fireFixed: boolean;
   /** Edge-triggered: select this fire group (1 to 4), or null to leave it. */
   selectGroup: number | null;
+  /** Edge-triggered: drop a charge from every countermeasure dispenser that has one. */
+  launchCountermeasure: boolean;
   /**
    * Edge-triggered: start locking this ship, or null. Refused (with a
    * `lockRefused` event) beyond sensor range, at max locks, or for a ship
@@ -838,6 +934,10 @@ export interface World {
   npcs: Record<string, NpcBrain>;
   spawners: Spawner[];
   projectiles: Projectile[];
+  /** Missiles and torpedoes in flight. */
+  munitions: Munition[];
+  /** Countermeasures burning in space. */
+  decoys: Decoy[];
   wrecks: Wreck[];
   loot: Loot[];
   weapons: Record<string, WeaponSpec>;
@@ -861,7 +961,7 @@ export interface World {
   events: WorldEvent[];
 }
 
-export type DamageCause = 'weapon' | 'ram' | 'station' | 'surface';
+export type DamageCause = 'weapon' | 'munition' | 'ram' | 'station' | 'surface';
 
 /** Why a lock could not start. */
 export type LockRefusal =
@@ -918,6 +1018,16 @@ export type WorldEvent =
   /** The capacitor is empty and an energy weapon could not fire. */
   | { type: 'capacitorEmpty'; shipId: string }
   | { type: 'fireGroupChanged'; shipId: string; group: number }
+  /** A missile or torpedo left `shipId` for `targetId`. */
+  | { type: 'munitionLaunched'; shipId: string; munitionId: string; targetId: string }
+  /** A launcher on `shipId` would not fire: launchers need a complete lock to fire at. */
+  | { type: 'launchRefused'; shipId: string; mountId: string; reason: 'noLock' }
+  /** A munition heading for `shipId` turned onto one of its decoys. */
+  | { type: 'munitionSpoofed'; shipId: string; munitionId: string; decoyId: string }
+  /** A munition fired by `shipId` was shot down (`by` the shooter), burnt out or spent on a decoy (`by` null). */
+  | { type: 'munitionDestroyed'; shipId: string; munitionId: string; by: string | null }
+  /** `shipId` dropped a countermeasure from `mountId`. */
+  | { type: 'countermeasureLaunched'; shipId: string; mountId: string; goodId: string }
   /** A ship was destroyed. `by` is the ship responsible, or null. */
   | { type: 'destroyed'; shipId: string; by: string | null }
   | { type: 'lootCollected'; shipId: string; item: string; amount: number }

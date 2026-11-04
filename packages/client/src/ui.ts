@@ -257,6 +257,10 @@ export class Ui {
         this.showToast(e.reason === 'outOfRange' ? 'Lock lost: out of sensor range.' : 'Lock lost.', 1500, 'info');
       } else if (e.type === 'lootCollected') {
         this.showToast(`+${e.amount} ${e.item}`, 1200, 'info');
+      } else if (e.type === 'launchRefused') {
+        this.showToast('Launchers need a complete lock to fire at.', 1500);
+      } else if (e.type === 'munitionSpoofed') {
+        this.showToast('Countermeasure drew a missile off.', 1500, 'info');
       }
     }
   }

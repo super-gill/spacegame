@@ -220,6 +220,8 @@ export function migrate4to5(world: unknown): unknown {
     npcs: {},
     spawners,
     projectiles: [],
+    munitions: [],
+    decoys: [],
     wrecks: [],
     loot: [],
     hulls: { ...HULLS },
@@ -370,6 +372,9 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
       ...world,
       ships,
       projectiles,
+      // Worlds saved before 6e part 2 had nothing in flight but shots.
+      munitions: Array.isArray(world.munitions) ? world.munitions : [],
+      decoys: Array.isArray(world.decoys) ? world.decoys : [],
       asteroids,
       hulls: { ...HULLS },
       modules: { ...MODULES },

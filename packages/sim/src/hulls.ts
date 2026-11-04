@@ -109,7 +109,7 @@ export const HULLS: Record<string, HullSpec> = {
       mount('b1', 'bay', 'S', -14, 13, []),
     ],
     bonuses: [
-      { source: 'role', label: '+15% weapon damage from full-size weapons', stat: 'damage', amount: 0.15, kind: 'weapon' },
+      { source: 'role', label: '+25% missile damage from full-size launchers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'missile' },
       { source: 'role', label: '+25% lock speed from a full-size targeting computer', stat: 'scanResolution', amount: 0.25, kind: 'targetingComputer' },
       { source: 'race', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
     ],

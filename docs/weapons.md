@@ -103,9 +103,31 @@ Choices the build made (Lead 3, 4 November 2026).
 - **Fire groups:** keys 1 to 4; every gun starts in group 1. Nothing assigns groups yet beyond that (outfitting, 6d).
 - **Client stopgaps** for the interface workstream: the capacitor fills the dial's inner ring (amber, red when low); weapon tiles show rounds loaded and boxes aboard or CAP, and the fire group; outfitting names the gun types and shows capacitor, recharge, drain and resistances.
 
+## As built: part 2
+
+Choices the build made (Lead 3, 4 November 2026).
+
+- **Launchers:** Ito-Marr Magazine S, M and L (missiles: warhead base 36, 72 and 144, one every 2.5 s, holding 4, 8 and 12) and the Arsenal L (torpedoes: base 320, one every 6 s, holding 4). No capacitor; they reload whole boxes from the hold over 8 to 12 seconds and draw little power. A new launcher joins **fire group 2** and comes loaded with the cheapest munition that fits. Space fires it at the **active lock**, and only a complete one (`launchRefused` otherwise).
+- **Munitions are goods**, boxed like rounds, from KOD: Summons Breach (explosive, the all-rounder), Summons Scatter (fragmentation, a little harder hitting), Summons Breach Heat (heat-seeking, a little weaker) in boxes of 4, and Foreclosure Breach torpedoes in boxes of 2. The good carries the airframe (`GoodSpec.munition`: speed, turn rate, life, signature, structure) and the warhead (`ammo.damageType`, `ammo.damage` scaling the launcher's base). A launcher loads any good whose `ammo.fits` names its slot, keeping to the same one while the hold has more.
+- **Flight:** a munition leaves with the ship's velocity and reaches its own speed relative to the local frame within about half a second, turning no faster than its turn rate towards where its quarry will be. Missiles fly at 420 to 440 u/s for 8 to 9 seconds; torpedoes at 210 u/s for 16. **A Tern at full speed outruns a torpedo**, and a hard turn close in beats a missile. A munition hits the first hull on its path, bursts within a few units of the ship it homes on, and is stopped by station hulls, rocks and surfaces.
+- **Radar-homing** follows the launch target while the launching ship holds its lock; drop the lock and it flies straight. **Heat-seeking** is fire and forget: every tick it turns for the hottest thing within about 50 degrees of its nose and 1,200 units, ships and flares alike, so the wrong ship can draw it.
+- **Point defence:** swivels shoot at the nearest munition coming for their own ship (homing on it, or launched at it), inside range and arc, **hot or cold**, before anything else; assigned to a lock or with none coming they behave as before. Any shot that crosses a munition can hit it. A missile dies to two swivel hits, a torpedo takes about eight. A Manifest's forward swivel cannot cover its stern.
+- **Countermeasures:** dispensers are utility or core modules with no power need, holding one kind of charge at a time and dropping one per press of C (one per second from S, faster from M). Brands as lore set them, each loaded with the main kind of its mix: Paragon Fair Warning S (chaff), Slagline Sparkler S (flares), Ito-Marr Screen M (chaff), Novum Ghost S (decoys). Charges are goods: chaff and flares in boxes of 6, decoys of 2. A dropped charge drifts astern and fades.
+  - Chaff, or a decoy, dropped within 1,500 units of a radar missile chasing its owner draws it with chance *charge signature / (charge + ship signature)*: about 60% for a Tern, 40% for a Manifest. Drawn, the missile chases the charge and is spent. The roll is a hash of the two ids, so the sim stays deterministic.
+  - Flares and decoys outshine a small hull while fresh (36 and 50 against a Tern's 18), so a heat seeker turns for them. A flare dropped and then a hard turn out of the seeker's cone is the counter; a big hull is brighter than a flare.
+- **Hull bonus:** the Warrant's is now +25% damage from full-size launchers (its family); the plain gun bonus is gone.
+- **NPCs:** pirates lock what they hunt and open with missiles from 400 to 1,800 units, then close to guns. The raider carries a Magazine S with one box of four missiles and, since it never docks, no reload: a fight costs it. The Watch carries a Magazine M (with the hull bonus) and a Fair Warning, launching from 350 to 2,200 units. Traders carry an Ito-Marr Screen. Any NPC with a dispenser drops a charge when a munition coming for it is within 700 units. NPCs restock munitions and charges at the dock like rounds.
+- **Markets:** Harbour sells Summons Breach, chaff and flares; Lantern Works the whole KOD range, torpedoes and decoys.
+- **The starter** has no free mount for a dispenser: a pilot who wants one gives up the armour plate in the utility mount. Its nose swivel already defends.
+- **In a 20-minute soak** pirates launched about 20 missiles at traders and the Watch; swivels shot down about 15 and chaff drew off about 10 (some were both); 4 hit. The Watch's missiles at undefended pirates hit 20 of 24. Trader docks went up slightly and losses down.
+- **Client stopgaps:** munitions drawn as small darts (torpedoes larger), red when coming for you; charges as flickering points; a pulsing MISSILE INBOUND line at the top with count, guidance and range; launcher and dispenser tiles show what is loaded and boxes aboard; swivel tiles say PD, or DEFENDING while something is inbound; C drops a charge; toasts when a launch is refused or a charge draws a missile off.
+
 ## Later
 
 - A capacitor battery module (fitting polish).
+- Mixed dispenser magazines, so a brand's mix (lore) is dropped as a mix rather than one kind at a time.
+- Picking which munition a launcher loads (today: the one in it while any is left, else the cheapest that fits).
+- Lock warnings: knowing that someone is locking you before the missile comes.
 - Capacitor warfare and electronic warfare.
 - Penetrator and other warheads; signature-seeking guidance; mines.
 - XL weapons; modules across two mounts.

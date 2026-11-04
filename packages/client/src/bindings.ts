@@ -23,6 +23,7 @@ export type SimAction =
   | 'toggleDock'
   | 'fireFixed'
   | 'toggleWeaponsHot'
+  | 'launchCountermeasure'
   | 'tractor';
 
 /**
@@ -67,7 +68,8 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'strafeLeft', codes: ['KeyQ'], group: 'Flight', label: 'Lateral thrust left', kind: 'hold' },
   { action: 'strafeRight', codes: ['KeyE'], group: 'Flight', label: 'Lateral thrust right', kind: 'hold' },
   { action: 'brake', codes: ['KeyX'], group: 'Flight', label: 'Brake', kind: 'hold', note: 'Stops drift and spin in any mode' },
-  { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire fixed guns', kind: 'hold', note: 'Fire where the nose points; follow the lead marker' },
+  { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire the selected group', kind: 'hold', note: 'Guns fire where the nose points; launchers fire at your active lock' },
+  { action: 'launchCountermeasure', codes: ['KeyC'], group: 'Weapons', label: 'Drop a countermeasure', kind: 'press', note: 'Chaff draws radar missiles, flares heat seekers; needs a dispenser' },
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
   { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
   { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Unlock the active lock', kind: 'press' },
@@ -76,8 +78,8 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },
   { action: 'board', codes: ['KeyB'], group: 'Ships', label: 'Board your nearest empty ship', kind: 'press', note: `Docked at the same station, or in space within ${BOARD_RANGE} units, under ${BOARD_MAX_RELATIVE_SPEED} u/s relative` },
   { action: 'stepOut', codes: ['KeyG'], group: 'Ships', label: 'Step out in an escape pod', kind: 'press', note: 'In space only. Press twice. Your ship stays where it is, empty; slow down first to park it' },
-  { action: 'group1', codes: ['Digit1'], group: 'Weapons', label: 'Fire group 1', kind: 'press', note: 'Space fires the selected group of fixed guns' },
-  { action: 'group2', codes: ['Digit2'], group: 'Weapons', label: 'Fire group 2', kind: 'press' },
+  { action: 'group1', codes: ['Digit1'], group: 'Weapons', label: 'Fire group 1', kind: 'press', note: 'New guns join group 1' },
+  { action: 'group2', codes: ['Digit2'], group: 'Weapons', label: 'Fire group 2', kind: 'press', note: 'New launchers join group 2' },
   { action: 'group3', codes: ['Digit3'], group: 'Weapons', label: 'Fire group 3', kind: 'press' },
   { action: 'group4', codes: ['Digit4'], group: 'Weapons', label: 'Fire group 4', kind: 'press' },
   { action: 'zoomIn', codes: ['Equal', 'NumpadAdd'], group: 'Interface', label: 'Zoom in', kind: 'press', note: 'Or the mouse wheel' },

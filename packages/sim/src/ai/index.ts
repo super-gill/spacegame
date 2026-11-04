@@ -3,6 +3,7 @@ import type { Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { thinkPirate } from './pirate.js';
 import { thinkTrader } from './trader.js';
 import { thinkWatch } from './watch.js';
+import { wantsCountermeasure } from './steer.js';
 
 /**
  * NPC decision making, run once per tick for every ship with a brain.
@@ -53,6 +54,12 @@ export function thinkNpcs(world: World): NpcDecisions {
       events.push(...t.events);
       if (t.depart) departures.push(shipId);
     }
+  }
+  // Any NPC with a dispenser drops a countermeasure when a munition is closing on it.
+  for (const shipId of Object.keys(inputs)) {
+    const ship = world.ships[shipId]!;
+    const stats = shipStats(world, ship);
+    if (wantsCountermeasure(world, ship, stats)) inputs[shipId] = { ...inputs[shipId]!, launchCountermeasure: true };
   }
   return { inputs, npcs, events, departures };
 }

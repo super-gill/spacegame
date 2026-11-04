@@ -49,9 +49,10 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `rails.ts` | Rails, frames and gravity (`gravityAt`, `gravityFrom`, `gravityEase`, `surfacesNext`): body and station positions as pure functions of the tick (`bodyState`, `stationState`, `placeStations`, `circularPeriod`), carrying inside spheres (`tickRails`, `applyCarry`), the local frame (`localFrame`, `frameVelocity`, `relativeVelocity`), pirate homes on rails |
 | `ownership.ts` | Owning versus flying: `pilotsAboard`, `shipPilot`, `isEmptyShip`, `isEscapePod`, `ownedShips` |
 | `pilots.ts` | Pilot ship commands: `buyShip`, `boardShip`, `wakePilot` (and `respawnPilot`), `claimStarterShip`, their `...Refusal` previews, pod ejection, ship prices |
-| `step.ts` | The tick, in a fixed order: stations move on rails; NPCs decide; ships dock, move against their local frame, are carried, bounce, fire, recharge, repair, ride pads; rams; projectiles; damage; destruction and departures; loot, wrecks, spawners |
+| `step.ts` | The tick, in a fixed order: stations move on rails; NPCs decide; ships dock, move against their local frame, are carried, bounce, fire, recharge, repair, ride pads; rams; projectiles; countermeasures and munitions; damage; destruction and departures; loot, wrecks, spawners |
 | `collision.ts` | Ship against station hull and ship against ship: push apart, bounce, mass-shared momentum, impact damage |
-| `combat.ts` | Fixed fire, turrets engaging the ship's target (slew, lead, fire tolerance), projectiles and hits, shields and damage, target leading |
+| `combat.ts` | Fixed fire, launchers and dispensers, turrets engaging the ship's target or shooting down incoming munitions (slew, lead, arcs, fire tolerance), reloading by ammunition slot, projectiles and hits on ships and munitions, capacitor, shields and damage, target leading |
+| `munitions.ts` | Missiles, torpedoes and countermeasures in flight: launching, radar and heat guidance, spoofing, steering, hits and burn-out |
 | `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the swivel, each with capacitor cost, ammunition good and damage type |
 | `goods.ts` | Goods catalogue (data) |
 | `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |

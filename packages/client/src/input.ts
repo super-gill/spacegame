@@ -96,6 +96,7 @@ export class InputController {
       toggleDock: this.latched.has('toggleDock'),
       fireFixed: this.held.has('fireFixed'),
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
+      launchCountermeasure: this.latched.has('launchCountermeasure'),
       ...this.pendingLock,
       selectGroup: this.pendingGroup,
       tractor: this.held.has('tractor'),

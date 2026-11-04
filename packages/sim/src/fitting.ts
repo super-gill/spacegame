@@ -1,3 +1,4 @@
+import { goodsFitting } from './goods.js';
 import { FIT_FEE_FRACTION, MODULE_RESALE_FRACTION } from './constants.js';
 import { cargoMass, fitStats, type Catalogues } from './stats.js';
 import { cargoUsed } from './trade.js';
@@ -87,7 +88,7 @@ function withStored(pilot: Pilot, stationId: string, moduleId: string, delta: nu
  * weapon starts ready, pointing along the heading.
  */
 export function weaponStatesFor(
-  cat: Pick<Catalogues, 'modules'> & Partial<Pick<Catalogues, 'weapons'>>,
+  cat: Pick<Catalogues, 'modules'> & Partial<Pick<Catalogues, 'weapons' | 'goods'>>,
   hull: HullSpec,
   fit: Readonly<Record<string, string>>,
   heading: number,
@@ -99,9 +100,34 @@ export function weaponStatesFor(
     if (!id || !cat.modules[id]?.weaponId) continue;
     const kept = previous && previous.fit[mount.id] === id ? previous.weapons.find((w) => w.mountId === mount.id) : undefined;
     // A new weapon starts loaded (the fitter loads it) in its default group:
-    // 1 for fixed guns, 2 for launchers later; turreted guns need none.
-    const weapon = cat.weapons?.[cat.modules[id]!.weaponId!];
-    states.push(kept ?? { mountId: mount.id, cooldownTicks: 0, aim: heading, loaded: weapon?.magazine ?? 0, reloadTicks: 0, group: 1 });
+    // 1 for fixed guns, 2 for launchers; turrets and dispensers need none.
+    // A dispenser comes with its maker's mix; a launcher with the cheapest
+    // munition that fits it; a gun with its slot's plain ammunition.
+    const module = cat.modules[id]!;
+    const weapon = cat.weapons?.[module.weaponId!];
+    if (kept) {
+      states.push(kept);
+      continue;
+    }
+    const magazine = weapon?.magazine ?? 0;
+    const slot = weapon?.ammo ?? null;
+    let loaded = magazine;
+    let loadedGood: string | null | undefined;
+    if (slot && cat.goods) {
+      loadedGood = module.startsLoadedWith ?? (cat.goods[slot] ? slot : (goodsFitting(cat.goods, slot)[0]?.id ?? null));
+      // Whole boxes, at least one.
+      const perBox = loadedGood ? (cat.goods[loadedGood]?.ammo?.perUnit ?? 1) : 1;
+      loaded = loadedGood ? Math.max(1, Math.floor(magazine / perBox)) * perBox : 0;
+    }
+    states.push({
+      mountId: mount.id,
+      cooldownTicks: 0,
+      aim: heading,
+      loaded,
+      ...(loadedGood !== undefined ? { loadedGood } : {}),
+      reloadTicks: 0,
+      group: weapon?.family === 'missile' ? 2 : 1,
+    });
   }
   return states;
 }

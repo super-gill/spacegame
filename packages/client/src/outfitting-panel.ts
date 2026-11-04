@@ -8,6 +8,7 @@ import {
   resaleValue,
   shipStats,
   storedCount,
+  isGun,
   weaponDps,
   type FitRefusal,
   type FlightWarning,
@@ -106,6 +107,8 @@ const WEAPON_NAMES: Record<string, string> = {
   'beam-laser': 'Beam laser',
   blaster: 'Blaster',
   railgun: 'Railgun',
+  'missile-launcher': 'Missile launcher',
+  'torpedo-tube': 'Torpedo tube',
 };
 
 const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = {
@@ -118,6 +121,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   radar: 'Radar',
   targetingComputer: 'Targeting computer',
   navComputer: 'Nav computer',
+  countermeasure: 'Countermeasure dispenser',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -140,10 +144,18 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
-  if (w) {
+  if (w && w.family === 'countermeasure') {
+    // Dispensers: what they hold and what they come with.
+    parts.push(`drops chaff, flares or decoys, holds ${w.magazine}, one every ${fixed1(w.fireInterval)} s`);
+    if (m.startsLoadedWith) parts.push(`comes loaded with ${world.goods[m.startsLoadedWith]?.name ?? m.startsLoadedWith}`);
+  } else if (w && w.family === 'missile') {
+    parts.push(`${Math.round(w.damage)} warhead base, one every ${fixed1(w.fireInterval)} s, needs a lock`);
+    parts.push(`loads ${w.ammo === 'torpedo' ? 'torpedoes' : 'missiles'}, holds ${w.magazine}`);
+  } else if (w) {
     parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
     if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
+    if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
   }
   if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
   if (m.capacitorDraw) parts.push(`draws ${fixed1(m.capacitorDraw)} cap/s at full size`);
@@ -172,7 +184,7 @@ interface StatRow {
 const DEG = 180 / Math.PI;
 const dps = (s: ShipStats, kind: 'fixed' | 'turret'): number =>
   Object.values(s.weapons)
-    .filter((w) => w.kind === kind)
+    .filter((w) => w.kind === kind && isGun(w))
     .reduce((n, w) => n + weaponDps(w), 0);
 
 const STAT_ROWS: StatRow[] = [

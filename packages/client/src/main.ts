@@ -20,6 +20,8 @@ import {
   type TradeRefusal,
   joinPilot,
   leadPoint,
+  incomingMunitions,
+  isGun,
   lockReadout,
   navReadout,
   nearestDockableStation,
@@ -52,6 +54,8 @@ import {
   drawLeadMarker,
   drawPads,
   drawPodBeacon,
+  drawDecoy,
+  drawMunition,
   drawProjectile,
   drawShip,
   drawStation,
@@ -464,10 +468,19 @@ function tick(nowMs: number): void {
   previous = current;
   current = stepWorld(current, inputs);
 
+  const flying = new Map(previous.munitions.map((m) => [m.id, m]));
   for (const e of current.events) {
-    if (e.type !== 'destroyed') continue;
-    const gone = before[e.shipId];
-    if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+    if (e.type === 'destroyed') {
+      const gone = before[e.shipId];
+      if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+    } else if (e.type === 'munitionDestroyed') {
+      // Shot down, spent on a decoy, or burnt out: a small burst where it was.
+      const m = flying.get(e.munitionId);
+      if (m) explosions.push({ at: m.position, radius: 6, startMs: nowMs });
+    } else if (e.type === 'damaged' && e.cause === 'munition') {
+      const hit = current.ships[e.shipId] ?? before[e.shipId];
+      if (hit) explosions.push({ at: hit.position, radius: 10, startMs: nowMs });
+    }
   }
   if (ship) {
     ui.handleEvents(current.events, ship.id);
@@ -594,6 +607,27 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' ? COLOUR.hostile : COLOUR.neutral);
   }
 
+  for (const d of current.decoys) drawDecoy(ctx!, camera, d, nowMs);
+  for (const m of current.munitions) {
+    const coming = mine && (m.homingOn === mine.id || m.targetId === mine.id);
+    const colour = mine && m.ownerShipId === mine.id ? COLOUR.inkBright : coming ? COLOUR.hostile : COLOUR.neutral;
+    drawMunition(ctx!, camera, m, current.goods[m.goodId]?.munition?.class === 'torpedo', colour);
+  }
+  // Stopgap (lead, 6e part 2): a warning while something is homing on you.
+  // The interface workstream's munition warnings replace it.
+  const inbound = mine ? incomingMunitions(current.munitions, mine.id) : [];
+  if (mine && inbound.length > 0) {
+    const nearest = Math.min(...inbound.map((m) => distance(m.position, mine.position)));
+    const kind = inbound.some((m) => m.guidance === 'heat') ? (inbound.some((m) => m.guidance === 'radar') ? 'RADAR + HEAT' : 'HEAT') : 'RADAR';
+    ctx!.save();
+    ctx!.fillStyle = COLOUR.hostile;
+    ctx!.globalAlpha = 0.65 + 0.35 * Math.sin(nowMs / 90);
+    ctx!.font = '13px ui-monospace, monospace';
+    ctx!.textAlign = 'center';
+    ctx!.fillText(`MISSILE INBOUND ×${inbound.length} · ${kind} · ${Math.round(nearest)} u · C COUNTERMEASURE`, camera.viewportWidth / 2, 64);
+    ctx!.restore();
+  }
+
   explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
   for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
@@ -604,7 +638,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
-    const gun = Object.values(shipStats(current, mine).weapons).find((w) => w.kind === 'fixed');
+    const gun = Object.values(shipStats(current, mine).weapons).find((w) => w.kind === 'fixed' && isGun(w));
     if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
       drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
     }
