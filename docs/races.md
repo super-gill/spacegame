@@ -1,6 +1,6 @@
 # Races and manufacturers
 
-Status: agreed design, 3 November 2026. The full version, with every manufacturer's house style and a coverage matrix, is the "Spacegame: Races and Manufacturers" doc; the history and politics are in "Spacegame: Lore of the Known Universe". This page is the summary the code is built against. Names are placeholders.
+Status: agreed design, 3 November 2026. The full version, with every manufacturer's house style and a coverage matrix, is the "Spacegame: Races and Manufacturers" doc; the history and politics are in [lore.md](lore.md), which is canon. This page is the summary the code is built against. Names are placeholders.
 
 ## Structure
 
@@ -43,10 +43,11 @@ Its own industry, separate from cargo: taxis and private shuttles (Meridian), bu
 - **Support and repair** is Vael-only for now (the lore's Mercy Clause makes the Vael sell to everyone).
 - **Stations** are race-specific in look; the hub is much bigger than its pads; most stations have only a few pads; each race's home system has one enormous capital station.
 
+- **Stations** have an Oru-grown core (Hive Ossk, under the Hive Peace) clad in each race's own look.
+- **Oru pilots** are human wards raised among the hives: Oru origin and standing, human body.
+- **Player organisations** are called outfits.
+
 ## Open
 
-- Whether Hive Ossk grows every station's shell (lore) alongside race-specific looks.
-- Whether a living Aurel ship can ever appear for sale (lore says once, in 604 AL).
-- Whether the Oru are a playable starting race, given the lore makes them a hive mind that licenses no humans.
-- Player organisations (groups of pilots), and their name: "clan" is taken by the Drifters.
 - Navy duties: what they are and how often.
+- Whether the Oru ever license navy pilots, wards included.
