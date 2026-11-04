@@ -145,7 +145,7 @@ Oldest first.
 | 260 to 275 AL | **The Hive War.** Halcyon crusades into Oru space hunting Radiant relics; Hive Tessh carriers rout the crusade. | Halcyon's lasting humiliation |
 | 275 AL | **The Hive Peace,** brokered by the Vael. The Oru agree to grow station cores for every people in exchange for fixed borders. | Every station has an Oru-grown core |
 | 301 AL | **The Novum Key.** Novum Systems builds a synthetic gate-waker. | Halcyon's gate monopoly ends and expansion explodes |
-| 388 AL | **The Concord Accord,** signed at Landfall by all six peoples. | Concord space, Witness Law and the Mercy Clause |
+| 388 AL | **The Landfall Accord,** signed at Landfall by all six peoples. | Accord space, Witness Law and the Mercy Clause |
 | 402 AL | The Halo Drone Consortium is founded. | The only joint human and Oru firm |
 | 451 AL | **The Dimming** begins: woken gates at the outer edge start falling asleep again. | Patrols pull back; the Marches and the Unclaimed form |
 | 530 AL | **The Kerran Incident.** A white ship destroys a Novum gate-waking expedition at the edge of the Dark, then leaves. | First modern Aurel sighting |
@@ -183,7 +183,7 @@ A state run as a holding company. Every citizen holds shares, every service is a
 
 - **Government.** A board of the largest corporations, chaired by the head of the Exchange. Votes weigh by holdings. Courts are commercial courts.
 - **Values.** Contract, competence, profit, punctuality. A Kessari promise is legally binding, and other peoples' casual promises baffle them.
-- **Grievance.** They paid to wake half the early gates and believe the Concord Accord robbed them of their tolls.
+- **Grievance.** They paid to wake half the early gates and believe the Landfall Accord robbed them of their tolls.
 - **Wants.** To own the Lattice economy: lanes, freight, and above all the next gate-waking technology.
 - **Secret (common among Belters, denied by Kessari).** Kessari courts fabricated the evidence that broke the Belt Strikes. Witness Law exists because of it.
 
@@ -194,7 +194,7 @@ Descendants of the fleet's indentured crews, who mined the first asteroid fields
 - **Government.** A federation of cooperatives. Each station or crew votes; delegates meet at Slagline. Slow, loud and fiercely democratic.
 - **Values.** Solidarity, fairness, self-reliance. A fixed ship is a good ship. Distrust of anyone in a suit, and of anything with a priest attached.
 - **Grievance.** Kessari still hold ore rights to most of the old Belt under the Slagline Accord.
-- **Wants.** Control of their own fields, and a Concord voice to match their share of the work.
+- **Wants.** Control of their own fields, and a voice at Landfall to match their share of the work.
 - **Secret (canon, hidden).** Not every cooperative accepted the Accord. Some never stopped striking, and the Union quietly supplies them (the Black Strike).
 
 ### Vael Commonwealth
@@ -226,24 +226,47 @@ The crews of the seven arks that refused to land. Six centuries on, the arks hav
 
 - **Government.** Each clan's ship council leads it. The clans meet every ten years at a moot in deep space. Clan Vesk keeps the shared fleet that guards them all.
 - **Values.** Freedom, hospitality, memory of the journey. A Drifter owns no land and wants none.
-- **Role in the Arm.** Couriers, scouts, salvagers and the best navigators alive. Clan Saro charted most lanes outside Concord space.
-- **Grievance.** Treated as vagrants in Concord space and as pirates in Halcyon space.
+- **Role in the Arm.** Couriers, scouts, salvagers and the best navigators alive. Clan Saro charted most lanes outside Accord space.
+- **Grievance.** Treated as vagrants in Accord space and as pirates in Halcyon space.
 - **Wants.** Free passage everywhere, and to find the Mouth again: the way home.
 - **Secret (canon, hidden).** On the 588 AL crossing, Clan Saro met the Aurel and was warned off. The elders were told something about the Unsung and have kept it to themselves.
 
 ## Powers and law
 
-### The Concord
+### The Landfall Accord
 
-The Concord Accord (388 AL) binds all six peoples. It is not a government; it is a treaty with a small permanent secretariat at Landfall and a shared patrol duty. Its three clauses that shape play:
+The Landfall Accord (388 AL) binds all six peoples. It is a treaty, not a government and not a police force. It has a small secretariat at Landfall and no ships of its own. Each signatory polices its own systems, and free ports police themselves. Its three clauses that shape play:
 
 - **Witness Law.** Nobody can be convicted of a crime without a witness or a recorded distress signal. Free Belt delegates wrote it, remembering the Strike trials. This is why crime only counts when seen, and why jamming comms is a trade of its own.
 - **The Mercy Clause.** Solace ships are protected in all signatory space, and the Vael must sell support ships to every signatory. Attacking a Solace ship is the one crime every people hunts.
-- **The Open Lanes.** Concord gates stay open to every licensed pilot of every signatory, whatever their people.
+- **The Open Lanes.** Accord gates stay open to every licensed pilot of every signatory, whatever their people.
+
+### Law enforcement
+
+There is no galactic police. Law is local: whoever holds a system enforces the law there, with ordinary ships flown by ordinary crews. They can be outfought, and they escalate rather than overwhelm.
+
+1. **The local watch answers.** A witnessed crime brings the nearest patrol of whoever holds the system: a port watch, a house guard, a militia rota.
+2. **It calls for help.** A watch that is outgunned calls its reserve, and keeps calling.
+3. **The holder's navy comes.** Serious or repeated crime brings the navy of the power that holds the system, slower to arrive and much harder to beat.
+4. **The farther out, the thinner it gets.** In the Marches the answer is late and small. In the Unclaimed nobody comes.
+
+A pilot can win the first fight and still lose to what follows. How fast each step comes, and what triggers it, is milestone 7's design.
+
+Each power names its own force (proposed, Jason to confirm):
+
+| Holder | Local force | Character |
+| --- | --- | --- |
+| Free ports (Calder and its like) | The port's watch, such as the Calder Watch | Paid by the port, answerable to its board |
+| Halcyon Dominion | House guard, under each Great House's colours | Proud, ceremonial and slow to forgive |
+| Kessari Combine | KOD Toll Patrol | Contracted, efficient, and it sends the bill |
+| Free Belt Union | Steward rotas, militia crews taking turns | Fierce near home, thin far out |
+| Vael Commonwealth | The Commonwealth Coastguard | Rescue first, arrest second |
+| Oru Collective | Brood wardens of the nearest hive | Do not police humans; they quarantine and remove |
+| Drifter Clans | Clan Vesk escorts | Guard the clan ships, nothing else |
 
 ### Outfits
 
-Pilots who work together register with the Concord as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name. The word is neutral on purpose; "clan" belongs to the Drifters, "company" sounds Kessari and "house" sounds Halcyon.
+Pilots who work together register with the Landfall Pilot Registry as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name. The word is neutral on purpose; "clan" belongs to the Drifters, "company" sounds Kessari and "house" sounds Halcyon.
 
 ### Navy service
 
@@ -266,11 +289,22 @@ Each security band in `design.md` has an in-world cause.
 
 | Band | In-world name | Why it is like this |
 | --- | --- | --- |
-| High security | Concord space | Gates woken early and patrolled by every signatory |
+| High security | Accord space | Gates woken early and well policed by whoever holds them |
 | Low security | The Marches | Gates still awake, but patrols pulled back during the Dimming to protect the core |
 | Null security | The Unclaimed | Woken by Novum-era prospectors, never covered by the Accord |
 | Unknown space | The Dark | Sleeping or broken gates near the Unsung's cage. Reachable only by jump drive, or by waking gates the Oru beg everyone to leave alone |
 | Aurel region | The Pale Reach | Behind the Shoals, cut off since the Sundering |
+
+## Why ships are built this way
+
+Every capability comes from a fitted system, and what a pilot knows comes from a system reading it (design pillar 5, the window rule). Four things in the setting explain why, and together they are canon.
+
+- **The Covenant Standard.** The arks of the Covenant Fleet were built so any part could replace any other: a voyage with no shipyard behind it could not afford anything else. Every human hull since follows the fleet's mount standard. A ship is a frame full of systems because the first ships had to be.
+- **Witness Law.** Under the Landfall Accord only a certified system's log counts as a witness; a pilot's eyes are not evidence. A ship that sees nothing on its instruments saw nothing, in law. Pilots and courts alike learned to trust the readout, not the window.
+- **Lattice glare.** Gates and gravity wells scatter radio and fine light, so at a distance the window and an untuned sensor alike can tell *that* something is there but not *what* it is: its make, mass, cargo, ore or intent. A tuned instrument reads through the glare. The glare garbles identification, never sight: the window always shows clearly where things are and how they move.
+- **The Aurel contrast.** Aurel ships carry no instruments at all: a voice simply knows. Human scholars think the Aur built sealed hulls because they never needed the window rule. It is the clearest sign of how different they are.
+
+**For the build:** this lore never asks for a degraded or blurred view. The play area is the captain's window and must look good and show what is going on. What systems add is knowledge (names, numbers, composition, intent), not the ability to see.
 
 ## Manufacturers
 
@@ -332,7 +366,7 @@ Specialities and navy roles are set in `races.md`. This section says where each 
 
 | Maker | Founded | Origin | Hook |
 | --- | --- | --- | --- |
-| Meridian Civil Yards | 1 AL | The fleet's civilian shipwrights at Landfall, held in trust by the Concord since 388 AL | Builds the ship every new pilot starts in; named for the Arm |
+| Meridian Civil Yards | 1 AL | The fleet's civilian shipwrights at Landfall, held in trust under the Landfall Accord since 388 AL | Builds the ship every new pilot starts in; named for the Arm |
 | Corvane Heavy Industries | 171 AL | A Kessari firm that bought into Belt yards under the Slagline Accord | Belters call it "the Strike tax with a logo" |
 | Paragon Arms | 262 AL | Founded in the Hive War by a dealer who sold to both sides, and to the Oru | Sells to anyone, and is rumoured to sell to pirates directly |
 | Halo Drone Consortium | 402 AL | Joint venture of Arbor Dynamics and Hive Thiel | The one place humans and Oru build together, and a target for anyone who wants that to fail |
@@ -359,14 +393,35 @@ Six NPC factions work outside the law, each born from a wound in a people's hist
 
 ## The starter sector
 
-The starter world (two stations, a trader and a pirate, `createStarterWorld`) in lore terms. Confirmed 4 November 2026.
+The starter system in lore terms. The set-up was confirmed on 4 November 2026; the bodies, the third station, the Watch and the belt were added the same day for 6c part 2.
 
-**Calder** is a Concord system on the edge of the Marches, where a Kessari freight lane meets a Free Belt mining ridge. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
+**Calder** is an Accord free system on the edge of the Marches, where a Kessari freight lane meets a Free Belt mining belt. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
 
-- **Harbour Station** is a Concord free port run by the Calder Port Authority, a Concord body with Kessari and Belt seats on its board. Its core was grown by Hive Ossk under the Hive Peace and clad by Meridian. Its hydroponic rings and light workshops make food and machinery cheap, and a Solace clinic makes medicine cheap. It hosts the sector's only outfitting floor, a Meridian dealership that stocks whatever the free port trade brings in, which is why Harbour sells modules from makers of four peoples. The Concord Pilot Registry licenses new pilots here and issues them a Meridian Courier. Its security zone is the Port Authority's patrol line, which pirates know better than to cross.
-- **Ridge Outpost** is a Free Belt cooperative, the Ridge Collective, dug into an ore ridge. Ore is cheap; everything else is shipped in at a premium. It has no outfitting floor because Belters fit their own ships, which suits Belters and annoys everyone else. Its ore rights are leased from Corvane under the Slagline Accord, a standing grievance.
-- **The trader** flies the Harbour to Ridge supply contract for Tessaract Logistics in a Tessaract Spine: food and machinery out to the Ridge. When one is lost, Tessaract simply sends another; the contract pays well enough to absorb it.
-- **The pirate** is a Black Strike raider flying a captured Kessari Orbital Defence Wedge, kept as a trophy and fitted cheaply. It hunts Kessari freight on the Calder lane and, this far from Slagline, anyone else outside the patrol line. When badly hurt it limps off to a hidden yard in the Marches (an old Union Defence Works site) and the Strike sends a fresh raider later.
+### Bodies
+
+| Placeholder | Name | What it is |
+| --- | --- | --- |
+| Calder I | **Fieldmark** | A temperate garden world farmed by an Accord colony of about two million. Its grain and protein go up the well to Harbour, which is why food is cheap there. |
+| Calder Ia | **Lantern** | Fieldmark's bright, airless ice moon, seen from the surface as a second, smaller lamp in the sky |
+| Calder Belt | **The Scree** | The belt: loose rock, mined by the Ridge Collective |
+
+The star keeps the system's name, Calder.
+
+**The Scree's rocks** are mostly nickel-iron and water ice. A few carry **gate-glass**: shards of Aurel-made material, like splinters off a gate, though no broken gate has ever been charted near Calder. **(canon, hidden)** The Scree is the wreck of a gate the Aurel shattered during the Sundering, long before Calder was settled. Gate-glass is for milestone 9's ore types; until then it is rumour and a rare find.
+
+### Stations
+
+- **Harbour Station** orbits Fieldmark. It is an Accord free port run by the Calder Port Authority, a board with Kessari and Belt seats. Its core was grown by Hive Ossk under the Hive Peace and clad by Meridian. Fieldmark's harvest makes food cheap, and a Solace clinic makes medicine cheap. Its outfitting floor is a Meridian dealership stocking whatever the free port trade brings in, which is why Harbour sells modules from makers of four peoples. The Landfall Pilot Registry licenses new pilots here and issues them a Meridian Tern.
+- **Lantern Works** orbits Lantern. Corvane Heavy Industries runs it as a foundry: Corvane leases the Ridge Collective's ore rights under the Slagline Accord and smelts the ore here, where ice for cooling is free. It wants ore and scrap, makes machinery cheap, and pays dearly for food and medicine. It has an outfitting floor for Corvane's industrial modules, a second place to refit, and no ship mart. The Belters dig the ore and Corvane profits, which nobody at the Ridge lets Corvane forget.
+- **Ridge Outpost** is a Free Belt cooperative, the Ridge Collective, dug into a big rock in the Scree. Ore is cheap; everything else is shipped in at a premium. It has no outfitting floor because Belters fit their own ships, which suits Belters and annoys everyone else.
+
+The trade triangle: food and medicine from Harbour to the Ridge, ore from the Ridge to Lantern Works, machinery from Lantern Works back out.
+
+### Who flies in Calder
+
+- **The Calder Watch** is the Port Authority's patrol. It flies Kessari Warrants bought from Kessari Orbital Defence and painted Port Authority white. The pirates fly the same hull, captured, which both sides find funny for different reasons. The Watch hunts pirates in the lanes and near the stations; until law arrives (milestone 7) it does not trouble pilots. It is an ordinary force and can be beaten, and it is the first step of the escalation under "Law enforcement".
+- **The traders** fly supply contracts for Tessaract Logistics in Tessaract Manifests, between all three stations. When one is lost, Tessaract sends another; the contracts pay well enough to absorb it.
+- **The pirates** are Black Strike raiders in captured Kessari Warrants, kept as trophies and fitted cheaply. They hunt Kessari freight and, this far from Slagline, anyone else outside the Watch's reach. They lurk in the Scree and the lanes. When badly hurt they limp off to a hidden yard in the Marches (an old Union Defence Works site) and the Strike sends fresh raiders later.
 
 ## Present day, 612 AL
 
@@ -392,7 +447,7 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 
 | Maker | Theme for model names | Why |
 | --- | --- | --- |
-| Meridian Civil Yards | Plain, friendly words; small hulls named for seabirds | Civilian, Concord-held, the first ship anyone flies |
+| Meridian Civil Yards | Plain, friendly words; small hulls named for seabirds | Civilian, held in trust under the Accord, the first ship anyone flies |
 | Kessari Orbital Defence | Legal and enforcement terms | Its job is enforcing the Combine's contracts and tolls |
 | Tessaract Logistics | Freight paperwork | The oldest freight line, run on documents |
 | Ito-Marr Dynamics | Strongholds and stores | Shields and power that hold the line |
@@ -409,8 +464,8 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | --- | --- | --- | --- |
 | `meridian-courier` | Meridian Tern | Meridian Civil Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
 | `kessari-wedge` | Kessari Warrant | Kessari Orbital Defence | KOD's toll-gate frigate. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
-| `tessaract-spine` | Tessaract Manifest | Tessaract Logistics | The six-bay hauler on half the freight contracts in Concord space |
-| `escape-pod` | Meridian Ark | Meridian Civil Yards | The Concord requires every licensed ship to carry one. Pilots call it an ark because it brings you home the way the fleet brought everyone here. |
+| `tessaract-spine` | Tessaract Manifest | Tessaract Logistics | The six-bay hauler on half the freight contracts in Accord space |
+| `escape-pod` | Meridian Ark | Meridian Civil Yards | The Landfall Accord requires every licensed ship to carry one. Pilots call it an ark because it brings you home the way the fleet brought everyone here. |
 | Sparrow's replacement | Aurel Tacet | Aurel (needs a new manufacturer entry, see below) | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Halcyon Cantors call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship, outside the economy and never issued. |
 
 ### Modules (`modules.ts`)
@@ -434,6 +489,21 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | `paragon-turret-s` | Paragon Watchman S | Light turret |
 | `union-autocannon-m` | Union Picket M | Named for the strike picket lines |
 | `paragon-turret-m` | Paragon Sentry M | Medium turret |
+
+New system modules (6c and 6d):
+
+| Id | Name | Note |
+| --- | --- | --- |
+| `meridian-radar-s` | Meridian Lookout S | Unchanged |
+| `itomarr-radar-s` | Ito-Marr Watchtower S | Was Farsight |
+| `tessaract-radar-m` | Tessaract Clearance M | Was Traffic Array; reads traffic as a port clearance office does |
+| `meridian-beacon-s` | Meridian Lifeline S | Unchanged; the pod's radar |
+| `meridian-computer-s` | Meridian Plotter S | Unchanged |
+| `paragon-computer-s` | Paragon Marksman S | Was Fire Director S; joins Fairshot, Watchman and Sentry |
+| `paragon-computer-m` | Paragon Marksman M | Was Fire Director M |
+| `tessaract-scanner-s` | Tessaract Tally S | Was Manifest Reader, which clashed with the Tessaract Manifest hull; a tally clerk counts cargo |
+| `meridian-nav-s` | Meridian Wayfinder S | Unchanged |
+| `itomarr-nav-m` | Ito-Marr Chartvault M | Was Deep Reckoner; a store of charts |
 
 ### Manufacturers (`manufacturers.ts`)
 
@@ -468,6 +538,13 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 Lore decisions by Jason, newest first.
 
+- 2026-11-04: No Concord. The treaty is the Landfall Accord, with no ships of its own. Law is local and escalating: each holder polices its own space with ordinary, beatable ships, calling for more as needed. A deliberate departure from EVE.
+- 2026-11-04: Calder's bodies are Fieldmark (a farmed garden world), Lantern (its ice moon) and the Scree (the belt).
+- 2026-11-04: The third station is Lantern Works, a Corvane foundry round Lantern: wants ore and scrap, makes machinery cheap, has outfitting, no ship mart.
+- 2026-11-04: Calder's patrols are the Calder Watch, the Port Authority's own, in Kessari Warrants.
+- 2026-11-04: The Scree is nickel-iron and ice with rare gate-glass.
+- 2026-11-04: Six system modules renamed to their makers' themes; the four Meridian names stand.
+- 2026-11-04: All four hooks for the systems principle are canon (the Covenant Standard, Witness Law, Lattice glare, the Aurel contrast), with glare never degrading what the window shows.
 - 2026-11-04: The core premise stands: the Aurel caged the Unsung by silencing the Lattice, and human gate-waking is slowly undoing it.
 - 2026-11-04: Hive Ossk grows the core of every station; each people clads it in its own look.
 - 2026-11-04: A pilot can start as Oru, as a human ward raised among the hives.
@@ -479,6 +556,7 @@ Lore decisions by Jason, newest first.
 
 ## Open questions
 
+- The local force names under "Law enforcement" are proposed.
 - Place and faction names (the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder, the pirate factions) are placeholders until Jason confirms them. Catalogue names are in "Names".
 - Where humans came from and why the Covenant Fleet fled. Leaving it unanswered is a valid choice.
 - Whether the Drifters' search for the Mouth becomes a late-game exploration goal.
