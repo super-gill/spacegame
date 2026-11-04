@@ -9,11 +9,13 @@ export const GOODS: Record<string, GoodSpec> = {
   scrap: { id: 'scrap', name: 'Scrap', unitMass: 0.3, basePrice: 8 },
   food: { id: 'food', name: 'Food', unitMass: 0.2, basePrice: 20 },
   // Ores (docs/mining.md). The ore catalogue is every good with an `ore`
-  // block: add one here and rocks made from then on can hold it. Names
-  // other than plain ore are provisional (a lore ask). Every rock is
+  // block: add one here and rocks made from then on can hold it. The
+  // Scree is nickel-iron and ice (lore); the other names are provisional
+  // (a lore ask). The common ore keeps the id `ore` so saves and markets
+  // are untouched. Every rock is
   // mostly common ore; richer ores turn up in some rocks, the best only
   // in bigger, harder ones.
-  ore: { id: 'ore', name: 'Ore', unitMass: 0.3, basePrice: 30, ore: { tier: 'common', chance: 1, share: 0, minRadius: 0 } },
+  ore: { id: 'ore', name: 'Nickel-iron', unitMass: 0.3, basePrice: 30, ore: { tier: 'common', chance: 1, share: 0, minRadius: 0 } },
   'banded-ore': { id: 'banded-ore', name: 'Banded ore', unitMass: 0.3, basePrice: 60, ore: { tier: 'middling', chance: 0.35, share: 0.25, minRadius: 0 } },
   'black-ore': { id: 'black-ore', name: 'Black ore', unitMass: 0.3, basePrice: 75, ore: { tier: 'middling', chance: 0.25, share: 0.3, minRadius: 25 } },
   glintstone: { id: 'glintstone', name: 'Glintstone', unitMass: 0.2, basePrice: 170, ore: { tier: 'valuable', chance: 0.15, share: 0.15, minRadius: 35 } },

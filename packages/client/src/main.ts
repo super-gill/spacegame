@@ -28,6 +28,7 @@ import {
   incomingMunitions,
   isGun,
   lockReadout,
+  cargoUsed,
   rockAt,
   asteroidPositions,
   navReadout,
@@ -526,6 +527,8 @@ interface Explosion {
 const EXPLOSION_MS = 700;
 const WRECK_FADE_SECONDS = 10;
 let explosions: Explosion[] = [];
+/** Whether the hold was full last frame, so "hold full" is said once. */
+let wasHoldFull = false;
 
 function resize(): void {
   const dpr = window.devicePixelRatio || 1;
@@ -708,7 +711,11 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (hull) drawWreck(ctx!, camera, w, hull, Math.min(1, (w.ticksLeft * current.dt) / WRECK_FADE_SECONDS));
   }
   for (const l of current.loot) drawLoot(ctx!, camera, l);
-  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, current.loot);
+  // The tractor's reach and pull lines, only while there is room in the hold to pull into.
+  const holdFull = mine ? cargoUsed(mine) >= shipStats(current, mine).cargoCapacity : false;
+  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, holdFull ? [] : current.loot);
+  if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
+  wasHoldFull = holdFull;
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
   if (mine) drawNav(ctx!, camera, current, mine, alpha);

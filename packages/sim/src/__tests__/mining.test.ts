@@ -133,7 +133,7 @@ describe('mining lasers', () => {
   it('cut a soft rock into canisters of ore, ore for ore, and it crumbles when empty', () => {
     const w0 = setup();
     expect(w0.ships['s']!.fireGroup).toBe(3); // the laser's group is ready
-    const { w, events } = run(w0, 12, { fireFixed: true });
+    const { w, events } = run(w0, 20, { fireFixed: true });
     expect(w.asteroids.find((a) => a.id === 'r1')).toBeUndefined();
     expect(events.some((e) => e.type === 'rockCrumbled' && e.rockId === 'r1' && e.shipId === 's')).toBe(true);
     // Every unit of the rock came out, in canisters of at most CANISTER_UNITS.

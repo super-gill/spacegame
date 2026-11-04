@@ -229,7 +229,9 @@ export class FlightHud {
         setText(tile.state, selected ? 'FIRE' : '');
         tile.root.classList.toggle('active', selected);
       } else if (s.moduleKind === 'tractor') {
-        setText(tile.state, ship.tractorActive ? 'ON' : 'OFF');
+        // A tractor with nowhere to put things pulls nothing.
+        const full = cargoUsed(ship) >= shipStats(world, ship).cargoCapacity;
+        setText(tile.state, ship.tractorActive ? (full ? 'HOLD FULL' : 'ON') : 'OFF');
         tile.root.classList.toggle('active', ship.tractorActive);
       } else if (s.moduleKind === 'surveyScanner') {
         // Ready, or seconds until the scanner has cycled.

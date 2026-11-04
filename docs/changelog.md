@@ -11,9 +11,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Mining lasers: hold fire on a rock to cut ore free in canisters, and scoop them with the tractor. A laser only cuts rock no harder than it is strong.
 - The Rook and Rivet Prospector, a mining cutter, sold at Ridge Outpost and Harbour.
 - Three new ores to sell: Banded ore, Black ore and Glintstone. Lantern Works pays best.
+- The tractor tile says HOLD FULL, and a message says so once, when there is no room left to pull loot into.
 
 ### Changed
 - Save format version 7: saves upgrade automatically, and their rocks are given ore.
+- Plain ore is now called Nickel-iron, what the Scree is made of.
+- Mining is slower and the prospector's hold bigger (40), so a trip is more cutting than hauling: about 45 seconds to fill.
 - Station ship marts refresh from the game's data when a save loads.
 
 ### Known

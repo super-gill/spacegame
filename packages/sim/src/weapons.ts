@@ -184,11 +184,12 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   'dispenser-s': dispenser('dispenser-s', 'Dispenser S', 'S', 12, 1),
   'dispenser-m': dispenser('dispenser-m', 'Dispenser M', 'M', 24, 0.8),
 
-  // Mining lasers. A light one fits a weapon mount and cuts soft, small
-  // rocks; the medium cuts most of what a cutter or sloop will meet. Heavy
+  // Mining lasers. Slow on purpose: cutting, not hauling, should be most
+  // of a mining trip (about 45 seconds to fill a prospector). A light one
+  // fits a weapon mount and cuts soft, small rocks; the medium cuts most of what a cutter or sloop will meet. Heavy
   // lasers for the hulk's mining mounts come with part 2.
-  'mining-laser-s': miningLaser('mining-laser-s', 'Mining laser S', 'S', 0.45, 1.5, 4, 260),
-  'mining-laser-m': miningLaser('mining-laser-m', 'Mining laser M', 'M', 0.7, 2.6, 8, 300),
+  'mining-laser-s': miningLaser('mining-laser-s', 'Mining laser S', 'S', 0.45, 0.75, 4, 260),
+  'mining-laser-m': miningLaser('mining-laser-m', 'Mining laser M', 'M', 0.7, 1.3, 8, 300),
 };
 
 function miningLaser(id: string, name: string, size: ModuleSize, strength: number, yieldPerSecond: number, capacitorPerSecond: number, range: number): WeaponSpec {
