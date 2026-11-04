@@ -273,7 +273,12 @@ export class Ui {
   announce(world: World, e: WorldEvent): void {
     const ship = world.ships[e.shipId];
     const name = ship ? shipName(world, ship) : 'ship';
-    if (e.type === 'shipBought') {
+    if (e.type === 'adminCreditsGranted') {
+      this.showToast(`Admin: +${e.amount.toLocaleString('en-GB')} cr.`, 2000, 'info');
+    } else if (e.type === 'adminShipSpawned') {
+      const pad = ship?.padId ? ` It is on pad ${ship.padId.toUpperCase()}; board it with B.` : '';
+      this.showToast(`Admin: spawned your ${name}.${pad}`, 3000, 'info');
+    } else if (e.type === 'shipBought') {
       const pad = ship?.padId ? ` It is on pad ${ship.padId.toUpperCase()}.` : '';
       this.showToast(`Bought a ${name} for ${e.price.toLocaleString('en-GB')} cr.${pad}`, 3000, 'info');
     } else if (e.type === 'boarded') {

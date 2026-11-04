@@ -236,6 +236,59 @@ export function buyShip(world: World, pilotId: string, loadoutId: string): Comma
 }
 
 // ---------------------------------------------------------------------------
+// Admin (testing). Commands for playtesting, not part of the game: they
+// make credits and ships from nothing. The client keeps them behind its
+// admin section; a shared world (milestone 11) must not accept them from
+// players.
+
+export type AdminRefusal =
+  | 'unknownPilot' // no such pilot
+  | 'badAmount' // not a positive whole number of credits
+  | 'noShip' // the pilot is flying nothing
+  | 'notDocked' // the pilot's ship is not docked
+  | 'unknownLoadout' // no such loadout
+  | 'noPad'; // no free pad here fits the new ship
+
+/** Admin: give a pilot `amount` credits. */
+export function adminGrantCredits(world: World, pilotId: string, amount: number): CommandResult<AdminRefusal> {
+  const pilot = world.pilots[pilotId];
+  if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
+  if (!Number.isInteger(amount) || amount <= 0) return { ok: false, world, reason: 'badAmount' };
+  return {
+    ok: true,
+    world: { ...world, pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits + amount } } },
+    event: { type: 'adminCreditsGranted', shipId: pilot.shipId ?? '', pilotId, amount },
+  };
+}
+
+/**
+ * Admin: a new ship from any loadout, sealed hulls included (the Aurel
+ * Tacet), free, at the station the pilot is docked at. Like a bought
+ * ship it is the pilot's, empty, on the smallest free pad that fits;
+ * board it with B. No ship mart needed.
+ */
+export function adminSpawnShip(world: World, pilotId: string, loadoutId: string): CommandResult<AdminRefusal> {
+  const pilot = world.pilots[pilotId];
+  if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
+  const current = pilot.shipId ? world.ships[pilot.shipId] : undefined;
+  if (!current) return { ok: false, world, reason: 'noShip' };
+  if (current.state !== 'docked' || !current.dockedAt) return { ok: false, world, reason: 'notDocked' };
+  const station = world.stations[current.dockedAt]!;
+  const loadout = world.loadouts[loadoutId];
+  const hull = loadout ? world.hulls[loadout.hullId] : undefined;
+  if (!loadout || !hull) return { ok: false, world, reason: 'unknownLoadout' };
+  const pad = freePadFor(station, hull.sizeClass, world.ships);
+  if (!pad) return { ok: false, world, reason: 'noPad' };
+  const made = nextShip(world, pilot, loadout, { position: station.position, heading: 0 });
+  const ship = onPad(made.ship, station, pad);
+  return {
+    ok: true,
+    world: { ...world, pilots: { ...world.pilots, [pilotId]: made.pilot }, ships: { ...world.ships, [ship.id]: ship } },
+    event: { type: 'adminShipSpawned', shipId: ship.id, stationId: station.id, loadoutId },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Boarding
 
 export type BoardRefusal =

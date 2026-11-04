@@ -544,6 +544,19 @@ button:hover {
   padding: 5px 8px;
 }
 
+.menu-row button {
+  white-space: nowrap;
+}
+
+.menu-panel select {
+  flex: 1;
+  font: inherit;
+  color: var(--ink-bright);
+  background: var(--bg, #05080a);
+  border: 1px solid var(--ink-dim);
+  padding: 5px 8px;
+}
+
 /* Developer controls panel: generated from bindings.ts. */
 .controls-panel {
   position: fixed;

@@ -1,4 +1,7 @@
 import {
+  adminGrantCredits,
+  adminSpawnShip,
+  type AdminRefusal,
   boardShip,
   stepOut,
   stepOutRefusal,
@@ -341,7 +344,37 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     saveNow();
     ui.notify('New world started.');
   },
-});
+  grantCredits(amount) {
+    const r = adminGrantCredits(current, me.id, amount);
+    if (!r.ok) {
+      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
+      return;
+    }
+    commanded(r.world, r.event);
+  },
+  spawnShip(loadoutId) {
+    const r = adminSpawnShip(current, me.id, loadoutId);
+    if (!r.ok) {
+      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
+      return;
+    }
+    commanded(r.world, r.event);
+  },
+}, Object.values(current.loadouts)
+  // Escape pods are issued, not flown by choice.
+  .filter((l) => !current.hulls[l.hullId]?.escapePod)
+  .map((l) => ({ id: l.id, name: l.name }))
+  .sort((a, b) => a.name.localeCompare(b.name)));
+
+/** Why an admin command was refused, for the pilot. */
+const ADMIN_REFUSALS: Record<AdminRefusal, string> = {
+  unknownPilot: 'No pilot.',
+  badAmount: 'Not a whole, positive amount.',
+  noShip: 'You need a ship to spawn one beside.',
+  notDocked: 'Dock first: spawned ships appear on a pad where you are docked.',
+  unknownLoadout: 'No such ship.',
+  noPad: 'No free pad here fits that ship.',
+};
 
 /** The ship this client is flying, or null while the pilot has none (destroyed). */
 function myShip(world: World): Ship | null {

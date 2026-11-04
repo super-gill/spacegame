@@ -1,7 +1,8 @@
 /**
- * Game menu (F2, or the Menu button): pilot name, display settings, and
- * saving. The world keeps running while it is open, as it must in a
- * shared world. Buttons report to main.ts, which owns the world.
+ * Game menu (F2, or the Menu button): pilot name, display settings,
+ * saving, and admin controls for playtesting. The world keeps running
+ * while it is open, as it must in a shared world. Buttons report to
+ * main.ts, which owns the world.
  */
 
 export interface MenuActions {
@@ -11,7 +12,20 @@ export interface MenuActions {
   exportSave(): void;
   importSave(file: File): void;
   newGame(): void;
+  /** Admin (testing): credits from nothing. */
+  grantCredits(amount: number): void;
+  /** Admin (testing): a free ship from any loadout, docked where you are. */
+  spawnShip(loadoutId: string): void;
 }
+
+/** A loadout the admin spawner offers. */
+export interface SpawnChoice {
+  id: string;
+  name: string;
+}
+
+/** Credit amounts the admin buttons grant. */
+const GRANTS = [10_000, 100_000, 1_000_000];
 
 /** Longest pilot name accepted, in characters. */
 export const MAX_NAME_LENGTH = 24;
@@ -36,7 +50,7 @@ export class MenuPanel {
   private readonly labelsBox = el('input');
   private readonly savedLine = el('p', 'muted');
 
-  constructor(root: HTMLElement, openButton: HTMLButtonElement, name: string, showLabels: boolean, actions: MenuActions) {
+  constructor(root: HTMLElement, openButton: HTMLButtonElement, name: string, showLabels: boolean, actions: MenuActions, spawnChoices: readonly SpawnChoice[]) {
     this.panel.setAttribute('role', 'dialog');
     this.panel.setAttribute('aria-label', 'Menu');
     openButton.addEventListener('click', () => this.toggle());
@@ -100,6 +114,23 @@ export class MenuPanel {
     );
     this.panel.append(dangerRow);
     this.panel.append(el('p', 'muted', 'The world saves itself every few seconds and when you close the tab.'));
+
+    // Admin: playtesting tools, not part of the game.
+    this.panel.append(el('h2', undefined, 'Admin (testing)'));
+    const creditRow = el('div', 'menu-row');
+    for (const amount of GRANTS) creditRow.append(button(`+${amount.toLocaleString('en-GB')} cr`, () => actions.grantCredits(amount)));
+    this.panel.append(creditRow);
+    const spawnRow = el('div', 'menu-row');
+    const select = el('select');
+    select.setAttribute('aria-label', 'Ship to spawn');
+    for (const c of spawnChoices) {
+      const option = el('option', undefined, c.name);
+      option.value = c.id;
+      select.append(option);
+    }
+    spawnRow.append(select, button('Spawn ship', () => actions.spawnShip(select.value)));
+    this.panel.append(spawnRow);
+    this.panel.append(el('p', 'muted', 'Spawned ships are yours, free, on a pad where you are docked; board with B. Sealed hulls such as the Aurel Tacet included.'));
 
     root.append(this.panel);
   }

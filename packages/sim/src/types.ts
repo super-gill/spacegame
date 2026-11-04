@@ -982,6 +982,10 @@ export type WorldEvent =
   | { type: 'dockRefused'; shipId: string; reason: 'tooFar' | 'tooFast' | 'noPad' }
   /** A pilot bought a ship. `shipId` is the new ship, empty and docked at `stationId`. */
   | { type: 'shipBought'; shipId: string; stationId: string; loadoutId: string; price: number }
+  /** Admin (testing): credits from nothing. `shipId` is the pilot's ship, or empty. */
+  | { type: 'adminCreditsGranted'; shipId: string; pilotId: string; amount: number }
+  /** Admin (testing): a ship from any loadout, free, docked here. */
+  | { type: 'adminShipSpawned'; shipId: string; stationId: string; loadoutId: string }
   /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */
   | { type: 'boarded'; shipId: string; from: string }
   /** The ship a pilot was flying was destroyed and they got away in the pod `shipId`. */
