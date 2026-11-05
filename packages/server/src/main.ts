@@ -5,6 +5,7 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { PROTOCOL_VERSION, readCommand, readInput, type ClientMessage, type KickReason, type ServerMessage, type World } from '@spacegame/sim';
 import { Accounts, type Character } from './accounts.js';
 import { Game } from './game.js';
+import { ServerStats } from './stats.js';
 import { Storage } from './storage.js';
 import { serveClient } from './web.js';
 
@@ -30,8 +31,8 @@ const HOST = process.env['HOST'] || undefined;
 const DATA = process.env['SPACEGAME_DATA'] ?? fileURLToPath(new URL('../data', import.meta.url));
 const CLIENT = fileURLToPath(new URL('../../client/dist', import.meta.url));
 
-/** Ticks between updates to players: 3 is 20 updates a second. */
-const UPDATE_EVERY_TICKS = 3;
+/** Ticks between updates to players: 2 is 30 updates a second (the client draws two updates behind, net/timeline.ts). */
+const UPDATE_EVERY_TICKS = 2;
 /** Save this often, ms. */
 const SAVE_EVERY_MS = 60_000;
 /** A player whose connection has this much waiting to send skips updates until it drains, bytes. */
@@ -41,6 +42,7 @@ const storage = new Storage(DATA);
 const loaded = storage.loadWorld();
 const game = new Game(loaded.world);
 const accounts = new Accounts(storage.loadAccounts());
+const stats = new ServerStats();
 
 /** One player's browser tab. */
 interface Connection {
@@ -126,6 +128,7 @@ function update(): void {
       made.set(connection.seen, text);
     }
     connection.socket.send(text);
+    stats.sent(performance.now(), text.length, connection.character.name);
     connection.seen = now;
   }
 }
@@ -139,7 +142,9 @@ setInterval(() => {
   // After a long stall (the PC slept), skip ahead rather than racing to catch up.
   if (now - due > 1000) due = now;
   while (now >= due) {
+    const started = performance.now();
     game.step();
+    stats.tick(started, performance.now() - started);
     ticks++;
     if (ticks % UPDATE_EVERY_TICKS === 0) update();
     due += tickMs;
@@ -180,7 +185,7 @@ sockets.on('connection', (socket) => {
 http.listen(PORT, HOST, () => {
   console.log(`Spacegame server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}.`);
   console.log(`Open http://localhost:${PORT} here, or http://<this machine's Tailscale address>:${PORT} from a friend's.`);
-  console.log('Type help for the console commands (op, deop, who, save, stop).');
+  console.log('Type help for the console commands (op, deop, who, stats, save, stop).');
 });
 
 /**
@@ -194,6 +199,7 @@ const CONSOLE_HELP = [
   'op <name>     make a character an operator (admin controls)',
   'deop <name>   make an operator a player again',
   'who           list characters, who is an operator, who is online',
+  'stats         is the server keeping up, and how much is it sending',
   'save          save the world now',
   'stop          save and stop the server (or Ctrl+C)',
 ].join('\n');
@@ -214,6 +220,12 @@ function consoleCommand(line: string): void {
         if (record) c.character = record;
       }
       return console.log(`${name} is now ${on ? 'an operator' : 'a player'}. The server allows or refuses their admin commands from now; the menu's admin controls ${on ? 'appear' : 'go'} when they reconnect.`);
+    }
+    case 'stats': {
+      for (const line of stats.report(performance.now())) console.log(line);
+      const w = game.current;
+      console.log(`World: ${Object.keys(w.ships).length} ships, ${w.projectiles.length} shots, ${w.munitions.length} missiles, ${w.asteroids.length} rocks.`);
+      return;
     }
     case 'who': {
       const online = new Set([...connections].map((c) => c.character?.pilotId));

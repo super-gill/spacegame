@@ -14,8 +14,8 @@ import type { World } from '@spacegame/sim';
  * delay.
  */
 
-/** How far behind the newest update to draw, in ticks: 6 is 100 ms, two updates' worth. */
-export const DELAY_TICKS = 6;
+/** How far behind the newest update to draw, in ticks: 4 is about 67 ms, two updates' worth at 30 a second. */
+export const DELAY_TICKS = 4;
 /** Further off than this, in ticks, and the clock jumps rather than drifts (after a stall, or on joining). */
 const JUMP_TICKS = 30;
 /** How strongly the clock is pulled towards where it should be, per frame: gently, so speed never visibly changes. */

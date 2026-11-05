@@ -33,11 +33,12 @@ The server never trusts a client to say who it is beyond its character token: a 
 
 ### What the server sends
 
-Each client gets the world as seen from its ship, about 20 times a second:
+Each client gets the world as seen from its ship, 30 times a second:
 
 - **Once, on connect:** everything that does not change (catalogues, bodies, stations' fixed parts) and the client's pilot.
 - **Each update:** ships, loot, shots and missiles within the pilot's sensor range plus a margin; their own ship and pilot in full; rocks that changed (mined, split, crumbled, fallen in); events that concern them.
-- The client draws a steady moment about 100 ms (6 ticks) behind the newest update, between the two updates either side of it (`net/timeline.ts`). Updates do not arrive evenly (the host's timers, especially on Windows, and the network bunch them), and drawing each as it lands stutters. Your own ship may feel a little laggy at first; a later step predicts it locally so steering feels immediate.
+- The client draws a steady moment about 67 ms (4 ticks, two updates) behind the newest update, between the two updates either side of it (`net/timeline.ts`). Updates do not arrive evenly (the host's timers, especially on Windows, and the network bunch them), and drawing each as it lands stutters. Your own ship is the exception: it is drawn from the newest update, carried forward by its own speed, with corrections faded in (`net/own-ship.ts`), so steering shows after only the round trip. Full prediction (the client running the rules for your ship at once) comes if that is not enough.
+- Rocks are sent one by one when they change (`diffWorld`, `applyUpdate`): miners cut rocks all the time, and resending the whole belt each update cost about 90 KB.
 
 Why not send everyone's inputs and let every browser run the sim (lockstep)? It needs every browser to compute exactly the same numbers, and different browsers' maths functions can differ in the last digit, which grows into different worlds. The authoritative server avoids that.
 

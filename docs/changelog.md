@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - The shared world (docs/shared-world.md, docs/hosting.md). The world runs on a server on the host's PC (`npm start`), saved to a file every minute; everyone plays in their browser, friends over Tailscale.
 - Characters: make one with a name (a suggestion fills the box) and get a key, shown once to keep; log in from any browser with name and key; this browser remembers it too. Names are unique. Two tabs can play two characters at once; logging in as a character already playing disconnects the other tab and says why.
 - Players and operators: only operators get the admin controls, and the server refuses admin commands from players. The first character on a new server is an operator; the host makes others with `op` and `deop` in the server's console (also `who`, `save`, `stop`).
+- `stats` in the server console: ticks a second, time per tick against the budget, and what each player is sent.
 - A connection meter in the top right corner: the round trip to the server, green, amber or red. Click it away; the menu brings it back.
 
 ### Changed
@@ -15,10 +16,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ### Known
 - A ship left in space when its pilot logs off stays there for now; it is meant to vanish after a short while and come back when they return.
-- Each player is sent every ship in the system 20 times a second (about 2 KB an update compressed, near Harbour, or 0.35 Mbit/s); sending only what a player's sensors can see comes next.
+- Each player is sent every ship in the system 30 times a second; sending only what a player's sensors can see comes next.
 
 ### Fixed
-- Motion no longer stutters: the client draws a steady moment about 100 ms behind the newest update, so updates that arrive unevenly (Windows timers, the network) are absorbed.
+- Motion no longer stutters: the client draws a steady moment about 67 ms behind the newest update (30 updates a second), so updates that arrive unevenly (Windows timers, the network) are absorbed. Your own ship is drawn from the newest update instead, carried forward by its speed, so steering responds after only the round trip.
+- Updates were about 90 KB each while anyone was mining, because the whole belt was resent; rocks now go one by one, about 13 KB an update before compression.
 
 ## [0.13.0] - 2026-11-05
 

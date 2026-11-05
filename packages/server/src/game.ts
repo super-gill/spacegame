@@ -1,5 +1,6 @@
 import {
   applyCommand,
+  diffWorld,
   emptyInput,
   joinPilot,
   pilotShip,
@@ -51,9 +52,6 @@ function heldOnly(input: ShipInput): ShipInput {
   for (const k of HELD) out[k] = input[k];
   return out as unknown as ShipInput;
 }
-
-/** Parts of the world clients never need after `welcome`: per-tick events go separately, and spawn timers are the server's business. */
-const NEVER_SENT = new Set(['events', 'spawners', 'rockfall', 'nextEntityId']);
 
 export class Game {
   private world: World;
@@ -119,21 +117,9 @@ export class Game {
     this.events.push(...this.world.events);
   }
 
-  /**
-   * What changed since `before` (a world this game gave out earlier): the
-   * top-level parts that are no longer the same object. The sim never
-   * changes a world in place, so a part that is the same object is
-   * unchanged, and the catalogues are never sent again after `welcome`.
-   */
+  /** What changed since `before`, a world this game gave out earlier (`diffWorld`). */
   changesSince(before: World): WorldUpdate {
-    const changed: Record<string, unknown> = {};
-    const now = this.world as unknown as Record<string, unknown>;
-    const then = before as unknown as Record<string, unknown>;
-    for (const key of Object.keys(now)) {
-      if (NEVER_SENT.has(key)) continue;
-      if (now[key] !== then[key]) changed[key] = now[key];
-    }
-    return changed as WorldUpdate;
+    return diffWorld(before, this.world);
   }
 
   /** The events since the last call, and forget them. */

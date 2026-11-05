@@ -10,7 +10,7 @@ const drawn = (m: { from: World; to: World; alpha: number }): number => m.from.t
 
 describe('the timeline', () => {
   it('draws steadily even when updates arrive bunched and late', () => {
-    // Updates every 3 ticks, but they land in uneven clumps (as with Windows' 15.6 ms timers).
+    // Updates every 2 ticks, but they land in uneven clumps (as with Windows' 15.6 ms timers).
     const timeline = new Timeline(at(0));
     const frame = 1 / 60;
     let sent = 0;
@@ -20,7 +20,7 @@ describe('the timeline', () => {
       // Every fourth frame nothing arrives; then two at once.
       if (f % 4 !== 3) {
         while (sent < f) {
-          sent += 3;
+          sent += 2;
           timeline.add(at(sent));
         }
       }
@@ -34,8 +34,8 @@ describe('the timeline', () => {
       expect(step).toBeLessThan(1.2);
     }
     // And it draws about DELAY_TICKS behind the newest update.
-    expect(sent - last).toBeGreaterThan(DELAY_TICKS - 4);
-    expect(sent - last).toBeLessThan(DELAY_TICKS + 4);
+    expect(sent - last).toBeGreaterThan(DELAY_TICKS - 3);
+    expect(sent - last).toBeLessThan(DELAY_TICKS + 3);
   });
 
   it('jumps to the newest update when told to, and after a long stall', () => {

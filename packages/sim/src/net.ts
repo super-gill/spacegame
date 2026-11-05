@@ -1,5 +1,5 @@
 import type { PilotCommand } from './commands.js';
-import type { ShipInput, World, WorldEvent } from './types.js';
+import type { Asteroid, ShipInput, World, WorldEvent } from './types.js';
 
 /**
  * The messages between a client and the server (docs/shared-world.md).
@@ -32,11 +32,53 @@ export type ClientMessage =
   | { t: 'ping'; sent: number };
 
 /**
- * The parts of the world that change while it runs, sent when they
- * change. Everything else (catalogues, rules of the system) comes once,
- * in `welcome`.
+ * What changed in the world since a client last heard: each top-level
+ * part that is no longer the same object (the sim never changes a world
+ * in place, so the same object means unchanged), except the belt, which
+ * comes rock by rock because a miner cutting one rock should not resend
+ * four hundred. Catalogues never change, so after `welcome` they are
+ * never sent again.
  */
-export type WorldUpdate = Partial<Omit<World, 'events'>>;
+export type WorldUpdate = Partial<Omit<World, 'events' | 'asteroids'>> & {
+  /** Rocks that are new or changed, and the ids of rocks that are gone. */
+  rocks?: { changed: Asteroid[]; removed: string[] };
+};
+
+/** Parts of the world clients never need after `welcome`: events go separately, and spawn timers are the server's business. */
+const NEVER_SENT = new Set(['events', 'spawners', 'rockfall', 'nextEntityId', 'asteroids']);
+
+/** What changed from `before` to `now` (both worlds the server gave out). */
+export function diffWorld(before: World, now: World): WorldUpdate {
+  const out: Record<string, unknown> = {};
+  const n = now as unknown as Record<string, unknown>;
+  const b = before as unknown as Record<string, unknown>;
+  for (const key of Object.keys(n)) {
+    if (!NEVER_SENT.has(key) && n[key] !== b[key]) out[key] = n[key];
+  }
+  if (now.asteroids !== before.asteroids) {
+    const old = new Map(before.asteroids.map((a) => [a.id, a]));
+    const changed = now.asteroids.filter((a) => old.get(a.id) !== a);
+    const kept = new Set(now.asteroids.map((a) => a.id));
+    const removed = before.asteroids.filter((a) => !kept.has(a.id)).map((a) => a.id);
+    if (changed.length > 0 || removed.length > 0) out['rocks'] = { changed, removed };
+  }
+  return out as WorldUpdate;
+}
+
+/** A client's world with an update applied: the next world to draw. */
+export function applyUpdate(world: World, update: WorldUpdate, events: WorldEvent[]): World {
+  const { rocks, ...parts } = update;
+  let asteroids = world.asteroids;
+  if (rocks) {
+    const gone = new Set(rocks.removed);
+    const fresh = new Map(rocks.changed.map((a) => [a.id, a]));
+    const out = asteroids.filter((a) => !gone.has(a.id)).map((a) => fresh.get(a.id) ?? a);
+    const known = new Set(out.map((a) => a.id));
+    for (const a of rocks.changed) if (!known.has(a.id)) out.push(a);
+    asteroids = out;
+  }
+  return { ...world, ...parts, asteroids, events };
+}
 
 /** A command's outcome as sent back: the event, or why it was refused. */
 export type CommandReply = { ok: true; event: WorldEvent } | { ok: false; reason: string };

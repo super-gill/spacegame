@@ -1,4 +1,5 @@
 import {
+  applyUpdate,
   type CommandReply,
   type WorldUpdate,
   type PilotCommand,
@@ -44,6 +45,7 @@ import { chooseCharacter } from './login-screen.js';
 import { keyFor } from './net/characters.js';
 import { serverAddress } from './net/link.js';
 import { Timeline } from './net/timeline.js';
+import { OwnShipView } from './net/own-ship.js';
 import { ConnectionMeter, showDisconnected } from './hud/connection.js';
 import { MenuPanel } from './menu-panel.js';
 import { DronePanel } from './hud/drone-panel.js';
@@ -344,6 +346,8 @@ function claimStarter(): void {
 // `current` are the two drawn between this frame; `current` is also what
 // the HUD and panels read.
 const timeline = new Timeline(session.welcome.world);
+// Your own ship is drawn from the newest update instead, carried forward (net/own-ship.ts).
+const own = new OwnShipView();
 let previous: World = session.welcome.world;
 let current: World = previous;
 
@@ -579,11 +583,16 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   const last = timeline.latest;
   const before = last.ships;
   const flying = new Map(last.munitions.map((m) => [m.id, m]));
-  const now: World = { ...last, ...changed, events };
+  const now: World = applyUpdate(last, changed, events);
   timeline.add(now);
+  const mineNow = myShip(now);
+  if (mineNow) own.update(mineNow, nowMs);
+  else own.clear();
   if (snapOnNextUpdate) {
     snapOnNextUpdate = false;
     timeline.jump();
+    own.clear();
+    if (mineNow) own.update(mineNow, nowMs);
     previous = current = now;
     const ship = myShip(now);
     if (ship) camera.snapTo(ship.position);
@@ -711,7 +720,8 @@ function labelShown(style: ShipStyle, ship: Ship): boolean {
 
 function render(alpha: number, frameSeconds: number, nowMs: number): void {
   const mine = myShip(current);
-  const view = mine ? interpolate(mine, previous.ships[mine.id], alpha) : null;
+  // Your own ship from the newest update, carried forward; everything else a moment behind.
+  const view = mine ? (own.pose(nowMs) ?? interpolate(mine, previous.ships[mine.id], alpha)) : null;
   if (view) lastSeen = view.position;
   const eye = view?.position ?? lastSeen;
 

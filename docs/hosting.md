@@ -55,6 +55,7 @@ Now a friend can reach only what Serve passes on (the game), and nothing else on
   - `op <name>`: make a character an operator.
   - `deop <name>`: make an operator a player again.
   - `who`: list characters, operators and who is online.
+  - `stats`: whether the server is keeping up (ticks a second, time per tick against the 16.7 ms budget) and how much each player is sent, over the last ten seconds. Run it during a fight if things stutter: if ticks go over budget, the server is the cause.
   - `save`: save now. `stop`: save and stop.
   The server refuses or allows their admin commands at once; the menu's admin controls appear or go when they reconnect.
 - Each new character is shown a **key** once. With the name, it is how that character logs in from another browser or computer, or after a browser forgets it. Keep it somewhere safe.
