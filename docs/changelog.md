@@ -11,6 +11,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Drones left out when you dock are lost, so recall them first.
 
 ### Fixed
+- The game starts when opened over plain http on another machine's address (a tailnet IP, say): the new-pilot id no longer needs a secure page.
 - Drones plan their way round rocks instead of wedging themselves between them, slow down among rocks so they stop wrecking themselves, and skip rocks too hard for their lasers.
 
 ## [0.12.0] - 2026-11-05

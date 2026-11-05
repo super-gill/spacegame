@@ -20,7 +20,11 @@ const STORAGE_KEY = 'spacegame.pilot';
 const DEFAULT_NAME = 'Pilot';
 
 function newId(): string {
-  return `pilot-${crypto.randomUUID()}`;
+  // randomUUID exists only on secure pages (https or localhost); a friend
+  // opening the game over plain http on a tailnet address still needs an id.
+  if (typeof crypto.randomUUID === 'function') return `pilot-${crypto.randomUUID()}`;
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return `pilot-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 function isLocalPilot(value: unknown): value is LocalPilot {
