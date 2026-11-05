@@ -2,7 +2,7 @@
 
 Conventions for anyone (human or AI) changing this repository.
 
-Several Claude chats work on this repo at once. Read [coordination.md](coordination.md) before starting: it says who owns `main`, which branch and files are yours, and where to leave notes for the other chats.
+A lead Claude chat builds the code and a lore chat writes the canon. Read [coordination.md](coordination.md) before starting: it says who does what, the session routine, and where to leave notes.
 
 ## Code
 

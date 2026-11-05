@@ -71,5 +71,5 @@ The split matters: `sim` is compiled against the ES2022 library only, so any att
 - [Roadmap](docs/roadmap.md)
 - [Changelog](docs/changelog.md)
 - [Contributing](docs/contributing.md): code, commit and version conventions
-- [Coordination](docs/coordination.md): how the lead and workstream chats work together
+- [Coordination](docs/coordination.md): how the lead and lore chats work together, and the handover routine
 - [Contributing](docs/contributing.md): conventions for code, commits and versions

@@ -1,87 +1,52 @@
 # Coordination
 
-How several Claude chats build this game as one team. Every chat working on the repo reads this file first and updates it last.
+How the Spacegame chats work together. Every chat working on the repo reads this file first and updates it last.
 
-Chats cannot message each other. This file, the branches and their commits are the only channel between them, so anything another chat needs to know goes here.
+**The repo is the memory.** No chat needs to remember the whole project: the design docs, `docs/changelog.md`, `docs/roadmap.md`, this file and the git history hold it. A chat that has lost track rereads them; a chat that is getting heavy hands over to a fresh one.
 
-## Roles
+## Who does what
 
-| Role | Who | Owns |
-| --- | --- | --- |
-| Designer | Jason | What the game is. Decides design questions, sets priorities, plays the builds. Does not code. |
-| Lead | The current lead chat in the Spacegame project ("Lead 3" from 4 November 2026) | `main`, versions, releases, `docs/changelog.md`, `docs/roadmap.md`, this file's contracts, merging workstream branches, the foundation work |
-| Workstream | One chat per workstream | Its own branch and the files listed for it below |
+| Who | Does |
+| --- | --- |
+| **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
+| **Lead** (the current lead chat; "Lead 3" since 4 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
+| **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
-## Phases
-
-1. **Foundation (lead only).** The lead builds the shared core that everything else hangs off. No workstreams open until it is on `main`. The 6a foundation (hull and module model, fitting, derived stats) landed in 0.7.0. The 6b foundation (ownership, pads, ship mart, boarding, escape pods, save version 4) and its client landed in 0.8.0. Next: 6c, the living system (`docs/system.md`), built by the lead in two parts, with 6d (the ship interface) built alongside it by the interface workstream. 6e, weapons and the capacitor, follows.
-2. **Fan-out.** The lead opens workstreams for parts with clean boundaries, writes their briefs below, and Jason starts a chat for each one.
-3. **Integrate.** The lead merges branches, resolves conflicts, runs the full test suite and a headless play check, then releases.
-
-## When to split work
-
-The lead decides when work goes to its own chat and tells Jason, unprompted, at these points:
-
-- the start of each milestone: what the foundation is and which workstreams follow it
-- when a foundation lands on `main`: which workstreams open now
-- whenever a request to the lead or an idea from Jason is big enough to stand alone
-
-**Split when all of these hold:**
-
-1. The contracts it depends on are on `main` and not expected to change.
-2. It lives mostly in its own files, such as client rendering vs client UI vs sim catalogue vs docs.
-3. It can be tested or played on its own, without another open workstream's branch.
-4. It is at least a full session's work. Anything smaller, the lead does directly.
-
-**Keep it in the lead chat when any of these hold:**
-
-- It changes core types, the save format, `stepWorld` or anything most of the code touches.
-- Two workstreams would need the same files at the same time.
-- It is a balance pass that needs the whole game in view.
-- It is a small fix, even in an area a workstream owns. The lead tells that workstream in the log.
-
-**Limits:**
-
-- At most three workstreams open at once. Jason carries messages between chats and the lead merges every branch, so more than three costs more than it saves.
-- Short-lived workstreams (one feature) close when merged. Long-lived ones (lore, balance) stay open across milestones but rebase often.
-
-### Opening a workstream
-
-The lead adds a row to "Workstreams" with a brief in the same commit:
-
-- **Goal:** what done looks like, in play terms
-- **Owns:** the files and folders it may change
-- **Uses:** the contracts it depends on
-- **Out of scope:** what it must leave alone
-- **Done when:** tests, a play check, docs updated
-
-Then the lead gives Jason this opener to paste into a new chat in the Spacegame project:
-
-> You are the `<name>` workstream for Spacegame. Read the project handover doc, then clone the repo and read `docs/coordination.md` and your brief in it. Work on branch `ws/<name>`. Start now.
-
-### Closing a workstream
-
-The lead merges the branch, moves its log entries and changelog lines onto `main`, marks the row "Closed", and tells Jason that chat is finished.
-
-## Rules for every chat
-
-- Read `docs/contributing.md` and the handover doc in the project before changing anything.
-- **Only the lead pushes to `main`.** Workstreams push to `ws/<name>` and rebase on `main` before each push.
-- **Only the lead bumps versions** or writes release entries in `docs/changelog.md` and `docs/roadmap.md`. Workstreams put their changelog lines in their log entry and the lead folds them in.
-- **Contracts below are fixed.** A workstream that needs one changed adds a request to "Requests to the lead" and works around it until the lead changes it on `main`. Never edit a contract on a branch.
-- Stay inside your workstream's files. If a change needs a file another workstream owns, raise it as a request.
-- `npm test` passes before every push, on every branch.
-- Design questions go to Jason through "Questions for Jason". Do not guess at design and build on the guess.
+Chats cannot message each other: this file, branches and commits are the only channel, and Jason carries anything urgent.
 
 ## Session routine
 
-**Start:** `git fetch`, rebase your branch on `origin/main`, read this file top to bottom, check "Requests to the lead" and "Decisions" for anything that affects you.
+**Lead, start:** `git fetch`, pull `main`, read this file and the handover doc in the project, check "Lore asks" and "Questions for Jason".
 
-**End:** add a log entry under "Log" in your branch's copy of this file (date, workstream, what changed, what you need, what is blocked, changelog lines), then push your branch. The lead merges log entries into `main` with your work. If you need the lead or Jason before your branch is merged, say so in your last message to Jason so he can carry it to the lead chat.
+**Lead, end:** a log entry (date, what changed, what is next), changelog lines under "Unreleased", the roadmap if a milestone moved, and Jason's commit message.
+
+**Lore, start and end:** rebase `ws/lore` on `main`, work through "Lore asks" with Jason, record answers in `docs/lore.md`, add a log entry in the branch, push, and tell Jason it is ready for the lead to merge.
+
+**Handing over to a new lead:** when a lead chat gets heavy, it updates the handover doc in the project (state, next task, practical notes) and this file, pushes, and gives Jason a one-line opener for the new chat. Nothing else carries over.
+
+**Rules for every chat:** only the lead pushes to `main` and bumps versions; `npm test` passes before every push; design questions go to Jason rather than being guessed and built on.
+
+## Lore asks
+
+Names and lore wanted from the lore chat. The game uses working names until these come back; the lead applies the answers. Newest first.
+
+- **Breaching** (2026-11-05): the Rook and Rivet Breacher (mid-size miner); the charge rig (`rookrivet-chargerig-s`); the deep assay (`rookrivet-deepassay-m`); breach charges, which clash with KOD's "Breach" warhead and need another name; any name gate-glass should carry when it is breached out of a core. Lore already says gate-glass is splinters of a gate shattered in the Sundering, and breaching cores fits that: is there more to say about what a core is?
+- **Drones** (2026-11-05): the mining drone, its Nibbler laser, the Drone Cradle and the Drone Bay.
+- **The hulk** (2026-11-05): the Rook and Rivet Hulk, the Excavator mining turret, the Ore Hold and the Furnace reactor.
+- **Mining part 1** (2026-11-04): the ores (Nickel-iron, Banded ore, Black ore, Glintstone) and their uses; the Rook and Rivet Prospector; the Pick mining lasers, Dowser survey scanners and Assay mining computers; who makes mining kit, if not Rook and Rivet.
+- **6f modules** (2026-11-04): flight computers, the pod bay, fire control, tractors and afterburners, all provisional.
+- **NPC miners** (2026-11-05): who they work for, if anyone (they sell at Ridge and Lantern Works).
+
+## Questions for Jason
+
+Open design questions. Answers go to "Decisions".
+
+- Navy duties.
 
 ## Contracts
 
-Interfaces that more than one workstream depends on. Owned by the lead.
+Interfaces the client, saves and any focused-pass chat rely on. Owned by the lead.
 
 Changing any of these needs the lead. All live in `packages/sim/src` and are exported from `index.ts`.
 
@@ -171,106 +136,13 @@ Mining part 1 contracts (on `main` from 4 November 2026; design in `docs/mining.
 - **Events:** `dronesLaunched`, `droneStowed`, `droneLost`, `droneRefused`, `surveyed`, `surveyRefused`, `miningTooHard`, `oreFreed`, `rockCrumbled`, `cacheDropped`, `hopperFilterChanged`, `oreEjected`, `laserAssigned`.
 - **Save format version 7** (`migrate6to7`).
 
-## Workstreams
-
-| Name | Branch | Owns | Status | Brief |
-| --- | --- | --- | --- | --- |
-| 6a foundation | `main` (lead) | Everything in milestone 6a | Closed, 0.7.0 | `docs/ships.md`, "First build slice" |
-| Lore | `ws/lore` | `docs/lore.md` (new), `docs/races.md` | Open (long-lived) | "Brief: Lore" below |
-| 6b foundation | `main` (lead) | The 6b sim side | Closed, 0.8.0 | `docs/ships.md`, "6b" |
-| Ship mart | `ws/ship-mart` | 6b client: see brief | Closed, 0.8.0 | "Brief: Ship mart" below |
-| 6c foundation | `main` (lead) | The 6c sim, parts 1 and 2 | Open; part 1 on `main` | `docs/system.md`, "Build order" |
-| Interface | `ws/interface` | `packages/client/`, `docs/controls.md` | Open (across 6c and 6d) | "Brief: Interface" below |
-
-6a was built whole by one chat before this process existed, so its planned workstreams (ship rendering, outfitting screen, catalogue) never opened.
-
-Candidates (not open yet):
-
-- **Catalogue and balance:** hull and module data, tuning against play. Not needed yet; balance is in the player's favour and that is fine for now.
-
-### Brief: Interface
-
-- **Goal:** the ship's interface and navigation. Flying should feel like flying a ship with instruments, Elite Dangerous for navigation and EVE for ship systems: gauges for shields, hull and (in 6e) capacitor, the modules you have fitted, a radar that shows only what your sensors can see, a nav target you fly to, a system map, and warnings that rise in steps. Then, as 6c lands, the planet, orbits and gravity on screen.
-- **Owns:** `packages/client/` (all of it) and `docs/controls.md`. May make mockups as design artifacts.
-- **Uses:** today's contracts, `ShipStats.sensorRange` (on `main` now), and the 6c contracts as the lead lands them (bodies, orbit and gravity helpers, path prediction). The lead names each new contract in this file and the log when it lands; rebase then.
-- **Deliver, in this order:**
-  1. **Mockups first, for Jason to judge, before any code.** The flight HUD (shield, hull, a reserved capacitor gauge, fitted modules and their state, target panel, warning area), the radar, the contacts list, the nav target and the system map. Jason dislikes Claude's default visual look; ask him what he likes in Elite and EVE before drawing, and offer two or three directions. Record his choice in the log.
-  2. The flight HUD and target panel, replacing today's text HUD.
-  3. The radar by sensor range. Ships beyond it are not drawn and get no edge markers; stations always do. This replaces today's markers for everything.
-  4. The contacts list (ships, stations, later bodies) and a nav target: one marker with distance and arrival time.
-  5. The system map: full screen, stations now, bodies and orbits when they land; never ships.
-  6. Warnings in tiers (advisory, caution, warning, alarm), starting with today's: hunted, too fast to dock, no free pad, an unflyable fit, a collision course with a station.
-  7. When 6c lands: bodies, orbits, the belt and moving stations drawn; the predicted path line; the gravity gauge and the gravity warnings in `docs/system.md`; apoapsis and periapsis.
-- **Out of scope:** any change in `packages/sim`; the capacitor itself (6e; leave its gauge as a slot). If the screens need something from the sim, add it to "Requests to the lead" and work round it.
-- **Note:** the lead may add a little client code while building 6c, so the game stays playable (for example a plain circle for a body). It will be in its own file where possible and named in the log; keep or replace it.
-- **Done when:** long-lived across 6c and 6d. Each stage ends with `npm test` and `npm run build` passing, a headless play check with real mouse clicks, `docs/controls.md` updated, a log entry with changelog lines, and a push to `ws/interface`. Tell Jason when a stage is worth merging.
-
-### Brief: Lore
-
-- **Goal:** the story that defines the world, written down in the repo where every chat can build on it. Today the lore lives in a claude.ai doc that code chats cannot rely on; from now on `docs/lore.md` is canon for the game.
-- **Owns:** `docs/lore.md` (create it) and `docs/races.md`. May keep the claude.ai lore doc in step, but the repo copy wins.
-- **Uses:** the claude.ai docs "Spacegame: Lore of the Known Universe" and "Spacegame: Races and Manufacturers", the "Spacegame ship concepts" canvas, `docs/ships.md` and `docs/design.md` for what the game already does.
-- **Deliver, in this order:**
-  1. `docs/lore.md`: the setting, the races, the powers and factions, and the starter sector in lore terms (who runs Harbour Station and Ridge Outpost, who the trader and the pirate work for).
-  2. Answers to the lore questions under "Questions for Jason", put to Jason in the lore chat, with his answers recorded in the log entry.
-  3. A naming table in `docs/lore.md` for the three hulls, the Sparrow's replacement as an Aurel dev hull, every module and every manufacturer. Module makers are a mix of their own companies and the hull makers. Names only: the lead puts them into the catalogue.
-  4. Lore hooks for what is coming: ship ownership and pads (6b), escape pods, hired NPC pilots and captains, law and security (7).
-- **Out of scope:** any code, catalogue data or numbers. Lore never sets a stat; if lore needs something mechanical (a race bonus, a station service), it goes to "Requests to the lead".
-- **Done when:** never fully; this is long-lived. Each session ends with a log entry and a push to `ws/lore`. Tell Jason when there is something worth merging, and he passes it to the lead.
-
-### Brief: Ship mart
-
-- **Goal:** everything 6b adds, playable. Docked at Harbour you can see the ships for sale with prices and buy one; your ships sit visibly on the station's pads; you can board one you own, docked or alongside in space, with a key and a clear prompt; a pod looks and reads like a pod; a pilot in a pod at Harbour who owns nothing can claim the free starter. After this, the lead releases 0.8.0.
-- **Owns:** `packages/client/` only: `index.html`, `style.css`, `main.ts`, `ui.ts`, `bindings.ts`, `controls-panel.ts`, `render/`, and a new panel file for the ship mart (and one for "your ships" if wanted). May touch `outfitting-panel.ts` and `market-panel.ts` only to fit a new tab into the docked panel. Updates `docs/controls.md` for any new key.
-- **Uses:** the 6b contracts above. The client never applies ownership, pad, boarding, buying or claiming rules itself: it asks `buyRefusal`, `boardRefusal`, `boardableShips` and `claimRefusal`, and calls the commands. Ships are drawn from their fit as now; a docked ship is drawn at its `position`, which is already its pad.
-- **Deliver:**
-  1. Pads drawn on stations (sized by `size`, at `padWorldPosition`, facing `facing`), and docked ships drawn on them, flown or empty. Today the client skips every ship that is not flying.
-  2. A ship mart tab in the docked panel at stations whose `shipMart` is not empty: each loadout's name, hull, size class, price (`shipPrice`) and a short read of its stats (`fitStats`), with Buy greyed and the reason shown when `buyRefusal` says no. Previews must never change layout (the 0.7.2 rule).
-  3. Your ships: a list, docked or not, of `ownedShips`, with where each is, so a pilot can find what they own. Board from the list when `boardRefusal` allows it.
-  4. A board key (B is free) and a prompt in flight naming the nearest ship in `boardableShips`, and the refusal when one is close but not boardable (too fast, too far).
-  5. Empty ships labelled as empty (`shipLabel` in `ui.ts` already does this) and drawn distinctly from flown ones.
-  6. The pod's look: it already draws from its hull outline and three modules; make it read as a lifeboat, not a tiny ship, and make the HUD say you are in a pod.
-  7. "Claim a free Courier" in the docked panel when `claimRefusal` is null.
-  8. Toasts for `shipBought`, `boarded`, `starterClaimed` and `pilotWoke`; the client already toasts `podEjected` and `noPad`.
-- **Out of scope:** any change in `packages/sim`. Selling ships, hired pilots, taking other people's ships. If the sim lacks something the screens need, add it to "Requests to the lead" and work round it.
-- **Done when:** `npm test` and `npm run build` pass; a headless play check with real mouse clicks covers buying, seeing the ship on its pad, boarding it docked, undocking, boarding back in space, losing a ship to a pod, docking the pod and claiming the starter; `docs/controls.md` updated; log entry with changelog lines; branch pushed.
-
-### Lore: 6e asks (2026-11-04)
-
-The lead is building 6e (`docs/weapons.md`) and needs these. Names and leanings only; the lead sets every number.
-
-1. **Weapon names**, in each maker's naming theme, for six guns in sizes S, M and L: autocannon and artillery (projectile), pulse laser and beam laser (energy), blaster and railgun (hybrid). Paragon Arms exists; the lore may add or use other arms makers (Union Defence Works, Cantor-Vell Arms, Kessari Orbital Defence). Today's Paragon Fairshot (pulse cannon) becomes an energy pulse laser; the Watchman and Sentry turrets become PDCs.
-2. **Which maker and people lean to which family**, as hull bonuses: for instance Kessari projectile, Halcyon energy, Free Belt or Ito-Marr hybrid, and who favours missiles. One line of why each.
-3. **Warhead and munition names**: fragmentation and explosive warheads, missiles and torpedoes, from whoever makes them.
-4. **The capacitor's character per hull** (Tern, Warrant, Manifest, Tacet, Ark): generous or tight, quick or slow to recover, in a line each, from the maker's expertise. The lead turns it into numbers.
-5. **Countermeasure brands**: who makes chaff, flares and decoys, and what mix each bundles.
-6. **PDC** as the in-world word for turreted point defence guns, or a better one.
-7. **Hull classes**, on an age-of-sail ladder (Jason's call): pod (jolly boat), cutter, sloop, brig, frigate, ship of the line (third and second rates), capital (first-rate, flagship: squadrons, station services aboard), and hulk for trade and industry at every size. Confirm or rename each in the setting's voice, say what each people calls its line ships and capitals, and place today's hulls: the Tern a cutter, the Warrant a sloop, the Manifest a hulk, the Tacet (Aurel, probably outside the ladder), the Ark a pod. Classes are about role and scale; module sizes (S, M, L, XL) stay what fits a mount.
-
-### Lore: 6c part 2 asks (2026-11-04, answered and merged)
-
-The lead is building the rest of 6c part 2 (the belt's asteroids, Concord patrols, more traders) and needs these from the lore workstream. Names only, plus who and why; the lead turns them into data. Put Jason's answers in `docs/lore.md` and list them in your log entry.
-
-1. **Bodies:** names for Calder's planet, its moon and the asteroid belt (placeholders Calder I, Calder Ia, Calder Belt). What the planet is like (inhabited, a gas giant, a garden world, a dead rock), in a line or two.
-2. **The third station,** in orbit round the moon: its name, who runs it, what it is for, and what its market should lean towards (what it makes cheap, what it wants), in words, not prices. Whether it has outfitting or a ship mart. It must make Calder's trade triangle worth flying.
-3. **Patrols:** who flies them in Calder (Port Authority, a navy, a contracted outfit), what they call themselves, and which existing hull they fly (Meridian Tern, Kessari Warrant, Tessaract Manifest). They hunt pirates, not pilots, until law arrives in milestone 7.
-4. **The belt:** what Calder's rocks are (the Ridge Collective mines them), for flavour now and ore types in milestone 9.
-5. **Module names** for the new systems, in each maker's naming theme: the radars (Meridian Lookout S, Ito-Marr Farsight S, Tessaract Traffic Array M, Meridian Lifeline S for pods), targeting computers (Meridian Plotter S, Paragon Fire Director S and M, Tessaract Manifest Reader S) and nav computers (Meridian Wayfinder S, Ito-Marr Deep Reckoner M). Keep or replace each.
-6. **Lore hooks** for Jason's systems principle: every capability comes from a fitted system, and what you know comes from a system reading it (the window rule). Anything in the setting that explains why ships are built this way is welcome.
-
-## Questions for Jason
-
-Open design questions any chat needs answered. Jason answers in the lead chat or in the chat that asked; the lead moves answers to "Decisions".
-
-- Navy duties.
-- **Sensor module names** (for the lore chat): two radars, a pod beacon and three targeting computers have placeholder names (see the sensor systems contract).
-- **Body names** (for the lore chat): the planet, its moon and the belt in Calder. Placeholders: Calder I, Calder Ia, Calder Belt.
-
 ## Ideas inbox
 
-Jason's ideas that are not scheduled yet. The lead triages them into the roadmap, a workstream or "not now".
+Jason's ideas that are not scheduled yet. The lead triages them into the roadmap or "not now".
 
 - **Station functions on ships** (2026-11-03, later): bigger ships could carry station services such as outfitting; player stations, or station ships, may follow.
+- **More ships per size** (2026-11-05): several ships at each size, with slight differences, better and worse in different areas, rather than one ship per rung of the ladder. A content pass once the mining ladder has settled.
+- **Industrial command ship** (2026-11-05, later): an industrial capital that coordinates NPC miners, carries mining fighters and a huge hold. Needs hired NPC agents first.
 - **Boarding abandoned ships** (2026-11-03): taking a ship nobody owns, or someone else's. Belongs with law (7) and salvage (9). Owning ships, swapping in space and pods are scheduled in 6b.
 - **Capacitor battery module** (2026-11-04, later, fitting polish): a fitted battery that adds capacitor, so a small ship can carry a big pool at a mass and price cost. Jason: the capacitor is a hull property for now; a battery feels like a later tuning and polishing decision.
 - **Missiles, torpedoes and CIWS** (2026-11-04, scheduled: 6e on the roadmap, designed in `docs/weapons.md`): missiles fast and cheap with modest damage; torpedoes heavy and slow with massive damage. The turret's slow, automatic tracking suits close-in weapon systems: turrets may simply become CIWS, engaging the closest hostile missile or torpedo (or ship) on their own, or a locked target if one is assigned. It has to be automatic, because a pilot cannot click a missile reliably while flying and fighting. Lead's notes: missiles and torpedoes are projectiles with a lock and their own steering (the same flight rules as ships); they need a signature so a CIWS can lock them, and ammunition (6e already plans ammunition for projectile weapons and missiles); assigning a turret to a lock (`WeaponState.lockTarget`, already in place) or to point defence is the 6e "systems assignable to locks" work. Fixed guns keep out-damaging turrets of the same size. **Countermeasures** (Jason, same day): chaff, flares and decoys at the top level, as countermeasure modules that each carry a mix from different manufacturers (brands trading what they carry, how many, mass and price). Lead's note: each counters a seeker type, so missiles and torpedoes need a guidance kind (radar, heat, signature) for the match to mean something; launching is a press, so it is a fitted system with charges, like ammunition.
@@ -286,6 +158,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-05: Simpler way of working: one lead chat builds all the code; Lore stays its own chat; interface work happens in occasional focused passes rather than a standing workstream. The repo docs, not any one chat, are the project's memory; a heavy lead chat hands over to a fresh one. (Jason)
 - 2026-11-05: Breaching is for gate-glass: a deep assay shows breach points; the pilot plants charges by hand at the marks, gets clear and detonates; the blast hurts everyone near (pilot and drones too), shatters small rocks and knocks ore off bigger ones; no sound but a big signature bloom that draws pirates; the rock splits; the exposed core degrades in minutes; glass is fragile (heavy turrets shatter it, drones and light lasers cut it); anyone can fit charges, the breacher is built for it. Ship ladder: prospector (cheap early), breacher (mid, strip mines and breaches), hulk (strip-mining behemoth), later an industrial command ship with NPC miners and mining fighters; later still, several ships per size with different strengths. (Jason)
 - 2026-11-05: NPC miners: two prospectors and a hulk to start; pirates hunt them like traders; NPC caches later. NPCs stay skin-deep (no wallets) until the economy milestone. (Jason)
 - 2026-11-05: Drones: the mother commands and drones fly themselves; they work only locked rocks; no hold of their own (the tractor and hopper collect); the parent ship goes to the rocks rather than drones dragging them; one on a prospector, several on a hulk; their own interface, later the fighter manager. (Jason)
@@ -321,44 +194,11 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 - 2026-11-03: The lead decides when work splits into its own chat, using the rules in "When to split work", and tells Jason at each milestone start and foundation landing. (Jason)
 - 2026-11-03: Work runs as a lead chat plus workstream chats coordinated through this file; the lead builds the 6a foundation before any workstream opens. (Jason)
 
-## Requests to the lead
-
-Contract changes, cross-workstream file changes, merges wanted. Newest first.
-
-- **Lore for 6e** (2026-11-04, lore; Jason's answers). **Merged and applied** to `docs/weapons.md`: merchantman split from hulk, family bonuses by canon, the Warrant keeps a plain damage bonus in part 1, swivels as the in-world word. Names go into the catalogue as part 1 lands. All in `docs/lore.md` under "Weapons and war" and "Names". For the lead:
-  - **Class change: merchantman.** Jason split your hulk class: **merchantman** for trade and passengers, **hulk** for industry only. The Tessaract Manifest is a merchantman, not a hulk. `HullSpec.class` needs the extra value; `weapons.md` says hulk for both.
-  - **Family bonuses follow canon,** not the sketch in the asks: Halcyon energy, Kessari missile, Free Belt projectile, Vael hybrid. The Warrant is Kessari, so its family bonus is missiles, which arrive in part 2. Its part 1 bonus is your call.
-  - **Names to apply** when the guns land: the gun, launcher, munition, warhead and countermeasure tables in "Names". The Fairshot becomes a pulse laser; the Watchman and Sentry become swivels. Ids are yours.
-  - **Swivel** is the in-world word for PDCs. Please use it in the HUD and outfitting (the interface workstream) and keep "PDC" as the docs term.
-  - **Capacitor characters** for the five hulls are under "Capacitors by hull".
-- **Lore for 6c part 2** (2026-11-04, lore; Jason's answers). **Merged and being applied** by the lead: decisions recorded, Concord renamed in `system.md` and `roadmap.md`, escalation added to milestone 7, names in the catalogue; Lantern Works, the Watch and the triangle are being built. All in `docs/lore.md` under "The starter sector", "Law enforcement", "Why ships are built this way" and "Names". For the lead to apply:
-  - **No Concord** (Jason's decision, please add it to "Decisions"): the treaty is the Landfall Accord and has no ships. Law is local and escalating: whoever holds a system polices it with ordinary, beatable ships, the local watch first, then its reserve, then the holder's navy, thinner the farther out. A deliberate departure from EVE's near-invulnerable police. Please rename "Concord patrols" in `docs/system.md`, `docs/roadmap.md` and this file, and carry the escalation into milestone 7's plan.
-  - **Bodies:** Calder I is Fieldmark (garden world), Calder Ia is Lantern (ice moon), Calder Belt is the Scree. The star stays Calder.
-  - **Third station:** Lantern Works, round Lantern, run by Corvane Heavy Industries. Market in words: wants ore and scrap, makes machinery cheap, food and medicine dear. Outfitting yes (Corvane's industrial modules; Corvane has no catalogue entry or modules yet, so stock it from what exists until it does), ship mart no. For the triangle to pay, Harbour should lean less on cheap machinery: food and medicine to the Ridge, ore to Lantern, machinery back out.
-  - **Patrols:** the Calder Watch, the Port Authority's patrol, in Kessari Warrants in Port Authority white. The pirates fly Warrants too, so the client must tell them apart (a note for the interface workstream).
-  - **Traders** run Tessaract Logistics contracts between all three stations, in Manifests.
-  - **Module renames:** `itomarr-radar-s` Ito-Marr Watchtower S, `tessaract-radar-m` Tessaract Clearance M, `paragon-computer-s` and `paragon-computer-m` Paragon Marksman S and M, `tessaract-scanner-s` Tessaract Tally S, `itomarr-nav-m` Ito-Marr Chartvault M. The four Meridian names stand. No maker changes.
-  - **Later:** gate-glass as a rare ore in the Scree for milestone 9.
-  - **The window:** Jason's caution: the systems lore must never mean a blurred or degraded view. The play area shows clearly where things are and how they move; systems add knowledge, not sight.
-- **Run the client's tests from the root** (2026-11-04, interface). **Done:** the root `npm test` runs every workspace.
-- **HUD through `navReadout`** (2026-11-04, lead to interface). **Done on `ws/interface`:** speed and frame come from `navReadout`; with none the dial shows `-` and `NO NAV COMPUTER`. Path, gauge and warnings follow in stage 7. Jason's window rule: the play area is what the captain sees out of the window; every property shown comes from a system. The dial's speed and frame read `relativeVelocity` and `localFrame` directly; switch them to `navReadout` (null means no nav computer: no speed shown). Stage 7's path line, gravity gauge, warnings and apoapsis and periapsis come from it too; the lead's stopgap `drawNav` in `render/bodies.ts` shows the shape.
-- **Target card through `lockReadout`** (2026-11-04, lead to interface). **Done on `ws/interface`:** the target card, lock cards and radar blips read only `lockReadout` (nothing while locking); hull drawings come from the catalogue via `identity.hullId`. Stage 2 was built before the readout contract: `hud/target-card.ts` and the lock cards read the target ship directly (shield, structure, who flies it). Route everything shown about a target through `lockReadout`, showing only the parts present (a Plotter gives rough condition, not exact bars; a Manifest Reader gives cargo). The bars over ships in space already follow it.
-- **Target locks** (2026-11-04, interface; Jason's design). **Done on `main`** in 6c part 2, inside save version 5: see "6c part 2 contracts". The lead put stopgap controls in the client (click locks or activates, Tab switches the active lock or locks the nearest ship with none, Esc unlocks; the target panel shows LOCKING n% and locks held); replace them freely. Replace the single `Ship.targetId` with EVE-style locks:
-  - **Locks take time**, faster with better sensors and against bigger ships. A lock in progress is visible to the client (its progress, 0 to 1).
-  - **Max locks is a ship stat**, from the hull and sensor modules, like `sensorRange` (for example a courier 2 or 3, bigger ships more).
-  - A lock needs the target inside sensor range; it drops when the target leaves it, docks or is destroyed (as `targetId` drops today).
-  - **One lock is active.** Turrets fire at the active lock while weapons are hot, as today.
-  - Inputs: start a lock on a ship, unlock one, set the active lock. In the client a click locks, Tab switches the active lock and Esc unlocks the active one.
-  - **Shape for later:** Jason wants systems assignable to a lock (each turret, and later missiles, the tractor and sensor modules, pointed at a chosen lock, defaulting to the active one). Fixed guns stay on the nose. Suggest building the assignment with weapons in 6e, but keep the lock data so a mount can name a lock.
-  - NPCs keep working: their brains can hold one lock.
-  - Needs a save version bump (the lead's call when). Until it lands the client shows today's single target as the active lock.
-
-Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lore names and added the Aurel Tacet and the `aurel` maker; built stepping out (Jason's answer on empty ships in space); fixed the stale 6b line in `docs/design.md`. Earlier: the lore decisions went into "Decisions" and their follow-ups onto the roadmap (milestones 7, 8 and 11).
-
 ## Log
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-05, lead (Lead 3): simplified how the chats work (see "Decisions"): this file now holds the handover routine, the contracts, the lore asks, questions, ideas, decisions and the log. Workstream rules, briefs and the request queue are gone; every past request was done. Closed the Interface and Ship mart workstreams; their branches are merged or stale. The client stopgaps listed in older entries are now simply the client, to be restyled in a future interface pass.
 - 2026-11-05, lead (Lead 3): breaching and gate-glass (`docs/mining.md`, "Breaching and gate-glass"), with the Rook and Rivet Breacher as the mid-size miner. Cores in big rocks read by a deep assay; charges planted by hand from the charge rig's tile and set off from 150 units clear; the rock splits, exposed glass is brittle and collapses in three minutes; the blast hurts everyone near; its bloom draws pirates to the blast (`PirateBrain.drawnTo`). Save 8 gives older belts cores. Also: drones sharing a small rock no longer pick the same spot. 402 sim and 25 client tests; play checked planting, the tile states, breach markers, the blast, chunks and glass. **Lore asks:** names for the breacher, the charge rig, the deep assay, breach charges ("Breach" is already KOD's warhead) and gate-glass if it wants one. **For the interface workstream:** the charge tile, breach markers and glass styling are lead stopgaps. Jason's direction recorded: more ships per size, each better and worse in different areas.
 - 2026-11-05, lead (Lead 3): NPC miners (`docs/mining.md`, "NPC miners"): `MinerBrain` (`ai/miner.ts`), two prospectors selling at Ridge and a hulk with drones hauling to Lantern; navigation shared with drones (`ai/navigate.ts`); `flyToStation`, `defend` and `hunter` exported from the trader; `sellNpcOre`; missing starter spawners added on load. Skin-deep: no NPC wallets until the economy. 388 sim tests including an eight-minute soak of the miners' loop.
 - 2026-11-05, lead (Lead 3): drone pathfinding after Jason's playtest (a drone wedged between rocks; drones hitting rocks): A* round rocks (`ai/path.ts`), replanned each second; slower among rocks; clear cutting spots; only cuttable rocks. 382 sim tests, including drones working into the densest patch of the Scree without damage.
