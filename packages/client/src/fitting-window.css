@@ -154,6 +154,21 @@
   width: 12px;
 }
 
+.fit-slot-what {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fit-slot-type {
+  color: var(--ink-dim);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .fit-slot-name {
   flex: 1 1 auto;
   min-width: 0;

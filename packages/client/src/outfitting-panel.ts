@@ -632,7 +632,11 @@ export class OutfittingPanel {
         row.type = 'button';
         row.setAttribute('aria-pressed', String(m.id === this.selected));
         row.title = g.tier === 'core' ? `${MOUNT_TYPE_NAME[m.type]} ${m.size}` : `${MOUNT_TYPE_NAME[m.type]} slot, takes up to ${m.size}`;
-        row.append(el('span', 'fit-slot-id', m.id.toUpperCase()), el('span', 'fit-slot-size', m.size), el('span', module ? 'fit-slot-name' : 'fit-slot-name empty', module?.name ?? 'empty'));
+        // The module's name, and under it what it is (a pulse laser, a shield generator).
+        const what = el('span', 'fit-slot-what');
+        what.append(el('span', module ? 'fit-slot-name' : 'fit-slot-name empty', module?.name ?? 'empty'));
+        if (module) what.append(el('span', 'fit-slot-type', moduleType(module, world)));
+        row.append(el('span', 'fit-slot-id', m.id.toUpperCase()), el('span', 'fit-slot-size', m.size), what);
         row.addEventListener('click', () => this.select(m.id));
         box.append(row);
       }
@@ -663,7 +667,7 @@ export class OutfittingPanel {
             : `Fixed, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
           : `Takes ${tier} modules up to ${mount.size}.`;
     head.append(el('div', 'muted', detail));
-    const fittedLine = el('div', 'fit-picker-fitted', `Fitted: ${current?.name ?? 'nothing'}`);
+    const fittedLine = el('div', 'fit-picker-fitted', `Fitted: ${current ? `${current.name} (${moduleType(current, world).toLowerCase()})` : 'nothing'}`);
     const ctx = this.ctx!;
     if (current && !hull.sealed) {
       const plan = ctx.plan(mount.id, null);
