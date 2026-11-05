@@ -129,7 +129,7 @@ Where a slot sits matters for arcs, blind spots and, later, damage to the module
 - **Every station outfits** while Calder is the dev environment (Ridge Outpost gained outfitting; saves pick it up on load).
 - **One storage per station** (`Pilot.storage`) holds unfitted modules and stored goods together; the old `hangar` is gone. Save 12 (`migrate11to12`) merges them.
 - **The fitting window** (`outfitting-panel.ts`), built from the approved mockup: budget bars (power with a preview outline, capacitor, mass with acceleration and spin-up, cargo, ore hold); the slots by tier on the left; the hull in the middle with every slot marked where it sits by tier and size (circle high, diamond mid, square low, outline core), the selected high slot's arc and blind spot or line of fire; every ship number below it, now and after; and on the right what fits the selected slot, from storage first, then for sale, then every module stored here to sell. Pointing at a module previews it everywhere.
-- **Not yet:** the fitter page still uses its own form; it moves onto the same window next, so there is one fitting interface to maintain.
+- **One window, two places:** the window works on a `FitContext` (hull, fit, how to check a change, what is stored, whether it is free). The game builds one for the docked ship (`stationFitContext`); the fitter builds one per fit with nothing to buy, any module in any slot it fits, and over-power fits allowed so a build can be sketched before it balances. Its styles live in `fitting-window.css`, shared by both pages.
 
 ## The fitter
 
@@ -145,7 +145,7 @@ A fitting calculator for Jason and the lead, built from the same sim code as the
 
 - **The lab** (`packages/sim/src/fitlab.ts`): `fitProblems` (why a fit could not be fitted), `fitSummary` (budgets, flight, defence, damage, sensors, holds, mining), and `duel` (two fits flown by the same scripted pilot from four starts, up to two minutes, in empty space; deterministic). The scripted pilot closes to 60% of its longest range, keeps its nose on the lead point, fires on aim, and takes its fire groups in turn.
 - **Reference fits:** the seven stock ships plus a Warrant brawler, kiter and glass cannon and a Manifest brick.
-- **The fitter page** (`fitter.html`, linked from the menu): two fits side by side, any hull and module (ones that would not fit are marked, not hidden), the numbers compared, a duel, saving in the browser, and JSON export and import.
+- **The fitter page** (`fitter.html`, linked from the menu): two fits, A and B, each edited in the game's own fitting window (since step 3; at first it was a form of drop-downs), the numbers compared, a duel, saving in the browser, and JSON export and import.
 - **The audit** (`scripts/audit.ts`): modules worse in every way than a rival, ladders where only price separates two modules, the reference fits' numbers, and the duel matrix. Not done yet: slots with one sensible choice, best fit per role, and mining and hauling runs.
 - **Baseline** (`docs/audits/2026-11-05-baseline.md`): the Ito-Marr Arsenal L is worse in every way than the Magazine L, and the Assay S than the Meridian Plotter S; the three countermeasure dispensers are a pure price ladder; the Warrant brawler beats every other combat fit, and the glass cannon loses to all of them (its energy guns empty the Warrant's 90-point capacitor).
 

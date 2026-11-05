@@ -4,35 +4,40 @@ import {
   MODULES,
   REFERENCE_FITS,
   WEAPONS,
+  createStarterWorld,
   duel,
   fitProblems,
   fitSummary,
   mountRefusal,
   type FitSpec,
   type FitSummary,
-  type HullSpec,
-  type ModuleSpec,
 } from '@spacegame/sim';
+import { FIT_REFUSALS, OutfittingPanel, type FitContext } from '../outfitting-panel.js';
 
 /**
- * The fitter (docs/fitting.md, "The fitter"): two fits side by side, any
- * hull and any module, with the game's own numbers, and a duel between
- * them. Fits save in this browser and export as JSON (the shape of
- * `FitSpec`, which pastes straight into `reference-fits.ts`).
+ * The fitter (docs/fitting.md, "The fitter"): two fits, A and B, each
+ * edited in the game's own fitting window (outfitting-panel.ts) with any
+ * hull and any module, then compared number by number and duelled. Fits
+ * save in this browser and export as JSON (the shape of `FitSpec`, which
+ * pastes straight into `reference-fits.ts`).
  *
- * Plain DOM, rebuilt on every change: it is a tool, not part of the game's
+ * The fitting window is built once and updated; everything around it is
+ * plain DOM rebuilt on every change: it is a tool, not part of the game's
  * frame loop.
  */
 
 const cat = { hulls: HULLS, modules: MODULES, weapons: WEAPONS, goods: GOODS };
 const SAVED_KEY = 'spacegame.fits';
 const root = document.getElementById('fitter')!;
+/** A world for its catalogues: the fitting window reads hulls, modules and makers from one. */
+const world = createStarterWorld();
 
 type Side = 'a' | 'b';
 const fits: Record<Side, FitSpec> = {
   a: structuredClone(REFERENCE_FITS[0]!),
   b: structuredClone(REFERENCE_FITS[1]!),
 };
+let active: Side = 'a';
 let duelText = '';
 let exchange = '';
 
@@ -61,30 +66,58 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, 
   return node;
 }
 
-/** Every module that could go in a mount of this type, best match first. */
-function candidates(hull: HullSpec, mountId: string): ModuleSpec[] {
-  const mount = hull.mounts.find((m) => m.id === mountId)!;
-  return Object.values(MODULES)
-    .filter((m) => m.mounts.includes(mount.type))
-    .sort((x, y) => (mountRefusal(mount, x) ? 1 : 0) - (mountRefusal(mount, y) ? 1 : 0) || x.size.localeCompare(y.size) || x.name.localeCompare(y.name));
-}
-
-const REASONS: Record<string, string> = { tooBig: 'too big', wrongMount: 'wrong mount', missingService: 'mount lacks a service it needs' };
-
-function editor(side: Side): HTMLElement {
+/**
+ * The fitting window's context for one side: any module in any slot it
+ * fits, nothing bought, and over-power fits allowed (the problems line and
+ * the power bar say so) so a build can be sketched before it balances.
+ */
+function sideContext(side: Side): FitContext {
   const spec = fits[side];
   const hull = HULLS[spec.hullId]!;
-  const box = h('section', { class: 'fit' });
+  return {
+    hull,
+    fit: spec.fit,
+    ship: null,
+    plan: (mountId, moduleId) => {
+      const mount = hull.mounts.find((m) => m.id === mountId);
+      if (!mount) return { ok: false, reason: 'unknownMount' };
+      if (moduleId === null) return spec.fit[mountId] ? { ok: true } : { ok: false, reason: 'emptyMount' };
+      const module = MODULES[moduleId];
+      if (!module) return { ok: false, reason: 'unknownModule' };
+      if (spec.fit[mountId] === moduleId) return { ok: false, reason: 'alreadyFitted' };
+      const refusal = mountRefusal(mount, module);
+      return refusal ? { ok: false, reason: refusal } : { ok: true };
+    },
+    owned: () => 0,
+    storedHere: null,
+    free: true,
+    key: JSON.stringify([side, spec.hullId, spec.fit]),
+  };
+}
 
-  const name = h('input', { value: spec.name, 'aria-label': `Fit ${side.toUpperCase()} name` });
+/** The bar above the fitting window: which fit is open, its name and hull, loading, saving and moving it as JSON. */
+function controls(): HTMLElement {
+  const spec = fits[active];
+  const box = h('section', { class: 'fit-controls' });
+  const tabs = h('div', { class: 'tabs', role: 'tablist' });
+  for (const side of ['a', 'b'] as Side[]) {
+    const tab = h('button', { type: 'button', role: 'tab', 'aria-selected': String(side === active) }, `Fit ${side.toUpperCase()}: ${fits[side].name}`);
+    tab.addEventListener('click', () => {
+      active = side;
+      render();
+    });
+    tabs.append(tab);
+  }
+
+  const name = h('input', { value: spec.name, 'aria-label': 'Fit name' });
   name.addEventListener('change', () => {
     spec.name = name.value;
     render();
   });
-  const hullPick = h('select', { 'aria-label': `Fit ${side.toUpperCase()} hull` });
+  const hullPick = h('select', { 'aria-label': 'Hull' });
   for (const x of Object.values(HULLS)) hullPick.append(h('option', { value: x.id, ...(x.id === spec.hullId ? { selected: '' } : {}) }, `${x.name} (${(x as { class?: string }).class ?? ''}, ${x.sizeClass})`));
   hullPick.addEventListener('change', () => {
-    fits[side] = { name: `New ${HULLS[hullPick.value]!.name}`, hullId: hullPick.value, fit: {} };
+    fits[active] = { name: `New ${HULLS[hullPick.value]!.name}`, hullId: hullPick.value, fit: {} };
     render();
   });
   const refPick = h('select', { 'aria-label': 'Load a reference or saved fit' }, h('option', { value: '' }, 'Load a fit...'));
@@ -93,31 +126,9 @@ function editor(side: Side): HTMLElement {
   refPick.addEventListener('change', () => {
     const v = refPick.value;
     const from = v.startsWith('r') ? REFERENCE_FITS[Number(v.slice(1))] : loadSaved()[Number(v.slice(1))];
-    if (from) fits[side] = structuredClone(from);
+    if (from) fits[active] = structuredClone(from);
     render();
   });
-  box.append(h('h2', {}, `Fit ${side.toUpperCase()}`), name, hullPick, refPick);
-
-  // One row per mount, grouped by mount type in hull order.
-  const table = h('table', { class: 'slots' });
-  for (const mount of hull.mounts) {
-    const pick = h('select', { 'aria-label': `${mount.id} ${mount.type} ${mount.size}` }, h('option', { value: '' }, '(empty)'));
-    for (const m of candidates(hull, mount.id)) {
-      const refusal = mountRefusal(mount, m);
-      pick.append(h('option', { value: m.id, ...(spec.fit[mount.id] === m.id ? { selected: '' } : {}) }, `${m.name} · ${m.power}p ${m.mass}t ${m.price.toLocaleString('en-GB')}cr${refusal ? ` (won't fit: ${REASONS[refusal] ?? refusal})` : ''}`));
-    }
-    pick.addEventListener('change', () => {
-      if (pick.value) spec.fit[mount.id] = pick.value;
-      else delete spec.fit[mount.id];
-      render();
-    });
-    table.append(h('tr', {}, h('td', { class: 'mount' }, `${mount.id}`), h('td', { class: 'type' }, `${mount.type} ${mount.size}`), h('td', {}, pick)));
-  }
-  box.append(table);
-
-  const problems = fitProblems(cat, spec);
-  box.append(h('p', { class: problems.length ? 'bad' : 'ok' }, problems.length ? `Could not be fitted: ${problems.map((p) => `${p.mountId ?? ''} ${p.reason}`.trim()).join(', ')}` : 'Fits.'));
-
   const save = h('button', { type: 'button' }, 'Save in this browser');
   save.addEventListener('click', () => {
     storeSaved([...loadSaved().filter((f) => f.name !== spec.name), structuredClone(spec)]);
@@ -133,13 +144,16 @@ function editor(side: Side): HTMLElement {
     try {
       const parsed = JSON.parse(exchange) as FitSpec;
       if (!HULLS[parsed.hullId] || typeof parsed.fit !== 'object') throw new Error('not a fit');
-      fits[side] = parsed;
+      fits[active] = parsed;
     } catch {
       alertText = 'That is not a fit.';
     }
     render();
   });
-  box.append(h('div', { class: 'buttons' }, save, exp, imp));
+
+  const problems = fitProblems(cat, spec);
+  const verdict = h('p', { class: problems.length ? 'bad' : 'ok' }, problems.length ? `Could not be fitted in the game: ${problems.map((p) => `${p.mountId ?? ''} ${p.reason}`.trim()).join(', ')}` : 'Fits.');
+  box.append(tabs, h('div', { class: 'row' }, name, hullPick, refPick, save, exp, imp), verdict);
   return box;
 }
 
@@ -211,9 +225,26 @@ function exchangePanel(): HTMLElement {
   return h('section', { class: 'exchange' }, h('h2', {}, 'Fit as JSON'), h('p', {}, 'Export puts a fit here to copy; paste one here and import it into A or B.'), area, h('p', { class: 'bad' }, alertText));
 }
 
+const top = h('div');
+const windowBox = h('section', { class: 'fit-window' });
+const bottom = h('div', { class: 'fitter-below' });
+root.append(top, windowBox, bottom);
+const panel = new OutfittingPanel(windowBox, (request) => {
+  if (request.kind !== 'refit') return; // nothing is bought or sold here
+  const spec = fits[active];
+  const plan = sideContext(active).plan(request.mountId, request.moduleId);
+  if (!plan.ok) {
+    alertText = FIT_REFUSALS[plan.reason];
+  } else if (request.moduleId) spec.fit[request.mountId] = request.moduleId;
+  else delete spec.fit[request.mountId];
+  render();
+});
+
 function render(): void {
   const focusLabel = document.activeElement?.getAttribute('aria-label');
-  root.replaceChildren(h('div', { class: 'fits' }, editor('a'), editor('b')), h('section', { class: 'numbers' }, h('h2', {}, 'Compared'), comparison()), duelPanel(), exchangePanel());
+  top.replaceChildren(controls());
+  panel.update(world, sideContext(active));
+  bottom.replaceChildren(h('section', { class: 'numbers' }, h('h2', {}, 'Compared'), comparison()), duelPanel(), exchangePanel());
   alertText = '';
   // Keep keyboard focus on the control that was used.
   if (focusLabel) root.querySelector<HTMLElement>(`[aria-label="${CSS.escape(focusLabel)}"]`)?.focus();

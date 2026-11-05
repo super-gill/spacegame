@@ -7,6 +7,10 @@
   --faint: #1f3532;
   --good: #8fd18f;
   --bad: #e06c5a;
+  /* What the shared fitting window (fitting-window.css) reads. */
+  --warn: #e0a458;
+  --alarm: #ff5c5c;
+  --panel: rgba(12, 24, 24, 0.6);
   --font: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 }
 
@@ -50,24 +54,48 @@ h2 {
 .fitter {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
 }
 
-.fits {
+.fit-controls .tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.fit-controls [role='tab'][aria-selected='true'] {
+  color: var(--ink-bright);
+  border-color: var(--ink-dim);
+}
+
+.fit-controls .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fit-controls p {
+  margin: 8px 0 0;
+}
+
+.fitter-below {
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
 }
 
-.fits,
-.duel,
-.exchange {
-  grid-column: 1;
+.fitter-below .numbers {
+  grid-row: 1 / span 2;
 }
 
-.numbers {
-  grid-column: 2;
-  grid-row: 1 / span 3;
+@media (max-width: 900px) {
+  .fitter-below {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fitter-below .numbers {
+    grid-row: auto;
+  }
 }
 
 section {
@@ -85,13 +113,6 @@ button {
   background: #0b1214;
   border: 1px solid var(--faint);
   padding: 3px 6px;
-}
-
-.fit > input,
-.fit > select {
-  display: block;
-  width: 100%;
-  margin-bottom: 6px;
 }
 
 button {
@@ -118,20 +139,6 @@ th {
   padding: 2px 4px;
   text-align: left;
   vertical-align: middle;
-}
-
-.slots select {
-  width: 100%;
-}
-
-.slots .mount {
-  color: var(--ink-bright);
-  width: 3em;
-}
-
-.slots .type {
-  color: var(--ink-dim);
-  white-space: nowrap;
 }
 
 .compare th {
@@ -184,4 +191,8 @@ pre {
     grid-column: 1;
     grid-row: auto;
   }
+}
+
+.muted {
+  color: var(--ink-dim);
 }

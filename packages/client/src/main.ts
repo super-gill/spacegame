@@ -67,7 +67,7 @@ import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
 import { SLOT_ACTIONS } from './bindings.js';
 import { MarketPanel, type TradeRequest } from './market-panel.js';
-import { FIT_REFUSALS, FLIGHT_WARNINGS, OutfittingPanel, type RefitRequest } from './outfitting-panel.js';
+import { FIT_REFUSALS, FLIGHT_WARNINGS, OutfittingPanel, stationFitContext, type RefitRequest } from './outfitting-panel.js';
 import {
   COLOUR,
   drawExplosion,
@@ -898,7 +898,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
 
   if (mine?.state === 'docked') {
     if (ui.dockTab === 'market') market.update(current, me.id);
-    else if (ui.dockTab === 'outfitting') outfitting.update(current, me.id);
+    else if (ui.dockTab === 'outfitting') outfitting.update(current, stationFitContext(current, me.id));
     else if (ui.dockTab === 'shipMart') shipMart.update(current, me.id);
     else yourShips.update(current, me.id);
   } else {

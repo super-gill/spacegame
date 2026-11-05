@@ -247,6 +247,51 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Turret dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },
 ];
 
+/**
+ * What the fitting window works on (docs/fitting.md, "The fitting
+ * window"): a docked ship at a station, with storage and money
+ * (`stationFitContext`), or a free fit in the fitter, where any module goes
+ * in any slot it fits and nothing is bought.
+ */
+export interface FitContext {
+  hull: HullSpec;
+  fit: Readonly<Record<string, string>>;
+  /** The ship, for its hold in the budgets; null in the fitter. */
+  ship: Ship | null;
+  /** Whether a change can be made, and if not, why. */
+  plan(mountId: string, moduleId: string | null): { ok: true } | { ok: false; reason: FitRefusal };
+  /** How many of a module are stored here; always 0 in the fitter. */
+  owned(moduleId: string): number;
+  /** Modules stored here, to sell; null where there is no storage (the fitter). */
+  storedHere: Readonly<Record<string, number>> | null;
+  /** True in the fitter: Fit just fits, nothing is bought or sold. */
+  free: boolean;
+  /** Changes whenever anything the window shows changes. */
+  key: string;
+}
+
+/** The fitting window's context for a pilot's docked ship; null if there is none. */
+export function stationFitContext(world: World, pilotId: string): FitContext | null {
+  const pilot = world.pilots[pilotId];
+  const ship = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
+  const hull = ship ? world.hulls[ship.hullId] : undefined;
+  if (!pilot || !ship || !hull) return null;
+  const stationId = ship.dockedAt ?? '';
+  return {
+    hull,
+    fit: ship.fit,
+    ship,
+    plan: (mountId, moduleId) => {
+      const r = planRefit(world, pilotId, mountId, moduleId);
+      return r.ok ? { ok: true } : { ok: false, reason: r.reason };
+    },
+    owned: (moduleId) => storedCount(pilot, stationId, moduleId),
+    storedHere: pilot.storage[stationId] ?? {},
+    free: false,
+    key: JSON.stringify([ship.id, ship.dockedAt, pilot.credits, pilot.storage, ship.fit, ship.hold]),
+  };
+}
+
 export class OutfittingPanel {
   private readonly root: HTMLDivElement;
   private readonly header: HTMLDivElement;
@@ -261,7 +306,7 @@ export class OutfittingPanel {
   /** The change being pointed at: a module for a mount, or null module for "remove". */
   private preview: { mountId: string; moduleId: string | null } | null = null;
   private world: World | null = null;
-  private pilotId = '';
+  private ctx: FitContext | null = null;
 
   constructor(
     container: HTMLElement,
@@ -298,25 +343,23 @@ export class OutfittingPanel {
   }
 
   /** Redraw if anything shown has changed. Cheap to call every frame. */
-  update(world: World, pilotId: string): void {
+  update(world: World, ctx: FitContext | null): void {
     this.world = world;
-    this.pilotId = pilotId;
-    const pilot = world.pilots[pilotId];
-    const ship = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
-    const hull = ship ? world.hulls[ship.hullId] : undefined;
-    if (!pilot || !ship || !hull) return;
+    this.ctx = ctx;
+    if (!ctx) return;
+    const hull = ctx.hull;
     if (this.selected && !hull.mounts.some((m) => m.id === this.selected)) this.selected = null;
     // Open on the first high slot, so the window starts somewhere useful.
     if (!this.selected) this.selected = hull.mounts.find((m) => m.type === 'high')?.id ?? hull.mounts[0]?.id ?? null;
 
-    const signature = JSON.stringify([ship.id, ship.dockedAt, pilot.credits, pilot.storage, ship.fit, ship.hold, this.selected]);
+    const signature = JSON.stringify([hull.id, ctx.key, this.selected]);
     if (signature === this.signature) return;
     this.signature = signature;
     this.preview = null;
     this.renderHeader(world, hull);
-    this.renderRails(world, hull, ship.fit);
-    this.renderPicker(world, hull, ship.fit);
-    this.renderStorage(world, ship.dockedAt);
+    this.renderRails(world, hull, ctx.fit);
+    this.renderPicker(world, hull, ctx.fit);
+    this.renderStorage(world);
     this.renderPreview();
   }
 
@@ -328,7 +371,7 @@ export class OutfittingPanel {
   private select(mountId: string): void {
     this.selected = mountId;
     this.invalidate();
-    if (this.world) this.update(this.world, this.pilotId);
+    if (this.world) this.update(this.world, this.ctx);
   }
 
   private setPreview(preview: { mountId: string; moduleId: string | null } | null): void {
@@ -346,22 +389,23 @@ export class OutfittingPanel {
   /** Redraw the drawing, the bars and the numbers for the current fit or the previewed change. */
   private renderPreview(): void {
     const world = this.world;
-    const ship = world?.ships[world.pilots[this.pilotId]?.shipId ?? ''];
-    const hull = ship && world ? world.hulls[ship.hullId] : undefined;
-    if (!world || !ship || !hull) return;
+    const ctx = this.ctx;
+    if (!world || !ctx) return;
+    const { hull, ship } = ctx;
+    const cargo = ship ? cargoMass(ship, world.goods) : 0;
 
-    const now = shipStats(world, ship);
-    let fit = ship.fit;
+    const now = ship ? shipStats(world, ship) : fitStats(world, hull, ctx.fit, 0);
+    let fit = ctx.fit;
     let after: ShipStats | null = null;
     if (this.preview) {
       // Preview even a change the rules refuse, so the pilot can see why
       // (power spare going negative, cargo falling below what is aboard).
       const { mountId, moduleId } = this.preview;
-      const changed = { ...ship.fit };
+      const changed = { ...ctx.fit };
       if (moduleId) changed[mountId] = moduleId;
       else delete changed[mountId];
       fit = changed;
-      after = fitStats(world, hull, changed, cargoMass(ship, world.goods));
+      after = fitStats(world, hull, changed, cargo);
     }
     this.drawShip(hull, fit);
     this.renderBudgets(world, ship, now, after);
@@ -381,8 +425,8 @@ export class OutfittingPanel {
   }
 
   /** Power, capacitor, mass, cargo and ore hold as bars; a preview outlines the power it would use. */
-  private renderBudgets(world: World, ship: Ship, now: ShipStats, after: ShipStats | null): void {
-    const use = holdUse(ship, now, world.goods);
+  private renderBudgets(world: World, ship: Ship | null, now: ShipStats, after: ShipStats | null): void {
+    const use = ship ? holdUse(ship, now, world.goods) : { ore: { used: 0, capacity: now.oreCapacity }, cargo: { used: 0, capacity: now.cargoCapacity } };
     const bar = (label: string, value: string, note: string, fill: number, colour: string, outline: number | null, outlineBad: boolean): HTMLElement => {
       const box = el('div', 'fit-budget');
       const top = el('div', 'fit-budget-top');
@@ -512,9 +556,7 @@ export class OutfittingPanel {
   }
 
   private clickDrawing(e: MouseEvent): void {
-    const world = this.world;
-    const ship = world?.ships[world.pilots[this.pilotId]?.shipId ?? ''];
-    const hull = ship && world ? world.hulls[ship.hullId] : undefined;
+    const hull = this.ctx?.hull;
     if (!hull) return;
     // The canvas may be drawn smaller than its pixel size: map back.
     const rect = this.canvas.getBoundingClientRect();
@@ -622,9 +664,10 @@ export class OutfittingPanel {
           : `Takes ${tier} modules up to ${mount.size}.`;
     head.append(el('div', 'muted', detail));
     const fittedLine = el('div', 'fit-picker-fitted', `Fitted: ${current?.name ?? 'nothing'}`);
+    const ctx = this.ctx!;
     if (current && !hull.sealed) {
-      const plan = planRefit(world, this.pilotId, mount.id, null);
-      const remove = el('button', undefined, 'Unfit to storage');
+      const plan = ctx.plan(mount.id, null);
+      const remove = el('button', undefined, ctx.free ? 'Unfit' : 'Unfit to storage');
       remove.type = 'button';
       remove.disabled = !plan.ok;
       if (!plan.ok) remove.title = FIT_REFUSALS[plan.reason];
@@ -637,17 +680,17 @@ export class OutfittingPanel {
     box.append(head);
     if (hull.sealed) return;
 
-    const pilot = world.pilots[this.pilotId];
-    const stationId = world.ships[pilot?.shipId ?? '']?.dockedAt ?? '';
     const options = Object.values(world.modules)
       .filter((m) => mountRefusal(mount, m) === null && m.id !== current?.id)
       .sort((a, b) => a.kind.localeCompare(b.kind) || a.size.localeCompare(b.size) || a.price - b.price);
-    const stored = options.filter((m) => (pilot ? storedCount(pilot, stationId, m.id) : 0) > 0);
-    box.append(el('h2', undefined, 'In storage here'));
-    if (stored.length === 0) box.append(el('p', 'muted', 'Nothing stored here fits this slot.'));
-    for (const m of stored) box.append(this.moduleRow(world, mount, m, pilot ? storedCount(pilot, stationId, m.id) : 0));
-    box.append(el('h2', undefined, 'For sale here'));
-    if (options.length === 0) box.append(el('p', 'muted', 'Nothing on sale fits this slot.'));
+    if (!ctx.free) {
+      const stored = options.filter((m) => ctx.owned(m.id) > 0);
+      box.append(el('h2', undefined, 'In storage here'));
+      if (stored.length === 0) box.append(el('p', 'muted', 'Nothing stored here fits this slot.'));
+      for (const m of stored) box.append(this.moduleRow(world, mount, m, ctx.owned(m.id)));
+    }
+    box.append(el('h2', undefined, ctx.free ? 'Everything that fits' : 'For sale here'));
+    if (options.length === 0) box.append(el('p', 'muted', ctx.free ? 'Nothing fits this slot.' : 'Nothing on sale fits this slot.'));
     const list = el('div', 'fit-list');
     for (const m of options) list.append(this.moduleRow(world, mount, m, 0));
     box.append(list);
@@ -655,14 +698,24 @@ export class OutfittingPanel {
 
   /** One module the selected slot takes: what it is, its costs, and its buttons. `owned` > 0 for a stored one. */
   private moduleRow(world: World, mount: MountPoint, m: ModuleSpec, owned: number): HTMLElement {
-    const plan = planRefit(world, this.pilotId, mount.id, m.id);
+    const ctx = this.ctx!;
+    const plan = ctx.plan(mount.id, m.id);
     const row = el('div', 'fit-module');
     row.title = describeModule(m, world);
     const info = el('div', 'fit-module-info');
     const smaller = m.size !== mount.size ? ' · undersized, no hull bonus' : '';
     info.append(el('span', 'fit-module-name', m.name), el('span', 'muted fit-module-does', `${moduleType(m, world)} · ${m.power ? `${m.power} power` : m.stats.powerOutput ? `+${m.stats.powerOutput} power` : 'no power'} · ${fixed1(m.mass)} t${smaller}`));
     const actions = el('div', 'fit-module-actions');
-    if (owned > 0) {
+    if (ctx.free) {
+      // The fitter: a price for reference, and Fit.
+      actions.append(el('span', 'fit-module-price', credits(m.price)));
+      if (plan.ok) {
+        const b = el('button', undefined, 'Fit');
+        b.type = 'button';
+        b.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: m.id }));
+        actions.append(b);
+      } else actions.append(el('span', 'refused', FIT_REFUSALS[plan.reason]));
+    } else if (owned > 0) {
       actions.append(el('span', 'muted', `×${owned}`));
       if (plan.ok) {
         const b = el('button', undefined, 'Fit');
@@ -690,12 +743,12 @@ export class OutfittingPanel {
     return row;
   }
 
-  /** Modules the pilot owns in storage at this station, with a Sell button each. */
-  private renderStorage(world: World, stationId: string | null): void {
+  /** Modules the pilot owns in storage at this station, with a Sell button each; nothing in the fitter. */
+  private renderStorage(world: World): void {
     const box = this.storageBox;
     box.replaceChildren();
-    const pilot = world.pilots[this.pilotId];
-    const here = stationId && pilot ? (pilot.storage[stationId] ?? {}) : {};
+    const here = this.ctx?.storedHere;
+    if (!here) return;
     // Goods kept here are shown in the hold panel; this is the modules.
     const ids = Object.keys(here)
       .filter((id) => world.modules[id])
