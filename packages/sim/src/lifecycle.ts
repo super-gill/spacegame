@@ -188,7 +188,13 @@ export interface LootStep {
 
 /** Loose loot comes to rest against its local frame with this time constant, seconds, so nothing wanders off. */
 export const LOOT_SETTLE_SECONDS = 2;
-/** A tractor with no room parks loot this far beyond the hull, units, and holds it there. */
+/**
+ * A tractor with no room gathers canisters only while its ship is all but
+ * still against its frame (below this speed, units/s), bringing them to
+ * rest this far beyond the hull, units. Moving off lets them go: a full
+ * ship never drags loot.
+ */
+export const GATHER_SPEED = 10;
 export const TRACTOR_PARK_GAP = 40;
 /** An ore hopper spits its filtered ore out astern at this speed, units/s, relative to the ship. */
 export const HOPPER_EJECT_SPEED = 30;
@@ -197,10 +203,10 @@ export const HOPPER_EJECT_SPEED = 30;
  * Drift loot, pull it towards ships running a tractor beam, and scoop
  * anything that reaches a hull into that ship's hold (`holdSpaceFor`, so
  * ore can use an ore hopper's space). When two beams reach the same
- * canister, the nearer ship wins it. A ship with no room for a canister
- * still catches it and parks it just off the hull, held there while the
- * beam runs (docs/mining.md); one with some room takes what fits and
- * parks the rest. A ship's ore hopper takes every canister in, but spits
+ * canister, the nearer ship wins it. A tractor never drags loot it has
+ * no room for (docs/mining.md): a ship with a full hold that is sitting
+ * still gathers canisters into a bunch at rest beside it; once it moves
+ * off, the beam lets them go and they stay where they are. A ship's ore hopper takes every canister in, but spits
  * its filter's ore straight back out astern, and that ship's tractor
  * leaves those rejects alone afterwards. With the gravity rule off, free loot slows to rest against
  * its local frame.
@@ -216,6 +222,10 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     .filter((s) => s.tractorActive && s.state === 'flying' && stats[s.id])
     .sort((a, b) => (a.id < b.id ? -1 : 1));
   const settle = Math.exp(-world.dt / LOOT_SETTLE_SECONDS);
+  // The frame as it was when this tick's velocities were set (the world passed in has already ticked).
+  const before = { ...world, tick: world.tick - 1 };
+  const frameAt = (p: Vec2): Vec2 => frameVelocity(before, { position: p, dockedAt: null });
+  const still = new Set(beams.filter((s) => distance(s.velocity, frameAt(s.position)) < GATHER_SPEED).map((s) => s.id));
 
   for (const item of world.loot) {
     if (item.ticksLeft <= 1) continue;
@@ -225,6 +235,8 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     let best = Infinity;
     for (const s of beams) {
       if (s.hopperEject === item.item && item.ejectedBy === s.id) continue; // its own reject: left alone
+      // No room for it: gather it only while sitting still (the hopper's filter ore still goes in, to be spat out).
+      if (s.hopperEject !== item.item && !still.has(s.id) && holdSpaceFor(updated[s.id]!, stats[s.id]!, world.goods, item.item) <= 0) continue;
       const d = distance(s.position, item.position);
       if (d <= stats[s.id]!.tractorRange && d <= best) {
         best = d;
@@ -259,17 +271,22 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
         updated[puller.id] = { ...current, hold };
         events.push({ type: 'lootCollected', shipId: puller.id, item: item.item, amount: taken });
         if (taken === item.amount) continue;
-        // The hold is now full: the rest is parked like any canister there is no room for.
+        // The hold is now full: the rest stays where it is.
         remaining = { ...item, amount: item.amount - taken };
+        velocity = frameAt(item.position);
+      } else if (room <= 0) {
+        // Full and sitting still: draw it in, and stop it beside the hull.
+        const frame = frameAt(item.position);
+        const towards = normalise(sub(puller.position, item.position));
+        velocity = best > radius + TRACTOR_PARK_GAP ? add(frame, scale(towards, Math.min(stats[puller.id]!.tractorPull, (best - radius - TRACTOR_PARK_GAP) / world.dt))) : frame;
+      } else {
+        const towards = normalise(sub(puller.position, item.position));
+        velocity = add(puller.velocity, scale(towards, stats[puller.id]!.tractorPull));
       }
-      const towards = normalise(sub(puller.position, item.position));
-      // No room: hold it just off the hull instead of scooping it.
-      const parked = room <= 0 || remaining !== item;
-      velocity = parked && best <= radius + TRACTOR_PARK_GAP ? puller.velocity : add(puller.velocity, scale(towards, stats[puller.id]!.tractorPull));
     } else if (!world.rules.gravity) {
       // In flat space loose loot comes to rest; with gravity on it falls as it should.
       // The frame as it was when this velocity was set: the start of the tick (the world passed in has already ticked).
-      const frame = frameVelocity({ ...world, tick: world.tick - 1 }, { position: item.position, dockedAt: null });
+      const frame = frameAt(item.position);
       velocity = add(frame, scale(sub(velocity, frame), settle));
     }
 

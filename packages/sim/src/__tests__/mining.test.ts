@@ -249,13 +249,22 @@ describe('making the light ship pay', () => {
     }
   });
 
-  it('with no room, the tractor parks canisters beside the ship instead of scooping them', () => {
+  it('with no room, a ship sitting still gathers canisters beside it; moving off leaves them behind', () => {
     let w = setup(testRock({ contents: { ore: 500 } }));
     const stats = shipStats(w, w.ships['s']!);
     w = { ...w, ships: { s: { ...w.ships['s']!, hold: { ore: holdCapacity(stats) } } } };
     w = run(w, 20, { fireFixed: true, tractor: true }).w;
     expect(w.loot.length).toBeGreaterThan(0);
     for (const l of w.loot) expect(Math.hypot(l.position.x - w.ships['s']!.position.x, l.position.y - w.ships['s']!.position.y)).toBeLessThanOrEqual(stats.radius + 45);
+
+    // Fly off with the tractor still on: the bunch stays where it is.
+    const pile = w.loot.map((l) => ({ ...l.position }));
+    const start = { ...w.ships['s']!.position };
+    const away = { x: -Math.cos(w.ships['s']!.heading) * 60, y: -Math.sin(w.ships['s']!.heading) * 60 };
+    w = { ...w, ships: { s: { ...w.ships['s']!, velocity: away, flightMode: 'manual' } } };
+    w = run(w, 6, { tractor: true }).w;
+    expect(Math.hypot(w.ships['s']!.position.x - start.x, w.ships['s']!.position.y - start.y)).toBeGreaterThan(200);
+    w.loot.forEach((l, i) => expect(Math.hypot(l.position.x - pile[i]!.x, l.position.y - pile[i]!.y)).toBeLessThan(3));
   });
 
   it('a cache takes the ore aboard and the loose ore nearby, and lasts an hour', () => {

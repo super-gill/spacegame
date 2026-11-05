@@ -19,7 +19,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ### Changed
 - Save format version 7: saves upgrade automatically, and their rocks are given ore.
 - Plain ore is now called Nickel-iron, what the Scree is made of.
-- Freed ore stays where it was cut and lasts 10 minutes; with gravity off, loose loot comes to rest. A tractor with a full hold parks canisters beside you instead of losing them.
+- Freed ore stays where it was cut and lasts 10 minutes; with gravity off, loose loot comes to rest. With a full hold, a tractor gathers canisters into a bunch beside you while you sit still, and leaves the bunch where it is when you move off.
 - Lasers free ore in the rock's mix, so richer ore comes out from the first canister.
 - The prospector carries 20 units of cargo plus 40 of ore.
 - Station ship marts refresh from the game's data when a save loads.

@@ -353,6 +353,7 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-05, lead (Lead 3): a full tractor no longer drags canisters (Jason): it gathers them into a bunch at rest beside a ship sitting still, and lets them go when the ship moves (`GATHER_SPEED` 10 u/s).
 - 2026-11-05, lead (Lead 3): the ore hopper now takes every canister in and spits its filtered ore out astern (Jason: the old filter left canisters in place, which read as the tractor failing). `Loot.ejectedBy`, `oreEjected`.
 - 2026-11-04, lead (Lead 3): light ship mechanics, on Jason's call that the prospector earned too little and the fix should be a mechanic: freed ore in the rock's mix, soft rock cuts faster, seams, the ore hopper with a filter (tile), caches (J, an hour), freed ore at rest, loose loot settling with gravity off, and a full tractor parking canisters. The prospector carries a Hopper S (60 units for ore). 364 sim and 25 client tests; play checked: cutting on the seam, a full hold parking canisters, a cache dropped. **For the interface workstream:** seam arcs, cache rings and radar squares, and the hopper tile are lead stopgaps.
 - 2026-11-04, lead (Lead 3): after Jason's first mining playtest (the hold filled too fast): plain ore renamed Nickel-iron (lore: the Scree is nickel-iron and ice; id stays `ore`); mining lasers halved (S 0.75 ore a second) and the prospector's hold doubled to 40, so filling takes about 45 seconds; HOLD FULL on the tractor tile and a one-time toast.
