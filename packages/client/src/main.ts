@@ -1,28 +1,18 @@
 import {
+  applyCommand,
+  type CommandOutcome,
+  type PilotCommand,
   activationSlots,
-  adminGrantCredits,
-  adminSpawnShip,
-  adminSetRule,
   type AdminRefusal,
-  boardShip,
-  stepOut,
   stepOutRefusal,
   type StepOutRefusal,
   boardableShips,
-  buyShip,
-  claimStarterShip,
   isEmptyShip,
   STARTER_STATION_ID,
   occupiedPads,
   type WorldEvent,
-  buyGood,
   createStarterWorld,
-  fitModule,
-  sellModule,
-  buyModule,
-  unfitModule,
   distance,
-  sellGood,
   type TradeRefusal,
   joinPilot,
   leadPoint,
@@ -34,10 +24,7 @@ import {
   SEAM_HALF_ARC,
   BLAST_RADIUS,
   rockAt,
-  storeGoods,
-  takeGoods,
   type HangarRefusal,
-  type HangarResult,
   lootClaim,
   hopperRejects,
   tractorTakes,
@@ -45,7 +32,6 @@ import {
   navReadout,
   nearestDockableStation,
   pilotShip,
-  wakePilot,
   flightWarnings,
   shipStats,
   stepWorld,
@@ -166,8 +152,8 @@ const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120
   setHopper: (drop) => input.requestHopperDrop(drop),
   pressTile: (mountId) => input.requestToggleModule(mountId),
   dropCache: () => input.requestDropCache(),
-  store: (good, quantity) => hangar(storeGoods(current, me.id, good, quantity)),
-  take: (good, quantity) => hangar(takeGoods(current, me.id, good, quantity)),
+  store: (good, quantity) => send({ type: 'storeGoods', good, quantity }),
+  take: (good, quantity) => send({ type: 'takeGoods', good, quantity }),
 });
 const dronePanel = new DronePanel(windows.add('drones', 'Drones', 'N', { x: 330, y: 120 }), (command) => input.requestDroneCommand(command));
 const targetCard = new TargetCard(
@@ -206,95 +192,110 @@ const HANGAR_REFUSALS: Record<HangarRefusal, string> = {
   space: 'Not enough room in the hold.',
 };
 
-/** Pilot command: move goods between the hold and station storage. */
-function hangar(r: HangarResult): void {
-  if (!r.ok) {
-    ui.notify(HANGAR_REFUSALS[r.reason], 'warn');
+/**
+ * Pilot commands (docs/shared-world.md). Everything the pilot asks for
+ * that is not flying goes through `send` as a `PilotCommand`, and its
+ * outcome comes back to `received`. For now the command is applied here
+ * in the page; with the server, `send` puts it on the wire and the
+ * server's reply arrives at `received`, so nothing else changes.
+ */
+function send(command: PilotCommand): void {
+  received(command, applyCommand(current, me.id, command));
+}
+
+/** Why a command was refused, in the pilot's words, by the command that was refused. */
+function refusalText(command: PilotCommand, reason: string): string | null {
+  const table: Record<string, string> | null = (() => {
+    switch (command.type) {
+      case 'buyGood':
+      case 'sellGood':
+        return REFUSALS;
+      case 'storeGoods':
+      case 'takeGoods':
+        return HANGAR_REFUSALS;
+      case 'fitModule':
+      case 'unfitModule':
+      case 'buyModule':
+      case 'sellModule':
+        return FIT_REFUSALS;
+      case 'buyShip':
+        return BUY_REFUSALS;
+      case 'boardShip':
+        return BOARD_REFUSALS;
+      case 'stepOut':
+        return STEP_OUT_REFUSALS;
+      case 'adminGrantCredits':
+      case 'adminSetRule':
+      case 'adminSpawnShip':
+        return ADMIN_REFUSALS;
+      // The buttons for these only show when they would work.
+      case 'claimStarter':
+      case 'wake':
+        return null;
+    }
+  })();
+  return table ? (table[reason] ?? `Refused: ${reason}.`) : null;
+}
+
+/** A command's outcome: the new world and a toast, or why it was refused. */
+function received(command: PilotCommand, outcome: CommandOutcome): void {
+  if (!outcome.ok) {
+    const text = refusalText(command, outcome.reason);
+    if (text) ui.notify(text, 'warn');
     return;
   }
-  current = r.world;
-  if (r.event.type === 'goodsStored' || r.event.type === 'goodsTaken') {
-    const name = current.goods[r.event.good]?.name ?? r.event.good;
-    ui.notify(`${r.event.type === 'goodsStored' ? 'Stored' : 'Loaded'} ${r.event.quantity} ${name}`);
+  // Treat the new state as the previous one too, so nothing interpolates
+  // from where it was (boarding can move us into another ship far away).
+  current = outcome.world;
+  previous = current;
+  const e = outcome.event;
+  const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
+  const moduleName = (id: string) => current.modules[id]?.name ?? id;
+  const goodName = (id: string) => current.goods[id]?.name ?? id;
+  if (e.type === 'traded') {
+    ui.notify(`${e.side === 'buy' ? 'Bought' : 'Sold'} ${e.quantity} ${goodName(e.good)} for ${cr(e.quantity * e.unitPrice)}`);
+  } else if (e.type === 'goodsStored' || e.type === 'goodsTaken') {
+    ui.notify(`${e.type === 'goodsStored' ? 'Stored' : 'Loaded'} ${e.quantity} ${goodName(e.good)}`);
+  } else if (e.type === 'fitted') {
+    const stored = e.replaced ? `; ${moduleName(e.replaced)} to storage` : '';
+    ui.notify(e.bought ? `Bought and fitted ${moduleName(e.moduleId)} for ${cr(e.cost)}${stored}` : `Fitted ${moduleName(e.moduleId)} from storage${stored}`);
+  } else if (e.type === 'moduleBought') {
+    ui.notify(`Bought ${e.quantity} ${moduleName(e.moduleId)} into storage here for ${cr(e.cost)}`);
+  } else if (e.type === 'unfitted') {
+    ui.notify(`Unfitted ${moduleName(e.moduleId)} to storage`);
+  } else if (e.type === 'moduleSold') {
+    ui.notify(`Sold ${moduleName(e.moduleId)} for ${cr(e.credits)}`);
+  } else {
+    ui.announce(current, e);
+  }
+  // Waking puts us somewhere new: look there.
+  if (command.type === 'wake') {
+    const ship = myShip(current);
+    if (ship) camera.snapTo(ship.position);
   }
 }
 
 /** Pilot command: buy or sell at the station we are docked at. */
 function trade(request: TradeRequest): void {
-  const r = request.side === 'buy'
-    ? buyGood(current, me.id, request.good, request.quantity)
-    : sellGood(current, me.id, request.good, request.quantity);
-  if (!r.ok) {
-    ui.notify(REFUSALS[r.reason], 'warn');
-    return;
-  }
-  current = r.world;
-  if (r.event.type === 'traded') {
-    const name = current.goods[r.event.good]?.name ?? r.event.good;
-    const total = r.event.quantity * r.event.unitPrice;
-    ui.notify(`${r.event.side === 'buy' ? 'Bought' : 'Sold'} ${r.event.quantity} ${name} for ${total.toLocaleString('en-GB')} cr`);
-  }
+  send({ type: request.side === 'buy' ? 'buyGood' : 'sellGood', good: request.good, quantity: request.quantity });
 }
 
 /** Pilot command: fit, unfit, buy or sell a module at the station we are docked at. */
 function refit(request: RefitRequest): void {
-  const r =
-    request.kind === 'sell'
-      ? sellModule(current, me.id, request.moduleId)
-      : request.kind === 'buy'
-        ? buyModule(current, me.id, request.moduleId)
-        : request.moduleId
-          ? fitModule(current, me.id, request.mountId, request.moduleId)
-          : unfitModule(current, me.id, request.mountId);
-  if (!r.ok) {
-    ui.notify(FIT_REFUSALS[r.reason], 'warn');
-    return;
-  }
-  current = r.world;
-  const e = r.event;
-  const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
-  const name = current.modules[e.type === 'fitted' || e.type === 'unfitted' || e.type === 'moduleSold' || e.type === 'moduleBought' ? e.moduleId : '']?.name;
-  if (e.type === 'fitted') {
-    const stored = e.replaced ? `; ${current.modules[e.replaced]?.name ?? e.replaced} to storage` : '';
-    ui.notify(e.bought ? `Bought and fitted ${name ?? e.moduleId} for ${cr(e.cost)}${stored}` : `Fitted ${name ?? e.moduleId} from storage${stored}`);
-  } else if (e.type === 'moduleBought') {
-    ui.notify(`Bought ${e.quantity} ${name ?? e.moduleId} into storage here for ${cr(e.cost)}`);
-  } else if (e.type === 'unfitted') {
-    ui.notify(`Unfitted ${name ?? e.moduleId} to storage`);
-  } else if (e.type === 'moduleSold') {
-    ui.notify(`Sold ${name ?? e.moduleId} for ${cr(e.credits)}`);
-  }
-}
-
-/**
- * After a pilot command that may have moved us into another ship: toast
- * its event, and treat the new state as the previous one too so nothing
- * interpolates from the old ship's place.
- */
-function commanded(world: World, event: WorldEvent): void {
-  current = world;
-  previous = current;
-  ui.announce(current, event);
+  if (request.kind === 'sell') send({ type: 'sellModule', moduleId: request.moduleId });
+  else if (request.kind === 'buy') send({ type: 'buyModule', moduleId: request.moduleId });
+  else if (request.moduleId) send({ type: 'fitModule', mountId: request.mountId, moduleId: request.moduleId });
+  else send({ type: 'unfitModule', mountId: request.mountId });
 }
 
 /** Pilot command: buy a ship from the ship mart where we are docked. */
 function buy(loadoutId: string): void {
-  const r = buyShip(current, me.id, loadoutId);
-  if (!r.ok) {
-    ui.notify(BUY_REFUSALS[r.reason], 'warn');
-    return;
-  }
-  commanded(r.world, r.event);
+  send({ type: 'buyShip', loadoutId });
 }
 
 /** Pilot command: board a ship we own that nobody is flying. */
 function board(shipId: string): void {
-  const r = boardShip(current, me.id, shipId);
-  if (!r.ok) {
-    ui.notify(BOARD_REFUSALS[r.reason], 'warn');
-    return;
-  }
-  commanded(r.world, r.event);
+  send({ type: 'boardShip', shipId });
 }
 
 /** Words for why the pilot cannot step out. */
@@ -322,12 +323,7 @@ function stepOutPressed(): void {
     return;
   }
   stepOutArmedAt = -Infinity;
-  const r = stepOut(current, me.id);
-  if (!r.ok) {
-    ui.notify(STEP_OUT_REFUSALS[r.reason], 'warn');
-    return;
-  }
-  commanded(r.world, r.event);
+  send({ type: 'stepOut' });
 }
 
 /** B: board the nearest ship we could board right now, or say why nothing is in reach. */
@@ -339,9 +335,7 @@ function boardNearest(): void {
 
 /** Pilot command: in a pod at Harbour, owning nothing, take the free starter Tern. */
 function claimStarter(): void {
-  const r = claimStarterShip(current, me.id);
-  if (!r.ok) return; // the button only shows when the claim would succeed
-  commanded(r.world, r.event);
+  send({ type: 'claimStarter' });
 }
 
 // Start from the saved world if there is one. joinPilot leaves a returning
@@ -420,44 +414,19 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     ui.notify('New world started.');
   },
   grantCredits(amount) {
-    const r = adminGrantCredits(current, me.id, amount);
-    if (!r.ok) {
-      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
-      return;
-    }
-    commanded(r.world, r.event);
+    send({ type: 'adminGrantCredits', amount });
   },
   setManoeuvreSpeed(share) {
-    const r = adminSetRule(current, me.id, 'manoeuvreSpeed', share);
-    if (!r.ok) {
-      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
-      return;
-    }
-    commanded(r.world, r.event);
+    send({ type: 'adminSetRule', rule: 'manoeuvreSpeed', value: share });
   },
   setOrbits(on) {
-    const r = adminSetRule(current, me.id, 'orbits', on);
-    if (!r.ok) {
-      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
-      return;
-    }
-    commanded(r.world, r.event);
+    send({ type: 'adminSetRule', rule: 'orbits', value: on });
   },
   setGravity(on) {
-    const r = adminSetRule(current, me.id, 'gravity', on);
-    if (!r.ok) {
-      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
-      return;
-    }
-    commanded(r.world, r.event);
+    send({ type: 'adminSetRule', rule: 'gravity', value: on });
   },
   spawnShip(loadoutId) {
-    const r = adminSpawnShip(current, me.id, loadoutId);
-    if (!r.ok) {
-      ui.notify(ADMIN_REFUSALS[r.reason], 'warn');
-      return;
-    }
-    commanded(r.world, r.event);
+    send({ type: 'adminSpawnShip', loadoutId });
   },
 }, Object.values(current.loadouts)
   // Escape pods are issued, not flown by choice.
@@ -503,11 +472,7 @@ camera.snapTo(lastSeen);
 
 /** Pilot command: wake at Harbour after losing your escape pod. */
 function respawn(): void {
-  const woke = wakePilot(current, me.id);
-  if (!woke.ok) return;
-  commanded(woke.world, woke.event);
-  const ship = myShip(current);
-  if (ship) camera.snapTo(ship.position);
+  send({ type: 'wake' });
 }
 
 /** Ships that can be targeted from this ship, nearest first. */

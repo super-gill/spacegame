@@ -1,6 +1,6 @@
 # The shared world (milestone 11)
 
-**Status: draft by the lead, 5 November 2026, for Jason to agree before building.** Brought forward after 0.13.0: Jason wants to play in one world with friends.
+**Status: agreed with Jason, 5 November 2026 (his answers are under "Decisions"); building.** Brought forward after 0.13.0: Jason wants to play in one world with friends.
 
 ## Goal
 
@@ -45,18 +45,15 @@ Rough size: a few kilobytes per update near a busy station, tens of kilobytes a 
 
 ### Characters
 
-- On connect, a client shows **character select**: your characters on this server, and "New character" with a name.
-- Each character has a secret token kept in that browser. Two tabs, two characters: that is multiboxing. Another browser or device needs the token, so there is an export and import for it in the menu.
+- On connect, a client shows **character select**: the characters this browser knows, "Log in" with a name and key, and "New character".
+- **A new character** gets a name (the box is filled with a suggested name, which the player can change; names are unique on the server, sensible length, no other rules) and a **key**: a secret the server makes. The key is shown to the player once, plainly, with a copy button and a note to keep it somewhere safe, and it is also kept in this browser's storage so they are not asked every time. Browser storage can be cleared, so the key the player keeps is what gets them back in, from any browser or device.
+- **Multiboxing:** each connection is one character. Two tabs, two characters, playing at the same time. Later, one window may run several characters; nothing here blocks that, because a connection, not a browser, is bound to a character.
+- **The same character twice:** logging in as a character that is already connected disconnects the older connection (it is told why), and the new one takes over.
 - A character is a `Pilot` in the world, with ships, storage and credits, exactly as today. The sim already has no "player": nothing in it changes.
 
-### Single-player
+### No single-player mode
 
-The browser game keeps working on its own, with no server. The client talks to the world through one small interface with two versions:
-
-- **Local:** the sim runs in the page, as today, saved in browser storage.
-- **Remote:** messages to and from the server.
-
-The rest of the client does not know which it has. That keeps one client, keeps offline play and the fitter working, and makes the split easy to test.
+The game is server and client only (Jason). Playing alone means running the server on your own machine. Browser-storage saves and save export in the client go away; the server's save file replaces them. The fitter page stays a standalone tool: it needs no world.
 
 ### Admin
 
@@ -64,7 +61,7 @@ The admin switches (orbits, gravity and so on) work only for the host's characte
 
 ## Order of work
 
-1. **The command boundary, in the browser.** Route every world change in `main.ts` (about fifteen places) through the local version of the interface. No server yet; the game plays exactly as before. Tests for the command messages.
+1. **The command boundary.** Every world change in `main.ts` (about fifteen places) becomes a command message, defined once and applied by one function the server will run. While the server is being built the client applies them through a stand-in in the page, so the game keeps playing exactly as before at every step. Tests for the command messages.
 2. **The server.** `packages/server`: tick loop, HTTP for the client, WebSocket, commands and inputs in, full snapshots out, saving to a file. Playable with two browser tabs on Jason's PC.
 3. **Characters:** select screen, tokens, new character.
 4. **Only what you can see:** updates filtered by sensor range, rocks sent when they change, static data once.
@@ -74,7 +71,17 @@ The admin switches (orbits, gravity and so on) work only for the host's characte
 
 Steps 1 and 2 give a working shared world; 3 to 7 make it good.
 
-## Questions for Jason
+## Decisions (Jason, 5 November 2026)
+
+1. **Logging off in space:** the ship stays where it is for a short while, then disappears until the character returns, and comes back where it was.
+2. **The starting world:** a new world. When the map comes, the world is made again anyway.
+3. **No single-player mode:** server and client only.
+4. **Death and pods:** as now (pod, respawn at Harbour) until law.
+5. **Names:** players choose them; unique on the server; sensible lengths; suggested names fill the boxes.
+6. **Keys:** shown to the player to keep, as well as stored in the browser, so a cleared browser does not lose a character.
+7. **Several characters at once** must not be blocked; the same character logging in twice disconnects the older connection.
+
+## Questions for Jason (answered above)
 
 1. **Logging off in space:** what happens to your ship when you disconnect away from a station? Options: it stays where it is, vulnerable, for a minute and then vanishes until you return (EVE-like); or it stays in space for good; or you can only log off safely when docked.
 2. **The starting world:** does the shared world start fresh, or from your current save (your ships and credits come with you as your character)?

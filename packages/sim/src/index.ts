@@ -181,3 +181,4 @@ export {
   type TickRails,
   type LocalFrame,
 } from './rails.js';
+export { applyCommand, readCommand, type PilotCommand, type CommandOutcome } from './commands.js';
