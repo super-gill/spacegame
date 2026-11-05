@@ -190,12 +190,16 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // lasers for the hulk's mining mounts come with part 2.
   'mining-laser-s': miningLaser('mining-laser-s', 'Mining laser S', 'S', 0.45, 0.75, 4, 260),
   'mining-laser-m': miningLaser('mining-laser-m', 'Mining laser M', 'M', 0.7, 1.3, 8, 300),
+  // Heavy mining turrets for a hulk's mining mounts: each is assigned a
+  // locked rock and cuts it on its own, slewing to keep the beam on it.
+  // Strong enough for any rock in the Scree.
+  'mining-turret-l': miningLaser('mining-turret-l', 'Mining turret L', 'L', 1, 2.2, 10, 480, 0.8),
 };
 
-function miningLaser(id: string, name: string, size: ModuleSize, strength: number, yieldPerSecond: number, capacitorPerSecond: number, range: number): WeaponSpec {
+function miningLaser(id: string, name: string, size: ModuleSize, strength: number, yieldPerSecond: number, capacitorPerSecond: number, range: number, turretTurnRate = 0): WeaponSpec {
   return {
-    id, name, size, kind: 'fixed', family: 'mining', damage: yieldPerSecond, damageType: 'thermal', fireInterval: 1,
-    projectileSpeed: 0, range, turretTurnRate: 0, capacitorPerShot: capacitorPerSecond, ammo: null, magazine: 0, reloadSeconds: 0,
+    id, name, size, kind: turretTurnRate > 0 ? 'turret' : 'fixed', family: 'mining', damage: yieldPerSecond, damageType: 'thermal', fireInterval: 1,
+    projectileSpeed: 0, range, turretTurnRate, capacitorPerShot: capacitorPerSecond, ammo: null, magazine: 0, reloadSeconds: 0,
     mining: { strength },
   };
 }

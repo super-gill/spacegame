@@ -72,6 +72,7 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   flight: 'Flight computer',
   podBay: 'Pod bay',
   fireControl: 'Fire control',
+  mining: 'Mining',
 };
 
 const INK = '#9fd3c7';
@@ -133,6 +134,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   afterburner: 'Afterburner',
   surveyScanner: 'Survey scanner',
   oreHopper: 'Ore hopper',
+  oreHold: 'Ore hold',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -159,7 +161,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.escapePod) parts.push('an escape pod: without one, losing the ship leaves you with nothing');
   if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
   if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
-  if (s.oreCapacity) parts.push(`${s.oreCapacity} units of hold for ore only; its tile sets one ore to spit back out astern`);
+  if (s.oreCapacity) parts.push(`${s.oreCapacity} units of hold for ore only${m.kind === 'oreHopper' ? '; its tile sets one ore to spit back out astern' : ''}`);
   if (s.surveyRange) parts.push(`survey pulse ${s.surveyRange} u for ${s.surveyCost ?? 0} cap: ${(s.surveyGrade ?? 0) >= 2 ? 'names the best ore in each rock' : 'tells rich rock from plain'}`);
   if (m.readouts?.includes('composition')) parts.push('reads what a locked rock holds and how hard it is, not guns');
   if (m.shieldRegenDelay) parts.push(`recharges ${fixed1(m.shieldRegenDelay)} s after a hit`);
@@ -169,6 +171,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
     parts.push(`drops chaff, flares or decoys, holds ${w.magazine}, one every ${fixed1(w.fireInterval)} s`);
     if (m.startsLoadedWith) parts.push(`comes loaded with ${world.goods[m.startsLoadedWith]?.name ?? m.startsLoadedWith}`);
   } else if (w && w.family === 'mining') {
+    if (w.kind === 'turret') parts.push('a mining turret: its tile gives it your active lock\'s rock, and it cuts that rock on its own');
     parts.push(`cuts rock up to ${Math.round((w.mining?.strength ?? 0) * 100)}% hard, ${fixed1(w.damage)} ore/s, range ${Math.round(w.range)}, ${fixed1(w.capacitorPerShot)} cap/s`);
   } else if (w && w.family === 'missile') {
     parts.push(`${Math.round(w.damage)} warhead base, one every ${fixed1(w.fireInterval)} s, needs a lock`);

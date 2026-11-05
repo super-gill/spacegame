@@ -240,6 +240,13 @@ export class FlightHud {
         const full = cargoUsed(ship) >= holdCapacity(shipStats(world, ship));
         setText(tile.state, ship.tractorActive ? (full ? 'HOLD FULL' : 'ON') : 'OFF');
         tile.root.classList.toggle('active', ship.tractorActive);
+      } else if (s.moduleKind === 'weapon') {
+        // A mining turret: the rock it was given, and whether it is cutting.
+        const state = ship.weapons.find((w) => w.mountId === s.mountId);
+        const beam = ship.beams?.find((b) => b.mountId === s.mountId);
+        const rock = state?.lockTarget ?? null;
+        setText(tile.state, !rock ? 'NO ROCK' : beam ? (beam.cutting ? (beam.onSeam ? 'ON SEAM' : 'CUTTING') : 'TOO HARD') : 'OUT OF REACH');
+        tile.root.classList.toggle('active', Boolean(beam?.cutting));
       } else if (s.moduleKind === 'oreHopper') {
         // The hopper's filter: the one ore the tractor leaves behind.
         const eject = ship.hopperEject;
@@ -303,6 +310,11 @@ export class FlightHud {
       if (spec.family === 'countermeasure') {
         setText(tile.state, 'C');
         tile.root.classList.toggle('active', false);
+      } else if (spec.kind === 'turret' && spec.family === 'mining') {
+        // A mining turret: what it is doing with the rock it was given.
+        const beam = ship.beams?.find((b) => b.mountId === mountId);
+        setText(tile.state, !state?.lockTarget ? 'NO ROCK' : beam ? (beam.cutting ? (beam.onSeam ? 'ON SEAM' : 'CUTTING') : 'TOO HARD') : 'OUT OF REACH');
+        tile.root.classList.toggle('active', Boolean(beam?.cutting));
       } else if (spec.kind === 'turret') {
         // Swivels shoot down munitions coming for you whether hot or cold.
         const defending = incomingMunitions(world.munitions, ship.id).length > 0;
@@ -335,7 +347,7 @@ function gunName(weaponId: string): string {
 }
 
 /** Short names for module tiles. */
-const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY', oreHopper: 'HOPPER' };
+const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY', oreHopper: 'HOPPER', weapon: 'TURRET' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
 function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string, weaponId: string): WeaponTile {
@@ -349,8 +361,8 @@ function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : kind === 'fixed' ? gunName(weaponId) : 'SWIVEL');
-  const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : kind === 'fixed' ? 'SPACE' : 'PD');
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : kind === 'fixed' ? gunName(weaponId) : 'SWIVEL');
+  const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : family === 'mining' && kind === 'turret' ? 'NO ROCK' : kind === 'fixed' ? 'SPACE' : 'PD');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);
   return { root, reload, state, ammo };

@@ -818,6 +818,52 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'mining-laser-m',
   },
+  // The hulk's kit (docs/mining.md, "The hulk"). Heavy mining turrets fit
+  // only mining mounts; ore holds fit bays and take only ore.
+  'rookrivet-excavator-l': {
+    id: 'rookrivet-excavator-l',
+    name: 'Rook and Rivet Excavator L',
+    kind: 'weapon',
+    size: 'L',
+    mounts: ['mining'],
+    needs: ['power'],
+    mass: 6,
+    power: 5,
+    price: 9500,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: {},
+    weaponId: 'mining-turret-l',
+  },
+  'rookrivet-orehold-l': {
+    id: 'rookrivet-orehold-l',
+    name: 'Rook and Rivet Ore Hold L',
+    kind: 'oreHold',
+    size: 'L',
+    mounts: ['bay'],
+    needs: [],
+    mass: 4,
+    power: 0,
+    price: 3200,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    // Ore only, but far more of it than a container of the same size.
+    stats: { oreCapacity: 200 },
+  },
+  'rookrivet-reactor-l': {
+    id: 'rookrivet-reactor-l',
+    name: 'Rook and Rivet Furnace L',
+    kind: 'reactor',
+    size: 'L',
+    mounts: ['core', 'internal'],
+    needs: [],
+    mass: 7,
+    power: 0,
+    price: 6000,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: { powerOutput: 40 },
+  },
   // Ore hoppers (internal): hold space only ore may use, and a filter set
   // from its tile for the one ore the tractor leaves behind. Fitting one
   // costs an armour or shield slot.
@@ -1061,6 +1107,23 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['sensor'],
     stats: { maxLocks: 4, scanResolution: 1.5 },
     readouts: ['identity', 'motion', 'condition', 'combat'],
+  },
+  // The hulk's assay: room for many rocks at once, one for each turret and more.
+  'rookrivet-assay-l': {
+    id: 'rookrivet-assay-l',
+    name: 'Rook and Rivet Assay L',
+    kind: 'targetingComputer',
+    size: 'L',
+    mounts: ['computer'],
+    needs: ['power'],
+    mass: 1.5,
+    power: 3,
+    price: 4200,
+    manufacturer: 'rookRivet',
+    capacitorDraw: 0.4,
+    tags: ['sensor', 'mining'],
+    stats: { maxLocks: 8, scanResolution: 0.9 },
+    readouts: ['identity', 'motion', 'composition'],
   },
   // Reads rock, not guns: what a locked rock holds and how hard it is.
   'rookrivet-assay-s': {

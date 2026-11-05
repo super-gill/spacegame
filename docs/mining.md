@@ -64,6 +64,21 @@ Built as a general system so later kinds slot in without rework.
 - **Breach charges are their own kind of mining:** cracking rocks open to reach pockets of particular ores, so a breach rig can target an ore. Designed separately from ordinary hulk mining.
 - **Drones:** Jason's lean is small mining bots that cut ore and bring it back to their parent ship. They are ships in the world (see "Drones"), built as a general system.
 - Cargo today: the prospector has +25% from full-size pods and a Hopper S (40 ore-only); nothing yet is specific to ore beyond the hopper. Ore holds come with the hulk.
+- **Sizes:** the full-size hulk first; the capital-size mining ship later; the middle size last, as a mix of the two.
+- **Drones follow your locks:** the hulk has plenty of locks, so drones can be sent to other locked rocks.
+
+### As built: the hulk (5 November 2026)
+
+- **Rook and Rivet Hulk** (class `hulk`, Free Belt, 85,000 credits, sold at Ridge Outpost; name provisional, a lore ask). Radius 46, the biggest hull that fits the stations' large pads; 2,700 structure, top speed 130, turn 0.45 radians a second, a 600-point capacitor recharging fast. Budget: 1 weapon (a swivel astern), 3 utility, 4 internal, 4 bays, 2 mining mounts. Role bonuses: +25% ore from full-size ore holds, +25% ore cut from full-size mining lasers.
+- **Mining mounts** (mount type `mining`) take only heavy mining turrets, and turn all the way round, so either turret can take any rock.
+- **Rook and Rivet Excavator L** (weapon `mining-turret-l`): a turret, strength 1 (cuts anything in the Scree), 2.2 ore a second (2.75 on the hulk) before the soft-rock and seam bonuses, 10 capacitor a second, range 480 from the hull's centre, slewing 0.8 radians a second.
+- **Assigning:** make a locked rock the active lock and press a turret's tile: that turret takes the rock (`WeaponState.lockTarget`, event `laserAssigned`) and cuts it on its own, with no trigger held, while the rock stays locked and in reach. Press the tile again, or with no rock active, to let it go. Mining turrets never engage ships and do not use fire control. Tiles come right after fire groups; the HUD says CUTTING, ON SEAM, TOO HARD, OUT OF REACH or NO ROCK.
+- **Rook and Rivet Assay L:** eight locks, with composition.
+- **Rook and Rivet Ore Hold L** (bay, kind `oreHold`): 200 ore-only units. Stock fit: four ore holds and a Hopper M, so 1,100 units for ore and no ordinary cargo.
+- **Rook and Rivet Furnace L:** a 40-power reactor; the stock fit adds a medium reactor to run two turrets, the assay and big sensors.
+- **Stock fit** also carries a long-reach tractor (Long Gleaner M), the Deep Dowser M, a chaff dispenser, a shield and armour.
+- **Numbers:** two turrets on big rocks cut about 7 ore a second, more on seams: a full 1,100-unit hold in about two to three minutes, worth about 46,000 at Lantern in nickel-iron alone. Full, it accelerates at about a quarter of its empty rate. To tune in play.
+
 
 ## Decisions (Jason, 4 November 2026)
 

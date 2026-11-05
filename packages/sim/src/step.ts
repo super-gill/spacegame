@@ -15,6 +15,7 @@ import { pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
+import type { Vec2 } from './vec2.js';
 import type { Decoy, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
@@ -83,6 +84,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const surfaces = surfacesNext(world.bodies, rails);
   // The belt's rocks at the end of the tick: solid to ships and shots alike.
   const rockStates = asteroidStates(world.bodies, world.asteroids, world.tick + 1, world.dt);
+  // Rocks by id, for mining turrets and their assignment.
+  const rockIndex = new Map(world.asteroids.map((a, i) => [a.id, i]));
+  const rockFor = (rockId: string): { position: Vec2; radius: number } | null => {
+    const i = rockIndex.get(rockId);
+    return i === undefined ? null : { position: rockStates[i]!.position, radius: world.asteroids[i]!.radius };
+  };
   const rocks: Surface[] = world.asteroids.map((a, i) => ({ bodyId: a.id, position: rockStates[i]!.position, velocity: rockStates[i]!.velocity, radius: a.radius }));
   const solid = [...surfaces, ...rocks];
 
@@ -169,6 +176,16 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
         targeted = pulse.ship;
         events.push(pulse.event);
       }
+      // A mining turret's tile gives it the active lock's rock to cut, or takes it away (pressed again, or with no rock active).
+      const turret = targeted.weapons.find((w) => w.mountId === input.toggleModule);
+      const turretSpec = turret ? stats.weapons[turret.mountId] : undefined;
+      if (turret && turretSpec?.family === 'mining' && turretSpec.kind === 'turret') {
+        const active = targeted.activeLock;
+        const rock = active && rockFor(active) ? active : null;
+        const rockId = rock && turret.lockTarget !== rock ? rock : null;
+        targeted = { ...targeted, weapons: targeted.weapons.map((w) => (w === turret ? { ...w, lockTarget: rockId } : w)) };
+        events.push({ type: 'laserAssigned', shipId: id, mountId: turret.mountId, rockId });
+      }
       // An ore hopper's tile cycles its filter: the one ore the tractor leaves behind.
       if (moduleId && world.modules[moduleId]?.kind === 'oreHopper') {
         const eject = nextHopperFilter(targeted.hopperEject, world.goods);
@@ -204,7 +221,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
 
     const aimer = targeted;
     const threats = incomingMunitions(world.munitions, id);
-    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId, world, threats);
+    const fired = fireWeapons(targeted, stats, input, (w) => weaponTarget(world, aimer, w), world.dt, nextEntityId, world, threats, rockFor);
     nextEntityId += fired.idsUsed;
     newProjectiles.push(...fired.projectiles);
     newMunitions.push(...fired.munitions);

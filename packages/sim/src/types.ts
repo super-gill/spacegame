@@ -27,7 +27,7 @@ export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
  * `computer` (targeting), `flight` (flight computer), `podBay`,
  * `fireControl`, `engine` and `core` (reactor, thrusters).
  */
-export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl';
+export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl' | 'mining';
 
 /**
  * What a mount point provides to the module on it. A module lists the
@@ -227,7 +227,8 @@ export type ModuleKind =
   | 'tractor'
   | 'afterburner'
   | 'surveyScanner'
-  | 'oreHopper';
+  | 'oreHopper'
+  | 'oreHold';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -1314,6 +1315,8 @@ export type WorldEvent =
   | { type: 'oreFreed'; shipId: string; rockId: string; item: string; amount: number }
   /** A ship left a cache of `units` units of ore (its hold's and loose canisters nearby). */
   | { type: 'cacheDropped'; shipId: string; units: number }
+  /** A mining turret was given a rock to cut (its tile, with the rock as the active lock), or let go of one (null). */
+  | { type: 'laserAssigned'; shipId: string; mountId: string; rockId: string | null }
   /** An ore hopper took in a canister of its filtered ore and spat it out astern. */
   | { type: 'oreEjected'; shipId: string; item: string; amount: number }
   /** An ore hopper's filter changed: the ore the tractor now leaves behind, or null for none. */

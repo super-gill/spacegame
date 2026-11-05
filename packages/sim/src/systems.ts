@@ -7,7 +7,8 @@ import { isGun } from './weapons.js';
  *
  * One row of numbered tiles on the HUD, in this order: a tile per fire
  * group that has a gun, launcher or mining laser in it, lowest group
- * first; then a tile per active module on a utility mount (tractor,
+ * first; then a tile per mining turret (assigns it the active lock's
+ * rock); then a tile per active module on a utility mount (tractor,
  * dispenser, survey scanner), in mount order, then per ore hopper (its
  * filter). Number keys 1 to 9 press
  * them: a group tile selects the group (the fire button fires it); a
@@ -42,6 +43,12 @@ export function activationSlots(cat: Catalogues, ship: Ship): ActivationSlot[] {
     if (spec && spec.kind === 'fixed' && (isGun(spec) || spec.family === 'missile' || spec.family === 'mining')) groups.add(w.group);
   }
   const out: ActivationSlot[] = [...groups].sort((a, b) => a - b).map((group) => ({ kind: 'group', group }));
+  // Mining turrets next: each tile gives its turret the active lock's rock.
+  for (const mount of hull.mounts) {
+    const spec = stats.weapons[mount.id];
+    const moduleId = ship.fit[mount.id];
+    if (spec?.family === 'mining' && spec.kind === 'turret' && moduleId) out.push({ kind: 'module', mountId: mount.id, moduleId, moduleKind: 'weapon' });
+  }
   // Utility modules first, then internal ones with a setting (an ore hopper's filter).
   for (const type of ['utility', 'internal'] as const) {
     for (const mount of hull.mounts) {

@@ -421,3 +421,79 @@ describe('saves', () => {
     expect(back.world.rockfall).toEqual(w.rockfall);
   });
 });
+
+describe('the hulk', () => {
+  /** A hulk parked between two rocks, one off each beam: rock a to port, rock b to starboard. */
+  function hulkBetween(): World {
+    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [], rockfall: { made: 0, timerTicks: 1e9 } };
+    const a = testRock({ id: 'a', radius: 60, hardness: 0.8, contents: { ore: 400 }, orbit: { ...testRock().orbit, phase: PHASE - 0.03 } });
+    const b = testRock({ id: 'b', radius: 60, hardness: 0.8, contents: { ore: 300, 'black-ore': 100 }, orbit: { ...testRock().orbit, phase: PHASE + 0.03 } });
+    const w0 = { ...base, asteroids: [a, b] };
+    const pa = rockAt(w0, 'a')!.position;
+    const pb = rockAt(w0, 'b')!.position;
+    const mid = { x: (pa.x + pb.x) / 2, y: (pa.y + pb.y) / 2 };
+    // Nose along the ring, out of the way of both: the rocks sit off the beams.
+    const across = Math.atan2(pb.y - pa.y, pb.x - pa.x);
+    const ship = buildShip(w0, { id: 's', loadout: LOADOUTS['rookrivet-hulk']!, ownerId: null, position: mid, heading: across + Math.PI / 2, flightMode: 'assisted' });
+    return { ...w0, ships: { s: ship } };
+  }
+  const lockAndAssign = (w: World, rockId: string, mountId: string): World => {
+    w = stepWorld(w, { s: { ...emptyInput(), lock: rockId } });
+    w = run(w, 2).w;
+    w = stepWorld(w, { s: { ...emptyInput(), activateLock: rockId } });
+    return stepWorld(w, { s: { ...emptyInput(), toggleModule: mountId } });
+  };
+
+  it('fits within its power, holds 1,100 ore and nothing else, locks eight rocks, and is sold at Ridge', () => {
+    const w = createStarterWorld();
+    const ship = hulkBetween().ships['s']!;
+    const stats = shipStats(w, ship);
+    expect(stats.powerDraw).toBeLessThanOrEqual(stats.powerOutput);
+    expect(stats.oreCapacity).toBe(1100);
+    expect(holdSpaceFor(ship, stats, GOODS, 'food')).toBe(0);
+    expect(stats.maxLocks).toBe(8);
+    expect(w.stations['station-ridge']!.shipMart).toContain('rookrivet-hulk');
+    expect(activationSlots(w, ship).slice(0, 2)).toEqual([
+      { kind: 'module', mountId: 'm1', moduleId: 'rookrivet-excavator-l', moduleKind: 'weapon' },
+      { kind: 'module', mountId: 'm2', moduleId: 'rookrivet-excavator-l', moduleKind: 'weapon' },
+    ]);
+  });
+
+  it('each turret cuts the rock it was assigned, on its own, with no trigger held', () => {
+    let w = hulkBetween();
+    // Which turret faces which rock: m1 is to port.
+    const ship = w.ships['s']!;
+    const pa = rockAt(w, 'a')!.position;
+    const port = Math.sin(Math.atan2(pa.y - ship.position.y, pa.x - ship.position.x) - ship.heading) < 0;
+    w = lockAndAssign(w, 'a', port ? 'm1' : 'm2');
+    expect(w.events).toContainEqual({ type: 'laserAssigned', shipId: 's', mountId: port ? 'm1' : 'm2', rockId: 'a' });
+    w = lockAndAssign(w, 'b', port ? 'm2' : 'm1');
+    const r = run(w, 10, { tractor: true });
+    const left = (id: string): number => oreLeft(r.w.asteroids.find((x) => x.id === id)!);
+    expect(left('a')).toBeLessThan(400);
+    expect(left('b')).toBeLessThan(400);
+    expect(r.w.ships['s']!.beams).toHaveLength(2);
+    expect(oreLeft({ contents: r.w.ships['s']!.hold })).toBeGreaterThan(0);
+  });
+
+  it("a turret's tile pressed again lets its rock go; a turret with no rock does nothing", () => {
+    let w = hulkBetween();
+    const ship = w.ships['s']!;
+    const pa = rockAt(w, 'a')!.position;
+    const mountId = Math.sin(Math.atan2(pa.y - ship.position.y, pa.x - ship.position.x) - ship.heading) < 0 ? 'm1' : 'm2';
+    w = lockAndAssign(w, 'a', mountId);
+    w = stepWorld(w, { s: { ...emptyInput(), toggleModule: mountId } });
+    expect(w.events).toContainEqual({ type: 'laserAssigned', shipId: 's', mountId, rockId: null });
+    const { w: after } = run(w, 5);
+    expect(after.ships['s']!.beams).toBeUndefined();
+    expect(oreLeft(after.asteroids.find((x) => x.id === 'a')!)).toBe(400);
+  });
+
+  it('turrets never engage ships', () => {
+    let w = hulkBetween();
+    w = { ...w, ships: { ...w.ships, s: { ...w.ships['s']!, weaponsHot: true, weapons: w.ships['s']!.weapons.map((x) => ({ ...x, lockTarget: null })) } } };
+    const { w: after } = run(w, 3, { fireFixed: true });
+    expect(after.ships['s']!.beams).toBeUndefined();
+  });
+});
+

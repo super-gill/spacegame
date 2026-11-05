@@ -104,6 +104,40 @@ export const LOADOUTS: Record<string, Loadout> = {
       b1: 'meridian-pod-s',
     },
   },
+  'rookrivet-hulk': {
+    // Sold at Ridge Outpost: two heavy turrets, an eight-rock assay, four
+    // ore holds, a long-reach tractor and a deep survey scanner.
+    id: 'rookrivet-hulk',
+    name: 'Rook and Rivet Hulk, Collective issue',
+    hullId: 'rookrivet-hulk',
+    fit: {
+      n1: 'itomarr-nav-m',
+      r1: 'tessaract-radar-m',
+      t1: 'rookrivet-assay-l',
+      f1: 'itomarr-coxswain-m',
+      x1: 'paragon-director-m',
+      p1: 'meridian-podbay-s',
+      w1: 'paragon-turret-m',
+      m1: 'rookrivet-excavator-l',
+      m2: 'rookrivet-excavator-l',
+      e1: 'slagline-engine-m',
+      e2: 'slagline-engine-m',
+      c1: 'slagline-thrusters-m',
+      c2: 'rookrivet-reactor-l',
+      i1: 'itomarr-shield-m',
+      i2: 'cantorvell-armour-m',
+      i3: 'rookrivet-hopper-m',
+      // A second reactor: the turrets, assay and sensors draw more than the Furnace gives.
+      i4: 'itomarr-reactor-m',
+      u1: 'tessaract-gleaner-m',
+      u2: 'tessaract-survey-m',
+      u3: 'paragon-fairwarning-s',
+      b1: 'rookrivet-orehold-l',
+      b2: 'rookrivet-orehold-l',
+      b3: 'rookrivet-orehold-l',
+      b4: 'rookrivet-orehold-l',
+    },
+  },
   'calder-watch': {
     // The Calder Watch: a Port Authority Warrant fitted to police, not to
     // raid. One heavy fixed gun and a Magazine for the hull's missile

@@ -12,6 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Lock a rock by clicking it. A mining computer (the Assay) reads what it holds and how hard it is.
 - Mining lasers: hold fire on a rock to cut ore free in canisters, and scoop them with the tractor. A laser only cuts rock no harder than it is strong.
 - The Rook and Rivet Prospector, a mining cutter, sold at Ridge Outpost and Harbour.
+- The Rook and Rivet Hulk, a big mining ship sold at Ridge Outpost: two heavy mining turrets, each given its own locked rock to cut, an eight-rock assay, and 1,100 units of ore hold.
 - Three new ores to sell: Banded ore, Black ore and Glintstone. Lantern Works pays best.
 - Soft rock cuts faster, and every rock has a seam: your mining computer shows it, and a beam on it cuts half as fast again.
 - An ore hopper (an internal module): hold space for ore only, and its tile sets one ore it spits back out astern while your tractor takes in everything else. The prospector carries one.

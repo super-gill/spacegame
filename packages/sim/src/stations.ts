@@ -121,7 +121,7 @@ export function ridgeOutpost(): Station {
     outfitting: false,
     pads: padRing(70, ['L', 'S', 'M', 'L', 'S', 'M']),
     // The Collective sells its prospectors to anyone who will dig.
-    shipMart: ['rookrivet-prospector'],
+    shipMart: ['rookrivet-prospector', 'rookrivet-hulk'],
   };
 }
 

@@ -165,7 +165,8 @@ Mining part 1 contracts (on `main` from 4 November 2026; design in `docs/mining.
 - **Locks on rocks** (`locks.ts`): a lock's `targetId` may be a rock id. `weaponTarget` still returns ships only. `LockReadout.composition` (ores, total, hardness, radius) with the `composition` readout.
 - **Mining** (`mining.ts`, `combat.ts`): weapon family `mining` with `WeaponSpec.mining.strength` (`damage` is ore a second, `capacitorPerShot` capacitor a second); `isGun` is false for it. `FireResult.beams`, `cutRocks`, `surveyPulse`. `Ship.beams` (`MiningBeam`) and `Ship.survey` (`SurveyResult`). Module kind `surveyScanner`; stats `surveyRange`, `surveyCost`, `surveyGrade`.
 - **Light ship mechanics:** `cutRate`, `rockSeam`, `LockReadout.composition.seam`, `MiningBeam.onSeam`; module kind `oreHopper`, stat `oreCapacity`, `Ship.hopperEject`; `holdCapacity`, `holdSpaceFor`, `holdFits` (use these, not `cargoFree`, for anything ore may fill); `Loot.ejectedBy` and the `oreEjected` event (the hopper spits its filtered ore astern); `ShipInput.dropCache`, `Loot.cache`, `dropCache`, `CACHE_LIFETIME` (3,600 s), `ORE_LOOT_LIFETIME` (600 s).
-- **Events:** `surveyed`, `surveyRefused`, `miningTooHard`, `oreFreed`, `rockCrumbled`, `cacheDropped`, `hopperFilterChanged`.
+- **Hulk:** mount type `mining`; heavy mining turrets (`WeaponSpec.kind` `turret`, family `mining`) cut the rock in `WeaponState.lockTarget`, set by a tile press (`ShipInput.toggleModule` with the mount id) from the active lock; `fireWeapons` takes a rock lookup; module kind `oreHold`.
+- **Events:** `surveyed`, `surveyRefused`, `miningTooHard`, `oreFreed`, `rockCrumbled`, `cacheDropped`, `hopperFilterChanged`, `oreEjected`, `laserAssigned`.
 - **Save format version 7** (`migrate6to7`).
 
 ## Workstreams
@@ -353,6 +354,7 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-05, lead (Lead 3): the full-size hulk (`docs/mining.md`, "As built: the hulk"): mount type `mining`, heavy mining turrets assigned to locked rocks by their tiles (`WeaponState.lockTarget`, `laserAssigned`), the Assay L (8 locks), ore holds (`oreHold`), the Furnace L reactor. Sold at Ridge. 368 sim and 25 client tests; play checked: two turrets cutting two rocks while parked. **Lore asks:** the hulk, Excavator, Ore Hold and Furnace names. **For the interface workstream:** turret tiles are lead stopgaps. Next: drones following locks, then breach charges as their own design, and the middle-size miner last.
 - 2026-11-05, lead (Lead 3): accessibility stopgaps from Jason's playtest: an UNLOCK button on the target card, and heading lock (V) with a HEADING chip so mouse steering can be paused. **For the interface workstream:** both are lead stopgaps to restyle. Hulk direction recorded in `docs/mining.md` (assigned swivel lasers on several rocks; breach charges as a separate kind of mining; drones as mining bots).
 - 2026-11-05, lead (Lead 3): a full tractor no longer drags canisters (Jason): it gathers them into a bunch at rest beside a ship sitting still, and lets them go when the ship moves (`GATHER_SPEED` 10 u/s).
 - 2026-11-05, lead (Lead 3): the ore hopper now takes every canister in and spits its filtered ore out astern (Jason: the old filter left canisters in place, which read as the tractor failing). `Loot.ejectedBy`, `oreEjected`.

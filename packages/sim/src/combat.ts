@@ -148,6 +148,7 @@ export function fireWeapons(
   nextId: number,
   world: Pick<World, 'goods' | 'hulls'> = { goods: {}, hulls: {} },
   threats: readonly Munition[] = [],
+  rockAt: (id: string) => { position: Vec2; radius: number } | null = () => null,
 ): FireResult {
   if (ship.state !== 'flying') return { ship, projectiles: [], munitions: [], decoys: [], beams: [], idsUsed: 0, events: [] };
 
@@ -179,7 +180,7 @@ export function fireWeapons(
   // the rest stay idle (docs/ship-systems.md).
   const directed = new Set(
     ship.weapons
-      .filter((w) => stats.weapons[w.mountId]?.kind === 'turret')
+      .filter((w) => stats.weapons[w.mountId]?.kind === 'turret' && stats.weapons[w.mountId]?.family !== 'mining')
       .map((w) => w.mountId)
       .sort()
       .slice(0, stats.turretControl),
@@ -193,7 +194,20 @@ export function fireWeapons(
     // Turrets: pick something to point at.
     let aim = ship.heading;
     let turretReady = false;
-    if (spec.kind === 'turret' && directed.has(w.mountId)) {
+    // Mining turrets point at the rock they were assigned, and only that (docs/mining.md, "The hulk").
+    let rockInReach = false;
+    if (spec.kind === 'turret' && spec.family === 'mining') {
+      aim = w.aim;
+      const rock = w.lockTarget && isLocked(ship, w.lockTarget) ? rockAt(w.lockTarget) : null;
+      if (rock) {
+        const wanted = toAngle(sub(rock.position, ship.position));
+        if (!mount || withinArc(ship, mount, wanted)) {
+          const step = spec.turretTurnRate * dt;
+          aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
+          rockInReach = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE && distance(ship.position, rock.position) - rock.radius <= spec.range;
+        }
+      }
+    } else if (spec.kind === 'turret' && directed.has(w.mountId)) {
       aim = w.aim;
       let quarry: { position: Vec2; velocity: Vec2 } | null = null;
       const assigned = w.lockTarget && isLocked(ship, w.lockTarget) ? targetFor(w) : null;
@@ -247,9 +261,9 @@ export function fireWeapons(
     const kept = (): WeaponState => ({ ...w, aim, cooldownTicks, loaded, reloadTicks, ...(spec.ammo ? { loadedGood } : {}) });
     const inGroup = w.group === ship.fireGroup;
 
-    // A mining laser runs while its group fires, paying its capacitor by the tick.
+    // A mining laser runs while its group fires (a turret: while it has its rock in reach), paying its capacitor by the tick.
     if (spec.family === 'mining') {
-      if (!(input.fireFixed && inGroup)) return kept();
+      if (spec.kind === 'turret' ? !rockInReach : !(input.fireFixed && inGroup)) return kept();
       const cost = spec.capacitorPerShot * dt;
       if (capacitor < cost) {
         if (!capacitorWarned) events.push({ type: 'capacitorEmpty', shipId: ship.id });
@@ -257,7 +271,7 @@ export function fireWeapons(
         return kept();
       }
       capacitor -= cost;
-      beams.push({ shipId: ship.id, mountId: w.mountId, origin: ship.position, bearing: ship.heading, range: spec.range, strength: spec.mining?.strength ?? 0, yield: spec.damage * dt });
+      beams.push({ shipId: ship.id, mountId: w.mountId, origin: ship.position, bearing: aim, range: spec.range, strength: spec.mining?.strength ?? 0, yield: spec.damage * dt });
       return kept();
     }
     const trigger =
