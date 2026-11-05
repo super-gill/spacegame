@@ -5,11 +5,13 @@ import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from '../vec
 import { angleDelta } from '../angle.js';
 import { emptyInput } from '../world.js';
 import { asteroidPositions } from '../asteroids.js';
-import { arriveVelocity, flightOn, steerSafely, type Obstacle } from './steer.js';
+import { arriveVelocity, flightOn, steerSafely, travelVelocity, type Obstacle } from './steer.js';
+import { clear, findPath, type Circle } from './path.js';
 
 /**
  * Mining drones (docs/drones.md). A drone flies itself; its mother ship
- * only commands it. It works the rocks the mother has locked: the one it
+ * only commands it. It works the rocks the mother has locked that its
+ * laser can cut: the one it
  * was sent to while that stays locked, else a locked rock nobody else is
  * on (no turret, no other drone), else the least crowded; once on a rock
  * it stays unless another is emptier. It parks off
@@ -54,23 +56,50 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   let mode = brain.mode;
   if (mode === 'work' && distance(ship.position, mother.position) > range) mode = 'return';
 
-  // Head for a spot, pushed off anything close: the mother's hull, rocks, other ships.
-  const around: Obstacle[] = [];
-  for (const r of asteroidPositions(world)) if (distance(r.position, ship.position) < 300) around.push({ position: r.position, radius: r.radius });
+  // Rocks near the drone, for planning; ships close by, for steering clear.
+  const rocks: Circle[] = asteroidPositions(world)
+    .filter((r) => distance(r.position, ship.position) < 900)
+    .map((r) => ({ position: r.position, radius: r.radius }));
+  const hull: Circle = { position: mother.position, radius: motherStats.radius };
+  const around: Obstacle[] = rocks.filter((r) => distance(r.position, ship.position) < 300);
   for (const other of Object.values(world.ships)) {
     if (other.id === ship.id || other.state !== 'flying' || distance(other.position, ship.position) > 300) continue;
     around.push({ position: other.position, radius: world.hulls[other.hullId]?.radius ?? 10 });
   }
-  const head = (spot: Vec2, frame: Vec2): Vec2 => add(frame, keepClear(ship, stats.radius, arriveVelocity(ship, stats, spot, cruise), around));
+  const clearance = stats.radius + CLEAR_MARGIN;
+
+  /**
+   * Fly to `spot` (moving with `frame`) along a planned path round the
+   * rocks (and the mother's hull, unless `spot` is the mother), replanned
+   * every second or when the spot moves. Returns the velocity wanted and
+   * the brain's path state.
+   */
+  const head = (spot: Vec2, frame: Vec2, avoidHull: boolean): { velocity: Vec2; plan: Pick<DroneBrain, 'path' | 'goal' | 'planTick'> } => {
+    const obstacles = avoidHull ? [...rocks, hull] : rocks;
+    const stale = !brain.path || !brain.goal || brain.planTick === undefined || world.tick - brain.planTick >= REPLAN_TICKS || distance(brain.goal, spot) > 25;
+    let path = stale ? (findPath(ship.position, spot, obstacles, clearance) ?? [spot]) : brain.path!;
+    const planTick = stale ? world.tick : brain.planTick!;
+    // Drop waypoints reached, and any the drone can already see past.
+    while (path.length > 1 && (distance(ship.position, path[0]!) < WAYPOINT_REACHED || clear(ship.position, path[1]!, obstacles, clearance))) path = path.slice(1);
+    const next = path[0]!;
+    // Slow among rocks: a drone burns only forwards, so it needs room to turn and stop.
+    const gap = Math.min(Infinity, ...obstacles.map((o) => distance(ship.position, o.position) - o.radius - stats.radius));
+    const careful = Math.min(cruise, Math.max(CLUTTER_MIN_SPEED, gap * CLUTTER_SPEED_PER_UNIT));
+    const wanted = path.length === 1 ? arriveVelocity(ship, stats, next, careful) : travelVelocity(ship, stats, next, spot, careful);
+    return { velocity: add(frame, keepClear(ship, stats.radius, wanted, around)), plan: { path, goal: spot, planTick } };
+  };
 
   if (mode === 'return') {
-    const desired = add(mother.velocity, arriveVelocity(ship, stats, mother.position, cruise));
-    return { input: steerSafely(ship, stats, desired, flight), brain: { ...brain, mode, rockId: null } };
+    const { velocity, plan } = head(mother.position, mother.velocity, false);
+    return { input: steerSafely(ship, stats, velocity, flight), brain: { ...brain, ...plan, mode, rockId: null } };
   }
 
   // Choose a rock: the one it was sent to, else a free locked one.
-  const sent = brain.sentRockId && isLocked(mother, brain.sentRockId) && rockAt(world, brain.sentRockId) ? brain.sentRockId : null;
-  const rockId = sent ?? pickRock(world, mother, ship.id, brain.rockId, decided);
+  // Only rocks its laser can cut.
+  const strength = Math.max(0, ...Object.values(stats.weapons).map((w) => w.mining?.strength ?? 0));
+  const cuttable = (id: string): boolean => (rockAt(world, id)?.rock.hardness ?? Infinity) <= strength;
+  const sent = brain.sentRockId && isLocked(mother, brain.sentRockId) && cuttable(brain.sentRockId) ? brain.sentRockId : null;
+  const rockId = sent ?? pickRock(world, mother, ship.id, brain.rockId, decided, cuttable);
   const next: DroneBrain = { ...brain, mode, rockId, sentRockId: sent };
   const rock = rockId ? rockAt(world, rockId) : null;
 
@@ -78,8 +107,8 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
     // Nothing to do: wait beside the mother.
     const side = fromAngle(mother.heading + Math.PI / 2 + (hashSide(ship.id) ? Math.PI : 0));
     const spot = add(mother.position, scale(side, motherStats.radius + DRONE_TUNING.waitGap));
-    const desired = head(spot, mother.velocity);
-    return { input: steerSafely(ship, stats, desired, flight), brain: { ...next, rockId: null } };
+    const { velocity, plan } = head(spot, mother.velocity, true);
+    return { input: steerSafely(ship, stats, velocity, flight), brain: { ...next, ...plan, rockId: null } };
   }
 
   // Park on the rock's near side (where its ore drifts to the mother's
@@ -89,16 +118,38 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   const homeward = toAngle(sub(mother.position, rock.position));
   const seamAngle = rockSeam(rock.rock.id);
   const base = Math.abs(angleDelta(homeward, seamAngle)) <= Math.PI / 2 ? seamAngle : homeward;
-  const face = fromAngle(base + SLOT_OFFSETS[slot % SLOT_OFFSETS.length]!);
-  const spot = add(rock.position, scale(face, rock.rock.radius + DRONE_TUNING.standoff + stats.radius));
-  const desired = head(spot, rock.velocity);
+  // Not a spot wedged against another rock or the mother: step round the face until clear.
+  const reach = rock.rock.radius + DRONE_TUNING.standoff + stats.radius;
+  const others = [...rocks.filter((r) => distance(r.position, rock.position) > 1), hull];
+  const first = base + SLOT_OFFSETS[slot % SLOT_OFFSETS.length]!;
+  let spot = add(rock.position, scale(fromAngle(first), reach));
+  for (let k = 0; k < SPOT_TRIES; k++) {
+    const angle = first + (k % 2 === 0 ? 1 : -1) * Math.ceil(k / 2) * SPOT_STEP;
+    const candidate = add(rock.position, scale(fromAngle(angle), reach));
+    if (others.every((o) => distance(candidate, o.position) >= o.radius + clearance + 4)) {
+      spot = candidate;
+      break;
+    }
+  }
+  const { velocity: desired, plan } = head(spot, rock.velocity, true);
   // Face the rock only once nearly there: with forward thrust only, a drone flies where it points.
   const near = distance(ship.position, spot) <= DRONE_TUNING.onSpot * 3;
   const input = steerSafely(ship, stats, desired, flight, near ? rock.position : undefined);
   const facing = Math.abs(angleDelta(ship.heading, toAngle(sub(rock.position, ship.position)))) <= DRONE_TUNING.aimTolerance;
   const there = distance(ship.position, spot) <= DRONE_TUNING.onSpot;
-  return { input: { ...input, fireFixed: facing && there }, brain: next };
+  return { input: { ...input, fireFixed: facing && there }, brain: { ...next, ...plan } };
 }
+
+/** Among rocks a drone flies no faster than this many units a second per unit of room, nor slower than the minimum. */
+const CLUTTER_SPEED_PER_UNIT = 0.9;
+const CLUTTER_MIN_SPEED = 20;
+/** Replan a drone's path this often, ticks (a second). */
+const REPLAN_TICKS = 60;
+/** A waypoint this close counts as reached, units. */
+const WAYPOINT_REACHED = 18;
+/** Looking for a clear cutting spot: this many steps round the rock's face, this far apart, radians. */
+const SPOT_TRIES = 12;
+const SPOT_STEP = 0.3;
 
 /** Within this many units of clearance, a drone is pushed off an obstacle. */
 const CLEAR_MARGIN = 22;
@@ -143,8 +194,8 @@ export function droneRangeOf(world: World, mother: Ship): number {
  * the one with the fewest drones on it. It keeps its current rock if that
  * is still locked and no busier than the alternatives.
  */
-function pickRock(world: World, mother: Ship, droneShipId: string, current: string | null, decided: World['npcs']): string | null {
-  const rocks = mother.locks.filter((l) => l.progress >= 1 && rockAt(world, l.targetId)).map((l) => l.targetId);
+function pickRock(world: World, mother: Ship, droneShipId: string, current: string | null, decided: World['npcs'], cuttable: (id: string) => boolean): string | null {
+  const rocks = mother.locks.filter((l) => l.progress >= 1 && rockAt(world, l.targetId) && cuttable(l.targetId)).map((l) => l.targetId);
   if (rocks.length === 0) return null;
   const load = new Map<string, number>(rocks.map((r) => [r, 0]));
   for (const w of mother.weapons) if (w.lockTarget && load.has(w.lockTarget)) load.set(w.lockTarget, load.get(w.lockTarget)! + 1);

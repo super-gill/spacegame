@@ -1117,6 +1117,10 @@ export interface DroneBrain {
   rockId: string | null;
   /** A rock the mother sent it to; it keeps to it while the rock stays locked. Null: it chooses. */
   sentRockId: string | null;
+  /** The way it is flying: waypoints to `goal` (ai/path.ts), planned at `planTick`. Absent: none yet. */
+  path?: Vec2[];
+  goal?: Vec2;
+  planTick?: number;
 }
 
 /** A drone in a bay: which drone it is, and how much structure it has left. */

@@ -10,6 +10,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ### Known
 - Drones left out when you dock are lost, so recall them first.
 
+### Fixed
+- Drones plan their way round rocks instead of wedging themselves between them, slow down among rocks so they stop wrecking themselves, and skip rocks too hard for their lasers.
+
 ## [0.12.0] - 2026-11-05
 
 Mining, first slice (9a): ore in the Scree's rocks, the prospector and the hulk, surveying, cutting, caches and the ore hopper; and two accessibility fixes from playtesting.

@@ -356,6 +356,7 @@ Done earlier: on 2026-11-04, merged `ws/ship-mart` and `ws/lore`; applied the lo
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-05, lead (Lead 3): drone pathfinding after Jason's playtest (a drone wedged between rocks; drones hitting rocks): A* round rocks (`ai/path.ts`), replanned each second; slower among rocks; clear cutting spots; only cuttable rocks. 382 sim tests, including drones working into the densest patch of the Scree without damage.
 - 2026-11-05, lead (Lead 3): drones, first build (`docs/drones.md`): drones are ships with a `drone` brain that fly themselves and work only the mother's locked rocks; drone bays; drones bought into the bay; the drone manager (N). 380 sim and 25 client tests; play checked: a hulk launching four drones that share two rocks and cut while the tractor collects. **Lore asks:** the drone, its Nibbler laser, the Drone Cradle and Drone Bay. **For the interface workstream:** the drone manager is a lead stopgap, meant to grow into the fighter manager.
 - 2026-11-05, lead (Lead 3): **released 0.12.0**, mining's first slice (changelog). Next: drones (Jason: no storage of their own, the tractor and hopper collect; one on a prospector, several on a hulk; they find and mine on their own or are directed).
 - 2026-11-05, lead (Lead 3): weapons drop an assigned target (`WeaponState.lockTarget`) whenever its lock goes, for any reason, in `stepLocks` (Jason); mining turrets report it as `laserAssigned` with a null rock.
