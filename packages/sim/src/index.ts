@@ -141,6 +141,7 @@ export {
 export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, LANTERN_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
 export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, rockSeam, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
 export { dronesOut, droneRoom, stepDrones } from './drones.js';
+export { breachAction, BLAST_RADIUS, BLOOM_RANGE, BREACH_MIN_RADIUS, CORE_LIFETIME, FRAGILE_STRENGTH, PLANT_REACH, SAFE_DISTANCE, type BreachAction } from './breach.js';
 export { cutRocks, cutRate, dropCache, nextHopperFilter, surveyPulse, CACHE_LIFETIME, CANISTER_UNITS, ORE_LOOT_LIFETIME, SEAM_HALF_ARC, SEAM_MULTIPLIER, SOFT_ROCK_BONUS, SURVEY_CYCLE_SECONDS, SURVEY_SHOW_SECONDS } from './mining.js';
 export { seededRandom } from './random.js';
 export { starterBodies, STAR_ID, PLANET_ID, MOON_ID, BELT_ID, BELT_RING_RADIUS, BELT_PERIOD } from './bodies.js';

@@ -16,6 +16,8 @@ import {
   shipStats,
   holdCapacity,
   SURVEY_CYCLE_SECONDS,
+  breachAction,
+  rockAt,
 } from '@spacegame/sim';
 import { boardPrompt, shipName } from '../ui.js';
 import { el, setAttr, setText, show, svg } from './dom.js';
@@ -252,6 +254,18 @@ export class FlightHud {
         const eject = ship.hopperEject;
         setText(tile.state, eject ? `DROP ${(world.goods[eject]?.name ?? eject).toUpperCase()}` : 'TAKE ALL');
         tile.root.classList.toggle('active', Boolean(eject));
+      } else if (s.moduleKind === 'breachCharger') {
+        // What a press does now: plant, set off, or why neither.
+        const left = ship.hold['breach-charge'] ?? 0;
+        const rockFor = (id: string) => {
+          const r = rockAt(world, id);
+          return r ? { position: r.position, radius: r.rock.radius } : null;
+        };
+        const action = breachAction(world, ship, rockFor, '');
+        const armed = (world.charges ?? []).filter((c) => c.shipId === ship.id).length;
+        setText(tile.state, action.kind === 'plant' ? `PLANT · ${left}` : action.kind === 'detonate' ? `DETONATE ${armed}` : (CHARGE_STATES[action.reason] ?? '') + (armed > 0 ? '' : ` · ${left}`));
+        tile.root.classList.toggle('active', action.kind !== 'refuse');
+        tile.root.classList.toggle('danger', action.kind === 'detonate');
       } else if (s.moduleKind === 'surveyScanner') {
         // Ready, or seconds until the scanner has cycled.
         const since = ship.survey ? (world.tick - ship.survey.tick) * world.dt : Infinity;
@@ -347,7 +361,10 @@ function gunName(weaponId: string): string {
 }
 
 /** Short names for module tiles. */
-const SLOT_NAMES: Partial<Record<string, string>> = { tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY', oreHopper: 'HOPPER', weapon: 'TURRET' };
+/** Why a charge rig's tile will not plant or set off, shortest first. */
+const CHARGE_STATES: Partial<Record<string, string>> = { noCharges: 'NO CHARGES', noRock: 'NO ROCK', tooFar: 'GET CLOSER', tooClose: 'TOO CLOSE', tooSmall: 'TOO SMALL' };
+
+const SLOT_NAMES: Partial<Record<string, string>> = { breachCharger: 'CHARGES', tractor: 'TRACTOR', countermeasure: 'CHAFF / FLARE', surveyScanner: 'SURVEY', oreHopper: 'HOPPER', weapon: 'TURRET' };
 
 /** A weapon tile: icon with a reload ring, its kind, and how it fires. */
 function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string, weaponId: string): WeaponTile {

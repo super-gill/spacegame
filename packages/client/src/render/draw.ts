@@ -469,6 +469,39 @@ export function drawSeam(ctx: CanvasRenderingContext2D, camera: Camera, centre: 
   ctx.restore();
 }
 
+/**
+ * A deep assay's breach points round a locked rock: a tick per point,
+ * spanning the charge rig's tolerance, lit where a charge already sits;
+ * and a dot for every charge planted on it.
+ */
+export function drawBreachPoints(ctx: CanvasRenderingContext2D, camera: Camera, centre: { x: number; y: number }, radius: number, points: readonly number[], tolerance: number, charges: readonly number[]): void {
+  const c = camera.worldToScreen(centre);
+  const r = radius * camera.zoom;
+  ctx.save();
+  for (const p of points) {
+    const covered = charges.some((b) => Math.abs(Math.atan2(Math.sin(b - p), Math.cos(b - p))) <= tolerance);
+    ctx.strokeStyle = covered ? '#9fd3c7' : '#c9f0ff';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r + 8, p - Math.max(tolerance, 0.04), p + Math.max(tolerance, 0.04));
+    ctx.stroke();
+    // A pointer in to the face, so the spot reads at any zoom.
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(c.x + Math.cos(p) * (r + 18), c.y + Math.sin(p) * (r + 18));
+    ctx.lineTo(c.x + Math.cos(p) * (r + 4), c.y + Math.sin(p) * (r + 4));
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#e0a458';
+  for (const b of charges) {
+    ctx.beginPath();
+    ctx.arc(c.x + Math.cos(b) * (r + 2), c.y + Math.sin(b) * (r + 2), 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 /** Shield and structure bars over a ship, shown once it has taken damage. */
 export function drawHealthBars(ctx: CanvasRenderingContext2D, camera: Camera, ship: Ship, stats: ShipStats, at: { x: number; y: number }): void {
   if (ship.shield >= stats.shield && ship.structure >= stats.structure) return;

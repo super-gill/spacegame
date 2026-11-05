@@ -865,6 +865,11 @@ button:hover {
   color: var(--ink-bright);
 }
 
+.hud-slot.danger {
+  border-color: var(--bad, #e06c5a);
+  color: var(--bad, #e06c5a);
+}
+
 .hud-slot.burner.active {
   border-color: var(--warn, #e0a458);
   color: var(--warn, #e0a458);

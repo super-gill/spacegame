@@ -20,6 +20,11 @@ export const GOODS: Record<string, GoodSpec> = {
   ore: { id: 'ore', name: 'Nickel-iron', unitMass: 0.3, basePrice: 30, ore: { tier: 'common', chance: 1, share: 0, minRadius: 0 } },
   'banded-ore': { id: 'banded-ore', name: 'Banded ore', unitMass: 0.3, basePrice: 60, ore: { tier: 'middling', chance: 0.35, share: 0.25, minRadius: 0 } },
   'black-ore': { id: 'black-ore', name: 'Black ore', unitMass: 0.3, basePrice: 75, ore: { tier: 'middling', chance: 0.25, share: 0.3, minRadius: 25 } },
+  // Gate-glass: never loose in rock, only in the cores some big rocks hide,
+  // reached by breaching (docs/mining.md, "Breaching"). Rare and precious.
+  'gate-glass': { id: 'gate-glass', name: 'Gate-glass', unitMass: 0.1, basePrice: 900, ore: { tier: 'rare', chance: 0, share: 0, minRadius: 0 } },
+  // Breach charges: planted on a rock and set off together to split it.
+  'breach-charge': { id: 'breach-charge', name: 'Breach charge', unitMass: 0.5, basePrice: 400 },
   glintstone: { id: 'glintstone', name: 'Glintstone', unitMass: 0.2, basePrice: 170, ore: { tier: 'valuable', chance: 0.15, share: 0.15, minRadius: 35 } },
   machinery: { id: 'machinery', name: 'Machinery', unitMass: 0.4, basePrice: 85 },
   medicine: { id: 'medicine', name: 'Medicine', unitMass: 0.1, basePrice: 65 },

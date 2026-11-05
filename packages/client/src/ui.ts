@@ -1,6 +1,9 @@
 import type { BoardRefusal, LockRefusal, Ship, Station, World, WorldEvent } from '@spacegame/sim';
 import {
   BOARD_MAX_RELATIVE_SPEED,
+  CORE_LIFETIME,
+  PLANT_REACH,
+  SAFE_DISTANCE,
   BOARD_RANGE,
   FLIGHT_MODE_LABELS,
   boardRefusal,
@@ -32,6 +35,14 @@ const LOCK_REFUSALS: Record<LockRefusal, string> = {
 };
 
 /** Why docking was refused, in words. */
+const CHARGE_REFUSALS: Record<Extract<WorldEvent, { type: 'chargeRefused' }>['reason'], string> = {
+  noCharges: 'No breach charges in the hold. Buy them at Ridge or Harbour.',
+  noRock: 'Lock a rock and make it your active lock to plant a charge.',
+  tooFar: `Get within ${PLANT_REACH} units of the rock's surface to plant a charge.`,
+  tooClose: `Too close to set them off: get ${SAFE_DISTANCE} units clear of the rock.`,
+  tooSmall: 'That rock is too small to breach.',
+};
+
 const DOCK_REFUSALS: Record<'tooFar' | 'tooFast' | 'noPad', string> = {
   tooFar: 'No station in range.',
   tooFast: 'Too fast to dock. Slow down.',
@@ -224,7 +235,11 @@ export class Ui {
    * Toasts for events involving this pilot's ship: things that happened to
    * it (`shipId`) or that it caused (`by`).
    */
+  /** Rocks seen breaking up (breached, mined out, collapsed); their lost locks go unannounced. */
+  private brokenRocks = new Set<string>();
+
   handleEvents(events: WorldEvent[], myShipId: string): void {
+    if (this.brokenRocks.size > 200) this.brokenRocks.clear();
     for (const e of events) {
       const mine = e.shipId === myShipId;
       if (e.type === 'podEjected' && e.from === myShipId) {
@@ -236,8 +251,27 @@ export class Ui {
         else if (e.by === myShipId) this.showToast('Target destroyed.', 2000, 'info');
         continue;
       }
+      // A rock that broke up already says so: no "Lock lost" over the top of it.
+      if (e.type === 'breached' || e.type === 'rockCrumbled' || e.type === 'coreCollapsed') this.brokenRocks.add(e.rockId);
+      if (e.type === 'lockLost' && this.brokenRocks.has(e.targetId)) continue;
+      if (e.type === 'coreCollapsed') {
+        // Nobody's in particular; only pilots breach, so say so.
+        this.showToast(`Exposed gate-glass collapsed: ${e.amount} units lost.`, 2500, 'warn');
+        continue;
+      }
       if (!mine) continue;
-      if (e.type === 'dockRefused') {
+      if (e.type === 'chargePlaced') {
+        this.showToast(`Charge planted (${e.placed} on this rock). Get ${SAFE_DISTANCE} units clear, then press again to detonate.`, 2500, 'info');
+      } else if (e.type === 'chargeRefused') {
+        this.showToast(CHARGE_REFUSALS[e.reason], 2000);
+      } else if (e.type === 'breached') {
+        const glass = e.glass > 0 ? ` ${e.glass} units of gate-glass exposed (${Math.round(e.quality * 100)}% of the breach points hit). It collapses in ${Math.round(CORE_LIFETIME / 60)} minutes and heavy lasers shatter it.` : '';
+        this.showToast(`Rock breached into ${e.chunks} chunks.${glass} The blast will draw pirates.`, 5000, 'warn');
+      } else if (e.type === 'glassShattered') {
+        this.showToast(`Gate-glass shattered: ${e.amount} units lost. Your laser is too strong for it.`, 2000, 'warn');
+      } else if (e.type === 'damaged' && e.cause === 'blast') {
+        this.showToast('Caught in the blast.', 1500, 'warn');
+      } else if (e.type === 'dockRefused') {
         this.showToast(DOCK_REFUSALS[e.reason]);
       } else if (e.type === 'flightModeChanged') {
         this.showToast(`Flight mode: ${FLIGHT_MODE_LABELS[e.mode]}`, 1200, 'info');

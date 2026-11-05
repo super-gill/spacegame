@@ -97,7 +97,8 @@ describe('rocks hold ore', () => {
   it('richer ores turn up somewhere, the best only in bigger rocks', () => {
     const rocks = screeAsteroids();
     for (const good of oreGoods(GOODS)) {
-      if (good.ore!.tier === 'common') continue;
+      // Common ore fills; gate-glass (chance 0) only ever comes from a core.
+      if (good.ore!.tier === 'common' || good.ore!.chance <= 0) continue;
       const holding = rocks.filter((r) => (r.contents[good.id] ?? 0) > 0);
       expect(holding.length, good.id).toBeGreaterThan(0);
       for (const r of holding) expect(r.radius).toBeGreaterThanOrEqual(good.ore!.minRadius);

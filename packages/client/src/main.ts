@@ -31,6 +31,7 @@ import {
   cargoUsed,
   holdCapacity,
   SEAM_HALF_ARC,
+  BLAST_RADIUS,
   rockAt,
   asteroidPositions,
   navReadout,
@@ -74,6 +75,7 @@ import {
   drawTargetBracket,
   drawMiningBeam,
   drawSeam,
+  drawBreachPoints,
   drawTractor,
   drawVelocityVector,
   drawWreck,
@@ -623,6 +625,9 @@ function tick(nowMs: number): void {
     if (e.type === 'destroyed') {
       const gone = before[e.shipId];
       if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+    } else if (e.type === 'breached') {
+      // The blast: as wide as it hurts.
+      explosions.push({ at: e.position, radius: BLAST_RADIUS, startMs: nowMs });
     } else if (e.type === 'munitionDestroyed') {
       // Shot down, spent on a decoy, or burnt out: a small burst where it was.
       const m = flying.get(e.munitionId);
@@ -813,6 +818,20 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     // Its seam, if your mining computer reads it: aim the beam there for half as much ore again.
     const seam = mine ? lockReadout(current, mine, lockedRock.rock.id)?.composition?.seam : undefined;
     if (seam !== undefined) drawSeam(ctx!, camera, lockedRock.position, lockedRock.rock.radius, seam, SEAM_HALF_ARC);
+  }
+  // Breach charges: every rock you have charges on, and a locked rock's breach points if your assay reads them.
+  if (mine) {
+    const planted = new Map<string, number[]>();
+    for (const c of current.charges ?? []) if (c.shipId === mine.id) planted.set(c.rockId, [...(planted.get(c.rockId) ?? []), c.bearing]);
+    const points = lockedRock && mine ? lockReadout(current, mine, lockedRock.rock.id)?.composition?.core?.points : undefined;
+    if (lockedRock && points && !planted.has(lockedRock.rock.id)) planted.set(lockedRock.rock.id, []);
+    const tolerance = shipStats(current, mine).breachTolerance;
+    for (const [rockId, bearings] of planted) {
+      const at = rockAt(current, rockId);
+      if (!at) continue;
+      const marks = rockId === lockedRock?.rock.id ? (points ?? []) : [];
+      drawBreachPoints(ctx!, camera, at.position, at.rock.radius, marks, tolerance, bearings);
+    }
   }
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);

@@ -302,6 +302,59 @@ export const HULLS: Record<string, HullSpec> = {
     ],
   },
 
+  'rookrivet-breacher': {
+    // Rook and Rivet breacher (docs/mining.md, "Breaching"; name
+    // provisional, a lore ask): the professional's ship between the
+    // prospector and the hulk. It mines well with two lasers and three
+    // drones, and it is the ship built to breach big rocks for gate-glass:
+    // a deep assay, a charge rig, and quick enough to clear its own blast.
+    id: 'rookrivet-breacher',
+    name: 'Rook and Rivet Breacher',
+    race: 'freeBelt',
+    manufacturer: 'rookRivet',
+    role: 'civilian',
+    sizeClass: 'M',
+    mass: 14,
+    structure: 900,
+    price: 24000,
+    // 26, not more: medium pads at Harbour sit 73 units from the large one.
+    radius: 26,
+    outline: outline([[25, 0], [19, -9], [6, -14], [-13, -13], [-24, -7], [-24, 7], [-13, 13], [6, 14], [19, 9]]),
+    maxSpeed: 240,
+    maxTurnRate: 1.3,
+    signature: 32,
+    class: 'sloop',
+    capacitor: 260,
+    capacitorRecharge: 14,
+    mounts: [
+      mount('n1', 'nav', 'S', 10, -4, ['power']),
+      mount('r1', 'radar', 'S', 10, 4, ['power']),
+      mount('t1', 'computer', 'M', 16, 0, ['power']),
+      mount('f1', 'flight', 'M', 22, 0, ['power']),
+      mount('x1', 'fireControl', 'S', 4, -8, ['power']),
+      mount('p1', 'podBay', 'S', 4, 8, []),
+      // Sloop budget: 3 weapon, 3 utility, 4 internal, 1 bay.
+      mount('w1', 'weapon', 'M', 22, -6, ['power']),
+      mount('w2', 'weapon', 'M', 22, 6, ['power']),
+      gunMount('w3', 'S', -18, 0, ['power'], AFT, BROAD_ARC),
+      mount('e1', 'engine', 'M', -24, 0, ['power'], AFT),
+      mount('c1', 'core', 'M', -16, -5, ['power']),
+      mount('c2', 'core', 'M', -16, 5, ['power']),
+      mount('i1', 'internal', 'M', -6, -6, ['power']),
+      mount('i2', 'internal', 'M', -6, 6, ['power']),
+      mount('i3', 'internal', 'M', 0, 0, ['power']),
+      mount('i4', 'internal', 'S', -10, 0, ['power']),
+      mount('u1', 'utility', 'M', 12, -13, ['power']),
+      mount('u2', 'utility', 'S', 12, 13, ['power']),
+      mount('u3', 'utility', 'S', -20, -10, ['power']),
+      mount('b1', 'bay', 'M', -20, 10, ['heavyLoad']),
+    ],
+    bonuses: [
+      { source: 'role', label: '+75% breach charge tolerance from full-size charge rigs', stat: 'breachTolerance', amount: 0.75, kind: 'breachCharger' },
+      { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' },
+    ],
+  },
+
   'rookrivet-drone': {
     // A Rook and Rivet mining drone (docs/drones.md; name provisional): a
     // flying laser with an engine. No hold, no sensors of its own: it works

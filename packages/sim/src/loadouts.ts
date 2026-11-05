@@ -107,6 +107,36 @@ export const LOADOUTS: Record<string, Loadout> = {
       b1: 'meridian-pod-s',
     },
   },
+  'rookrivet-breacher': {
+    // Sold at Ridge Outpost: two medium lasers, three drones, a deep assay
+    // and a charge rig. Breach charges are bought separately.
+    id: 'rookrivet-breacher',
+    name: 'Rook and Rivet Breacher, Collective issue',
+    hullId: 'rookrivet-breacher',
+    drones: { loadoutId: 'rookrivet-mining-drone', count: 3 },
+    fit: {
+      n1: 'meridian-nav-s',
+      r1: 'meridian-radar-s',
+      t1: 'rookrivet-deepassay-m',
+      f1: 'paragon-helmsman-s',
+      x1: 'paragon-director-s',
+      p1: 'meridian-podbay-s',
+      w1: 'rookrivet-pick-m',
+      w2: 'rookrivet-pick-m',
+      w3: 'paragon-turret-s',
+      e1: 'slagline-engine-m',
+      c1: 'slagline-thrusters-m',
+      c2: 'itomarr-reactor-m',
+      i1: 'itomarr-shield-m',
+      i2: 'rookrivet-hopper-m',
+      i3: 'rookrivet-dronebay-m',
+      i4: 'meridian-reactor-s',
+      u1: 'tessaract-gleaner-m',
+      u2: 'rookrivet-chargerig-s',
+      u3: 'rookrivet-survey-s',
+      b1: 'tessaract-container-m',
+    },
+  },
   'rookrivet-mining-drone': {
     // A drone as it comes out of the box (docs/drones.md).
     id: 'rookrivet-mining-drone',

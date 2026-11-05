@@ -220,7 +220,15 @@ describe('turrets and locks', () => {
 
 describe('NPCs and saves', () => {
   it('a trader locks the pirate hunting it and holds one lock', () => {
-    let w = createStarterWorld();
+    // Without the miners, which the pirate may find first.
+    const start = createStarterWorld();
+    const miner = (id: string) => id.startsWith('npc-miner');
+    let w: World = {
+      ...start,
+      ships: Object.fromEntries(Object.entries(start.ships).filter(([id]) => !miner(id))),
+      npcs: Object.fromEntries(Object.entries(start.npcs).filter(([id]) => !miner(id))),
+      spawners: start.spawners.filter((s) => !s.id.startsWith('miner')),
+    };
     let most = 0;
     let lockedPirate = false;
     for (let i = 0; i < SECOND * 70; i++) {

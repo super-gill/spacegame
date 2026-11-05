@@ -71,6 +71,8 @@ export function harbourStation(): Station {
       'banded-ore': { ask: null, bid: 52 },
       'black-ore': { ask: null, bid: 64 },
       glintstone: { ask: null, bid: 140 },
+      'gate-glass': { ask: null, bid: 850 },
+      'breach-charge': { ask: 500, bid: 250 },
       machinery: { ask: 78, bid: 66 },
       medicine: { ask: 55, bid: 47 },
       scrap: { ask: null, bid: 7 },
@@ -114,6 +116,8 @@ export function ridgeOutpost(): Station {
       'banded-ore': { ask: null, bid: 30 },
       'black-ore': { ask: null, bid: 36 },
       glintstone: { ask: null, bid: 80 },
+      'gate-glass': { ask: null, bid: 500 },
+      'breach-charge': { ask: 420, bid: 250 },
       machinery: { ask: 112, bid: 98 },
       medicine: { ask: 86, bid: 75 },
       scrap: { ask: null, bid: 9 },
@@ -123,7 +127,7 @@ export function ridgeOutpost(): Station {
     outfitting: false,
     pads: padRing(70, ['L', 'S', 'M', 'L', 'S', 'M']),
     // The Collective sells its prospectors to anyone who will dig.
-    shipMart: ['rookrivet-prospector', 'rookrivet-hulk'],
+    shipMart: ['rookrivet-prospector', 'rookrivet-breacher', 'rookrivet-hulk'],
   };
 }
 
@@ -151,6 +155,7 @@ export function lanternWorks(): Station {
       'banded-ore': { ask: null, bid: 68 },
       'black-ore': { ask: null, bid: 84 },
       glintstone: { ask: null, bid: 190 },
+      'gate-glass': { ask: null, bid: 1000 },
       machinery: { ask: 48, bid: 40 },
       medicine: { ask: 96, bid: 82 },
       scrap: { ask: null, bid: 14 },

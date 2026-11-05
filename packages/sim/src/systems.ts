@@ -21,7 +21,7 @@ import { isGun } from './weapons.js';
  */
 
 /** Module kinds that get a numbered tile. */
-const ACTIVATED: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['tractor', 'countermeasure', 'surveyScanner']);
+const ACTIVATED: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['tractor', 'countermeasure', 'surveyScanner', 'breachCharger']);
 /** Module kinds on internal mounts that still get a tile (a setting to change in flight). */
 const ACTIVATED_INTERNAL: ReadonlySet<ModuleKind> = new Set<ModuleKind>(['oreHopper']);
 

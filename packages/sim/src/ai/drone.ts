@@ -96,7 +96,9 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   const base = Math.abs(angleDelta(homeward, seamAngle)) <= Math.PI / 2 ? seamAngle : homeward;
   // Not a spot wedged against another rock or the mother: step round the face until clear.
   const reach = rock.rock.radius + DRONE_TUNING.standoff + stats.radius;
-  const others = [...rocks.filter((r) => distance(r.position, rock.position) > 1), hull];
+  // Nor on top of a sister drone's spot on this rock (on a small rock the search can land two on one).
+  const sisters = sisterSpots(world, decided, ship.id, mother.id, rock.rock.id).map((p) => ({ position: p, radius: stats.radius }));
+  const others = [...rocks.filter((r) => distance(r.position, rock.position) > 1), hull, ...sisters];
   const first = base + SLOT_OFFSETS[slot % SLOT_OFFSETS.length]!;
   let spot = add(rock.position, scale(fromAngle(first), reach));
   for (let k = 0; k < SPOT_TRIES; k++) {
@@ -162,6 +164,17 @@ function slotOn(world: World, decided: World['npcs'], droneShipId: string, mothe
     if (brain.kind === 'drone' && brain.motherId === motherId && brain.rockId === rockId) before++;
   }
   return before;
+}
+
+/** Where the mother's drones before this one (by id) on the same rock mean to sit. */
+function sisterSpots(world: World, decided: World['npcs'], droneShipId: string, motherId: string, rockId: string): Vec2[] {
+  const spots: Vec2[] = [];
+  for (const id of Object.keys(world.npcs)) {
+    if (id >= droneShipId) continue;
+    const brain = decided[id] ?? world.npcs[id]!;
+    if (brain.kind === 'drone' && brain.motherId === motherId && brain.rockId === rockId && brain.goal) spots.push(brain.goal);
+  }
+  return spots;
 }
 
 /** Which side of the mother an idle drone waits on, from its id. */

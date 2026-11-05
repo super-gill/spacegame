@@ -55,8 +55,13 @@ const ROCKFALL_CLEARANCE = 1500;
 /** Placement attempts per new rock before giving up until the next check. */
 const ROCKFALL_TRIES = 40;
 
+/** Only rocks at least this big can hide a gate-glass core (docs/mining.md, "Breaching"). */
+export const CORE_MIN_RADIUS = 50;
+/** The share of such rocks that do. */
+const CORE_CHANCE = 0.3;
+
 /** What a new rock of this radius holds, and how hard it is. Draws from `random`. */
-export function rockMakeup(random: () => number, radius: number, goods: Readonly<Record<string, GoodSpec>> = GOODS): Pick<Asteroid, 'contents' | 'hardness'> {
+export function rockMakeup(random: () => number, radius: number, goods: Readonly<Record<string, GoodSpec>> = GOODS): Pick<Asteroid, 'contents' | 'hardness' | 'core'> {
   const size = Math.max(0, Math.min(1, (radius - MIN_RADIUS) / (MAX_RADIUS - MIN_RADIUS)));
   const hardness = Math.max(0.05, Math.min(1, HARDNESS_MIN + HARDNESS_SPAN * size + (random() * 2 - 1) * HARDNESS_JITTER));
   const total = Math.max(1, Math.round(radius * radius * ORE_PER_AREA));
@@ -75,7 +80,18 @@ export function rockMakeup(random: () => number, radius: number, goods: Readonly
   }
   const common = ores.find((g) => g.ore!.tier === 'common');
   if (left > 0 && common) contents[common.id] = (contents[common.id] ?? 0) + left;
-  return { contents, hardness: Math.round(hardness * 100) / 100 };
+  const core = rockCore(random, radius, goods);
+  return { contents, hardness: Math.round(hardness * 100) / 100, ...(core ? { core } : {}) };
+}
+
+/** Some big rocks hide a gate-glass core, with two or three breach points round them; null for the rest. */
+export function rockCore(random: () => number, radius: number, goods: Readonly<Record<string, GoodSpec>> = GOODS): Asteroid['core'] | null {
+  if (radius < CORE_MIN_RADIUS || !goods['gate-glass'] || random() >= CORE_CHANCE) return null;
+  const glass = 20 + Math.round(random() * 20);
+  const count = random() < 0.5 ? 2 : 3;
+  const start = random() * Math.PI * 2;
+  const points = Array.from({ length: count }, (_, i) => Math.round(((start + (i * Math.PI * 2) / count + (random() - 0.5) * 0.6) % (Math.PI * 2)) * 1000) / 1000);
+  return { glass, points };
 }
 
 /**

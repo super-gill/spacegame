@@ -3,7 +3,7 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { ROCK_FIELDS, rockMakeup, screeAsteroids } from './asteroids.js';
+import { ROCK_FIELDS, rockCore, rockMakeup, screeAsteroids } from './asteroids.js';
 import { seededRandom } from './random.js';
 import { starterBodies } from './bodies.js';
 import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -84,6 +84,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   4: (world) => migrate4to5(world),
   5: (world) => migrate5to6(world),
   6: (world) => migrate6to7(world),
+  7: (world) => migrate7to8(world),
 };
 
 /**
@@ -105,6 +106,22 @@ export function migrate6to7(world: unknown): unknown {
     return { ...a, ...rockMakeup(seededRandom(idSeed(id)), radius), field };
   });
   return { ...world, asteroids };
+}
+
+/**
+ * 7 to 8: breaching (docs/mining.md, "Breaching"). Big rocks in an older
+ * belt may now hide a gate-glass core, drawn from the rock's id so every
+ * load of the same save agrees. A rock already part mined keeps its core
+ * too: the glass is deep. No charges are planted.
+ */
+export function migrate7to8(world: unknown): unknown {
+  if (!isRecord(world) || !Array.isArray(world['asteroids'])) return world;
+  const asteroids = world['asteroids'].map((a: unknown) => {
+    if (!isRecord(a) || a['core'] !== undefined || typeof a['radius'] !== 'number') return a;
+    const core = rockCore(seededRandom(idSeed(`${String(a['id'] ?? '')}:core`)), a['radius']);
+    return core ? { ...a, core } : a;
+  });
+  return { ...world, asteroids, charges: [] };
 }
 
 /** A seed from an id, FNV-1a. */

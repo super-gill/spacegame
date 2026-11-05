@@ -26,7 +26,7 @@ import type { ModuleStat } from './types.js';
 export type Catalogues = Pick<World, 'hulls' | 'modules' | 'weapons' | 'goods'>;
 
 /** Readouts in a fixed order, so stats compare equal however the fit is ordered. */
-const READOUT_ORDER: ReadoutKind[] = ['identity', 'motion', 'condition', 'combat', 'cargo', 'composition'];
+const READOUT_ORDER: ReadoutKind[] = ['identity', 'motion', 'condition', 'combat', 'cargo', 'composition', 'core'];
 
 const STAT_KEYS: ModuleStat[] = [
   'mainThrust',
@@ -54,6 +54,7 @@ const STAT_KEYS: ModuleStat[] = [
   'droneCapacity',
   'droneControl',
   'droneRange',
+  'breachTolerance',
 ];
 
 /** Resistances layered: the stronger of each type wins (two armour plates do not stack). */
@@ -115,6 +116,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     droneCapacity: 0,
     droneControl: 0,
     droneRange: 0,
+    breachTolerance: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -203,6 +205,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     droneCapacity: Math.floor(totals.droneCapacity + 1e-9),
     droneControl: Math.floor(totals.droneControl + 1e-9),
     droneRange: totals.droneRange,
+    breachTolerance: totals.breachTolerance,
     weapons,
     capacitor: hull.capacitor,
     capacitorRecharge: hull.capacitorRecharge,

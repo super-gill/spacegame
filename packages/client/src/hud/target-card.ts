@@ -1,5 +1,5 @@
 import type { LockReadout, Ship, TargetLock, World } from '@spacegame/sim';
-import { lockReadout, shipStats } from '@spacegame/sim';
+import { FRAGILE_STRENGTH, lockReadout, shipStats } from '@spacegame/sim';
 import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, silhouettePoints } from './geometry.js';
 
@@ -241,7 +241,10 @@ export class TargetCard {
     setText(this.lockState, lock.progress < 1 ? `LOCKING ${Math.floor(lock.progress * 100)}%` : 'LOCKED');
     const comp = read?.composition;
     setText(this.name, comp ? `Rock, ${comp.total} units` : 'Rock');
-    setText(this.who, comp ? `Hardness ${Math.round(comp.hardness * 100)}%` : lock.progress < 1 ? 'Locking…' : 'No composition reading');
+    // A deep assay also reads a gate-glass core and its breach points.
+    const core = comp?.core ? ` · GLASS CORE, ${comp.core.points.length} BREACH POINTS` : comp?.core === null ? ' · no core' : '';
+    setText(this.who, comp ? `Hardness ${Math.round(comp.hardness * 100)}%${core}` : lock.progress < 1 ? 'Locking…' : 'No composition reading');
+    if (comp?.fragile) setText(this.name, `Exposed gate-glass · collapses in ${Math.ceil(comp.fragile.secondsLeft ?? 0)}s`);
     if (this.hullId !== 'rock') {
       this.hullId = 'rock';
       setAttr(this.outline, 'points', rockPoints(SIL_RING * 0.8));
@@ -261,6 +264,8 @@ export class TargetCard {
       // Can any fitted mining laser cut it?
       const strength = Math.max(0, ...Object.values(shipStats(world, ship).weapons).map((w) => w.mining?.strength ?? 0));
       setText(this.armed, strength <= 0 ? 'NO MINING LASER FITTED' : strength >= comp.hardness ? `YOUR LASER CUTS IT (${Math.round(strength * 100)}%)` : `TOO HARD FOR YOUR LASER (${Math.round(strength * 100)}%)`);
+      // Brittle glass: a heavy laser shatters what it cuts.
+      if (comp.fragile && strength > FRAGILE_STRENGTH) setText(this.armed, `BRITTLE: YOUR LASER (${Math.round(strength * 100)}%) WILL SHATTER IT: USE DRONES OR A LIGHT LASER`);
     }
     show(this.cargo, true);
     setText(

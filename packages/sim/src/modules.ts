@@ -911,6 +911,39 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['drone'],
     stats: { droneCapacity: 6, droneControl: 4, droneRange: 2000 },
   },
+  // Breaching (docs/mining.md, "Breaching"): a charge rig plants breach
+  // charges and sets them off from its tile; a deep assay reads a rock's
+  // gate-glass core and where to breach it.
+  'rookrivet-chargerig-s': {
+    id: 'rookrivet-chargerig-s',
+    name: 'Rook and Rivet Charge Rig S',
+    kind: 'breachCharger',
+    size: 'S',
+    mounts: ['utility'],
+    needs: ['power'],
+    mass: 0.8,
+    power: 0.5,
+    price: 2500,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    stats: { breachTolerance: 0.2 },
+  },
+  'rookrivet-deepassay-m': {
+    id: 'rookrivet-deepassay-m',
+    name: 'Rook and Rivet Deep Assay M',
+    kind: 'targetingComputer',
+    size: 'M',
+    mounts: ['computer'],
+    needs: ['power'],
+    mass: 1.2,
+    power: 2,
+    price: 6500,
+    manufacturer: 'rookRivet',
+    capacitorDraw: 0.3,
+    tags: ['sensor', 'mining'],
+    stats: { maxLocks: 4, scanResolution: 1 },
+    readouts: ['identity', 'motion', 'composition', 'core'],
+  },
   // Ore hoppers (internal): hold space only ore may use, and a filter set
   // from its tile for the one ore the tractor leaves behind. Fitting one
   // costs an armour or shield slot.

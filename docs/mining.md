@@ -114,6 +114,29 @@ Built as a general system so later kinds slot in without rework.
   - Typical numbers: soft rock off the seam about 1.7 ore a second, on the seam about 2.5; 60 units in 25 to 35 seconds. A hold of nickel-iron is worth about 2,500 at Lantern.
 - **Not yet:** NPC miners, charges, the hulk, drones, gate-glass (part 2).
 
+## Breaching and gate-glass (5 November 2026)
+
+Agreed with Jason: breaching is for gate-glass, its own kind of mining. A deep assay shows where to breach, the pilot plants the charges by hand, gets clear and sets them off. The blast is not loud (space) but its signature bloom is huge, and draws pirates.
+
+- **Cores:** about three in ten rocks of radius 50 and up hide a core of 20 to 40 units of gate-glass with two or three breach points round it (`Asteroid.core`). Glass is never loose in a rock: a laser cannot reach it. The starter belt has six cored rocks, all in the ring; rockfall makes more; older saves draw cores on load (save 8, `migrate7to8`).
+- **Reading:** only a deep assay (`rookrivet-deepassay-m`, readout `core`) finds a core. The target card says GLASS CORE and the breach points show as pale ticks round the locked rock, each as wide as the charge rig's tolerance.
+- **Planting:** a charge rig (`rookrivet-chargerig-s`, utility, `breachCharger`) plants a breach charge (a good, bought at Ridge and Harbour) from its tile on the active lock's rock, where the ship is: within 70 units of the surface. Rocks under radius 40 refuse. Planted charges show as amber dots.
+- **Detonating:** the same tile, pressed at least 150 units from the surface, sets off every charge the ship has on that rock. The tile says what a press will do: `PLANT · n`, `DETONATE n`, `GET CLOSER`, `TOO CLOSE`, `NO CHARGES`.
+- **The split:** the rock breaks into two chunks (three from radius 60), its ore shared out, 0.2 softer for the cracking. A cored rock also exposes its glass as a small brittle rock: all of it if every breach point had a charge within tolerance, down to a quarter if none did.
+- **Glass is fragile:** a laser stronger than 60% shatters what it cuts (lost, `glassShattered`); drones and light lasers free it in canisters. Exposed glass collapses after three minutes (`coreCollapsed`).
+- **The blast:** up to 450 damage within 320 units, falling to nothing at the edge, to everyone: the breacher, its drones, bystanders. Rocks under radius 30 in it shatter into canisters; bigger ones lose 10 units off the face.
+- **The bloom:** pirates within 9,000 units fly to the blast (`PirateBrain.drawnTo`) and hunt whatever they find there.
+- **Prices:** gate-glass sells for about 850 at Harbour, 1,000 at Lantern Works and 500 at Ridge; a charge costs about 500 (420 at Ridge). A clean breach is worth roughly 30,000.
+- **Who can breach:** any ship with a utility mount can fit a charge rig, but finding cores needs the deep assay. The breacher is built for it.
+
+### The ship ladder (Jason, 5 November 2026)
+
+- **Prospector:** the cheap early money-maker, feeding at the bottom.
+- **Breacher (mid):** a professional's ship that strip-mines and breaches. Rook and Rivet Breacher, 24,000 at Ridge: two medium fixed mining lasers (+25% mining), a small aft turret, the deep assay, a charge rig (+75% tolerance, so about 20 degrees), three drones, a hopper and 100 units of ore hold.
+- **Hulk:** the strip-mining behemoth. It carries no charges by default.
+- **Later:** an industrial capital or command ship coordinating NPC miners, with mining fighters and a huge hold.
+- **Later still (Jason):** more ships at each size with slight differences, better and worse in different areas, rather than one ship per rung.
+
 ## NPC miners (5 November 2026)
 
 Agreed with Jason: two prospectors and a hulk to start; pirates hunt them like any traffic; NPC caches later, as a second step.

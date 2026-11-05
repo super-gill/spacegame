@@ -58,6 +58,7 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Seams | Lock a rock with a mining computer | A gold arc on the rock's edge marks its seam: cut there and the laser tile says `ON SEAM`, half as fast again |
 | Ore hopper filter | Its tile's number | Cycles the one ore your hopper spits back out astern: `TAKE ALL`, then each ore in turn. Your tractor still pulls everything in, then leaves the rejects alone |
 | Drop an ore cache | J | Leaves the ore aboard, and loose ore near you, as a cache that lasts an hour, ringed in space and shown on your radar. Anyone can take it. Switches your tractor off so it is not scooped straight back |
+| Breach charges | The charge rig's tile | Near a locked rock (within 70 units of its surface): plants a charge where you are. A deep assay marks the rock's breach points; cover them all for all the glass. From 150 units clear: sets off every charge you have on it. The tile says `PLANT`, `DETONATE`, `GET CLOSER` or `TOO CLOSE`. Stay clear of the blast (320 units) |
 | Survey | Its tile's number | A survey scanner pulses: rocks in reach worth a look are outlined for a few seconds (amber rich, gold valuable, cyan rare). It cycles in 5 seconds and costs capacitor |
 | Tractor beam | R (hold) | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile leaves it running |
 | Afterburner | Shift (hold) | If one is fitted: a higher top speed and more main thrust while held, paid for from the capacitor; it will not light on an empty one |

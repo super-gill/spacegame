@@ -4,6 +4,7 @@ import { goodsFitting } from './goods.js';
 import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
 import { asteroidStates, stepRockfall } from './asteroids.js';
 import { stepDrones } from './drones.js';
+import { breachAction, collapseCores, detonate } from './breach.js';
 import { CACHE_LIFETIME, cutRocks, dropCache, nextHopperFilter, surveyPulse } from './mining.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
@@ -103,6 +104,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const beams: BeamShot[] = [];
   const cacheLoot: Loot[] = [];
   const droneCommands: Record<string, DroneCommand> = {};
+  let charges = [...(world.charges ?? [])];
+  const detonations: { shipId: string; rockId: string; tolerance: number }[] = [];
   const cacheMarks = new Map<string, string>();
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
@@ -188,6 +191,22 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
         targeted = { ...targeted, weapons: targeted.weapons.map((w) => (w === turret ? { ...w, lockTarget: rockId } : w)) };
         events.push({ type: 'laserAssigned', shipId: id, mountId: turret.mountId, rockId });
       }
+      // A breach charger's tile plants a charge, or sets them off (breach.ts).
+      if (moduleId && world.modules[moduleId]?.kind === 'breachCharger') {
+        const action = breachAction({ asteroids: world.asteroids, charges }, targeted, rockFor, `c${nextEntityId}`);
+        if (action.kind === 'plant') {
+          nextEntityId++;
+          charges = [...charges, action.charge];
+          const left = (targeted.hold['breach-charge'] ?? 1) - 1;
+          const { 'breach-charge': _used, ...rest } = targeted.hold;
+          targeted = { ...targeted, hold: left > 0 ? { ...rest, 'breach-charge': left } : rest };
+          events.push({ type: 'chargePlaced', shipId: id, rockId: action.charge.rockId, placed: charges.filter((c) => c.shipId === id && c.rockId === action.charge.rockId).length });
+        } else if (action.kind === 'detonate') {
+          detonations.push({ shipId: id, rockId: action.rockId, tolerance: stats.breachTolerance });
+        } else {
+          events.push({ type: 'chargeRefused', shipId: id, reason: action.reason });
+        }
+      }
       // An ore hopper's tile cycles its filter: the one ore the tractor leaves behind.
       if (moduleId && world.modules[moduleId]?.kind === 'oreHopper') {
         const eject = nextHopperFilter(targeted.hopperEject, world.goods);
@@ -255,6 +274,27 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   ships = cut.ships;
   events.push(...cut.events);
 
+  // Breach charges go off; exposed cores past their time collapse.
+  let asteroids = cut.asteroids;
+  const blastLoot: Loot[] = [];
+  const drawn: Record<string, Vec2> = {};
+  for (const d of detonations) {
+    const blast = detonate(world, asteroids, charges, ships, d.shipId, d.rockId, d.tolerance, world.tick + 1, nextEntityId);
+    asteroids = blast.asteroids;
+    charges = blast.charges;
+    nextEntityId += blast.idsUsed;
+    blastLoot.push(...blast.loot);
+    damage.push(...blast.damage);
+    events.push(...blast.events);
+    for (const [pid, brain] of Object.entries(blast.npcs)) if (brain.kind === 'pirate' && brain.drawnTo && world.npcs[pid] !== brain) drawn[pid] = brain.drawnTo;
+  }
+  const collapsed = collapseCores(asteroids, world.tick + 1);
+  asteroids = collapsed.asteroids;
+  events.push(...collapsed.events);
+  // Charges on rocks that are gone go with them.
+  const standing = new Set(asteroids.map((a) => a.id));
+  charges = charges.filter((c) => standing.has(c.rockId));
+
   // 3. Rams.
   const statsFor = (s: Ship): ShipStats | undefined => (world.hulls[s.hullId] ? shipStats(world, s) : undefined);
   const rams = collideShips(ships, statsFor);
@@ -282,6 +322,11 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   // 5. Apply damage in a fixed order and note who last hurt each ship.
   const killers: Record<string, string | null> = {};
   const npcs = { ...npc.npcs };
+  // Pirates that saw a breach's signature bloom come to see.
+  for (const [pid, at] of Object.entries(drawn)) {
+    const brain = npcs[pid];
+    if (brain?.kind === 'pirate' && brain.mode !== 'hunt') npcs[pid] = { ...brain, drawnTo: at };
+  }
   for (const d of damage) {
     const target = ships[d.shipId];
     if (!target || target.structure <= 0) continue;
@@ -304,7 +349,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
 
   let next: World = {
     ...world,
-    asteroids: cut.asteroids,
+    asteroids,
+    charges,
     // Marked canisters join their cache and last as long.
     loot: [
       ...world.loot.map((l) => {
@@ -313,6 +359,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       }),
       ...cacheLoot,
       ...cut.loot,
+      ...blastLoot,
     ],
     tick: world.tick + 1,
     stations: stationsNext,

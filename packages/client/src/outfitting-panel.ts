@@ -136,6 +136,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   oreHopper: 'Ore hopper',
   oreHold: 'Ore hold',
   droneBay: 'Drone bay',
+  breachCharger: 'Charge rig',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -166,6 +167,8 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.droneCapacity) parts.push(`holds ${s.droneCapacity} drone${s.droneCapacity === 1 ? '' : 's'}, flies ${s.droneControl ?? 0} at once, within ${s.droneRange ?? 0} u (drones are bought at the market)`);
   if (s.surveyRange) parts.push(`survey pulse ${s.surveyRange} u for ${s.surveyCost ?? 0} cap: ${(s.surveyGrade ?? 0) >= 2 ? 'names the best ore in each rock' : 'tells rich rock from plain'}`);
   if (m.readouts?.includes('composition')) parts.push('reads what a locked rock holds and how hard it is, not guns');
+  if (m.readouts?.includes('core')) parts.push('also finds gate-glass cores in big rocks and marks their breach points');
+  if (s.breachTolerance) parts.push(`plants breach charges (bought at the market) from its tile; a charge counts on a breach point within ${Math.round((s.breachTolerance * 180) / Math.PI)}° of it, and hulls built for breaching widen that`);
   if (m.shieldRegenDelay) parts.push(`recharges ${fixed1(m.shieldRegenDelay)} s after a hit`);
   const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
   if (w && w.family === 'countermeasure') {

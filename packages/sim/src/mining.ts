@@ -1,4 +1,6 @@
 import { bestTier, oreLeft, rockSeam } from './asteroids.js';
+/** Lasers stronger than this shatter exposed gate-glass (breach.ts). */
+export const FRAGILE_STRENGTH = 0.6;
 import { oreGoods } from './goods.js';
 import { segmentHitsCircle, type BeamShot } from './combat.js';
 import type { Asteroid, GoodSpec, Loot, MiningBeam, Ship, ShipStats, SurveyResult, WorldEvent } from './types.js';
@@ -180,6 +182,11 @@ export function cutRocks(
       }
       cut -= amount;
       left -= amount;
+      // Gate-glass is brittle: a laser too strong for it shatters what it frees.
+      if (rock.fragile && beam.strength > FRAGILE_STRENGTH) {
+        events.push({ type: 'glassShattered', shipId: beam.shipId, rockId: rock.id, amount });
+        continue;
+      }
       loot.push({
         id: `l${nextId + idsUsed++}`,
         item: good,

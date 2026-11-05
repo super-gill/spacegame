@@ -211,7 +211,9 @@ export type ModuleStat =
   | 'droneCapacity'
   | 'droneControl'
   /** Drone bay: how far from the mother ship its drones will work, units. */
-  | 'droneRange';
+  | 'droneRange'
+  /** Breach charger: how close to a breach point a charge must sit to count, radians round the rock. */
+  | 'breachTolerance';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -234,7 +236,8 @@ export type ModuleKind =
   | 'surveyScanner'
   | 'oreHopper'
   | 'oreHold'
-  | 'droneBay';
+  | 'droneBay'
+  | 'breachCharger';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -249,7 +252,7 @@ export type ModuleKind =
  * - `cargo`: what is in the hold and how full it is.
  * - `composition`: what a locked rock is made of, and how hard it is (a mining computer).
  */
-export type ReadoutKind = 'identity' | 'motion' | 'condition' | 'combat' | 'cargo' | 'composition';
+export type ReadoutKind = 'identity' | 'motion' | 'condition' | 'combat' | 'cargo' | 'composition' | 'core';
 
 /**
  * A module: anything fitted to a mount. Data only.
@@ -434,6 +437,8 @@ export interface ShipStats {
   droneCapacity: number;
   droneControl: number;
   droneRange: number;
+  /** Breach chargers (docs/mining.md, "Breaching"): how close to a breach point a charge counts, radians; 0 with none. */
+  breachTolerance: number;
   shieldRegenDelay: number;
   structure: number;
   cargoCapacity: number;
@@ -963,6 +968,26 @@ export interface Asteroid {
   mined?: Record<string, number>;
   /** The field it belongs to, which tops it back up (`ROCK_FIELDS`). */
   field: string;
+  /**
+   * A sealed gate-glass core (big rocks only, some of them): how much
+   * glass, and the breach points, as bearings round the rock from its
+   * centre. Breaching it with charges on those points splits the rock and
+   * exposes the core. Absent: none.
+   */
+  core?: { glass: number; points: number[] };
+  /** Exposed gate-glass: brittle. A laser stronger than `FRAGILE_STRENGTH` shatters what it cuts. */
+  fragile?: true;
+  /** An exposed core degrades: at this tick it collapses and its glass is lost. Absent: it lasts. */
+  expiresTick?: number;
+}
+
+/** A breach charge stuck to a rock, waiting to be set off by the ship that planted it. */
+export interface PlantedCharge {
+  id: string;
+  shipId: string;
+  rockId: string;
+  /** Where on the rock: a bearing from its centre, radians. */
+  bearing: number;
 }
 
 /** A mining laser running this tick (`Ship.beams`). */
@@ -1231,6 +1256,11 @@ export interface PirateBrain {
   patrolIndex: number;
   /** Ship that last shot or rammed this pirate. It will turn on them. */
   provokedBy: string | null;
+  /**
+   * A breach's signature bloom it saw: it flies there (when not hunting)
+   * and hunts whatever it finds. Cleared on arrival.
+   */
+  drawnTo?: Vec2 | null;
   /** Its attack run, while hunting. */
   attack?: RunState;
 }
@@ -1286,6 +1316,8 @@ export interface World {
   munitions: Munition[];
   /** Countermeasures burning in space. */
   decoys: Decoy[];
+  /** Breach charges planted on rocks (docs/mining.md, "Breaching"). Absent: none. */
+  charges?: PlantedCharge[];
   wrecks: Wreck[];
   loot: Loot[];
   weapons: Record<string, WeaponSpec>;
@@ -1311,7 +1343,7 @@ export interface World {
   events: WorldEvent[];
 }
 
-export type DamageCause = 'weapon' | 'munition' | 'ram' | 'station' | 'surface';
+export type DamageCause = 'weapon' | 'munition' | 'ram' | 'station' | 'surface' | 'blast';
 
 /** Why a lock could not start. */
 export type LockRefusal =
@@ -1405,6 +1437,20 @@ export type WorldEvent =
   | { type: 'droneLost'; shipId: string; droneId: string; reason: 'destroyed' | 'leftBehind' }
   /** A drone command could not be carried out. */
   | { type: 'droneRefused'; shipId: string; reason: 'noBay' | 'noneStowed' | 'control' | 'noRock' | 'docked' }
+  /** A breach charge was planted on a rock. */
+  | { type: 'chargePlaced'; shipId: string; rockId: string; placed: number }
+  /** A breach charge could not be planted or set off. */
+  | { type: 'chargeRefused'; shipId: string; reason: 'noCharges' | 'noRock' | 'tooFar' | 'tooClose' | 'tooSmall' }
+  /**
+   * Charges went off and broke a rock: into `chunks` pieces, and with a
+   * core, `glass` units of gate-glass exposed from `quality` (the share of
+   * breach points charged). Its signature bloom draws pirates from far off.
+   */
+  | { type: 'breached'; shipId: string; rockId: string; position: Vec2; chunks: number; glass: number; quality: number }
+  /** A laser too strong for gate-glass shattered what it cut. */
+  | { type: 'glassShattered'; shipId: string; rockId: string; amount: number }
+  /** An exposed core degraded and collapsed; its glass is gone. */
+  | { type: 'coreCollapsed'; rockId: string; /** Nobody: always ''. */ shipId: string; amount: number }
   /** A mining turret was given a rock to cut (its tile, with the rock as the active lock), or let go of one (null). */
   | { type: 'laserAssigned'; shipId: string; mountId: string; rockId: string | null }
   /** An ore hopper took in a canister of its filtered ore and spat it out astern. */

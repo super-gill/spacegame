@@ -112,10 +112,10 @@ export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, wor
   }
   ctx.fillStyle = '#0b0d0f';
   ctx.lineWidth = 1;
-  for (const rock of asteroidPositions(world)) {
+  asteroidPositions(world).forEach((rock, index) => {
     const c = camera.worldToScreen(rock.position);
     const r = rock.radius * camera.zoom;
-    if (c.x < -margin - r || c.y < -margin - r || c.x > camera.viewportWidth + margin + r || c.y > camera.viewportHeight + margin + r) continue;
+    if (c.x < -margin - r || c.y < -margin - r || c.x > camera.viewportWidth + margin + r || c.y > camera.viewportHeight + margin + r) return;
     let seed = 0;
     for (const ch of rock.id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
     ctx.beginPath();
@@ -131,15 +131,20 @@ export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, wor
     }
     ctx.closePath();
     ctx.fill();
-    const lit = readings.get(rock.id);
+    // Exposed gate-glass glitters: a pulsing pale ink, faster as its time runs out.
+    const glass = world.asteroids[index]?.fragile;
+    const lit = glass ? GLASS_INK : readings.get(rock.id);
     ctx.strokeStyle = lit ?? ROCK_INK;
     ctx.lineWidth = lit ? 2 : 1;
-    ctx.globalAlpha = lit ? 0.4 + 0.6 * fade : 1;
+    ctx.globalAlpha = glass ? 0.55 + 0.45 * Math.sin(world.tick * 0.15) : lit ? 0.4 + 0.6 * fade : 1;
     ctx.stroke();
     ctx.globalAlpha = 1;
-  }
+  });
   ctx.restore();
 }
+
+/** Exposed gate-glass. */
+const GLASS_INK = '#c9f0ff';
 
 const PATH_INK = 'rgba(159, 211, 199, 0.55)';
 const PATH_WARN = '#e06c5a';

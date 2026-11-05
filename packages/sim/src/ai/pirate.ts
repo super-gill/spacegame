@@ -52,6 +52,8 @@ export const PIRATE_TUNING = {
    * brake and turn away before crossing its edge.
    */
   zoneCaution: 300,
+  /** Drawn by a bloom, it stops looking this close to the blast, units. */
+  bloomArrival: 400,
   /** Fire when the nose is within this angle of the lead point, radians. About 3 degrees. */
   aimTolerance: 0.05,
   /** Fire only when the target is within this fraction of weapon range. */
@@ -269,8 +271,19 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
     const target = findTarget(world, ship, stats.sensorRange);
     if (target) {
       events.push({ type: 'huntStarted', shipId: target.id, pirateId: ship.id });
-      b = switchMode(b, 'hunt', { targetId: target.id });
+      b = switchMode(b, 'hunt', { targetId: target.id, drawnTo: null });
       return { input: steer(target.velocity, target.position), brain: b, events };
+    }
+  }
+
+  // Drawn by a breach's bloom: go and see, fast.
+  if (b.drawnTo) {
+    if (distance(ship.position, b.drawnTo) < PIRATE_TUNING.bloomArrival) {
+      b = { ...b, drawnTo: null };
+    } else {
+      const waypoint = routeAround(ship, stats, b.drawnTo, avoid(world, around));
+      const desired = travelVelocity(ship, stats, waypoint, b.drawnTo, stats.maxSpeed * 0.9);
+      return { input: steer(desired), brain: b, events };
     }
   }
 
