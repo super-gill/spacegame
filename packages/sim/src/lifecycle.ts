@@ -190,6 +190,8 @@ export interface LootStep {
 export const LOOT_SETTLE_SECONDS = 2;
 /** A tractor with no room parks loot this far beyond the hull, units, and holds it there. */
 export const TRACTOR_PARK_GAP = 40;
+/** An ore hopper spits its filtered ore out astern at this speed, units/s, relative to the ship. */
+export const HOPPER_EJECT_SPEED = 30;
 
 /**
  * Drift loot, pull it towards ships running a tractor beam, and scoop
@@ -198,8 +200,9 @@ export const TRACTOR_PARK_GAP = 40;
  * canister, the nearer ship wins it. A ship with no room for a canister
  * still catches it and parks it just off the hull, held there while the
  * beam runs (docs/mining.md); one with some room takes what fits and
- * parks the rest. A ship's ore hopper filter leaves that ore alone
- * entirely. With the gravity rule off, free loot slows to rest against
+ * parks the rest. A ship's ore hopper takes every canister in, but spits
+ * its filter's ore straight back out astern, and that ship's tractor
+ * leaves those rejects alone afterwards. With the gravity rule off, free loot slows to rest against
  * its local frame.
  */
 export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (point: Vec2) => Carry, gravityAt?: (point: Vec2) => Vec2): LootStep {
@@ -221,7 +224,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     let puller: Ship | null = null;
     let best = Infinity;
     for (const s of beams) {
-      if (s.hopperEject === item.item) continue; // filtered out: left where it is
+      if (s.hopperEject === item.item && item.ejectedBy === s.id) continue; // its own reject: left alone
       const d = distance(s.position, item.position);
       if (d <= stats[s.id]!.tractorRange && d <= best) {
         best = d;
@@ -235,6 +238,20 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     if (puller) {
       const radius = stats[puller.id]!.radius;
       const current = updated[puller.id]!;
+      // The hopper's filter: taken in, then spat out astern.
+      if (current.hopperEject === item.item && best <= radius + SCOOP_DISTANCE) {
+        const back = fromAngle(current.heading + Math.PI);
+        const spat: Loot = {
+          ...item,
+          position: add(current.position, scale(back, radius + 10)),
+          velocity: add(current.velocity, scale(back, HOPPER_EJECT_SPEED)),
+          ticksLeft: item.ticksLeft - 1,
+          ejectedBy: current.id,
+        };
+        out.push(spat);
+        events.push({ type: 'oreEjected', shipId: current.id, item: item.item, amount: item.amount });
+        continue;
+      }
       const room = holdSpaceFor(current, stats[current.id]!, world.goods, item.item);
       if (room > 0 && best <= radius + SCOOP_DISTANCE) {
         const taken = Math.min(item.amount, room);

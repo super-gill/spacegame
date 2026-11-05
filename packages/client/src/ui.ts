@@ -248,7 +248,7 @@ export class Ui {
       } else if (e.type === 'cacheDropped') {
         this.showToast(`Cache left: ${e.units} units of ore. It lasts an hour and shows on your radar.`, 2500, 'info');
       } else if (e.type === 'hopperFilterChanged') {
-        this.showToast(e.eject ? `Hopper: leaving ${e.eject} behind.` : 'Hopper: taking everything.', 1500, 'info');
+        this.showToast(e.eject ? `Hopper: spitting out ${e.eject}.` : 'Hopper: keeping everything.', 1500, 'info');
       } else if (e.type === 'collided') {
         this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'rammed') {

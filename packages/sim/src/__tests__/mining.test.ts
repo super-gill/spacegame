@@ -229,15 +229,24 @@ describe('making the light ship pay', () => {
     expect(holdSpaceFor(someOre, stats, GOODS, 'ore')).toBe(stats.cargoCapacity + 10);
   });
 
-  it("the hopper's tile cycles its filter, and the tractor leaves that ore behind", () => {
+  it("the hopper's tile cycles its filter; filtered ore is taken in and spat out astern, then left alone", () => {
     let w = setup(testRock({ contents: { ore: 12, glintstone: 3 } }));
     w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'i2' } });
     expect(w.ships['s']!.hopperEject).toBe('banded-ore');
     expect(w.events).toContainEqual({ type: 'hopperFilterChanged', shipId: 's', eject: 'banded-ore' });
     w = { ...w, ships: { s: { ...w.ships['s']!, hopperEject: 'ore' } } };
-    w = run(w, 40, { fireFixed: true, tractor: true }).w;
+    const r = run(w, 40, { fireFixed: true, tractor: true });
+    w = r.w;
     expect(w.ships['s']!.hold).toEqual({ glintstone: 3 });
     expect(oreInLoot(w)).toEqual({ ore: 12 });
+    expect(r.events.filter((e) => e.type === 'oreEjected').reduce((n, e) => n + (e.type === 'oreEjected' ? e.amount : 0), 0)).toBe(12);
+    // Behind the ship, away from the rock it faces, and marked as its rejects.
+    const ship = w.ships['s']!;
+    for (const l of w.loot) {
+      expect(l.ejectedBy).toBe('s');
+      const ahead = (l.position.x - ship.position.x) * Math.cos(ship.heading) + (l.position.y - ship.position.y) * Math.sin(ship.heading);
+      expect(ahead).toBeLessThan(0);
+    }
   });
 
   it('with no room, the tractor parks canisters beside the ship instead of scooping them', () => {

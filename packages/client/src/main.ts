@@ -716,7 +716,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const l of current.loot) drawLoot(ctx!, camera, l, l.cache !== undefined && l.cache.ownerId === me.id);
   // The tractor's reach and pull lines, only while there is room in the hold to pull into.
   const holdFull = mine ? cargoUsed(mine) >= holdCapacity(shipStats(current, mine)) : false;
-  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, holdFull ? [] : current.loot);
+  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && l.item === mine.hopperEject)));
   if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
   wasHoldFull = holdFull;
 

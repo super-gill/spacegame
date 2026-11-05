@@ -665,6 +665,12 @@ export interface Loot {
    * `ownerId` is the pilot, or the ship for an NPC. Absent: plain loot.
    */
   cache?: { ownerId: string };
+  /**
+   * The ship whose ore hopper spat this out (its filter's ore). That
+   * ship's tractor leaves it alone while the filter stays on this ore.
+   * Absent: nobody's reject.
+   */
+  ejectedBy?: string;
 }
 
 /**
@@ -1308,6 +1314,8 @@ export type WorldEvent =
   | { type: 'oreFreed'; shipId: string; rockId: string; item: string; amount: number }
   /** A ship left a cache of `units` units of ore (its hold's and loose canisters nearby). */
   | { type: 'cacheDropped'; shipId: string; units: number }
+  /** An ore hopper took in a canister of its filtered ore and spat it out astern. */
+  | { type: 'oreEjected'; shipId: string; item: string; amount: number }
   /** An ore hopper's filter changed: the ore the tractor now leaves behind, or null for none. */
   | { type: 'hopperFilterChanged'; shipId: string; eject: string | null }
   /** A rock was mined out and crumbled; `shipId` mined the last of it. */

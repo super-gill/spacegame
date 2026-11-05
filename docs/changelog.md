@@ -12,7 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - The Rook and Rivet Prospector, a mining cutter, sold at Ridge Outpost and Harbour.
 - Three new ores to sell: Banded ore, Black ore and Glintstone. Lantern Works pays best.
 - Soft rock cuts faster, and every rock has a seam: your mining computer shows it, and a beam on it cuts half as fast again.
-- An ore hopper (an internal module): hold space for ore only, and its tile sets one ore for your tractor to leave behind. The prospector carries one.
+- An ore hopper (an internal module): hold space for ore only, and its tile sets one ore it spits back out astern while your tractor takes in everything else. The prospector carries one.
 - Ore caches (J): leave the ore aboard, and loose ore nearby, as a cache that lasts an hour and shows on your radar. Anyone can take it.
 - The tractor tile says HOLD FULL, and a message says so once, when there is no room left to pull loot into.
 
