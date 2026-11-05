@@ -19,11 +19,14 @@ import { serveClient } from './web.js';
  * 3. steps the world 60 times a second, sends each player what changed
  *    20 times a second, and saves every minute and on the way out.
  *
- * Settings come from the environment: `PORT` (default 8080) and
- * `SPACEGAME_DATA` (default `packages/server/data`).
+ * Settings come from the environment: `PORT` (default 8080), `HOST`
+ * (default every network) and `SPACEGAME_DATA` (default
+ * `packages/server/data`).
  */
 
 const PORT = Number(process.env['PORT'] ?? 8080);
+/** Which network to listen on: every one by default; `127.0.0.1` for this PC only, when Tailscale Serve passes friends in (docs/hosting.md). */
+const HOST = process.env['HOST'] || undefined;
 const DATA = process.env['SPACEGAME_DATA'] ?? fileURLToPath(new URL('../data', import.meta.url));
 const CLIENT = fileURLToPath(new URL('../../client/dist', import.meta.url));
 
@@ -174,7 +177,7 @@ sockets.on('connection', (socket) => {
   });
 });
 
-http.listen(PORT, () => {
+http.listen(PORT, HOST, () => {
   console.log(`Spacegame server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}.`);
   console.log(`Open http://localhost:${PORT} here, or http://<this machine's Tailscale address>:${PORT} from a friend's.`);
   console.log('Type help for the console commands (op, deop, who, save, stop).');

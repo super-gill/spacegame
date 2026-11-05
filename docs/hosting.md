@@ -36,6 +36,17 @@ Sharing your PC lets a friend reach any program on it that accepts connections, 
 
 If another program already uses port 8080, start the game on another, for example `$env:PORT=8090; npm start` in PowerShell, and give friends that port.
 
+## Only the game, at a Tailscale web address (recommended)
+
+Instead of opening port 8080 to friends, let Tailscale Serve hand them the game at your PC's own HTTPS address, such as `https://your-pc.your-tailnet.ts.net`, and keep the game itself listening on your PC only:
+
+1. Start the game for this PC only. In PowerShell: `$env:HOST="127.0.0.1"; npm start`
+2. In another terminal, once: `tailscale serve --bg --https=443 8080`. It keeps running in the background, across restarts, until you turn it off with `tailscale serve reset`. If Tailscale asks you to turn on HTTPS certificates for your tailnet, do (admin console, DNS).
+3. Give friends the `https://...ts.net` address it prints.
+4. In the access rules, let shared users reach only port 443: `{ "src": ["autogroup:shared"], "dst": ["*"], "ip": ["443"] }`, and make sure no rule with `"src": ["*"]` lets them reach the rest.
+
+Now a friend can reach only what Serve passes on (the game), and nothing else on your PC, because nothing else is listening to them. The game switches to a secure connection by itself when the page is HTTPS.
+
 ## Characters and operators
 
 - Everyone is a **player** (log in and play) or an **operator** (also the admin controls: credits, spawning ships, the world's switches). The server checks this for every admin command, not just the menu.
@@ -64,6 +75,7 @@ To back up, copy the folder while the server is stopped. To start a new world, s
 Set before `npm start`, for example `PORT=9000 npm start` (on Windows PowerShell: `$env:PORT=9000; npm start`):
 
 - `PORT`: the port, default 8080.
+- `HOST`: the network to listen on, default all of them; `127.0.0.1` for this PC only (with Tailscale Serve).
 - `SPACEGAME_DATA`: the data folder.
 
 ## Development
