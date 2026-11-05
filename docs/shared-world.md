@@ -55,9 +55,9 @@ Rough size: a few kilobytes per update near a busy station, tens of kilobytes a 
 
 The game is server and client only (Jason). Playing alone means running the server on your own machine. Browser-storage saves and save export in the client go away; the server's save file replaces them. The fitter page stays a standalone tool: it needs no world.
 
-### Admin
+### Players and operators
 
-The admin switches (orbits, gravity and so on) work only for the host's character, set on the server.
+Every character is a **player** or an **operator** (Jason, 5 November 2026). Operators also get the admin controls (credits, spawning ships, the world's switches, which change the whole server); the server refuses admin commands from players, whatever their page sends. The first character made on a new server is an operator; the host makes others with `op <name>` and `deop <name>` in the server's console (`docs/hosting.md`).
 
 ## Order of work
 

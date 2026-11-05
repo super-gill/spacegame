@@ -2,7 +2,7 @@
   "name": "spacegame",
   "version": "0.13.0",
   "private": true,
-  "description": "Single-player 2D free-roam space sim in the spirit of Flatspace. Browser, TypeScript, Canvas 2D.",
+  "description": "Shared-world 2D free-roam space sim in the spirit of Flatspace. Node server, browser client, TypeScript, Canvas 2D.",
   "workspaces": [
     "packages/*"
   ],
@@ -12,7 +12,8 @@
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
     "preview": "npm run preview --workspace=@spacegame/client",
-    "audit": "vite-node scripts/audit.ts"
+    "audit": "vite-node scripts/audit.ts",
+    "start": "npm run start --workspace=@spacegame/server"
   },
   "engines": {
     "node": ">=20"

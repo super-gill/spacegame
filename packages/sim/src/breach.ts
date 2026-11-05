@@ -227,6 +227,7 @@ export function collapseCores(asteroids: readonly Asteroid[], tick: number): { a
     events.push({ type: 'coreCollapsed', rockId: a.id, shipId: '', amount: oreLeft(a) });
     return false;
   });
-  return { asteroids: kept.length === asteroids.length ? [...asteroids] : kept, events };
+  // Nothing collapsed: the same list, so an unchanged belt is the same object (docs/shared-world.md).
+  return { asteroids: kept.length === asteroids.length ? (asteroids as Asteroid[]) : kept, events };
 }
 

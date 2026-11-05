@@ -4,6 +4,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- The shared world (docs/shared-world.md, docs/hosting.md). The world runs on a server on the host's PC (`npm start`), saved to a file every minute; everyone plays in their browser, friends over Tailscale.
+- Characters: make one with a name (a suggestion fills the box) and get a key, shown once to keep; log in from any browser with name and key; this browser remembers it too. Names are unique. Two tabs can play two characters at once; logging in as a character already playing disconnects the other tab and says why.
+- Players and operators: only operators get the admin controls, and the server refuses admin commands from players. The first character on a new server is an operator; the host makes others with `op` and `deop` in the server's console (also `who`, `save`, `stop`).
+- A connection meter in the top right corner: the round trip to the server, green, amber or red. Click it away; the menu brings it back.
+
+### Changed
+- No single-player mode and no browser saves: the server keeps the world. Save, export, import and new game are gone from the menu; the menu shows your character and key instead.
+
+### Known
+- A ship left in space when its pilot logs off stays there for now; it is meant to vanish after a short while and come back when they return.
+- Each player is sent every ship and station 20 times a second, about 20 KB an update near Harbour; sending only what a player's sensors can see comes next.
+
 ## [0.13.0] - 2026-11-05
 
 Mining grows up and fitting is rebuilt. Drones, NPC miners and breaching for gate-glass; ore holds, sorting hoppers and loot that remembers whose it is; slot tiers (high, mid, low) with placement on the hull, buy then fit, and a new fitting window shared with the fitter page; the first big warships. Saves from 0.12.0 load and are upgraded (save version 12).

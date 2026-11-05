@@ -1,12 +1,12 @@
 # spacegame
 
-A 2D free-roam space sim in the spirit of Flatspace, built for the browser. Play solo, or (later) with a few friends on a world one of you hosts, Minecraft style.
+A 2D free-roam space sim in the spirit of Flatspace, played in the browser in one shared world that one of you hosts, Minecraft style: a small Node server runs the world and everyone joins it from their browser.
 
 Version 0.13.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 
-Milestone 6a, "modular ships": ships are built from a hull and the modules fitted to its mount points, and every bit of performance comes from the fit. Refit at Harbour Station's outfitting screen and watch the stats and the drawing change. One sector with two trading stations, an armed trader in a Tessaract hauler and a pirate in a Kessari frigate that hunts lone ships outside station security. Click or Tab to target; fixed guns on Space with a lead marker, and turrets that engage your target on their own while weapons are hot. Shields, ramming, wrecks, loot and a tractor beam. Cargo has mass. The world autosaves in the browser and can be exported and imported as a file. Pure Newtonian flight with three flight-assist modes. See [docs/roadmap.md](docs/roadmap.md).
+A star system with three stations, traders, pirates, the Calder Watch and NPC miners; modular ships fitted EVE-style (high, mid and low slots); four weapon families, missiles and countermeasures; mining with drones and breaching for gate-glass. Since 0.13.0 the world runs on a server and friends join it over Tailscale (docs/shared-world.md, in progress). See [docs/roadmap.md](docs/roadmap.md) and [docs/changelog.md](docs/changelog.md).
 
 ## Quick start
 
@@ -14,10 +14,11 @@ Requires Node 20 or newer.
 
 ```sh
 npm install
-npm run dev
+npm run build
+npm start
 ```
 
-Open the URL Vite prints (normally http://localhost:5173).
+Open http://localhost:8080 and make a character (the first one on a new server is an operator). Friends on your tailnet open `http://<your Tailscale address>:8080`. Hosting, keys, operators and the server console: [docs/hosting.md](docs/hosting.md).
 
 ## Controls
 
@@ -36,7 +37,7 @@ Open the URL Vite prints (normally http://localhost:5173).
 | Dock / undock | F (when the station name shows in the HUD) |
 | Refit | Outfitting tab while docked at Harbour Station |
 | Controls panel | F1 or ` |
-| Menu (name, settings, save, export, import, new game) | F2 |
+| Menu (your character and key, settings, admin for operators) | F2 |
 
 Press F1 in game for the full list. Detail in [docs/controls.md](docs/controls.md).
 
@@ -44,8 +45,9 @@ Press F1 in game for the full list. Detail in [docs/controls.md](docs/controls.m
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Start the client with hot reload |
-| `npm test` | Run the sim's unit tests |
+| `npm start` | Run the server (the world), serving the built client on port 8080 |
+| `npm run dev` | The client with hot reload on port 5173, talking to the server started with `npm start` |
+| `npm test` | Run the unit tests (sim, client, server) |
 | `npm run typecheck` | Type-check every package |
 | `npm run build` | Type-check and produce a static site in `packages/client/dist` |
 | `npm run preview` | Serve the built site locally |
@@ -55,7 +57,8 @@ Press F1 in game for the full list. Detail in [docs/controls.md](docs/controls.m
 ```
 packages/
   sim/      Headless game simulation. Pure TypeScript, no DOM, no timers.
-  client/   Browser client. Vite, Canvas 2D, input, HUD.
+  client/   Browser client. Vite, Canvas 2D, input, HUD; logs in and draws what the server sends.
+  server/   The shared-world server: runs the sim, saves it, serves the client, WebSocket.
 docs/       Design, architecture, controls, roadmap, changelog.
 ```
 

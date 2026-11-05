@@ -270,7 +270,9 @@ export function cutRocks(
       out[id] = rest;
     }
   }
-  return { asteroids: rocks, ships: out ?? (ships as Record<string, Ship>), loot, events, idsUsed };
+  // Nothing cut: hand back the same list, so the server can tell the belt has not changed (docs/shared-world.md).
+  const same = rocks.length === asteroids.length && rocks.every((r, i) => r === asteroids[i]);
+  return { asteroids: same ? (asteroids as Asteroid[]) : rocks, ships: out ?? (ships as Record<string, Ship>), loot, events, idsUsed };
 }
 
 /** How much faster than its plain rate a laser of this strength cuts rock this hard (1 at its limit). */

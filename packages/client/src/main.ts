@@ -1,6 +1,6 @@
 import {
-  applyCommand,
-  type CommandOutcome,
+  type CommandReply,
+  type WorldUpdate,
   type PilotCommand,
   activationSlots,
   type AdminRefusal,
@@ -11,10 +11,8 @@ import {
   STARTER_STATION_ID,
   occupiedPads,
   type WorldEvent,
-  createStarterWorld,
   distance,
   type TradeRefusal,
-  joinPilot,
   leadPoint,
   incomingMunitions,
   isGun,
@@ -34,7 +32,6 @@ import {
   pilotShip,
   flightWarnings,
   shipStats,
-  stepWorld,
   wrapAngle,
   type Ship,
   type ShipInput,
@@ -43,12 +40,14 @@ import {
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
-import { loadLocalPilot, saveLocalPilot } from './identity.js';
+import { chooseCharacter } from './login-screen.js';
+import { keyFor } from './net/characters.js';
+import { serverAddress } from './net/link.js';
+import { ConnectionMeter, showDisconnected } from './hud/connection.js';
 import { MenuPanel } from './menu-panel.js';
 import { DronePanel } from './hud/drone-panel.js';
 import { HoldPanel } from './hud/hold-panel.js';
 import { WindowManager } from './hud/windows.js';
-import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWorld, storeWorld } from './persistence.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
 import { SLOT_ACTIONS } from './bindings.js';
@@ -89,17 +88,16 @@ import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
 /**
  * Game loop.
  *
- * The sim runs at a fixed 60 Hz regardless of display refresh. Rendering
- * runs on requestAnimationFrame and interpolates between the previous and
- * current sim states so motion is smooth on 120 Hz screens and stable on
- * slow ones. This is the only file that knows about both sim and DOM.
+ * The world runs on the server (docs/shared-world.md). This client logs
+ * in as one character, sends that pilot's controls 60 times a second and
+ * their commands when they act, and draws the world the server sends
+ * about 20 times a second, interpolating between the last two updates so
+ * motion is smooth. This is the only file that knows about both the sim
+ * and the DOM.
  *
  * The sim has no "player". This client is one pilot in the world: it
- * joins with its local identity, sends input for that pilot's ship only,
- * and shows events involving that ship only. Today the world runs here in
- * the browser; for a shared world it will run on the host's server instead
- * and this loop will send inputs and pilot commands (like respawn) and
- * receive states over the network.
+ * sends input for that pilot's ship only, and shows events involving
+ * that ship only.
  */
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
@@ -144,6 +142,8 @@ const ui = new Ui(
   () => claimStarter(),
 );
 const hudLayer = document.getElementById('hud-layer')!;
+// The connection meter (docs/shared-world.md): round trip to the server, in a corner.
+const meter = new ConnectionMeter(hudLayer);
 const flightHud = new FlightHud(hudLayer);
 // Windows (hud/windows.ts): the hold and the drone manager, with a launcher strip.
 const windows = new WindowManager(hudLayer);
@@ -163,7 +163,10 @@ const targetCard = new TargetCard(
 );
 const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
 
-let me = loadLocalPilot();
+// Character select first: nothing below runs until this tab is logged in.
+const session = await chooseCharacter();
+const link = session.link;
+const me = { id: session.welcome.pilotId, name: session.welcome.name };
 const settings = loadSettings();
 canvas.classList.toggle('mouse-steering', settings.mouseSteering);
 input.mouseSteering = settings.mouseSteering;
@@ -194,13 +197,12 @@ const HANGAR_REFUSALS: Record<HangarRefusal, string> = {
 
 /**
  * Pilot commands (docs/shared-world.md). Everything the pilot asks for
- * that is not flying goes through `send` as a `PilotCommand`, and its
- * outcome comes back to `received`. For now the command is applied here
- * in the page; with the server, `send` puts it on the wire and the
- * server's reply arrives at `received`, so nothing else changes.
+ * that is not flying goes to the server through `send` as a
+ * `PilotCommand`; its outcome comes back to `received`, and the change to
+ * the world arrives with the next update.
  */
 function send(command: PilotCommand): void {
-  received(command, applyCommand(current, me.id, command));
+  link.sendCommand(command);
 }
 
 /** Why a command was refused, in the pilot's words, by the command that was refused. */
@@ -227,7 +229,7 @@ function refusalText(command: PilotCommand, reason: string): string | null {
       case 'adminGrantCredits':
       case 'adminSetRule':
       case 'adminSpawnShip':
-        return ADMIN_REFUSALS;
+        return { ...ADMIN_REFUSALS, notAdmin: 'Only the host can do that.' };
       // The buttons for these only show when they would work.
       case 'claimStarter':
       case 'wake':
@@ -237,17 +239,13 @@ function refusalText(command: PilotCommand, reason: string): string | null {
   return table ? (table[reason] ?? `Refused: ${reason}.`) : null;
 }
 
-/** A command's outcome: the new world and a toast, or why it was refused. */
-function received(command: PilotCommand, outcome: CommandOutcome): void {
+/** A command's outcome: a toast, or why it was refused. */
+function received(command: PilotCommand, outcome: CommandReply): void {
   if (!outcome.ok) {
     const text = refusalText(command, outcome.reason);
     if (text) ui.notify(text, 'warn');
     return;
   }
-  // Treat the new state as the previous one too, so nothing interpolates
-  // from where it was (boarding can move us into another ship far away).
-  current = outcome.world;
-  previous = current;
   const e = outcome.event;
   const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
   const moduleName = (id: string) => current.modules[id]?.name ?? id;
@@ -268,12 +266,12 @@ function received(command: PilotCommand, outcome: CommandOutcome): void {
   } else {
     ui.announce(current, e);
   }
-  // Waking puts us somewhere new: look there.
-  if (command.type === 'wake') {
-    const ship = myShip(current);
-    if (ship) camera.snapTo(ship.position);
-  }
+  // Waking or boarding can put us somewhere new: look there when the next update lands.
+  if (command.type === 'wake' || command.type === 'boardShip' || command.type === 'claimStarter') snapOnNextUpdate = true;
 }
+
+/** Set by a command that moves us: the next update snaps the camera and skips interpolating. */
+let snapOnNextUpdate = false;
 
 /** Pilot command: buy or sell at the station we are docked at. */
 function trade(request: TradeRequest): void {
@@ -338,46 +336,22 @@ function claimStarter(): void {
   send({ type: 'claimStarter' });
 }
 
-// Start from the saved world if there is one. joinPilot leaves a returning
-// pilot exactly as they were, and gives a new one a starter ship.
-const stored = loadStoredWorld();
-let previous: World = joinPilot(stored.kind === 'loaded' ? stored.world : createStarterWorld(), me.id, me.name);
+// The world as the server last sent it (`current`) and the update before
+// (`previous`), drawn in between; and when the last update arrived.
+let previous: World = session.welcome.world;
 let current: World = previous;
-if (stored.kind === 'unreadable') {
-  ui.notify(`${LOAD_REFUSALS[stored.reason]} Starting a new world; the old save was kept aside.`, 'warn');
-}
+let updateArrivedMs = performance.now();
+/** Time between updates, ms: 3 ticks at 60 a second (the server's UPDATE_EVERY_TICKS). */
+const UPDATE_INTERVAL_MS = 50;
 
-/** Replace the whole world (load, import, new game) and point the camera at our ship. */
-function replaceWorld(world: World): void {
-  current = joinPilot(world, me.id, me.name);
-  previous = current;
-  const ship = myShip(current);
-  if (ship) camera.snapTo(ship.position);
-  market.invalidate();
-  outfitting.invalidate();
-  shipMart.invalidate();
-  yourShips.invalidate();
-}
-
-// Saving: autosave every few seconds and whenever the tab is hidden or closed.
-const AUTOSAVE_MS = 10_000;
-let lastSaveMs = performance.now();
-let lastSaveOk = true;
-function saveNow(): void {
-  lastSaveOk = storeWorld(current, new Date());
-  lastSaveMs = performance.now();
-}
-window.addEventListener('pagehide', saveNow);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') saveNow();
-});
-
-const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, me.name, settings, {
-  rename(name) {
-    me = { ...me, name };
-    saveLocalPilot(me);
-    current = joinPilot(current, me.id, me.name);
-    ui.notify(`Pilot name: ${name}`);
+const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, settings, {
+  showMeter() {
+    meter.setHidden(false);
+  },
+  switchCharacter() {
+    // Back to character select: the simplest clean way is a fresh page.
+    link.close();
+    location.reload();
   },
   setShowLabels(show) {
     settings.showLabels = show;
@@ -388,30 +362,6 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     saveSettings(settings);
     canvas.classList.toggle('mouse-steering', on);
     input.mouseSteering = on;
-  },
-  saveNow() {
-    saveNow();
-    ui.notify(lastSaveOk ? 'World saved.' : 'Could not save: browser storage is not available.', lastSaveOk ? 'info' : 'warn');
-  },
-  exportSave() {
-    exportWorld(current, new Date());
-  },
-  importSave(file) {
-    void importWorld(file).then((r) => {
-      if (!r.ok) {
-        ui.notify(LOAD_REFUSALS[r.reason], 'warn');
-        return;
-      }
-      replaceWorld(r.world);
-      saveNow();
-      ui.notify('World imported.');
-    });
-  },
-  newGame() {
-    clearStoredWorld();
-    replaceWorld(createStarterWorld());
-    saveNow();
-    ui.notify('New world started.');
   },
   grantCredits(amount) {
     send({ type: 'adminGrantCredits', amount });
@@ -613,30 +563,29 @@ function steer(sampled: ShipInput, ship: Ship): ShipInput {
   };
 }
 
-// Fixed-timestep accumulator.
-let accumulator = 0;
-let lastFrameMs = performance.now();
-const MAX_FRAME_SECONDS = 0.25; // clamp so a background tab does not spiral
-
-// FPS smoothing for the HUD.
-let fpsSmoothed = 60;
-
-function tick(nowMs: number): void {
+/** One client tick: the pilot's controls to the server. */
+function tick(): void {
   const ship = myShip(current);
-  const inputs: Record<string, ShipInput> = {};
-  if (ship) {
-    inputs[ship.id] = steer(input.sample(), ship);
-  } else {
-    input.sample(); // drain latched presses so they do not fire on respawn
+  if (ship) link.sendInput(steer(input.sample(), ship));
+  else input.sample(); // drain latched presses so they do not fire on respawn
+}
+
+/** The server sent what changed: step our copy of the world, and react to the events. */
+function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): void {
+  // Note where ships are before they can be gone from this update, for explosions.
+  const before = current.ships;
+  const flying = new Map(current.munitions.map((m) => [m.id, m]));
+  previous = current;
+  current = { ...current, ...changed, events };
+  updateArrivedMs = nowMs;
+  if (snapOnNextUpdate) {
+    snapOnNextUpdate = false;
+    previous = current;
+    const ship = myShip(current);
+    if (ship) camera.snapTo(ship.position);
   }
 
-  // Note where ships are before they can be destroyed this tick, for explosions.
-  const before = current.ships;
-  previous = current;
-  current = stepWorld(current, inputs);
-
-  const flying = new Map(previous.munitions.map((m) => [m.id, m]));
-  for (const e of current.events) {
+  for (const e of events) {
     if (e.type === 'destroyed') {
       const gone = before[e.shipId];
       if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
@@ -652,10 +601,11 @@ function tick(nowMs: number): void {
       if (hit) explosions.push({ at: hit.position, radius: 10, startMs: nowMs });
     }
   }
+  const ship = myShip(current) ?? myShip(previous);
   if (ship) {
-    ui.handleEvents(current.events, ship.id);
+    ui.handleEvents(events, ship.id);
     // Undocking in a ship that cannot fly is allowed, but never silent.
-    if (current.events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
+    if (events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
       for (const w of flightWarnings(shipStats(current, ship))) {
         if (w !== 'noWeapons') ui.notify(FLIGHT_WARNINGS[w], 'warn');
       }
@@ -663,25 +613,50 @@ function tick(nowMs: number): void {
   }
 }
 
+link.listen({
+  update: (_tick, changed, events) => updated(changed, events, performance.now()),
+  outcome: (command, outcome) => received(command, outcome),
+  latency: (ms) => meter.show(ms),
+  closed: (reason) => showDisconnected(reason),
+});
+
+// Controls go out at the sim's own rate, whatever the display's refresh.
+let accumulator = 0;
+let lastFrameMs = performance.now();
+const MAX_FRAME_SECONDS = 0.25; // clamp so a background tab does not spiral
+const TICK_SECONDS = current.dt;
+
+// FPS smoothing for the HUD.
+let fpsSmoothed = 60;
+
 function frame(nowMs: number): void {
   const frameSeconds = Math.min((nowMs - lastFrameMs) / 1000, MAX_FRAME_SECONDS);
   lastFrameMs = nowMs;
-  if (nowMs - lastSaveMs >= AUTOSAVE_MS) saveNow();
-  const ago = Math.round((nowMs - lastSaveMs) / 1000);
-  menu.setSavedStatus(lastSaveOk ? `Saved ${ago} s ago, in this browser.` : 'Not saving: browser storage is not available.');
   menu.setGravity(current.rules.gravity);
   menu.setOrbits(current.rules.orbits);
   menu.setManoeuvreSpeed(current.rules.manoeuvreSpeed);
   accumulator += frameSeconds;
   fpsSmoothed += (1 / Math.max(frameSeconds, 1e-6) - fpsSmoothed) * 0.05;
 
-  while (accumulator >= current.dt) {
-    tick(nowMs);
-    accumulator -= current.dt;
+  while (accumulator >= TICK_SECONDS) {
+    tick();
+    accumulator -= TICK_SECONDS;
   }
 
-  render(accumulator / current.dt, frameSeconds, nowMs);
+  // Draw between the last two updates: 0 is the previous one, 1 the latest.
+  render(Math.min(1, (nowMs - updateArrivedMs) / UPDATE_INTERVAL_MS), frameSeconds, nowMs);
   requestAnimationFrame(frame);
+}
+
+/**
+ * The world and the fraction of a tick to draw bodies at: updates are
+ * several ticks apart, and the body drawing moves on by a fraction of one
+ * tick from `world.tick`.
+ */
+function bodiesAt(alpha: number): [World, number] {
+  const at = previous.tick + (current.tick - previous.tick) * alpha;
+  const whole = Math.floor(at);
+  return [{ ...current, tick: whole + 1 }, at - whole];
 }
 
 /** Interpolated position and heading of a ship, for drawing only; the sim is untouched. */
@@ -740,7 +715,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   ctx!.fillRect(0, 0, camera.viewportWidth, camera.viewportHeight);
   drawStarfield(ctx!, camera);
 
-  drawBodies(ctx!, camera, current, alpha);
+  drawBodies(ctx!, camera, ...bodiesAt(alpha));
   drawAsteroids(ctx!, camera, current, mine);
 
   // Stations move on rails: draw them between ticks like ships, so docked ships stay on their pads.
@@ -770,7 +745,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   wasHoldFull = holdFull;
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
-  if (mine) drawNav(ctx!, camera, current, mine, alpha);
+  if (mine) drawNav(ctx!, camera, bodiesAt(alpha)[0], mine, bodiesAt(alpha)[1]);
   // Every ship, flying or docked: a docked ship's position is its pad.
   for (const ship of Object.values(current.ships)) {
     const hull = current.hulls[ship.hullId]!;

@@ -8,6 +8,11 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
+    // In development (npm run dev) the page comes from Vite, the world from
+    // the game server (npm start): pass the WebSocket through to it.
+    proxy: {
+      '/ws': { target: 'ws://localhost:8080', ws: true },
+    },
   },
   build: {
     target: 'es2022',
