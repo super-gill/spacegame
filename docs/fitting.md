@@ -1,6 +1,6 @@
 # Fitting overhaul (design, 5 November 2026)
 
-**Status: draft for Jason's review. No code until he approves it.** Supersedes the mount types in `docs/ships.md` and the slot budget in `docs/ship-systems.md` once built.
+**Status: approved by Jason, 5 November 2026.** Building starts with the fitter, after 0.13.0. Supersedes the mount types in `docs/ships.md` and the slot budget in `docs/ship-systems.md` once built.
 
 ## Goals (Jason, 5 November)
 
@@ -30,7 +30,7 @@ Every ship has **core systems**, one of each, at a size the hull sets. Then **hi
 
 - **High slots are hardpoints:** each has a place on the hull and a firing arc, as weapon mounts do now. Mid and low slots have places only so the ship can be drawn from its fit.
 - **The dedicated mining mount goes.** Mining turrets fit high slots; the Hulk's two big highs have full arcs. The mining hull's bonus is the nudge.
-- **Tractor and charge rig move to high** (Jason, agreed). **Afterburner moves to mid.** Jason's rule of thumb: outward-acting in high, inward in mid, passive in low; how scanners, countermeasures and electronic warfare fit that rule is still open (question 1).
+- **Tractor and charge rig move to high** (Jason, agreed). **Afterburner moves to mid.** The rule (Jason, 5 November): high does work on something else; mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
 - **Drone bays stay a low** so any ship can trade armour for drones. Carriers later get theirs built in.
 
 ### Sizes
@@ -125,5 +125,6 @@ Answered 5 November (Jason):
 - Big guns struggle with small ships by **both** weapon resolution against signature and slower big turrets; mindful that big ships must still defend themselves (the floor, small highs, drones and the audit check above). The floor starts at about 40%, to tune.
 - The starter system is the dev environment: every station sells every module. The real, playable systems come with the map (8), with regional stock.
 
-Still open:
-1. **The tier rule's wording.** "Outward in high, inward in mid, passive in low" would put survey scanners, countermeasures and electronic warfare in highs, but your list had them in mids, as EVE does on purpose (a fighting ship trades tank for interference). Lead's wording: high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
+- **The tier rule:** high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive. Scanners, countermeasures and electronic warfare are mids.
+
+Nothing open: the design is approved for building, starting with the fitter.
