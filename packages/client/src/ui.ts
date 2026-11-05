@@ -1,6 +1,7 @@
 import type { BoardRefusal, LockRefusal, Ship, Station, World, WorldEvent } from '@spacegame/sim';
 import {
   BOARD_MAX_RELATIVE_SPEED,
+  GOODS,
   CORE_LIFETIME,
   PLANT_REACH,
   SAFE_DISTANCE,
@@ -235,6 +236,11 @@ export class Ui {
    * Toasts for events involving this pilot's ship: things that happened to
    * it (`shipId`) or that it caused (`by`).
    */
+  /** A good's display name, from the catalogue. */
+  private goodName(id: string): string {
+    return GOODS[id]?.name ?? id;
+  }
+
   /** Rocks seen breaking up (breached, mined out, collapsed); their lost locks go unannounced. */
   private brokenRocks = new Set<string>();
 
@@ -290,7 +296,14 @@ export class Ui {
         const say = { off: 'Tractor off.', mine: 'Tractor on: your own loot only.', all: "Tractor on: everything in reach, other people's too." }[e.mode];
         this.showToast(say, 1500, e.mode === 'all' ? 'warn' : 'info');
       } else if (e.type === 'hopperFilterChanged') {
-        this.showToast(e.eject ? `Hopper: spitting out ${e.eject}.` : 'Hopper: keeping everything.', 1500, 'info');
+        const names = e.drop.map((g) => this.goodName(g)).join(', ');
+        this.showToast(e.on && e.drop.length > 0 ? `Hopper: spitting out ${names}.` : 'Hopper: keeping everything.', 1500, 'info');
+      } else if (e.type === 'jettisoned') {
+        this.showToast(`Jettisoned ${e.amount} ${this.goodName(e.item)}. Anyone can take it.`, 2000, 'info');
+      } else if (e.type === 'jettisonRefused') {
+        this.showToast(e.reason === 'docked' ? 'Undock to jettison.' : 'Nothing of that aboard.', 1500);
+      } else if (e.type === 'oreTradedUp') {
+        this.showToast(`Hopper: traded ${e.amount} ${this.goodName(e.dropped)} for ${this.goodName(e.item)}.`, 1200, 'info');
       } else if (e.type === 'collided') {
         this.showToast(`Hull contact at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'rammed') {

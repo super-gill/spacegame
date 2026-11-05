@@ -17,6 +17,7 @@ import {
   holdCapacity,
   SURVEY_CYCLE_SECONDS,
   breachAction,
+  hopperRejects,
   isSwitchedOn,
   rockAt,
 } from '@spacegame/sim';
@@ -255,10 +256,12 @@ export class FlightHud {
         setText(tile.state, !rock ? 'NO ROCK' : beam ? (beam.cutting ? (beam.onSeam ? 'ON SEAM' : 'CUTTING') : 'TOO HARD') : 'OUT OF REACH');
         tile.root.classList.toggle('active', Boolean(beam?.cutting));
       } else if (s.moduleKind === 'oreHopper') {
-        // The hopper's filter: the one ore the tractor leaves behind.
-        const eject = ship.hopperEject;
-        setText(tile.state, eject ? `DROP ${(world.goods[eject]?.name ?? eject).toUpperCase()}` : 'TAKE ALL');
-        tile.root.classList.toggle('active', Boolean(eject));
+        // The hopper's sorting: a small one names the ore it drops; a bigger one says whether its list is on.
+        const drop = hopperRejects(ship);
+        const grade = shipStats(world, ship).hopperGrade;
+        const text = drop.length === 0 ? 'TAKE ALL' : grade <= 1 ? `DROP ${(world.goods[drop[0]!]?.name ?? drop[0]!).toUpperCase()}` : `SORTING · ${drop.length} OUT`;
+        setText(tile.state, text);
+        tile.root.classList.toggle('active', drop.length > 0);
       } else if (s.moduleKind === 'breachCharger') {
         // What a press does now: plant, set off, or why neither.
         const left = ship.hold['breach-charge'] ?? 0;

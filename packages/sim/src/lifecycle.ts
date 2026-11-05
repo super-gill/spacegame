@@ -9,6 +9,7 @@ import {
 import { freePadFor, onPad } from './docking.js';
 import { buildShip } from './factory.js';
 import { isEscapePod, lootClaim, pilotsAboard, tractorTakes } from './ownership.js';
+import { hopperRejects, tradeUpFor } from './mining.js';
 import { ejectPilot } from './pilots.js';
 import { fitStats, shipStats } from './stats.js';
 import { holdSpaceFor } from './trade.js';
@@ -242,10 +243,13 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     let puller: Ship | null = null;
     let best = Infinity;
     for (const s of beams) {
-      if (s.hopperEject === item.item && item.ejectedBy === s.id) continue; // its own reject: left alone
+      const rejected = hopperRejects(s).includes(item.item);
+      if (rejected && item.ejectedBy === s.id) continue; // its own reject: left alone
+      if (item.jettisoned && item.ejectedBy === s.id && s.tractorMode !== 'all') continue; // thrown out on purpose
       if (!tractorTakes(s, claims[s.id]!, item)) continue; // someone else's, and not set to take all
-      // No room for it: gather it only while sitting still (the hopper's filter ore still goes in, to be spat out).
-      if (s.hopperEject !== item.item && !still.has(s.id) && holdSpaceFor(updated[s.id]!, stats[s.id]!, world.goods, item.item) <= 0) continue;
+      // No room for it: gather it only while sitting still (a reject still goes in, to be spat out; a large hopper trades up).
+      const room = holdSpaceFor(updated[s.id]!, stats[s.id]!, world.goods, item.item);
+      if (!rejected && !still.has(s.id) && room <= 0 && !tradeUpFor(updated[s.id]!, stats[s.id]!.hopperGrade, room, world.goods, item.item)) continue;
       const d = distance(s.position, item.position);
       if (d <= stats[s.id]!.tractorRange && d <= best) {
         best = d;
@@ -259,8 +263,8 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     if (puller) {
       const radius = stats[puller.id]!.radius;
       const current = updated[puller.id]!;
-      // The hopper's filter: taken in, then spat out astern.
-      if (current.hopperEject === item.item && best <= radius + SCOOP_DISTANCE) {
+      // The hopper's rejects: taken in, then spat out astern.
+      if (hopperRejects(current).includes(item.item) && best <= radius + SCOOP_DISTANCE) {
         const back = fromAngle(current.heading + Math.PI);
         const spat: Loot = {
           ...item,
@@ -274,7 +278,21 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
         continue;
       }
       const room = holdSpaceFor(current, stats[current.id]!, world.goods, item.item);
-      if (room > 0 && best <= radius + SCOOP_DISTANCE) {
+      // A large hopper with the ore hold full: in with the better ore, out with as much of the cheapest.
+      const cheaper = tradeUpFor(current, stats[current.id]!.hopperGrade, room, world.goods, item.item);
+      if (cheaper && best <= radius + SCOOP_DISTANCE) {
+        const amount = Math.min(item.amount, current.hold[cheaper] ?? 0);
+        const left = (current.hold[cheaper] ?? 0) - amount;
+        const { [cheaper]: _out, ...rest } = current.hold;
+        const hold = { ...rest, ...(left > 0 ? { [cheaper]: left } : {}), [item.item]: (current.hold[item.item] ?? 0) + amount };
+        updated[puller.id] = { ...current, hold };
+        const back = fromAngle(current.heading + Math.PI);
+        out.push({ id: `${item.id}x${world.tick}`, item: cheaper, amount, position: add(current.position, scale(back, radius + 10)), velocity: add(current.velocity, scale(back, HOPPER_EJECT_SPEED)), ticksLeft: item.ticksLeft, ejectedBy: current.id, ...(claims[current.id] ? { claim: claims[current.id]! } : {}) });
+        events.push({ type: 'oreTradedUp', shipId: current.id, item: item.item, dropped: cheaper, amount });
+        if (amount === item.amount) continue;
+        remaining = { ...item, amount: item.amount - amount };
+        velocity = frameAt(item.position);
+      } else if (room > 0 && best <= radius + SCOOP_DISTANCE) {
         const taken = Math.min(item.amount, room);
         const hold = { ...current.hold, [item.item]: (current.hold[item.item] ?? 0) + taken };
         updated[puller.id] = { ...current, hold };
@@ -283,7 +301,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
         // The hold is now full: the rest stays where it is.
         remaining = { ...item, amount: item.amount - taken };
         velocity = frameAt(item.position);
-      } else if (room <= 0) {
+      } else if (room <= 0 && !cheaper) {
         // Full and sitting still: draw it in, and stop it beside the hull.
         const frame = frameAt(item.position);
         const towards = normalise(sub(puller.position, item.position));

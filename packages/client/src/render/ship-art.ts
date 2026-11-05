@@ -258,7 +258,6 @@ function drawModule(
       });
       return;
     case 'cargoPod':
-    case 'oreHold':
       // Cargo pod: a solid block with bands.
       body(() => ctx.rect(-3.75 * k, -2 * k, 7.5 * k, 4 * k), 0.4);
       ctx.globalAlpha = base * 0.7;

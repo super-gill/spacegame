@@ -33,7 +33,12 @@ import {
   SEAM_HALF_ARC,
   BLAST_RADIUS,
   rockAt,
+  storeGoods,
+  takeGoods,
+  type HangarRefusal,
+  type HangarResult,
   lootClaim,
+  hopperRejects,
   tractorTakes,
   asteroidPositions,
   navReadout,
@@ -54,6 +59,8 @@ import { ControlsPanel } from './controls-panel.js';
 import { loadLocalPilot, saveLocalPilot } from './identity.js';
 import { MenuPanel } from './menu-panel.js';
 import { DronePanel } from './hud/drone-panel.js';
+import { HoldPanel } from './hud/hold-panel.js';
+import { WindowManager } from './hud/windows.js';
 import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWorld, storeWorld } from './persistence.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
@@ -129,9 +136,13 @@ const input = new InputController(
     if (action === 'toggleControls') controlsPanel.toggle();
     else if (action === 'toggleMenu') menu.toggle();
     else if (action === 'cycleTarget') cycleTarget();
-    else if (action === 'clearTarget') unlockActive();
+    else if (action === 'clearTarget') {
+      // Esc closes the top window first; with none open it drops the active lock.
+      if (!windows.closeTop()) unlockActive();
+    }
     else if (action === 'toggleHeadingLock') toggleHeadingLock();
     else if (action === 'toggleDrones') dronePanel.toggle();
+    else if (action === 'toggleHold') holdPanel.toggle();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
     else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
@@ -147,7 +158,17 @@ const ui = new Ui(
 );
 const hudLayer = document.getElementById('hud-layer')!;
 const flightHud = new FlightHud(hudLayer);
-const dronePanel = new DronePanel(hudLayer, (command) => input.requestDroneCommand(command));
+// Windows (hud/windows.ts): the hold and the drone manager, with a launcher strip.
+const windows = new WindowManager(hudLayer);
+const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120 }), {
+  jettison: (good) => input.requestJettison(good),
+  setHopper: (drop) => input.requestHopperDrop(drop),
+  pressTile: (mountId) => input.requestToggleModule(mountId),
+  dropCache: () => input.requestDropCache(),
+  store: (good, quantity) => hangar(storeGoods(current, me.id, good, quantity)),
+  take: (good, quantity) => hangar(takeGoods(current, me.id, good, quantity)),
+});
+const dronePanel = new DronePanel(windows.add('drones', 'Drones', 'N', { x: 330, y: 120 }), (command) => input.requestDroneCommand(command));
 const targetCard = new TargetCard(
   hudLayer,
   (id) => input.requestActivate(id),
@@ -174,6 +195,27 @@ const REFUSALS: Record<TradeRefusal, string> = {
   space: 'Not enough cargo space.',
   notHeld: 'You do not have that many.',
 };
+
+const HANGAR_REFUSALS: Record<HangarRefusal, string> = {
+  noShip: 'You have no ship.',
+  notDocked: 'Dock first.',
+  badQuantity: 'Nothing to move.',
+  notHeld: 'Not that much here.',
+  space: 'Not enough room in the hold.',
+};
+
+/** Pilot command: move goods between the hold and station storage. */
+function hangar(r: HangarResult): void {
+  if (!r.ok) {
+    ui.notify(HANGAR_REFUSALS[r.reason], 'warn');
+    return;
+  }
+  current = r.world;
+  if (r.event.type === 'goodsStored' || r.event.type === 'goodsTaken') {
+    const name = current.goods[r.event.good]?.name ?? r.event.good;
+    ui.notify(`${r.event.type === 'goodsStored' ? 'Stored' : 'Loaded'} ${r.event.quantity} ${name}`);
+  }
+}
 
 /** Pilot command: buy or sell at the station we are docked at. */
 function trade(request: TradeRequest): void {
@@ -750,7 +792,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine?.tractorActive && view) {
     // Beams only to what it will take: not its hopper's rejects, not other people's loot unless set to ALL.
     const claim = lootClaim(current, mine.id);
-    const pulled = holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && l.item === mine.hopperEject) && tractorTakes(mine, claim, l));
+    const pulled = holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && (hopperRejects(mine).includes(l.item) || (l.jettisoned && mine.tractorMode !== 'all'))) && tractorTakes(mine, claim, l));
     drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, pulled);
   }
   if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
@@ -862,6 +904,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   ui.update(current, mine);
   dronePanel.update(current, mine);
+  holdPanel.update(current, mine, me.id);
   flightHud.headingLock = settings.mouseSteering ? headingLocked : null;
   flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
   targetCard.update(current, mine);

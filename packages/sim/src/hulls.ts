@@ -207,6 +207,8 @@ export const HULLS: Record<string, HullSpec> = {
     mass: 6,
     structure: 200,
     price: 2600,
+    // Its mining hull's ore hold: ore goes here, never into cargo pods.
+    oreHold: 100,
     radius: 19,
     outline: outline([[17, 0], [12, -9], [2, -11], [-14, -9], [-17, -4], [-17, 4], [-14, 9], [2, 11], [12, 9]]),
     maxSpeed: 300,
@@ -257,6 +259,8 @@ export const HULLS: Record<string, HullSpec> = {
     mass: 40,
     structure: 2600,
     price: 85000,
+    // Its mining hull's ore hold: ore goes here, never into cargo pods.
+    oreHold: 1200,
     radius: 46,
     outline: outline([
       [43.2, 0], [38.4, -12.8], [24, -19.2], [-8, -20.8], [-32, -17.6], [-44.8, -11.2], [-44.8, 11.2], [-32, 17.6], [-8, 20.8], [24, 19.2], [38.4, 12.8],
@@ -297,7 +301,6 @@ export const HULLS: Record<string, HullSpec> = {
       mount('b4', 'bay', 'L', -24, 14.4, ['heavyLoad']),
     ],
     bonuses: [
-      { source: 'role', label: '+25% ore from full-size ore holds', stat: 'oreCapacity', amount: 0.25, kind: 'oreHold' },
       { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' },
     ],
   },
@@ -317,6 +320,8 @@ export const HULLS: Record<string, HullSpec> = {
     mass: 14,
     structure: 900,
     price: 24000,
+    // Its mining hull's ore hold: ore goes here, never into cargo pods.
+    oreHold: 250,
     // 26, not more: medium pads at Harbour sit 73 units from the large one.
     radius: 26,
     outline: outline([[25, 0], [19, -9], [6, -14], [-13, -13], [-24, -7], [-24, 7], [-13, 13], [6, 14], [19, 9]]),

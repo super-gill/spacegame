@@ -17,7 +17,7 @@ import { KEY_BINDINGS, SLOT_ACTIONS, SUPPRESS_DEFAULT, type Action, type UiActio
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'toggleHold', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {
@@ -56,6 +56,8 @@ export class InputController {
   /** Module to switch on or off (or fire) with the next sample, by mount, or null. */
   private pendingToggle: string | null = null;
   private pendingDrones: DroneCommand | null = null;
+  private pendingJettison: string | null = null;
+  private pendingHopper: string[] | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -102,6 +104,21 @@ export class InputController {
     this.pendingDrones = command;
   }
 
+  /** Throw a good's whole stack out, on the next tick. */
+  requestJettison(good: string): void {
+    this.pendingJettison = good;
+  }
+
+  /** Set the ore hopper's list of ores to spit out, on the next tick. */
+  requestHopperDrop(drop: string[]): void {
+    this.pendingHopper = drop;
+  }
+
+  /** Drop an ore cache on the next tick, as J does. */
+  requestDropCache(): void {
+    this.latched.add('dropCache');
+  }
+
   /** Drop the lock on a ship, on the next tick. */
   requestUnlock(id: string): void {
     this.pendingLock = { ...this.pendingLock, unlock: id };
@@ -130,12 +147,16 @@ export class InputController {
       tractor: this.held.has('tractor'),
       dropCache: this.latched.has('dropCache'),
       droneCommand: this.pendingDrones,
+      jettison: this.pendingJettison,
+      hopperDrop: this.pendingHopper,
     };
     this.latched.clear();
     this.pendingLock = { lock: null, unlock: null, activateLock: null };
     this.pendingGroup = null;
     this.pendingToggle = null;
     this.pendingDrones = null;
+    this.pendingJettison = null;
+    this.pendingHopper = null;
     return input;
   }
 

@@ -86,6 +86,7 @@ function multiplier(hull: HullSpec, stat: ModuleStat | 'damage', module: ModuleS
  */
 export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<string, string>>, cargoMass = 0): ShipStats {
   const totals: Record<ModuleStat, number> = {
+    hopperGrade: 0,
     mainThrust: 0,
     reverseThrust: 0,
     lateralThrust: 0,
@@ -130,6 +131,8 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   let turretTracking = 0;
   // The best survey scanner fitted does the surveying; a second adds nothing.
   let survey = { range: 0, cost: 0, grade: 0 };
+  // The best hopper fitted does the sorting.
+  let hopperGrade = 0;
   let armourResists: Resistances = {};
 
   for (const mount of hull.mounts) {
@@ -152,6 +155,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
       hasShieldGenerator = true;
     }
     turretTracking = Math.max(turretTracking, module.stats.turretTracking ?? 0);
+    if (module.kind === 'oreHopper') hopperGrade = Math.max(hopperGrade, module.stats.hopperGrade ?? 1);
     if (module.kind === 'surveyScanner') {
       const grade = module.stats.surveyGrade ?? 0;
       const range = module.stats.surveyRange ?? 0;
@@ -201,7 +205,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     surveyRange: survey.range,
     surveyCost: survey.cost,
     surveyGrade: survey.grade,
-    oreCapacity: Math.floor(totals.oreCapacity + 1e-9),
+    // A mining hull's ore hold is built in.
+    oreCapacity: Math.floor(totals.oreCapacity + (hull.oreHold ?? 0) + 1e-9),
+    hopperGrade,
     droneCapacity: Math.floor(totals.droneCapacity + 1e-9),
     droneControl: Math.floor(totals.droneControl + 1e-9),
     droneRange: totals.droneRange,

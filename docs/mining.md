@@ -132,7 +132,7 @@ Agreed with Jason: breaching is for gate-glass, its own kind of mining. A deep a
 ### The ship ladder (Jason, 5 November 2026)
 
 - **Prospector:** the cheap early money-maker, feeding at the bottom.
-- **Breacher (mid):** a professional's ship that strip-mines and breaches. Rook and Rivet Breacher, 24,000 at Ridge: two medium fixed mining lasers (+25% mining), a small aft turret, the deep assay, a charge rig (+75% tolerance: about 12 degrees either side of a breach point, from the rig's 7), three drones, a hopper and 100 units of ore hold.
+- **Breacher (mid):** a professional's ship that strip-mines and breaches. Rook and Rivet Breacher, 24,000 at Ridge: two medium fixed mining lasers (+25% mining), a small aft turret, the deep assay, a charge rig (+75% tolerance: about 12 degrees either side of a breach point, from the rig's 7), three drones, a Hopper M and a built-in ore hold of 250 (superseded the earlier 100 from its hopper; see "Holds").
 - **Hulk:** the strip-mining behemoth. It carries no charges by default.
 - **Later:** an industrial capital or command ship coordinating NPC miners, with mining fighters and a huge hold.
 - **Later still (Jason):** more ships at each size with slight differences, better and worse in different areas, rather than one ship per rung.
@@ -145,6 +145,20 @@ Agreed with Jason: with miners working the belt, the tractor pulled everything i
 - **The tractor tile** cycles `OFF`, `MINE` (your own loot and nobody's, the default) and `ALL` (anything in reach, other people's too), then off. Holding R tractors in the tile's mode, `MINE` when the tile is off. The ore hopper's filter applies on top in both modes. `ALL` is the deliberate act law (7) can later treat as theft.
 - **A cache** never takes in other people's canisters when it is dropped.
 - **Not done (Jason unsure):** drawing other people's loot differently, which might feed the player too much. No lock-a-canister mode (Jason: too much).
+
+## Holds (5 November 2026)
+
+Agreed with Jason, superseding the hopper-as-hold and Ore Hold module notes above: a mining hull's bonus is a big ore hold built into the hull; hoppers sort, they do not hold; every ship can jettison; pilots can store goods at stations; a hold panel manages it all.
+
+- **Ore holds are built in** (`HullSpec.oreHold`): Prospector 100, Breacher 250, Hulk 1,200. On a mining hull ore goes into the ore hold and only there; cargo pods never take ore, even when the ore hold is full (a full ore hold makes the tractor park canisters, as before). On any other hull ore is ordinary cargo. `holdSpaceFor` and `holdUse` say how much room each side has. The Ore Hold L modules and the Hulk's bonus for them are gone: Jason's point that on a big ship one slot of cargo is too valuable to trade for ore. The Hulk carries one Tessaract Standard L container (70 cargo, a new module) for charges, ammunition and trade.
+- **Hoppers sort** (`ModuleStat.hopperGrade`, `Ship.hopper`): the tractor takes every canister in and the hopper spits its rejects out astern, claimed as yours, and your tractor leaves them alone.
+  - **Small (grade 1, Prospector):** drops one ore. Its tile steps through the ores and back to `TAKE ALL`.
+  - **Medium (grade 2, Breacher):** a list: KEEP or DROP each ore, set in the hold panel (`ShipInput.hopperDrop`). Its tile switches sorting off and on, keeping the list.
+  - **Large (grade 3, Hulk, new Hopper L):** the list, and with the ore hold full it trades up: better ore coming in (by base price) pushes out as much of the cheapest ore aboard (`tradeUpFor`, `oreTradedUp`).
+- **Jettison** (`ShipInput.jettison`), any ship, in space: a whole stack of one good goes out astern, unclaimed (anyone may take it, Jason). Your own MINE tractor leaves it; ALL takes it back.
+- **Station storage** for goods (`Pilot.hangar`, `storeGoods`, `takeGoods` in `hangar.ts`): docked, move stacks between the hold and the station. No limit, no cost; goods stay where they were left. Manufacturing (9) will draw on it.
+- **The hold panel** (I), a window: the ore hold and cargo with used/capacity, JETTISON per stack in space or STORE when docked, station storage with TAKE (as much as fits), the hopper's settings, and in space the tractor's mode and the cache drop.
+- **Saves:** version 10 (`migrate9to10`): fitted or stored Ore Hold L modules become containers in the same place; a one-ore filter becomes a one-ore list.
 
 ## NPC miners (5 November 2026)
 

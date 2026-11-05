@@ -98,7 +98,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       c1: 'meridian-thrusters-s',
       c2: 'meridian-reactor-s',
       i1: 'meridian-shield-s',
-      // A hopper instead of armour: 40 more units for ore.
+      // A hopper instead of armour: it spits out one ore you do not want.
       i2: 'rookrivet-hopper-s',
       // One drone, which works a second rock beside you.
       i3: 'rookrivet-dronebay-s',
@@ -151,8 +151,8 @@ export const LOADOUTS: Record<string, Loadout> = {
     },
   },
   'rookrivet-hulk': {
-    // Sold at Ridge Outpost: two heavy turrets, an eight-rock assay, four
-    // ore holds, a long-reach tractor and a deep survey scanner.
+    // Sold at Ridge Outpost: two heavy turrets, an eight-rock assay, the
+    // big hopper, a long-reach tractor and a deep survey scanner.
     id: 'rookrivet-hulk',
     name: 'Rook and Rivet Hulk, Collective issue',
     hullId: 'rookrivet-hulk',
@@ -171,19 +171,18 @@ export const LOADOUTS: Record<string, Loadout> = {
       e2: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
       c2: 'rookrivet-reactor-l',
-      i1: 'itomarr-shield-m',
+      // The big hopper in the big slot: sorts, and trades up when the ore hold is full.
+      i1: 'rookrivet-hopper-l',
       // Four drones out of six aboard, in place of armour.
       i2: 'rookrivet-dronebay-m',
-      i3: 'rookrivet-hopper-m',
+      i3: 'itomarr-shield-m',
       // A second reactor: the turrets, assay and sensors draw more than the Furnace gives.
       i4: 'itomarr-reactor-m',
       u1: 'tessaract-gleaner-m',
       u2: 'tessaract-survey-m',
       u3: 'paragon-fairwarning-s',
-      b1: 'rookrivet-orehold-l',
-      b2: 'rookrivet-orehold-l',
-      b3: 'rookrivet-orehold-l',
-      b4: 'rookrivet-orehold-l',
+      // The ore hold is built in; one container for charges, ammunition and trade.
+      b1: 'tessaract-container-l',
     },
   },
   'calder-watch': {

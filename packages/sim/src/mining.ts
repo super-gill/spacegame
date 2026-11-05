@@ -97,6 +97,47 @@ export function claimed(claim: string | undefined): { claim?: string } {
   return claim === undefined ? {} : { claim };
 }
 
+/** The ores a ship's hopper spits out now: its list, unless sorting is switched off. */
+export function hopperRejects(ship: Pick<Ship, 'hopper'>): readonly string[] {
+  return ship.hopper && !ship.hopper.off ? ship.hopper.drop : [];
+}
+
+/**
+ * The hopper after a press of its tile. A small hopper (grade 1) steps its
+ * one dropped ore through the ore catalogue and back to taking all; a
+ * bigger one switches its list on and off.
+ */
+export function hopperAfterTile(ship: Pick<Ship, 'hopper'>, grade: number, goods: Readonly<Record<string, GoodSpec>>): Ship['hopper'] {
+  if (grade <= 1) {
+    const next = nextHopperFilter(ship.hopper && !ship.hopper.off ? ship.hopper.drop[0] : null, goods);
+    return next ? { drop: [next] } : undefined;
+  }
+  const drop = ship.hopper?.drop ?? [];
+  return ship.hopper?.off ? { drop } : { drop, off: true };
+}
+
+/** A hopper list as set from the hold panel: ores only, no repeats, in catalogue order, one at most on a small hopper. */
+export function hopperList(list: readonly string[], grade: number, goods: Readonly<Record<string, GoodSpec>>): string[] {
+  const ores = oreGoods(goods).map((g) => g.id).filter((id) => list.includes(id));
+  return grade <= 1 ? ores.slice(0, 1) : ores;
+}
+
+/**
+ * With a large hopper (grade 3) and the ore hold full: the cheapest ore
+ * aboard that `item` is worth more than, to spit out in its place; null if
+ * there is none or the ship cannot trade up.
+ */
+export function tradeUpFor(ship: Ship, grade: number, oreRoom: number, goods: Readonly<Record<string, GoodSpec>>, item: string): string | null {
+  if (grade < 3 || oreRoom > 0 || !goods[item]?.ore) return null;
+  const value = goods[item]!.basePrice;
+  let cheapest: string | null = null;
+  for (const [id, q] of Object.entries(ship.hold)) {
+    if (q <= 0 || !goods[id]?.ore || id === item || goods[id]!.basePrice >= value) continue;
+    if (!cheapest || goods[id]!.basePrice < goods[cheapest]!.basePrice || (goods[id]!.basePrice === goods[cheapest]!.basePrice && id < cheapest)) cheapest = id;
+  }
+  return cheapest;
+}
+
 /** The ore an ore hopper's filter leaves behind after `current`, cycling through the ore catalogue and back to none. */
 export function nextHopperFilter(current: string | null | undefined, goods: Readonly<Record<string, GoodSpec>>): string | null {
   const ores = oreGoods(goods).map((g) => g.id);

@@ -201,6 +201,20 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: [],
     stats: { cargoCapacity: 16 },
   },
+  'tessaract-container-l': {
+    id: 'tessaract-container-l',
+    name: 'Tessaract Standard L',
+    kind: 'cargoPod',
+    size: 'L',
+    mounts: ['bay'],
+    needs: ['heavyLoad'],
+    mass: 6,
+    power: 0,
+    price: 2000,
+    manufacturer: 'tessaract',
+    tags: [],
+    stats: { cargoCapacity: 70 },
+  },
   'tessaract-container-m': {
     id: 'tessaract-container-m',
     name: 'Tessaract Standard M',
@@ -835,21 +849,6 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'mining-turret-l',
   },
-  'rookrivet-orehold-l': {
-    id: 'rookrivet-orehold-l',
-    name: 'Rook and Rivet Ore Hold L',
-    kind: 'oreHold',
-    size: 'L',
-    mounts: ['bay'],
-    needs: [],
-    mass: 4,
-    power: 0,
-    price: 3200,
-    manufacturer: 'rookRivet',
-    tags: ['mining'],
-    // Ore only, but far more of it than a container of the same size.
-    stats: { oreCapacity: 200 },
-  },
   'rookrivet-reactor-l': {
     id: 'rookrivet-reactor-l',
     name: 'Rook and Rivet Furnace L',
@@ -959,7 +958,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 1100,
     manufacturer: 'rookRivet',
     tags: ['mining'],
-    stats: { oreCapacity: 40 },
+    // Drops one ore of your choice.
+    stats: { hopperGrade: 1 },
   },
   'rookrivet-hopper-m': {
     id: 'rookrivet-hopper-m',
@@ -973,7 +973,23 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 2600,
     manufacturer: 'rookRivet',
     tags: ['mining'],
-    stats: { oreCapacity: 100 },
+    // Sorts by a list: keep or drop each ore.
+    stats: { hopperGrade: 2 },
+  },
+  'rookrivet-hopper-l': {
+    id: 'rookrivet-hopper-l',
+    name: 'Rook and Rivet Hopper L',
+    kind: 'oreHopper',
+    size: 'L',
+    mounts: ['internal'],
+    needs: [],
+    mass: 4,
+    power: 0,
+    price: 5200,
+    manufacturer: 'rookRivet',
+    tags: ['mining'],
+    // Sorts by a list, and with the ore hold full trades its cheapest ore for better.
+    stats: { hopperGrade: 3 },
   },
   // Survey scanners (utility, active): a pulse that lights up rocks worth a look.
   'rookrivet-survey-s': {

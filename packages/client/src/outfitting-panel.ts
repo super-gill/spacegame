@@ -134,7 +134,6 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   afterburner: 'Afterburner',
   surveyScanner: 'Survey scanner',
   oreHopper: 'Ore hopper',
-  oreHold: 'Ore hold',
   droneBay: 'Drone bay',
   breachCharger: 'Charge rig',
 };

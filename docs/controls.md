@@ -28,11 +28,12 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 | --- | --- | --- |
 | Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Swivels need no group |
 | Mining turrets (hulk) | Make a rock your active lock, then press a turret's tile | That turret takes the rock and cuts it on its own while it stays locked and in reach. Press the tile again to let it go. Each turret can work a different rock |
+| Hold | I | A window: what is aboard, split into ore hold and cargo. In space, JETTISON throws a whole stack out astern for anyone to take; docked, STORE and TAKE move stacks to and from your storage at that station. Also the ore hopper's sorting and the tractor's mode |
 | Drone manager | N | Launch, recall and send drones (to your active lock), and see each drone's state and condition. Drones work only rocks you have locked; your tractor collects what they cut. Recall them before you dock: drones left out are lost |
 | Heading lock | V | With mouse steering: the nose holds its bearing so you can move the pointer (to the interface, or to pick a target) without turning. Press again to release. A HEADING chip shows the state |
 | Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. The target card's UNLOCK button drops the lock it shows, without the keyboard. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
-| Unlock | Esc | Drops the active lock; the next one takes over |
+| Unlock | Esc | Closes the top window (hold, drones) if one is open; otherwise drops the active lock and the next one takes over |
 
 On the right edge, below the menu buttons:
 
@@ -47,6 +48,10 @@ On the right edge, below the menu buttons:
 
 The active lock also gets corner brackets in space (white when cold, red when hot). A lock drops when its target leaves your sensor range, docks or is destroyed.
 
+## Windows
+
+Small panels in flight (the hold, the drone manager) are windows: open each with its key or its button on the launcher strip under your status lines, drag the title bar to move it (the place is remembered), close it with its ✕ or Esc. Several can be open at once.
+
 ## Weapons
 
 | Action | Key | Notes |
@@ -56,7 +61,7 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Weapons hot / cold | H | Hot: turrets engage your target on their own when on aim and in range. Cold: they hold fire |
 | Mine | Hold fire with a mining laser's group selected | The laser cuts the rock its beam reaches if the rock is no harder than the laser is strong, freeing ore in canisters; scoop them with the tractor. Its tile says `CUTTING`, `TOO HARD` or `NO ROCK` |
 | Seams | Lock a rock with a mining computer | A gold arc on the rock's edge marks its seam: cut there and the laser tile says `ON SEAM`, half as fast again |
-| Ore hopper filter | Its tile's number | Cycles the one ore your hopper spits back out astern: `TAKE ALL`, then each ore in turn. Your tractor still pulls everything in, then leaves the rejects alone |
+| Ore hopper | Its tile's number, or the hold panel | A small hopper's tile cycles the one ore it spits back out astern: `TAKE ALL`, then each ore in turn. Bigger hoppers sort by a list of KEEP or DROP per ore, set in the hold panel; their tile switches sorting on and off. A large hopper with the ore hold full swaps your cheapest ore for better. Your tractor pulls everything in, then leaves the rejects alone |
 | Drop an ore cache | J | Leaves the ore aboard, and loose ore near you, as a cache that lasts an hour, ringed in space and shown on your radar. Anyone can take it. Switches your tractor off so it is not scooped straight back |
 | Breach charges | The charge rig's tile | Near a locked rock (within 70 units of its surface): plants a charge where you are. A deep assay marks the rock's breach points; cover them all for all the glass. From 150 units clear: sets off every charge you have on it. The tile says `PLANT`, `DETONATE`, `GET CLOSER` or `TOO CLOSE`. Stay clear of the blast (320 units) |
 | Survey | Its tile's number | A survey scanner pulses: rocks in reach worth a look are outlined for a few seconds (amber rich, gold valuable, cyan rare). It cycles in 5 seconds and costs capacitor |

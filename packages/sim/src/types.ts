@@ -205,6 +205,8 @@ export type ModuleStat =
   | 'surveyCost'
   /** Survey scanner: 1 tells rich rocks from common ones; 2 names the best tier a rock holds. */
   | 'surveyGrade'
+  /** An ore hopper's grade: 1 drops one ore, 2 sorts by a list, 3 also trades up when the ore hold is full. */
+  | 'hopperGrade'
   /** Ore hopper: hold space only ore may use, units. */
   | 'oreCapacity'
   /** Drone bay: drones it holds, and how many can be out at once. */
@@ -235,7 +237,6 @@ export type ModuleKind =
   | 'afterburner'
   | 'surveyScanner'
   | 'oreHopper'
-  | 'oreHold'
   | 'droneBay'
   | 'breachCharger';
 
@@ -378,6 +379,12 @@ export interface HullSpec {
    * owning no ship.
    */
   escapePod?: boolean;
+  /**
+   * A mining hull's built-in ore hold, units (docs/mining.md, "Holds"):
+   * ore goes here and only here, never into cargo pods. Absent or 0: no
+   * ore hold, and ore is ordinary cargo.
+   */
+  oreHold?: number;
 }
 
 /** A named fit for a hull. NPC spawners and new pilots are built from these. */
@@ -431,6 +438,8 @@ export interface ShipStats {
   surveyRange: number;
   surveyCost: number;
   surveyGrade: number;
+  /** The best ore hopper fitted: 0 none, 1 drops one ore, 2 sorts by a list, 3 also trades up when full. */
+  hopperGrade: number;
   /** Hold space only ore may use, from ore hoppers (and later ore holds), on top of `cargoCapacity`. */
   oreCapacity: number;
   /** Drone bays: drones held, drones out at once, and how far they work from the ship (docs/drones.md). */
@@ -702,6 +711,8 @@ export interface Loot {
    * leaves other people's alone. Absent: nobody's.
    */
   claim?: string;
+  /** Thrown out of a hold on purpose (`ShipInput.jettison`): the ship that did it will not take it back unless its tractor takes ALL. */
+  jettisoned?: true;
 }
 
 /**
@@ -808,10 +819,12 @@ export interface Ship {
   /** The last survey pulse, which the HUD shows for a few seconds (docs/mining.md). Absent: none yet. */
   survey?: SurveyResult;
   /**
-   * An ore hopper's filter: the one ore this ship's tractor leaves in
-   * space instead of scooping. Absent or null: it takes everything.
+   * An ore hopper's sorting (docs/mining.md, "Holds"): the ores it spits
+   * back out astern instead of keeping. `off` keeps the list but takes
+   * everything for now. A small hopper drops at most one ore. Absent:
+   * takes everything.
    */
-  hopperEject?: string | null;
+  hopper?: { drop: string[]; off?: true };
   /**
    * What its tractor takes: absent, its own loot and loot nobody has a
    * claim on (`Loot.claim`); `all`, anything in reach, other people's
@@ -1076,6 +1089,12 @@ export interface Pilot {
    * economy later.
    */
   storage: Record<string, Record<string, number>>;
+  /**
+   * Goods the pilot keeps at stations, by station id then good id to
+   * count (`hangar.ts`): moved in and out of a docked ship's hold.
+   * Absent: none anywhere.
+   */
+  hangar?: Record<string, Record<string, number>>;
 }
 
 /**
@@ -1140,6 +1159,13 @@ export interface ShipInput {
    * canisters near the ship as part of it (docs/mining.md, "Caches").
    */
   dropCache: boolean;
+  /** Edge-triggered: throw this good's whole stack out astern, for anyone to take. In space only. */
+  jettison?: string | null;
+  /**
+   * Set the ore hopper's list of ores to spit out (and switch sorting on).
+   * A small hopper takes at most one. Null or absent: no change.
+   */
+  hopperDrop?: string[] | null;
 }
 
 /**
@@ -1476,7 +1502,15 @@ export type WorldEvent =
   /** An ore hopper took in a canister of its filtered ore and spat it out astern. */
   | { type: 'oreEjected'; shipId: string; item: string; amount: number }
   /** An ore hopper's filter changed: the ore the tractor now leaves behind, or null for none. */
-  | { type: 'hopperFilterChanged'; shipId: string; eject: string | null }
+  | { type: 'hopperFilterChanged'; shipId: string; drop: string[]; on: boolean }
+  /** A full ore hold with a large hopper took better ore in and spat `dropped` of its cheapest ore out. */
+  | { type: 'oreTradedUp'; shipId: string; item: string; dropped: string; amount: number }
+  /** A stack thrown out of the hold. */
+  | { type: 'jettisoned'; shipId: string; item: string; amount: number }
+  | { type: 'jettisonRefused'; shipId: string; reason: 'notHeld' | 'docked' }
+  /** Goods moved between a docked ship's hold and the pilot's storage at that station. */
+  | { type: 'goodsStored'; shipId: string; stationId: string; good: string; quantity: number }
+  | { type: 'goodsTaken'; shipId: string; stationId: string; good: string; quantity: number }
   /** A tractor's tile changed what it does: off, taking only its own loot, or taking everything. */
   | { type: 'tractorModeChanged'; shipId: string; mode: 'off' | 'mine' | 'all' }
   /** A rock was mined out and crumbled; `shipId` mined the last of it. */

@@ -7,7 +7,7 @@ import { GOODS, oreGoods } from '../goods.js';
 import { LOADOUTS } from '../loadouts.js';
 import { lockReadout, lockRefusal } from '../locks.js';
 import { CACHE_LIFETIME, CANISTER_UNITS, ORE_LOOT_LIFETIME, SEAM_HALF_ARC, SURVEY_CYCLE_SECONDS, cutRate } from '../mining.js';
-import { holdCapacity, holdSpaceFor } from '../trade.js';
+import { holdCapacity, holdSpaceFor, holdUse } from '../trade.js';
 import { angleDelta } from '../angle.js';
 import { seededRandom } from '../random.js';
 import { SAVE_FORMAT, deserializeWorld, serializeWorld } from '../save.js';
@@ -218,24 +218,31 @@ describe('making the light ship pay', () => {
     }
   });
 
-  it('an ore hopper adds space only ore may use', () => {
+  it("a mining hull's ore hold takes ore, and only there; elsewhere ore is cargo", () => {
     const ship = setup().ships['s']!;
     const stats = shipStats(createStarterWorld(), ship);
-    expect(stats.oreCapacity).toBe(40);
-    expect(holdCapacity(stats)).toBe(stats.cargoCapacity + 40);
-    const full = { ...ship, hold: { ore: stats.cargoCapacity + 40 } };
+    expect(stats.oreCapacity).toBe(100);
+    expect(holdCapacity(stats)).toBe(stats.cargoCapacity + 100);
+    const full = { ...ship, hold: { ore: 100 } };
     expect(holdSpaceFor(full, stats, GOODS, 'ore')).toBe(0);
-    const someOre = { ...ship, hold: { ore: 30 } };
-    expect(holdSpaceFor(someOre, stats, GOODS, 'food')).toBe(stats.cargoCapacity);
-    expect(holdSpaceFor(someOre, stats, GOODS, 'ore')).toBe(stats.cargoCapacity + 10);
+    expect(holdSpaceFor(full, stats, GOODS, 'food')).toBe(stats.cargoCapacity);
+    expect(holdUse(full, stats, GOODS)).toEqual({ ore: { used: 100, capacity: 100 }, cargo: { used: 0, capacity: stats.cargoCapacity } });
+    const someOre = { ...ship, hold: { ore: 30, food: 5 } };
+    expect(holdSpaceFor(someOre, stats, GOODS, 'ore')).toBe(70);
+    // A Tern has no ore hold: ore is ordinary cargo.
+    const w = createStarterWorld();
+    const tern = buildShip(w, { id: 't', loadout: LOADOUTS['meridian-starter']!, ownerId: null, position: { x: 0, y: 0 }, heading: 0, flightMode: 'assisted' });
+    const ts = shipStats(w, { ...tern, hold: { food: 5 } });
+    expect(ts.oreCapacity).toBe(0);
+    expect(holdSpaceFor({ ...tern, hold: { food: 5 } }, ts, GOODS, 'ore')).toBe(ts.cargoCapacity - 5);
   });
 
   it("the hopper's tile cycles its filter; filtered ore is taken in and spat out astern, then left alone", () => {
     let w = setup(testRock({ contents: { ore: 12, glintstone: 3 } }));
     w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'i2' } });
-    expect(w.ships['s']!.hopperEject).toBe('banded-ore');
-    expect(w.events).toContainEqual({ type: 'hopperFilterChanged', shipId: 's', eject: 'banded-ore' });
-    w = { ...w, ships: { s: { ...w.ships['s']!, hopperEject: 'ore' } } };
+    expect(w.ships['s']!.hopper).toEqual({ drop: ['banded-ore'] });
+    expect(w.events).toContainEqual({ type: 'hopperFilterChanged', shipId: 's', drop: ['banded-ore'], on: true });
+    w = { ...w, ships: { s: { ...w.ships['s']!, hopper: { drop: ['ore'] } } } };
     const r = run(w, 40, { fireFixed: true, tractor: true });
     w = r.w;
     expect(w.ships['s']!.hold).toEqual({ glintstone: 3 });
@@ -445,13 +452,14 @@ describe('the hulk', () => {
     return stepWorld(w, { s: { ...emptyInput(), toggleModule: mountId } });
   };
 
-  it('fits within its power, holds 1,100 ore and nothing else, locks eight rocks, and is sold at Ridge', () => {
+  it('fits within its power, holds 1,200 ore and a container of cargo, locks eight rocks, and is sold at Ridge', () => {
     const w = createStarterWorld();
     const ship = hulkBetween().ships['s']!;
     const stats = shipStats(w, ship);
     expect(stats.powerDraw).toBeLessThanOrEqual(stats.powerOutput);
-    expect(stats.oreCapacity).toBe(1100);
-    expect(holdSpaceFor(ship, stats, GOODS, 'food')).toBe(0);
+    expect(stats.oreCapacity).toBe(1200);
+    expect(stats.hopperGrade).toBe(3);
+    expect(holdSpaceFor(ship, stats, GOODS, 'food')).toBe(70);
     expect(stats.maxLocks).toBe(8);
     expect(w.stations['station-ridge']!.shipMart).toContain('rookrivet-hulk');
     expect(activationSlots(w, ship).slice(0, 2)).toEqual([

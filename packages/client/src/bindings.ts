@@ -40,6 +40,7 @@ export type UiAction =
   | 'cycleTarget'
   | 'toggleHeadingLock'
   | 'toggleDrones'
+  | 'toggleHold'
   | 'clearTarget'
   | 'board'
   | 'stepOut'
@@ -95,10 +96,11 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire the selected group', kind: 'hold', note: 'Or hold the left mouse button, with mouse steering. Guns fire where the nose points; launchers fire at your active lock' },
   { action: 'launchCountermeasure', codes: ['KeyC'], group: 'Weapons', label: 'Drop a countermeasure', kind: 'press', note: 'Chaff draws radar missiles, flares heat seekers; needs a dispenser' },
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
+  { action: 'toggleHold', codes: ['KeyI'], group: 'Systems', label: 'Hold', kind: 'press', note: 'What is aboard, in the ore hold and cargo: jettison a stack in space, store it or take from station storage when docked; set the ore hopper and the tractor' },
   { action: 'toggleDrones', codes: ['KeyN'], group: 'Systems', label: 'Drone manager', kind: 'press', note: 'Launch, recall and send drones, and see what each is doing. Drones work only rocks you have locked' },
   { action: 'toggleHeadingLock', codes: ['KeyV'], group: 'Flight', label: 'Heading lock', kind: 'press', note: 'With mouse steering: the nose holds its bearing so you can move the pointer without turning. Press again to release' },
   { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
-  { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Unlock the active lock', kind: 'press' },
+  { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Close the top window, or unlock the active lock', kind: 'press', note: 'With a window open (hold, drones), closes it first' },
   { action: 'tractor', codes: ['KeyR'], group: 'Systems', label: 'Tractor beam', kind: 'hold', note: 'If one is fitted: pulls in nearby loot while held; its tile leaves it running' },
   { action: 'cycleFlightMode', codes: ['KeyZ'], group: 'Flight computer', label: 'Cycle flight mode', kind: 'press', note: 'Full assist, rotation assist, manual' },
   { action: 'toggleDock', codes: ['KeyF'], group: 'Station', label: 'Dock / undock', kind: 'press', note: 'Inside the range ring and slow enough' },

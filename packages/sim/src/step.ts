@@ -5,19 +5,19 @@ import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './muni
 import { asteroidStates, stepRockfall } from './asteroids.js';
 import { stepDrones } from './drones.js';
 import { breachAction, collapseCores, detonate } from './breach.js';
-import { CACHE_LIFETIME, cutRocks, dropCache, nextHopperFilter, surveyPulse } from './mining.js';
+import { CACHE_LIFETIME, ORE_LOOT_LIFETIME, cutRocks, dropCache, hopperAfterTile, hopperList, surveyPulse } from './mining.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
-import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
+import { HOPPER_EJECT_SPEED, departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
 import { lootClaim, pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
-import type { Vec2 } from './vec2.js';
+import { add, fromAngle, scale, type Vec2 } from './vec2.js';
 import type { Decoy, DroneCommand, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
@@ -103,6 +103,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const newDecoys: Decoy[] = [];
   const beams: BeamShot[] = [];
   const cacheLoot: Loot[] = [];
+  const jettisoned: Loot[] = [];
   const droneCommands: Record<string, DroneCommand> = {};
   let charges = [...(world.charges ?? [])];
   const detonations: { shipId: string; rockId: string; tolerance: number }[] = [];
@@ -207,11 +208,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
           events.push({ type: 'chargeRefused', shipId: id, reason: action.reason });
         }
       }
-      // An ore hopper's tile cycles its filter: the one ore the tractor leaves behind.
+      // An ore hopper's tile: a small one steps its one dropped ore along, a bigger one switches its list on or off.
       if (moduleId && world.modules[moduleId]?.kind === 'oreHopper') {
-        const eject = nextHopperFilter(targeted.hopperEject, world.goods);
-        targeted = { ...targeted, hopperEject: eject };
-        events.push({ type: 'hopperFilterChanged', shipId: id, eject });
+        const { hopper: _old, ...plain } = targeted;
+        const hopper = hopperAfterTile(targeted, stats.hopperGrade, world.goods);
+        targeted = hopper ? { ...plain, hopper } : plain;
+        events.push({ type: 'hopperFilterChanged', shipId: id, drop: hopper?.drop ?? [], on: Boolean(hopper && !hopper.off) });
       }
       // A tractor's tile cycles off, on taking only its own loot, on taking everything, and off.
       if (moduleId && world.modules[moduleId]?.kind === 'tractor') {
@@ -227,6 +229,35 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
           targeted = { ...plain, switchedOn: (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) };
           events.push({ type: 'tractorModeChanged', shipId: id, mode: 'off' });
         }
+      }
+    }
+    // The hold panel sets the hopper's list, and switches sorting on.
+    if (input.hopperDrop && stats.hopperGrade > 0) {
+      const drop = hopperList(input.hopperDrop, stats.hopperGrade, world.goods);
+      const { hopper: _old, ...plain } = targeted;
+      targeted = drop.length > 0 ? { ...plain, hopper: { drop } } : plain;
+      events.push({ type: 'hopperFilterChanged', shipId: id, drop, on: drop.length > 0 });
+    }
+    // Jettison: a whole stack out astern, for anyone to take.
+    if (input.jettison) {
+      const amount = targeted.hold[input.jettison] ?? 0;
+      if (targeted.state !== 'flying') events.push({ type: 'jettisonRefused', shipId: id, reason: 'docked' });
+      else if (amount <= 0) events.push({ type: 'jettisonRefused', shipId: id, reason: 'notHeld' });
+      else {
+        const { [input.jettison]: _gone, ...hold } = targeted.hold;
+        const back = fromAngle(targeted.heading + Math.PI);
+        jettisoned.push({
+          id: `l${nextEntityId++}`,
+          item: input.jettison,
+          amount,
+          position: add(targeted.position, scale(back, stats.radius + 10)),
+          velocity: add(targeted.velocity, scale(back, HOPPER_EJECT_SPEED)),
+          ticksLeft: Math.round(ORE_LOOT_LIFETIME / world.dt),
+          ejectedBy: id,
+          jettisoned: true,
+        });
+        targeted = { ...targeted, hold };
+        events.push({ type: 'jettisoned', shipId: id, item: input.jettison, amount });
       }
     }
     // Fire groups: a number key picks which fixed guns Space fires.
@@ -370,6 +401,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
         return owner ? { ...l, cache: { ownerId: owner }, claim: owner, ticksLeft: Math.max(l.ticksLeft, Math.round(CACHE_LIFETIME / world.dt)) } : l;
       }),
       ...cacheLoot,
+      ...jettisoned,
       ...cut.loot,
       ...blastLoot,
     ],

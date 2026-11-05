@@ -44,9 +44,10 @@ export function holdCapacity(stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapaci
 }
 
 /**
- * Room for more of `goodId`. Ore fills the ore-only space (an ore hopper)
- * first and then ordinary cargo space; anything else has ordinary cargo
- * space only, less any ore that has spilled into it.
+ * Room for more of `goodId`. On a hull with an ore hold, ore goes there
+ * and only there; elsewhere ore is ordinary cargo. Anything else has
+ * ordinary cargo space only, less any ore left in it (from before ore
+ * holds, or a ship with none).
  */
 export function holdSpaceFor(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapacity'>, goods: Readonly<Record<string, GoodSpec>>, goodId: string): number {
   let ore = 0;
@@ -57,7 +58,25 @@ export function holdSpaceFor(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity' 
   }
   const oreSpace = stats.oreCapacity ?? 0;
   const general = Math.max(0, stats.cargoCapacity - other - Math.max(0, ore - oreSpace));
-  return goods[goodId]?.ore ? general + Math.max(0, oreSpace - ore) : general;
+  if (!goods[goodId]?.ore) return general;
+  return oreSpace > 0 ? Math.max(0, oreSpace - ore) : general;
+}
+
+/**
+ * How full each part of the hold is: the ore hold (a mining hull's,
+ * capacity 0 without one) and cargo. Ore beyond the ore hold, or on a
+ * hull without one, counts as cargo.
+ */
+export function holdUse(ship: Ship, stats: Pick<ShipStats, 'cargoCapacity' | 'oreCapacity'>, goods: Readonly<Record<string, GoodSpec>>): { ore: { used: number; capacity: number }; cargo: { used: number; capacity: number } } {
+  let ore = 0;
+  let other = 0;
+  for (const [id, q] of Object.entries(ship.hold)) {
+    if (goods[id]?.ore) ore += q;
+    else other += q;
+  }
+  const oreSpace = stats.oreCapacity ?? 0;
+  const inOreHold = Math.min(ore, oreSpace);
+  return { ore: { used: inOreHold, capacity: oreSpace }, cargo: { used: other + ore - inOreHold, capacity: stats.cargoCapacity } };
 }
 
 /** True if everything aboard fits the hold these stats give (after a refit, say). */

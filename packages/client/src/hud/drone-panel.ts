@@ -1,28 +1,27 @@
 import type { DroneCommand, Ship, World } from '@spacegame/sim';
 import { dronesOut, shipStats } from '@spacegame/sim';
 import { el, setText, show } from './dom.js';
+import type { HudWindow } from './windows.js';
 
 /**
  * Stopgap (lead): the drone manager (docs/drones.md). The pilot commands;
  * drones fly themselves. One row per drone, stowed or out, with its state
  * and condition; buttons to launch and recall all or one, and to send a
- * drone to the active lock's rock. N opens and closes it. Built as a
+ * drone to the active lock's rock. N opens and closes it (a window,
+ * windows.ts). Built as a
  * manager so fighters can join it later; the interface workstream
  * restyles it.
  */
 export class DronePanel {
-  private readonly root = el('div', 'hud-drones hidden');
+  private readonly root = el('div', 'hud-drones');
   private readonly summary = el('span', 'hud-dim');
   private readonly list = el('div', 'hud-drones-list');
   private readonly empty = el('p', 'hud-dim', 'No drone bay fitted.');
-  private open = false;
   private key = '';
 
-  constructor(parent: HTMLElement, private readonly onCommand: (command: DroneCommand) => void) {
-    this.root.setAttribute('role', 'region');
-    this.root.setAttribute('aria-label', 'Drones');
+  constructor(private readonly window: HudWindow, private readonly onCommand: (command: DroneCommand) => void) {
     const head = el('div', 'hud-drones-head');
-    head.append(el('span', 'hud-drones-title', 'DRONES · N'), this.summary);
+    head.append(this.summary);
     const all = el('div', 'hud-drones-all');
     all.append(
       this.button('LAUNCH ALL', 'Launch every stowed drone the bay can control', { action: 'launch' }),
@@ -30,18 +29,17 @@ export class DronePanel {
       this.button('SEND', 'Send the next free drone to your active lock', { action: 'send' }),
     );
     this.root.append(head, all, this.list, this.empty);
-    parent.append(this.root);
+    window.body.append(this.root);
   }
 
   toggle(): void {
-    this.open = !this.open;
+    this.window.toggle();
   }
 
   update(world: World, ship: Ship | null): void {
     const stats = ship ? shipStats(world, ship) : null;
     const has = Boolean(ship && stats && stats.droneCapacity > 0);
-    show(this.root, this.open && ship !== null);
-    if (!this.open || !ship || !stats) return;
+    if (!this.window.opened || !ship || !stats) return;
     show(this.empty, !has);
     if (!has) {
       setText(this.summary, '');

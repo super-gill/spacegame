@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -86,6 +86,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   6: (world) => migrate6to7(world),
   7: (world) => migrate7to8(world),
   8: (world) => migrate8to9(world),
+  9: (world) => migrate9to10(world),
 };
 
 /**
@@ -141,6 +142,46 @@ export function migrate8to9(world: unknown): unknown {
     return core ? { ...rest, core } : rest;
   });
   return { ...world, asteroids };
+}
+
+/**
+ * 9 to 10: holds (docs/mining.md, "Holds"). Mining hulls carry their ore
+ * hold built in, so the Ore Hold L modules are gone: each one fitted or
+ * stored becomes a Tessaract Standard L container in the same place. An
+ * ore hopper's one-ore filter (`hopperEject`) becomes its list (`hopper`).
+ */
+export function migrate9to10(world: unknown): unknown {
+  if (!isRecord(world)) return world;
+  const OLD = 'rookrivet-orehold-l';
+  const NEW = 'tessaract-container-l';
+  const ships: Record<string, unknown> = {};
+  for (const [id, ship] of Object.entries(isRecord(world['ships']) ? world['ships'] : {})) {
+    if (!isRecord(ship)) {
+      ships[id] = ship;
+      continue;
+    }
+    const { hopperEject, ...rest } = ship;
+    const fit = isRecord(rest['fit']) ? Object.fromEntries(Object.entries(rest['fit']).map(([m, v]) => [m, v === OLD ? NEW : v])) : rest['fit'];
+    ships[id] = { ...rest, fit, ...(typeof hopperEject === 'string' ? { hopper: { drop: [hopperEject] } } : {}) };
+  }
+  const pilots: Record<string, unknown> = {};
+  for (const [id, pilot] of Object.entries(isRecord(world['pilots']) ? world['pilots'] : {})) {
+    if (!isRecord(pilot) || !isRecord(pilot['storage'])) {
+      pilots[id] = pilot;
+      continue;
+    }
+    const storage: Record<string, unknown> = {};
+    for (const [station, held] of Object.entries(pilot['storage'])) {
+      if (!isRecord(held) || typeof held[OLD] !== 'number') {
+        storage[station] = held;
+        continue;
+      }
+      const { [OLD]: count, ...others } = held;
+      storage[station] = { ...others, [NEW]: (typeof others[NEW] === 'number' ? others[NEW] : 0) + (count as number) };
+    }
+    pilots[id] = { ...pilot, storage };
+  }
+  return { ...world, ships, pilots };
 }
 
 /** A seed from an id, FNV-1a. */
