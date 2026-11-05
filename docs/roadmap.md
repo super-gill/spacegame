@@ -21,7 +21,7 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 8 Map | Interdiction and warp disruption with faster-than-light travel. Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; fuel and star scooping if not in 6f; the Unsung as hostile ships in unknown space | |
 | 9 Industry | Mining (starting in the Scree; ore read by a mining computer, gate-glass as a rare find), salvage (read by a salvage scanner), drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
-| 11 Shared world | Host-run Node server serving the client, friends join by address, per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | |
+| 11 Shared world | Host-run Node server serving the client, friends join by address, a small dismissable connection meter coloured by latency, per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | |
 
 Version 1.0 is milestone 8 polished. Everything after that is content, plus the shared world.
 
