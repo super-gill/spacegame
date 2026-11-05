@@ -43,6 +43,7 @@ import { ControlsPanel } from './controls-panel.js';
 import { chooseCharacter } from './login-screen.js';
 import { keyFor } from './net/characters.js';
 import { serverAddress } from './net/link.js';
+import { Timeline } from './net/timeline.js';
 import { ConnectionMeter, showDisconnected } from './hud/connection.js';
 import { MenuPanel } from './menu-panel.js';
 import { DronePanel } from './hud/drone-panel.js';
@@ -338,11 +339,13 @@ function claimStarter(): void {
 
 // The world as the server last sent it (`current`) and the update before
 // (`previous`), drawn in between; and when the last update arrived.
+// The worlds the server sent, drawn a little in the past on a steady clock
+// so uneven arrivals do not stutter (net/timeline.ts). `previous` and
+// `current` are the two drawn between this frame; `current` is also what
+// the HUD and panels read.
+const timeline = new Timeline(session.welcome.world);
 let previous: World = session.welcome.world;
 let current: World = previous;
-let updateArrivedMs = performance.now();
-/** Time between updates, ms: 3 ticks at 60 a second (the server's UPDATE_EVERY_TICKS). */
-const UPDATE_INTERVAL_MS = 50;
 
 const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, settings, {
   showMeter() {
@@ -573,22 +576,23 @@ function tick(): void {
 /** The server sent what changed: step our copy of the world, and react to the events. */
 function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): void {
   // Note where ships are before they can be gone from this update, for explosions.
-  const before = current.ships;
-  const flying = new Map(current.munitions.map((m) => [m.id, m]));
-  previous = current;
-  current = { ...current, ...changed, events };
-  updateArrivedMs = nowMs;
+  const last = timeline.latest;
+  const before = last.ships;
+  const flying = new Map(last.munitions.map((m) => [m.id, m]));
+  const now: World = { ...last, ...changed, events };
+  timeline.add(now);
   if (snapOnNextUpdate) {
     snapOnNextUpdate = false;
-    previous = current;
-    const ship = myShip(current);
+    timeline.jump();
+    previous = current = now;
+    const ship = myShip(now);
     if (ship) camera.snapTo(ship.position);
   }
 
   for (const e of events) {
     if (e.type === 'destroyed') {
       const gone = before[e.shipId];
-      if (gone) explosions.push({ at: gone.position, radius: current.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+      if (gone) explosions.push({ at: gone.position, radius: now.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
     } else if (e.type === 'breached') {
       // The blast: as wide as it hurts.
       explosions.push({ at: e.position, radius: BLAST_RADIUS, startMs: nowMs });
@@ -597,16 +601,16 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
       const m = flying.get(e.munitionId);
       if (m) explosions.push({ at: m.position, radius: 6, startMs: nowMs });
     } else if (e.type === 'damaged' && e.cause === 'munition') {
-      const hit = current.ships[e.shipId] ?? before[e.shipId];
+      const hit = now.ships[e.shipId] ?? before[e.shipId];
       if (hit) explosions.push({ at: hit.position, radius: 10, startMs: nowMs });
     }
   }
-  const ship = myShip(current) ?? myShip(previous);
+  const ship = myShip(now) ?? myShip(last);
   if (ship) {
     ui.handleEvents(events, ship.id);
     // Undocking in a ship that cannot fly is allowed, but never silent.
     if (events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
-      for (const w of flightWarnings(shipStats(current, ship))) {
+      for (const w of flightWarnings(shipStats(now, ship))) {
         if (w !== 'noWeapons') ui.notify(FLIGHT_WARNINGS[w], 'warn');
       }
     }
@@ -643,8 +647,11 @@ function frame(nowMs: number): void {
     accumulator -= TICK_SECONDS;
   }
 
-  // Draw between the last two updates: 0 is the previous one, 1 the latest.
-  render(Math.min(1, (nowMs - updateArrivedMs) / UPDATE_INTERVAL_MS), frameSeconds, nowMs);
+  // Draw a steady moment a little in the past, between the updates either side of it.
+  const moment = timeline.advance(frameSeconds, TICK_SECONDS);
+  previous = moment.from;
+  current = moment.to;
+  render(moment.alpha, frameSeconds, nowMs);
   requestAnimationFrame(frame);
 }
 

@@ -37,7 +37,7 @@ Each client gets the world as seen from its ship, about 20 times a second:
 
 - **Once, on connect:** everything that does not change (catalogues, bodies, stations' fixed parts) and the client's pilot.
 - **Each update:** ships, loot, shots and missiles within the pilot's sensor range plus a margin; their own ship and pilot in full; rocks that changed (mined, split, crumbled, fallen in); events that concern them.
-- The client draws between updates by interpolating, as it already does between ticks. Your own ship may feel a little laggy at first; a later step predicts it locally so steering feels immediate.
+- The client draws a steady moment about 100 ms (6 ticks) behind the newest update, between the two updates either side of it (`net/timeline.ts`). Updates do not arrive evenly (the host's timers, especially on Windows, and the network bunch them), and drawing each as it lands stutters. Your own ship may feel a little laggy at first; a later step predicts it locally so steering feels immediate.
 
 Why not send everyone's inputs and let every browser run the sim (lockstep)? It needs every browser to compute exactly the same numbers, and different browsers' maths functions can differ in the last digit, which grows into different worlds. The authoritative server avoids that.
 

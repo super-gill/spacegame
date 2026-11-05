@@ -17,6 +17,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - A ship left in space when its pilot logs off stays there for now; it is meant to vanish after a short while and come back when they return.
 - Each player is sent every ship in the system 20 times a second (about 2 KB an update compressed, near Harbour, or 0.35 Mbit/s); sending only what a player's sensors can see comes next.
 
+### Fixed
+- Motion no longer stutters: the client draws a steady moment about 100 ms behind the newest update, so updates that arrive unevenly (Windows timers, the network) are absorbed.
+
 ## [0.13.0] - 2026-11-05
 
 Mining grows up and fitting is rebuilt. Drones, NPC miners and breaching for gate-glass; ore holds, sorting hoppers and loot that remembers whose it is; slot tiers (high, mid, low) with placement on the hull, buy then fit, and a new fitting window shared with the fitter page; the first big warships. Saves from 0.12.0 load and are upgraded (save version 12).
