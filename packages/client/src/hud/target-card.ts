@@ -34,6 +34,7 @@ const FLOWN_BY_STANCE: Record<NonNullable<LockReadout['identity']>['flownBy'], T
   watch: 'watch',
   pilot: 'pilot',
   drone: 'pilot',
+  miner: 'neutral',
   nobody: 'empty',
 };
 
@@ -53,6 +54,7 @@ const FLOWN_BY_WORDS: Record<NonNullable<LockReadout['identity']>['flownBy'], st
   watch: 'PATROL',
   pilot: 'PILOT',
   drone: 'DRONE',
+  miner: 'MINER',
   nobody: 'NOBODY ABOARD',
 };
 

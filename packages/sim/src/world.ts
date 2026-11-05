@@ -139,13 +139,42 @@ export function createStarterWorld(): World {
     spawned: 0,
   };
 
+  // NPC miners (docs/mining.md, "NPC miners"): two prospectors working the
+  // field round Ridge and selling there, and a hulk with its drones working
+  // the bigger rocks and hauling to Lantern Works, a long, exposed run.
+  const prospector: Spawner = {
+    id: 'miner-prospector',
+    loadoutId: 'rookrivet-prospector',
+    position: { ...outpost.position },
+    heading: 0,
+    dockedAt: outpost.id,
+    brain: { kind: 'miner', field: outpost.id, market: outpost.id, mode: 'docked', waitTicks: 5 * 60, rockId: null, modeTicks: 0 },
+    hold: {},
+    respawnSeconds: 90,
+    shipId: null,
+    timerTicks: 0,
+    spawned: 0,
+  };
+  const secondProspector: Spawner = {
+    ...prospector,
+    id: 'miner-prospector-2',
+    brain: { ...prospector.brain, waitTicks: 40 * 60 } as Spawner['brain'],
+  };
+  const hulk: Spawner = {
+    ...prospector,
+    id: 'miner-hulk',
+    loadoutId: 'rookrivet-hulk',
+    brain: { kind: 'miner', field: outpost.id, market: works.id, mode: 'docked', waitTicks: 20 * 60, rockId: null, modeTicks: 0 },
+    respawnSeconds: 180,
+  };
+
   const empty: World = {
     tick: 0,
     dt: FIXED_DT,
     pilots: {},
     ships: {},
     npcs: {},
-    spawners: [trader, secondTrader, watch, pirate],
+    spawners: [trader, secondTrader, watch, pirate, prospector, secondProspector, hulk],
     rules: { ...DEFAULT_RULES },
     projectiles: [],
     munitions: [],

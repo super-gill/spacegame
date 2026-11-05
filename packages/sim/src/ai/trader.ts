@@ -1,5 +1,5 @@
 import { DOCK_MAX_SPEED } from '../constants.js';
-import type { ShipStats, Ship, ShipInput, TraderBrain, World } from '../types.js';
+import type { ShipStats, Ship, ShipInput, Station, TraderBrain, World } from '../types.js';
 import { speedRelativeTo } from '../docking.js';
 import { bodyPosition } from '../rails.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
@@ -41,7 +41,7 @@ export const TRADER_TUNING = {
 };
 
 /** The nearest pirate currently hunting this ship, or null. */
-function hunter(world: World, ship: Ship): Ship | null {
+export function hunter(world: World, ship: Ship): Ship | null {
   let best: Ship | null = null;
   let bestDist = Infinity;
   for (const [id, brain] of Object.entries(world.npcs)) {
@@ -63,7 +63,7 @@ function hunter(world: World, ship: Ship): Ship | null {
  * on their own once the lock completes. Any other lock is dropped first.
  * When nobody is hunting it, the trader unlocks and goes cold.
  */
-function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
+export function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
   const threat = hunter(world, ship);
   const stray = ship.locks.find((l) => l.targetId !== threat?.id);
   const holding = threat ? ship.locks.some((l) => l.targetId === threat.id) : false;
@@ -95,24 +95,35 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
     };
   }
 
-  const inRange = distance(ship.position, station.position) <= station.dockRange;
-  const slowEnough = speedRelativeTo(ship, station) <= DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction;
-  if (inRange && slowEnough) {
+  const leftId = brain.route[(brain.leg + brain.route.length - 1) % brain.route.length];
+  const left = leftId ? world.stations[leftId] : undefined;
+  const flight = flyToStation(world, ship, stats, station, left);
+  if (flight.dock) {
     // Set the dwell now; if the dock is refused, the next tick tries again.
     const dwell = Math.round(TRADER_TUNING.dwellSeconds / world.dt);
     return { input: { ...emptyInput(), toggleDock: true }, brain: { ...brain, waitTicks: dwell } };
   }
+  return { input: defend(world, ship, flight.input), brain };
+}
+
+/**
+ * Fly to a station and dock: clear the station just left (if any), then
+ * approach its near side, match its velocity and ask to dock once in
+ * range and slow enough (`dock` true: send `toggleDock`). Shared by
+ * traders and miners.
+ */
+export function flyToStation(world: World, ship: Ship, stats: ShipStats, station: Station, left?: Station): { input: ShipInput; dock: boolean } {
+  const inRange = distance(ship.position, station.position) <= station.dockRange;
+  const slowEnough = speedRelativeTo(ship, station) <= DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction;
+  if (inRange && slowEnough) return { input: emptyInput(), dock: true };
 
   // Just undocked: stations move fast on their orbits, so first move
   // clear of the one just left, keeping its velocity, before setting
   // course. Otherwise the station runs the ship down from behind.
-  const leftId = brain.route[(brain.leg + brain.route.length - 1) % brain.route.length];
-  const left = leftId ? world.stations[leftId] : undefined;
   if (left && left.id !== station.id && distance(ship.position, left.position) < left.radius + TRADER_TUNING.departureClearance) {
     const desired = add(left.velocity, scale(awayFromStation(world, ship, left), TRADER_TUNING.departureSpeed));
-    return { input: defend(world, ship, steerSafely(ship, stats, desired, flightOn(world, ship))), brain };
+    return { input: steerSafely(ship, stats, desired, flightOn(world, ship)), dock: false };
   }
-
   // Aim for the point on the station's near side, just clear of the hull,
   // unless that side faces the body it orbits: then come in from outside.
   const around = obstacles(world, stats);
@@ -134,5 +145,5 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
   // station may be coming towards the ship.
   const near = distance(ship.position, station.position) < station.dockRange + TRADER_TUNING.creepMargin;
   const desired = add(station.velocity, travelVelocity(ship, stats, waypoint, approach, near ? DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction : cruise));
-  return { input: defend(world, ship, steerSafely(ship, stats, desired, flightOn(world, ship))), brain };
+  return { input: steerSafely(ship, stats, desired, flightOn(world, ship)), dock: false };
 }

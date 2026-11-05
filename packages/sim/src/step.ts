@@ -9,7 +9,7 @@ import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, 
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
 import { DOCK_REPAIR_PER_SECOND } from './constants.js';
-import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks } from './lifecycle.js';
+import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
 import { pilotsAboard } from './ownership.js';
@@ -337,6 +337,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const drones = stepDrones(next, world, droneCommands);
   next = drones.world;
   events.push(...drones.events);
+  next = sellNpcOre(next);
 
   // 6. Loot, wrecks, spawners.
   const loot = stepLoot(next, next.ships, rails.carryAt, rails.gravityAt);

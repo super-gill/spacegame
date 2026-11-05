@@ -5,8 +5,8 @@ import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from '../vec
 import { angleDelta } from '../angle.js';
 import { emptyInput } from '../world.js';
 import { asteroidPositions } from '../asteroids.js';
-import { arriveVelocity, flightOn, steerSafely, travelVelocity, type Obstacle } from './steer.js';
-import { clear, findPath, type Circle } from './path.js';
+import { flightOn, steerSafely } from './steer.js';
+import { CLEAR_MARGIN, navigate } from './navigate.js';
 
 /**
  * Mining drones (docs/drones.md). A drone flies itself; its mother ship
@@ -56,38 +56,14 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   let mode = brain.mode;
   if (mode === 'work' && distance(ship.position, mother.position) > range) mode = 'return';
 
-  // Rocks near the drone, for planning; ships close by, for steering clear.
-  const rocks: Circle[] = asteroidPositions(world)
+  // Rocks near the drone, for choosing a clear cutting spot.
+  const rocks = asteroidPositions(world)
     .filter((r) => distance(r.position, ship.position) < 900)
     .map((r) => ({ position: r.position, radius: r.radius }));
-  const hull: Circle = { position: mother.position, radius: motherStats.radius };
-  const around: Obstacle[] = rocks.filter((r) => distance(r.position, ship.position) < 300);
-  for (const other of Object.values(world.ships)) {
-    if (other.id === ship.id || other.state !== 'flying' || distance(other.position, ship.position) > 300) continue;
-    around.push({ position: other.position, radius: world.hulls[other.hullId]?.radius ?? 10 });
-  }
+  const hull = { position: mother.position, radius: motherStats.radius };
   const clearance = stats.radius + CLEAR_MARGIN;
-
-  /**
-   * Fly to `spot` (moving with `frame`) along a planned path round the
-   * rocks (and the mother's hull, unless `spot` is the mother), replanned
-   * every second or when the spot moves. Returns the velocity wanted and
-   * the brain's path state.
-   */
-  const head = (spot: Vec2, frame: Vec2, avoidHull: boolean): { velocity: Vec2; plan: Pick<DroneBrain, 'path' | 'goal' | 'planTick'> } => {
-    const obstacles = avoidHull ? [...rocks, hull] : rocks;
-    const stale = !brain.path || !brain.goal || brain.planTick === undefined || world.tick - brain.planTick >= REPLAN_TICKS || distance(brain.goal, spot) > 25;
-    let path = stale ? (findPath(ship.position, spot, obstacles, clearance) ?? [spot]) : brain.path!;
-    const planTick = stale ? world.tick : brain.planTick!;
-    // Drop waypoints reached, and any the drone can already see past.
-    while (path.length > 1 && (distance(ship.position, path[0]!) < WAYPOINT_REACHED || clear(ship.position, path[1]!, obstacles, clearance))) path = path.slice(1);
-    const next = path[0]!;
-    // Slow among rocks: a drone burns only forwards, so it needs room to turn and stop.
-    const gap = Math.min(Infinity, ...obstacles.map((o) => distance(ship.position, o.position) - o.radius - stats.radius));
-    const careful = Math.min(cruise, Math.max(CLUTTER_MIN_SPEED, gap * CLUTTER_SPEED_PER_UNIT));
-    const wanted = path.length === 1 ? arriveVelocity(ship, stats, next, careful) : travelVelocity(ship, stats, next, spot, careful);
-    return { velocity: add(frame, keepClear(ship, stats.radius, wanted, around)), plan: { path, goal: spot, planTick } };
-  };
+  // Drones still give each other room, though they would pass through each other harmlessly.
+  const head = (spot: Vec2, frame: Vec2, avoidHull: boolean) => navigate(world, ship, stats, brain, spot, frame, cruise, { avoid: avoidHull ? [hull] : [] });
 
   if (mode === 'return') {
     const { velocity, plan } = head(mother.position, mother.velocity, false);
@@ -140,46 +116,9 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   return { input: { ...input, fireFixed: facing && there }, brain: { ...next, ...plan } };
 }
 
-/** Among rocks a drone flies no faster than this many units a second per unit of room, nor slower than the minimum. */
-const CLUTTER_SPEED_PER_UNIT = 0.9;
-const CLUTTER_MIN_SPEED = 20;
-/** Replan a drone's path this often, ticks (a second). */
-const REPLAN_TICKS = 60;
-/** A waypoint this close counts as reached, units. */
-const WAYPOINT_REACHED = 18;
 /** Looking for a clear cutting spot: this many steps round the rock's face, this far apart, radians. */
 const SPOT_TRIES = 12;
 const SPOT_STEP = 0.3;
-
-/** Within this many units of clearance, a drone is pushed off an obstacle. */
-const CLEAR_MARGIN = 22;
-/** How hard, units/s at contact, falling to nothing at the margin. */
-const CLEAR_PUSH = 90;
-
-/**
- * The velocity a drone wants, bent round whatever it is about to touch:
- * near an obstacle, the part of `wanted` heading into it is turned to
- * slide along its edge instead (so a drone works its way round the
- * mother's hull rather than stalling against it), and a push moves it
- * off the edge.
- */
-function keepClear(ship: Ship, radius: number, wanted: Vec2, around: readonly Obstacle[]): Vec2 {
-  let v = wanted;
-  for (const o of around) {
-    const gap = distance(ship.position, o.position) - o.radius - radius;
-    if (gap >= CLEAR_MARGIN) continue;
-    const away = fromAngle(toAngle(sub(ship.position, o.position)));
-    const into = v.x * away.x + v.y * away.y;
-    if (into < 0) {
-      // Slide: drop the inward part and spend it along the edge, on the side it was already leaning.
-      const edge = { x: -away.y, y: away.x };
-      const lean = v.x * edge.x + v.y * edge.y >= 0 ? 1 : -1;
-      v = add(sub(v, scale(away, into)), scale(edge, -into * lean));
-    }
-    v = add(v, scale(away, CLEAR_PUSH * (1 - Math.max(0, gap) / CLEAR_MARGIN)));
-  }
-  return v;
-}
 
 /** How far the mother's drones will work from it: its bay's range. */
 export function droneRangeOf(world: World, mother: Ship): number {

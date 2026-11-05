@@ -495,10 +495,14 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const stations: Record<string, Station> = {};
   // Ship mart stock too: what a starter station sells is design data.
   for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart] } : st;
+  // NPC spawners added since the save was made join it (miners, say); those it has keep their state.
+  const known = new Set(world.spawners.map((sp) => sp.id));
+  const spawners = [...world.spawners, ...createStarterWorld().spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];
   const loaded: World = {
       ...world,
       ships,
       stations,
+      spawners,
       projectiles,
       // Worlds saved before the rules existed take the defaults (gravity off).
       rules: { ...DEFAULT_RULES, ...(world.rules ?? {}) },

@@ -296,6 +296,23 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
   return { loot: out, ships: updated, events };
 }
 
+/**
+ * NPC miners sell their ore by docking: it simply leaves the hold, paying
+ * nobody, until the economy milestone gives NPCs wallets (docs/mining.md).
+ */
+export function sellNpcOre(world: World): World {
+  let ships: Record<string, Ship> | null = null;
+  for (const [id, brain] of Object.entries(world.npcs)) {
+    const ship = world.ships[id];
+    if (brain.kind !== 'miner' || !ship || ship.state !== 'docked' || ship.dockedAt !== brain.market) continue;
+    if (!Object.keys(ship.hold).some((g) => world.goods[g]?.ore)) continue;
+    const hold = Object.fromEntries(Object.entries(ship.hold).filter(([g]) => !world.goods[g]?.ore));
+    ships ??= { ...world.ships };
+    ships[id] = { ...ship, hold };
+  }
+  return ships ? { ...world, ships } : world;
+}
+
 /** Spawn an NPC ship and brain from a spawner. */
 function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
   const loadout = world.loadouts[sp.loadoutId];

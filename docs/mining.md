@@ -113,3 +113,17 @@ Built as a general system so later kinds slot in without rework.
   - **Caches** (J): the ore aboard goes out of the stern, and loose ore canisters within 200 units (or tractor reach) join it. A cache lasts an hour (Jason), shows on its owner's radar as amber squares and in space with a ring, and anyone can scoop it; taking someone else's becomes theft with law (7). Dropping one switches a running tractor off, or it would scoop the cache straight back. Pirates do not hunt caches until NPC miners exist (part 2).
   - Typical numbers: soft rock off the seam about 1.7 ore a second, on the seam about 2.5; 60 units in 25 to 35 seconds. A hold of nickel-iron is worth about 2,500 at Lantern.
 - **Not yet:** NPC miners, charges, the hulk, drones, gate-glass (part 2).
+
+## NPC miners (5 November 2026)
+
+Agreed with Jason: two prospectors and a hulk to start; pirates hunt them like any traffic; NPC caches later, as a second step.
+
+- **Skin-deep, like traders:** NPCs have no wallets. Their ore really comes out of the rocks and is really hauled, and docking at the market takes it out of the hold (`sellNpcOre`), but it pays nobody and moves no prices. NPCs chasing profit comes with the economy milestone (10).
+- **The brain** (`MinerBrain`, `ai/miner.ts`): docked (sell, wait, undock), outbound (the nearest rock round its field station, within 4,500 units, that its lasers can cut and no other miner has taken), mining, inbound (full, or hunted). It flies along planned paths (`ai/navigate.ts`, shared with drones) and works through the same inputs as a pilot.
+- **Prospectors** park off the rock's face, turn to it, cut with the tractor on, then take the next rock until full; they sell at Ridge.
+- **The hulk** goes for rocks of radius 35 and up, parks 150 units off, locks up to four rocks within 420 units, gives each turret one, launches its drones and runs its tractor. Full or hunted, it recalls its drones and waits up to 25 seconds for them before leaving, then hauls to Lantern Works: a long, exposed run.
+- **Hunted** (a pirate hunting it): it heads for its market, locks the pirate and goes weapons hot, as traders do.
+- **Spawners:** `miner-prospector` and `miner-prospector-2` (respawn 90 s), `miner-hulk` (180 s), all starting docked at Ridge. Saves made before them gain the spawners on load.
+- **Belt:** about 18,500 units of ore to start; the three miners take roughly 16,000 an hour, rockfall can replace about 37,000 an hour, so the belt keeps up while the Ridge field runs thin locally.
+- **Cost:** the starter system now steps at about 2.7 ms a tick headless (pathfinding for the hulk's drones and the miners). Fine at 60 a second; to watch as NPCs grow.
+

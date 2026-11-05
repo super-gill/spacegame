@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
+- NPC miners: two prospectors working the field round Ridge and selling there, and a hulk with its drones hauling to Lantern Works. Pirates hunt them like any traffic. Older saves gain them on load.
 - Mining drones. They fly themselves, work only rocks you have locked, and cut ore for your tractor to collect. The prospector carries one, the hulk four (six fit its bay). Open the drone manager with N to launch, recall or send them to your active lock. Buy more at Harbour or Ridge; they go straight into your drone bay.
 
 ### Known

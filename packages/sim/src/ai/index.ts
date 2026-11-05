@@ -4,6 +4,7 @@ import { thinkPirate } from './pirate.js';
 import { thinkTrader } from './trader.js';
 import { thinkWatch } from './watch.js';
 import { thinkDrone } from './drone.js';
+import { thinkMiner } from './miner.js';
 import { wantsCountermeasure } from './steer.js';
 
 /**
@@ -43,6 +44,10 @@ export function thinkNpcs(world: World): NpcDecisions {
       const t = thinkTrader(world, ship, stats, brain);
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
+    } else if (brain.kind === 'miner') {
+      const t = thinkMiner(world, ship, stats, brain);
+      inputs[shipId] = t.input;
+      npcs[shipId] = t.brain;
     } else if (brain.kind === 'drone') {
       const t = thinkDrone(world, ship, stats, brain, npcs);
       inputs[shipId] = t.input;
@@ -73,3 +78,4 @@ export { PIRATE_TUNING, inSecurityZone } from './pirate.js';
 export { TRADER_TUNING } from './trader.js';
 export { WATCH_TUNING } from './watch.js';
 export { DRONE_TUNING } from './drone.js';
+export { MINER_TUNING } from './miner.js';

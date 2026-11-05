@@ -1102,7 +1102,32 @@ export interface ShipInput {
  * brain flies, so NPC state saves and loads with the world like anything
  * else. The behaviour lives in `ai/`.
  */
-export type NpcBrain = TraderBrain | PirateBrain | WatchBrain | DroneBrain;
+export type NpcBrain = TraderBrain | PirateBrain | WatchBrain | DroneBrain | MinerBrain;
+
+/**
+ * An NPC miner (ai/miner.ts, docs/mining.md): works the belt round
+ * `field` (a station), cutting rocks its lasers can take, and hauls the
+ * ore to `market` when full. A prospector cuts with its own laser; a hulk
+ * locks rocks, assigns its turrets and flies its drones. Skin-deep for
+ * now: what it sells pays nobody (the economy milestone changes that).
+ */
+export interface MinerBrain {
+  kind: 'miner';
+  /** The station whose belt it works. */
+  field: string;
+  /** The station it sells at. */
+  market: string;
+  mode: 'docked' | 'outbound' | 'mining' | 'inbound';
+  /** Ticks left to wait while docked. */
+  waitTicks: number;
+  /** The rock it is working towards or cutting, or null. */
+  rockId: string | null;
+  /** Ticks in the current mode, for patience. */
+  modeTicks: number;
+  path?: Vec2[];
+  goal?: Vec2;
+  planTick?: number;
+}
 
 /**
  * A drone flies itself (docs/drones.md, ai/drone.ts): it works rocks its

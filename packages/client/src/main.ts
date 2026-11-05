@@ -689,6 +689,7 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
+  if (brain?.kind === 'miner') return { colour: COLOUR.neutral, label: 'MINER' };
   if (brain?.kind === 'drone') return { colour: ship.ownerId === me.id ? COLOUR.ink : COLOUR.inkDim, label: `DRONE ${(ship.droneId ?? '').toUpperCase()}` };
   // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
   if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: 'CALDER WATCH' };

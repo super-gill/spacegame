@@ -54,6 +54,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `combat.ts` | Fixed fire, launchers and dispensers, turrets engaging the ship's target or shooting down incoming munitions (slew, lead, arcs, fire tolerance), reloading by ammunition slot, projectiles and hits on ships and munitions, capacitor, shields and damage, target leading |
 | `munitions.ts` | Missiles, torpedoes and countermeasures in flight: launching, radar and heat guidance, spoofing, steering, hits and burn-out |
 | `drones.ts` | Drones: launching, recalling and sending them, stowing them when home, losing them (`ai/drone.ts` flies them) |
+| `ai/miner.ts`, `ai/navigate.ts`, `ai/path.ts` | NPC miners; flying small craft through the belt (paths, slowing in clutter, sliding off obstacles); A* round rocks |
 | `mining.ts` | Mining part 1: survey pulses, and mining lasers cutting rocks into canisters of ore |
 | `systems.ts` | Activation tiles: which fire groups and modules get a numbered tile, in order |
 | `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the swivel, each with capacitor cost, ammunition good and damage type |
