@@ -52,6 +52,9 @@ function heldOnly(input: ShipInput): ShipInput {
   return out as unknown as ShipInput;
 }
 
+/** Parts of the world clients never need after `welcome`: per-tick events go separately, and spawn timers are the server's business. */
+const NEVER_SENT = new Set(['events', 'spawners', 'rockfall', 'nextEntityId']);
+
 export class Game {
   private world: World;
   /** Controls waiting to be used, per pilot (not per ship: a pilot can change ships). */
@@ -127,7 +130,7 @@ export class Game {
     const now = this.world as unknown as Record<string, unknown>;
     const then = before as unknown as Record<string, unknown>;
     for (const key of Object.keys(now)) {
-      if (key === 'events') continue;
+      if (NEVER_SENT.has(key)) continue;
       if (now[key] !== then[key]) changed[key] = now[key];
     }
     return changed as WorldUpdate;

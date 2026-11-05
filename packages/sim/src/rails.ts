@@ -116,7 +116,9 @@ export function stationState(bodies: Readonly<Record<string, Body>>, station: St
 export function placeStation(bodies: Readonly<Record<string, Body>>, station: Station, time: number): Station {
   if (!station.orbit) return station;
   const s = stationState(bodies, station, time);
-  return { ...station, position: s.position, velocity: s.velocity };
+  // Unmoved (orbits off): the same station, so the server can tell nothing changed.
+  const same = s.position.x === station.position.x && s.position.y === station.position.y && s.velocity.x === station.velocity.x && s.velocity.y === station.velocity.y;
+  return same ? station : { ...station, position: s.position, velocity: s.velocity };
 }
 
 /** Every station moved to where its rail puts it at `tick`. */
@@ -128,8 +130,13 @@ export function placeStations(
 ): Record<string, Station> {
   const time = railTime(tick, dt);
   const out: Record<string, Station> = {};
-  for (const [id, st] of Object.entries(stations)) out[id] = placeStation(bodies, st, time);
-  return out;
+  let moved = false;
+  for (const [id, st] of Object.entries(stations)) {
+    out[id] = placeStation(bodies, st, time);
+    if (out[id] !== st) moved = true;
+  }
+  // None moved: the same record, for the same reason.
+  return moved ? out : (stations as Record<string, Station>);
 }
 
 /**

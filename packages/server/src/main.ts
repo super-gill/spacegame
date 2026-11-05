@@ -149,7 +149,8 @@ function save(): void {
 setInterval(save, SAVE_EVERY_MS);
 
 const http = createServer(serveClient(CLIENT));
-const sockets = new WebSocketServer({ server: http, path: '/ws' });
+// Compress messages: the world's JSON shrinks several times over, and the host's upload is the limit.
+const sockets = new WebSocketServer({ server: http, path: '/ws', perMessageDeflate: { threshold: 1024 } });
 sockets.on('connection', (socket) => {
   const connection: Connection = { socket, character: null, seen: null };
   connections.add(connection);

@@ -15,7 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ### Known
 - A ship left in space when its pilot logs off stays there for now; it is meant to vanish after a short while and come back when they return.
-- Each player is sent every ship and station 20 times a second, about 20 KB an update near Harbour; sending only what a player's sensors can see comes next.
+- Each player is sent every ship in the system 20 times a second (about 2 KB an update compressed, near Harbour, or 0.35 Mbit/s); sending only what a player's sensors can see comes next.
 
 ## [0.13.0] - 2026-11-05
 
