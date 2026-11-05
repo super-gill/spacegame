@@ -67,6 +67,7 @@ export function harbourStation(): Station {
     market: {
       food: { ask: 14, bid: 11 },
       ore: { ask: 40, bid: 30 },
+      'mining-drone': { ask: 1500, bid: 900 },
       'banded-ore': { ask: null, bid: 52 },
       'black-ore': { ask: null, bid: 64 },
       glintstone: { ask: null, bid: 140 },
@@ -109,6 +110,7 @@ export function ridgeOutpost(): Station {
       ore: { ask: 18, bid: 14 },
       // The Collective buys what its prospectors bring in, cheaply: the
       // real money is a long haul away at Lantern Works.
+      'mining-drone': { ask: 1400, bid: 900 },
       'banded-ore': { ask: null, bid: 30 },
       'black-ore': { ask: null, bid: 36 },
       glintstone: { ask: null, bid: 80 },

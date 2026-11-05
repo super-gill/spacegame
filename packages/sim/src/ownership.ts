@@ -44,14 +44,15 @@ export function isEscapePod(world: Pick<World, 'hulls'>, ship: Ship): boolean {
 }
 
 /**
- * Ships a pilot owns, escape pods left out, sorted by id. Pods are
- * lifeboats, not property: owning only a pod counts as owning nothing.
+ * Ships a pilot owns, escape pods and drones left out, sorted by id. Pods
+ * are lifeboats, not property: owning only a pod counts as owning
+ * nothing. Drones belong to their mother ship's bay.
  */
 export function ownedShips(world: Pick<World, 'ships' | 'hulls'>, pilotId: string): Ship[] {
   return Object.keys(world.ships)
     .sort()
     .map((id) => world.ships[id]!)
-    .filter((s) => s.ownerId === pilotId && !isEscapePod(world, s));
+    .filter((s) => s.ownerId === pilotId && !isEscapePod(world, s) && !s.motherId);
 }
 
 /**

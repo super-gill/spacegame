@@ -245,6 +245,11 @@ export class Ui {
         this.showToast('Pirate closing in. Run for station security.', 3000);
       } else if (e.type === 'huntEnded') {
         this.showToast('The pirate has broken off.', 2000, 'info');
+      } else if (e.type === 'droneLost') {
+        this.showToast(e.reason === 'destroyed' ? `Drone ${e.droneId} destroyed.` : `Drone ${e.droneId} left behind and lost.`, 2500, 'warn');
+      } else if (e.type === 'droneRefused') {
+        const why = { noBay: 'No drone bay fitted.', noneStowed: 'No drones in the bay.', control: 'The bay controls no more drones at once.', noRock: 'Lock a rock and make it your active lock first.', docked: 'Undock to launch drones.' }[e.reason];
+        this.showToast(why, 2000);
       } else if (e.type === 'cacheDropped') {
         this.showToast(`Cache left: ${e.units} units of ore. It lasts an hour and shows on your radar.`, 2500, 'info');
       } else if (e.type === 'hopperFilterChanged') {

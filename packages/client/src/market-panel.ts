@@ -63,7 +63,9 @@ export class MarketPanel {
     const goods = new Set([...Object.keys(station.market), ...Object.keys(ship.hold)]);
     for (const id of [...goods].sort((a, b) => (world.goods[a]?.name ?? a).localeCompare(world.goods[b]?.name ?? b))) {
       const quote = scriptedPrices.quote(world, station.id, id);
-      const aboard = ship.hold[id] ?? 0;
+      // Drones are counted in the drone bay, not the hold.
+      const drone = world.goods[id]?.drone;
+      const aboard = drone ? (ship.droneBay ?? []).filter((d) => d.loadoutId === drone.loadoutId).length : (ship.hold[id] ?? 0);
       const canBuy = maxBuyable(world, pilotId, id);
       const row = el('tr');
       row.append(

@@ -1,5 +1,6 @@
 import { idleThrusters } from './flight.js';
 import { weaponStatesFor } from './fitting.js';
+import { LOADOUTS } from './loadouts.js';
 import { fitStats, type Catalogues } from './stats.js';
 import type { FlightMode, Loadout, Ship } from './types.js';
 import type { Vec2 } from './vec2.js';
@@ -59,6 +60,9 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
     weapons,
     tractorActive: false,
     hold: { ...(o.hold ?? {}) },
+    ...(o.loadout.drones && o.loadout.drones.count > 0
+      ? { droneBay: Array.from({ length: o.loadout.drones.count }, (_, i) => ({ id: `d${i + 1}`, loadoutId: o.loadout.drones!.loadoutId, structure: cat.hulls[LOADOUTS[o.loadout.drones!.loadoutId]?.hullId ?? '']?.structure ?? 60 })) }
+      : {}),
     locks: [],
     activeLock: null,
     capacitor: stats.capacitor,

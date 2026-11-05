@@ -51,6 +51,9 @@ const STAT_KEYS: ModuleStat[] = [
   'afterburnerThrust',
   'afterburnerDraw',
   'oreCapacity',
+  'droneCapacity',
+  'droneControl',
+  'droneRange',
 ];
 
 /** Resistances layered: the stronger of each type wins (two armour plates do not stack). */
@@ -109,6 +112,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     surveyCost: 0,
     surveyGrade: 0,
     oreCapacity: 0,
+    droneCapacity: 0,
+    droneControl: 0,
+    droneRange: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -194,6 +200,9 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     surveyCost: survey.cost,
     surveyGrade: survey.grade,
     oreCapacity: Math.floor(totals.oreCapacity + 1e-9),
+    droneCapacity: Math.floor(totals.droneCapacity + 1e-9),
+    droneControl: Math.floor(totals.droneControl + 1e-9),
+    droneRange: totals.droneRange,
     weapons,
     capacitor: hull.capacitor,
     capacitorRecharge: hull.capacitorRecharge,

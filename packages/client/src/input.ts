@@ -1,4 +1,4 @@
-import type { ShipInput } from '@spacegame/sim';
+import type { ShipInput, DroneCommand } from '@spacegame/sim';
 import { KEY_BINDINGS, SLOT_ACTIONS, SUPPRESS_DEFAULT, type Action, type UiAction } from './bindings.js';
 
 /**
@@ -17,7 +17,7 @@ import { KEY_BINDINGS, SLOT_ACTIONS, SUPPRESS_DEFAULT, type Action, type UiActio
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {
@@ -55,6 +55,7 @@ export class InputController {
   private pendingGroup: number | null = null;
   /** Module to switch on or off (or fire) with the next sample, by mount, or null. */
   private pendingToggle: string | null = null;
+  private pendingDrones: DroneCommand | null = null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -96,6 +97,11 @@ export class InputController {
     this.pendingToggle = mountId;
   }
 
+  /** Give the drones an order, on the next tick. */
+  requestDroneCommand(command: DroneCommand): void {
+    this.pendingDrones = command;
+  }
+
   /** Drop the lock on a ship, on the next tick. */
   requestUnlock(id: string): void {
     this.pendingLock = { ...this.pendingLock, unlock: id };
@@ -123,11 +129,13 @@ export class InputController {
       selectGroup: this.pendingGroup,
       tractor: this.held.has('tractor'),
       dropCache: this.latched.has('dropCache'),
+      droneCommand: this.pendingDrones,
     };
     this.latched.clear();
     this.pendingLock = { lock: null, unlock: null, activateLock: null };
     this.pendingGroup = null;
     this.pendingToggle = null;
+    this.pendingDrones = null;
     return input;
   }
 

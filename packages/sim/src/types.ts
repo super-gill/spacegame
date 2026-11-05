@@ -80,7 +80,7 @@ export type HullRole = 'civilian' | 'combat' | 'transport' | 'development';
  * what fits a mount. Merchantmen (trade, passengers) and hulks
  * (industry) come at any size; the Aurel are outside the ladder.
  */
-export type HullClass = 'pod' | 'cutter' | 'sloop' | 'brig' | 'frigate' | 'lineShip' | 'capital' | 'merchantman' | 'hulk' | 'aurel';
+export type HullClass = 'pod' | 'cutter' | 'sloop' | 'brig' | 'frigate' | 'lineShip' | 'capital' | 'merchantman' | 'hulk' | 'aurel' | 'drone';
 
 /**
  * What a shot does its damage as. Defences resist each type differently
@@ -206,7 +206,12 @@ export type ModuleStat =
   /** Survey scanner: 1 tells rich rocks from common ones; 2 names the best tier a rock holds. */
   | 'surveyGrade'
   /** Ore hopper: hold space only ore may use, units. */
-  | 'oreCapacity';
+  | 'oreCapacity'
+  /** Drone bay: drones it holds, and how many can be out at once. */
+  | 'droneCapacity'
+  | 'droneControl'
+  /** Drone bay: how far from the mother ship its drones will work, units. */
+  | 'droneRange';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -228,7 +233,8 @@ export type ModuleKind =
   | 'afterburner'
   | 'surveyScanner'
   | 'oreHopper'
-  | 'oreHold';
+  | 'oreHold'
+  | 'droneBay';
 
 /**
  * What a locked target tells you, by kind of information. A targeting
@@ -378,6 +384,8 @@ export interface Loadout {
   hullId: string;
   /** Mount id to module id. Mounts left out are empty. */
   fit: Record<string, string>;
+  /** Drones a ship of this loadout comes with, stowed in its bay. Absent: none. */
+  drones?: { loadoutId: string; count: number };
 }
 
 /**
@@ -422,6 +430,10 @@ export interface ShipStats {
   surveyGrade: number;
   /** Hold space only ore may use, from ore hoppers (and later ore holds), on top of `cargoCapacity`. */
   oreCapacity: number;
+  /** Drone bays: drones held, drones out at once, and how far they work from the ship (docs/drones.md). */
+  droneCapacity: number;
+  droneControl: number;
+  droneRange: number;
   shieldRegenDelay: number;
   structure: number;
   cargoCapacity: number;
@@ -484,6 +496,12 @@ export interface GoodSpec {
   decoy?: DecoySpec;
   /** Ores only: how it turns up in rocks (docs/mining.md). */
   ore?: OreSpec;
+  /**
+   * Drones only (docs/drones.md): buying one puts a drone of this loadout
+   * straight into the ship's drone bay instead of the hold; selling takes
+   * one from the bay.
+   */
+  drone?: { loadoutId: string };
 }
 
 /**
@@ -782,6 +800,12 @@ export interface Ship {
    * space instead of scooping. Absent or null: it takes everything.
    */
   hopperEject?: string | null;
+  /** Drones stowed in its drone bay (docs/drones.md). Drones out are ships with `motherId` set. Absent: none. */
+  droneBay?: StoredDrone[];
+  /** For a drone: the ship that carries and commands it. Absent: not a drone. */
+  motherId?: string;
+  /** For a drone: its id in the mother's bay, kept while it is out. */
+  droneId?: string;
   /** Goods aboard, item id to amount. */
   hold: Record<string, number>;
   /**
@@ -1064,6 +1088,8 @@ export interface ShipInput {
   toggleWeaponsHot: boolean;
   /** Run the tractor beam to pull in nearby loot. */
   tractor: boolean;
+  /** A command for this ship's drones (the drone manager), or null. */
+  droneCommand?: DroneCommand | null;
   /**
    * Edge-triggered: drop the ore aboard as a cache, and mark the loose ore
    * canisters near the ship as part of it (docs/mining.md, "Caches").
@@ -1076,7 +1102,35 @@ export interface ShipInput {
  * brain flies, so NPC state saves and loads with the world like anything
  * else. The behaviour lives in `ai/`.
  */
-export type NpcBrain = TraderBrain | PirateBrain | WatchBrain;
+export type NpcBrain = TraderBrain | PirateBrain | WatchBrain | DroneBrain;
+
+/**
+ * A drone flies itself (docs/drones.md, ai/drone.ts): it works rocks its
+ * mother ship has locked, or the one it was sent to, and comes home when
+ * recalled, out of range, or with nothing to do.
+ */
+export interface DroneBrain {
+  kind: 'drone';
+  motherId: string;
+  mode: 'work' | 'return';
+  /** The rock it is working, or null. */
+  rockId: string | null;
+  /** A rock the mother sent it to; it keeps to it while the rock stays locked. Null: it chooses. */
+  sentRockId: string | null;
+}
+
+/** A drone in a bay: which drone it is, and how much structure it has left. */
+export interface StoredDrone {
+  id: string;
+  loadoutId: string;
+  structure: number;
+}
+
+/** What a pilot tells its drones (the drone manager). Without `droneId`, launch and recall mean all of them; `send` takes the next drone working on its own. */
+export interface DroneCommand {
+  action: 'launch' | 'recall' | 'send';
+  droneId?: string;
+}
 
 /** Flies a fixed loop of stations, docking at each for a while. */
 export interface TraderBrain {
@@ -1315,6 +1369,13 @@ export type WorldEvent =
   | { type: 'oreFreed'; shipId: string; rockId: string; item: string; amount: number }
   /** A ship left a cache of `units` units of ore (its hold's and loose canisters nearby). */
   | { type: 'cacheDropped'; shipId: string; units: number }
+  /** Drones went out of, or came back into, a mother ship's bay. */
+  | { type: 'dronesLaunched'; shipId: string; droneIds: string[] }
+  | { type: 'droneStowed'; shipId: string; droneId: string }
+  /** A drone was lost: destroyed, or left out when its mother docked or was destroyed. */
+  | { type: 'droneLost'; shipId: string; droneId: string; reason: 'destroyed' | 'leftBehind' }
+  /** A drone command could not be carried out. */
+  | { type: 'droneRefused'; shipId: string; reason: 'noBay' | 'noneStowed' | 'control' | 'noRock' | 'docked' }
   /** A mining turret was given a rock to cut (its tile, with the rock as the active lock), or let go of one (null). */
   | { type: 'laserAssigned'; shipId: string; mountId: string; rockId: string | null }
   /** An ore hopper took in a canister of its filtered ore and spat it out astern. */

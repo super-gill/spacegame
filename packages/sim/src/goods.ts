@@ -15,6 +15,8 @@ export const GOODS: Record<string, GoodSpec> = {
   // are untouched. Every rock is
   // mostly common ore; richer ores turn up in some rocks, the best only
   // in bigger, harder ones.
+  // Drones: bought into a drone bay, not the hold (docs/drones.md).
+  'mining-drone': { id: 'mining-drone', name: 'Mining drone', unitMass: 0.6, basePrice: 1500, drone: { loadoutId: 'rookrivet-mining-drone' } },
   ore: { id: 'ore', name: 'Nickel-iron', unitMass: 0.3, basePrice: 30, ore: { tier: 'common', chance: 1, share: 0, minRadius: 0 } },
   'banded-ore': { id: 'banded-ore', name: 'Banded ore', unitMass: 0.3, basePrice: 60, ore: { tier: 'middling', chance: 0.35, share: 0.25, minRadius: 0 } },
   'black-ore': { id: 'black-ore', name: 'Black ore', unitMass: 0.3, basePrice: 75, ore: { tier: 'middling', chance: 0.25, share: 0.3, minRadius: 25 } },

@@ -1,3 +1,4 @@
+import { droneRoom, nextDroneId } from './drones.js';
 import { shipStats } from './stats.js';
 import type { GoodSpec, MarketEntry, Ship, ShipStats, World, WorldEvent } from './types.js';
 
@@ -99,7 +100,12 @@ export function maxBuyable(world: World, pilotId: string, goodId: string, prices
   const ask = prices.quote(world, d.stationId, goodId)?.ask;
   const pilot = world.pilots[pilotId];
   if (ask == null || ask <= 0 || !pilot) return 0;
-  return Math.min(Math.floor(pilot.credits / ask), holdSpaceFor(d.ship, shipStats(world, d.ship), world.goods, goodId));
+  return Math.min(Math.floor(pilot.credits / ask), roomFor(world, d.ship, goodId));
+}
+
+/** Room for more of a good: drones go to the drone bay, everything else to the hold. */
+function roomFor(world: World, ship: Ship, goodId: string): number {
+  return world.goods[goodId]?.drone ? droneRoom(world, ship) : holdSpaceFor(ship, shipStats(world, ship), world.goods, goodId);
 }
 
 /** Buy `quantity` units of a good from the station the pilot is docked at. All or nothing. */
@@ -113,15 +119,26 @@ export function buyGood(world: World, pilotId: string, goodId: string, quantity:
   const pilot = world.pilots[pilotId]!;
   const cost = ask * quantity;
   if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
-  if (quantity > holdSpaceFor(d.ship, shipStats(world, d.ship), world.goods, goodId)) return { ok: false, world, reason: 'space' };
+  if (quantity > roomFor(world, d.ship, goodId)) return { ok: false, world, reason: 'space' };
 
-  const hold = { ...d.ship.hold, [goodId]: (d.ship.hold[goodId] ?? 0) + quantity };
+  // A drone goes into the drone bay, ready to launch.
+  const drone = world.goods[goodId]?.drone;
+  let bought: Ship;
+  if (drone) {
+    const loadout = world.loadouts[drone.loadoutId];
+    const structure = world.hulls[loadout?.hullId ?? '']?.structure ?? 1;
+    let ship = d.ship;
+    for (let i = 0; i < quantity; i++) ship = { ...ship, droneBay: [...(ship.droneBay ?? []), { id: nextDroneId(world, ship), loadoutId: drone.loadoutId, structure }] };
+    bought = ship;
+  } else {
+    bought = { ...d.ship, hold: { ...d.ship.hold, [goodId]: (d.ship.hold[goodId] ?? 0) + quantity } };
+  }
   return {
     ok: true,
     world: {
       ...world,
       pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits - cost } },
-      ships: { ...world.ships, [d.ship.id]: { ...d.ship, hold } },
+      ships: { ...world.ships, [d.ship.id]: bought },
     },
     event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: ask, side: 'buy' },
   };
@@ -135,19 +152,29 @@ export function sellGood(world: World, pilotId: string, goodId: string, quantity
   const bid = prices.quote(world, d.stationId, goodId)?.bid;
   if (bid == null) return { ok: false, world, reason: 'notTraded' };
 
-  const held = d.ship.hold[goodId] ?? 0;
+  // Drones are sold from the drone bay, most worn first; anything else from the hold.
+  const drone = world.goods[goodId]?.drone;
+  const bay = (d.ship.droneBay ?? []).filter((x) => x.loadoutId === drone?.loadoutId);
+  const held = drone ? bay.length : (d.ship.hold[goodId] ?? 0);
   if (quantity > held) return { ok: false, world, reason: 'notHeld' };
 
   const pilot = world.pilots[pilotId]!;
-  const hold = { ...d.ship.hold };
-  if (held === quantity) delete hold[goodId];
-  else hold[goodId] = held - quantity;
+  let sold: Ship;
+  if (drone) {
+    const going = new Set([...bay].sort((a, b) => a.structure - b.structure || (a.id < b.id ? -1 : 1)).slice(0, quantity).map((x) => x.id));
+    sold = { ...d.ship, droneBay: (d.ship.droneBay ?? []).filter((x) => !going.has(x.id)) };
+  } else {
+    const hold = { ...d.ship.hold };
+    if (held === quantity) delete hold[goodId];
+    else hold[goodId] = held - quantity;
+    sold = { ...d.ship, hold };
+  }
   return {
     ok: true,
     world: {
       ...world,
       pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits + bid * quantity } },
-      ships: { ...world.ships, [d.ship.id]: { ...d.ship, hold } },
+      ships: { ...world.ships, [d.ship.id]: sold },
     },
     event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: bid, side: 'sell' },
   };

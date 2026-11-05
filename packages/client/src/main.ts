@@ -50,6 +50,7 @@ import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { loadLocalPilot, saveLocalPilot } from './identity.js';
 import { MenuPanel } from './menu-panel.js';
+import { DronePanel } from './hud/drone-panel.js';
 import { LOAD_REFUSALS, clearStoredWorld, exportWorld, importWorld, loadStoredWorld, storeWorld } from './persistence.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { InputController } from './input.js';
@@ -126,6 +127,7 @@ const input = new InputController(
     else if (action === 'cycleTarget') cycleTarget();
     else if (action === 'clearTarget') unlockActive();
     else if (action === 'toggleHeadingLock') toggleHeadingLock();
+    else if (action === 'toggleDrones') dronePanel.toggle();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
     else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
@@ -141,6 +143,7 @@ const ui = new Ui(
 );
 const hudLayer = document.getElementById('hud-layer')!;
 const flightHud = new FlightHud(hudLayer);
+const dronePanel = new DronePanel(hudLayer, (command) => input.requestDroneCommand(command));
 const targetCard = new TargetCard(
   hudLayer,
   (id) => input.requestActivate(id),
@@ -686,6 +689,7 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
+  if (brain?.kind === 'drone') return { colour: ship.ownerId === me.id ? COLOUR.ink : COLOUR.inkDim, label: `DRONE ${(ship.droneId ?? '').toUpperCase()}` };
   // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
   if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: 'CALDER WATCH' };
   if (isEmptyShip(world, ship)) {
@@ -830,6 +834,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     yourShips.invalidate();
   }
   ui.update(current, mine);
+  dronePanel.update(current, mine);
   flightHud.headingLock = settings.mouseSteering ? headingLocked : null;
   flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
   targetCard.update(current, mine);

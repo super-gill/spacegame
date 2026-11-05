@@ -33,6 +33,7 @@ const FLOWN_BY_STANCE: Record<NonNullable<LockReadout['identity']>['flownBy'], T
   trader: 'neutral',
   watch: 'watch',
   pilot: 'pilot',
+  drone: 'pilot',
   nobody: 'empty',
 };
 
@@ -51,6 +52,7 @@ const FLOWN_BY_WORDS: Record<NonNullable<LockReadout['identity']>['flownBy'], st
   trader: 'TRADER',
   watch: 'PATROL',
   pilot: 'PILOT',
+  drone: 'DRONE',
   nobody: 'NOBODY ABOARD',
 };
 

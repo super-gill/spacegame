@@ -193,6 +193,8 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // Heavy mining turrets for a hulk's mining mounts: each is assigned a
   // locked rock and cuts it on its own, slewing to keep the beam on it.
   // Strong enough for any rock in the Scree.
+  // A mining drone's laser: weak and short, but a drone parks on the seam.
+  'mining-laser-drone': miningLaser('mining-laser-drone', 'Drone mining laser', 'S', 0.5, 0.6, 3, 90),
   'mining-turret-l': miningLaser('mining-turret-l', 'Mining turret L', 'L', 1, 2.2, 10, 480, 0.8),
 };
 

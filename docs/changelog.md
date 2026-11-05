@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- Mining drones. They fly themselves, work only rocks you have locked, and cut ore for your tractor to collect. The prospector carries one, the hulk four (six fit its bay). Open the drone manager with N to launch, recall or send them to your active lock. Buy more at Harbour or Ridge; they go straight into your drone bay.
+
+### Known
+- Drones left out when you dock are lost, so recall them first.
+
 ## [0.12.0] - 2026-11-05
 
 Mining, first slice (9a): ore in the Scree's rocks, the prospector and the hulk, surveying, cutting, caches and the ore hopper; and two accessibility fixes from playtesting.

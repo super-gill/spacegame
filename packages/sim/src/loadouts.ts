@@ -84,6 +84,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     id: 'rookrivet-prospector',
     name: 'Rook and Rivet Prospector, Collective issue',
     hullId: 'rookrivet-prospector',
+    drones: { loadoutId: 'rookrivet-mining-drone', count: 1 },
     fit: {
       n1: 'meridian-nav-s',
       r1: 'meridian-radar-s',
@@ -99,9 +100,24 @@ export const LOADOUTS: Record<string, Loadout> = {
       i1: 'meridian-shield-s',
       // A hopper instead of armour: 40 more units for ore.
       i2: 'rookrivet-hopper-s',
+      // One drone, which works a second rock beside you.
+      i3: 'rookrivet-dronebay-s',
       u1: 'meridian-gleaner-s',
       u2: 'rookrivet-survey-s',
       b1: 'meridian-pod-s',
+    },
+  },
+  'rookrivet-mining-drone': {
+    // A drone as it comes out of the box (docs/drones.md).
+    id: 'rookrivet-mining-drone',
+    name: 'Rook and Rivet Mining Drone',
+    hullId: 'rookrivet-drone',
+    fit: {
+      w1: 'rookrivet-drone-laser',
+      f1: 'meridian-helm-s',
+      e1: 'meridian-engine-s',
+      c1: 'meridian-thrusters-s',
+      c2: 'meridian-reactor-s',
     },
   },
   'rookrivet-hulk': {
@@ -110,6 +126,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     id: 'rookrivet-hulk',
     name: 'Rook and Rivet Hulk, Collective issue',
     hullId: 'rookrivet-hulk',
+    drones: { loadoutId: 'rookrivet-mining-drone', count: 4 },
     fit: {
       n1: 'itomarr-nav-m',
       r1: 'tessaract-radar-m',
@@ -125,7 +142,8 @@ export const LOADOUTS: Record<string, Loadout> = {
       c1: 'slagline-thrusters-m',
       c2: 'rookrivet-reactor-l',
       i1: 'itomarr-shield-m',
-      i2: 'cantorvell-armour-m',
+      // Four drones out of six aboard, in place of armour.
+      i2: 'rookrivet-dronebay-m',
       i3: 'rookrivet-hopper-m',
       // A second reactor: the turrets, assay and sensors draw more than the Furnace gives.
       i4: 'itomarr-reactor-m',

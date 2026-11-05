@@ -135,6 +135,7 @@ const MODULE_TYPE_NAME: Record<Exclude<ModuleSpec['kind'], 'weapon'>, string> = 
   surveyScanner: 'Survey scanner',
   oreHopper: 'Ore hopper',
   oreHold: 'Ore hold',
+  droneBay: 'Drone bay',
 };
 
 /** What a fit leaves the ship unable to do, for the pilot. Shared with main.ts. */
@@ -162,6 +163,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
   if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
   if (s.oreCapacity) parts.push(`${s.oreCapacity} units of hold for ore only${m.kind === 'oreHopper' ? '; its tile sets one ore to spit back out astern' : ''}`);
+  if (s.droneCapacity) parts.push(`holds ${s.droneCapacity} drone${s.droneCapacity === 1 ? '' : 's'}, flies ${s.droneControl ?? 0} at once, within ${s.droneRange ?? 0} u (drones are bought at the market)`);
   if (s.surveyRange) parts.push(`survey pulse ${s.surveyRange} u for ${s.surveyCost ?? 0} cap: ${(s.surveyGrade ?? 0) >= 2 ? 'names the best ore in each rock' : 'tells rich rock from plain'}`);
   if (m.readouts?.includes('composition')) parts.push('reads what a locked rock holds and how hard it is, not guns');
   if (m.shieldRegenDelay) parts.push(`recharges ${fixed1(m.shieldRegenDelay)} s after a hit`);

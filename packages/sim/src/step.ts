@@ -3,6 +3,7 @@ import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor
 import { goodsFitting } from './goods.js';
 import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
 import { asteroidStates, stepRockfall } from './asteroids.js';
+import { stepDrones } from './drones.js';
 import { CACHE_LIFETIME, cutRocks, dropCache, nextHopperFilter, surveyPulse } from './mining.js';
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
@@ -16,7 +17,7 @@ import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } fro
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
 import type { Vec2 } from './vec2.js';
-import type { Decoy, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
+import type { Decoy, DroneCommand, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
 import { emptyInput } from './world.js';
 
 /** Boxes of each ammunition an NPC keeps aboard. */
@@ -101,6 +102,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const newDecoys: Decoy[] = [];
   const beams: BeamShot[] = [];
   const cacheLoot: Loot[] = [];
+  const droneCommands: Record<string, DroneCommand> = {};
   const cacheMarks = new Map<string, string>();
   let nextEntityId = world.nextEntityId;
   let ships: Record<string, Ship> = {};
@@ -203,6 +205,9 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       targeted = { ...targeted, fireGroup: input.selectGroup };
       events.push({ type: 'fireGroupChanged', shipId: id, group: input.selectGroup });
     }
+
+    // Orders for drones are carried out after ships move (drones.ts).
+    if (input.droneCommand) droneCommands[id] = input.droneCommand;
 
     // Drop a cache: the ore aboard, and loose ore canisters nearby.
     if (input.dropCache && targeted.state === 'flying') {
@@ -327,6 +332,11 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const departure = departShips(next, npc.departures);
   next = departure.world;
   events.push(...departure.events);
+
+  // Drones: orders, homecomings, and drones lost.
+  const drones = stepDrones(next, world, droneCommands);
+  next = drones.world;
+  events.push(...drones.events);
 
   // 6. Loot, wrecks, spawners.
   const loot = stepLoot(next, next.ships, rails.carryAt, rails.gravityAt);

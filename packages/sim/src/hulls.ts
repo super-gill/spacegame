@@ -302,6 +302,37 @@ export const HULLS: Record<string, HullSpec> = {
     ],
   },
 
+  'rookrivet-drone': {
+    // A Rook and Rivet mining drone (docs/drones.md; name provisional): a
+    // flying laser with an engine. No hold, no sensors of its own: it works
+    // what its mother has locked.
+    id: 'rookrivet-drone',
+    name: 'Rook and Rivet Mining Drone',
+    race: 'freeBelt',
+    manufacturer: 'rookRivet',
+    role: 'civilian',
+    sizeClass: 'S',
+    mass: 0.6,
+    structure: 60,
+    price: 1200,
+    radius: 6,
+    outline: outline([[6, 0], [1, -4], [-5, -3], [-5, 3], [1, 4]]),
+    maxSpeed: 220,
+    maxTurnRate: 3.5,
+    signature: 5,
+    class: 'drone',
+    capacitor: 50,
+    capacitorRecharge: 6,
+    mounts: [
+      mount('w1', 'weapon', 'S', 5, 0, ['power']),
+      mount('f1', 'flight', 'S', 0, 0, ['power']),
+      mount('e1', 'engine', 'S', -5, 0, ['power'], AFT),
+      mount('c1', 'core', 'S', -2, -2, ['power']),
+      mount('c2', 'core', 'S', -2, 2, ['power']),
+    ],
+    bonuses: [],
+  },
+
   'aurel-tacet': {
     // Development and test ship: a living Aurel ship whose voice has never
     // sung to anyone (docs/lore.md, "Names"). Complete, sealed, outside

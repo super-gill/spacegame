@@ -30,12 +30,17 @@ describe('slot budgets', () => {
     expect(slots('tessaract-spine')).toMatchObject({ weapon: 1, utility: 2, internal: 4, bay: 6 });
   });
 
-  it('every flyable hull has one each of the fixed system mounts; a pod only flight', () => {
+  it('every flyable hull has one each of the fixed system mounts; a pod or a drone only flight', () => {
     for (const hull of Object.values(HULLS)) {
       const s = slots(hull.id);
       if (hull.escapePod) {
         expect(s, hull.id).toMatchObject({ flight: 1 });
         expect(s['podBay'] ?? 0, hull.id).toBe(0);
+        continue;
+      }
+      if (hull.class === 'drone') {
+        // A drone flies itself on its mother's locks: a flight computer, nothing else fixed.
+        expect(s, hull.id).toMatchObject({ flight: 1 });
         continue;
       }
       expect(s, hull.id).toMatchObject({ flight: 1, podBay: 1, fireControl: 1, nav: 1, radar: 1, computer: 1 });

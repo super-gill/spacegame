@@ -864,6 +864,53 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['mining'],
     stats: { powerOutput: 40 },
   },
+  // Drones (docs/drones.md). A drone's laser, and drone bays (internal):
+  // how many drones a ship holds, how many fly at once, and how far from
+  // it they work.
+  'rookrivet-drone-laser': {
+    id: 'rookrivet-drone-laser',
+    name: 'Rook and Rivet Nibbler',
+    kind: 'weapon',
+    size: 'S',
+    mounts: ['weapon'],
+    needs: ['power'],
+    mass: 0.2,
+    power: 1,
+    price: 300,
+    manufacturer: 'rookRivet',
+    tags: ['mining', 'drone'],
+    stats: {},
+    weaponId: 'mining-laser-drone',
+  },
+  'rookrivet-dronebay-s': {
+    id: 'rookrivet-dronebay-s',
+    name: 'Rook and Rivet Drone Cradle S',
+    kind: 'droneBay',
+    size: 'S',
+    mounts: ['internal'],
+    needs: [],
+    mass: 1,
+    // A cradle, not a control suite: it draws nothing, so a prospector can carry one.
+    power: 0,
+    price: 1500,
+    manufacturer: 'rookRivet',
+    tags: ['drone'],
+    stats: { droneCapacity: 1, droneControl: 1, droneRange: 1200 },
+  },
+  'rookrivet-dronebay-m': {
+    id: 'rookrivet-dronebay-m',
+    name: 'Rook and Rivet Drone Bay M',
+    kind: 'droneBay',
+    size: 'M',
+    mounts: ['internal'],
+    needs: ['power'],
+    mass: 3,
+    power: 2,
+    price: 5000,
+    manufacturer: 'rookRivet',
+    tags: ['drone'],
+    stats: { droneCapacity: 6, droneControl: 4, droneRange: 2000 },
+  },
   // Ore hoppers (internal): hold space only ore may use, and a filter set
   // from its tile for the one ore the tractor leaves behind. Fitting one
   // costs an armour or shield slot.

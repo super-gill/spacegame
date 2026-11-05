@@ -440,7 +440,8 @@ describe('sensor range', () => {
   it('comes only from a fitted radar: a bare hull sees nothing', () => {
     for (const hull of Object.values(HULLS)) {
       expect(fitStats(TEST_CATALOGUES, hull, {}).sensorRange, hull.id).toBe(0);
-      expect(hull.mounts.filter((m) => m.type === 'radar'), hull.id).toHaveLength(1);
+      // Drones see through their mother's sensors.
+      if (hull.class !== 'drone') expect(hull.mounts.filter((m) => m.type === 'radar'), hull.id).toHaveLength(1);
     }
     const radar = MODULES['meridian-radar-s']!;
     expect(fitStats(TEST_CATALOGUES, courier, { r1: radar.id }).sensorRange).toBe(radar.stats.sensorRange);

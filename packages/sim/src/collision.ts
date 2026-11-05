@@ -127,7 +127,7 @@ export interface ShipCollisionResult {
  * Resolve every overlapping pair of flying ships. Pairs are visited in
  * sorted id order so the result is deterministic. `statsFor` gives each
  * ship's stats as it flies, cargo mass included, so a laden ship rams
- * harder. Fine for the handful of ships in a sector; a spatial grid can come when sectors get busy.
+ * harder. A drone passes through its mother and its sister drones. Fine for the handful of ships in a sector; a spatial grid can come when sectors get busy.
  */
 export function collideShips(ships: Record<string, Ship>, statsFor: (ship: Ship) => ShipStats | undefined): ShipCollisionResult {
   const out: Record<string, Ship> = { ...ships };
@@ -144,6 +144,8 @@ export function collideShips(ships: Record<string, Ship>, statsFor: (ship: Ship)
       const ha = statsFor(a);
       const hb = statsFor(b);
       if (!ha || !hb) continue;
+      // A mother's drones fly in and out of each other and its hull without harm (docs/drones.md).
+      if ((a.motherId && (a.motherId === b.id || a.motherId === b.motherId)) || (b.motherId && b.motherId === a.id)) continue;
 
       const minDist = ha.radius + hb.radius;
       const d = distance(a.position, b.position);
