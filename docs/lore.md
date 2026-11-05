@@ -368,6 +368,41 @@ Each people has its own words for the top two rungs:
 | Oru Collective | Broods | Seedhives |
 | Drifter Clans | None | Homeships: the old arks themselves |
 
+## Mining and materials
+
+### Who builds mining kit
+
+| Maker | What | Why |
+| --- | --- | --- |
+| Belt Forge Collective | The mining ships, lasers, survey scanners, mining computers, hoppers, drones, drone bays and breaching kit | The first cooperative to own its tools after the Strikes; the best mining kit in the Arm is Belter-made |
+| Corvane Heavy Industries | Heavy plant: the Collier's turrets, ore bunkers and furnace reactors | Corvane runs Lantern Works and builds furnaces for a living; its kit is heavier and cheaper than Belt Forge's |
+| Tessaract Logistics | The Deep Dowser, a long-range survey scanner | Tessaract maps freight lanes and sells the same instruments to prospectors |
+
+A Collier is a Belt Forge hull full of Corvane parts. Belters fly it and grumble about it: the oldest trade rivalry in the Arm, bolted into one ship. Rook and Rivet stays a salvage firm.
+
+### Ores
+
+| Ore | Grade | Used for |
+| --- | --- | --- |
+| Nickel-iron | Common | Hull plate, frames, everything structural. Lantern Works eats it by the thousand tonnes. |
+| Copperband | Middling | Copper-striped rock: wiring, reactors and every electrical system |
+| Blackjack | Middling | Old miners' slang for zinc ore: zinc and carbon for armour composites and capacitor cells |
+| Glintstone | Valuable, big rocks only | Clear crystal: laser optics and sensor lenses. Cantor-Vell buys all it can. |
+| Gate-glass | Rare, from splinters and knots | No human can make it. Researchers want it, the Canticle reveres it, and Novum needs it for gate-waking. |
+
+### More to come (Jason's direction)
+
+- **The ore catalogue grows.** Rarer ores belong in rarer and more dangerous systems, the Marches, the Unclaimed and the Dark, so the best rock is where the worst people are.
+- **Makers have their own alloys.** Each manufacturer blends refined metals into signature alloys of its own, which is part of why two makers' ships of the same size feel different. Alloys are where smelting, founding and later player building begin. Their names and recipes are future lore asks.
+
+### Breaching
+
+Belters call a breach charge a **cracker**. The **shotfirer** is the miner who sets and fires them, and the rig is named for the job. A Sounder reads a rock for what lies deep inside it, which is how a breacher finds a knot. The bloom of a breach is visible across half a system, so every Belter knows a breach is also an invitation to pirates.
+
+### Drones
+
+Belt Forge's mining drone is the **Knocker**. In the old mines of the human homeworld, knockers were small spirits heard tapping at the rock face; Belters say the drones sound just the same through the hull. Drones ride out and home in a **Cage**, named for the mine cage that carried miners up and down the shaft.
+
 ## Manufacturers
 
 Specialities and navy roles are set in `races.md`. This section says where each maker came from and gives a hook for quests and contracts.
@@ -453,6 +488,26 @@ Six NPC factions work outside the law, each born from a wound in a people's hist
 - **The Hiveless.** When an Oru drone-body is away from its hive too long, it forgets the hive. Nobody can join them. The Oru are ashamed of them and pay bounties for their recovery, not their destruction.
 - **The Hollow Choir.** A Canticle heresy from about 560 AL that believes the Unsung are the true Radiant, betrayed and caged by the Aurel, and that waking every gate will free them. They pay fortunes for husks and voice fragments, and they are right about more than anyone would like. The faction most likely to become a story arc.
 
+## Who NPCs work for
+
+Every NPC pilot, trader, miner or patrol, is either **independent** or works for a **company**. Calder is one example; seeded systems draw their own mix from the same pattern, so no two systems feel alike.
+
+| Kind | Who | Flavour |
+| --- | --- | --- |
+| Company crews | Contract crews for a maker or a big firm: Tessaract freight, Corvane hulks, Grand Tithe liners, KOD patrols | Company colours and company hulls, steady routes, and the company sends another when one is lost |
+| Cooperative crews | Free Belt cooperatives such as the Ridge Collective; Drifter clan ships | Their own people's hulls, worked hard and patched often; loyal to their station or clan |
+| House and institute crews | Halcyon houses, Vael institutes, Oru hives | Serve their holder; rarely seen outside its space |
+| Independents | Owner-pilots and small outfits working for whoever pays | Any hull, any fit, often second-hand; a name of their own rather than a company's |
+
+How the mix shifts, in words (the lead sets the numbers):
+
+- **By holder.** A system takes its flavour from who holds it: Kessari systems run on company crews, Belt systems on cooperatives, Halcyon systems on house crews, free ports like Calder on a bit of everything.
+- **By band.** Accord space is mostly company and cooperative crews on steady routes. The Marches have more independents, taking risks for better pay. In the Unclaimed nearly everyone is independent, and some of them are pirates on a bad day.
+- **By what the system has.** A belt brings miners, a foundry brings haulers, a pilgrim route brings liners, and each draws the employers that fit it.
+- **Pirates follow the money.** Each pirate faction preys hardest on the employers it hates: the Black Strike on Kessari and Corvane, the Red Tithe on Grand Tithe liners and Halcyon houses.
+
+Variation within a kind (hulls, fits, paint, names) is for the lead's generator. Company crews should read as their company; independents should read as people.
+
 ## The starter sector
 
 The starter system in lore terms. The set-up was confirmed on 4 November 2026; the bodies, the third station, the Watch and the belt were added the same day for 6c part 2.
@@ -469,7 +524,9 @@ The starter system in lore terms. The set-up was confirmed on 4 November 2026; t
 
 The star keeps the system's name, Calder.
 
-**The Scree's rocks** are mostly nickel-iron and water ice. A few carry **gate-glass**: shards of Aurel-made material, like splinters off a gate, though no broken gate has ever been charted near Calder. **(canon, hidden)** The Scree is the wreck of a gate the Aurel shattered during the Sundering, long before Calder was settled. Gate-glass is for milestone 9's ore types; until then it is rumour and a rare find.
+**The Scree's rocks** are mostly nickel-iron and water ice, with Copperband, Blackjack and, in the big rocks, Glintstone (see "Mining and materials"). A few carry **gate-glass**: Aurel-made material, like splinters off a gate, though no broken gate has ever been charted near Calder. **(canon, hidden)** The Scree is the wreck of a gate the Aurel shattered during the Sundering, long before Calder was settled.
+
+Most gate-glass is splinters, scattered and small. A few big rocks hold a **knot**: a piece of the gate's own frame that molten rock swallowed whole in the Sundering and cooled around. A knot is unbroken gate structure, so a well-placed breach brings its glass out clean. Only a Sounder finds one. **(canon, hidden)** A knot still hums, very faintly, on the right frequency. The Hollow Choir would pay anything for one whole, and Novum Systems wants knot glass for its stronger gate-waker.
 
 ### Stations
 
@@ -483,6 +540,7 @@ The trade triangle: food and medicine from Harbour to the Ridge, ore from the Ri
 
 - **The Calder Watch** is the Port Authority's patrol. It flies Kessari Warrants bought from Kessari Orbital Defence and painted Port Authority white. The pirates fly the same hull, captured, which both sides find funny for different reasons. The Watch hunts pirates in the lanes and near the stations; until law arrives (milestone 7) it does not trouble pilots. It is an ordinary force and can be beaten, and it is the first step of the escalation under "Law enforcement".
 - **The traders** fly supply contracts for Tessaract Logistics in Tessaract Manifests, between all three stations. When one is lost, Tessaract sends another; the contracts pay well enough to absorb it.
+- **The miners** work the Scree round Ridge Outpost. The prospectors are Ridge Collective crews, mining for the cooperative and selling at Ridge. The hulk is a Corvane contract crew in a Belt Forge Collier, hauling to Lantern Works on the long, exposed run; the Black Strike hunts it harder than anything else in Calder.
 - **The pirates** are Black Strike raiders in captured Kessari Warrants, kept as trophies and fitted cheaply. They hunt Kessari freight and, this far from Slagline, anyone else outside the Watch's reach. They lurk in the Scree and the lanes. When badly hurt they limp off to a hidden yard in the Marches (an old Union Defence Works site) and the Strike sends fresh raiders later.
 
 ## Present day, 612 AL
@@ -517,6 +575,8 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | Slagline Motors | Belter slang for running | Built so crews could outrun Kessari patrols |
 | Rook and Rivet | Salvager's shop talk | Its plate is cut from wrecks |
 | Union Defence Works | Strike words | The Belt Strikes' arsenal |
+| Belt Forge Collective | Old mining trades and tools | The Belt's own mining cooperative |
+| Corvane Heavy Industries | Heavy plant | Foundry and furnace builders |
 | Commonwealth Fleet Works | Replies | Its ships have never fired first, so its guns are named as answers |
 | Paragon Arms | Plain trade names that promise fairness | Sells to anyone, and wants you to feel fine about it |
 | Aurel | Silent and musical terms given by human scholars | The Aurel share no names; humans name what they see |
@@ -604,6 +664,51 @@ Munitions are made by Kessari Orbital Defence and named in its legal voice. A mu
 | Novum Ghost | Novum Systems | Mostly decoys, a little chaff | Kessari electronic warfare at its finest, and priced like it |
 | Paragon Fair Warning | Paragon Arms | Even chaff and flares, no decoys | Sold to anyone |
 
+### Mining (`hulls.ts`, `modules.ts`, `goods.ts`)
+
+Ids keep their wording. Every `rookrivet-` mining item changes maker as listed.
+
+| Id | Name | Maker | Note |
+| --- | --- | --- | --- |
+| `rookrivet-prospector` | Belt Forge Prospector | Belt Forge Collective | Cutter; the lone digger looking for a strike |
+| `rookrivet-breacher` | Belt Forge Sinker | Belt Forge Collective | Mid-size; shaft sinkers dug the deep, dangerous bores |
+| `rookrivet-hulk` | Belt Forge Collier | Belt Forge Collective | Hulk class; colliers were the age of sail's coal ships, big, slow and filthy |
+| `rookrivet-drone` | Belt Forge Knocker | Belt Forge Collective | The mining drone |
+| `rookrivet-pick-s`, `rookrivet-pick-m` | Belt Forge Pick S, M | Belt Forge Collective | Mining lasers |
+| `rookrivet-survey-s` | Belt Forge Dowser S | Belt Forge Collective | Survey scanner |
+| `tessaract-survey-m` | Tessaract Deep Dowser M | Tessaract Logistics | Unchanged |
+| `rookrivet-assay-s`, `rookrivet-assay-l` | Belt Forge Assay S, L | Belt Forge Collective | Mining computers |
+| `rookrivet-deepassay-m` | Belt Forge Sounder M | Belt Forge Collective | Was Deep Assay; finds knots |
+| `rookrivet-chargerig-s` | Belt Forge Shotfirer S | Belt Forge Collective | Was Charge Rig |
+| `rookrivet-hopper-s`, `rookrivet-hopper-m` | Belt Forge Hopper S, M | Belt Forge Collective | |
+| `rookrivet-drone-laser` | Belt Forge Nibbler | Belt Forge Collective | The Knocker's laser |
+| `rookrivet-dronebay-s` | Belt Forge Cradle S | Belt Forge Collective | Was Drone Cradle |
+| `rookrivet-dronebay-m` | Belt Forge Cage M | Belt Forge Collective | Was Drone Bay |
+| `rookrivet-excavator-l` | Corvane Excavator L | Corvane Heavy Industries | Mining turret |
+| `rookrivet-orehold-l` | Corvane Bunker L | Corvane Heavy Industries | Was Ore Hold; an ore bunker |
+| `rookrivet-reactor-l` | Corvane Furnace L | Corvane Heavy Industries | Reactor |
+| good `breach-charge` | Cracker | | Was Breach charge, which clashed with KOD's Breach warhead |
+| good `mining-drone` | Knocker (mining drone) | | |
+| good `banded-ore` | Copperband | | Was Banded ore |
+| good `black-ore` | Blackjack | | Was Black ore |
+| good `ore` | Nickel-iron | | Unchanged |
+| good `glintstone` | Glintstone | | Unchanged |
+| good `gate-glass` | Gate-glass | | Unchanged; a core is a knot |
+
+### Ship systems (6f, `modules.ts`)
+
+| Id | Name | Note |
+| --- | --- | --- |
+| `meridian-helm-s` | Meridian Helm S | Unchanged |
+| `paragon-helmsman-s` | Paragon Helmsman S | Unchanged |
+| `itomarr-coxswain-m` | Ito-Marr Coxswain M | Unchanged; flight computers are named for the crew who steer |
+| `meridian-podbay-s` | Meridian Davit S | Was Ark Bay; davits hold a ship's boats |
+| `paragon-director-s`, `paragon-director-m` | Paragon Gunlayer S, M | Was Director |
+| `meridian-gleaner-s` | Meridian Gleaner S | Unchanged |
+| `tessaract-gleaner-m` | Tessaract Collection M | Was Long Gleaner; freight collection |
+| `slagline-kick-s` (afterburner) | Slagline Bolt S | Was Kick S, which is also the engine `slagline-engine-s` |
+| `itomarr-surge-m` | Ito-Marr Sally M | Was Surge; a sally bursts out of a fortress |
+
 ### Manufacturers (`manufacturers.ts`)
 
 The names already in the catalogue are confirmed. The other makers in `races.md` keep their names for when they enter the catalogue.
@@ -619,7 +724,11 @@ The names already in the catalogue are confirmed. The other makers in `races.md`
 | `rookRivet` | Rook and Rivet | Free Belt |
 | `unionDefence` | Union Defence Works | Free Belt |
 | `cantorVell` | Cantor-Vell Arms | Halcyon |
-| new, suggested `aurel` | Aurel | Aurel |
+| `novum` | Novum Systems | Kessari |
+| `commonwealth` | Commonwealth Fleet Works | Vael |
+| `aurel` | Aurel | Aurel |
+| new, suggested `beltForge` | Belt Forge Collective | Free Belt |
+| new, suggested `corvane` | Corvane Heavy Industries | none (multi-race) |
 
 The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catalogue still needs a maker on each hull, so the entry is simply "Aurel", and the UI should show it the same way it would show a maker.
 
@@ -637,6 +746,13 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 Lore decisions by Jason, newest first.
 
+- 2026-11-05: Mining kit is Belt Forge Collective's, with Corvane's heavy plant on the Collier; Rook and Rivet stays salvage.
+- 2026-11-05: Mining ships are the Prospector, the Sinker (was Breacher) and the Collier (was Hulk); the drone is the Knocker, in a Cradle or a Cage.
+- 2026-11-05: Breaching: crackers (charges), the Shotfirer (rig), the Sounder (deep assay); a core is a knot, a piece of the gate's frame swallowed by rock.
+- 2026-11-05: Ores: Nickel-iron, Copperband, Blackjack, Glintstone and gate-glass. More ores come later, rarer in more dangerous systems, and makers will have their own alloys, the start of smelting and player building.
+- 2026-11-05: 6f modules: Meridian Davit, Paragon Gunlayer, Tessaract Collection, Slagline Bolt, Ito-Marr Sally; the flight computers keep their names.
+- 2026-11-05: NPC miners: prospectors are Ridge Collective crews; the hulk is a Corvane contract crew hauling to Lantern Works.
+- 2026-11-05: Any NPC can be independent or work for a company; seeded systems vary the mix by holder, security band and what the system has ("Who NPCs work for").
 - 2026-11-04: Weapon families follow canon: Halcyon energy, Kessari missile, Free Belt projectile, Vael hybrid; the Oru and Drifters lean to none; Paragon sells light guns of every family.
 - 2026-11-04: Gun names: Union Picket and Lockout, Cantor-Vell Verse and Litany, Commonwealth Retort and Answer, Paragon Fairshot as the open-market pulse laser.
 - 2026-11-04: Missiles: Ito-Marr Magazine and Arsenal launchers; KOD Summons missiles and Foreclosure torpedoes; Scatter and Breach warheads; Heat for heat-seekers.
@@ -662,6 +778,7 @@ Lore decisions by Jason, newest first.
 
 ## Open questions
 
+- Maker alloys: names and what goes into them, when smelting is designed.
 - The local force names under "Law enforcement" are proposed.
 - Place and faction names (the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder, the pirate factions) are placeholders until Jason confirms them. Catalogue names are in "Names".
 - Where humans came from and why the Covenant Fleet fled. Leaving it unanswered is a valid choice.
