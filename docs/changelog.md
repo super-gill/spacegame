@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
+- Two big warships at Harbour: the Kessari Injunction, a brig, and the Union Defence Works Walkout, a Free Belt frigate (working names). Large engines, thrusters, shields and armour came with them.
 - A new fitting window: budget bars, your slots by tier, the ship with every slot drawn where it sits (and a swivel's arc and blind spot), and what fits the selected slot from your storage or for sale. Buy modules straight into storage, fit them from there, or buy and fit in one. Fitting and unfitting are free, every station outfits for now, and goods and modules share one storage at each station.
 - Slots now sit where they belong on each hull: high slots on the edges, mids in the body, lows deep inside.
 - Slot tiers: every ship now has high slots (guns, launchers, mining lasers, tractor, charge rig), mid slots (shields, afterburner, countermeasures, scanners, hopper) and low slots (armour, cargo, drone bays, extra reactors) alongside its core systems, and any module of a tier fits any slot of that tier and size. Fits carry over; anything with nowhere to go goes to your storage.
@@ -21,10 +22,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - NPC miners: two prospectors working the field round Ridge and selling there, and a hulk with its drones hauling to Lantern Works. Pirates hunt them like any traffic. Older saves gain them on load.
 - Mining drones. They fly themselves, work only rocks you have locked, and cut ore for your tractor to collect. The prospector carries one, the hulk four (six fit its bay). Open the drone manager with N to launch, recall or send them to your active lock. Buy more at Harbour or Ridge; they go straight into your drone bay.
 
+### Changed
+- The belt has more rocks round the whole ring (350 rather than 120), and refills every 5 seconds instead of every 20, into the emptiest gaps, so miners no longer strip the field round Ridge. Older saves fill up over the first twenty minutes or so.
+
 ### Known
 - Drones left out when you dock are lost, so recall them first.
 
 ### Fixed
+- Drones launch clear of rocks instead of into a rock the mother is parked beside.
+- Buying a drone with full drone bays says the bays are full, not the cargo hold: drones never use cargo.
+- The fitting window shows what each fitted module is (autocannon, shield generator) under its name again.
+- Drones no longer sit idle when they stop just short of their spot: they cut from anywhere the rock is in laser range, nose on.
+- A ship full of drone bays spreads its drones round the rock, in a second ring if need be, instead of piling them up.
 - The game starts when opened over plain http on another machine's address (a tailnet IP, say): the new-pilot id no longer needs a secure page.
 - Drones plan their way round rocks instead of wedging themselves between them, slow down among rocks so they stop wrecking themselves, and skip rocks too hard for their lasers.
 

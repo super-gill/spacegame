@@ -21,8 +21,18 @@ import type { Vec2 } from './vec2.js';
 /** The seed the starter system's belt is generated from. */
 export const SCREE_SEED = 0x5c7ee;
 
-/** The Scree's fields and how many rocks each keeps: rocks spread round the whole ring, and the field round Ridge Outpost. */
+/**
+ * The Scree's fields and how many rocks each keeps: rocks spread round the
+ * whole ring, and the field round Ridge Outpost. The ring was 120 until
+ * the NPC miners came and the open belt felt empty; Ridge stays the dense
+ * one (Jason, 5 November 2026).
+ */
 export const ROCK_FIELDS: readonly { id: string; target: number }[] = [
+  { id: 'ring', target: 350 },
+  { id: 'ridge', target: 60 },
+];
+/** The belt as it was first made: drawn first, so every rock it had is the same in a new world, and the extra ring rocks come after. */
+const FIRST_FIELDS: readonly { id: string; target: number }[] = [
   { id: 'ring', target: 120 },
   { id: 'ridge', target: 60 },
 ];
@@ -48,8 +58,10 @@ const HARDNESS_SPAN = 0.8;
 /** How far a rock's hardness may stray from its size's, either way. */
 const HARDNESS_JITTER = 0.08;
 
-/** Seconds between rockfall checks. Each check adds at most one rock to each field below its target. */
-export const ROCKFALL_SECONDS = 20;
+/** Seconds between rockfall checks. Each check adds at most one rock to each field below its target: quick enough that miners working a field do not strip it. */
+export const ROCKFALL_SECONDS = 5;
+/** A new rock goes in the emptiest of this many clear places tried: rockfall fills the gaps miners leave. */
+const ROCKFALL_CANDIDATES = 6;
 /** A new rock never appears closer than this to a ship, units, so nobody sees it arrive. */
 const ROCKFALL_CLEARANCE = 1500;
 /** Placement attempts per new rock before giving up until the next check. */
@@ -137,13 +149,14 @@ function drawRock(random: () => number, field: string, id: string, goods: Readon
 export function screeAsteroids(seed = SCREE_SEED, ringWidth = RING_WIDTH, goods: Readonly<Record<string, GoodSpec>> = GOODS): Asteroid[] {
   const random = seededRandom(seed);
   const out: Asteroid[] = [];
-  const total = ROCK_FIELDS.reduce((n, f) => n + f.target, 0);
+  // The first belt (the ring's rocks, then Ridge's), then each field topped up to its target now.
+  const wanted = [...FIRST_FIELDS, ...ROCK_FIELDS.map((f) => ({ id: f.id, target: f.target - (FIRST_FIELDS.find((g) => g.id === f.id)?.target ?? 0) }))];
+  const total = wanted.reduce((n, f) => n + f.target, 0);
   let tries = 0;
-  while (out.length < total && tries < 5000) {
+  while (out.length < total && tries < 10000) {
     tries++;
-    // Fields in order: the ring's rocks first, then Ridge's.
     let before = 0;
-    const field = ROCK_FIELDS.find((f) => out.length < (before += f.target))!;
+    const field = wanted.find((f) => out.length < (before += f.target))!;
     const rock = drawRock(random, field.id, `rock-${out.length + 1}`, goods, ringWidth);
     if (rock) out.push(rock);
   }
@@ -211,7 +224,7 @@ export function bestTier(rock: Pick<Asteroid, 'contents'>, goods: Readonly<Recor
 /**
  * The belt tops itself up. Every `ROCKFALL_SECONDS`, each field with
  * fewer rocks than its target gains one, drifting in somewhere no ship is
- * near enough to see it arrive. Seeded by how many rocks have been made,
+ * near enough to see it arrive, in the emptiest of a few such places. Seeded by how many rocks have been made,
  * so a world replays the same way. New rocks keep to the belt's current
  * motion: frozen with everything else when orbits are stopped.
  */
@@ -232,17 +245,25 @@ export function stepRockfall(world: World): Pick<World, 'asteroids' | 'rockfall'
     if (asteroids.filter((a) => a.field === field.id).length >= field.target) continue;
     made++;
     const random = seededRandom((SCREE_SEED + Math.imul(made, 0x9e3779b1)) >>> 0);
-    for (let t = 0; t < ROCKFALL_TRIES; t++) {
+    const others = asteroidStates(world.bodies, asteroids, world.tick, world.dt);
+    let best: { rock: Asteroid; angle: number; room: number } | null = null;
+    let found = 0;
+    for (let t = 0; t < ROCKFALL_TRIES && found < ROCKFALL_CANDIDATES; t++) {
       const drawn = drawRock(random, field.id, `rock-n${made}`, world.goods);
       if (!drawn) continue;
       const angle = drawn.orbit.phase + shift;
       const at = { x: beltAt.x + Math.cos(angle) * drawn.orbit.radius, y: beltAt.y + Math.sin(angle) * drawn.orbit.radius };
       if (ships.some((s) => Math.hypot(s.position.x - at.x, s.position.y - at.y) < ROCKFALL_CLEARANCE + drawn.radius)) continue;
-      const others = asteroidStates(world.bodies, asteroids, world.tick, world.dt);
-      if (others.some((o, i) => Math.hypot(o.position.x - at.x, o.position.y - at.y) < asteroids[i]!.radius + drawn.radius + 10)) continue;
-      const still: Orbit = { ...drawn.orbit, phase: angle, frozen: true };
-      asteroids = [...asteroids, { ...drawn, orbit: world.rules.orbits ? withOrbitMoving(still, true, time) : still }];
-      break;
+      // The gap to the nearest rock's edge; under 10 units is no place at all.
+      let room = Infinity;
+      others.forEach((o, i) => (room = Math.min(room, Math.hypot(o.position.x - at.x, o.position.y - at.y) - asteroids[i]!.radius - drawn.radius)));
+      if (room < 10) continue;
+      found++;
+      if (!best || room > best.room) best = { rock: drawn, angle, room };
+    }
+    if (best) {
+      const still: Orbit = { ...best.rock.orbit, phase: best.angle, frozen: true };
+      asteroids = [...asteroids, { ...best.rock, orbit: world.rules.orbits ? withOrbitMoving(still, true, time) : still }];
     }
   }
   return { asteroids, rockfall: { made, timerTicks: Math.round(ROCKFALL_SECONDS / world.dt) } };

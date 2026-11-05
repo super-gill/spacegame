@@ -409,7 +409,7 @@ describe('the prospector', () => {
 describe('saves', () => {
   it('a version 6 world gains ore in its rocks, the same on every load', () => {
     const w = createStarterWorld();
-    const old = { ...w, asteroids: w.asteroids.map(({ contents: _c, hardness: _h, field: _f, ...a }) => a) };
+    const old = { ...w, asteroids: w.asteroids.slice(0, 180).map(({ contents: _c, hardness: _h, field: _f, ...a }) => a) };
     const text = JSON.stringify({ format: SAVE_FORMAT, version: 6, savedAt: '', world: old });
     const a = deserializeWorld(text);
     const b = deserializeWorld(text);

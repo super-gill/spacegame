@@ -19,7 +19,8 @@ const SECOND = 60;
 const OPEN = { x: -7000, y: -7000 };
 
 function quiet(): World {
-  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
+  // No rocks: these tests are about munitions, and a long chase can run into the belt.
+  return { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [], rockfall: { made: 0, timerTicks: 1e9 } };
 }
 
 /** A ship from a loadout in open space, with fit changes, hold, heading and offset from OPEN. */

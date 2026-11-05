@@ -3,7 +3,7 @@ import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { ROCK_FIELDS, rockCore, rockMakeup, screeAsteroids } from './asteroids.js';
+import { rockCore, rockMakeup, screeAsteroids } from './asteroids.js';
 import { seededRandom } from './random.js';
 import { starterBodies } from './bodies.js';
 import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
@@ -100,7 +100,8 @@ export const MIGRATIONS: Record<number, Migration> = {
  */
 export function migrate6to7(world: unknown): unknown {
   if (!isRecord(world) || !Array.isArray(world['asteroids'])) return world;
-  const ring = ROCK_FIELDS[0]!.target;
+  // The ring had 120 rocks then, whatever it keeps now.
+  const ring = 120;
   const asteroids = world['asteroids'].map((a: unknown) => {
     if (!isRecord(a) || isRecord(a['contents'])) return a;
     const id = String(a['id'] ?? '');
