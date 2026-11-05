@@ -86,9 +86,9 @@ Translated from today's mounts so totals stay close and stock ships stay viable;
 | Meridian Tern (cutter) | S S S | S S | S S S | S, S, S | | 1 |
 | Kessari Warrant (sloop) | M M S S | M S S | M M S | M, M, M | | 2 |
 | Tessaract Manifest (merchantman) | S S | M S S | M M M M M M S | M, M, S | | 2 |
-| Rook and Rivet Prospector (cutter) | S S S | S S S | S S S | S, S, S | ore hold 100 | 1 |
-| Rook and Rivet Breacher (sloop) | M M M S S | M S S | M M M S | M, M, M | ore hold 250 | 2 |
-| Rook and Rivet Hulk (hulk) | L L M M | L M M S | L L L L M M | M, L, L | ore hold 1,200 | 3 |
+| Belt Forge Prospector (cutter) | S S S | S S S | S S S | S, S, S | ore hold 100 | 1 |
+| Belt Forge Sinker (sloop) | M M M S S | M S S | M M M S | M, M, M | ore hold 250 | 2 |
+| Belt Forge Collier (hulk) | L L M M | L M M S | L L L L M M | M, L, L | ore hold 1,200 | 3 |
 | Aurel Tacet (dev) | S S S | S S | S S | S, S, S | | 0 |
 | Drone, escape pod | as today: core only, plus the drone's laser in one small high | | | | | 0 |
 
@@ -103,9 +103,9 @@ Translated from today's mounts so totals stay close and stock ships stay viable;
 | Meridian Tern | cutter | S S S | S S | S S S |
 | Kessari Warrant | sloop | M M S S | M S S | M M S S |
 | Tessaract Manifest | merchantman | S S | M M S | M M M M M M S S S |
-| Rook and Rivet Prospector | cutter | S S S | S S S | S S S |
-| Rook and Rivet Breacher | sloop | M M S M S | M M S | M S M M |
-| Rook and Rivet Hulk | hulk | L L M M | L M M S | M M L L L L |
+| Belt Forge Prospector | cutter | S S S | S S S | S S S |
+| Belt Forge Sinker | sloop | M M S M S | M M S | M S M M |
+| Belt Forge Collier | hulk | L L M M | L M M S | M M L L L L |
 | Kessari Injunction (working name) | brig | M M M M M | M M S | M M M M S S |
 | Union Defence Works Walkout (working name) | frigate | L L M M M M | L M M S | L L M M M M S |
 | Aurel Tacet (dev) | | S S S | S S | S S |

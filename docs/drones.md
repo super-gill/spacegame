@@ -16,7 +16,7 @@ Related: [mining.md](mining.md) for rocks, locks and the hulk; [ship-systems.md]
 ## As built (5 November 2026)
 
 - **A drone is a ship** (hull class `drone`): it flies, can be locked and shot, and shows on radar. It carries `motherId` and `droneId`, and an NPC brain of kind `drone` (`ai/drone.ts`). A mother's drones pass through it and through each other without harm; anything else they hit is a collision as usual.
-- **Rook and Rivet Mining Drone** (names provisional, a lore ask): structure 60, top speed 220, a weak laser (Nibbler: strength 0.5, 0.6 ore a second, reach 90), its own small capacitor. No sensors of its own.
+- **Belt Forge Knocker** (names from the lore): structure 60, top speed 220, a weak laser (Nibbler: strength 0.5, 0.6 ore a second, reach 90), its own small capacitor. No sensors of its own.
 - **Drone bays** (internal modules, kind `droneBay`): `droneCapacity` drones held in all (stowed and out), `droneControl` out at once, `droneRange` how far from the mother they work. Rook and Rivet Drone Cradle S (1, 1, 1,200 units, no power) on the prospector; Drone Bay M (6, 4, 2,000 units) on the hulk, in place of its armour. The stock prospector comes with one drone, the hulk with four.
 - **Stowed drones** are `Ship.droneBay` items keeping their structure, so a damaged drone comes back damaged.
 - **Buying:** the good `mining-drone` (1,500 at Harbour, 1,400 at Ridge) goes straight into the drone bay, not the hold; selling takes the most worn first.

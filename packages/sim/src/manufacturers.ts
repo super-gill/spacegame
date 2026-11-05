@@ -13,6 +13,8 @@ export const MANUFACTURERS: Record<string, ManufacturerSpec> = {
   novum: { id: 'novum', name: 'Novum Systems', race: 'kessari' },
   slagline: { id: 'slagline', name: 'Slagline Motors', race: 'freeBelt' },
   rookRivet: { id: 'rookRivet', name: 'Rook and Rivet', race: 'freeBelt' },
+  beltForge: { id: 'beltForge', name: 'Belt Forge Collective', race: 'freeBelt' },
+  corvane: { id: 'corvane', name: 'Corvane Heavy Industries', race: null },
   unionDefence: { id: 'unionDefence', name: 'Union Defence Works', race: 'freeBelt' },
   cantorVell: { id: 'cantorVell', name: 'Cantor-Vell Arms', race: 'halcyon' },
   commonwealth: { id: 'commonwealth', name: 'Commonwealth Fleet Works', race: 'vael' },

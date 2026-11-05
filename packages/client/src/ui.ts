@@ -37,7 +37,7 @@ const LOCK_REFUSALS: Record<LockRefusal, string> = {
 
 /** Why docking was refused, in words. */
 const CHARGE_REFUSALS: Record<Extract<WorldEvent, { type: 'chargeRefused' }>['reason'], string> = {
-  noCharges: 'No breach charges in the hold. Buy them at Ridge or Harbour.',
+  noCharges: 'No crackers in the hold. Buy them at Ridge or Harbour.',
   noRock: 'Lock a rock and make it your active lock to plant a charge.',
   tooFar: `Get within ${PLANT_REACH} units of the rock's surface to plant a charge.`,
   tooClose: `Too close to set them off: get ${SAFE_DISTANCE} units clear of the rock.`,

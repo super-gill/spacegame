@@ -771,7 +771,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Flight computers (docs/ship-systems.md): how well the hull is flown.
   // Thrusters decide how fast it can turn; this decides how cleanly the
   // nose settles on the mouse and how firmly assist holds. No computer:
-  // manual flight on the keys. Names provisional (lore ask).
+  // manual flight on the keys. Names from docs/lore.md.
   'meridian-helm-s': {
     id: 'meridian-helm-s',
     name: 'Meridian Helm S',
@@ -819,7 +819,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // means waking at home without it.
   'meridian-podbay-s': {
     id: 'meridian-podbay-s',
-    name: 'Meridian Ark Bay S',
+    name: 'Meridian Davit S',
     kind: 'podBay',
     size: 'S',
     mounts: ['podBay'],
@@ -835,7 +835,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Fire control: how many swivels a ship can direct, and how fast they track.
   'paragon-director-s': {
     id: 'paragon-director-s',
-    name: 'Paragon Director S',
+    name: 'Paragon Gunlayer S',
     kind: 'fireControl',
     size: 'S',
     mounts: ['fireControl'],
@@ -849,7 +849,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'paragon-director-m': {
     id: 'paragon-director-m',
-    name: 'Paragon Director M',
+    name: 'Paragon Gunlayer M',
     kind: 'fireControl',
     size: 'M',
     mounts: ['fireControl'],
@@ -862,12 +862,12 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { turretControl: 3, turretTracking: 1.25 },
   },
 
-  // Mining (docs/mining.md; names provisional, a lore ask). Rook and Rivet
-  // build for the Collective's prospectors: lasers for weapon mounts, a
+  // Mining (docs/mining.md; names in docs/lore.md). Belt Forge Collective
+  // builds the mining kit, Corvane the Collier's heavy plant: lasers for weapon mounts, a
   // survey scanner and an assay computer that reads rock instead of guns.
   'rookrivet-pick-s': {
     id: 'rookrivet-pick-s',
-    name: 'Rook and Rivet Pick S',
+    name: 'Belt Forge Pick S',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -875,14 +875,14 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 1,
     power: 1.5,
     price: 900,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     stats: {},
     weaponId: 'mining-laser-s',
   },
   'rookrivet-pick-m': {
     id: 'rookrivet-pick-m',
-    name: 'Rook and Rivet Pick M',
+    name: 'Belt Forge Pick M',
     kind: 'weapon',
     size: 'M',
     mounts: ['high'],
@@ -890,7 +890,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 2,
     power: 3,
     price: 2400,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     stats: {},
     weaponId: 'mining-laser-m',
@@ -899,7 +899,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // only mining mounts; ore holds fit bays and take only ore.
   'rookrivet-excavator-l': {
     id: 'rookrivet-excavator-l',
-    name: 'Rook and Rivet Excavator L',
+    name: 'Corvane Excavator L',
     kind: 'weapon',
     size: 'L',
     mounts: ['high'],
@@ -907,14 +907,14 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 6,
     power: 5,
     price: 9500,
-    manufacturer: 'rookRivet',
+    manufacturer: 'corvane',
     tags: ['mining'],
     stats: {},
     weaponId: 'mining-turret-l',
   },
   'rookrivet-reactor-l': {
     id: 'rookrivet-reactor-l',
-    name: 'Rook and Rivet Furnace L',
+    name: 'Corvane Furnace L',
     kind: 'reactor',
     size: 'L',
     mounts: ['core', 'low'],
@@ -922,7 +922,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 7,
     power: 0,
     price: 6000,
-    manufacturer: 'rookRivet',
+    manufacturer: 'corvane',
     tags: ['mining'],
     stats: { powerOutput: 40 },
   },
@@ -931,7 +931,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // it they work.
   'rookrivet-drone-laser': {
     id: 'rookrivet-drone-laser',
-    name: 'Rook and Rivet Nibbler',
+    name: 'Belt Forge Nibbler',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -939,14 +939,14 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 0.2,
     power: 1,
     price: 300,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining', 'drone'],
     stats: {},
     weaponId: 'mining-laser-drone',
   },
   'rookrivet-dronebay-s': {
     id: 'rookrivet-dronebay-s',
-    name: 'Rook and Rivet Drone Cradle S',
+    name: 'Belt Forge Cradle S',
     kind: 'droneBay',
     size: 'S',
     mounts: ['low'],
@@ -955,13 +955,13 @@ export const MODULES: Record<string, ModuleSpec> = {
     // A cradle, not a control suite: it draws nothing, so a prospector can carry one.
     power: 0,
     price: 1500,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['drone'],
     stats: { droneCapacity: 1, droneControl: 1, droneRange: 1200 },
   },
   'rookrivet-dronebay-m': {
     id: 'rookrivet-dronebay-m',
-    name: 'Rook and Rivet Drone Bay M',
+    name: 'Belt Forge Cage M',
     kind: 'droneBay',
     size: 'M',
     mounts: ['low'],
@@ -969,7 +969,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 3,
     power: 2,
     price: 5000,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['drone'],
     stats: { droneCapacity: 6, droneControl: 4, droneRange: 2000 },
   },
@@ -978,7 +978,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // gate-glass core and where to breach it.
   'rookrivet-chargerig-s': {
     id: 'rookrivet-chargerig-s',
-    name: 'Rook and Rivet Charge Rig S',
+    name: 'Belt Forge Shotfirer S',
     kind: 'breachCharger',
     size: 'S',
     mounts: ['high'],
@@ -986,13 +986,13 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 0.8,
     power: 0.5,
     price: 2500,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     stats: { breachTolerance: 0.12 },
   },
   'rookrivet-deepassay-m': {
     id: 'rookrivet-deepassay-m',
-    name: 'Rook and Rivet Deep Assay M',
+    name: 'Belt Forge Sounder M',
     kind: 'targetingComputer',
     size: 'M',
     mounts: ['computer'],
@@ -1000,7 +1000,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 1.2,
     power: 2,
     price: 6500,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     capacitorDraw: 0.3,
     tags: ['sensor', 'mining'],
     stats: { maxLocks: 4, scanResolution: 1 },
@@ -1011,7 +1011,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // costs an armour or shield slot.
   'rookrivet-hopper-s': {
     id: 'rookrivet-hopper-s',
-    name: 'Rook and Rivet Hopper S',
+    name: 'Belt Forge Hopper S',
     kind: 'oreHopper',
     size: 'S',
     mounts: ['mid'],
@@ -1019,14 +1019,14 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 1,
     power: 0,
     price: 1100,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     // Drops one ore of your choice.
     stats: { hopperGrade: 1 },
   },
   'rookrivet-hopper-m': {
     id: 'rookrivet-hopper-m',
-    name: 'Rook and Rivet Hopper M',
+    name: 'Belt Forge Hopper M',
     kind: 'oreHopper',
     size: 'M',
     mounts: ['mid'],
@@ -1034,14 +1034,14 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 2.5,
     power: 0,
     price: 2600,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     // Sorts by a list: keep or drop each ore.
     stats: { hopperGrade: 2 },
   },
   'rookrivet-hopper-l': {
     id: 'rookrivet-hopper-l',
-    name: 'Rook and Rivet Hopper L',
+    name: 'Belt Forge Hopper L',
     kind: 'oreHopper',
     size: 'L',
     mounts: ['mid'],
@@ -1049,7 +1049,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 4,
     power: 0,
     price: 5200,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['mining'],
     // Sorts by a list, and with the ore hold full trades its cheapest ore for better.
     stats: { hopperGrade: 3 },
@@ -1057,7 +1057,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Survey scanners (utility, active): a pulse that lights up rocks worth a look.
   'rookrivet-survey-s': {
     id: 'rookrivet-survey-s',
-    name: 'Rook and Rivet Dowser S',
+    name: 'Belt Forge Dowser S',
     kind: 'surveyScanner',
     size: 'S',
     mounts: ['mid'],
@@ -1065,7 +1065,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 0.4,
     power: 0.5,
     price: 600,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     tags: ['sensor', 'mining'],
     // Tells rich rock from plain, not what is in it.
     stats: { surveyRange: 1500, surveyCost: 15, surveyGrade: 1 },
@@ -1102,7 +1102,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'tessaract-gleaner-m': {
     id: 'tessaract-gleaner-m',
-    name: 'Tessaract Long Gleaner M',
+    name: 'Tessaract Collection M',
     kind: 'tractor',
     size: 'M',
     mounts: ['high'],
@@ -1120,7 +1120,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // reactor: no power draw.
   'slagline-kick-s': {
     id: 'slagline-kick-s',
-    name: 'Slagline Kick S',
+    name: 'Slagline Bolt S',
     kind: 'afterburner',
     size: 'S',
     mounts: ['mid'],
@@ -1134,7 +1134,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'itomarr-surge-m': {
     id: 'itomarr-surge-m',
-    name: 'Ito-Marr Surge M',
+    name: 'Ito-Marr Sally M',
     kind: 'afterburner',
     size: 'M',
     mounts: ['mid'],
@@ -1270,7 +1270,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // The hulk's assay: room for many rocks at once, one for each turret and more.
   'rookrivet-assay-l': {
     id: 'rookrivet-assay-l',
-    name: 'Rook and Rivet Assay L',
+    name: 'Belt Forge Assay L',
     kind: 'targetingComputer',
     size: 'L',
     mounts: ['computer'],
@@ -1278,7 +1278,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 1.5,
     power: 3,
     price: 4200,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     capacitorDraw: 0.4,
     tags: ['sensor', 'mining'],
     stats: { maxLocks: 8, scanResolution: 0.9 },
@@ -1287,7 +1287,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Reads rock, not guns: what a locked rock holds and how hard it is.
   'rookrivet-assay-s': {
     id: 'rookrivet-assay-s',
-    name: 'Rook and Rivet Assay S',
+    name: 'Belt Forge Assay S',
     kind: 'targetingComputer',
     size: 'S',
     mounts: ['computer'],
@@ -1295,7 +1295,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     mass: 0.6,
     power: 1,
     price: 700,
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     capacitorDraw: 0.2,
     tags: ['sensor', 'mining'],
     stats: { maxLocks: 2, scanResolution: 1 },

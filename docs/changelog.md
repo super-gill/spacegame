@@ -4,6 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Changed
+- Mining ships and kit take their names from the lore: Belt Forge Collective builds the Prospector, Sinker (was Breacher), Collier (was Hulk) and the Knocker drone, with the Pick, Dowser, Assay, Sounder (was Deep Assay), Shotfirer (was Charge Rig), Hopper, Nibbler, Cradle and Cage; Corvane Heavy Industries builds the Excavator and the Furnace. Rook and Rivet stays the salvage firm.
+- Ores and charges renamed: Copperband (was Banded ore), Blackjack (was Black ore), crackers (were breach charges), and the Knocker as a good.
+- Ship systems renamed: Meridian Davit (was Ark Bay), Paragon Gunlayer (was Director), Tessaract Collection (was Long Gleaner), Slagline Bolt (the afterburner, was Kick, like the engine), Ito-Marr Sally (was Surge). Ids are unchanged, so worlds carry on.
+
 ## [0.14.0] - 2026-11-05
 
 The shared world. The world runs on a server on the host's PC, and everyone plays in it from their browser; friends join over Tailscale. Characters with keys, players and operators, a connection meter, and updates small enough for a home connection. Worlds from 0.13.0 browser saves are not carried over: a server starts a new world.

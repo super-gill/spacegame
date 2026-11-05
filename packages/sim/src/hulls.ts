@@ -314,14 +314,14 @@ export const HULLS: Record<string, HullSpec> = {
   },
 
   'rookrivet-prospector': {
-    // Rook and Rivet prospector (docs/mining.md; name provisional, a lore
-    // ask): the Collective's belt cutter. A survey scanner, an assay
+    // Belt Forge Prospector (docs/mining.md; names in docs/lore.md):
+    // the Collective's belt cutter. A survey scanner, an assay
     // computer and a light mining laser; a small hold, so it finds rock and
     // picks the easy ones, or scouts for a hulk. A swivel for company.
     id: 'rookrivet-prospector',
-    name: 'Rook and Rivet Prospector',
+    name: 'Belt Forge Prospector',
     race: 'freeBelt',
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'S',
     mass: 6,
@@ -366,15 +366,15 @@ export const HULLS: Record<string, HullSpec> = {
   },
 
   'rookrivet-hulk': {
-    // Rook and Rivet hulk (docs/mining.md, "The hulk"; name provisional, a
-    // lore ask): a big, slow mining ship you park and work from. Two heavy
+    // Belt Forge Collier (docs/mining.md, "The hulk"; names in
+    // docs/lore.md): a big, slow mining ship you park and work from. Two heavy
     // mining turrets, each assigned a locked rock; an assay that holds
     // eight rocks; four bays of ore hold. One swivel and a thick hide:
     // it wants an escort.
     id: 'rookrivet-hulk',
-    name: 'Rook and Rivet Hulk',
+    name: 'Belt Forge Collier',
     race: 'freeBelt',
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'L',
     mass: 40,
@@ -427,15 +427,15 @@ export const HULLS: Record<string, HullSpec> = {
   },
 
   'rookrivet-breacher': {
-    // Rook and Rivet breacher (docs/mining.md, "Breaching"; name
-    // provisional, a lore ask): the professional's ship between the
+    // Belt Forge Sinker (docs/mining.md, "Breaching"; names in
+    // docs/lore.md): the professional's ship between the
     // prospector and the hulk. It mines well with two lasers and three
     // drones, and it is the ship built to breach big rocks for gate-glass:
     // a deep assay, a charge rig, and quick enough to clear its own blast.
     id: 'rookrivet-breacher',
-    name: 'Rook and Rivet Breacher',
+    name: 'Belt Forge Sinker',
     race: 'freeBelt',
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'M',
     mass: 14,
@@ -477,19 +477,19 @@ export const HULLS: Record<string, HullSpec> = {
       low('l1', 'M', 11, 0),
     ],
     bonuses: [
-      { source: 'role', label: '+75% breach charge tolerance from full-size charge rigs', stat: 'breachTolerance', amount: 0.75, kind: 'breachCharger' },
+      { source: 'role', label: '+75% cracker tolerance from full-size charge rigs', stat: 'breachTolerance', amount: 0.75, kind: 'breachCharger' },
       { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' },
     ],
   },
 
   'rookrivet-drone': {
-    // A Rook and Rivet mining drone (docs/drones.md; name provisional): a
+    // The Belt Forge Knocker mining drone (docs/drones.md): a
     // flying laser with an engine. No hold, no sensors of its own: it works
     // what its mother has locked.
     id: 'rookrivet-drone',
-    name: 'Rook and Rivet Mining Drone',
+    name: 'Belt Forge Knocker',
     race: 'freeBelt',
-    manufacturer: 'rookRivet',
+    manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'S',
     mass: 0.6,

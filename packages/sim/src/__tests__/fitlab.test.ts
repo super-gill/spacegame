@@ -20,7 +20,7 @@ describe('the fitting lab', () => {
   });
 
   it('sums a fit into the numbers a pilot compares', () => {
-    const s = fitSummary(TEST_CATALOGUES, byName('Rook and Rivet Hulk'))!;
+    const s = fitSummary(TEST_CATALOGUES, byName('Belt Forge Collier'))!;
     expect(s.oreHold).toBe(1200);
     expect(s.miningRate).toBeGreaterThan(0);
     expect(s.powerDraw).toBeLessThanOrEqual(s.powerOutput);

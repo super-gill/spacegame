@@ -153,7 +153,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // Sold at Ridge and Harbour: everything a new miner needs to find and
     // cut the easy rocks, and a swivel for company.
     id: 'rookrivet-prospector',
-    name: 'Rook and Rivet Prospector, Collective issue',
+    name: 'Belt Forge Prospector, Collective issue',
     hullId: 'rookrivet-prospector',
     drones: { loadoutId: 'rookrivet-mining-drone', count: 1 },
     fit: {
@@ -182,7 +182,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // Sold at Ridge Outpost: two medium lasers, three drones, a deep assay
     // and a charge rig. Breach charges are bought separately.
     id: 'rookrivet-breacher',
-    name: 'Rook and Rivet Breacher, Collective issue',
+    name: 'Belt Forge Sinker, Collective issue',
     hullId: 'rookrivet-breacher',
     drones: { loadoutId: 'rookrivet-mining-drone', count: 3 },
     fit: {
@@ -211,7 +211,7 @@ export const LOADOUTS: Record<string, Loadout> = {
   'rookrivet-mining-drone': {
     // A drone as it comes out of the box (docs/drones.md).
     id: 'rookrivet-mining-drone',
-    name: 'Rook and Rivet Mining Drone',
+    name: 'Belt Forge Knocker',
     hullId: 'rookrivet-drone',
     fit: {
       w1: 'rookrivet-drone-laser',
@@ -225,7 +225,7 @@ export const LOADOUTS: Record<string, Loadout> = {
     // Sold at Ridge Outpost: two heavy turrets, an eight-rock assay, the
     // big hopper, a long-reach tractor and a deep survey scanner.
     id: 'rookrivet-hulk',
-    name: 'Rook and Rivet Hulk, Collective issue',
+    name: 'Belt Forge Collier, Collective issue',
     hullId: 'rookrivet-hulk',
     drones: { loadoutId: 'rookrivet-mining-drone', count: 4 },
     fit: {
