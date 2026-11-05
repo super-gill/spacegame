@@ -24,6 +24,18 @@ npm start
 
 To stop it, press Ctrl+C in its window. It tells everyone, saves, and stops.
 
+## Letting friends in over Tailscale
+
+Your PC is already a machine on your tailnet. The server listens on every network your PC has, so nothing in the game needs changing; friends just need to be able to reach your PC.
+
+1. **Share your PC with each friend** (simplest): in the Tailscale admin console, Machines, find your PC, the "..." menu, Share. Send them the link; they accept with their own Tailscale account and see only your PC, without joining your tailnet. (Or invite them to your tailnet, which shows them all your machines.)
+2. **Windows Firewall:** the first time the server runs, Windows may ask whether Node.js may accept connections. Allow it. If friends cannot connect, add an inbound rule allowing TCP port 8080 (Windows Defender Firewall, Advanced settings, Inbound Rules, New Rule, Port).
+3. **The address to give them:** `http://<your PC's name>:8080` with MagicDNS (the name as it shows in Tailscale), or `http://100.x.y.z:8080` with your PC's Tailscale address.
+
+Sharing your PC lets a friend reach any program on it that accepts connections, not just the game. Among friends that is usually fine; to limit them to the game's port, add an access rule in the Tailscale admin console (Access controls) allowing only port 8080 for shared users.
+
+If another program already uses port 8080, start the game on another, for example `$env:PORT=8090; npm start` in PowerShell, and give friends that port.
+
 ## Characters and operators
 
 - Everyone is a **player** (log in and play) or an **operator** (also the admin controls: credits, spawning ships, the world's switches). The server checks this for every admin command, not just the menu.
