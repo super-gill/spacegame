@@ -98,14 +98,30 @@ export class TargetCard {
   private readonly cargo = el('div', 'hud-target-extra hidden');
   private readonly reads = el('div', 'hud-target-reads');
   private hullId = '';
+  /** Drops the lock on show, so it can be done without the keyboard. */
+  private readonly unlock = el('button', 'hud-target-unlock', 'UNLOCK ✕') as HTMLButtonElement;
+  private shownId: string | null = null;
 
-  /** `onActivate` makes a lock the active one (a click on its card). */
-  constructor(parent: HTMLElement, private readonly onActivate: (targetId: string) => void) {
+  /** `onActivate` makes a lock the active one (a click on its card); `onUnlock` drops one (the card's unlock button). */
+  constructor(
+    parent: HTMLElement,
+    private readonly onActivate: (targetId: string) => void,
+    private readonly onUnlock: (targetId: string) => void = () => {},
+  ) {
+    this.unlock.type = 'button';
+    this.unlock.setAttribute('aria-label', 'Unlock this target');
+    this.unlock.title = 'Unlock this target (Esc)';
+    this.unlock.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.shownId) this.onUnlock(this.shownId);
+    });
     this.locksHead.append(this.locksCount, el('span', '', 'ESC unlock'));
     this.locks.append(this.locksHead, this.chips);
 
     const head = el('div', 'hud-target-head');
-    head.append(this.stance, this.lockState);
+    const right = el('span', 'hud-target-head-right');
+    right.append(this.lockState, this.unlock);
+    head.append(this.stance, right);
 
     const pic = svg('svg', {
       width: SILHOUETTE,
@@ -139,6 +155,7 @@ export class TargetCard {
 
     const lock = locks.find((l) => l.targetId === ship?.activeLock);
     show(this.root, Boolean(ship && lock));
+    this.shownId = lock?.targetId ?? null;
     if (!ship || !lock) return;
 
     const read = lockReadout(world, ship, lock.targetId);

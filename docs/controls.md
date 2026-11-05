@@ -27,7 +27,8 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 | Action | Input | Notes |
 | --- | --- | --- |
 | Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Swivels need no group |
-| Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
+| Heading lock | V | With mouse steering: the nose holds its bearing so you can move the pointer (to the interface, or to pick a target) without turning. Press again to release. A HEADING chip shows the state |
+| Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. The target card's UNLOCK button drops the lock it shows, without the keyboard. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Drops the active lock; the next one takes over |
 

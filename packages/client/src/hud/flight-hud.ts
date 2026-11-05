@@ -87,6 +87,9 @@ export class FlightHud {
   private readonly frameLine = el('div', 'hud-frame');
   private readonly modeChip = el('span', 'hud-chip');
   private readonly weaponsChip = el('span', 'hud-chip');
+  private readonly headingChip = el('span', 'hud-chip');
+  /** Heading lock state from the client (mouse steering only); null hides the chip. */
+  headingLock: boolean | null = null;
   private readonly weapons = el('div', 'hud-weapons');
   /** Stopgap (lead, 6f): the numbered activation tiles and the afterburner, above the weapon tiles. */
   private readonly slots = el('div', 'hud-slots');
@@ -124,7 +127,7 @@ export class FlightHud {
     );
 
     const chips = el('div', 'hud-chips');
-    chips.append(this.modeChip, this.weaponsChip);
+    chips.append(this.modeChip, this.weaponsChip, this.headingChip);
     const centre = el('div', 'hud-dial-column');
     centre.append(dial, this.frameLine, chips);
     const kit = el('div', 'hud-kit');
@@ -197,6 +200,9 @@ export class FlightHud {
     setText(this.modeChip, `${FLIGHT_MODE_LABELS[ship.flightMode].toUpperCase()} · Z`);
     setText(this.weaponsChip, ship.weaponsHot ? 'WEAPONS HOT · H' : 'WEAPONS COLD · H');
     this.weaponsChip.classList.toggle('hot', ship.weaponsHot);
+    show(this.headingChip, this.headingLock !== null);
+    setText(this.headingChip, this.headingLock ? 'HEADING LOCKED · V' : 'HEADING FREE · V');
+    this.headingChip.classList.toggle('hot', this.headingLock === true);
 
     this.updateWeapons(world, ship);
     this.updateSlots(world, ship);

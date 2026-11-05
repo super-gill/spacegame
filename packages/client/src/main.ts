@@ -125,6 +125,7 @@ const input = new InputController(
     else if (action === 'toggleMenu') menu.toggle();
     else if (action === 'cycleTarget') cycleTarget();
     else if (action === 'clearTarget') unlockActive();
+    else if (action === 'toggleHeadingLock') toggleHeadingLock();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
     else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
@@ -140,7 +141,11 @@ const ui = new Ui(
 );
 const hudLayer = document.getElementById('hud-layer')!;
 const flightHud = new FlightHud(hudLayer);
-const targetCard = new TargetCard(hudLayer, (id) => input.requestActivate(id));
+const targetCard = new TargetCard(
+  hudLayer,
+  (id) => input.requestActivate(id),
+  (id) => input.requestUnlock(id),
+);
 const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
 
 let me = loadLocalPilot();
@@ -547,6 +552,20 @@ resize();
 
 /** The bearing the pointer last asked for, kept while it sits on the ship itself. */
 let lastAim: number | null = null;
+/** Heading lock (V): the nose holds its bearing and the pointer moves freely. */
+let headingLocked = false;
+
+function toggleHeadingLock(): void {
+  if (!settings.mouseSteering) {
+    ui.notify('Heading lock is for mouse steering (Menu, F2).', 'info');
+    return;
+  }
+  headingLocked = !headingLocked;
+  // Lock on the bearing the nose is holding now.
+  const ship = myShip(current);
+  if (headingLocked && lastAim === null && ship) lastAim = ship.heading;
+  ui.notify(headingLocked ? 'Heading locked: move the pointer freely. V to release.' : 'Heading follows the pointer.', 'info');
+}
 /** Pointer this close to the ship (screen pixels) keeps the last aim rather than spinning on the spot. */
 const AIM_DEAD_ZONE_PX = 24;
 
@@ -562,7 +581,7 @@ function steer(sampled: ShipInput, ship: Ship): ShipInput {
     const dx = input.pointer.x - at.x;
     const dy = input.pointer.y - at.y;
     // Over a panel or card the aim holds: reaching for the interface must not swing the ship.
-    if (input.pointerOnGame && Math.hypot(dx, dy) > AIM_DEAD_ZONE_PX) lastAim = Math.atan2(dy, dx);
+    if (!headingLocked && input.pointerOnGame && Math.hypot(dx, dy) > AIM_DEAD_ZONE_PX) lastAim = Math.atan2(dy, dx);
   }
   return {
     ...sampled,
@@ -811,6 +830,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     yourShips.invalidate();
   }
   ui.update(current, mine);
+  flightHud.headingLock = settings.mouseSteering ? headingLocked : null;
   flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
   targetCard.update(current, mine);
   radar.update(current, mine, me.id, camera, eye);

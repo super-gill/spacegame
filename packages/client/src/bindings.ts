@@ -38,6 +38,7 @@ export type UiAction =
   | 'toggleControls'
   | 'toggleMenu'
   | 'cycleTarget'
+  | 'toggleHeadingLock'
   | 'clearTarget'
   | 'board'
   | 'stepOut'
@@ -93,6 +94,7 @@ export const KEY_BINDINGS: readonly KeyBinding[] = [
   { action: 'fireFixed', codes: ['Space'], group: 'Weapons', label: 'Fire the selected group', kind: 'hold', note: 'Or hold the left mouse button, with mouse steering. Guns fire where the nose points; launchers fire at your active lock' },
   { action: 'launchCountermeasure', codes: ['KeyC'], group: 'Weapons', label: 'Drop a countermeasure', kind: 'press', note: 'Chaff draws radar missiles, flares heat seekers; needs a dispenser' },
   { action: 'toggleWeaponsHot', codes: ['KeyH'], group: 'Weapons', label: 'Weapons hot / cold', kind: 'press', note: 'Hot: turrets engage your target on their own' },
+  { action: 'toggleHeadingLock', codes: ['KeyV'], group: 'Flight', label: 'Heading lock', kind: 'press', note: 'With mouse steering: the nose holds its bearing so you can move the pointer without turning. Press again to release' },
   { action: 'cycleTarget', codes: ['Tab'], group: 'Targeting', label: 'Next lock', kind: 'press', note: 'Switches the active lock; with none, locks the nearest ship' },
   { action: 'clearTarget', codes: ['Escape'], group: 'Targeting', label: 'Unlock the active lock', kind: 'press' },
   { action: 'tractor', codes: ['KeyR'], group: 'Systems', label: 'Tractor beam', kind: 'hold', note: 'If one is fitted: pulls in nearby loot while held; its tile leaves it running' },

@@ -58,6 +58,13 @@ Built as a general system so later kinds slot in without rework.
 
 **Lore (lore workstream).** Ore names and what each is for; gate-glass; who builds the prospector, the hulk, the lasers, scanners and drones; mining charges.
 
+## The hulk and part 2 (Jason, 5 November 2026; being designed)
+
+- **Ordinary hulk mining:** the hulk mounts heavy swivel mining lasers and works several rocks at once. A bigger mining computer holds several rock locks; a laser is assigned a rock (make it the active lock, press the laser's tile) and keeps cutting it while the pilot locks the next. Bigger, more sophisticated modules and ore holds in its bays. Lasers still take each rock's mix.
+- **Breach charges are their own kind of mining:** cracking rocks open to reach pockets of particular ores, so a breach rig can target an ore. Designed separately from ordinary hulk mining.
+- **Drones:** Jason's lean is small mining bots that cut ore and bring it back to their parent ship. They are ships in the world (see "Drones"), built as a general system.
+- Cargo today: the prospector has +25% from full-size pods and a Hopper S (40 ore-only); nothing yet is specific to ore beyond the hopper. Ore holds come with the hulk.
+
 ## Decisions (Jason, 4 November 2026)
 
 1. The full sequence (survey, analyse, break, cut, collect) is for big, rich rocks only; small ships work small rocks.

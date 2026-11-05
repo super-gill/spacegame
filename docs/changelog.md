@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ### Added
 - Mining, part 1. Every rock in the Scree holds ore: mostly common ore, some richer ores, and the best only in bigger, harder rocks. Mined-out rocks crumble, and the belt slowly brings in new ones.
 - A survey scanner: press its tile to pulse, and rocks worth a look light up for a few seconds. A better scanner reaches further and names the best ore in each rock.
+- An UNLOCK button on the target card, so a lock can be dropped without the keyboard.
+- Heading lock (V): with mouse steering, the nose holds its bearing while you move the pointer. A chip shows when it is on.
 - Lock a rock by clicking it. A mining computer (the Assay) reads what it holds and how hard it is.
 - Mining lasers: hold fire on a rock to cut ore free in canisters, and scoop them with the tractor. A laser only cuts rock no harder than it is strong.
 - The Rook and Rivet Prospector, a mining cutter, sold at Ridge Outpost and Harbour.
