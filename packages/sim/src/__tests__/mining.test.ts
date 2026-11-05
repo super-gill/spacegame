@@ -489,6 +489,26 @@ describe('the hulk', () => {
     expect(oreLeft(after.asteroids.find((x) => x.id === 'a')!)).toBe(400);
   });
 
+  it('a turret lets its rock go when the lock goes: unlocked, or the rock mined out', () => {
+    let w = hulkBetween();
+    const ship = w.ships['s']!;
+    const pa = rockAt(w, 'a')!.position;
+    const mountId = Math.sin(Math.atan2(pa.y - ship.position.y, pa.x - ship.position.x) - ship.heading) < 0 ? 'm1' : 'm2';
+    w = lockAndAssign(w, 'a', mountId);
+    w = stepWorld(w, { s: { ...emptyInput(), unlock: 'a' } });
+    expect(w.ships['s']!.weapons.find((x) => x.mountId === mountId)!.lockTarget).toBeNull();
+    expect(w.events).toContainEqual({ type: 'laserAssigned', shipId: 's', mountId, rockId: null });
+
+    // Mined out: a small soft rock crumbles, and the turret is free again.
+    let v = hulkBetween();
+    v = { ...v, asteroids: v.asteroids.map((x) => (x.id === 'a' ? { ...x, contents: { ore: 10 }, hardness: 0.2 } : x)) };
+    v = lockAndAssign(v, 'a', mountId);
+    const r = run(v, 10, { tractor: true });
+    expect(r.w.asteroids.some((x) => x.id === 'a')).toBe(false);
+    expect(r.w.ships['s']!.weapons.find((x) => x.mountId === mountId)!.lockTarget).toBeNull();
+    expect(r.w.ships['s']!.locks.some((l) => l.targetId === 'a')).toBe(false);
+  });
+
   it('turrets never engage ships', () => {
     let w = hulkBetween();
     w = { ...w, ships: { ...w.ships, s: { ...w.ships['s']!, weaponsHot: true, weapons: w.ships['s']!.weapons.map((x) => ({ ...x, lockTarget: null })) } } };

@@ -41,6 +41,9 @@ import { isGun, weaponDps } from './weapons.js';
  *   rock is how a mining computer reads it. Guns and launchers never
  *   engage a rock; `weaponTarget` returns ships only.
  *
+ * - A weapon assigned a target (`WeaponState.lockTarget`) drops it when
+ *   the lock goes, for any reason: unlocked, out of range, or gone.
+ *
  * Like everything else, locks change only through `ShipInput`: `lock`,
  * `unlock` and `activateLock`. NPCs lock the same way, and take as long.
  */
@@ -153,8 +156,17 @@ export function stepLocks(
   if (active && !locks.some((l) => l.targetId === active)) active = null;
   if (!active && locks.length > 0) active = locks[0]!.targetId;
 
-  if (locks === ship.locks && active === ship.activeLock) return { ship, events };
-  return { ship: { ...ship, locks, activeLock: active }, events };
+  // A weapon given a target that is no longer locked, for whatever reason, lets it go too.
+  let weapons = ship.weapons;
+  if (ship.weapons.some((w) => w.lockTarget && !locks.some((l) => l.targetId === w.lockTarget))) {
+    weapons = ship.weapons.map((w) => {
+      if (!w.lockTarget || locks.some((l) => l.targetId === w.lockTarget)) return w;
+      if (stats.weapons[w.mountId]?.family === 'mining') events.push({ type: 'laserAssigned', shipId: ship.id, mountId: w.mountId, rockId: null });
+      return { ...w, lockTarget: null };
+    });
+  }
+  if (locks === ship.locks && active === ship.activeLock && weapons === ship.weapons) return { ship, events };
+  return { ship: { ...ship, locks, activeLock: active, weapons }, events };
 }
 
 /** The ship a weapon on `ship` engages: its assigned lock if complete, else the active lock if complete, else none. */
