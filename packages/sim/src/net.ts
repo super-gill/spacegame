@@ -1,5 +1,5 @@
 import type { PilotCommand } from './commands.js';
-import type { Asteroid, ShipInput, World, WorldEvent } from './types.js';
+import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
 
 /**
  * The messages between a client and the server (docs/shared-world.md).
@@ -39,13 +39,26 @@ export type ClientMessage =
  * four hundred. Catalogues never change, so after `welcome` they are
  * never sent again.
  */
-export type WorldUpdate = Partial<Omit<World, 'events' | 'asteroids'>> & {
+export type WorldUpdate = Partial<Omit<World, 'events' | 'asteroids' | 'ships'>> & {
   /** Rocks that are new or changed, and the ids of rocks that are gone. */
   rocks?: { changed: Asteroid[]; removed: string[] };
+  /**
+   * Ships, field by field: for each ship that changed, the fields that
+   * changed (`set`; a new ship comes whole) and the fields it no longer
+   * has (`unset`), and the ids of ships that are gone. A ship's fit, hold
+   * and the rest rarely change; its position changes every tick.
+   */
+  ships?: { changed: Record<string, ShipChange>; removed: string[] };
 };
 
+/** What changed in one ship. */
+export interface ShipChange {
+  set: Partial<Ship>;
+  unset?: string[];
+}
+
 /** Parts of the world clients never need after `welcome`: events go separately, and spawn timers are the server's business. */
-const NEVER_SENT = new Set(['events', 'spawners', 'rockfall', 'nextEntityId', 'asteroids']);
+const NEVER_SENT = new Set(['events', 'spawners', 'rockfall', 'nextEntityId', 'asteroids', 'ships']);
 
 /** What changed from `before` to `now` (both worlds the server gave out). */
 export function diffWorld(before: World, now: World): WorldUpdate {
@@ -62,12 +75,64 @@ export function diffWorld(before: World, now: World): WorldUpdate {
     const removed = before.asteroids.filter((a) => !kept.has(a.id)).map((a) => a.id);
     if (changed.length > 0 || removed.length > 0) out['rocks'] = { changed, removed };
   }
+  if (now.ships !== before.ships) {
+    const changed: Record<string, ShipChange> = {};
+    for (const ship of Object.values(now.ships)) {
+      const old = before.ships[ship.id];
+      if (old === ship) continue;
+      if (!old) {
+        changed[ship.id] = { set: ship };
+        continue;
+      }
+      const fields = changedFields(old, ship);
+      if (fields) changed[ship.id] = fields;
+    }
+    const removed = Object.keys(before.ships).filter((id) => !now.ships[id]);
+    if (Object.keys(changed).length > 0 || removed.length > 0) out['ships'] = { changed, removed };
+  }
   return out as WorldUpdate;
+}
+
+/**
+ * The fields of a ship that differ from before, or null if none do. The
+ * sim often rebuilds a part (its weapons' state, its thrusters) with the
+ * same contents, so a part that is a new object is compared by value
+ * before it is sent.
+ */
+function changedFields(before: Ship, now: Ship): ShipChange | null {
+  const b = before as unknown as Record<string, unknown>;
+  const n = now as unknown as Record<string, unknown>;
+  const set: Record<string, unknown> = {};
+  const unset: string[] = [];
+  for (const key of new Set([...Object.keys(b), ...Object.keys(n)])) {
+    const was = b[key];
+    const is = n[key];
+    if (was === is) continue;
+    if (is === undefined) {
+      unset.push(key);
+      continue;
+    }
+    if (typeof is === 'object' && is !== null && typeof was === 'object' && was !== null && JSON.stringify(was) === JSON.stringify(is)) continue;
+    set[key] = is;
+  }
+  if (Object.keys(set).length === 0 && unset.length === 0) return null;
+  return unset.length > 0 ? { set: set as Partial<Ship>, unset } : { set: set as Partial<Ship> };
 }
 
 /** A client's world with an update applied: the next world to draw. */
 export function applyUpdate(world: World, update: WorldUpdate, events: WorldEvent[]): World {
-  const { rocks, ...parts } = update;
+  const { rocks, ships: shipChanges, ...parts } = update;
+  let ships = world.ships;
+  if (shipChanges) {
+    const next: Record<string, Ship> = { ...ships };
+    for (const id of shipChanges.removed) delete next[id];
+    for (const [id, change] of Object.entries(shipChanges.changed)) {
+      const merged = { ...(next[id] ?? {}), ...change.set } as Record<string, unknown>;
+      for (const k of change.unset ?? []) delete merged[k];
+      next[id] = merged as unknown as Ship;
+    }
+    ships = next;
+  }
   let asteroids = world.asteroids;
   if (rocks) {
     const gone = new Set(rocks.removed);
@@ -77,7 +142,7 @@ export function applyUpdate(world: World, update: WorldUpdate, events: WorldEven
     for (const a of rocks.changed) if (!known.has(a.id)) out.push(a);
     asteroids = out;
   }
-  return { ...world, ...parts, asteroids, events };
+  return { ...world, ...parts, asteroids, ships, events };
 }
 
 /** A command's outcome as sent back: the event, or why it was refused. */

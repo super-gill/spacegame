@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
@@ -126,6 +127,8 @@ function update(): void {
       const message: ServerMessage = { t: 'update', tick: now.tick, changed: game.changesSince(connection.seen), events };
       text = JSON.stringify(message);
       made.set(connection.seen, text);
+      // Now and then, see how well it compresses, for `stats`.
+      if (now.tick % 300 === 0) stats.compressed(text.length, deflateRawSync(text).length);
     }
     connection.socket.send(text);
     stats.sent(performance.now(), text.length, connection.character.name);

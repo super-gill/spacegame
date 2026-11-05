@@ -16,6 +16,16 @@ export class ServerStats {
   private ticks: [number, number][] = [];
   /** [when, bytes, who] for each update sent. */
   private sends: [number, number, string][] = [];
+  /** When counting began, so the first ten seconds are not reported as slow. */
+  private readonly startedMs = performance.now();
+
+  /** Compressed size over raw size, from a sample of updates: what actually goes down the wire. */
+  private compression = 1;
+
+  /** A sampled update: its size before and after compression. */
+  compressed(raw: number, packed: number): void {
+    if (raw > 0) this.compression = packed / raw;
+  }
 
   tick(atMs: number, tookMs: number): void {
     this.ticks.push([atMs, tookMs]);
@@ -35,13 +45,14 @@ export class ServerStats {
   /** A few lines for the console. */
   report(nowMs: number): string[] {
     this.trim(nowMs);
-    const seconds = WINDOW_MS / 1000;
+    // Over the last ten seconds, or since the server started if that is sooner.
+    const seconds = Math.max(0.001, Math.min(WINDOW_MS, nowMs - this.startedMs) / 1000);
     const times = this.ticks.map(([, t]) => t);
     const average = times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
     const worst = times.length > 0 ? Math.max(...times) : 0;
     const over = times.filter((t) => t > 1000 / 60).length;
     const lines = [
-      `Last ${seconds} s: ${(times.length / seconds).toFixed(1)} ticks a second (should be 60).`,
+      `Last ${seconds.toFixed(0)} s: ${(times.length / seconds).toFixed(1)} ticks a second (should be 60).`,
       `Tick time: ${average.toFixed(2)} ms on average, ${worst.toFixed(2)} ms at worst, ${over} over the 16.7 ms budget.`,
     ];
     const byWho = new Map<string, { bytes: number; count: number }>();
@@ -53,7 +64,8 @@ export class ServerStats {
     }
     if (byWho.size === 0) lines.push('Nobody connected.');
     for (const [who, w] of byWho) {
-      lines.push(`${who}: ${(w.count / seconds).toFixed(1)} updates a second, ${((w.bytes * 8) / seconds / 1_000_000).toFixed(2)} Mbit/s before compression, ${(w.bytes / w.count / 1024).toFixed(1)} KB each.`);
+      const mbit = (w.bytes * 8) / seconds / 1_000_000;
+      lines.push(`${who}: ${(w.count / seconds).toFixed(1)} updates a second, ${(w.bytes / w.count / 1024).toFixed(1)} KB each, ${mbit.toFixed(2)} Mbit/s before compression, about ${(mbit * this.compression).toFixed(2)} Mbit/s sent.`);
     }
     return lines;
   }
