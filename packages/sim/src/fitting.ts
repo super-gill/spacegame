@@ -18,10 +18,9 @@ import type { HullSpec, ModuleSpec, MountPoint, Pilot, Ship, ShipStats, WeaponSt
  *
  * Modules are owned. A module the pilot has in storage at this station
  * is fitted from there; otherwise it is bought new. Unfitting puts the
- * module into storage at this station. Fitting and unfitting each cost a
- * small handling fee (FIT_FEE_FRACTION of the module's price), so
- * swapping between owned modules is cheap but not free. Stored modules
- * can be sold back to the station.
+ * module into storage at this station. Fitting and unfitting are free for
+ * now (FIT_FEE_FRACTION is 0). Modules can also be bought straight into
+ * storage (`buyModule`), and stored modules sold back to the station.
  *
  * These are pilot commands, like trading: a person asks once, the sim
  * checks and applies it, and over a network they become requests.
@@ -237,6 +236,31 @@ export function fitModule(world: World, pilotId: string, mountId: string, module
 /** Take the module off a mount on the pilot's docked ship and put it in storage here. All or nothing. */
 export function unfitModule(world: World, pilotId: string, mountId: string): FitResult {
   return apply(world, pilotId, planRefit(world, pilotId, mountId, null));
+}
+
+/**
+ * Buy `quantity` of a module into storage at the station the pilot is
+ * docked at, without fitting it. Needs a station with outfitting. All or
+ * nothing.
+ */
+export function buyModule(world: World, pilotId: string, moduleId: string, quantity = 1): FitResult {
+  const pilot = world.pilots[pilotId];
+  const ship = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
+  if (!pilot || !ship) return { ok: false, world, reason: 'noShip' };
+  if (ship.state !== 'docked' || !ship.dockedAt) return { ok: false, world, reason: 'notDocked' };
+  const stationId = ship.dockedAt;
+  if (!world.stations[stationId]?.outfitting) return { ok: false, world, reason: 'noOutfitting' };
+  const module = world.modules[moduleId];
+  if (!module) return { ok: false, world, reason: 'unknownModule' };
+  if (!Number.isInteger(quantity) || quantity <= 0) return { ok: false, world, reason: 'unknownModule' };
+  const cost = module.price * quantity;
+  if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
+  const bought = withStored({ ...pilot, credits: pilot.credits - cost }, stationId, moduleId, quantity);
+  return {
+    ok: true,
+    world: { ...world, pilots: { ...world.pilots, [pilotId]: bought } },
+    event: { type: 'moduleBought', shipId: ship.id, stationId, moduleId, quantity, cost },
+  };
 }
 
 /**

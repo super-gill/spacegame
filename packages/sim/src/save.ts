@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -88,6 +88,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   8: (world) => migrate8to9(world),
   9: (world) => migrate9to10(world),
   10: (world) => migrate10to11(world),
+  11: (world) => migrate11to12(world),
 };
 
 /**
@@ -245,6 +246,30 @@ export function migrate10to11(world: unknown): unknown {
     ships[id] = { ...rest, fit, weapons, ...(switchedOn.length > 0 ? { switchedOn } : {}) };
   }
   return { ...world, ships, pilots };
+}
+
+/**
+ * 11 to 12: one storage per station (docs/fitting.md). Goods a pilot kept
+ * at stations (`hangar`) join their unfitted modules in `storage`.
+ */
+export function migrate11to12(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['pilots'])) return world;
+  const pilots: Record<string, unknown> = {};
+  for (const [id, raw] of Object.entries(world['pilots'])) {
+    if (!isRecord(raw) || !isRecord(raw['hangar'])) {
+      pilots[id] = raw;
+      continue;
+    }
+    const { hangar, ...pilot } = raw;
+    const storage: Record<string, Record<string, number>> = {};
+    for (const [st, held] of Object.entries(isRecord(pilot['storage']) ? pilot['storage'] : {})) storage[st] = { ...(held as Record<string, number>) };
+    for (const [st, held] of Object.entries(hangar as Record<string, Record<string, number>>)) {
+      const shelf = (storage[st] ??= {});
+      for (const [item, n] of Object.entries(held)) shelf[item] = (shelf[item] ?? 0) + n;
+    }
+    pilots[id] = { ...pilot, storage };
+  }
+  return { ...world, pilots };
 }
 
 /** A seed from an id, FNV-1a. */
@@ -634,7 +659,7 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const current = starterStations();
   const stations: Record<string, Station> = {};
   // Ship mart stock too: what a starter station sells is design data.
-  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart] } : st;
+  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart], outfitting: current[id]!.outfitting } : st;
   // NPC spawners added since the save was made join it (miners, say); those it has keep their state.
   const known = new Set(world.spawners.map((sp) => sp.id));
   const spawners = [...world.spawners, ...createStarterWorld().spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];

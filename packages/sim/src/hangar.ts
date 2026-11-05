@@ -5,7 +5,7 @@ import type { Pilot, Ship, World, WorldEvent } from './types.js';
 /**
  * Station storage for goods (docs/mining.md, "Holds"): a pilot keeps goods
  * at any station, moving them between a docked ship's hold and the
- * station. Pilot commands, like trading: a person asks once, the sim
+ * station. The same storage as unfitted modules (`Pilot.storage`). Pilot commands, like trading: a person asks once, the sim
  * checks and applies it. Storage has no limit and costs nothing, and goods
  * stay at the station where they were left.
  */
@@ -20,8 +20,8 @@ export type HangarRefusal =
 export type HangarResult = { ok: true; world: World; event: WorldEvent } | { ok: false; world: World; reason: HangarRefusal };
 
 /** How many of a good the pilot keeps at a station. */
-export function storedGoods(pilot: Pick<Pilot, 'hangar'>, stationId: string, goodId: string): number {
-  return pilot.hangar?.[stationId]?.[goodId] ?? 0;
+export function storedGoods(pilot: Pick<Pilot, 'storage'>, stationId: string, goodId: string): number {
+  return pilot.storage?.[stationId]?.[goodId] ?? 0;
 }
 
 function docked(world: World, pilotId: string): { pilot: Pilot; ship: Ship; stationId: string } | HangarRefusal {
@@ -33,11 +33,11 @@ function docked(world: World, pilotId: string): { pilot: Pilot; ship: Ship; stat
 }
 
 function withHangar(pilot: Pilot, stationId: string, goodId: string, change: number): Pilot {
-  const here = { ...(pilot.hangar?.[stationId] ?? {}) };
+  const here = { ...(pilot.storage?.[stationId] ?? {}) };
   const count = (here[goodId] ?? 0) + change;
   if (count > 0) here[goodId] = count;
   else delete here[goodId];
-  return { ...pilot, hangar: { ...(pilot.hangar ?? {}), [stationId]: here } };
+  return { ...pilot, storage: { ...(pilot.storage ?? {}), [stationId]: here } };
 }
 
 /** Move `quantity` of a good from the docked ship's hold into storage at that station. */

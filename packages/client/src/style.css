@@ -106,47 +106,309 @@ canvas#game {
 }
 
 .dock-panel.wide {
-  width: min(880px, calc(100vw - var(--clear-left) - 24px));
+  /* Wide enough for the fitting window's three columns on a laptop screen. */
+  width: min(1320px, calc(100vw - var(--clear-left) - 24px));
 }
 
-/* Outfitting: drawing and stats on top, mounts, then what fits the selected mount. */
+/* The fitting window (outfitting-panel.ts): budgets, then slots | ship | what fits. */
 .outfitting {
   margin: 4px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fit-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.fit-hull {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-bright);
+}
+
+.fit-builtin {
+  margin-left: auto;
+}
+
+.fit-budgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.fit-budget {
+  border: 1px solid var(--faint);
+  background: #0b1214;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fit-budget-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fit-budget-value {
+  color: var(--ink-bright);
+}
+
+.fit-budget-note {
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.fit-bar {
+  position: relative;
+  height: 6px;
+  background: var(--faint);
+}
+
+.fit-bar-fill,
+.fit-bar-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 6px;
+}
+
+.fit-bar-preview {
+  box-sizing: border-box;
+  border: 1px solid var(--ink-bright);
+}
+
+.fit-bar-preview.bad {
+  border-color: var(--alarm);
 }
 
 /*
- * Drawing and stats side by side. Whether they stack is decided by the
- * screen width alone, never by content: if previewing a module could tip
- * the row into wrapping, the buttons below would jump out from under the
- * pointer mid-click.
+ * Three columns that stack only by screen width, never by content, so a
+ * preview never moves a button out from under the pointer.
  */
-.outfitting-top {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 20px;
-  align-items: flex-start;
+.fit-grid {
+  display: grid;
+  grid-template-columns: 230px minmax(320px, 1fr) 340px;
+  gap: 14px;
+  align-items: start;
 }
 
-.outfitting-preview {
-  flex: 0 0 auto;
-}
-
-/* Takes the rest of the row, so long warnings wrap inside the panel. */
-.outfitting-stats {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-@media (max-width: 900px) {
-  .outfitting-top {
-    flex-wrap: wrap;
+@media (max-width: 1100px) {
+  .fit-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.outfitting-preview {
+.fit-rails,
+.fit-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fit-rail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--faint);
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+}
+
+.fit-rail-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink-bright);
+}
+
+.fit-slot {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 26px;
+  padding: 2px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fit-slot:hover,
+.fit-slot:focus-visible {
+  border-color: var(--faint);
+}
+
+.fit-slot.selected {
+  background: #13232a;
+  border-color: var(--ink);
+}
+
+.fit-slot-id {
+  color: var(--ink-bright);
+  width: 24px;
+}
+
+.fit-slot-size {
+  color: var(--ink-dim);
+  width: 12px;
+}
+
+.fit-slot-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fit-slot-name.empty {
+  color: var(--ink-dim);
+  font-style: italic;
+}
+
+/* Tier marks: shape and colour, so tiers differ in more than hue. */
+.fit-mark {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+}
+
+.fit-mark.high {
+  border-radius: 50%;
+  background: #e0a458;
+}
+
+.fit-mark.mid {
+  transform: rotate(45deg);
+  background: #7cc8ff;
+}
+
+.fit-mark.low {
+  background: #3f7f73;
+  border: 1px solid var(--ink);
+}
+
+.fit-mark.core {
+  border: 1px solid var(--ink-dim);
+}
+
+.fit-centre {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fit-centre .outfitting-preview {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 340;
   border: 1px solid rgba(79, 122, 114, 0.4);
   background: #0b1016;
   cursor: pointer;
+}
+
+.fit-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 10px;
+  color: var(--ink-dim);
+}
+
+.fit-key {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fit-picker-head {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-bottom: 1px solid var(--faint);
+  padding-bottom: 8px;
+}
+
+.fit-picker-title {
+  font-weight: 600;
+  color: var(--ink-bright);
+}
+
+.fit-picker-fitted {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.fit-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.fit-module {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+}
+
+.fit-module:hover {
+  border-color: var(--faint);
+  background: #0b1214;
+}
+
+.fit-module-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fit-module-name {
+  color: var(--ink-bright);
+}
+
+.fit-module-does {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fit-module-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.fit-module-price {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.fit-module-actions button.quiet,
+.outfitting-storage button.quiet {
+  border-color: var(--faint);
+  color: var(--ink-dim);
 }
 
 .outfitting h2 {

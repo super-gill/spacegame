@@ -273,3 +273,34 @@ describe('loading a save', () => {
     expect(r.ok && r.world.stations['station-harbour']!.position).toEqual(stale.stations['station-harbour']!.position);
   });
 });
+
+describe('slot placement (docs/fitting.md, "Placement")', () => {
+  const inside = (p: { x: number; y: number }, poly: { x: number; y: number }[]): boolean => {
+    let hit = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[i]!, b = poly[j]!;
+      if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) hit = !hit;
+    }
+    return hit;
+  };
+  const toEdge = (p: { x: number; y: number }, poly: { x: number; y: number }[]): number => {
+    let best = Infinity;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[j]!, b = poly[i]!;
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy)));
+      best = Math.min(best, Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)));
+    }
+    return best;
+  };
+
+  it('puts high slots on the hull edge, and mids and lows inside it', () => {
+    for (const hull of Object.values(HULLS)) {
+      for (const m of hull.mounts) {
+        if (m.type === 'high') expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
+        // A merchantman's cargo pods hang off its spine, outside the outline.
+        if ((m.type === 'mid' || m.type === 'low') && !(hull.class === 'merchantman' && m.id.startsWith('b'))) expect(inside(m.position, hull.outline), `${hull.id} ${m.id}`).toBe(true);
+      }
+    }
+  });
+});

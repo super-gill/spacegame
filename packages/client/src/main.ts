@@ -19,6 +19,7 @@ import {
   createStarterWorld,
   fitModule,
   sellModule,
+  buyModule,
   unfitModule,
   distance,
   sellGood,
@@ -234,14 +235,16 @@ function trade(request: TradeRequest): void {
   }
 }
 
-/** Pilot command: fit, unfit or sell a module at the station we are docked at. */
+/** Pilot command: fit, unfit, buy or sell a module at the station we are docked at. */
 function refit(request: RefitRequest): void {
   const r =
     request.kind === 'sell'
       ? sellModule(current, me.id, request.moduleId)
-      : request.moduleId
-        ? fitModule(current, me.id, request.mountId, request.moduleId)
-        : unfitModule(current, me.id, request.mountId);
+      : request.kind === 'buy'
+        ? buyModule(current, me.id, request.moduleId)
+        : request.moduleId
+          ? fitModule(current, me.id, request.mountId, request.moduleId)
+          : unfitModule(current, me.id, request.mountId);
   if (!r.ok) {
     ui.notify(FIT_REFUSALS[r.reason], 'warn');
     return;
@@ -249,12 +252,14 @@ function refit(request: RefitRequest): void {
   current = r.world;
   const e = r.event;
   const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
-  const name = current.modules[e.type === 'fitted' || e.type === 'unfitted' || e.type === 'moduleSold' ? e.moduleId : '']?.name;
+  const name = current.modules[e.type === 'fitted' || e.type === 'unfitted' || e.type === 'moduleSold' || e.type === 'moduleBought' ? e.moduleId : '']?.name;
   if (e.type === 'fitted') {
     const stored = e.replaced ? `; ${current.modules[e.replaced]?.name ?? e.replaced} to storage` : '';
-    ui.notify(`${e.bought ? 'Bought and fitted' : 'Fitted'} ${name ?? e.moduleId} for ${cr(e.cost)}${stored}`);
+    ui.notify(e.bought ? `Bought and fitted ${name ?? e.moduleId} for ${cr(e.cost)}${stored}` : `Fitted ${name ?? e.moduleId} from storage${stored}`);
+  } else if (e.type === 'moduleBought') {
+    ui.notify(`Bought ${e.quantity} ${name ?? e.moduleId} into storage here for ${cr(e.cost)}`);
   } else if (e.type === 'unfitted') {
-    ui.notify(`Unfitted ${name ?? e.moduleId} to storage for ${cr(e.fee)}`);
+    ui.notify(`Unfitted ${name ?? e.moduleId} to storage`);
   } else if (e.type === 'moduleSold') {
     ui.notify(`Sold ${name ?? e.moduleId} for ${cr(e.credits)}`);
   }

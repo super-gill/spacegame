@@ -92,7 +92,8 @@ export function harbourStation(): Station {
 }
 
 /**
- * A mining outpost on the belt, turning with it. No outfitting; its ship
+ * A mining outpost on the belt, turning with it. Outfitting while the
+ * starter system is the dev environment; its ship
  * mart sells prospectors. The belt has no gravity, so its period is the belt's, not one
  * worked out from gravity.
  */
@@ -124,7 +125,8 @@ export function ridgeOutpost(): Station {
       // Any Belter can make rounds.
       rounds: { ask: 48, bid: 32 },
     },
-    outfitting: false,
+    // Every station outfits while the starter system is the dev environment (docs/fitting.md).
+    outfitting: true,
     pads: padRing(70, ['L', 'S', 'M', 'L', 'S', 'M']),
     // The Collective sells its prospectors to anyone who will dig.
     shipMart: ['rookrivet-prospector', 'rookrivet-breacher', 'rookrivet-hulk'],

@@ -30,6 +30,11 @@ const spine = HULLS['tessaract-spine']!;
  * A world with one pilot in a starter ship docked at `stationId`, no NPCs.
  * The utility mount is emptied so tests have a free mount to fit into.
  */
+/** The same world with outfitting switched off at Ridge, for the rules about stations without it. */
+function noOutfitting(w: World): World {
+  return { ...w, stations: { ...w.stations, [RIDGE]: { ...w.stations[RIDGE]!, outfitting: false } } };
+}
+
 function dockedAt(stationId = HARBOUR, credits = STARTING_CREDITS): { w: World; me: string } {
   const base = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
   let w = joinPilot(base, 'ana', 'Ana');
@@ -194,9 +199,9 @@ describe('fitting', () => {
     });
   });
 
-  it('charges a fee of FIT_FEE_FRACTION of the price, rounded up', () => {
-    for (const m of Object.values(MODULES)) expect(fitFee(m)).toBe(Math.ceil(m.price * FIT_FEE_FRACTION));
-    expect(fitFee({ ...MODULES['meridian-pod-s']!, price: 1 })).toBe(1);
+  it('charges no fitting fee for now (docs/fitting.md)', () => {
+    expect(FIT_FEE_FRACTION).toBe(0);
+    for (const m of Object.values(MODULES)) expect(fitFee(m)).toBe(0);
   });
 
   it('unfitting puts the module in storage at this station for a fee', () => {
@@ -260,7 +265,7 @@ describe('fitting', () => {
     const notStored = sellModule(w, 'ana', 'meridian-pod-s');
     expect(notStored.ok ? 'ok' : notStored.reason).toBe('notStored');
     expect(notStored.world).toBe(w);
-    const ridge = dockedAt(RIDGE).w;
+    const ridge = noOutfitting(dockedAt(RIDGE).w);
     const away = sellModule(ridge, 'ana', 'meridian-pod-s');
     expect(away.ok ? 'ok' : away.reason).toBe('noOutfitting');
   });
@@ -307,7 +312,7 @@ describe('fitting', () => {
   });
 
   it('happens only while docked at a station with outfitting', () => {
-    const ridge = dockedAt(RIDGE).w;
+    const ridge = noOutfitting(dockedAt(RIDGE).w);
     expect(planRefit(ridge, 'ana', 'i2', 'rookrivet-armour-s')).toEqual({ ok: false, reason: 'noOutfitting' });
     const { w, me } = dockedAt();
     const flying = { ...w, ships: { ...w.ships, [me]: { ...w.ships[me]!, state: 'flying' as const, dockedAt: null } } };
@@ -415,10 +420,8 @@ describe('ships in the world', () => {
     expect(ranDry).toBe(true);
   });
 
-  it('only Harbour Station has outfitting', () => {
-    const w = createStarterWorld();
-    expect(w.stations[HARBOUR]!.outfitting).toBe(true);
-    expect(w.stations[RIDGE]!.outfitting).toBe(false);
+  it('every station outfits while Calder is the dev environment', () => {
+    for (const st of Object.values(createStarterWorld().stations)) expect(st.outfitting, st.id).toBe(true);
   });
 
   it('refuses saves from before modular ships', () => {

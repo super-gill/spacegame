@@ -1,9 +1,9 @@
 import {
   cargoMass,
+  holdUse,
   fitStats,
   flightWarnings,
   mountRefusal,
-  fitFee,
   planRefit,
   resaleValue,
   shipStats,
@@ -16,29 +16,37 @@ import {
   type ModuleSpec,
   type MountPoint,
   type MountType,
+  type Ship,
   type ShipStats,
   type World,
 } from '@spacegame/sim';
-import { RACE_COLOUR, drawShipArt } from './render/ship-art.js';
+import { RACE_COLOUR } from './render/ship-art.js';
 
 /**
- * Outfitting, shown inside the docked panel at stations that refit ships.
+ * The fitting window (docs/fitting.md, "The fitting window"), inside the
+ * docked panel at stations that refit ships.
  *
- * Left: the ship as fitted, with empty mounts as dashed sockets; click a
- * mount (there or in the list) to select it. Right: the ship's derived
- * stats. Below: the modules that physically fit the selected mount, each
- * with how many you own here and what fitting it costs (the handling fee,
- * plus the price if you do not own one), then the modules you have in
- * storage at this station, which you can sell. Pointing at a
- * module previews it: the drawing and the stats show the ship as it would
- * be, so the effect of a change is visible before paying for it.
+ * - Budget bars across the top: power, capacitor, mass, cargo, ore hold.
+ * - Left: the slots by tier (high, mid, low, then core systems), each with
+ *   what is fitted.
+ * - Middle: the ship as fitted, every slot marked where it sits on the
+ *   hull by tier (circle high, diamond mid, square low, outline core) and
+ *   size; the selected high slot shows its swivel arc or its line of
+ *   fire. Below it, every number the ship has, now and after a change.
+ * - Right: what fits the selected slot, from storage here first, then for
+ *   sale here, with Fit, Buy and fit, and Buy; then everything stored
+ *   here, to sell.
  *
- * The panel only draws and reports clicks. Fitting is a sim command run
- * by main.ts, which owns the world.
+ * Pointing at a module previews it: the drawing, the bars and the numbers
+ * show the ship as it would be. The panel only draws and reports clicks;
+ * main.ts runs the sim commands.
  */
 
-/** Fit `moduleId` on a mount, or with `moduleId` null unfit it; or sell one stored module. */
-export type RefitRequest = { kind: 'refit'; mountId: string; moduleId: string | null } | { kind: 'sell'; moduleId: string };
+/** Fit `moduleId` on a mount, or with `moduleId` null unfit it; buy a module into storage; or sell one stored module. */
+export type RefitRequest =
+  | { kind: 'refit'; mountId: string; moduleId: string | null }
+  | { kind: 'buy'; moduleId: string }
+  | { kind: 'sell'; moduleId: string };
 
 /** Player-facing reasons a refit is refused. Shared with main.ts for toasts. */
 export const FIT_REFUSALS: Record<FitRefusal, string> = {
@@ -77,8 +85,9 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
 const TIER_ORDER: Partial<Record<MountType, number>> = { high: 1, mid: 2, low: 3 };
 
 const INK = '#9fd3c7';
-const PREVIEW_W = 360;
-const PREVIEW_H = 230;
+/** The ship drawing's size in CSS pixels; it scales down with its column. */
+const PREVIEW_W = 480;
+const PREVIEW_H = 340;
 /** Pixels of slop round a mount when clicking it in the drawing. */
 const MOUNT_CLICK_PX = 12;
 
@@ -240,11 +249,13 @@ const STAT_ROWS: StatRow[] = [
 
 export class OutfittingPanel {
   private readonly root: HTMLDivElement;
+  private readonly header: HTMLDivElement;
+  private readonly budgets: HTMLDivElement;
+  private readonly rails: HTMLDivElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly statsBox: HTMLDivElement;
-  private readonly mountsBox: HTMLDivElement;
+  private readonly picker: HTMLDivElement;
   private readonly storageBox: HTMLDivElement;
-  private readonly modulesBox: HTMLDivElement;
   private signature = '';
   private selected: string | null = null;
   /** The change being pointed at: a module for a mount, or null module for "remove". */
@@ -257,22 +268,33 @@ export class OutfittingPanel {
     private readonly onRefit: (request: RefitRequest) => void,
   ) {
     this.root = el('div', 'outfitting');
-    const top = el('div', 'outfitting-top');
+    this.header = el('div', 'fit-header');
+    this.budgets = el('div', 'fit-budgets');
+    const grid = el('div', 'fit-grid');
+    this.rails = el('div', 'fit-rails');
+    const centre = el('div', 'fit-centre');
     this.canvas = el('canvas', 'outfitting-preview');
     this.canvas.addEventListener('click', (e) => this.clickDrawing(e));
+    const legend = el('div', 'fit-legend');
+    legend.append(
+      this.key('high', 'High: works on something else'),
+      this.key('mid', "Mid: the ship's own systems"),
+      this.key('low', 'Low: passive'),
+      this.key('core', 'Core systems'),
+    );
     this.statsBox = el('div', 'outfitting-stats');
-    top.append(this.canvas, this.statsBox);
-    this.mountsBox = el('div', 'outfitting-mounts');
-    this.modulesBox = el('div', 'outfitting-modules');
+    centre.append(this.canvas, legend, this.statsBox);
+    const right = el('div', 'fit-right');
+    this.picker = el('div', 'fit-picker');
     this.storageBox = el('div', 'outfitting-storage');
-    this.root.append(top, this.mountsBox, this.modulesBox, this.storageBox);
+    right.append(this.picker, this.storageBox);
+    grid.append(this.rails, centre, right);
+    this.root.append(this.header, this.budgets, grid);
     container.append(this.root);
 
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = PREVIEW_W * dpr;
     this.canvas.height = PREVIEW_H * dpr;
-    this.canvas.style.width = `${PREVIEW_W}px`;
-    this.canvas.style.height = `${PREVIEW_H}px`;
   }
 
   /** Redraw if anything shown has changed. Cheap to call every frame. */
@@ -284,13 +306,16 @@ export class OutfittingPanel {
     const hull = ship ? world.hulls[ship.hullId] : undefined;
     if (!pilot || !ship || !hull) return;
     if (this.selected && !hull.mounts.some((m) => m.id === this.selected)) this.selected = null;
+    // Open on the first high slot, so the window starts somewhere useful.
+    if (!this.selected) this.selected = hull.mounts.find((m) => m.type === 'high')?.id ?? hull.mounts[0]?.id ?? null;
 
     const signature = JSON.stringify([ship.id, ship.dockedAt, pilot.credits, pilot.storage, ship.fit, ship.hold, this.selected]);
     if (signature === this.signature) return;
     this.signature = signature;
     this.preview = null;
-    this.renderMounts(world, hull, ship.fit);
-    this.renderModules(world, hull, ship.fit);
+    this.renderHeader(world, hull);
+    this.renderRails(world, hull, ship.fit);
+    this.renderPicker(world, hull, ship.fit);
     this.renderStorage(world, ship.dockedAt);
     this.renderPreview();
   }
@@ -301,7 +326,7 @@ export class OutfittingPanel {
   }
 
   private select(mountId: string): void {
-    this.selected = this.selected === mountId ? null : mountId;
+    this.selected = mountId;
     this.invalidate();
     if (this.world) this.update(this.world, this.pilotId);
   }
@@ -312,7 +337,13 @@ export class OutfittingPanel {
     this.renderPreview();
   }
 
-  /** Redraw the ship drawing and stats for the current fit or the previewed change. */
+  private key(tier: TierKey, label: string): HTMLElement {
+    const k = el('span', 'fit-key');
+    k.append(el('span', `fit-mark ${tier}`), document.createTextNode(label));
+    return k;
+  }
+
+  /** Redraw the drawing, the bars and the numbers for the current fit or the previewed change. */
   private renderPreview(): void {
     const world = this.world;
     const ship = world?.ships[world.pilots[this.pilotId]?.shipId ?? ''];
@@ -332,38 +363,152 @@ export class OutfittingPanel {
       fit = changed;
       after = fitStats(world, hull, changed, cargoMass(ship, world.goods));
     }
-    this.drawShip(world, hull, fit);
+    this.drawShip(hull, fit);
+    this.renderBudgets(world, ship, now, after);
     this.renderStats(now, after);
   }
 
-  private drawShip(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
+  private renderHeader(world: World, hull: HullSpec): void {
+    const maker = world.manufacturers[hull.manufacturer]?.name ?? hull.manufacturer;
+    const cls = (hull as { class?: string }).class ?? '';
+    const line = el('div', 'fit-title');
+    line.append(el('span', 'fit-hull', hull.name), el('span', 'muted', `${cls} · ${hull.sizeClass} · ${maker}`));
+    if (hull.oreHold) line.append(el('span', 'muted fit-builtin', `Built in: ore hold ${hull.oreHold}`));
+    const parts: HTMLElement[] = [line];
+    if (hull.bonuses.length) parts.push(el('p', 'bonuses', `Bonuses: ${hull.bonuses.map((b) => b.label).join('; ')}.`));
+    if (hull.sealed) parts.push(el('p', 'muted', FIT_REFUSALS.sealed));
+    this.header.replaceChildren(...parts);
+  }
+
+  /** Power, capacitor, mass, cargo and ore hold as bars; a preview outlines the power it would use. */
+  private renderBudgets(world: World, ship: Ship, now: ShipStats, after: ShipStats | null): void {
+    const use = holdUse(ship, now, world.goods);
+    const bar = (label: string, value: string, note: string, fill: number, colour: string, outline: number | null, outlineBad: boolean): HTMLElement => {
+      const box = el('div', 'fit-budget');
+      const top = el('div', 'fit-budget-top');
+      top.append(el('span', 'muted', label), el('span', 'fit-budget-value', value));
+      const track = el('div', 'fit-bar');
+      const f = el('div', 'fit-bar-fill');
+      f.style.width = `${Math.max(0, Math.min(100, fill * 100))}%`;
+      f.style.background = colour;
+      track.append(f);
+      if (outline !== null) {
+        const o = el('div', `fit-bar-preview${outlineBad ? ' bad' : ''}`);
+        o.style.width = `${Math.max(0, Math.min(100, outline * 100))}%`;
+        track.append(o);
+      }
+      box.append(top, track, el('div', 'fit-budget-note', note));
+      return box;
+    };
+    const s = after ?? now;
+    const parts = [
+      bar('Power', `${fixed1(s.powerDraw)} / ${fixed1(s.powerOutput)}`, s.powerDraw > s.powerOutput ? 'not enough power' : `${fixed1(s.powerOutput - s.powerDraw)} spare`, now.powerOutput > 0 ? now.powerDraw / now.powerOutput : 0, INK, after ? (after.powerOutput > 0 ? after.powerDraw / after.powerOutput : 1) : null, Boolean(after && after.powerDraw > after.powerOutput)),
+      bar('Capacitor', `${Math.round(s.capacitor)}`, `recharges ${fixed1(s.capacitorRecharge)}/s · drains ${fixed1(s.capacitorDraw)}/s idle`, 1, '#7cc8ff', null, false),
+      bar('Mass', `${fixed1(s.mass)} t`, `acceleration ${fixed1(s.mainThrust / s.mass)} u/s² · spin-up ${Math.round((s.rotationThrust / s.mass) * DEG)}°/s²`, Math.min(1, s.mass / 120), '#6a988f', null, false),
+      bar('Cargo', `${use.cargo.used} / ${s.cargoCapacity}`, s.cargoCapacity > 0 ? `${Math.max(0, s.cargoCapacity - use.cargo.used)} free` : 'no cargo space', s.cargoCapacity > 0 ? use.cargo.used / s.cargoCapacity : 0, INK, null, false),
+    ];
+    if (s.oreCapacity > 0) parts.push(bar('Ore hold', `${use.ore.used} / ${s.oreCapacity}`, 'built in: ore only', use.ore.used / s.oreCapacity, INK, null, false));
+    this.budgets.replaceChildren(...parts);
+  }
+
+  private drawShip(hull: HullSpec, fit: Readonly<Record<string, string>>): void {
     const ctx = this.canvas.getContext('2d');
     if (!ctx) return;
     const dpr = window.devicePixelRatio || 1;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, PREVIEW_W, PREVIEW_H);
     const scale = this.drawingScale(hull);
+    // The hull as a plain outline: the slot marks carry the fit, so the
+    // in-flight module art (in maker colours) would only compete with them.
     ctx.save();
     ctx.translate(PREVIEW_W / 2, PREVIEW_H / 2);
-    ctx.scale(scale, scale);
-    drawShipArt(ctx, scale, {
-      hull,
-      fit,
-      modules: world.modules,
-      manufacturers: world.manufacturers,
-      colour: hull.race ? RACE_COLOUR[hull.race] : INK,
-      heading: 0,
-      showMounts: true,
-      highlightMount: this.selected,
-    });
+    ctx.beginPath();
+    hull.outline.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x * scale, p.y * scale) : ctx.lineTo(p.x * scale, p.y * scale)));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(159, 211, 199, 0.05)';
+    ctx.fill();
+    ctx.strokeStyle = hull.race ? RACE_COLOUR[hull.race] : INK;
+    ctx.globalAlpha = 0.7;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.restore();
+    this.drawSlots(ctx, hull, fit, scale);
+  }
+
+  /** Each slot where it sits, by tier and size; the selected high slot's arc or line of fire. */
+  private drawSlots(ctx: CanvasRenderingContext2D, hull: HullSpec, fit: Readonly<Record<string, string>>, scale: number): void {
+    const at = (m: MountPoint) => ({ x: PREVIEW_W / 2 + m.position.x * scale, y: PREVIEW_H / 2 + m.position.y * scale });
+    const sel = hull.mounts.find((m) => m.id === this.selected);
+    if (sel && sel.type === 'high') {
+      const p = at(sel);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(224, 164, 88, 0.6)';
+      ctx.fillStyle = 'rgba(224, 164, 88, 0.10)';
+      ctx.setLineDash([4, 4]);
+      if (sel.arc !== undefined && sel.arc < Math.PI * 2 - 1e-6) {
+        const r = Math.min(PREVIEW_W, PREVIEW_H) * 0.55;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.arc(p.x, p.y, r, sel.facing - sel.arc / 2, sel.facing + sel.arc / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#e0a458';
+        ctx.font = '11px ' + FONT;
+        const blind = sel.facing + Math.PI;
+        ctx.fillText('blind spot', p.x + Math.cos(blind) * 60 - 28, p.y + Math.sin(blind) * 60 + 4);
+      } else if (sel.arc !== undefined) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.min(PREVIEW_W, PREVIEW_H) * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + Math.cos(sel.facing) * 90, p.y + Math.sin(sel.facing) * 90);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    for (const m of hull.mounts) {
+      const p = at(m);
+      const tier = tierOf(m.type);
+      const r = tier === 'core' ? 4 : { S: 6, M: 8.5, L: 11, XL: 13 }[m.size];
+      const empty = !fit[m.id];
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = TIER_LINE[tier];
+      ctx.fillStyle = TIER_FILL[tier];
+      if (empty && tier !== 'core') ctx.setLineDash([3, 2]);
+      ctx.beginPath();
+      if (tier === 'high') ctx.arc(0, 0, r, 0, Math.PI * 2);
+      else if (tier === 'mid') {
+        ctx.moveTo(0, -r);
+        ctx.lineTo(r, 0);
+        ctx.lineTo(0, r);
+        ctx.lineTo(-r, 0);
+        ctx.closePath();
+      } else ctx.rect(-r, -r, r * 2, r * 2);
+      if (!empty && tier !== 'core') ctx.fill();
+      ctx.lineWidth = tier === 'core' ? 1 : 2;
+      ctx.stroke();
+      if (m.id === this.selected) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#dffbf3';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-r - 4, -r - 4, (r + 4) * 2, (r + 4) * 2);
+      }
+      ctx.restore();
+    }
   }
 
   /** Pixels per world unit that fit the whole hull, mounts included, in the drawing. */
   private drawingScale(hull: HullSpec): number {
     const points = [...hull.outline, ...hull.mounts.map((m) => m.position)];
     const extent = Math.max(...points.map((p) => Math.max(Math.abs(p.x) * (PREVIEW_H / PREVIEW_W), Math.abs(p.y))), 1);
-    return (PREVIEW_H * 0.4) / extent;
+    return (PREVIEW_H * 0.42) / extent;
   }
 
   private clickDrawing(e: MouseEvent): void {
@@ -371,10 +516,12 @@ export class OutfittingPanel {
     const ship = world?.ships[world.pilots[this.pilotId]?.shipId ?? ''];
     const hull = ship && world ? world.hulls[ship.hullId] : undefined;
     if (!hull) return;
+    // The canvas may be drawn smaller than its pixel size: map back.
     const rect = this.canvas.getBoundingClientRect();
+    const k = PREVIEW_W / rect.width;
     const scale = this.drawingScale(hull);
-    const x = (e.clientX - rect.left - PREVIEW_W / 2) / scale;
-    const y = (e.clientY - rect.top - PREVIEW_H / 2) / scale;
+    const x = ((e.clientX - rect.left) * k - PREVIEW_W / 2) / scale;
+    const y = ((e.clientY - rect.top) * k - PREVIEW_H / 2) / scale;
     let best: MountPoint | null = null;
     let bestDist = MOUNT_CLICK_PX / scale + 3;
     for (const m of hull.mounts) {
@@ -419,113 +566,128 @@ export class OutfittingPanel {
     this.statsBox.append(warnings);
   }
 
-  private renderMounts(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
-    const box = this.mountsBox;
-    box.replaceChildren();
-    const maker = world.manufacturers[hull.manufacturer]?.name ?? hull.manufacturer;
-    box.append(el('h2', undefined, `${hull.name} · ${maker} · ${hull.role}`));
-    if (hull.sealed) box.append(el('p', 'muted', FIT_REFUSALS.sealed));
-    if (hull.bonuses.length) box.append(el('p', 'bonuses', `Bonuses: ${hull.bonuses.map((b) => b.label).join('; ')}.`));
-    const count = (t: MountType): string => hull.mounts.filter((m) => m.type === t).map((m) => m.size).join(' ') || 'none';
-    box.append(el('p', 'muted', `High ${count('high')} · Mid ${count('mid')} · Low ${count('low')}${hull.oreHold ? ` · ore hold ${hull.oreHold} built in` : ''}`));
-
-    const table = el('table');
-    const head = el('tr');
-    for (const h of ['Mount', 'Size', 'Fitted', '']) head.append(el('th', undefined, h));
-    table.append(head);
-    const ordered = hull.mounts.map((m, i) => ({ m, i })).sort((a, b) => (TIER_ORDER[a.m.type] ?? 0) - (TIER_ORDER[b.m.type] ?? 0) || a.i - b.i).map((x) => x.m);
-    for (const mount of ordered) {
-      const module = fit[mount.id] ? world.modules[fit[mount.id]!] : undefined;
-      const tr = el('tr', mount.id === this.selected ? 'selected' : undefined);
-      const name = el('button', 'link', `${mount.id.toUpperCase()} ${MOUNT_TYPE_NAME[mount.type]}`);
-      name.type = 'button';
-      name.title = mount.services.length ? `Provides: ${mount.services.join(', ')}` : 'No services';
-      name.addEventListener('click', () => this.select(mount.id));
-      const nameCell = el('td');
-      nameCell.append(name);
-      const fitted = el('td', module ? undefined : 'muted-cell', module?.name ?? 'empty');
-      if (module) fitted.append(el('span', 'module-type', ` · ${moduleType(module, world)}`));
-      tr.append(nameCell, el('td', undefined, mount.size), fitted);
-
-      const actions = el('td', 'actions');
-      if (module && !hull.sealed) {
-        const plan = planRefit(world, this.pilotId, mount.id, null);
-        const remove = el('button', undefined, `Unfit ${credits(fitFee(module))}`);
-        remove.title = 'Moves it to storage at this station';
-        remove.type = 'button';
-        remove.disabled = !plan.ok;
-        if (!plan.ok) remove.title = FIT_REFUSALS[plan.reason];
-        remove.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: null }));
-        remove.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: null }));
-        remove.addEventListener('mouseleave', () => this.setPreview(null));
-        actions.append(remove);
+  /** The slots by tier, each with what is fitted; core systems last. */
+  private renderRails(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
+    const groups: { tier: TierKey; title: string }[] = [
+      { tier: 'high', title: 'HIGH' },
+      { tier: 'mid', title: 'MID' },
+      { tier: 'low', title: 'LOW' },
+      { tier: 'core', title: 'CORE SYSTEMS' },
+    ];
+    const parts: HTMLElement[] = [];
+    for (const g of groups) {
+      const mounts = hull.mounts.filter((m) => tierOf(m.type) === g.tier);
+      if (mounts.length === 0) continue;
+      const box = el('div', 'fit-rail');
+      const head = el('div', 'fit-rail-head');
+      const title = el('span', 'fit-rail-title');
+      title.append(el('span', `fit-mark ${g.tier}`), document.createTextNode(g.title));
+      head.append(title, el('span', 'muted', g.tier === 'core' ? String(mounts.length) : `${mounts.filter((m) => fit[m.id]).length} of ${mounts.length} fitted`));
+      box.append(head);
+      for (const m of mounts) {
+        const module = fit[m.id] ? world.modules[fit[m.id]!] : undefined;
+        const row = el('button', `fit-slot${m.id === this.selected ? ' selected' : ''}`) as HTMLButtonElement;
+        row.type = 'button';
+        row.setAttribute('aria-pressed', String(m.id === this.selected));
+        row.title = g.tier === 'core' ? `${MOUNT_TYPE_NAME[m.type]} ${m.size}` : `${MOUNT_TYPE_NAME[m.type]} slot, takes up to ${m.size}`;
+        row.append(el('span', 'fit-slot-id', m.id.toUpperCase()), el('span', 'fit-slot-size', m.size), el('span', module ? 'fit-slot-name' : 'fit-slot-name empty', module?.name ?? 'empty'));
+        row.addEventListener('click', () => this.select(m.id));
+        box.append(row);
       }
-      tr.append(actions);
-      table.append(tr);
+      parts.push(box);
     }
-    box.append(table);
+    this.rails.replaceChildren(...parts);
   }
 
-  private renderModules(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
-    const box = this.modulesBox;
+  /** What fits the selected slot: from storage here first, then for sale here. */
+  private renderPicker(world: World, hull: HullSpec, fit: Readonly<Record<string, string>>): void {
+    const box = this.picker;
     box.replaceChildren();
     const mount = hull.mounts.find((m) => m.id === this.selected);
-    if (!mount || hull.sealed) {
-      if (!hull.sealed) box.append(el('p', 'muted', 'Select a mount to see what fits it.'));
+    if (!mount) {
+      box.append(el('p', 'muted', 'Select a slot, on the ship or in the list.'));
       return;
     }
-    box.append(el('h2', undefined, `Fits ${mount.id.toUpperCase()} (${MOUNT_TYPE_NAME[mount.type]} ${mount.size})`));
-
-    const options = Object.values(world.modules)
-      .filter((m) => mountRefusal(mount, m) === null)
-      .sort((a, b) => a.kind.localeCompare(b.kind) || a.size.localeCompare(b.size) || a.price - b.price);
-    if (options.length === 0) {
-      box.append(el('p', 'muted', 'Nothing on sale fits this mount.'));
-      return;
+    const tier = tierOf(mount.type);
+    const current = fit[mount.id] ? world.modules[fit[mount.id]!] : undefined;
+    const head = el('div', 'fit-picker-head');
+    head.append(el('div', 'fit-picker-title', `${mount.id.toUpperCase()} · ${MOUNT_TYPE_NAME[mount.type].toUpperCase()} ${mount.size}`));
+    const detail =
+      tier === 'core'
+        ? `Core system: one ${MOUNT_TYPE_NAME[mount.type].toLowerCase()}, up to ${mount.size}.`
+        : tier === 'high'
+          ? mount.arc !== undefined
+            ? `Swivel arc ${Math.round(mount.arc * DEG)}°, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
+            : `Fixed, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
+          : `Takes ${tier} modules up to ${mount.size}.`;
+    head.append(el('div', 'muted', detail));
+    const fittedLine = el('div', 'fit-picker-fitted', `Fitted: ${current?.name ?? 'nothing'}`);
+    if (current && !hull.sealed) {
+      const plan = planRefit(world, this.pilotId, mount.id, null);
+      const remove = el('button', undefined, 'Unfit to storage');
+      remove.type = 'button';
+      remove.disabled = !plan.ok;
+      if (!plan.ok) remove.title = FIT_REFUSALS[plan.reason];
+      remove.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: null }));
+      remove.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: null }));
+      remove.addEventListener('mouseleave', () => this.setPreview(null));
+      fittedLine.append(remove);
     }
+    head.append(fittedLine);
+    box.append(head);
+    if (hull.sealed) return;
 
-    const table = el('table');
-    const head = el('tr');
-    for (const h of ['Module', 'Type', 'Maker', 'Mass', 'Power', 'Does', 'Owned', 'Cost', '']) head.append(el('th', undefined, h));
-    table.append(head);
-    const current = fit[mount.id];
     const pilot = world.pilots[this.pilotId];
     const stationId = world.ships[pilot?.shipId ?? '']?.dockedAt ?? '';
-    for (const m of options) {
-      const plan = planRefit(world, this.pilotId, mount.id, m.id);
-      const old = current ? world.modules[current] : undefined;
-      const owned = pilot ? storedCount(pilot, stationId, m.id) : 0;
-      // Same sum the sim charges: price unless owned, fee to fit, fee to unfit what it replaces.
-      const cost = (owned > 0 ? 0 : m.price) + fitFee(m) + (old ? fitFee(old) : 0);
-      const tr = el('tr', m.id === current ? 'selected' : undefined);
-      const smaller = m.size !== mount.size ? ' (no hull bonus)' : '';
-      tr.append(
-        el('td', undefined, `${m.name}${smaller}`),
-        el('td', undefined, moduleType(m, world)),
-        el('td', undefined, world.manufacturers[m.manufacturer]?.name ?? m.manufacturer),
-        el('td', 'num', fixed1(m.mass)),
-        el('td', 'num', m.power ? `-${m.power}` : m.stats.powerOutput ? `+${m.stats.powerOutput}` : '0'),
-        el('td', 'does', describeModule(m, world)),
-        el('td', 'num', owned ? String(owned) : ''),
-        el('td', 'num', m.id === current ? '' : credits(cost)),
-      );
-      const actions = el('td', 'actions');
+    const options = Object.values(world.modules)
+      .filter((m) => mountRefusal(mount, m) === null && m.id !== current?.id)
+      .sort((a, b) => a.kind.localeCompare(b.kind) || a.size.localeCompare(b.size) || a.price - b.price);
+    const stored = options.filter((m) => (pilot ? storedCount(pilot, stationId, m.id) : 0) > 0);
+    box.append(el('h2', undefined, 'In storage here'));
+    if (stored.length === 0) box.append(el('p', 'muted', 'Nothing stored here fits this slot.'));
+    for (const m of stored) box.append(this.moduleRow(world, mount, m, pilot ? storedCount(pilot, stationId, m.id) : 0));
+    box.append(el('h2', undefined, 'For sale here'));
+    if (options.length === 0) box.append(el('p', 'muted', 'Nothing on sale fits this slot.'));
+    const list = el('div', 'fit-list');
+    for (const m of options) list.append(this.moduleRow(world, mount, m, 0));
+    box.append(list);
+  }
+
+  /** One module the selected slot takes: what it is, its costs, and its buttons. `owned` > 0 for a stored one. */
+  private moduleRow(world: World, mount: MountPoint, m: ModuleSpec, owned: number): HTMLElement {
+    const plan = planRefit(world, this.pilotId, mount.id, m.id);
+    const row = el('div', 'fit-module');
+    row.title = describeModule(m, world);
+    const info = el('div', 'fit-module-info');
+    const smaller = m.size !== mount.size ? ' · undersized, no hull bonus' : '';
+    info.append(el('span', 'fit-module-name', m.name), el('span', 'muted fit-module-does', `${moduleType(m, world)} · ${m.power ? `${m.power} power` : m.stats.powerOutput ? `+${m.stats.powerOutput} power` : 'no power'} · ${fixed1(m.mass)} t${smaller}`));
+    const actions = el('div', 'fit-module-actions');
+    if (owned > 0) {
+      actions.append(el('span', 'muted', `×${owned}`));
       if (plan.ok) {
         const b = el('button', undefined, 'Fit');
         b.type = 'button';
         b.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: m.id }));
         actions.append(b);
-      } else {
-        actions.append(el('span', 'refused', m.id === current ? 'Fitted' : FIT_REFUSALS[plan.reason]));
-      }
-      tr.append(actions);
-      if (m.id !== current) {
-        tr.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: m.id }));
-        tr.addEventListener('mouseleave', () => this.setPreview(null));
-      }
-      table.append(tr);
+      } else actions.append(el('span', 'refused', FIT_REFUSALS[plan.reason]));
+    } else {
+      actions.append(el('span', 'fit-module-price', credits(m.price)));
+      if (plan.ok) {
+        const b = el('button', undefined, 'Buy and fit');
+        b.type = 'button';
+        b.addEventListener('click', () => this.onRefit({ kind: 'refit', mountId: mount.id, moduleId: m.id }));
+        actions.append(b);
+      } else actions.append(el('span', 'refused', FIT_REFUSALS[plan.reason]));
+      const buy = el('button', 'quiet', 'Buy');
+      buy.type = 'button';
+      buy.title = 'Buy one into storage here without fitting it';
+      buy.addEventListener('click', () => this.onRefit({ kind: 'buy', moduleId: m.id }));
+      actions.append(buy);
     }
-    box.append(table);
+    row.append(info, actions);
+    row.addEventListener('mouseenter', () => this.setPreview({ mountId: mount.id, moduleId: m.id }));
+    row.addEventListener('mouseleave', () => this.setPreview(null));
+    return row;
   }
 
   /** Modules the pilot owns in storage at this station, with a Sell button each. */
@@ -534,30 +696,46 @@ export class OutfittingPanel {
     box.replaceChildren();
     const pilot = world.pilots[this.pilotId];
     const here = stationId && pilot ? (pilot.storage[stationId] ?? {}) : {};
-    const ids = Object.keys(here).sort((a, b) => (world.modules[a]?.name ?? a).localeCompare(world.modules[b]?.name ?? b));
-    box.append(el('h2', undefined, 'Stored here'));
+    // Goods kept here are shown in the hold panel; this is the modules.
+    const ids = Object.keys(here)
+      .filter((id) => world.modules[id])
+      .sort((a, b) => (world.modules[a]?.name ?? a).localeCompare(world.modules[b]?.name ?? b));
+    box.append(el('h2', undefined, 'Modules stored here'));
     if (ids.length === 0) {
-      box.append(el('p', 'muted', 'Nothing stored here. Unfitted modules are kept at the station you unfit them at.'));
+      box.append(el('p', 'muted', 'None. Unfitted and bought modules are kept at the station where you leave them.'));
       return;
     }
-    const table = el('table');
-    const head = el('tr');
-    for (const h of ['Module', 'Type', 'Size', 'Count', '']) head.append(el('th', undefined, h));
-    table.append(head);
     for (const id of ids) {
-      const m = world.modules[id];
-      const tr = el('tr');
-      tr.append(el('td', undefined, m?.name ?? id), el('td', undefined, m ? moduleType(m, world) : ''), el('td', undefined, m?.size ?? ''), el('td', 'num', String(here[id])));
-      const actions = el('td', 'actions');
-      if (m) {
-        const sell = el('button', undefined, `Sell +${credits(resaleValue(m))}`);
-        sell.type = 'button';
-        sell.addEventListener('click', () => this.onRefit({ kind: 'sell', moduleId: id }));
-        actions.append(sell);
-      }
-      tr.append(actions);
-      table.append(tr);
+      const m = world.modules[id]!;
+      const row = el('div', 'fit-module');
+      const info = el('div', 'fit-module-info');
+      info.append(el('span', 'fit-module-name', m.name), el('span', 'muted fit-module-does', `${moduleType(m, world)} · ${tierOf(m.mounts[0]!)} ${m.size} · ×${here[id]}`));
+      const actions = el('div', 'fit-module-actions');
+      const sell = el('button', 'quiet', `Sell +${credits(resaleValue(m))}`);
+      sell.type = 'button';
+      sell.addEventListener('click', () => this.onRefit({ kind: 'sell', moduleId: id }));
+      actions.append(sell);
+      row.append(info, actions);
+      box.append(row);
     }
-    box.append(table);
   }
+}
+
+type TierKey = 'high' | 'mid' | 'low' | 'core';
+
+function tierOf(type: MountType): TierKey {
+  return type === 'high' || type === 'mid' || type === 'low' ? type : 'core';
+}
+
+const TIER_LINE: Record<TierKey, string> = { high: '#e0a458', mid: '#7cc8ff', low: '#9fd3c7', core: '#6a988f' };
+const TIER_FILL: Record<TierKey, string> = { high: '#e0a458', mid: '#7cc8ff', low: '#3f7f73', core: 'transparent' };
+const FONT = "'IBM Plex Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace";
+
+/** Which way a slot faces, in words. */
+function facingWord(facing: number): string {
+  const a = ((facing % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  if (a < Math.PI / 4 || a > (Math.PI * 7) / 4) return 'ahead';
+  if (a < (Math.PI * 3) / 4) return 'to starboard';
+  if (a < (Math.PI * 5) / 4) return 'aft';
+  return 'to port';
 }

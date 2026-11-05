@@ -50,7 +50,8 @@ export class HoldPanel {
     const docked = ship.state === 'docked' && ship.dockedAt !== null;
     const stationId = docked ? ship.dockedAt! : '';
     const pilot = world.pilots[pilotId];
-    const hangar = docked ? Object.entries(pilot?.hangar?.[stationId] ?? {}).filter(([, n]) => n > 0) : [];
+    // Goods in this station's storage (unfitted modules are listed in outfitting).
+    const hangar = docked ? Object.entries(pilot?.storage?.[stationId] ?? {}).filter(([g, n]) => n > 0 && world.goods[g]) : [];
     const aboard = Object.entries(ship.hold).filter(([, n]) => n > 0);
     const isOre = (g: string): boolean => Boolean(world.goods[g]?.ore);
     const oreRows = use.ore.capacity > 0 ? aboard.filter(([g]) => isOre(g)) : [];

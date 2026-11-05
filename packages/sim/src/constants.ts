@@ -102,10 +102,11 @@ export const SHIELD_REGEN_DELAY = 3;
 
 /**
  * Fee for fitting or unfitting a module, as a fraction of its price,
- * charged each way and rounded up to whole credits. Handling, not buying:
- * an owned module costs only this to move between ship and storage.
+ * charged each way and rounded up to whole credits. None for now (Jason,
+ * docs/fitting.md): experimenting with a fit costs nothing once the
+ * modules are bought.
  */
-export const FIT_FEE_FRACTION = 0.05;
+export const FIT_FEE_FRACTION = 0;
 
 /**
  * Fraction of a module's price a station pays for a stored module sold

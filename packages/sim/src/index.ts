@@ -25,6 +25,7 @@ export {
   fitFee,
   storedCount,
   sellModule,
+  buyModule,
   weaponStatesFor,
   type FitRefusal,
   type FitResult,

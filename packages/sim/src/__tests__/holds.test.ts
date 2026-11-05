@@ -131,7 +131,7 @@ describe('station storage', () => {
   it('takes only what fits the hold', () => {
     let w = docked();
     const pilot = w.pilots['ana']!;
-    w = { ...w, pilots: { ana: { ...pilot, hangar: { 'station-ridge': { ore: 500 } } } } };
+    w = { ...w, pilots: { ana: { ...pilot, storage: { 'station-ridge': { ore: 500 } } } } };
     expect(takeGoods(w, 'ana', 'ore', 500)).toMatchObject({ ok: false, reason: 'space' });
   });
 });
@@ -176,5 +176,31 @@ describe('save 11: slot tiers', () => {
     };
     const after = migrate10to11(old) as { pilots: Record<string, { storage: Record<string, Record<string, number>> }> };
     expect(after.pilots['ana']!.storage['station-ridge']).toEqual({ 'meridian-shield-s': 1 });
+  });
+});
+
+describe('buying modules into storage, and one storage per station', () => {
+  it('buys modules straight into storage at the station, without fitting them', async () => {
+    const { buyModule, fitModule } = await import('../fitting.js');
+    let w = createStarterWorld();
+    w = { ...w, pilots: { ...w.pilots, ana: { id: 'ana', name: 'Ana', shipId: null, shipsIssued: 0, credits: 5000, storage: {} } } };
+    w = issueShip(w, 'ana', 'rookrivet-prospector', 'station-ridge').world;
+    const r = buyModule(w, 'ana', 'rookrivet-armour-s', 2);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.world.pilots['ana']!.credits).toBe(5000 - 700);
+    expect(r.world.pilots['ana']!.storage['station-ridge']).toEqual({ 'rookrivet-armour-s': 2 });
+    // Fitting from storage costs nothing now: no fee.
+    const fitted = fitModule(r.world, 'ana', 'l1', 'rookrivet-armour-s');
+    expect(fitted.ok && fitted.world.pilots['ana']!.credits).toBe(5000 - 700);
+    expect(buyModule(w, 'ana', 'rookrivet-hulk-nope')).toMatchObject({ ok: false, reason: 'unknownModule' });
+  });
+
+  it('save 12 puts goods kept at stations into the same storage as modules', async () => {
+    const { migrate11to12 } = await import('../save.js');
+    const old = { pilots: { ana: { id: 'ana', storage: { 'station-ridge': { 'rookrivet-armour-s': 1 } }, hangar: { 'station-ridge': { ore: 30 }, 'station-harbour': { food: 2 } } } } };
+    const after = migrate11to12(old) as { pilots: Record<string, Record<string, unknown>> };
+    expect(after.pilots['ana']!['hangar']).toBeUndefined();
+    expect(after.pilots['ana']!['storage']).toEqual({ 'station-ridge': { 'rookrivet-armour-s': 1, ore: 30 }, 'station-harbour': { food: 2 } });
   });
 });

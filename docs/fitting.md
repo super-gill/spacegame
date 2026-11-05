@@ -114,6 +114,23 @@ Translated from today's mounts so totals stay close and stock ships stay viable;
 - **Outfitting** lists core systems, then high, mid and low slots, with the counts and any built-in ore hold under the hull's bonuses.
 - **Saves:** version 11 (`migrate10to11`): what still fits stays; the rest moves to the smallest free slot that takes it (a running tractor stays on); anything left over goes to the owner's storage where the ship is docked, else at Harbour.
 
+### Placement (5 November 2026)
+
+Where a slot sits matters for arcs, blind spots and, later, damage to the modules on the side that is hit, so placement is a rule (Jason):
+
+- **High slots are hardpoints on the hull's edge** (within a fifth of the hull's radius of the outline), each with a facing, and a swivel's arc; blind spots come from the shape.
+- **Mid slots sit in the body, low slots deep inside**, both within the outline. The one exception is a merchantman's cargo pods, which hang off its spine.
+- **Core systems keep their own places.**
+- A test checks every hull against the rule, and every hull was moved to it, checked against a drawing of each slot map.
+
+### As built: step 3 and the fitting window (5 November 2026)
+
+- **Buy, then fit:** `buyModule` buys modules into storage at the station; the fitting window's **Buy and fit** buys and fits in one, **Fit** fits from storage, **Unfit to storage** puts it back, and stored modules sell back at half price. There is no fitting fee (`FIT_FEE_FRACTION` 0).
+- **Every station outfits** while Calder is the dev environment (Ridge Outpost gained outfitting; saves pick it up on load).
+- **One storage per station** (`Pilot.storage`) holds unfitted modules and stored goods together; the old `hangar` is gone. Save 12 (`migrate11to12`) merges them.
+- **The fitting window** (`outfitting-panel.ts`), built from the approved mockup: budget bars (power with a preview outline, capacitor, mass with acceleration and spin-up, cargo, ore hold); the slots by tier on the left; the hull in the middle with every slot marked where it sits by tier and size (circle high, diamond mid, square low, outline core), the selected high slot's arc and blind spot or line of fire; every ship number below it, now and after; and on the right what fits the selected slot, from storage first, then for sale, then every module stored here to sell. Pointing at a module previews it everywhere.
+- **Not yet:** the fitter page still uses its own form; it moves onto the same window next, so there is one fitting interface to maintain.
+
 ## The fitter
 
 A fitting calculator for Jason and the lead, built from the same sim code as the game so it can never drift out of date.

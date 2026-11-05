@@ -1092,18 +1092,12 @@ export interface Pilot {
   /** The pilot's money. Belongs to the pilot, not the ship, so it survives losing a ship. */
   credits: number;
   /**
-   * Modules the pilot owns but has not fitted, by station id then module
-   * id to count. They stay where they were unfitted and are collected
-   * there. Same shape as a cargo hold, so modules can join the goods
-   * economy later.
+   * What the pilot keeps at stations, by station id then item id to
+   * count: modules not fitted, and goods moved out of a hold
+   * (`hangar.ts`). One storage per station for both (docs/fitting.md);
+   * module and good ids never clash. Items stay where they were left.
    */
   storage: Record<string, Record<string, number>>;
-  /**
-   * Goods the pilot keeps at stations, by station id then good id to
-   * count (`hangar.ts`): moved in and out of a docked ship's hold.
-   * Absent: none anywhere.
-   */
-  hangar?: Record<string, Record<string, number>>;
 }
 
 /**
@@ -1518,6 +1512,8 @@ export type WorldEvent =
   | { type: 'jettisoned'; shipId: string; item: string; amount: number }
   | { type: 'jettisonRefused'; shipId: string; reason: 'notHeld' | 'docked' }
   /** Goods moved between a docked ship's hold and the pilot's storage at that station. */
+  /** Modules bought straight into storage at a station. */
+  | { type: 'moduleBought'; shipId: string; stationId: string; moduleId: string; quantity: number; cost: number }
   | { type: 'goodsStored'; shipId: string; stationId: string; good: string; quantity: number }
   | { type: 'goodsTaken'; shipId: string; stationId: string; good: string; quantity: number }
   /** A tractor's tile changed what it does: off, taking only its own loot, or taking everything. */
