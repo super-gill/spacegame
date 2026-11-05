@@ -47,14 +47,14 @@ Freedom only works if every module costs something a different build would rathe
 - **Mass** already costs acceleration and spin-up (thrust divided by mass); top speed and turn rate stay hull limits. Armour should feel heavy: the audit checks that an armour-bricked hull is clearly slower to get going and to turn. If not, armour's mass goes up.
 - **Capacitor:** shields, energy guns, scanners and boosters share one pool.
 - **Signature** (proposal): bigger and hotter kit raises the hull's signature (big guns, engines, charge rigs), making it easier to see and lock.
-- **Big weapons against small targets** (proposal, needed for undersizing): each weapon has a **resolution** by size (small 15, medium 30, large 60). A hit does full damage to a target whose signature is at least the resolution, and proportionally less to smaller ones. Swivels also traverse slower the bigger they are. Mining lasers are unaffected (rocks are big).
+- **Big weapons against small targets** (proposal, needed for undersizing): each weapon has a **resolution** by size (small 15, medium 30, large 60). A hit does full damage to a target whose signature is at least the resolution, and proportionally less to smaller ones. Swivels also traverse slower the bigger they are: both, Jason. Mining lasers are unaffected (rocks are big).
 - **But a big ship must be able to defend itself** (Jason): in EVE a battleship fitted as a battleship struggles with anything much smaller, which an MMO's fleets cover but which would be punishing here, where a player is often alone. So: a floor on resolution (a big gun never does less than about 40% to a small target, to tune); every big hull has a few small highs for swivels, and stock fits use them; drones as the other answer to small ships. The audit checks that every stock fit with guns can drive off or kill a pirate raider in reasonable time.
 
 ## Buying and fitting
 
 - **Modules are items.** They are sold at markets (for now every station sells every module, Jason: the starter system is the test bed; regional stock later), bought into your **station storage**, and fitted from storage at a station with outfitting. Unfitting puts them back in storage; you can sell them at the market.
 - **One storage per station** for goods and modules together (today's `Pilot.storage` for modules and `Pilot.hangar` for goods merge).
-- **No fitting fee per item** (Jason): fitting and unfitting while docked is free, so experimenting costs nothing. A charge for keeping a new fit is open (question 3).
+- **No fitting fee** (Jason, for now): fitting and unfitting while docked is free, so experimenting costs nothing.
 - **Ships** stay in the ship mart, sold with their stock fit.
 
 ## Rigs (later)
@@ -118,8 +118,12 @@ Release 0.13.0 first (after Jason's playtest of breaching and holds), so the ove
 
 ## Questions for Jason
 
-Answered 5 November: tractor and charge rig in highs; oversizing pays only its natural costs; no fee per fitted item; every station sells every module for now.
+Answered 5 November (Jason):
+- Tractor and charge rig in highs, afterburner in mids.
+- Oversizing pays only the modules' natural requirements; balance it by adjusting base hulls and modules, not by adding special penalties.
+- No fitting fee at all for now, per item or for keeping a new fit.
+- Big guns struggle with small ships by **both** weapon resolution against signature and slower big turrets; mindful that big ships must still defend themselves (the floor, small highs, drones and the audit check above). The floor starts at about 40%, to tune.
+- The starter system is the dev environment: every station sells every module. The real, playable systems come with the map (8), with regional stock.
 
-1. **The tier rule.** "Outward in high, inward in mid, passive in low" puts survey scanners, countermeasures and electronic warfare in highs, since all three act outward, but your list had them in mids. EVE keeps them in mids on purpose, so a fighting ship trades tank for interference. Lead's suggestion: high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
-2. **Weapon resolution against signature** (explained in chat), with a floor so big ships can still defend themselves (Jason: be mindful of punishing big ships): agreed, and is about 40% the right floor to start?
-3. **Charging for a new fit:** charge something when you undock with a changed fit, or nothing at all?
+Still open:
+1. **The tier rule's wording.** "Outward in high, inward in mid, passive in low" would put survey scanners, countermeasures and electronic warfare in highs, but your list had them in mids, as EVE does on purpose (a fighting ship trades tank for interference). Lead's wording: high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
