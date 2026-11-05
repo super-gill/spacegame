@@ -31,6 +31,7 @@ Chats cannot message each other: this file, branches and commits are the only ch
 
 Names and lore wanted from the lore chat. The game uses working names until these come back; the lead applies the answers. Newest first.
 
+- **Big ships** (2026-11-05): the Kessari brig (working name Kessari Injunction, by Kessari Orbital Defence) and the Free Belt frigate (working name Union Defence Works Walkout); the large kit that came with them: the Slagline Runner L and Jink L, the Ito-Marr Bastion L, and the Union Defence Works Bulwark L armour. Union Defence Works names its guns for labour actions (Picket, Lockout), hence the Walkout.
 - **Breaching** (2026-11-05): the Rook and Rivet Breacher (mid-size miner); the charge rig (`rookrivet-chargerig-s`); the deep assay (`rookrivet-deepassay-m`); breach charges, which clash with KOD's "Breach" warhead and need another name; any name gate-glass should carry when it is breached out of a core. Lore already says gate-glass is splinters of a gate shattered in the Sundering, and breaching cores fits that: is there more to say about what a core is?
 - **Drones** (2026-11-05): the mining drone, its Nibbler laser, the Drone Cradle and the Drone Bay.
 - **The hulk** (2026-11-05): the Rook and Rivet Hulk, the Excavator mining turret, the Ore Hold and the Furnace reactor.

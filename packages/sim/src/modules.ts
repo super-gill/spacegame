@@ -53,6 +53,22 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['speed'],
     stats: { mainThrust: 2600 },
   },
+  // Large kit for the first frigates (docs/fitting.md, "Big ships"):
+  // engine, thrusters, shield and armour. First numbers; the audit moves them.
+  'slagline-engine-l': {
+    id: 'slagline-engine-l',
+    name: 'Slagline Runner L',
+    kind: 'engine',
+    size: 'L',
+    mounts: ['engine'],
+    needs: ['power'],
+    mass: 8,
+    power: 7,
+    price: 6000,
+    manufacturer: 'slagline',
+    tags: ['speed'],
+    stats: { mainThrust: 3800 },
+  },
 
   // Thruster packages: reverse, lateral and rotation thrust.
   'meridian-thrusters-s': {
@@ -82,6 +98,20 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'slagline',
     tags: ['speed'],
     stats: { reverseThrust: 1300, lateralThrust: 1300, rotationThrust: 150 },
+  },
+  'slagline-thrusters-l': {
+    id: 'slagline-thrusters-l',
+    name: 'Slagline Jink L',
+    kind: 'thrusters',
+    size: 'L',
+    mounts: ['core'],
+    needs: ['power'],
+    mass: 5,
+    power: 4,
+    price: 4200,
+    manufacturer: 'slagline',
+    tags: ['speed'],
+    stats: { reverseThrust: 2800, lateralThrust: 2800, rotationThrust: 360 },
   },
 
   // Reactors: power. They need no feed; they are the feed.
@@ -152,6 +182,23 @@ export const MODULES: Record<string, ModuleSpec> = {
     shieldRegenDelay: 2.2,
     resists: { thermal: 0.35, kinetic: 0.1, explosive: 0.2, fragmentation: 0 },
   },
+  'itomarr-shield-l': {
+    id: 'itomarr-shield-l',
+    name: 'Ito-Marr Bastion L',
+    kind: 'shieldGenerator',
+    size: 'L',
+    mounts: ['mid'],
+    needs: ['power'],
+    mass: 6,
+    power: 8,
+    price: 5600,
+    manufacturer: 'itoMarr',
+    tags: ['shield'],
+    stats: { shield: 560, shieldRegen: 16 },
+    shieldArc: STOCK_SHIELD_ARC,
+    shieldRegenDelay: 2.2,
+    resists: { thermal: 0.35, kinetic: 0.1, explosive: 0.2, fragmentation: 0 },
+  },
 
   // Armour plating: structure.
   'rookrivet-armour-s': {
@@ -184,6 +231,22 @@ export const MODULES: Record<string, ModuleSpec> = {
     tags: ['armour'],
     stats: { structure: 100 },
     resists: { kinetic: 0.3, fragmentation: 0.4, explosive: 0.25, thermal: 0.05 },
+  },
+  'union-armour-l': {
+    id: 'union-armour-l',
+    name: 'Union Defence Works Bulwark L',
+    kind: 'armour',
+    size: 'L',
+    mounts: ['low'],
+    needs: [],
+    mass: 9,
+    power: 0,
+    price: 3800,
+    manufacturer: 'unionDefence',
+    tags: ['armour'],
+    stats: { structure: 700 },
+    // Belter plate: heavy, cheap, good against rounds and shrapnel.
+    resists: { kinetic: 0.3, fragmentation: 0.4, explosive: 0.2, thermal: 0.05 },
   },
 
   // Cargo pods.

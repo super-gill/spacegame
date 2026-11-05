@@ -78,6 +78,77 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
     },
   },
+  'kessari-brig': {
+    // Sold at Harbour: a Kessari Orbital Defence brig in its yard fit. A
+    // launcher and an autocannon forward, a swivel on each flank and one
+    // aft, a medium shield, an afterburner and chaff, plate and a second
+    // reactor below. Fights its own size and still swats small things.
+    id: 'kessari-brig',
+    name: 'Kessari Injunction, yard issue',
+    hullId: 'kessari-brig',
+    fit: {
+      n1: 'meridian-nav-s',
+      r1: 'tessaract-radar-m',
+      t1: 'paragon-computer-m',
+      f1: 'itomarr-coxswain-m',
+      x1: 'paragon-director-m',
+      p1: 'meridian-podbay-s',
+      w1: 'itomarr-magazine-m',
+      w2: 'union-autocannon-m',
+      w3: 'paragon-turret-m',
+      w4: 'paragon-turret-m',
+      w5: 'paragon-turret-s',
+      e1: 'slagline-engine-m',
+      e2: 'slagline-engine-m',
+      c1: 'slagline-thrusters-m',
+      c2: 'itomarr-reactor-m',
+      u1: 'itomarr-shield-m',
+      u2: 'itomarr-surge-m',
+      u3: 'paragon-fairwarning-s',
+      i1: 'itomarr-reactor-m',
+      i2: 'rookrivet-armour-s',
+      i3: 'rookrivet-armour-s',
+      i4: 'tessaract-container-m',
+      b1: 'meridian-pod-s',
+    },
+  },
+  'union-frigate': {
+    // Sold at Harbour: a Free Belt militia frigate. Two heavy autocannons
+    // forward, swivels on the flanks and one aft, a big shield, a lot of
+    // plate, and a tractor for what is left of the other side.
+    id: 'union-frigate',
+    name: 'Union Defence Works Walkout, militia issue',
+    hullId: 'union-frigate',
+    fit: {
+      n1: 'meridian-nav-s',
+      r1: 'tessaract-radar-m',
+      t1: 'paragon-computer-m',
+      f1: 'itomarr-coxswain-m',
+      x1: 'paragon-director-m',
+      p1: 'meridian-podbay-s',
+      w1: 'union-picket-l',
+      w2: 'union-picket-l',
+      w3: 'paragon-turret-m',
+      w4: 'paragon-turret-m',
+      w5: 'paragon-turret-m',
+      w6: 'tessaract-gleaner-m',
+      e1: 'slagline-engine-l',
+      e2: 'slagline-engine-l',
+      c1: 'slagline-thrusters-l',
+      c2: 'rookrivet-reactor-l',
+      u1: 'itomarr-shield-l',
+      u2: 'itomarr-surge-m',
+      u3: 'itomarr-screen-m',
+      u4: 'paragon-fairwarning-s',
+      i1: 'union-armour-l',
+      i2: 'union-armour-l',
+      i3: 'itomarr-reactor-m',
+      i4: 'rookrivet-armour-s',
+      i5: 'rookrivet-armour-s',
+      i6: 'tessaract-container-m',
+      b1: 'meridian-pod-s',
+    },
+  },
   'rookrivet-prospector': {
     // Sold at Ridge and Harbour: everything a new miner needs to find and
     // cut the easy rocks, and a swivel for company.

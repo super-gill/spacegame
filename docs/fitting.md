@@ -106,6 +106,8 @@ Translated from today's mounts so totals stay close and stock ships stay viable;
 | Rook and Rivet Prospector | cutter | S S S | S S S | S S S |
 | Rook and Rivet Breacher | sloop | M M S M S | M M S | M S M M |
 | Rook and Rivet Hulk | hulk | L L M M | L M M S | M M L L L L |
+| Kessari Injunction (working name) | brig | M M M M M | M M S | M M M M S S |
+| Union Defence Works Walkout (working name) | frigate | L L M M M M | L M M S | L L M M M M S |
 | Aurel Tacet (dev) | | S S S | S S | S S |
 
   The Warrant has four lows, as the sloop template says, rather than the first pass's three.
@@ -130,6 +132,19 @@ Where a slot sits matters for arcs, blind spots and, later, damage to the module
 - **One storage per station** (`Pilot.storage`) holds unfitted modules and stored goods together; the old `hangar` is gone. Save 12 (`migrate11to12`) merges them.
 - **The fitting window** (`outfitting-panel.ts`), built from the approved mockup: budget bars (power with a preview outline, capacitor, mass with acceleration and spin-up, cargo, ore hold); the slots by tier on the left; the hull in the middle with every slot marked where it sits by tier and size (circle high, diamond mid, square low, outline core), the selected high slot's arc and blind spot or line of fire; every ship number below it, now and after; and on the right what fits the selected slot, from storage first, then for sale, then every module stored here to sell. Pointing at a module previews it everywhere.
 - **One window, two places:** the window works on a `FitContext` (hull, fit, how to check a change, what is stored, whether it is free). The game builds one for the docked ship (`stationFitContext`); the fitter builds one per fit with nothing to buy, any module in any slot it fits, and over-power fits allowed so a build can be sketched before it balances. Its styles live in `fitting-window.css`, shared by both pages.
+
+### As built: the first big ships (5 November 2026)
+
+Step 4 balances big guns against small targets, and there were no big combat hulls to test it on, so two came first (Jason: a Kessari brig and a frigate, sold at Harbour while Calder is the dev system).
+
+- **Kessari Injunction** (`kessari-brig`, brig, working name): the Warrant's wedge, longer and wider. Two guns at the nose, a swivel on each flank and one aft, five highs in all, M throughout. Missile and shield bonuses like the Warrant. 30,000 bare; the yard fit is about 68,000.
+- **Union Defence Works Walkout** (`union-frigate`, frigate, working name): the Free Belt militia's slab. Two L guns forward, M swivels on every corner, L shield and plate slots. +25% structure from full-size armour, +15% damage from full-size projectile guns. 60,000 bare; the militia fit about 137,000.
+- **Large kit** to fit a frigate, first numbers: Slagline Runner L engine and Jink L thrusters, Ito-Marr Bastion L shield, Union Defence Works Bulwark L armour.
+- **Pads:** both take large pads (radius 34 and 42).
+- **Reference fits:** both stock fits, a brig brawler, and a frigate with undersized guns built to swat small ships.
+- **The duellist** now closes to its guns' range, not its launcher's: Warrants carrying a Magazine used to hold off at missile range, out of gun range, and draw. Audit: `docs/audits/2026-11-05-big-ships.md`.
+- **What the audit shows, before step 4:** each class beats everything below it every time, quickly and barely scratched (the frigate kills a brig in about nine seconds with 85% left; the brig kills any Warrant). Big guns hit small ships as hard as big ones today. That is what step 4 is for.
+- **Also found:** the Cantor-Vell Vigil M armour (100 structure, 4.5 t) is worse than the Patchplate S (240 structure, 2 t) apart from slightly better resists; step 4 looks at it with the rest.
 
 ## The fitter
 

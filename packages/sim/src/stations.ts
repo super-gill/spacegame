@@ -87,7 +87,7 @@ export function harbourStation(): Station {
     outfitting: true,
     // Ten pads, sizes mixed so large hulls are never side by side.
     pads: padRing(90, ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'L', 'M', 'S']),
-    shipMart: ['meridian-starter', 'kessari-raider', 'tessaract-trader', 'rookrivet-prospector'],
+    shipMart: ['meridian-starter', 'kessari-raider', 'tessaract-trader', 'rookrivet-prospector', 'kessari-brig', 'union-frigate'],
   };
 }
 

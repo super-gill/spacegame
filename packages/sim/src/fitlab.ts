@@ -161,7 +161,7 @@ export interface DuelResult {
   draws: number;
 }
 
-/** How a scripted duellist flies: closes to `preferred` of its longest gun's range, keeps its nose on the lead point, fires when on aim. */
+/** How a scripted duellist flies: closes to `preferred` of its longest gun's range (launchers aside), keeps its nose on the lead point, fires when on aim. */
 const DUELLIST = { preferred: 0.6, aimTolerance: 0.08, tooClose: 0.3 };
 
 /**
@@ -230,7 +230,11 @@ function pilot(w: World, me: string, foe: string, tick: number): ShipInput {
   const stats = fitStats(w, w.hulls[mine.hullId]!, mine.fit);
   const guns = Object.values(stats.weapons).filter((x) => x.family !== 'mining' && x.family !== 'countermeasure');
   const fixed = guns.filter((x) => x.kind === 'fixed');
-  const longest = Math.max(1, ...guns.map((x) => x.range));
+  // Close to gun range, not launcher range: a launcher's few missiles are
+  // gone in a minute, and a ship that holds off at missile range with
+  // guns aboard never fires them. A launcher-only fit stands off.
+  const direct = guns.filter((x) => x.family !== 'missile');
+  const longest = Math.max(1, ...(direct.length > 0 ? direct : guns).map((x) => x.range));
   const lead = fixed[0] ? leadPoint(mine, them, fixed[0].projectileSpeed || 1e6) : them.position;
   const want = toAngle(sub(lead, mine.position));
   const err = Math.abs(angleDelta(mine.heading, want));
@@ -243,7 +247,7 @@ function pilot(w: World, me: string, foe: string, tick: number): ShipInput {
     aimHeading: want,
     thrustForward: d > longest * DUELLIST.preferred && err < 0.5,
     thrustReverse: d < longest * DUELLIST.tooClose,
-    fireFixed: err < DUELLIST.aimTolerance && d < longest * 0.95,
+    fireFixed: err < DUELLIST.aimTolerance && d < Math.max(longest, ...guns.map((x) => x.range)) * 0.95,
     lock: tick === 0 ? foe : null,
     activateLock: tick === 0 ? foe : null,
     selectGroup: group !== null && group !== mine.fireGroup ? group : null,

@@ -34,6 +34,8 @@ export const REFERENCE_FITS: FitSpec[] = [
   stock('rookrivet-prospector', 'mining', 'The cheap miner.'),
   stock('rookrivet-breacher', 'mining', 'The breaching miner.'),
   stock('rookrivet-hulk', 'mining', 'The strip miner.'),
+  stock('kessari-brig', 'combat', 'The Kessari brig as the yard sells it.'),
+  stock('union-frigate', 'combat', 'The Free Belt militia frigate as sold.'),
   {
     name: 'Warrant brawler',
     hullId: 'kessari-wedge',
@@ -61,5 +63,19 @@ export const REFERENCE_FITS: FitSpec[] = [
     role: 'hauling',
     note: 'Armour everywhere it fits: survive long enough to reach security.',
     fit: { ...LOADOUTS['tessaract-trader']!.fit, i1: 'itomarr-shield-m', i2: 'rookrivet-armour-s', i3: 'rookrivet-armour-s', i4: 'rookrivet-armour-s' },
+  },
+  {
+    name: 'Brig brawler',
+    hullId: 'kessari-brig',
+    role: 'combat',
+    note: 'Every high slot a gun for close range, plate below: how hard a brig can hit its own size.',
+    fit: { ...LOADOUTS['kessari-brig']!.fit, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'paragon-turret-m', w4: 'paragon-turret-m', w5: 'paragon-turret-m', u2: 'paragon-fairwarning-s', u3: 'slagline-kick-s', i4: 'itomarr-reactor-m' },
+  },
+  {
+    name: 'Frigate anti-small',
+    hullId: 'union-frigate',
+    role: 'combat',
+    note: 'Undersized guns in the big slots and every swivel manned: built to swat cutters and sloops.',
+    fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-autocannon-m', w2: 'union-autocannon-m', w6: 'paragon-turret-m', x1: 'paragon-director-m' },
   },
 ];

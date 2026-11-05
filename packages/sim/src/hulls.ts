@@ -140,6 +140,120 @@ export const HULLS: Record<string, HullSpec> = {
     ],
   },
 
+  'kessari-brig': {
+    // Kessari Orbital Defence brig (name provisional, a lore ask): the
+    // Warrant's big sister. The same wedge, longer and wider, with two
+    // forward guns at the nose, a swivel on each flank for broadsides, and
+    // one covering the stern. Built to hold a lane, not to chase.
+    id: 'kessari-brig',
+    name: 'Kessari Injunction',
+    race: 'kessari',
+    manufacturer: 'kessariOrbital',
+    role: 'combat',
+    sizeClass: 'L',
+    price: 30000,
+    mass: 22,
+    structure: 900,
+    radius: 34,
+    outline: outline([[34, 0], [10, -12], [-20, -16], [-30, -12], [-26, 0], [-30, 12], [-20, 16], [10, 12]]),
+    maxSpeed: 270,
+    maxTurnRate: 1.4,
+    signature: 42,
+    class: 'brig',
+    // A deeper pool than the Warrant, the same quick breath.
+    capacitor: 220,
+    capacitorRecharge: 16,
+    mounts: [
+      mount('n1', 'nav', 'S', 4, -3, ['power']),
+      mount('r1', 'radar', 'M', 20, -2, ['power']),
+      mount('t1', 'computer', 'M', 20, 2, ['power']),
+      mount('f1', 'flight', 'M', 14, -3, ['power']),
+      mount('x1', 'fireControl', 'M', 14, 3, ['power']),
+      mount('p1', 'podBay', 'S', -24, -8, []),
+      // Brig template: 5 high, 3 mid, 6 low, mostly M.
+      high('w1', 'M', 24, -5),
+      high('w2', 'M', 24, 5),
+      high('w3', 'M', 0, -13.3, -Math.PI / 2, BROAD_ARC),
+      high('w4', 'M', 0, 13.3, Math.PI / 2, BROAD_ARC),
+      high('w5', 'M', -27.7, -5, AFT, BROAD_ARC),
+      mount('e1', 'engine', 'M', -29, -9, ['power'], AFT),
+      mount('e2', 'engine', 'M', -29, 9, ['power'], AFT),
+      mount('c1', 'core', 'M', -16, -4, ['power']),
+      mount('c2', 'core', 'M', -16, 4, ['power']),
+      mid('u1', 'M', 8, 0),
+      mid('u2', 'M', -4, -7),
+      mid('u3', 'S', -4, 7),
+      low('i1', 'M', -6, 0),
+      low('i2', 'M', 4, -8),
+      low('i3', 'M', 4, 8),
+      low('i4', 'M', -14, -10),
+      low('i5', 'S', -14, 10),
+      low('b1', 'S', -22, 0),
+    ],
+    bonuses: [
+      { source: 'role', label: '+25% missile damage from full-size launchers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'missile' },
+      { source: 'race', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
+    ],
+  },
+
+  'union-frigate': {
+    // Union Defence Works frigate (name provisional, a lore ask): the Free
+    // Belt's militia warship, a slab of plate round two heavy guns. Slow
+    // and hard to kill; swivels on every corner so nothing small sits in
+    // a blind spot for long.
+    id: 'union-frigate',
+    name: 'Union Defence Works Walkout',
+    race: 'freeBelt',
+    manufacturer: 'unionDefence',
+    role: 'combat',
+    sizeClass: 'L',
+    price: 60000,
+    mass: 34,
+    structure: 1600,
+    radius: 42,
+    outline: outline([[42, 0], [34, -12], [12, -18], [-26, -18], [-40, -12], [-40, 12], [-26, 18], [12, 18], [34, 12]]),
+    maxSpeed: 210,
+    maxTurnRate: 0.9,
+    signature: 56,
+    class: 'frigate',
+    capacitor: 380,
+    capacitorRecharge: 22,
+    mounts: [
+      mount('n1', 'nav', 'M', 20, 8, ['power']),
+      mount('r1', 'radar', 'M', 20, -8, ['power']),
+      mount('t1', 'computer', 'M', 24, 0, ['power']),
+      mount('f1', 'flight', 'M', 32, 0, ['power']),
+      mount('x1', 'fireControl', 'M', 10, -10, ['power']),
+      mount('p1', 'podBay', 'S', 10, 10, []),
+      // Frigate template: 6 high, 4 mid, 7 low, M and L.
+      high('w1', 'L', 38, -6),
+      high('w2', 'L', 38, 6),
+      high('w3', 'M', 0, -18, -Math.PI / 2, BROAD_ARC),
+      high('w4', 'M', 0, 18, Math.PI / 2, BROAD_ARC),
+      high('w5', 'M', -33, -15, AFT, BROAD_ARC),
+      high('w6', 'M', -33, 15, AFT, BROAD_ARC),
+      mount('e1', 'engine', 'L', -40, -6, ['power'], AFT),
+      mount('e2', 'engine', 'L', -40, 6, ['power'], AFT),
+      mount('c1', 'core', 'L', -30, -6, ['power']),
+      mount('c2', 'core', 'L', -30, 6, ['power']),
+      mid('u1', 'L', 14, 0),
+      mid('u2', 'M', 2, -8),
+      mid('u3', 'M', 2, 8),
+      mid('u4', 'S', -20, 0),
+      low('i1', 'L', -12, -9),
+      low('i2', 'L', -12, 9),
+      low('i3', 'M', 0, 0),
+      low('i4', 'M', -4, -14),
+      low('i5', 'M', -4, 14),
+      low('i6', 'M', -24, -12),
+      low('b1', 'S', -24, 12),
+    ],
+    bonuses: [
+      { source: 'role', label: '+25% structure from full-size armour', stat: 'structure', amount: 0.25, tag: 'armour' },
+      { source: 'race', label: '+15% damage from full-size projectile guns', stat: 'damage', amount: 0.15, kind: 'weapon', tag: 'projectile' },
+    ],
+  },
+
   'tessaract-spine': {
     // Tessaract Logistics hauler: a cab, a bare spine with six container
     // bays, twin engines. Best hauler there is full; handles far better
