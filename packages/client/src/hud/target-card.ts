@@ -1,5 +1,5 @@
 import type { LockReadout, Ship, TargetLock, World } from '@spacegame/sim';
-import { FRAGILE_STRENGTH, lockReadout, shipStats } from '@spacegame/sim';
+import { FRAGILE_STRENGTH, droneStrength, lockReadout, shipStats } from '@spacegame/sim';
 import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, silhouettePoints } from './geometry.js';
 
@@ -266,6 +266,9 @@ export class TargetCard {
       setText(this.armed, strength <= 0 ? 'NO MINING LASER FITTED' : strength >= comp.hardness ? `YOUR LASER CUTS IT (${Math.round(strength * 100)}%)` : `TOO HARD FOR YOUR LASER (${Math.round(strength * 100)}%)`);
       // Brittle glass: a heavy laser shatters what it cuts.
       if (comp.fragile && strength > FRAGILE_STRENGTH) setText(this.armed, `BRITTLE: YOUR LASER (${Math.round(strength * 100)}%) WILL SHATTER IT: USE DRONES OR A LIGHT LASER`);
+      // And the drones, which cut softer rock than most turrets.
+      const drones = droneStrength(world, ship);
+      if (drones > 0 && !comp.fragile) setText(this.armed, `${this.armed.textContent ?? ''} · ${drones >= comp.hardness ? 'DRONES CUT IT' : `TOO HARD FOR DRONES (${Math.round(drones * 100)}%)`}`);
     }
     show(this.cargo, true);
     setText(

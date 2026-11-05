@@ -202,3 +202,29 @@ function order(world: World, ships: Record<string, Ship>, npcs: World['npcs'], m
   if (brain) nextNpcs[chosen.id] = { ...brain, mode: 'work', sentRockId: rock, rockId: rock };
   return { ships, npcs: nextNpcs, events: [] };
 }
+
+/** The hardest rock a ship's drones can cut: their lasers' best strength (0 with no drones). */
+export function droneStrength(world: World, mother: Ship): number {
+  const fits = [...(mother.droneBay ?? []).map((d) => world.loadouts[d.loadoutId]?.fit ?? {}), ...dronesOut(world, mother.id).map((d) => d.fit)];
+  let best = 0;
+  for (const fit of fits) {
+    for (const moduleId of Object.values(fit)) {
+      const weaponId = world.modules[moduleId]?.weaponId;
+      best = Math.max(best, (weaponId ? world.weapons[weaponId]?.mining?.strength : 0) ?? 0);
+    }
+  }
+  return best;
+}
+
+/** Why a ship's drones out are waiting rather than working, or null if there is no particular reason to tell the pilot. */
+export function droneIdleReason(world: World, mother: Ship): 'noLock' | 'tooHard' | 'outOfRange' | null {
+  const rocks = mother.locks.flatMap((l) => (l.progress >= 1 ? [rockAt(world, l.targetId)] : [])).filter((r): r is NonNullable<typeof r> => r !== null);
+  if (rocks.length === 0) return 'noLock';
+  const strength = droneStrength(world, mother);
+  const soft = rocks.filter((r) => r.rock.hardness <= strength);
+  if (soft.length === 0) return 'tooHard';
+  // The bays' reach is the longest of them, as the drones reckon it (ai/drone.ts).
+  const range = Math.max(0, ...Object.values(mother.fit).map((id) => world.modules[id]?.stats.droneRange ?? 0));
+  if (soft.every((r) => distance(r.position, mother.position) > range)) return 'outOfRange';
+  return null;
+}

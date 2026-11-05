@@ -142,7 +142,7 @@ export {
 } from './pilots.js';
 export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, LANTERN_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
 export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, rockSeam, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
-export { dronesOut, droneRoom, stepDrones } from './drones.js';
+export { droneIdleReason, dronesOut, droneRoom, droneStrength, stepDrones } from './drones.js';
 export { duel, fitProblems, fitSummary, type DuelResult, type DuelRun, type FitProblem, type FitSpec, type FitSummary } from './fitlab.js';
 export { REFERENCE_FITS } from './reference-fits.js';
 export { storeGoods, takeGoods, storedGoods, type HangarRefusal, type HangarResult } from './hangar.js';

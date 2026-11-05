@@ -1236,6 +1236,11 @@ button:hover {
   border-color: var(--ink);
 }
 
+.hud-drones-hint {
+  margin: 4px 0;
+  color: var(--warn);
+}
+
 .hud-drones-head {
   display: flex;
   justify-content: space-between;

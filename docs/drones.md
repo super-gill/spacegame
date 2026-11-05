@@ -28,10 +28,11 @@ Related: [mining.md](mining.md) for rocks, locks and the hulk; [ship-systems.md]
 - **Storage:** drones live in the drone bays (`Ship.droneBay`), never in cargo; the bays' capacity is the limit, and buying past it says the drone bays are full (it used to say there was not enough cargo space).
 - **Home and lost:** recalled, or beyond the bay's range, a drone flies home and is stowed when it reaches the hull. One destroyed is lost (`droneLost`, `destroyed`); drones out when the mother docks or is destroyed are lost (`leftBehind`).
 - **Events:** `dronesLaunched`, `droneStowed`, `droneLost`, `droneRefused`.
-- **Client stopgaps (lead):** the drone manager (N): a row per drone with its state (IN BAY, TO ROCK, CUTTING, WAITING, RETURNING) and condition, and LAUNCH ALL, RECALL ALL and SEND, plus per-drone launch, send and recall. Drones are labelled DRONE D1 and so on.
+- **Client stopgaps (lead):** the drone manager (N): a row per drone with its state (IN BAY, TO ROCK, CUTTING, WAITING, RETURNING) and condition, and LAUNCH ALL, RECALL ALL and SEND, plus per-drone launch, send and recall. Drones are labelled DRONE D1 and so on. When drones out are waiting for a reason the pilot can change, a line says so (nothing locked, every locked rock too hard for their lasers, or the soft ones beyond the bays' range: `droneIdleReason`), and a locked rock's card says whether the drones can cut it (`droneStrength`).
 
 ## Later
 
 - Fighters and guards (combat drones attacking the mother's lock), heavy mining craft, carriers.
+- Heavier mining drones (Jason, 5 November 2026): a stronger laser for harder rocks, taking more than one place in the drone bay. The limit on today's drones (hardness 0.5, rocks up to about radius 50) stays: big rocks are turret work.
 - A collector drone that ferries ore from far rocks.
 - NPC miners with drones, for pirates to prey on.

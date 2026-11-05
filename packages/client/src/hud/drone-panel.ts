@@ -1,5 +1,5 @@
 import type { DroneCommand, Ship, World } from '@spacegame/sim';
-import { dronesOut, shipStats } from '@spacegame/sim';
+import { droneIdleReason, dronesOut, droneStrength, shipStats } from '@spacegame/sim';
 import { el, setText, show } from './dom.js';
 import type { HudWindow } from './windows.js';
 
@@ -15,6 +15,8 @@ import type { HudWindow } from './windows.js';
 export class DronePanel {
   private readonly root = el('div', 'hud-drones');
   private readonly summary = el('span', 'hud-dim');
+  /** Why drones out are waiting, when there is a reason the pilot can fix. */
+  private readonly hint = el('p', 'hud-dim hud-drones-hint');
   private readonly list = el('div', 'hud-drones-list');
   private readonly empty = el('p', 'hud-dim', 'No drone bay fitted.');
   private key = '';
@@ -28,7 +30,7 @@ export class DronePanel {
       this.button('RECALL ALL', 'Bring every drone home', { action: 'recall' }),
       this.button('SEND', 'Send the next free drone to your active lock', { action: 'send' }),
     );
-    this.root.append(head, all, this.list, this.empty);
+    this.root.append(head, all, this.hint, this.list, this.empty);
     window.body.append(this.root);
   }
 
@@ -76,6 +78,14 @@ export class DronePanel {
       rows.push({ id: d.droneId ?? d.id, state, health: d.structure / max, isOut: true });
     }
     rows.sort((a, b) => (a.id < b.id ? -1 : 1));
+
+    // Waiting drones say why, when it is something the pilot can change.
+    const waiting = rows.some((r) => r.state === 'WAITING');
+    const reason = waiting ? droneIdleReason(world, ship) : null;
+    const cut = Math.round(droneStrength(world, ship) * 100);
+    const why = { noLock: 'Waiting: lock a rock for them to work.', tooHard: `Waiting: every locked rock is too hard. Drones cut up to hardness ${cut}%: lock smaller rocks.`, outOfRange: 'Waiting: the locked rocks they can cut are beyond the bays\' range.' } as const;
+    setText(this.hint, reason ? why[reason] : '');
+    show(this.hint, reason !== null);
 
     const key = rows.map((r) => `${r.id}:${r.isOut}`).join(' ');
     if (key !== this.key) {

@@ -5,7 +5,7 @@ import { findPath } from '../ai/path.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from '../bodies.js';
 import { FIXED_DT } from '../constants.js';
 import { freePadFor, onPad } from '../docking.js';
-import { dronesOut, stepDrones } from '../drones.js';
+import { droneIdleReason, dronesOut, droneStrength, stepDrones } from '../drones.js';
 import { buildShip } from '../factory.js';
 import { LOADOUTS } from '../loadouts.js';
 import { ownedShips } from '../ownership.js';
@@ -140,6 +140,19 @@ describe('drone bays', () => {
       for (const s of spots) expect(s.gap).toBeLessThanOrEqual(90 * 0.9);
       for (let i = 0; i < 12; i++) for (let j = 0; j < i; j++) expect(Math.hypot(spots[i]!.x - spots[j]!.x, spots[i]!.y - spots[j]!.y)).toBeGreaterThanOrEqual(12);
     }
+  });
+
+  it('say why they wait: nothing locked, or every locked rock too hard for them', () => {
+    // Jason's drones sat idle beside a hulk with big rocks locked: their lasers cut up to 0.5.
+    const hard = hulkWorld([rock('a', -0.015, { hardness: 0.8 }), rock('b', 0.015, { hardness: 0.3 })]);
+    expect(droneStrength(hard, hard.ships['h']!)).toBe(0.5);
+    expect(droneIdleReason(hard, hard.ships['h']!)).toBe('noLock');
+    let w = stepWorld(hard, { h: { ...emptyInput(), lock: 'a' } });
+    w = run(w, 4).w;
+    expect(droneIdleReason(w, w.ships['h']!)).toBe('tooHard');
+    w = stepWorld(w, { h: { ...emptyInput(), lock: 'b' } });
+    w = run(w, 4).w;
+    expect(droneIdleReason(w, w.ships['h']!)).toBeNull();
   });
 
   it("drones skip a rock a turret is on while there is a free one", () => {
