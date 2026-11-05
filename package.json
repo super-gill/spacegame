@@ -11,7 +11,8 @@
     "build": "npm run build --workspace=@spacegame/sim && npm run build --workspace=@spacegame/client",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
-    "preview": "npm run preview --workspace=@spacegame/client"
+    "preview": "npm run preview --workspace=@spacegame/client",
+    "audit": "vite-node scripts/audit.ts"
   },
   "engines": {
     "node": ">=20"

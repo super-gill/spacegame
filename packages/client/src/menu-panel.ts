@@ -147,6 +147,12 @@ export class MenuPanel {
 
     // Admin: playtesting tools, not part of the game.
     this.panel.append(el('h2', undefined, 'Admin (testing)'));
+    // The fitter: a separate page built from the same code (docs/fitting.md).
+    const fitter = el('a', 'menu-link', 'Open the fitter in a new tab');
+    fitter.href = './fitter.html';
+    fitter.target = '_blank';
+    fitter.rel = 'noopener';
+    this.panel.append(el('p', undefined), fitter);
     const creditRow = el('div', 'menu-row');
     for (const amount of GRANTS) creditRow.append(button(`+${amount.toLocaleString('en-GB')} cr`, () => actions.grantCredits(amount)));
     this.panel.append(creditRow);

@@ -1,0 +1,187 @@
+/* The fitter (docs/fitting.md): the game's ink on the game's background, plain and dense. */
+:root {
+  --bg: #05070a;
+  --ink: #9fd3c7;
+  --ink-dim: #6a988f;
+  --ink-bright: #dffbf3;
+  --faint: #1f3532;
+  --good: #8fd18f;
+  --bad: #e06c5a;
+  --font: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+a {
+  color: var(--ink-bright);
+}
+
+h1,
+h2 {
+  color: var(--ink-bright);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+h1 {
+  font-size: 18px;
+}
+
+h2 {
+  font-size: 13px;
+}
+
+.fitter-head p {
+  color: var(--ink-dim);
+  margin: 0 0 16px;
+}
+
+.fitter {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.fits {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.fits,
+.duel,
+.exchange {
+  grid-column: 1;
+}
+
+.numbers {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
+section {
+  border: 1px solid var(--faint);
+  padding: 12px;
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  color: var(--ink);
+  background: #0b1214;
+  border: 1px solid var(--faint);
+  padding: 3px 6px;
+}
+
+.fit > input,
+.fit > select {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  color: var(--ink-bright);
+  border-color: var(--ink-dim);
+  outline: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  padding: 2px 4px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.slots select {
+  width: 100%;
+}
+
+.slots .mount {
+  color: var(--ink-bright);
+  width: 3em;
+}
+
+.slots .type {
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+.compare th {
+  color: var(--ink-dim);
+  font-weight: normal;
+}
+
+.compare tr:first-child th {
+  color: var(--ink-bright);
+}
+
+.compare td {
+  text-align: right;
+}
+
+.better {
+  color: var(--good);
+}
+
+.worse,
+.bad {
+  color: var(--bad);
+}
+
+.ok {
+  color: var(--good);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+textarea {
+  width: 100%;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1100px) {
+  .fitter,
+  .fits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .numbers {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

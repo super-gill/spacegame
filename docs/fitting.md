@@ -99,8 +99,16 @@ A fitting calculator for Jason and the lead, built from the same sim code as the
 - **Where:** a second page of the client (`fitter.html`), served wherever the game is (the Tailscale preview included), plus a command-line audit for the lead.
 - **Fit a ship:** pick any hull, put any module in any slot (illegal choices shown with the reason), and see the ship's stats live: power and mass, speed, acceleration and turn, capacitor and its balance, shield and armour totals and resistances, damage per second by type and against small, medium and large targets, lock time and range, cargo and ore hold, mining yield, drones. A second fit side by side shows the differences.
 - **Simulate:** headless runs of the real sim. Duels against reference fits (brawler, kiter, glass cannon, brick tank, pirate raider, Watch), several runs each, with win rate and time to kill; a mining run on a standard patch of rock (ore an hour, value an hour at each market); a hauling run under pirate pressure (survival rate).
-- **Reference fits** live in the repo (`docs/fits/*.json`), shared between the fitter, the tests and the audit. Jason can export a fit from the fitter and send it; the lead adds it to the library.
-- **The audit** (`npm run audit`): for every hull, modules no fit should ever choose (worse in every respect than another option), slots with only one sensible choice, the best fit per role, and the duel matrix between archetypes. Run at every release; the release notes say what moved.
+- **Reference fits** live in the sim (`packages/sim/src/reference-fits.ts`), shared between the fitter, the tests and the audit. Jason can export a fit from the fitter as JSON and send it; the lead pastes it into the library.
+- **The audit** (`npm run audit`): for every hull, modules no fit should ever choose (worse in every respect than another option), slots with only one sensible choice, the best fit per role, and the duel matrix between archetypes. Run at every release; the release notes say what moved. Reports are kept in `docs/audits/`.
+
+### As built: step 1 (5 November 2026)
+
+- **The lab** (`packages/sim/src/fitlab.ts`): `fitProblems` (why a fit could not be fitted), `fitSummary` (budgets, flight, defence, damage, sensors, holds, mining), and `duel` (two fits flown by the same scripted pilot from four starts, up to two minutes, in empty space; deterministic). The scripted pilot closes to 60% of its longest range, keeps its nose on the lead point, fires on aim, and takes its fire groups in turn.
+- **Reference fits:** the seven stock ships plus a Warrant brawler, kiter and glass cannon and a Manifest brick.
+- **The fitter page** (`fitter.html`, linked from the menu): two fits side by side, any hull and module (ones that would not fit are marked, not hidden), the numbers compared, a duel, saving in the browser, and JSON export and import.
+- **The audit** (`scripts/audit.ts`): modules worse in every way than a rival, ladders where only price separates two modules, the reference fits' numbers, and the duel matrix. Not done yet: slots with one sensible choice, best fit per role, and mining and hauling runs.
+- **Baseline** (`docs/audits/2026-11-05-baseline.md`): the Ito-Marr Arsenal L is worse in every way than the Magazine L, and the Assay S than the Meridian Plotter S; the three countermeasure dispensers are a pure price ladder; the Warrant brawler beats every other combat fit, and the glass cannon loses to all of them (its energy guns empty the Warrant's 90-point capacitor).
 
 ## Saves
 
