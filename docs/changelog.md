@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-05
+
+Mining, first slice (9a): ore in the Scree's rocks, the prospector and the hulk, surveying, cutting, caches and the ore hopper; and two accessibility fixes from playtesting.
+
 ### Added
 - Mining, part 1. Every rock in the Scree holds ore: mostly common ore, some richer ores, and the best only in bigger, harder rocks. Mined-out rocks crumble, and the belt slowly brings in new ones.
 - A survey scanner: press its tile to pulse, and rocks worth a look light up for a few seconds. A better scanner reaches further and names the best ore in each rock.
