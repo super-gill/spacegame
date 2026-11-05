@@ -24,10 +24,13 @@ function slots(hullId: string): Record<string, number> {
 }
 
 describe('slot budgets', () => {
-  it('follow hull class (docs/ship-systems.md)', () => {
-    expect(slots('meridian-courier')).toMatchObject({ weapon: 2, utility: 2, internal: 3, bay: 1 });
-    expect(slots('kessari-wedge')).toMatchObject({ weapon: 3, utility: 3, internal: 4, bay: 1 });
-    expect(slots('tessaract-spine')).toMatchObject({ weapon: 1, utility: 2, internal: 4, bay: 6 });
+  it('follow the hull class template (docs/fitting.md)', () => {
+    expect(slots('meridian-courier')).toMatchObject({ high: 3, mid: 2, low: 3 });
+    expect(slots('kessari-wedge')).toMatchObject({ high: 4, mid: 3, low: 4 });
+    expect(slots('tessaract-spine')).toMatchObject({ high: 2, mid: 3, low: 9 });
+    expect(slots('rookrivet-prospector')).toMatchObject({ high: 3, mid: 3, low: 3 });
+    expect(slots('rookrivet-breacher')).toMatchObject({ high: 5, mid: 3, low: 4 });
+    expect(slots('rookrivet-hulk')).toMatchObject({ high: 4, mid: 4, low: 6 });
   });
 
   it('every flyable hull has one each of the fixed system mounts; a pod or a drone only flight', () => {
@@ -47,11 +50,10 @@ describe('slot budgets', () => {
     }
   });
 
-  it('armour is passive (internal) and active kit is utility', () => {
-    expect(MODULES['rookrivet-armour-s']!.mounts).toEqual(['internal']);
-    for (const m of Object.values(MODULES).filter((m) => ['tractor', 'afterburner', 'countermeasure'].includes(m.kind))) {
-      expect(m.mounts, m.id).toEqual(['utility']);
-    }
+  it('high works on something else, mid runs the ship\'s own systems, low is passive', () => {
+    const tier: Record<string, string> = { weapon: 'high', tractor: 'high', breachCharger: 'high', shieldGenerator: 'mid', afterburner: 'mid', countermeasure: 'mid', surveyScanner: 'mid', oreHopper: 'mid', armour: 'low', cargoPod: 'low', droneBay: 'low' };
+    for (const m of Object.values(MODULES)) if (tier[m.kind]) expect(m.mounts, m.id).toEqual([tier[m.kind]]);
+    expect(MODULES['itomarr-reactor-m']!.mounts).toEqual(['core', 'low']);
   });
 
   it('the starter carries its systems: a flight computer, a pod bay, fire control, a tractor and an afterburner', () => {
@@ -208,31 +210,31 @@ describe('active modules', () => {
     return { w: { ...w0, ships: { [s.id]: s } }, id: s.id };
   }
 
-  it('lists group tiles first, then the active utility modules in mount order', () => {
+  it('lists group tiles first, then active modules in high slots, then in mids, in mount order', () => {
     const { w, id } = solo({ u2: 'paragon-fairwarning-s' });
     const ship = { ...w.ships[id]!, weapons: w.ships[id]!.weapons.map((x) => (x.mountId === 'w1' ? { ...x, group: 2 } : x)) };
     expect(activationSlots(w, ship)).toEqual([
       { kind: 'group', group: 2 },
-      { kind: 'module', mountId: 'u1', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
+      { kind: 'module', mountId: 'w3', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
       { kind: 'module', mountId: 'u2', moduleId: 'paragon-fairwarning-s', moduleKind: 'countermeasure' },
     ]);
   });
 
   it('the tractor needs a tractor module; its tile cycles off, own loot, everything', () => {
-    const none = solo({ u1: null });
+    const none = solo({ w3: null });
     expect(stepWorld(none.w, { [none.id]: { ...emptyInput(), tractor: true } }).ships[none.id]!.tractorActive).toBe(false);
     const { w, id } = solo();
-    let x = stepWorld(w, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    let x = stepWorld(w, { [id]: { ...emptyInput(), toggleModule: 'w3' } });
     expect(x.ships[id]!.tractorActive).toBe(true);
     x = stepWorld(x, { [id]: emptyInput() });
     expect(x.ships[id]!.tractorActive).toBe(true);
     expect(x.ships[id]!.tractorMode).toBeUndefined();
     // Pressed again: still on, now taking everything; again: off, back to its own loot only.
-    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'w3' } });
     expect(x.ships[id]!.tractorActive).toBe(true);
     expect(x.ships[id]!.tractorMode).toBe('all');
     expect(x.events).toContainEqual({ type: 'tractorModeChanged', shipId: id, mode: 'all' });
-    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'w3' } });
     expect(x.ships[id]!.tractorActive).toBe(false);
     expect(x.ships[id]!.tractorMode).toBeUndefined();
   });

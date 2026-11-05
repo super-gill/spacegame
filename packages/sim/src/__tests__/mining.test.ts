@@ -294,8 +294,8 @@ describe('making the light ship pay', () => {
 
   it('dropping a cache switches a running tractor off, so it is not scooped straight back up', () => {
     let w = setup(testRock({ contents: { ore: 500 } }));
-    w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'u1' } });
-    expect(w.ships['s']!.switchedOn).toEqual(['u1']);
+    w = stepWorld(w, { s: { ...emptyInput(), toggleModule: 'w3' } });
+    expect(w.ships['s']!.switchedOn).toEqual(['w3']);
     w = { ...w, ships: { s: { ...w.ships['s']!, hold: { ore: 20 } } } };
     w = stepWorld(w, { s: { ...emptyInput(), dropCache: true } });
     w = run(w, 5).w;
@@ -391,9 +391,9 @@ describe('the prospector', () => {
     expect(stats.readouts).toContain('composition');
     expect(activationSlots(w, ship)).toEqual([
       { kind: 'group', group: 3 },
-      { kind: 'module', mountId: 'u1', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
-      { kind: 'module', mountId: 'u2', moduleId: 'rookrivet-survey-s', moduleKind: 'surveyScanner' },
+      { kind: 'module', mountId: 'w3', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
       { kind: 'module', mountId: 'i2', moduleId: 'rookrivet-hopper-s', moduleKind: 'oreHopper' },
+      { kind: 'module', mountId: 'u2', moduleId: 'rookrivet-survey-s', moduleKind: 'surveyScanner' },
     ]);
   });
 

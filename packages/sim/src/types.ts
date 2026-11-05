@@ -27,7 +27,16 @@ export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
  * `computer` (targeting), `flight` (flight computer), `podBay`,
  * `fireControl`, `engine` and `core` (reactor, thrusters).
  */
-export type MountType = 'weapon' | 'bay' | 'utility' | 'engine' | 'core' | 'internal' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl' | 'mining';
+/**
+ * Where a module can go (docs/fitting.md). Core systems, one of each:
+ * `engine`, `core` (thrusters and the main reactor), `radar`, `computer`,
+ * `nav`, `flight`, `podBay`, `fireControl`. Then the general tiers any
+ * module of that tier can use: `high` does work on something else (guns,
+ * launchers, mining lasers, tractor, charge rig); `mid` runs the ship's
+ * own active systems (shields, afterburner, countermeasures, scanners,
+ * hopper); `low` is passive (armour, cargo, drone bays, extra reactors).
+ */
+export type MountType = 'high' | 'mid' | 'low' | 'engine' | 'core' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl';
 
 /**
  * What a mount point provides to the module on it. A module lists the

@@ -14,9 +14,9 @@ describe('the fitting lab', () => {
 
   it('names what is wrong with a fit that could not be', () => {
     const starter = byName('Meridian Tern');
-    const problems = fitProblems(TEST_CATALOGUES, { ...starter, fit: { ...starter.fit, w1: 'union-picket-l', i3: 'tessaract-container-m' } });
+    const problems = fitProblems(TEST_CATALOGUES, { ...starter, fit: { ...starter.fit, w1: 'union-picket-l', u2: 'tessaract-container-m' } });
     expect(problems).toContainEqual({ mountId: 'w1', moduleId: 'union-picket-l', reason: 'tooBig' });
-    expect(problems).toContainEqual({ mountId: 'i3', moduleId: 'tessaract-container-m', reason: 'wrongMount' });
+    expect(problems).toContainEqual({ mountId: 'u2', moduleId: 'tessaract-container-m', reason: 'wrongMount' });
   });
 
   it('sums a fit into the numbers a pilot compares', () => {

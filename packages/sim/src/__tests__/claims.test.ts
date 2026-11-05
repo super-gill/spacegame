@@ -43,7 +43,7 @@ function canister(w: World, claim?: string): Loot {
   return { id: 'can', item: 'ore', amount: 5, position: { x: s.position.x, y: s.position.y + 40 }, velocity: { x: 0, y: 0 }, ticksLeft: 1e6, ...(claim ? { claim } : {}) };
 }
 
-const tile = (w: World): World => stepWorld(w, { s: { ...emptyInput(), toggleModule: 'u1' } });
+const tile = (w: World): World => stepWorld(w, { s: { ...emptyInput(), toggleModule: 'w3' } });
 
 describe('loot claims', () => {
   it('ore a laser frees is claimed by whoever cut it', () => {

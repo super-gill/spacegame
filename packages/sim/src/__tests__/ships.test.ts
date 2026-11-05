@@ -37,7 +37,7 @@ function dockedAt(stationId = HARBOUR, credits = STARTING_CREDITS): { w: World; 
   const st = w.stations[stationId]!;
   // Strip the armour plate, the tractor and fire control so tests have a free
   // internal slot and power to spare (the stock starter runs at full power).
-  const { i2: _armour, u1: _tractor, x1: _fireControl, ...fit } = w.ships[me]!.fit;
+  const { i2: _armour, w3: _tractor, x1: _fireControl, ...fit } = w.ships[me]!.fit;
   const hull = HULLS[w.ships[me]!.hullId]!;
   const stats = fitStats(w, hull, fit);
   w = {
@@ -134,11 +134,11 @@ describe('hull bonuses', () => {
   });
 
   it('a race bonus rewards the race tech: Kessari shields', () => {
-    const fit = { c1: 'itomarr-reactor-m', i1: 'itomarr-shield-m' };
+    const fit = { c1: 'itomarr-reactor-m', u1: 'itomarr-shield-m' };
     const m = MODULES['itomarr-shield-m']!.stats.shield!;
     const s = MODULES['meridian-shield-s']!.stats.shield!;
     expect(fitStats(TEST_CATALOGUES, wedge, fit).shield).toBeCloseTo(m * 1.2, 9);
-    expect(fitStats(TEST_CATALOGUES, courier, { c2: 'meridian-reactor-s', i1: 'meridian-shield-s' }).shield).toBe(s);
+    expect(fitStats(TEST_CATALOGUES, courier, { c2: 'meridian-reactor-s', u1: 'meridian-shield-s' }).shield).toBe(s);
   });
 
   it('the Warrant adds damage to full-size launchers only: its family is missiles', () => {
@@ -167,7 +167,7 @@ describe('mount rules', () => {
     expect(mountRefusal(at('kessari-wedge', 'w1'), MODULES['paragon-pulse-s']!)).toBeNull(); // smaller fits
   });
 
-  it('reactors go on core or internal mounts', () => {
+  it('reactors go on core mounts or in low slots', () => {
     expect(mountRefusal(at('kessari-wedge', 'c1'), MODULES['itomarr-reactor-m']!)).toBeNull();
     expect(mountRefusal(at('kessari-wedge', 'i1'), MODULES['itomarr-reactor-m']!)).toBeNull();
     expect(mountRefusal(at('kessari-wedge', 'u1'), MODULES['itomarr-reactor-m']!)).toBe('wrongMount');
@@ -275,7 +275,7 @@ describe('fitting', () => {
       [fitModule(w, 'ana', 'zz', 'meridian-pod-s'), 'unknownMount'],
       [fitModule(w, 'ana', 'u1', 'no-such-module'), 'unknownModule'],
       [fitModule(w, 'ana', 'e1', 'meridian-engine-s'), 'alreadyFitted'],
-      [unfitModule(w, 'ana', 'u1'), 'emptyMount'],
+      [unfitModule(w, 'ana', 'w3'), 'emptyMount'],
       [unfitModule(w, 'ana', 'c2'), 'power'], // the only reactor
       [unfitModule(laden, 'ana', 'b1'), 'cargo'], // the only pod, with cargo aboard
       [fitModule(sealed, 'ana', 'u1', 'meridian-pod-s'), 'sealed'],
@@ -291,12 +291,12 @@ describe('fitting', () => {
     // Stripped starter: 12 of 13 power drawn. Make room, take a hungrier engine,
     // then see that 13 of 13 fits and 14 of 13 does not.
     const { w } = dockedAt(HARBOUR, 100_000);
-    const noShield = ok(unfitModule(w, 'ana', 'i1')); // draw 10 of 13
+    const noShield = ok(unfitModule(w, 'ana', 'u1')); // draw 10 of 13
     const kick = ok(fitModule(noShield, 'ana', 'e1', 'slagline-engine-s')); // draw 11
-    const back = fitModule(kick, 'ana', 'i1', 'meridian-shield-s'); // draw 13: allowed
+    const back = fitModule(kick, 'ana', 'u1', 'meridian-shield-s'); // draw 13: allowed
     expect(back.ok).toBe(true);
     const thirsty = { ...kick.modules, 'meridian-shield-s': { ...kick.modules['meridian-shield-s']!, power: 3 } };
-    const r = fitModule({ ...kick, modules: thirsty }, 'ana', 'i1', 'meridian-shield-s'); // draw 14
+    const r = fitModule({ ...kick, modules: thirsty }, 'ana', 'u1', 'meridian-shield-s'); // draw 14
     expect(r.ok ? 'ok' : r.reason).toBe('power');
   });
 

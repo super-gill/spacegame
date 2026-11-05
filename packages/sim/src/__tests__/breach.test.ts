@@ -45,7 +45,7 @@ function setup(bearing = 0, gap = 30, extra: Asteroid[] = [], loadout = 'rookriv
   return w;
 }
 
-const press = (w: World): World => stepWorld(w, { s: { ...emptyInput(), toggleModule: 'u2' } });
+const press = (w: World): World => stepWorld(w, { s: { ...emptyInput(), toggleModule: 'w5' } });
 
 /** Move the ship to `gap` off the rock's surface at `bearing`, at rest. */
 function moveTo(w: World, bearing: number, gap: number): World {

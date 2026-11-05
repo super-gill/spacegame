@@ -92,6 +92,28 @@ Translated from today's mounts so totals stay close and stock ships stay viable;
 | Aurel Tacet (dev) | S S S | S S | S S | S, S, S | | 0 |
 | Drone, escape pod | as today: core only, plus the drone's laser in one small high | | | | | 0 |
 
+### As built: step 2, the tiers (5 November 2026)
+
+- **Mount types** (`MountType`): the core systems as before (`engine`, `core`, `radar`, `computer`, `nav`, `flight`, `podBay`, `fireControl`) and the tiers `high`, `mid`, `low`. The old `weapon`, `utility`, `internal`, `bay` and `mining` mounts are gone. High slots keep their positions, facings and swivel arcs; a high slot without an arc fires straight ahead.
+- **Modules re-tagged:** every weapon, launcher, mining laser and turret, the tractor and the charge rig in high; shields, afterburners, countermeasures, survey scanners and hoppers in mid; armour, cargo pods and containers and drone bays in low; reactors in core or low. Cargo containers no longer need a heavy-load mount.
+- **Slots as built** (high / mid / low, sizes in order):
+
+| Hull | Class | High | Mid | Low |
+| --- | --- | --- | --- | --- |
+| Meridian Tern | cutter | S S S | S S | S S S |
+| Kessari Warrant | sloop | M M S S | M S S | M M S S |
+| Tessaract Manifest | merchantman | S S | M M S | M M M M M M S S S |
+| Rook and Rivet Prospector | cutter | S S S | S S S | S S S |
+| Rook and Rivet Breacher | sloop | M M S M S | M M S | M S M M |
+| Rook and Rivet Hulk | hulk | L L M M | L M M S | M M L L L L |
+| Aurel Tacet (dev) | | S S S | S S | S S |
+
+  The Warrant has four lows, as the sloop template says, rather than the first pass's three.
+- **Mount ids kept** where a slot survived, so fits carry over; the stock fits moved only their tractors and charge rigs to new high slots and their shields to mids.
+- **Tiles:** groups, then mining turrets, then active modules in high slots, then in mids, in mount order.
+- **Outfitting** lists core systems, then high, mid and low slots, with the counts and any built-in ore hold under the hull's bonuses.
+- **Saves:** version 11 (`migrate10to11`): what still fits stays; the rest moves to the smallest free slot that takes it (a running tractor stays on); anything left over goes to the owner's storage where the ship is docked, else at Harbour.
+
 ## The fitter
 
 A fitting calculator for Jason and the lead, built from the same sim code as the game so it can never drift out of date.

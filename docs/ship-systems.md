@@ -13,6 +13,8 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [weapons.md](weapon
 
 ## Slot budget by hull class
 
+**Superseded (5 November 2026):** slots are now core systems plus high, mid and low tiers; see `docs/fitting.md`. The table below is kept as history.
+
 | Class | Weapon | Utility (active) | Internal (passive) | Cargo bays | Special |
 | --- | --- | --- | --- | --- | --- |
 | Pod | 0 | 0 | 0 | 0 | |

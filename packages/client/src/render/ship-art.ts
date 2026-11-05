@@ -183,15 +183,15 @@ function socketRadius(mount: MountPoint): number {
   return 2.2 * SIZE_SCALE[mount.size];
 }
 
-/** An empty mount: a dashed socket, round for guns and gear, square for bays and internals. */
+/** An empty mount: a dashed socket, round for high and mid slots, square for lows and core systems. */
 function drawSocket(ctx: CanvasRenderingContext2D, px: (n: number) => number, mount: MountPoint): void {
   const k = SIZE_SCALE[mount.size];
   ctx.strokeStyle = SOCKET;
   ctx.lineWidth = px(1);
   ctx.setLineDash([px(2), px(2)]);
   ctx.beginPath();
-  if (mount.type === 'bay') ctx.rect(-3.75 * k, -2 * k, 7.5 * k, 4 * k);
-  else if (mount.type === 'internal' || mount.type === 'core' || mount.type === 'computer' || mount.type === 'nav') ctx.rect(-1.4 * k, -1.4 * k, 2.8 * k, 2.8 * k);
+  if (mount.type === 'low' && mount.size !== 'S') ctx.rect(-3.75 * k, -2 * k, 7.5 * k, 4 * k);
+  else if (mount.type === 'low' || mount.type === 'core' || mount.type === 'computer' || mount.type === 'nav') ctx.rect(-1.4 * k, -1.4 * k, 2.8 * k, 2.8 * k);
   else ctx.arc(0, 0, socketRadius(mount), 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);

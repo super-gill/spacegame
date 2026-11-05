@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
+- Slot tiers: every ship now has high slots (guns, launchers, mining lasers, tractor, charge rig), mid slots (shields, afterburner, countermeasures, scanners, hopper) and low slots (armour, cargo, drone bays, extra reactors) alongside its core systems, and any module of a tier fits any slot of that tier and size. Fits carry over; anything with nowhere to go goes to your storage.
 - The fitter: a second page (from the menu, or `fitter.html`) to fit any hull with any module, compare two fits side by side with the game's own numbers, and duel them. Fits save in the browser and export as JSON.
 - Breaching for gate-glass. Some big rocks hide a glass core that only a deep assay finds; it marks the breach points round the rock. Fly to each, plant a breach charge from the charge rig's tile, get clear and press the tile again to set them off. Bigger rocks hold more glass and more breach points; some cores are fractured and give half. The rock splits and its chunks drift apart, and the glass is exposed for three minutes: cut it with drones or a light laser, because heavy lasers shatter it. The blast hurts anything close, you included, and its bloom brings pirates from far off.
 - Loot remembers whose it is: ore you or your drones cut, spoils from your kills and your caches. Your tractor's tile now cycles OFF, MINE (yours, and nobody's) and ALL (other people's too), so you no longer scoop up other miners' canisters by accident.

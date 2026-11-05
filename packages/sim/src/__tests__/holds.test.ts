@@ -148,3 +148,33 @@ describe('saves', () => {
     expect(after.pilots['ana']!.storage).toEqual({ 'station-ridge': { 'tessaract-container-l': 3 } });
   });
 });
+
+describe('save 11: slot tiers', () => {
+  it('moves what no longer fits to a free slot of its tier, keeping a running tractor on', async () => {
+    const { migrate10to11 } = await import('../save.js');
+    const old = {
+      pilots: {},
+      ships: {
+        s: {
+          id: 's', hullId: 'meridian-courier', ownerId: null, heading: 0, state: 'flying', weapons: [],
+          fit: { w1: 'paragon-pulse-s', w2: 'paragon-turret-s', i1: 'meridian-shield-s', i2: 'rookrivet-armour-s', u1: 'meridian-gleaner-s', u2: 'slagline-kick-s', b1: 'meridian-pod-s' },
+          switchedOn: ['u1'],
+        },
+      },
+    };
+    const after = migrate10to11(old) as { ships: Record<string, Ship> };
+    const ship = after.ships['s']!;
+    expect(ship.fit).toEqual({ w1: 'paragon-pulse-s', w2: 'paragon-turret-s', w3: 'meridian-gleaner-s', u1: 'meridian-shield-s', u2: 'slagline-kick-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s' });
+    expect(ship.switchedOn).toEqual(['w3']);
+  });
+
+  it('sends what has nowhere to go to the owner\'s storage', async () => {
+    const { migrate10to11 } = await import('../save.js');
+    const old = {
+      pilots: { ana: { id: 'ana', storage: {} } },
+      ships: { s: { id: 's', hullId: 'meridian-courier', ownerId: 'ana', heading: 0, state: 'docked', dockedAt: 'station-ridge', weapons: [], fit: { i1: 'meridian-shield-s', u1: 'meridian-shield-s', u2: 'meridian-shield-s' } } },
+    };
+    const after = migrate10to11(old) as { pilots: Record<string, { storage: Record<string, Record<string, number>> }> };
+    expect(after.pilots['ana']!.storage['station-ridge']).toEqual({ 'meridian-shield-s': 1 });
+  });
+});

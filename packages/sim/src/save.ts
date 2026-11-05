@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -87,6 +87,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   7: (world) => migrate7to8(world),
   8: (world) => migrate8to9(world),
   9: (world) => migrate9to10(world),
+  10: (world) => migrate10to11(world),
 };
 
 /**
@@ -184,6 +185,68 @@ export function migrate9to10(world: unknown): unknown {
   return { ...world, ships, pilots };
 }
 
+/**
+ * 10 to 11: slot tiers (docs/fitting.md). Hulls now have core systems and
+ * high, mid and low slots. Every module that still fits where it is stays;
+ * the rest move to the first free slot that takes them (a tractor from
+ * its old utility mount to a high slot, a shield from an internal mount
+ * to a mid), keeping a switched-on tractor on; anything with nowhere to go
+ * goes to its owner's storage where the ship is docked, else at Harbour.
+ * Weapon states are rebuilt, keeping those whose mount and module did not
+ * change.
+ */
+export function migrate10to11(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['ships'])) return world;
+  const pilots: Record<string, Pilot> = isRecord(world['pilots']) ? { ...(world['pilots'] as Record<string, Pilot>) } : {};
+  const ships: Record<string, unknown> = {};
+  for (const [id, raw] of Object.entries(world['ships'])) {
+    const ship = raw as unknown as Ship;
+    const hull = isRecord(raw) ? HULLS[ship.hullId] : undefined;
+    if (!hull) {
+      ships[id] = raw;
+      continue;
+    }
+    const oldFit = ship.fit ?? {};
+    const fit: Record<string, string> = {};
+    const homeless: { from: string; moduleId: string }[] = [];
+    for (const [mountId, moduleId] of Object.entries(oldFit)) {
+      const mount = hull.mounts.find((m) => m.id === mountId);
+      const module = MODULES[moduleId];
+      if (!module) continue;
+      if (mount && mountRefusal(mount, module) === null) fit[mountId] = moduleId;
+      else homeless.push({ from: mountId, moduleId });
+    }
+    // Biggest first, so a large module is not shut out by small ones taking its slot.
+    const size = { S: 0, M: 1, L: 2, XL: 3 } as const;
+    homeless.sort((a, b) => size[MODULES[b.moduleId]!.size] - size[MODULES[a.moduleId]!.size]);
+    const moved: Record<string, string> = {};
+    const leftover: string[] = [];
+    for (const h of homeless) {
+      const module = MODULES[h.moduleId]!;
+      // The smallest free slot that takes it, so it does not squat a bigger one.
+      const free = hull.mounts
+        .filter((m) => !fit[m.id] && mountRefusal(m, module) === null)
+        .sort((a, b) => size[a.size] - size[b.size])[0];
+      if (free) {
+        fit[free.id] = h.moduleId;
+        moved[h.from] = free.id;
+      } else leftover.push(h.moduleId);
+    }
+    const owner = ship.ownerId ? pilots[ship.ownerId] : undefined;
+    if (owner && leftover.length > 0) {
+      const stationId = ship.state === 'docked' && ship.dockedAt ? ship.dockedAt : HARBOUR_ID;
+      const shelf = { ...(owner.storage?.[stationId] ?? {}) };
+      for (const moduleId of leftover) shelf[moduleId] = (shelf[moduleId] ?? 0) + 1;
+      pilots[owner.id] = { ...owner, storage: { ...(owner.storage ?? {}), [stationId]: shelf } };
+    }
+    const switchedOn = (ship.switchedOn ?? []).map((m) => moved[m] ?? m).filter((m) => fit[m]);
+    const weapons = weaponStatesFor({ modules: MODULES, weapons: WEAPONS, goods: GOODS }, hull, fit, ship.heading ?? 0, { fit: oldFit, weapons: ship.weapons ?? [] });
+    const { switchedOn: _old, ...rest } = ship;
+    ships[id] = { ...rest, fit, weapons, ...(switchedOn.length > 0 ? { switchedOn } : {}) };
+  }
+  return { ...world, ships, pilots };
+}
+
 /** A seed from an id, FNV-1a. */
 function idSeed(id: string): number {
   let h = 0x811c9dc5;
@@ -258,7 +321,7 @@ export function migrate5to6(world: unknown): unknown {
       if (stock && MODULES[stock] && mountRefusal(mount, MODULES[stock]!) === null) fit[mount.id] = stock;
     }
     if (!hull.escapePod && !Object.values(fit).some((m) => MODULES[m]?.kind === 'tractor')) {
-      const spare = hull.mounts.find((m) => m.type === 'utility' && !fit[m.id] && mountRefusal(m, MODULES[STOCK_TRACTOR]!) === null);
+      const spare = hull.mounts.find((m) => m.type === 'high' && !fit[m.id] && mountRefusal(m, MODULES[STOCK_TRACTOR]!) === null);
       if (spare) fit[spare.id] = STOCK_TRACTOR;
     }
     // What could not be rehoused goes to the owner's storage.

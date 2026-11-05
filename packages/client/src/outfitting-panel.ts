@@ -60,20 +60,21 @@ export const FIT_REFUSALS: Record<FitRefusal, string> = {
 };
 
 const MOUNT_TYPE_NAME: Record<MountType, string> = {
-  weapon: 'Weapon',
-  bay: 'Bay',
-  utility: 'Utility',
+  high: 'High',
+  mid: 'Mid',
+  low: 'Low',
   engine: 'Engine',
   core: 'Core',
-  internal: 'Internal',
   radar: 'Radar',
   computer: 'Targeting computer',
   nav: 'Navigation',
   flight: 'Flight computer',
   podBay: 'Pod bay',
   fireControl: 'Fire control',
-  mining: 'Mining',
 };
+
+/** Table order: core systems first (as the hull lists them), then high, mid and low slots. */
+const TIER_ORDER: Partial<Record<MountType, number>> = { high: 1, mid: 2, low: 3 };
 
 const INK = '#9fd3c7';
 const PREVIEW_W = 360;
@@ -425,12 +426,15 @@ export class OutfittingPanel {
     box.append(el('h2', undefined, `${hull.name} · ${maker} · ${hull.role}`));
     if (hull.sealed) box.append(el('p', 'muted', FIT_REFUSALS.sealed));
     if (hull.bonuses.length) box.append(el('p', 'bonuses', `Bonuses: ${hull.bonuses.map((b) => b.label).join('; ')}.`));
+    const count = (t: MountType): string => hull.mounts.filter((m) => m.type === t).map((m) => m.size).join(' ') || 'none';
+    box.append(el('p', 'muted', `High ${count('high')} · Mid ${count('mid')} · Low ${count('low')}${hull.oreHold ? ` · ore hold ${hull.oreHold} built in` : ''}`));
 
     const table = el('table');
     const head = el('tr');
     for (const h of ['Mount', 'Size', 'Fitted', '']) head.append(el('th', undefined, h));
     table.append(head);
-    for (const mount of hull.mounts) {
+    const ordered = hull.mounts.map((m, i) => ({ m, i })).sort((a, b) => (TIER_ORDER[a.m.type] ?? 0) - (TIER_ORDER[b.m.type] ?? 0) || a.i - b.i).map((x) => x.m);
+    for (const mount of ordered) {
       const module = fit[mount.id] ? world.modules[fit[mount.id]!] : undefined;
       const tr = el('tr', mount.id === this.selected ? 'selected' : undefined);
       const name = el('button', 'link', `${mount.id.toUpperCase()} ${MOUNT_TYPE_NAME[mount.type]}`);

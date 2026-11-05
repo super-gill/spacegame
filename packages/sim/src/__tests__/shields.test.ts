@@ -48,7 +48,7 @@ describe('shield arcs', () => {
 
   it('a ship with no shield generator has no arc', () => {
     const s = tern();
-    const { i1: _shield, ...fit } = s.fit;
+    const { u1: _shield, ...fit } = s.fit;
     expect(shipStats(w, { ...s, fit }).shieldArc).toBe(0);
   });
 });
