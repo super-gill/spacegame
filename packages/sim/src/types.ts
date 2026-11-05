@@ -1098,6 +1098,14 @@ export interface Pilot {
    * module and good ids never clash. Items stay where they were left.
    */
   storage: Record<string, Record<string, number>>;
+  /**
+   * Logged off (docs/shared-world.md, decision 1): when, by tick. Absent
+   * while the pilot is playing. A pilot away long enough has their ship
+   * taken out of space (`stowed`) until they return (`away.ts`).
+   */
+  away?: { sinceTick: number };
+  /** The ship this pilot was flying when they logged off, out of the world until they return; its drones back in its bay. */
+  stowed?: Ship;
 }
 
 /**

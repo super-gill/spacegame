@@ -1,6 +1,6 @@
 # The shared world (milestone 11)
 
-**Status: agreed with Jason, 5 November 2026 (his answers are under "Decisions"); building.** Brought forward after 0.13.0: Jason wants to play in one world with friends.
+**Status: agreed with Jason, 5 November 2026 (his answers are under "Decisions"); built in 0.14.0 apart from sending only what each player can see (step 4) and full prediction for your own ship (step 6).** Brought forward after 0.13.0: Jason wants to play in one world with friends.
 
 ## Goal
 

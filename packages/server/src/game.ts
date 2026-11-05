@@ -1,5 +1,8 @@
 import {
   applyCommand,
+  pilotLeft,
+  pilotReturned,
+  stepAway,
   diffWorld,
   emptyInput,
   joinPilot,
@@ -71,9 +74,17 @@ export class Game {
     return this.world;
   }
 
-  /** Bring a pilot into the world: a new one gets a starter ship, a returning one is left as they were. */
+  /** Bring a pilot into the world: a new one gets a starter ship; a returning one gets theirs back if it was taken out of space. */
   join(pilotId: string, name: string): void {
-    this.world = joinPilot(this.world, pilotId, name);
+    this.world = pilotReturned(joinPilot(this.world, pilotId, name), pilotId);
+  }
+
+  /**
+   * Everyone is logged off: on starting up, before anyone connects. Their
+   * ships in space disappear after the usual grace (away.ts).
+   */
+  allAway(): void {
+    for (const id of Object.keys(this.world.pilots)) this.world = pilotLeft(this.world, id);
   }
 
   /** A pilot's controls for one tick. */
@@ -97,10 +108,11 @@ export class Game {
     return outcome;
   }
 
-  /** A pilot left: forget their queued controls (their ship is left to the world). */
+  /** A pilot logged off: forget their controls; their ship stays in space a while, then disappears until they return (away.ts). */
   leave(pilotId: string): void {
     this.queued.delete(pilotId);
     this.last.delete(pilotId);
+    this.world = pilotLeft(this.world, pilotId);
   }
 
   /** One tick: everyone's controls in, the world stepped. */
@@ -113,7 +125,7 @@ export class Game {
       this.last.set(pilotId, input);
       if (ship) inputs[ship.id] = input;
     }
-    this.world = stepWorld(this.world, inputs);
+    this.world = stepAway(stepWorld(this.world, inputs));
     this.events.push(...this.world.events);
   }
 

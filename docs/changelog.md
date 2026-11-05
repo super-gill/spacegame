@@ -4,10 +4,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-05
+
+The shared world. The world runs on a server on the host's PC, and everyone plays in it from their browser; friends join over Tailscale. Characters with keys, players and operators, a connection meter, and updates small enough for a home connection. Worlds from 0.13.0 browser saves are not carried over: a server starts a new world.
+
 ### Added
 - The shared world (docs/shared-world.md, docs/hosting.md). The world runs on a server on the host's PC (`npm start`), saved to a file every minute; everyone plays in their browser, friends over Tailscale.
 - Characters: make one with a name (a suggestion fills the box) and get a key, shown once to keep; log in from any browser with name and key; this browser remembers it too. Names are unique. Two tabs can play two characters at once; logging in as a character already playing disconnects the other tab and says why.
 - Players and operators: only operators get the admin controls, and the server refuses admin commands from players. The first character on a new server is an operator; the host makes others with `op` and `deop` in the server's console (also `who`, `save`, `stop`).
+- Logging off in space: your ship stays where it is for a minute, then disappears with its drones taken aboard, and comes back where it was, stopped, when you return. A docked ship stays docked. When the server starts, everyone counts as logged off.
 - `stats` in the server console: ticks a second, time per tick against the budget, and what each player is sent, before and after compression.
 - A connection meter in the top right corner: the round trip to the server, green, amber or red. Click it away; the menu brings it back.
 
@@ -15,7 +20,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - No single-player mode and no browser saves: the server keeps the world. Save, export, import and new game are gone from the menu; the menu shows your character and key instead.
 
 ### Known
-- A ship left in space when its pilot logs off stays there for now; it is meant to vanish after a short while and come back when they return.
 - Each player is sent every ship in the system 30 times a second; sending only what a player's sensors can see comes next.
 
 ### Fixed

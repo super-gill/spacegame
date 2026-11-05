@@ -22,20 +22,21 @@ Milestones are ordered by what proves the game is fun soonest. Each one is playa
 | 8 Map | Interdiction and warp disruption with faster-than-light travel. Multiple systems, jump links, security bands, abstract NPC traffic; systems generated once from a seed; whether to add in-system faster-than-light travel; fuel and star scooping if not in 6f; the Unsung as hostile ships in unknown space | |
 | 9 Industry | Mining (starting in the Scree; ore read by a mining computer, gate-glass as a rare find), salvage (read by a salvage scanner), drones, manufacturing | |
 | 10 Economy | Replace scripted prices with supply and demand | |
-| 11 Shared world | Host-run Node server serving the client, friends join by address, a small dismissable connection meter coloured by latency, multiboxing as a built-in feature (several clients at once, each a separate character, chosen on connect), per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | Next, brought forward after 0.13.0 |
+| 11 Shared world | Host-run Node server serving the client, friends join by address, a small dismissable connection meter coloured by latency, multiboxing as a built-in feature (several clients at once, each a separate character, chosen on connect), per-pilot progress persisted with the world, pilot names, character creation (including starting as an Oru ward) | Done in 0.14.0: server, characters with keys, players and operators, logging off. Still: updates by sensor range, full prediction, character creation beyond a name |
 
 Version 1.0 is milestone 8 polished. Everything after that is content, plus the shared world.
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Plan from here (after 0.13.0)
+## Plan from here (after 0.14.0)
 
-1. **0.13.0 released:** mining grown up (drones, NPC miners, breaching, ore holds, sorting hoppers, loot claims) and fitting rebuilt (tiers, placement, buy then fit, the fitting window and the fitter), plus the first brig and frigate.
-2. **Next: the shared world (11), brought forward** (Jason, 5 November 2026: he wants to play in one world with friends). A host-run Node server owns the world; clients send commands and draw what the server sends. First: every client action that changes the world today (trade, refit, buy and sell modules, storage, drone commands, jettison, ship mart, boarding, admin rules) becomes a command the server checks and applies; saves move to the server; the connection meter; characters chosen on connect, ready for multiboxing. Code stays readable by a human developer. Design and plan in `docs/shared-world.md` before building.
-3. **Fitting step 4 (costs)** alongside or just after: weapon resolution against signature (a floor about 40%), slower big turrets, signature from kit, capacitor modules for low slots, the audit extended (mining and hauling runs, best fit per role). Until then the brig and frigate outclass smaller ships badly.
-4. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
-5. The interface passes carry on (6d: contacts and the nav target, aim reticle, munition warnings, shield arcs on the HUD).
-6. Then law (7, with electronic warfare), then the map (8).
+1. **0.14.0 released: the shared world** (`docs/shared-world.md`, `docs/hosting.md`). A server on the host's PC runs the world; players join from their browsers over Tailscale; characters with keys; players and operators; ships stowed after logging off; updates of about 0.3 Mbit/s a player.
+2. **Next: fitting step 4 (costs)** (`docs/fitting.md`): weapon resolution against signature (a floor about 40%), slower big turrets, signature from kit, capacitor modules for low slots, the audit extended (mining and hauling runs, best fit per role). It matters more now that players fight each other: until then the brig and frigate win every fight against smaller ships.
+3. **Shared world, still to do:** send each player only what their sensors can see (it is also a way to cheat today: every player is sent the whole system, holds included); full prediction for your own ship if steering still lags for friends; your own shots drawn from where you see your ship.
+4. **Drones:** try full manoeuvring (Jason's call) for the pathfinding trouble below.
+5. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
+6. The interface passes carry on (6d: contacts and the nav target, aim reticle, munition warnings, shield arcs on the HUD).
+7. Then law (7, with electronic warfare), then the map (8).
 
 ## To check later (from playtests)
 

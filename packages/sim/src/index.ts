@@ -183,3 +183,4 @@ export {
 } from './rails.js';
 export { applyCommand, readCommand, type PilotCommand, type CommandOutcome } from './commands.js';
 export { PROTOCOL_VERSION, MAX_NAME_LENGTH, applyUpdate, cleanName, diffWorld, readInput, type ClientMessage, type ServerMessage, type CommandReply, type ShipChange, type WorldUpdate, type LoginRefusal, type KickReason } from './net.js';
+export { AWAY_GRACE_SECONDS, pilotLeft, pilotReturned, stepAway } from './away.js';

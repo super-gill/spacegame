@@ -42,6 +42,8 @@ const MAX_BUFFERED_BYTES = 2_000_000;
 const storage = new Storage(DATA);
 const loaded = storage.loadWorld();
 const game = new Game(loaded.world);
+// Nobody is connected yet: everyone is away, and ships left in space disappear after the grace.
+game.allAway();
 const accounts = new Accounts(storage.loadAccounts());
 const stats = new ServerStats();
 
