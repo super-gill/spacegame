@@ -30,13 +30,13 @@ Every ship has **core systems**, one of each, at a size the hull sets. Then **hi
 
 - **High slots are hardpoints:** each has a place on the hull and a firing arc, as weapon mounts do now. Mid and low slots have places only so the ship can be drawn from its fit.
 - **The dedicated mining mount goes.** Mining turrets fit high slots; the Hulk's two big highs have full arcs. The mining hull's bonus is the nudge.
-- **Tractor and charge rig move to high** (lead's suggestion: both act outward, as EVE puts tractors in highs). **Afterburner moves to mid** (a self system, like EVE's propulsion). Jason to confirm.
+- **Tractor and charge rig move to high** (Jason, agreed). **Afterburner moves to mid.** Jason's rule of thumb: outward-acting in high, inward in mid, passive in low; how scanners, countermeasures and electronic warfare fit that rule is still open (question 1).
 - **Drone bays stay a low** so any ship can trade armour for drones. Carriers later get theirs built in.
 
 ### Sizes
 
 - **Undersizing is legal** (it already is): a small module in a bigger slot. Role bonuses apply only at full size, as now. Undersizing is a real tactic only if big weapons are weak against small targets (below).
-- **Oversizing (proposal):** a module one size up in a mid or low slot (Jason's oversized afterburner), at double the module's power and half again its mass. Not in core slots. Not in high slots, so arcs and hardpoints stay honest; slot merging covers big guns.
+- **Oversizing:** a module one size up in a mid or low slot (Jason's oversized afterburner), paying only its natural costs: its own power, mass and capacitor draw, which are already a large share of a small hull's budget (Jason). The audit watches for oversized modules that cost too little (a bigger afterburner draws no power today, only capacitor while burning); a penalty is added only if needed. Not in core slots. Not in high slots, so arcs and hardpoints stay honest; slot merging covers big guns.
 - **Slot merging (part two):** two neighbouring slots of the same tier and size become one a size up, losing both. The hull lists which pairs may merge. A glass cannon: two small highs on the nose become one medium gun.
 
 ## Costs that make choices
@@ -51,9 +51,9 @@ Freedom only works if every module costs something a different build would rathe
 
 ## Buying and fitting
 
-- **Modules are items.** They are sold at markets (each station sells what its makers and trade bring: Harbour general kit, Ridge mining kit, Lantern Works industrial kit, as now), bought into your **station storage**, and fitted from storage at a station with outfitting. Unfitting puts them back in storage; you can sell them at the market.
+- **Modules are items.** They are sold at markets (for now every station sells every module, Jason: the starter system is the test bed; regional stock later), bought into your **station storage**, and fitted from storage at a station with outfitting. Unfitting puts them back in storage; you can sell them at the market.
 - **One storage per station** for goods and modules together (today's `Pilot.storage` for modules and `Pilot.hangar` for goods merge).
-- **Fitting fee:** today 5% per fit or unfit. With buying separate, Jason's call: keep it small, or drop it.
+- **No fitting fee per item** (Jason): fitting and unfitting while docked is free, so experimenting costs nothing. A charge for keeping a new fit is open (question 3).
 - **Ships** stay in the ship mart, sold with their stock fit.
 
 ## Rigs (later)
@@ -101,8 +101,8 @@ Release 0.13.0 first (after Jason's playtest of breaching and holds), so the ove
 
 ## Questions for Jason
 
-1. Tractor and charge rig in highs, afterburner in mids: agreed?
-2. Oversizing in mids and lows only, at double power and half again the mass: a fair start?
-3. The fitting fee once buying is separate: keep it small, or drop it?
-4. Weapon resolution against signature as the way big guns struggle with small ships: agreed, or do you want it done by tracking only?
-5. Should every station sell every module, or only its makers' and region's kit (Ridge mining, Lantern industrial), so where you buy matters?
+Answered 5 November: tractor and charge rig in highs; oversizing pays only its natural costs; no fee per fitted item; every station sells every module for now.
+
+1. **The tier rule.** "Outward in high, inward in mid, passive in low" puts survey scanners, countermeasures and electronic warfare in highs, since all three act outward, but your list had them in mids. EVE keeps them in mids on purpose, so a fighting ship trades tank for interference. Lead's suggestion: high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
+2. **Weapon resolution against signature** (explained in chat): agreed, or tracking only?
+3. **Charging for a new fit:** charge something when you undock with a changed fit, or nothing at all?
