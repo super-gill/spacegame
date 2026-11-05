@@ -36,7 +36,7 @@ Every ship has **core systems**, one of each, at a size the hull sets. Then **hi
 ### Sizes
 
 - **Undersizing is legal** (it already is): a small module in a bigger slot. Role bonuses apply only at full size, as now. Undersizing is a real tactic only if big weapons are weak against small targets (below).
-- **Oversizing:** a module one size up in a mid or low slot (Jason's oversized afterburner), paying only its natural costs: its own power, mass and capacitor draw, which are already a large share of a small hull's budget (Jason). The audit watches for oversized modules that cost too little (a bigger afterburner draws no power today, only capacitor while burning); a penalty is added only if needed. Not in core slots. Not in high slots, so arcs and hardpoints stay honest; slot merging covers big guns.
+- **Oversizing:** a module one size up in a mid or low slot (Jason's oversized afterburner), paying only its natural costs: its own power, mass and capacitor draw, which are already a large share of a small hull's budget (Jason). The EVE version works because the cost defines the whole fit: a large afterburner empties a small capacitor almost at once, so the build needs capacitor modules in every spare low, and the right ones are rare and expensive. Ours needs the same: capacitor draw that scales hard with module size, and capacitor modules for lows (batteries that add to the pool, rechargers that speed it up), so an oversized build is possible, tight and costly rather than a free upgrade. Expensive higher-grade kit (EVE's faction and pirate gear) comes later with the economy. The audit watches for oversized modules that cost too little. Not in core slots. Not in high slots, so arcs and hardpoints stay honest; slot merging covers big guns.
 - **Slot merging (part two):** two neighbouring slots of the same tier and size become one a size up, losing both. The hull lists which pairs may merge. A glass cannon: two small highs on the nose become one medium gun.
 
 ## Costs that make choices
@@ -47,7 +47,8 @@ Freedom only works if every module costs something a different build would rathe
 - **Mass** already costs acceleration and spin-up (thrust divided by mass); top speed and turn rate stay hull limits. Armour should feel heavy: the audit checks that an armour-bricked hull is clearly slower to get going and to turn. If not, armour's mass goes up.
 - **Capacitor:** shields, energy guns, scanners and boosters share one pool.
 - **Signature** (proposal): bigger and hotter kit raises the hull's signature (big guns, engines, charge rigs), making it easier to see and lock.
-- **Big weapons against small targets** (proposal, needed for undersizing): each weapon has a **resolution** by size (small 15, medium 30, large 60). A hit does full damage to a target whose signature is at least the resolution, and proportionally less to smaller ones. A large gun barely scratches a frigate; a small gun does full damage to anything. Swivels also traverse slower the bigger they are. Mining lasers are unaffected (rocks are big).
+- **Big weapons against small targets** (proposal, needed for undersizing): each weapon has a **resolution** by size (small 15, medium 30, large 60). A hit does full damage to a target whose signature is at least the resolution, and proportionally less to smaller ones. Swivels also traverse slower the bigger they are. Mining lasers are unaffected (rocks are big).
+- **But a big ship must be able to defend itself** (Jason): in EVE a battleship fitted as a battleship struggles with anything much smaller, which an MMO's fleets cover but which would be punishing here, where a player is often alone. So: a floor on resolution (a big gun never does less than about 40% to a small target, to tune); every big hull has a few small highs for swivels, and stock fits use them; drones as the other answer to small ships. The audit checks that every stock fit with guns can drive off or kill a pirate raider in reasonable time.
 
 ## Buying and fitting
 
@@ -59,6 +60,22 @@ Freedom only works if every module costs something a different build would rathe
 ## Rigs (later)
 
 Permanent hull modifications: a bonus with a drawback, installed at outfitting, destroyed if removed. Each hull gets a rig count now (small 1, medium 2, large 3) with nothing to fit until the tiers have been played. Name to come from the lore chat.
+
+## Hull classes set the template
+
+The class ladder stays (`HullSpec.class`, `docs/ship-systems.md`). A class sets a hull's slot template and the usual size of its slots, which follows the class up the ladder; each hull then varies within its class for character (one slot moved between tiers, or one extra in its role), and its pad size (`sizeClass`) follows as now. Today's budget table translates: high is today's weapon slots plus one (tractor and charge rig moved in), mid is today's utility slots (afterburner and scanners stay, shields move in), low is today's internal slots plus cargo bays (shields move out).
+
+| Class | High | Mid | Low | Usual slot size |
+| --- | --- | --- | --- | --- |
+| Pod | 0 | 0 | 0 | |
+| Cutter | 3 | 2 | 3 | S |
+| Sloop | 4 | 3 | 4 | M, some S |
+| Brig | 5 | 3 | 6 | M |
+| Frigate | 6 | 4 | 7 | M and L |
+| Ship of the line | 9 | 5 | 10 | L |
+| Capital | 11 | 6 | 13 | L, XL later |
+| Merchantman | 2 | 3 | 9 | M |
+| Hulk | 4 | 4 | 6 | L and M |
 
 ## Slot counts, first pass
 
@@ -104,5 +121,5 @@ Release 0.13.0 first (after Jason's playtest of breaching and holds), so the ove
 Answered 5 November: tractor and charge rig in highs; oversizing pays only its natural costs; no fee per fitted item; every station sells every module for now.
 
 1. **The tier rule.** "Outward in high, inward in mid, passive in low" puts survey scanners, countermeasures and electronic warfare in highs, since all three act outward, but your list had them in mids. EVE keeps them in mids on purpose, so a fighting ship trades tank for interference. Lead's suggestion: high does work on something else (shoots, cuts, pulls, blasts); mid runs the ship's own active systems, including sensing, defending and interfering; low is passive.
-2. **Weapon resolution against signature** (explained in chat): agreed, or tracking only?
+2. **Weapon resolution against signature** (explained in chat), with a floor so big ships can still defend themselves (Jason: be mindful of punishing big ships): agreed, and is about 40% the right floor to start?
 3. **Charging for a new fit:** charge something when you undock with a changed fit, or nothing at all?
