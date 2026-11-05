@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { asteroidPositions, oreLeft, rockAt } from '../asteroids.js';
+import { slotPlace, thinkDrone } from '../ai/drone.js';
 import { findPath } from '../ai/path.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from '../bodies.js';
 import { FIXED_DT } from '../constants.js';
@@ -12,7 +13,7 @@ import { deserializeWorld, serializeWorld } from '../save.js';
 import { shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import { buyGood, maxBuyable, sellGood } from '../trade.js';
-import type { Asteroid, DroneCommand, ShipInput, World, WorldEvent } from '../types.js';
+import type { Asteroid, DroneBrain, DroneCommand, ShipInput, World, WorldEvent } from '../types.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
 
 /** Drones (docs/drones.md): mining drones that fly themselves and work their mother's locked rocks. */
@@ -113,6 +114,34 @@ describe('drone bays', () => {
     expect(w.ships['h']!.hold['ore'] ?? 0).toBeGreaterThan(0);
   });
 
+  it('a drone short of its spot, nose on the rock, cuts from there', () => {
+    // With no reverse thrust it cannot back off to its spot; it used to wait for ever.
+    let w = lockRocks(hulkWorld());
+    w = command(w, { action: 'launch', droneId: 'd1' });
+    w = run(w, 2).w;
+    const drone = w.ships['h/d1']!;
+    const brain = w.npcs['h/d1'] as DroneBrain;
+    const rock = rockAt(w, brain.rockId!)!;
+    // 15 units off the face (its spot is 40 off), pointing at the rock, at rest.
+    const bearing = Math.atan2(brain.goal!.y - rock.position.y, brain.goal!.x - rock.position.x);
+    const position = { x: rock.position.x + Math.cos(bearing) * (30 + 15 + 6), y: rock.position.y + Math.sin(bearing) * (30 + 15 + 6) };
+    const placed = { ...drone, position, velocity: rock.velocity, heading: bearing + Math.PI };
+    w = { ...w, ships: { ...w.ships, [placed.id]: placed } };
+    expect(thinkDrone(w, placed, shipStats(w, placed), brain).input.fireFixed).toBe(true);
+  });
+
+  it('a dozen drones on one small rock each get a spot of their own, all in laser range', () => {
+    // Spots used to repeat from the seventh drone, so a hulk full of drone bays piled them up.
+    for (const rockRadius of [12, 30, 64]) {
+      const spots = Array.from({ length: 24 }, (_, i) => {
+        const p = slotPlace(i, rockRadius, 6, 90);
+        return { x: Math.cos(p.offset) * p.reach, y: Math.sin(p.offset) * p.reach, gap: p.reach - rockRadius };
+      });
+      for (const s of spots) expect(s.gap).toBeLessThanOrEqual(90 * 0.9);
+      for (let i = 0; i < 12; i++) for (let j = 0; j < i; j++) expect(Math.hypot(spots[i]!.x - spots[j]!.x, spots[i]!.y - spots[j]!.y)).toBeGreaterThanOrEqual(12);
+    }
+  });
+
   it("drones skip a rock a turret is on while there is a free one", () => {
     let w = lockRocks(hulkWorld());
     w = stepWorld(w, { h: { ...emptyInput(), activateLock: 'a' } });
@@ -181,6 +210,8 @@ describe('drone bays', () => {
     if (!bought.ok) return;
     expect(bought.world.ships[old.id]!.droneBay?.map((d) => d.id)).toEqual(['d1', 'd2', 'd3']);
     expect(bought.world.ships[old.id]!.hold['mining-drone']).toBeUndefined();
+    // Past the bays' room it is the bays that are full, whatever the cargo hold has free.
+    expect(buyGood(bought.world, 'ana', 'mining-drone', 4)).toMatchObject({ ok: false, reason: 'droneBay' });
     const sold = sellGood(bought.world, 'ana', 'mining-drone', 1);
     expect(sold.ok).toBe(true);
     if (!sold.ok) return;

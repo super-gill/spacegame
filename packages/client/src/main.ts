@@ -194,6 +194,7 @@ const REFUSALS: Record<TradeRefusal, string> = {
   badQuantity: 'Nothing to trade.',
   credits: 'Not enough credits.',
   space: 'Not enough cargo space.',
+  droneBay: 'Your drone bays are full: fit another bay to carry more drones.',
   notHeld: 'You do not have that many.',
 };
 

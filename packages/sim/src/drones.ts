@@ -1,9 +1,9 @@
-import { rockAt } from './asteroids.js';
+import { asteroidPositions, rockAt } from './asteroids.js';
 import { buildShip } from './factory.js';
 import { isLocked } from './locks.js';
 import { shipStats } from './stats.js';
 import type { DroneBrain, DroneCommand, Ship, StoredDrone, World, WorldEvent } from './types.js';
-import { add, distance, fromAngle, scale } from './vec2.js';
+import { add, distance, fromAngle, scale, type Vec2 } from './vec2.js';
 
 /**
  * Drones (docs/drones.md): a general system, mining drones first.
@@ -113,6 +113,9 @@ interface Changed {
   events: WorldEvent[];
 }
 
+/** Room a launched drone is given from any rock's surface, units. */
+const LAUNCH_CLEARANCE = 20;
+
 /** Launch one stowed drone, or as many as control allows. */
 function launch(world: World, ships: Record<string, Ship>, npcs: World['npcs'], mother: Ship, droneId?: string): Changed {
   const refuse = (reason: Extract<WorldEvent, { type: 'droneRefused' }>['reason']): Changed => ({ ships, npcs, events: [{ type: 'droneRefused', shipId: mother.id, reason }] });
@@ -128,15 +131,28 @@ function launch(world: World, ships: Record<string, Ship>, npcs: World['npcs'], 
 
   const going = wanted.slice(0, room);
   const motherRadius = world.hulls[mother.hullId]?.radius ?? 20;
+  const rocks = asteroidPositions(world).filter((r) => Math.hypot(r.position.x - mother.position.x, r.position.y - mother.position.y) < motherRadius + 300);
   const nextShips = { ...ships };
   const nextNpcs = { ...npcs };
   going.forEach((d, i) => {
     const loadout = world.loadouts[d.loadoutId];
     if (!loadout) return;
     // Out of either beam in turn, spread along the hull.
-    const side = fromAngle(mother.heading + (i % 2 === 0 ? Math.PI / 2 : -Math.PI / 2));
-    const along = fromAngle(mother.heading);
-    const at = add(add(mother.position, scale(side, motherRadius + 14)), scale(along, (Math.floor(i / 2) - 0.5) * 24));
+    // Not against a rock, though: a mother parked beside one would launch
+    // straight into it, so try further out, then round the hull.
+    const placeAt = (angle: number, out: number): Vec2 => add(add(mother.position, scale(fromAngle(angle), motherRadius + out)), scale(fromAngle(mother.heading), (Math.floor(i / 2) - 0.5) * 24));
+    const firstAngle = mother.heading + (i % 2 === 0 ? Math.PI / 2 : -Math.PI / 2);
+    const clear = (p: Vec2): boolean => rocks.every((r) => Math.hypot(r.position.x - p.x, r.position.y - p.y) >= r.radius + LAUNCH_CLEARANCE);
+    let at = placeAt(firstAngle, 14);
+    found: for (const turn of [0, Math.PI, Math.PI / 2, -Math.PI / 2]) {
+      for (const out of [14, 40, 70]) {
+        const p = placeAt(firstAngle + turn, out);
+        if (clear(p)) {
+          at = p;
+          break found;
+        }
+      }
+    }
     const built = buildShip(world, { id: `${mother.id}/${d.id}`, loadout, ownerId: mother.ownerId, position: at, heading: mother.heading, flightMode: 'assisted' });
     nextShips[built.id] = { ...built, velocity: mother.velocity, structure: Math.min(built.structure, d.structure), motherId: mother.id, droneId: d.id };
     const brain: DroneBrain = { kind: 'drone', motherId: mother.id, mode: 'work', rockId: null, sentRockId: null };

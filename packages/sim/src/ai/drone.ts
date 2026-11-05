@@ -24,10 +24,12 @@ import { CLEAR_MARGIN, navigate } from './navigate.js';
 export const DRONE_TUNING = {
   /** Gap kept between a drone and the rock face it cuts, units. */
   standoff: 40,
-  /** Close enough to its spot to start cutting, units. */
+  /** Close to its spot, units: within three times this it turns to face the rock. */
   onSpot: 20,
   /** Facing the rock within this, radians, before the laser runs. */
   aimTolerance: 0.12,
+  /** Cuts once the rock's face is within this share of its laser's range. */
+  reachShare: 0.9,
   /** Cruising speed as a share of the drone's top speed. */
   cruise: 0.4,
   /** Where an idle drone waits: this far beyond the mother's hull, units. */
@@ -94,19 +96,36 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   const homeward = toAngle(sub(mother.position, rock.position));
   const seamAngle = rockSeam(rock.rock.id);
   const base = Math.abs(angleDelta(homeward, seamAngle)) <= Math.PI / 2 ? seamAngle : homeward;
+  // Its place among them: round the face from the seam, then, once a ring
+  // round the rock is full, a second ring further out, still in laser range.
+  const laserReach = Math.max(0, ...Object.values(stats.weapons).filter((w) => w.mining).map((w) => w.range));
+  const place = slotPlace(slot, rock.rock.radius, stats.radius, laserReach);
   // Not a spot wedged against another rock or the mother: step round the face until clear.
-  const reach = rock.rock.radius + DRONE_TUNING.standoff + stats.radius;
+  const reach = place.reach;
   // Nor on top of a sister drone's spot on this rock (on a small rock the search can land two on one).
   const sisters = sisterSpots(world, decided, ship.id, mother.id, rock.rock.id).map((p) => ({ position: p, radius: stats.radius }));
   const others = [...rocks.filter((r) => distance(r.position, rock.position) > 1), hull, ...sisters];
-  const first = base + SLOT_OFFSETS[slot % SLOT_OFFSETS.length]!;
+  const first = base + place.offset;
+  // In a crowded patch every place round the face may be tight: then the
+  // one with the most room, out to the edge of laser range, never simply
+  // the first (which may be wedged against a neighbour).
+  const roomAt = (p: Vec2): number => Math.min(...others.map((o) => distance(p, o.position) - o.radius - clearance - 4));
+  const outermost = rock.rock.radius + Math.max(DRONE_TUNING.standoff, laserReach * DRONE_TUNING.reachShare - stats.radius - SLOT_GAP) + stats.radius;
   let spot = add(rock.position, scale(fromAngle(first), reach));
-  for (let k = 0; k < SPOT_TRIES; k++) {
-    const angle = first + (k % 2 === 0 ? 1 : -1) * Math.ceil(k / 2) * SPOT_STEP;
-    const candidate = add(rock.position, scale(fromAngle(angle), reach));
-    if (others.every((o) => distance(candidate, o.position) >= o.radius + clearance + 4)) {
-      spot = candidate;
-      break;
+  let bestRoom = -Infinity;
+  search: for (const r of reach < outermost ? [reach, (reach + outermost) / 2, outermost] : [reach]) {
+    for (let k = 0; k < SPOT_TRIES; k++) {
+      const angle = first + (k % 2 === 0 ? 1 : -1) * Math.ceil(k / 2) * SPOT_STEP;
+      const candidate = add(rock.position, scale(fromAngle(angle), r));
+      const room = others.length > 0 ? roomAt(candidate) : Infinity;
+      if (room >= 0) {
+        spot = candidate;
+        break search;
+      }
+      if (room > bestRoom) {
+        bestRoom = room;
+        spot = candidate;
+      }
     }
   }
   const { velocity: desired, plan } = head(spot, rock.velocity, true);
@@ -114,8 +133,12 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   const near = distance(ship.position, spot) <= DRONE_TUNING.onSpot * 3;
   const input = steerSafely(ship, stats, desired, flight, near ? rock.position : undefined);
   const facing = Math.abs(angleDelta(ship.heading, toAngle(sub(rock.position, ship.position)))) <= DRONE_TUNING.aimTolerance;
-  const there = distance(ship.position, spot) <= DRONE_TUNING.onSpot;
-  return { input: { ...input, fireFixed: facing && there }, brain: { ...next, ...plan } };
+  // Cut from wherever it can reach the face, not only from its exact spot:
+  // a drone that ends up a little short of its spot, nose on the rock, has
+  // no reverse thrust to back off and would otherwise wait for ever.
+  const gap = distance(ship.position, rock.position) - rock.rock.radius;
+  const inReach = near && gap <= laserReach * DRONE_TUNING.reachShare;
+  return { input: { ...input, fireFixed: facing && inReach }, brain: { ...next, ...plan } };
 }
 
 /** Looking for a clear cutting spot: this many steps round the rock's face, this far apart, radians. */
@@ -152,8 +175,38 @@ function pickRock(world: World, mother: Ship, droneShipId: string, current: stri
   return rocks.find((r) => load.get(r) === least) ?? null;
 }
 
-/** Where along a rock's face drones sharing it sit, radians from the seam: the first two on it. */
-const SLOT_OFFSETS = [0, 0.32, -0.32, 0.64, -0.64, 0.96];
+/**
+ * Where the `slot`th drone on a rock sits: an angle from the seam and a
+ * distance from the rock's centre. Drones fill a ring round the face, a
+ * drone's width and a little apart, alternating either side of the seam
+ * (0, +1, -1, +2, -2...), then the next ring out, a drone's width further,
+ * as long as the face stays in laser range; past that they double up on
+ * the outer ring.
+ */
+export function slotPlace(slot: number, rockRadius: number, droneRadius: number, laserReach: number): { offset: number; reach: number } {
+  const width = droneRadius * 2 + SLOT_GAP;
+  const furthest = Math.max(DRONE_TUNING.standoff, laserReach * DRONE_TUNING.reachShare - droneRadius - SLOT_GAP);
+  let left = slot;
+  for (let ring = 0; ; ring++) {
+    const standoff = Math.min(DRONE_TUNING.standoff + ring * width, furthest);
+    const reach = rockRadius + standoff + droneRadius;
+    // At least the old spacing, so a few drones on a big rock still spread out.
+    const step = Math.max(SLOT_MIN_STEP, width / reach);
+    const fits = Math.max(1, Math.floor((Math.PI * 2) / step));
+    const last = standoff >= furthest;
+    if (left < fits || last) {
+      const k = last ? left % fits : left;
+      // Rings after the first sit between the spots of the one inside.
+      const shift = ring % 2 === 1 ? step / 2 : 0;
+      return { offset: (k % 2 === 1 ? 1 : -1) * Math.ceil(k / 2) * step + shift, reach };
+    }
+    left -= fits;
+  }
+}
+
+/** Space between neighbouring drones' spots, units; and the least angle between them, radians. */
+const SLOT_GAP = 6;
+const SLOT_MIN_STEP = 0.32;
 
 /** This drone's place among its mother's drones on the same rock, by id. */
 function slotOn(world: World, decided: World['npcs'], droneShipId: string, motherId: string, rockId: string): number {

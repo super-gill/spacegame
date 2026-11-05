@@ -97,6 +97,7 @@ export type TradeRefusal =
   | 'badQuantity' // quantity is not a whole number above zero
   | 'credits' // not enough credits
   | 'space' // not enough cargo space
+  | 'droneBay' // a drone, and the drone bays are full (drones never go in cargo)
   | 'notHeld'; // selling more than is aboard
 
 export type TradeResult =
@@ -138,7 +139,7 @@ export function buyGood(world: World, pilotId: string, goodId: string, quantity:
   const pilot = world.pilots[pilotId]!;
   const cost = ask * quantity;
   if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
-  if (quantity > roomFor(world, d.ship, goodId)) return { ok: false, world, reason: 'space' };
+  if (quantity > roomFor(world, d.ship, goodId)) return { ok: false, world, reason: world.goods[goodId]?.drone ? 'droneBay' : 'space' };
 
   // A drone goes into the drone bay, ready to launch.
   const drone = world.goods[goodId]?.drone;
