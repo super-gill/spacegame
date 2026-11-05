@@ -1,4 +1,4 @@
-import { cargoUsed, holdCapacity, maxBuyable, scriptedPrices, shipStats, type World } from '@spacegame/sim';
+import { holdUse, maxBuyable, scriptedPrices, shipStats, type World } from '@spacegame/sim';
 
 /**
  * Station market, shown inside the docked panel.
@@ -44,13 +44,15 @@ export class MarketPanel {
     if (signature === this.signature) return;
     this.signature = signature;
 
-    const capacity = holdCapacity(shipStats(world, ship));
+    // Cargo and the ore hold are separate spaces: only ore goes in the ore hold.
+    const use = holdUse(ship, shipStats(world, ship), world.goods);
     this.root.replaceChildren();
 
     const summary = el('div', 'market-summary');
     summary.append(
       el('span', undefined, `Credits ${pilot.credits.toLocaleString('en-GB')}`),
-      el('span', undefined, `Cargo ${cargoUsed(ship)} / ${capacity}`),
+      el('span', undefined, `Cargo ${use.cargo.used} / ${use.cargo.capacity}`),
+      ...(use.ore.capacity > 0 ? [el('span', undefined, `Ore hold ${use.ore.used} / ${use.ore.capacity}`)] : []),
     );
     this.root.append(summary);
 
@@ -76,15 +78,19 @@ export class MarketPanel {
       );
 
       const actions = el('td', 'actions');
-      const button = (label: string, request: TradeRequest, enabled: boolean): void => {
+      // Why Buy is greyed: money first, then room (a drone bay for drones, the hold for the rest).
+      const ask = quote?.ask;
+      const buyWhy = ask == null ? 'Not sold here.' : pilot.credits < ask ? `Not enough credits: ${ask.toLocaleString('en-GB')} each, you have ${pilot.credits.toLocaleString('en-GB')}.` : drone ? 'No room in your drone bays.' : 'No room in the hold for this.';
+      const button = (label: string, request: TradeRequest, enabled: boolean, why = ''): void => {
         const b = el('button', undefined, label);
         b.type = 'button';
         b.disabled = !enabled;
+        if (!enabled && why) b.title = why;
         b.addEventListener('click', () => this.onTrade(request));
         actions.append(b);
       };
-      button('Buy 1', { side: 'buy', good: id, quantity: 1 }, canBuy >= 1);
-      button(`Buy max${canBuy > 1 ? ` (${canBuy})` : ''}`, { side: 'buy', good: id, quantity: Math.max(1, canBuy) }, canBuy >= 1);
+      button('Buy 1', { side: 'buy', good: id, quantity: 1 }, canBuy >= 1, buyWhy);
+      button(`Buy max${canBuy > 1 ? ` (${canBuy})` : ''}`, { side: 'buy', good: id, quantity: Math.max(1, canBuy) }, canBuy >= 1, buyWhy);
       button('Sell 1', { side: 'sell', good: id, quantity: 1 }, quote?.bid != null && aboard >= 1);
       button('Sell all', { side: 'sell', good: id, quantity: Math.max(1, aboard) }, quote?.bid != null && aboard >= 1);
       row.append(actions);

@@ -19,6 +19,7 @@ import {
   type Ship,
   type ShipStats,
   type World,
+  RESOLUTION_FLOOR,
 } from '@spacegame/sim';
 import { RACE_COLOUR } from './render/ship-art.js';
 
@@ -189,9 +190,11 @@ export function describeModule(m: ModuleSpec, world: World): string {
     parts.push(`cuts rock up to ${Math.round((w.mining?.strength ?? 0) * 100)}% hard, ${fixed1(w.damage)} ore/s, range ${Math.round(w.range)}, ${fixed1(w.capacitorPerShot)} cap/s`);
   } else if (w && w.family === 'missile') {
     parts.push(`${Math.round(w.damage)} warhead base, one every ${fixed1(w.fireInterval)} s, needs a lock`);
+    parts.push(resolutionNote(w.resolution));
     parts.push(`loads ${w.ammo === 'torpedo' ? 'torpedoes' : 'missiles'}, holds ${w.magazine}`);
   } else if (w) {
     parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
+    parts.push(resolutionNote(w.resolution));
     if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
     if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
@@ -221,6 +224,11 @@ interface StatRow {
 }
 
 const DEG = 180 / Math.PI;
+/** What a weapon's resolution means for the pilot (docs/fitting.md, "Costs that make choices"). */
+function resolutionNote(resolution: number): string {
+  return `full damage to targets of signature ${resolution} and up, less to smaller ones (at least ${Math.round(RESOLUTION_FLOOR * 100)}%)`;
+}
+
 const dps = (s: ShipStats, kind: 'fixed' | 'turret'): number =>
   Object.values(s.weapons)
     .filter((w) => w.kind === kind && isGun(w))
@@ -238,6 +246,7 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Cargo', value: (s) => s.cargoCapacity, format: (n) => String(n), better: 'higher' },
   { label: 'Sensor range', value: (s) => s.sensorRange, format: (n) => (n > 0 ? `${n} u` : 'blind'), better: 'higher' },
   { label: 'Locks', value: (s) => s.maxLocks, format: (n) => String(n), better: 'higher' },
+  { label: 'Signature', value: (s) => s.signature, format: (n) => String(Math.round(n)), better: 'lower' },
   { label: 'Lock speed', value: (s) => s.scanResolution, format: (n) => (n > 0 ? `${fixed1(n)}x` : 'none'), better: 'higher' },
   { label: 'Capacitor', value: (s) => s.capacitor, format: (n) => String(Math.round(n)), better: 'higher' },
   { label: 'Cap recharge', value: (s) => s.capacitorRecharge, format: (n) => `${fixed1(n)}/s`, better: 'higher' },

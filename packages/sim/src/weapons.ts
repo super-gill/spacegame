@@ -1,3 +1,4 @@
+import { RESOLUTION_BY_SIZE, TORPEDO_RESOLUTION_FACTOR, TURRET_SLEW_FALLOFF } from './constants.js';
 import type { ModuleSize, WeaponSpec } from './types.js';
 
 /**
@@ -29,10 +30,14 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  *
  * Each size roughly doubles the one below in damage per shot and in
  * capacitor or round cost, a little less in damage per second, so bigger
- * guns are about alpha rather than sustained fire.
+ * guns are about alpha rather than sustained fire. Bigger guns and
+ * warheads also have a coarser resolution (`RESOLUTION_BY_SIZE`): they
+ * do only part of their damage to targets smaller than it, and bigger
+ * swivels slew slower (`TURRET_SLEW_FALLOFF`), so small, quick ships are
+ * hard for big guns (docs/fitting.md, "Costs that make choices").
  */
 
-type Profile = Omit<WeaponSpec, 'id' | 'name' | 'size'>;
+type Profile = Omit<WeaponSpec, 'id' | 'name' | 'size' | 'resolution'>;
 
 /** Scale a base S profile up a size. */
 function sized(id: string, name: string, size: ModuleSize, base: Profile): WeaponSpec {
@@ -47,7 +52,8 @@ function sized(id: string, name: string, size: ModuleSize, base: Profile): Weapo
     fireInterval: base.fireInterval * Math.pow(1.15, step),
     capacitorPerShot: base.capacitorPerShot * k,
     range: base.range * Math.pow(1.12, step),
-    turretTurnRate: base.turretTurnRate / Math.pow(1.3, step),
+    turretTurnRate: base.turretTurnRate / Math.pow(TURRET_SLEW_FALLOFF, step),
+    resolution: RESOLUTION_BY_SIZE[size],
   };
 }
 
@@ -202,6 +208,8 @@ function miningLaser(id: string, name: string, size: ModuleSize, strength: numbe
   return {
     id, name, size, kind: turretTurnRate > 0 ? 'turret' : 'fixed', family: 'mining', damage: yieldPerSecond, damageType: 'thermal', fireInterval: 1,
     projectileSpeed: 0, range, turretTurnRate, capacitorPerShot: capacitorPerSecond, ammo: null, magazine: 0, reloadSeconds: 0,
+    // Rocks are big: mining lasers ignore resolution.
+    resolution: 0,
     mining: { strength },
   };
 }
@@ -210,6 +218,7 @@ function launcher(id: string, name: string, size: ModuleSize, slot: 'missile' | 
   return {
     id, name, size, kind: 'fixed', family: 'missile', damage, damageType: 'explosive', fireInterval: interval,
     projectileSpeed: slot === 'missile' ? 420 : 210, range, turretTurnRate: 0, capacitorPerShot: 0, ammo: slot, magazine, reloadSeconds: reload,
+    resolution: RESOLUTION_BY_SIZE[size] * (slot === 'torpedo' ? TORPEDO_RESOLUTION_FACTOR : 1),
   };
 }
 
@@ -217,6 +226,7 @@ function dispenser(id: string, name: string, size: ModuleSize, magazine: number,
   return {
     id, name, size, kind: 'fixed', family: 'countermeasure', damage: 0, damageType: 'kinetic', fireInterval: interval,
     projectileSpeed: 0, range: 0, turretTurnRate: 0, capacitorPerShot: 0, ammo: 'countermeasure', magazine, reloadSeconds: 4,
+    resolution: 0,
   };
 }
 

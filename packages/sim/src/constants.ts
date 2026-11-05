@@ -197,3 +197,32 @@ export const POINT_DEFENCE_RANGE_FRACTION = 1;
  * wash (docs/weapons.md, "Shield arcs").
  */
 export const STOCK_SHIELD_ARC = (3 * Math.PI) / 2;
+
+// Fitting step 4, costs (docs/fitting.md, "Costs that make choices").
+
+/**
+ * Weapon resolution by size: the signature a target needs to take a
+ * weapon's full damage. Smaller targets take a share, signature over
+ * resolution, never below `RESOLUTION_FLOOR`. Big guns are for big ships.
+ */
+export const RESOLUTION_BY_SIZE = { S: 15, M: 30, L: 60, XL: 120 } as const;
+/**
+ * The least share of its damage a gun or munition ever does, however small
+ * the target (Jason: a big ship must still be able to defend itself).
+ */
+export const RESOLUTION_FLOOR = 0.4;
+/** Torpedoes are capital killers: their resolution is this many times their tube's size. */
+export const TORPEDO_RESOLUTION_FACTOR = 2;
+/** How much each size up slows a swivel's traverse: S turns this many times faster than M, and so on. */
+export const TURRET_SLEW_FALLOFF = 1.6;
+/**
+ * Signature fitted kit adds to the hull's, by kind and size, unless the
+ * module names its own (`ModuleSpec.stats.signature`). Big drives and big
+ * guns are hot and bright; small kit adds nothing.
+ */
+export const KIT_SIGNATURE: Partial<Record<string, { S: number; M: number; L: number; XL: number }>> = {
+  engine: { S: 2, M: 4, L: 8, XL: 16 },
+  weapon: { S: 0, M: 1, L: 4, XL: 8 },
+};
+/** A burning afterburner blooms the ship's signature by this share: fast, but easy to see and to hit. */
+export const AFTERBURNER_SIGNATURE_BLOOM = 0.5;

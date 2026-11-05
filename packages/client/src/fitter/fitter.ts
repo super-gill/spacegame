@@ -9,6 +9,7 @@ import {
   fitProblems,
   fitSummary,
   mountRefusal,
+  TARGET_SIGNATURES,
   type FitSpec,
   type FitSummary,
 } from '@spacegame/sim';
@@ -176,6 +177,9 @@ const ROWS: Row[] = [
   ['Shield regen', (s) => s.shieldRegen, 1, 'higher'],
   ['Structure', (s) => s.structure, 0, 'higher'],
   ['Damage per second', (s) => s.dps, 1, 'higher'],
+  [`  against small (sig ${TARGET_SIGNATURES.small})`, (s) => s.dpsAgainst.small, 1, 'higher'],
+  [`  against medium (sig ${TARGET_SIGNATURES.medium})`, (s) => s.dpsAgainst.medium, 1, 'higher'],
+  [`  against large (sig ${TARGET_SIGNATURES.large})`, (s) => s.dpsAgainst.large, 1, 'higher'],
   ['Longest range', (s) => s.range, 0, 'higher'],
   ['Signature', (s) => s.signature, 0, 'lower'],
   ['Sensor range', (s) => s.sensorRange, 0, 'higher'],

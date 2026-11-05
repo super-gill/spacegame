@@ -4,7 +4,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- Weapon resolution: big guns and warheads do only part of their damage to small ships (full to a target as big as the gun's resolution, never less than 40%). Small guns 15, medium 30, large 60; torpedoes twice their tube.
+- Signature from kit: big engines and guns make a ship bigger to sensors and guns, the charge rig more so, and a burning afterburner blooms it by half.
+- The fitting window shows your signature and each weapon's resolution; the fitter shows damage against small, medium and large targets.
+- The market shows cargo and the ore hold separately, and a greyed Buy button says why on hover.
+
 ### Changed
+- Bigger swivels slew slower: each size turns 1.6 times slower than the one below (was 1.3).
+- The Cantor-Vell Vigil M armour plate carries 460 structure (was 100, worse than the small plate).
 - Mining ships and kit take their names from the lore: Belt Forge Collective builds the Prospector, Sinker (was Breacher), Collier (was Hulk) and the Knocker drone, with the Pick, Dowser, Assay, Sounder (was Deep Assay), Shotfirer (was Charge Rig), Hopper, Nibbler, Cradle and Cage; Corvane Heavy Industries builds the Excavator and the Furnace. Rook and Rivet stays the salvage firm.
 - Ores and charges renamed: Copperband (was Banded ore), Blackjack (was Black ore), crackers (were breach charges), and the Knocker as a good.
 - Ship systems renamed: Meridian Davit (was Ark Bay), Paragon Gunlayer (was Director), Tessaract Collection (was Long Gleaner), Slagline Bolt (the afterburner, was Kick, like the engine), Ito-Marr Sally (was Surge). Ids are unchanged, so worlds carry on.

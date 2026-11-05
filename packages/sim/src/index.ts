@@ -15,7 +15,7 @@ export { MODULES } from './modules.js';
 export { LOADOUTS } from './loadouts.js';
 export { MANUFACTURERS } from './manufacturers.js';
 export { WEAPONS, weaponDps, isGun } from './weapons.js';
-export { fitStats, shipStats, cargoMass, bonusApplies, flightWarnings, type Catalogues, type FlightWarning } from './stats.js';
+export { fitStats, shipStats, moduleSignature, cargoMass, bonusApplies, flightWarnings, type Catalogues, type FlightWarning } from './stats.js';
 export {
   fitModule,
   unfitModule,
@@ -49,7 +49,7 @@ export {
 } from './trade.js';
 export { buildShip } from './factory.js';
 export { lockSeconds, lockRefusal, stepLocks, isLocked, weaponTarget, activeTarget, lockReadout, type LockStep, type LockReadout } from './locks.js';
-export { applyDamage, shieldCovers, fireWeapons, leadPoint, leadFor, loadedGoodOf, nextAmmo, stepProjectiles, regenerateShield } from './combat.js';
+export { applyDamage, resolutionShare, shieldCovers, fireWeapons, leadPoint, leadFor, loadedGoodOf, nextAmmo, stepProjectiles, regenerateShield } from './combat.js';
 export { decoySignature, incomingMunitions, launchMunition, dropDecoy, stepMunitions, stepDecoys, spoofRadar, type MunitionHit } from './munitions.js';
 export { collideShips } from './collision.js';
 export {
@@ -143,7 +143,7 @@ export {
 export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, LANTERN_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
 export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, rockSeam, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
 export { droneIdleReason, dronesOut, droneRoom, droneStrength, stepDrones } from './drones.js';
-export { duel, fitProblems, fitSummary, type DuelResult, type DuelRun, type FitProblem, type FitSpec, type FitSummary } from './fitlab.js';
+export { duel, fitProblems, fitSummary, TARGET_SIGNATURES, type DuelResult, type DuelRun, type FitProblem, type FitSpec, type FitSummary, type TargetSize } from './fitlab.js';
 export { REFERENCE_FITS } from './reference-fits.js';
 export { storeGoods, takeGoods, storedGoods, type HangarRefusal, type HangarResult } from './hangar.js';
 export { breachAction, BLAST_RADIUS, BLOOM_RANGE, BREACH_MIN_RADIUS, CORE_LIFETIME, FRAGILE_STRENGTH, PLANT_REACH, SAFE_DISTANCE, type BreachAction } from './breach.js';

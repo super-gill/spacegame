@@ -27,7 +27,8 @@ import { isGun, weaponDps } from './weapons.js';
  *   hold (`maxLocks`) and how fast it locks (`scanResolution`). No
  *   computer, no locks.
  * - Locking takes time: `lockSeconds`, shorter with a better computer
- *   and against a target with a bigger signature (`HullSpec.signature`).
+ *   and against a target with a bigger signature (`ShipStats.signature`:
+ *   its hull's, plus its kit's, bloomed while it burns an afterburner).
  * - A lock needs its target inside this ship's radar range: no radar,
  *   nothing to lock. It drops
  *   when the target leaves range, docks or is destroyed; every lock drops
@@ -69,7 +70,7 @@ type LockWorld = Pick<World, 'ships' | 'hulls' | 'modules' | 'weapons' | 'goods'
 /** Where a lockable thing is and how big it looks to sensors, or null if `targetId` is neither a flying ship nor a rock. */
 function lockable(world: LockWorld, targetId: string): { position: Vec2; signature: number } | null {
   const target = world.ships[targetId];
-  if (target) return target.state === 'flying' ? { position: target.position, signature: world.hulls[target.hullId]?.signature ?? LOCK_REFERENCE_SIGNATURE } : null;
+  if (target) return target.state === 'flying' ? { position: target.position, signature: world.hulls[target.hullId] ? shipStats(world, target).signature : LOCK_REFERENCE_SIGNATURE } : null;
   const rock = world.asteroids ? rockAt(world, targetId) : null;
   // A rock's signature is its size: big rocks lock almost at once.
   return rock ? { position: rock.position, signature: rock.rock.radius } : null;

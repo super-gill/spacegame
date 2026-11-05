@@ -1,5 +1,5 @@
 import { angleDelta, wrapAngle } from './angle.js';
-import { MUNITION_HIT_MARGIN, POINT_DEFENCE_RANGE_FRACTION, SHIELD_CAPACITOR_PER_POINT, TURRET_FIRE_TOLERANCE } from './constants.js';
+import { MUNITION_HIT_MARGIN, POINT_DEFENCE_RANGE_FRACTION, RESOLUTION_FLOOR, SHIELD_CAPACITOR_PER_POINT, TURRET_FIRE_TOLERANCE } from './constants.js';
 import { goodsFitting } from './goods.js';
 import { isLocked } from './locks.js';
 import { dropDecoy, launchMunition, type MunitionHit } from './munitions.js';
@@ -47,6 +47,20 @@ export interface Damage {
   type: DamageType;
   /** Where the hit came from (a shot's or munition's last position), for the shield arc. Absent: from everywhere, the shield takes it. */
   from?: Vec2;
+  /** The resolution of the gun or warhead behind it (`WeaponSpec.resolution`). Absent: full damage to anything. */
+  resolution?: number;
+}
+
+/**
+ * The share of a hit's damage a target takes against a weapon's
+ * resolution (docs/fitting.md, "Costs that make choices"): all of it when
+ * the target's signature is at least the resolution, signature over
+ * resolution below that, never less than `RESOLUTION_FLOOR`. A resolution
+ * of zero or none means full damage.
+ */
+export function resolutionShare(signature: number, resolution: number | undefined): number {
+  if (!resolution || resolution <= 0) return 1;
+  return Math.min(1, Math.max(RESOLUTION_FLOOR, signature / resolution));
 }
 
 function dot(a: Vec2, b: Vec2): number {
@@ -334,6 +348,7 @@ export function fireWeapons(
       velocity: add(ship.velocity, scale(dir, spec.projectileSpeed)),
       damage: spec.damage * (round?.damage ?? 1),
       damageType: round?.damageType ?? spec.damageType,
+      resolution: spec.resolution,
       ticksLeft: Math.round(spec.range / spec.projectileSpeed / dt),
     });
     idsUsed++;
@@ -452,7 +467,7 @@ export function stepProjectiles(
       continue;
     }
     if (hitShip) {
-      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType, from: p.position });
+      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType, from: p.position, resolution: p.resolution ?? 0 });
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;

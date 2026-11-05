@@ -1,5 +1,5 @@
 import { angleDelta } from './angle.js';
-import { leadPoint } from './combat.js';
+import { leadPoint, resolutionShare } from './combat.js';
 import { buildShip } from './factory.js';
 import { mountRefusal, type FitRefusal } from './fitting.js';
 import { fitStats, type Catalogues } from './stats.js';
@@ -59,6 +59,12 @@ export function fitProblems(cat: Catalogues, spec: FitSpec): FitProblem[] {
   return problems;
 }
 
+/** Target sizes the fitter and audit measure damage against. */
+export type TargetSize = 'small' | 'medium' | 'large';
+const TARGET_SIZES: TargetSize[] = ['small', 'medium', 'large'];
+/** Signatures standing for each target size: about a Tern, a fitted Warrant and a fitted brig. */
+export const TARGET_SIGNATURES: Record<TargetSize, number> = { small: 20, medium: 35, large: 60 };
+
 /** The numbers a pilot compares fits by. */
 export interface FitSummary {
   price: number;
@@ -81,6 +87,8 @@ export interface FitSummary {
   /** Damage per second of everything that shoots, total and by type (ammunition-fed guns count at their base damage). */
   dps: number;
   dpsByType: Partial<Record<DamageType, number>>;
+  /** Damage per second against a small, a medium and a large target (`TARGET_SIGNATURES`), after resolution. */
+  dpsAgainst: Record<TargetSize, number>;
   /** Longest weapon range. */
   range: number;
   signature: number;
@@ -103,6 +111,7 @@ export function fitSummary(cat: Catalogues, spec: FitSpec): FitSummary | null {
   let range = 0;
   let energy = 0;
   const dpsByType: Partial<Record<DamageType, number>> = {};
+  const dpsAgainst: Record<TargetSize, number> = { small: 0, medium: 0, large: 0 };
   for (const w of Object.values(stats.weapons)) {
     if (w.family === 'mining') {
       miningRate += w.damage;
@@ -112,6 +121,7 @@ export function fitSummary(cat: Catalogues, spec: FitSpec): FitSummary | null {
     const d = weaponDps(w);
     dps += d;
     dpsByType[w.damageType] = (dpsByType[w.damageType] ?? 0) + d;
+    for (const size of TARGET_SIZES) dpsAgainst[size] += d * resolutionShare(TARGET_SIGNATURES[size], w.resolution);
     range = Math.max(range, w.range);
     energy += w.capacitorPerShot / w.fireInterval;
   }
@@ -133,6 +143,7 @@ export function fitSummary(cat: Catalogues, spec: FitSpec): FitSummary | null {
     structure: stats.structure,
     dps,
     dpsByType,
+    dpsAgainst,
     range,
     signature: stats.signature,
     sensorRange: stats.sensorRange,

@@ -229,7 +229,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 1600,
     manufacturer: 'cantorVell',
     tags: ['armour'],
-    stats: { structure: 100 },
+    stats: { structure: 460 },
     resists: { kinetic: 0.3, fragmentation: 0.4, explosive: 0.25, thermal: 0.05 },
   },
   'union-armour-l': {
@@ -988,7 +988,8 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 2500,
     manufacturer: 'beltForge',
     tags: ['mining'],
-    stats: { breachTolerance: 0.12 },
+    // A rig full of explosives and its firing gear shows up on every scope.
+    stats: { breachTolerance: 0.12, signature: 6 },
   },
   'rookrivet-deepassay-m': {
     id: 'rookrivet-deepassay-m',

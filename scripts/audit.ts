@@ -8,10 +8,12 @@
  * 2. Ladders: a module better in every way than another except price, so
  *    the only question is what you can afford.
  * 3. The reference fits: problems, budgets and the numbers that matter.
- * 4. Duels between the combat reference fits.
+ * 4. Damage against small, medium and large targets, after resolution.
+ * 5. Every fit with guns against the pirate raider.
+ * 6. Duels between the combat reference fits, with time and health left.
  */
 import { GOODS, HULLS, MODULES, WEAPONS, weaponDps, type ModuleSpec } from '../packages/sim/src/index.js';
-import { duel, fitProblems, fitSummary } from '../packages/sim/src/fitlab.js';
+import { duel, fitProblems, fitSummary, TARGET_SIGNATURES, type DuelResult } from '../packages/sim/src/fitlab.js';
 import { REFERENCE_FITS } from '../packages/sim/src/reference-fits.js';
 import type { Catalogues } from '../packages/sim/src/stats.js';
 
@@ -97,18 +99,54 @@ say();
 
 say(`## Reference fits`);
 say();
-say(`| Fit | Role | Problems | Power | Mass | Price | Speed | Accel | DPS | Range | Shield + structure | Cargo | Ore | Ore/s |`);
-say(`| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |`);
+say(`| Fit | Role | Problems | Power | Mass | Price | Speed | Accel | Signature | DPS | Range | Shield + structure | Cargo | Ore | Ore/s |`);
+say(`| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |`);
 for (const f of REFERENCE_FITS) {
   const s = fitSummary(cat, f)!;
   const problems = fitProblems(cat, f).map((p) => `${p.mountId ?? ''} ${p.reason}`.trim()).join(', ') || 'none';
-  say(`| ${f.name} | ${f.role ?? ''} | ${problems} | ${s.powerDraw}/${s.powerOutput} | ${s.mass.toFixed(1)} | ${s.price.toLocaleString('en-GB')} | ${s.topSpeed} | ${s.acceleration.toFixed(1)} | ${s.dps.toFixed(0)} | ${Math.round(s.range)} | ${Math.round(s.shield + s.structure)} | ${s.cargo} | ${s.oreHold} | ${s.miningRate.toFixed(1)} |`);
+  say(`| ${f.name} | ${f.role ?? ''} | ${problems} | ${s.powerDraw}/${s.powerOutput} | ${s.mass.toFixed(1)} | ${s.price.toLocaleString('en-GB')} | ${s.topSpeed} | ${s.acceleration.toFixed(1)} | ${Math.round(s.signature)} | ${s.dps.toFixed(0)} | ${Math.round(s.range)} | ${Math.round(s.shield + s.structure)} | ${s.cargo} | ${s.oreHold} | ${s.miningRate.toFixed(1)} |`);
+}
+say();
+
+say(`## Damage against target sizes`);
+say();
+say(`Damage per second after resolution against a small (signature ${TARGET_SIGNATURES.small}), medium (${TARGET_SIGNATURES.medium}) and large (${TARGET_SIGNATURES.large}) target, and the share kept against small. Swivels and fixed guns alike; tracking is not counted here.`);
+say();
+say(`| Fit | Small | Medium | Large | Kept against small |`);
+say(`| --- | --- | --- | --- | --- |`);
+for (const f of REFERENCE_FITS) {
+  const s = fitSummary(cat, f)!;
+  if (s.dps <= 0) continue;
+  say(`| ${f.name} | ${s.dpsAgainst.small.toFixed(0)} | ${s.dpsAgainst.medium.toFixed(0)} | ${s.dpsAgainst.large.toFixed(0)} | ${Math.round((100 * s.dpsAgainst.small) / s.dps)}% |`);
+}
+say();
+
+/** A duel's runs in one cell: wins, mean seconds and mean health left for the winner. */
+function cell(r: DuelResult, side: 'a' | 'b'): string {
+  const won = r.runs.filter((x) => x.winner === side);
+  if (won.length === 0) return `${side === 'a' ? r.winsA : r.winsB}`;
+  const secs = won.reduce((n, x) => n + x.seconds, 0) / won.length;
+  const left = won.reduce((n, x) => n + (side === 'a' ? x.aLeft : x.bLeft), 0) / won.length;
+  return `${won.length} (${secs.toFixed(0)} s, ${Math.round(left * 100)}%)`;
+}
+
+say(`## Against the pirate raider`);
+say();
+say(`Every reference fit with guns against the Black Strike raider: wins out of 4, with the mean time to kill and health left. The design asks every stock fit with guns to drive it off or kill it in reasonable time.`);
+say();
+const raider = REFERENCE_FITS.find((f) => f.name.startsWith('Kessari Warrant, Black Strike'))!;
+say(`| Fit | Wins | Raider wins |`);
+say(`| --- | --- | --- |`);
+for (const f of REFERENCE_FITS) {
+  if (f === raider || fitSummary(cat, f)!.dps <= 0) continue;
+  const r = duel(f, raider);
+  say(`| ${f.name} | ${cell(r, 'a')} | ${cell(r, 'b')} |`);
 }
 say();
 
 say(`## Duels between combat fits`);
 say();
-say(`Row against column: wins out of 4 starts (a draw is neither dead after two minutes). Both fly the same simple script.`);
+say(`Row against column: wins out of 4 starts, with the mean seconds to win and the winner's health left (a draw is neither dead after two minutes). Both fly the same simple script, which closes and sits nose on: it never circles, so it does not test tracking.`);
 say();
 const fighters = REFERENCE_FITS.filter((f) => f.role === 'combat');
 say(`| | ${fighters.map((f) => f.name).join(' | ')} |`);
@@ -116,8 +154,7 @@ say(`| --- | ${fighters.map(() => '---').join(' | ')} |`);
 for (const a of fighters) {
   const cells = fighters.map((b) => {
     if (a === b) return '-';
-    const r = duel(a, b);
-    return `${r.winsA}`;
+    return cell(duel(a, b), 'a');
   });
   say(`| ${a.name} | ${cells.join(' | ')} |`);
 }

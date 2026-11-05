@@ -1,4 +1,4 @@
-import { SHIELD_REGEN_DELAY, STOCK_SHIELD_ARC } from './constants.js';
+import { AFTERBURNER_SIGNATURE_BLOOM, KIT_SIGNATURE, SHIELD_REGEN_DELAY, STOCK_SHIELD_ARC } from './constants.js';
 import type { HullBonus, HullSpec, ModuleSpec, MountPoint, ReadoutKind, Resistances, Ship, ShipStats, World } from './types.js';
 import type { ModuleStat } from './types.js';
 
@@ -118,6 +118,8 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     droneControl: 0,
     droneRange: 0,
     breachTolerance: 0,
+    // Summed separately as `kitSignature`, with defaults by kind and size.
+    signature: 0,
   };
   let mass = hull.mass + cargoMass;
   let powerDraw = 0;
@@ -134,6 +136,8 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
   // The best hopper fitted does the sorting.
   let hopperGrade = 0;
   let armourResists: Resistances = {};
+  // Kit adds to how big the ship looks (docs/fitting.md, "Costs that make choices").
+  let kitSignature = 0;
 
   for (const mount of hull.mounts) {
     const id = fit[mount.id];
@@ -141,6 +145,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     if (!module) continue;
     mass += module.mass;
     powerDraw += module.power;
+    kitSignature += moduleSignature(module);
     for (const stat of STAT_KEYS) {
       const value = module.stats[stat];
       if (value) totals[stat] += value * multiplier(hull, stat, module, mount);
@@ -189,7 +194,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     sensorRange: totals.sensorRange,
     maxLocks: Math.floor(totals.maxLocks + 1e-9),
     scanResolution: totals.scanResolution,
-    signature: hull.signature,
+    signature: hull.signature + kitSignature,
     readouts: READOUT_ORDER.filter((r) => readouts.has(r)),
     navHorizon: totals.navHorizon,
     // One flight computer flies the ship; a second adds nothing.
@@ -234,7 +239,14 @@ export function cargoMass(ship: Ship, goods: World['goods']): number {
 export function shipStats(cat: Catalogues, ship: Ship): ShipStats {
   const hull = cat.hulls[ship.hullId];
   if (!hull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${ship.id}"`);
-  return fitStats(cat, hull, ship.fit, cargoMass(ship, cat.goods));
+  const stats = fitStats(cat, hull, ship.fit, cargoMass(ship, cat.goods));
+  // A burning afterburner is bright.
+  return ship.afterburning ? { ...stats, signature: stats.signature * (1 + AFTERBURNER_SIGNATURE_BLOOM) } : stats;
+}
+
+/** Signature a module adds to its hull's: its own figure, else the default for its kind and size. */
+export function moduleSignature(module: ModuleSpec): number {
+  return module.stats.signature ?? KIT_SIGNATURE[module.kind]?.[module.size] ?? 0;
 }
 
 /** Something a fit leaves the ship unable to do. */

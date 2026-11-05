@@ -146,6 +146,21 @@ Step 4 balances big guns against small targets, and there were no big combat hul
 - **What the audit shows, before step 4:** each class beats everything below it every time, quickly and barely scratched (the frigate kills a brig in about nine seconds with 85% left; the brig kills any Warrant). Big guns hit small ships as hard as big ones today. That is what step 4 is for.
 - **Also found:** the Cantor-Vell Vigil M armour (100 structure, 4.5 t) is worse than the Patchplate S (240 structure, 2 t) apart from slightly better resists; step 4 looks at it with the rest.
 
+### As built: step 4, the costs (5 November 2026)
+
+- **Resolution** (`WeaponSpec.resolution`, `resolutionShare` in `combat.ts`): S 15, M 30, L 60 (`RESOLUTION_BY_SIZE`); torpedoes twice their tube's size (`TORPEDO_RESOLUTION_FACTOR`); mining lasers and dispensers none. A hit does full damage to a target whose signature is at least the resolution, signature over resolution below that, never less than 40% (`RESOLUTION_FLOOR`). Shots and munitions carry it; it is applied where damage lands (`step.ts`), against the target's `ShipStats.signature`, so the `damaged` event reports what was really done. Rams and blasts ignore it. A steeper curve (the share to the power 1.5) was tried and dropped: with the floor, it made undersized guns worse against small ships, not better.
+- **Signature from kit** (`KIT_SIGNATURE`, `moduleSignature` in `stats.ts`): engines add 2, 4, 8 by size; guns 0, 1, 4; a module can name its own (`stats.signature`; the charge rig adds 6). A burning afterburner blooms the signature by half (`AFTERBURNER_SIGNATURE_BLOOM`, in `shipStats`). Lock time now uses this signature too, not the bare hull's. Heat seekers and decoys still use the hull's.
+- **Slower big swivels:** each size up slews 1.6 times slower (`TURRET_SLEW_FALLOFF`, was 1.3).
+- **Armour:** the Vigil M goes from 100 to 460 structure (a little under the Patchplate S per tonne, with better resists).
+- **The fitter and the audit** show damage per second against a small (20), medium (35) and large (60) target (`FitSummary.dpsAgainst`, `TARGET_SIGNATURES`); the fitting window shows signature and each weapon's resolution. The audit adds those, every fit with guns against the raider, and times and health left in the duels. Report: `docs/audits/2026-11-05-costs.md`.
+- **Not done here:** capacitor modules for lows belong with oversizing (step 5).
+
+**What the audit shows after step 4:**
+
+- The Warrant brawler now beats the brig's yard fit; the brig brawler and the frigate still beat every smaller fit, mostly on hit points (the frigate has six times a Warrant's shield and structure). The duel script closes and sits nose on, so tracking never comes into it.
+- **Undersizing is barely a tactic yet.** The frigate's L guns keep 48% against a small target, its undersized M guns 67%, but the L guns start 1.74 times stronger and carry its +15% bonus, so they still do about as much (167 against 174 a second). With a 40% floor, an L gun at the floor still does 70% of an M gun. This is a question for Jason (coordination, "Questions for Jason").
+- **Mining ships and the stock Manifest lose to the raider** every time (one swivel each; the Collier's drones are not flown in a duel). The design asks every stock fit with guns to drive it off.
+
 ## The fitter
 
 A fitting calculator for Jason and the lead, built from the same sim code as the game so it can never drift out of date.
@@ -173,7 +188,7 @@ Mount ids are kept where a slot survives, so most fits carry straight over. Anyt
 1. **The fitter and the audit, on today's rules.** Measures where fitting stands before anything changes, and every later step is checked against it.
 2. **Tiers:** core, high, mid and low slots; every hull and module re-tagged; stock fits re-checked; the outfitting screen shows tiers; save migration.
 3. **Buy, then fit:** modules as items at markets, one storage per station, fitting from storage.
-4. **Costs:** weapon resolution against signature, signature from kit, mass checked, numbers moved by the audit.
+4. **Costs:** weapon resolution against signature, signature from kit, mass checked, numbers moved by the audit. Built 5 November (below).
 5. **Oversizing,** then **slot merging**; **rigs** after the tiers have been played.
 
 Release 0.13.0 first (after Jason's playtest of breaching and holds), so the overhaul starts from a stable version.

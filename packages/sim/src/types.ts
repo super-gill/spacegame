@@ -224,7 +224,9 @@ export type ModuleStat =
   /** Drone bay: how far from the mother ship its drones will work, units. */
   | 'droneRange'
   /** Breach charger: how close to a breach point a charge must sit to count, radians round the rock. */
-  | 'breachTolerance';
+  | 'breachTolerance'
+  /** Signature this module adds to the hull's. Absent: the default for its kind and size (`KIT_SIGNATURE`). */
+  | 'signature';
 
 /** What a module does. Decides its silhouette and which stats it carries. */
 export type ModuleKind =
@@ -472,7 +474,12 @@ export interface ShipStats {
   maxLocks: number;
   /** Lock speed multiplier from its targeting computer: lock time is divided by this (locks.ts). */
   scanResolution: number;
-  /** How big this ship looks to other ships' sensors (`HullSpec.signature`). */
+  /**
+   * How big this ship looks to other ships' sensors and guns: the hull's
+   * signature plus what its kit adds (`KIT_SIGNATURE`), bloomed while an
+   * afterburner burns (`shipStats` only). Sets lock time against it and
+   * how much of a big weapon's damage it takes (`resolutionShare`).
+   */
   signature: number;
   /** What its locks show, from its targeting computer. Empty without one. */
   readouts: ReadoutKind[];
@@ -582,6 +589,13 @@ export interface WeaponSpec {
   /** Turrets only: how fast the turret slews, rad/s. */
   turretTurnRate: number;
   /**
+   * The signature a target needs to take this weapon's full damage
+   * (docs/fitting.md, "Costs that make choices"); smaller targets take a
+   * share (`resolutionShare`). Zero: full damage to anything (mining
+   * lasers, dispensers).
+   */
+  resolution: number;
+  /**
    * Mining lasers only (family `mining`, docs/mining.md). A beam along the
    * nose while the trigger is held, out to `range`: it cuts a rock no
    * harder than `strength` (0 to 1), freeing `damage` units of ore a
@@ -636,6 +650,8 @@ export interface Projectile {
   velocity: Vec2;
   damage: number;
   damageType: DamageType;
+  /** The firing weapon's resolution (`WeaponSpec.resolution`). Absent: full damage. */
+  resolution?: number;
   ticksLeft: number;
 }
 
@@ -662,6 +678,8 @@ export interface Munition {
   heading: number;
   damage: number;
   damageType: DamageType;
+  /** The warhead's resolution, from its launcher (`WeaponSpec.resolution`). Absent: full damage. */
+  resolution?: number;
   structure: number;
   ticksLeft: number;
 }
