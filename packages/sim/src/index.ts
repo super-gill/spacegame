@@ -113,7 +113,7 @@ export {
   speedRelativeTo,
   type DockingView,
 } from './docking.js';
-export { pilotsAboard, shipPilot, isEmptyShip, isEscapePod, ownedShips } from './ownership.js';
+export { lootClaim, pilotsAboard, shipPilot, isEmptyShip, isEscapePod, ownedShips, tractorTakes } from './ownership.js';
 export {
   shipPrice,
   buyShip,

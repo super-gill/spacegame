@@ -5,7 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
-- Breaching for gate-glass. Some big rocks hide a glass core that only a deep assay finds; it marks the breach points round the rock. Fly to each, plant a breach charge from the charge rig's tile, get clear and press the tile again to set them off. The rock splits, and the glass is exposed for three minutes: cut it with drones or a light laser, because heavy lasers shatter it. The blast hurts anything close, you included, and its bloom brings pirates from far off.
+- Breaching for gate-glass. Some big rocks hide a glass core that only a deep assay finds; it marks the breach points round the rock. Fly to each, plant a breach charge from the charge rig's tile, get clear and press the tile again to set them off. Bigger rocks hold more glass and more breach points; some cores are fractured and give half. The rock splits and its chunks drift apart, and the glass is exposed for three minutes: cut it with drones or a light laser, because heavy lasers shatter it. The blast hurts anything close, you included, and its bloom brings pirates from far off.
+- Loot remembers whose it is: ore you or your drones cut, spoils from your kills and your caches. Your tractor's tile now cycles OFF, MINE (yours, and nobody's) and ALL (other people's too), so you no longer scoop up other miners' canisters by accident.
 - The Rook and Rivet Breacher, a mid-size mining ship sold at Ridge: two mining lasers, a deep assay, a charge rig, three drones and a hopper.
 - Breach charges and gate-glass at the markets: charges at Ridge and Harbour, glass bought at Harbour, Ridge and Lantern Works.
 - NPC miners: two prospectors working the field round Ridge and selling there, and a hulk with its drones hauling to Lantern Works. Pirates hunt them like any traffic. Older saves gain them on load.

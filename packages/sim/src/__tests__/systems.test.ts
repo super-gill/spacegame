@@ -218,7 +218,7 @@ describe('active modules', () => {
     ]);
   });
 
-  it('the tractor needs a tractor module; its tile leaves it running', () => {
+  it('the tractor needs a tractor module; its tile cycles off, own loot, everything', () => {
     const none = solo({ u1: null });
     expect(stepWorld(none.w, { [none.id]: { ...emptyInput(), tractor: true } }).ships[none.id]!.tractorActive).toBe(false);
     const { w, id } = solo();
@@ -226,8 +226,15 @@ describe('active modules', () => {
     expect(x.ships[id]!.tractorActive).toBe(true);
     x = stepWorld(x, { [id]: emptyInput() });
     expect(x.ships[id]!.tractorActive).toBe(true);
+    expect(x.ships[id]!.tractorMode).toBeUndefined();
+    // Pressed again: still on, now taking everything; again: off, back to its own loot only.
+    x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
+    expect(x.ships[id]!.tractorActive).toBe(true);
+    expect(x.ships[id]!.tractorMode).toBe('all');
+    expect(x.events).toContainEqual({ type: 'tractorModeChanged', shipId: id, mode: 'all' });
     x = stepWorld(x, { [id]: { ...emptyInput(), toggleModule: 'u1' } });
     expect(x.ships[id]!.tractorActive).toBe(false);
+    expect(x.ships[id]!.tractorMode).toBeUndefined();
   });
 
   it('a dispenser tile drops a charge from that dispenser', () => {

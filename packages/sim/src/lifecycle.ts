@@ -8,7 +8,7 @@ import {
 } from './constants.js';
 import { freePadFor, onPad } from './docking.js';
 import { buildShip } from './factory.js';
-import { isEscapePod, pilotsAboard } from './ownership.js';
+import { isEscapePod, lootClaim, pilotsAboard, tractorTakes } from './ownership.js';
 import { ejectPilot } from './pilots.js';
 import { fitStats, shipStats } from './stats.js';
 import { holdSpaceFor } from './trade.js';
@@ -104,6 +104,9 @@ export function destroyShips(world: World, killers: Record<string, string | null
     spill['scrap'] = (spill['scrap'] ?? 0) + Math.round(builtMass * SCRAP_PER_MASS);
 
     // Each good in up to MAX_LOOT_CANISTERS canisters, fanned out round the wreck.
+    // The spoils are the killer's.
+    const killedBy = killers[ship.id];
+    const killer = killedBy ? lootClaim(world, killedBy, aboard) : null;
     const goodsSpilled = Object.keys(spill).sort();
     goodsSpilled.forEach((good, g) => {
       const total = spill[good]!;
@@ -118,6 +121,7 @@ export function destroyShips(world: World, killers: Record<string, string | null
           position: add(ship.position, scale(dir, 10)),
           velocity: add(keep(0.6), scale(dir, LOOT_SCATTER_SPEED * (1 + g * 0.3))),
           ticksLeft: Math.round(LOOT_LIFETIME / world.dt),
+          ...(killer ? { claim: killer } : {}),
         };
         loot.push(item);
       }
@@ -226,6 +230,10 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
   const before = { ...world, tick: world.tick - 1 };
   const frameAt = (p: Vec2): Vec2 => frameVelocity(before, { position: p, dockedAt: null });
   const still = new Set(beams.filter((s) => distance(s.velocity, frameAt(s.position)) < GATHER_SPEED).map((s) => s.id));
+  // Whose loot each beam counts as its own.
+  const aboard = pilotsAboard(world);
+  const claims: Record<string, string> = {};
+  for (const s of beams) claims[s.id] = lootClaim({ pilots: world.pilots, ships }, s.id, aboard);
 
   for (const item of world.loot) {
     if (item.ticksLeft <= 1) continue;
@@ -235,6 +243,7 @@ export function stepLoot(world: World, ships: Record<string, Ship>, carryAt?: (p
     let best = Infinity;
     for (const s of beams) {
       if (s.hopperEject === item.item && item.ejectedBy === s.id) continue; // its own reject: left alone
+      if (!tractorTakes(s, claims[s.id]!, item)) continue; // someone else's, and not set to take all
       // No room for it: gather it only while sitting still (the hopper's filter ore still goes in, to be spat out).
       if (s.hopperEject !== item.item && !still.has(s.id) && holdSpaceFor(updated[s.id]!, stats[s.id]!, world.goods, item.item) <= 0) continue;
       const d = distance(s.position, item.position);

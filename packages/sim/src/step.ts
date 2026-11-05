@@ -13,7 +13,7 @@ import { DOCK_REPAIR_PER_SECOND } from './constants.js';
 import { departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
-import { pilotsAboard } from './ownership.js';
+import { lootClaim, pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
 import { stepShip } from './ship.js';
 import { shipStats } from './stats.js';
@@ -213,10 +213,20 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
         targeted = { ...targeted, hopperEject: eject };
         events.push({ type: 'hopperFilterChanged', shipId: id, eject });
       }
+      // A tractor's tile cycles off, on taking only its own loot, on taking everything, and off.
       if (moduleId && world.modules[moduleId]?.kind === 'tractor') {
         const on = isSwitchedOn(targeted, input.toggleModule);
-        const switchedOn = on ? (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) : [...(targeted.switchedOn ?? []), input.toggleModule];
-        targeted = { ...targeted, switchedOn };
+        const { tractorMode: _mode, ...plain } = targeted;
+        if (!on) {
+          targeted = { ...plain, switchedOn: [...(targeted.switchedOn ?? []), input.toggleModule] };
+          events.push({ type: 'tractorModeChanged', shipId: id, mode: 'mine' });
+        } else if (targeted.tractorMode !== 'all') {
+          targeted = { ...targeted, tractorMode: 'all' };
+          events.push({ type: 'tractorModeChanged', shipId: id, mode: 'all' });
+        } else {
+          targeted = { ...plain, switchedOn: (targeted.switchedOn ?? []).filter((m) => m !== input.toggleModule) };
+          events.push({ type: 'tractorModeChanged', shipId: id, mode: 'off' });
+        }
       }
     }
     // Fire groups: a number key picks which fixed guns Space fires.
@@ -235,7 +245,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       targeted = dropped.ship;
       // A tractor left running would scoop the cache straight back up: dropping one switches it off.
       if (dropped.event && targeted.switchedOn?.some((m) => world.modules[targeted.fit[m] ?? '']?.kind === 'tractor')) {
-        targeted = { ...targeted, switchedOn: targeted.switchedOn.filter((m) => world.modules[targeted.fit[m] ?? '']?.kind !== 'tractor') };
+        const { tractorMode: _mode, ...plain } = targeted;
+        targeted = { ...plain, switchedOn: targeted.switchedOn.filter((m) => world.modules[targeted.fit[m] ?? '']?.kind !== 'tractor') };
       }
       nextEntityId += dropped.idsUsed;
       cacheLoot.push(...dropped.added);
@@ -269,7 +280,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   }
 
   // Mining lasers cut the rocks they reach; freed ore joins the loot below.
-  const cut = cutRocks(world.asteroids, rockStates, ships, world.ships, beams, world.dt, nextEntityId);
+  const claimFor = (shipId: string): string => lootClaim(world, shipId, aboard);
+  const cut = cutRocks(world.asteroids, rockStates, ships, world.ships, beams, world.dt, nextEntityId, claimFor);
   nextEntityId += cut.idsUsed;
   ships = cut.ships;
   events.push(...cut.events);
@@ -279,7 +291,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   const blastLoot: Loot[] = [];
   const drawn: Record<string, Vec2> = {};
   for (const d of detonations) {
-    const blast = detonate(world, asteroids, charges, ships, d.shipId, d.rockId, d.tolerance, world.tick + 1, nextEntityId);
+    const blast = detonate(world, asteroids, charges, ships, d.shipId, d.rockId, d.tolerance, world.tick + 1, nextEntityId, claimFor(d.shipId));
     asteroids = blast.asteroids;
     charges = blast.charges;
     nextEntityId += blast.idsUsed;
@@ -355,7 +367,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     loot: [
       ...world.loot.map((l) => {
         const owner = cacheMarks.get(l.id);
-        return owner ? { ...l, cache: { ownerId: owner }, ticksLeft: Math.max(l.ticksLeft, Math.round(CACHE_LIFETIME / world.dt)) } : l;
+        return owner ? { ...l, cache: { ownerId: owner }, claim: owner, ticksLeft: Math.max(l.ticksLeft, Math.round(CACHE_LIFETIME / world.dt)) } : l;
       }),
       ...cacheLoot,
       ...cut.loot,

@@ -286,6 +286,9 @@ export class Ui {
         this.showToast(why, 2000);
       } else if (e.type === 'cacheDropped') {
         this.showToast(`Cache left: ${e.units} units of ore. It lasts an hour and shows on your radar.`, 2500, 'info');
+      } else if (e.type === 'tractorModeChanged') {
+        const say = { off: 'Tractor off.', mine: 'Tractor on: your own loot only.', all: "Tractor on: everything in reach, other people's too." }[e.mode];
+        this.showToast(say, 1500, e.mode === 'all' ? 'warn' : 'info');
       } else if (e.type === 'hopperFilterChanged') {
         this.showToast(e.eject ? `Hopper: spitting out ${e.eject}.` : 'Hopper: keeping everything.', 1500, 'info');
       } else if (e.type === 'collided') {

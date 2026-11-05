@@ -240,7 +240,7 @@ export interface LockReadout {
      * its breach points' bearings round the rock (plant charges there).
      * Null: the deep assay finds none. Absent: no deep assay.
      */
-    core?: { points: number[]; glass: number } | null;
+    core?: { points: number[]; glass: number; fractured?: true } | null;
     /** Exposed gate-glass: brittle, and how many seconds before it collapses. */
     fragile?: { secondsLeft: number | null };
   };
@@ -267,7 +267,7 @@ export function lockReadout(world: World, ship: Ship, targetId: string): LockRea
     }
     if (mine.readouts.includes('composition')) {
       out.composition = { ores: { ...rock.rock.contents }, total: oreLeft(rock.rock), hardness: rock.rock.hardness, radius: rock.rock.radius, seam: rockSeam(rock.rock.id) };
-      if (mine.readouts.includes('core')) out.composition.core = rock.rock.core ? { points: [...rock.rock.core.points], glass: rock.rock.core.glass } : null;
+      if (mine.readouts.includes('core')) out.composition.core = rock.rock.core ? { points: [...rock.rock.core.points], glass: rock.rock.core.glass, ...(rock.rock.core.fractured ? { fractured: true as const } : {}) } : null;
       if (rock.rock.fragile) out.composition.fragile = { secondsLeft: rock.rock.expiresTick !== undefined ? Math.max(0, (rock.rock.expiresTick - world.tick) * world.dt) : null };
     }
     return out;

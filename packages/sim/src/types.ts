@@ -695,6 +695,13 @@ export interface Loot {
    * Absent: nobody's reject.
    */
   ejectedBy?: string;
+  /**
+   * Who it belongs to (`lootClaim`): whoever freed it (their laser, their
+   * drones, their breach), killed the ship it spilled from, or cached it.
+   * The pilot, or the ship for an NPC. A tractor set to take only its own
+   * leaves other people's alone. Absent: nobody's.
+   */
+  claim?: string;
 }
 
 /**
@@ -805,6 +812,12 @@ export interface Ship {
    * space instead of scooping. Absent or null: it takes everything.
    */
   hopperEject?: string | null;
+  /**
+   * What its tractor takes: absent, its own loot and loot nobody has a
+   * claim on (`Loot.claim`); `all`, anything in reach, other people's
+   * too. Set from the tractor's tile.
+   */
+  tractorMode?: 'all';
   /** Drones stowed in its drone bay (docs/drones.md). Drones out are ships with `motherId` set. Absent: none. */
   droneBay?: StoredDrone[];
   /** For a drone: the ship that carries and commands it. Absent: not a drone. */
@@ -972,9 +985,16 @@ export interface Asteroid {
    * A sealed gate-glass core (big rocks only, some of them): how much
    * glass, and the breach points, as bearings round the rock from its
    * centre. Breaching it with charges on those points splits the rock and
-   * exposes the core. Absent: none.
+   * exposes the core. `fractured`: a cracked core that yields half its
+   * glass however well it is breached. Absent: none.
    */
-  core?: { glass: number; points: number[] };
+  core?: { glass: number; points: number[]; fractured?: true };
+  /**
+   * Pushed off its track by a blast: it moves `offset` from where its
+   * orbit puts it, easing out from `fromTick` to a stop at `toTick`, and
+   * keeps that offset afterwards. Absent: it sits on its track.
+   */
+  drift?: { offset: Vec2; fromTick: number; toTick: number };
   /** Exposed gate-glass: brittle. A laser stronger than `FRAGILE_STRENGTH` shatters what it cuts. */
   fragile?: true;
   /** An exposed core degrades: at this tick it collapses and its glass is lost. Absent: it lasts. */
@@ -1457,6 +1477,8 @@ export type WorldEvent =
   | { type: 'oreEjected'; shipId: string; item: string; amount: number }
   /** An ore hopper's filter changed: the ore the tractor now leaves behind, or null for none. */
   | { type: 'hopperFilterChanged'; shipId: string; eject: string | null }
+  /** A tractor's tile changed what it does: off, taking only its own loot, or taking everything. */
+  | { type: 'tractorModeChanged'; shipId: string; mode: 'off' | 'mine' | 'all' }
   /** A rock was mined out and crumbled; `shipId` mined the last of it. */
   | { type: 'rockCrumbled'; shipId: string; rockId: string }
   /** A trade completed while docked. `unitPrice` is per unit, in credits. */

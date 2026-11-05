@@ -17,6 +17,7 @@ import {
   holdCapacity,
   SURVEY_CYCLE_SECONDS,
   breachAction,
+  isSwitchedOn,
   rockAt,
 } from '@spacegame/sim';
 import { boardPrompt, shipName } from '../ui.js';
@@ -240,8 +241,12 @@ export class FlightHud {
       } else if (s.moduleKind === 'tractor') {
         // A tractor with nowhere to put things pulls nothing.
         const full = cargoUsed(ship) >= holdCapacity(shipStats(world, ship));
-        setText(tile.state, ship.tractorActive ? (full ? 'HOLD FULL' : 'ON') : 'OFF');
+        // On, it takes only your own loot (MINE) or everything in reach (ALL).
+        const on = isSwitchedOn(ship, s.mountId);
+        const mode = ship.tractorMode === 'all' ? 'ALL' : 'MINE';
+        setText(tile.state, on || ship.tractorActive ? (full ? `${mode} · FULL` : mode) : 'OFF');
         tile.root.classList.toggle('active', ship.tractorActive);
+        tile.root.classList.toggle('danger', on && ship.tractorMode === 'all');
       } else if (s.moduleKind === 'weapon') {
         // A mining turret: the rock it was given, and whether it is cutting.
         const state = ship.weapons.find((w) => w.mountId === s.mountId);

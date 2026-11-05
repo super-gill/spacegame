@@ -33,6 +33,8 @@ import {
   SEAM_HALF_ARC,
   BLAST_RADIUS,
   rockAt,
+  lootClaim,
+  tractorTakes,
   asteroidPositions,
   navReadout,
   nearestDockableStation,
@@ -745,7 +747,12 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const l of current.loot) drawLoot(ctx!, camera, l, l.cache !== undefined && l.cache.ownerId === me.id);
   // The tractor's reach and pull lines, only while there is room in the hold to pull into.
   const holdFull = mine ? cargoUsed(mine) >= holdCapacity(shipStats(current, mine)) : false;
-  if (mine?.tractorActive && view) drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && l.item === mine.hopperEject)));
+  if (mine?.tractorActive && view) {
+    // Beams only to what it will take: not its hopper's rejects, not other people's loot unless set to ALL.
+    const claim = lootClaim(current, mine.id);
+    const pulled = holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && l.item === mine.hopperEject) && tractorTakes(mine, claim, l));
+    drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, pulled);
+  }
   if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
   wasHoldFull = holdFull;
 

@@ -60,7 +60,7 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 | Drop an ore cache | J | Leaves the ore aboard, and loose ore near you, as a cache that lasts an hour, ringed in space and shown on your radar. Anyone can take it. Switches your tractor off so it is not scooped straight back |
 | Breach charges | The charge rig's tile | Near a locked rock (within 70 units of its surface): plants a charge where you are. A deep assay marks the rock's breach points; cover them all for all the glass. From 150 units clear: sets off every charge you have on it. The tile says `PLANT`, `DETONATE`, `GET CLOSER` or `TOO CLOSE`. Stay clear of the blast (320 units) |
 | Survey | Its tile's number | A survey scanner pulses: rocks in reach worth a look are outlined for a few seconds (amber rich, gold valuable, cyan rare). It cycles in 5 seconds and costs capacitor |
-| Tractor beam | R (hold) | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile leaves it running |
+| Tractor beam | R (hold), or its tile | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile cycles `OFF`, `MINE` (only loot that is yours or nobody's) and `ALL` (other people's too). R alone works in the tile's mode, `MINE` when it is off |
 | Afterburner | Shift (hold) | If one is fitted: a higher top speed and more main thrust while held, paid for from the capacitor; it will not light on an empty one |
 
 Fixed guns hit harder than turrets. Turrets let you fight while flying any direction, but a fast target close in can outrun them. Swivels also shoot down missiles and torpedoes coming for you, on their own, hot or cold, if the munition is inside their arc.

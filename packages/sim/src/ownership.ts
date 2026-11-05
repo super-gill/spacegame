@@ -27,6 +27,22 @@ export function pilotsAboard(world: Pick<World, 'pilots'>): Record<string, strin
   return aboard;
 }
 
+/**
+ * Whose loot a ship frees, kills or caches (`Loot.claim`): the pilot
+ * aboard, else its owner, else the ship itself (an NPC). A drone's is its
+ * mother's. `aboard` saves recomputing `pilotsAboard` in a loop.
+ */
+export function lootClaim(world: Pick<World, 'pilots' | 'ships'>, shipId: string, aboard: Record<string, string> = pilotsAboard(world)): string {
+  const ship = world.ships[shipId];
+  if (ship?.motherId && ship.motherId !== shipId) return lootClaim(world, ship.motherId, aboard);
+  return aboard[shipId] ?? ship?.ownerId ?? shipId;
+}
+
+/** True if a ship's tractor will take this loot: its own, nobody's, or anything when set to take all. */
+export function tractorTakes(ship: Pick<Ship, 'tractorMode'>, claim: string, loot: { claim?: string }): boolean {
+  return ship.tractorMode === 'all' || loot.claim === undefined || loot.claim === claim;
+}
+
 /** The pilot flying this ship, or null if no pilot is aboard. */
 export function shipPilot(world: Pick<World, 'pilots'>, shipId: string): Pilot | null {
   const id = pilotsAboard(world)[shipId];

@@ -926,7 +926,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     price: 2500,
     manufacturer: 'rookRivet',
     tags: ['mining'],
-    stats: { breachTolerance: 0.2 },
+    stats: { breachTolerance: 0.12 },
   },
   'rookrivet-deepassay-m': {
     id: 'rookrivet-deepassay-m',

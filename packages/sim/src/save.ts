@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -85,6 +85,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   5: (world) => migrate5to6(world),
   6: (world) => migrate6to7(world),
   7: (world) => migrate7to8(world),
+  8: (world) => migrate8to9(world),
 };
 
 /**
@@ -122,6 +123,24 @@ export function migrate7to8(world: unknown): unknown {
     return core ? { ...a, core } : a;
   });
   return { ...world, asteroids, charges: [] };
+}
+
+/**
+ * 8 to 9: cores retuned (smaller in smaller rocks, more breach points in
+ * bigger ones, some fractured). Every whole rock big enough draws its core
+ * again from its id, as 7 to 8 did, so older belts play like new ones.
+ * Exposed glass and rocks with charges on them keep what they have.
+ */
+export function migrate8to9(world: unknown): unknown {
+  if (!isRecord(world) || !Array.isArray(world['asteroids'])) return world;
+  const charged = new Set((Array.isArray(world['charges']) ? world['charges'] : []).map((c: unknown) => (isRecord(c) ? String(c['rockId']) : '')));
+  const asteroids = world['asteroids'].map((a: unknown) => {
+    if (!isRecord(a) || a['fragile'] || typeof a['radius'] !== 'number' || charged.has(String(a['id']))) return a;
+    const { core: _old, ...rest } = a;
+    const core = rockCore(seededRandom(idSeed(`${String(a['id'] ?? '')}:core`)), a['radius']);
+    return core ? { ...rest, core } : rest;
+  });
+  return { ...world, asteroids };
 }
 
 /** A seed from an id, FNV-1a. */

@@ -84,14 +84,29 @@ export function rockMakeup(random: () => number, radius: number, goods: Readonly
   return { contents, hardness: Math.round(hardness * 100) / 100, ...(core ? { core } : {}) };
 }
 
-/** Some big rocks hide a gate-glass core, with two or three breach points round them; null for the rest. */
+/** A core's share of cores that are cracked, yielding half their glass. */
+export const FRACTURED_CHANCE = 0.25;
+
+/**
+ * Some big rocks hide a gate-glass core; null for the rest. The glass
+ * grows with the rock (8 to 20 units at the smallest that can hold one,
+ * 20 to 40 at the biggest), and so do its breach points (2 or 3 in the
+ * smaller half, 3 or 4 in the bigger). A quarter are fractured. Always
+ * the same number of draws for a cored rock, so changing these numbers
+ * never reshuffles the rest of the belt.
+ */
 export function rockCore(random: () => number, radius: number, goods: Readonly<Record<string, GoodSpec>> = GOODS): Asteroid['core'] | null {
   if (radius < CORE_MIN_RADIUS || !goods['gate-glass'] || random() >= CORE_CHANCE) return null;
-  const glass = 20 + Math.round(random() * 20);
-  const count = random() < 0.5 ? 2 : 3;
+  const size = Math.max(0, Math.min(1, (radius - CORE_MIN_RADIUS) / (MAX_RADIUS - CORE_MIN_RADIUS)));
+  const low = 8 + 12 * size;
+  const high = 20 + 20 * size;
+  const glass = Math.round(low + random() * (high - low));
+  const count = (size < 0.5 ? 2 : 3) + (random() < 0.5 ? 0 : 1);
   const start = random() * Math.PI * 2;
-  const points = Array.from({ length: count }, (_, i) => Math.round(((start + (i * Math.PI * 2) / count + (random() - 0.5) * 0.6) % (Math.PI * 2)) * 1000) / 1000);
-  return { glass, points };
+  const fractured = random() < FRACTURED_CHANCE;
+  const jitter = [random(), random(), random(), random()];
+  const points = Array.from({ length: count }, (_, i) => Math.round(((start + (i * Math.PI * 2) / count + (jitter[i]! - 0.5) * 0.6) % (Math.PI * 2)) * 1000) / 1000);
+  return { glass, points, ...(fractured ? { fractured: true as const } : {}) };
 }
 
 /**
@@ -142,7 +157,16 @@ export function asteroidStates(bodies: Readonly<Record<string, Body>>, asteroids
   return asteroids.map((a) => {
     const parent = (parents[a.orbit.parent] ??= bodyState(bodies, a.orbit.parent, time));
     const s = orbitState(a.orbit, parent, time);
-    return { position: s.position, velocity: s.velocity };
+    if (!a.drift) return { position: s.position, velocity: s.velocity };
+    // Eased out: fast at first, coming to rest at the full offset.
+    const span = Math.max(1, a.drift.toTick - a.drift.fromTick);
+    const u = Math.max(0, Math.min(1, (tick - a.drift.fromTick) / span));
+    const moved = 1 - (1 - u) * (1 - u);
+    const rate = u < 1 && tick >= a.drift.fromTick ? (2 * (1 - u)) / (span * dt) : 0;
+    return {
+      position: { x: s.position.x + a.drift.offset.x * moved, y: s.position.y + a.drift.offset.y * moved },
+      velocity: { x: s.velocity.x + a.drift.offset.x * rate, y: s.velocity.y + a.drift.offset.y * rate },
+    };
   });
 }
 

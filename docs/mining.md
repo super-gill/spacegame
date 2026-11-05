@@ -118,11 +118,11 @@ Built as a general system so later kinds slot in without rework.
 
 Agreed with Jason: breaching is for gate-glass, its own kind of mining. A deep assay shows where to breach, the pilot plants the charges by hand, gets clear and sets them off. The blast is not loud (space) but its signature bloom is huge, and draws pirates.
 
-- **Cores:** about three in ten rocks of radius 50 and up hide a core of 20 to 40 units of gate-glass with two or three breach points round it (`Asteroid.core`). Glass is never loose in a rock: a laser cannot reach it. The starter belt has six cored rocks, all in the ring; rockfall makes more; older saves draw cores on load (save 8, `migrate7to8`).
+- **Cores:** about three in ten rocks of radius 50 and up hide a core of gate-glass (`Asteroid.core`). Tuned after Jason's first breach paid too well: the glass grows with the rock, 8 to 20 units at radius 50 up to 20 to 40 at the biggest; smaller rocks have 2 or 3 breach points, bigger ones 3 or 4; a quarter are **fractured** (`core.fractured`), which the deep assay shows and which halves the glass however clean the breach. Glass is never loose in a rock: a laser cannot reach it. The starter belt has four cored rocks; rockfall makes more. Older saves draw cores on load (save 8) and redraw them under the new tuning (save 9, `migrate8to9`), except exposed glass and rocks with charges on them.
 - **Reading:** only a deep assay (`rookrivet-deepassay-m`, readout `core`) finds a core. The target card says GLASS CORE and the breach points show as pale ticks round the locked rock, each as wide as the charge rig's tolerance.
 - **Planting:** a charge rig (`rookrivet-chargerig-s`, utility, `breachCharger`) plants a breach charge (a good, bought at Ridge and Harbour) from its tile on the active lock's rock, where the ship is: within 70 units of the surface. Rocks under radius 40 refuse. Planted charges show as amber dots.
 - **Detonating:** the same tile, pressed at least 150 units from the surface, sets off every charge the ship has on that rock. The tile says what a press will do: `PLANT · n`, `DETONATE n`, `GET CLOSER`, `TOO CLOSE`, `NO CHARGES`.
-- **The split:** the rock breaks into two chunks (three from radius 60), its ore shared out, 0.2 softer for the cracking. A cored rock also exposes its glass as a small brittle rock: all of it if every breach point had a charge within tolerance, down to a quarter if none did.
+- **The split:** the rock breaks into two chunks (three from radius 60), its ore shared out, 0.2 softer for the cracking. The chunks drift apart over 20 seconds, easing to a stop the rock's radius plus 100 units further out (`Asteroid.drift`), so drones can reach the glass (in Jason's first play they could not). A cored rock also exposes its glass as a small brittle rock: all of it if every breach point had a charge within tolerance, down to a quarter if none did, halved again if fractured. Drift is in system coordinates: with the admin orbits rule on, a drifted chunk keeps its offset in a fixed direction while its track turns, which is close enough for a few minutes' work.
 - **Glass is fragile:** a laser stronger than 60% shatters what it cuts (lost, `glassShattered`); drones and light lasers free it in canisters. Exposed glass collapses after three minutes (`coreCollapsed`).
 - **The blast:** up to 450 damage within 320 units, falling to nothing at the edge, to everyone: the breacher, its drones, bystanders. Rocks under radius 30 in it shatter into canisters; bigger ones lose 10 units off the face.
 - **The bloom:** pirates within 9,000 units fly to the blast (`PirateBrain.drawnTo`) and hunt whatever they find there.
@@ -132,10 +132,19 @@ Agreed with Jason: breaching is for gate-glass, its own kind of mining. A deep a
 ### The ship ladder (Jason, 5 November 2026)
 
 - **Prospector:** the cheap early money-maker, feeding at the bottom.
-- **Breacher (mid):** a professional's ship that strip-mines and breaches. Rook and Rivet Breacher, 24,000 at Ridge: two medium fixed mining lasers (+25% mining), a small aft turret, the deep assay, a charge rig (+75% tolerance, so about 20 degrees), three drones, a hopper and 100 units of ore hold.
+- **Breacher (mid):** a professional's ship that strip-mines and breaches. Rook and Rivet Breacher, 24,000 at Ridge: two medium fixed mining lasers (+25% mining), a small aft turret, the deep assay, a charge rig (+75% tolerance: about 12 degrees either side of a breach point, from the rig's 7), three drones, a hopper and 100 units of ore hold.
 - **Hulk:** the strip-mining behemoth. It carries no charges by default.
 - **Later:** an industrial capital or command ship coordinating NPC miners, with mining fighters and a huge hold.
 - **Later still (Jason):** more ships at each size with slight differences, better and worse in different areas, rather than one ship per rung.
+
+## Whose loot (5 November 2026)
+
+Agreed with Jason: with miners working the belt, the tractor pulled everything in reach, other miners' canisters included.
+
+- **Claims:** loot remembers whose it is (`Loot.claim`, from `lootClaim`): whoever freed it (their laser, their drones, their breach), killed the ship it spilled from, or cached it. The claim is the pilot aboard, else the ship's owner, else the ship itself (an NPC); a drone claims for its mother. Loot from before claims, and any other loot, is nobody's.
+- **The tractor tile** cycles `OFF`, `MINE` (your own loot and nobody's, the default) and `ALL` (anything in reach, other people's too), then off. Holding R tractors in the tile's mode, `MINE` when the tile is off. The ore hopper's filter applies on top in both modes. `ALL` is the deliberate act law (7) can later treat as theft.
+- **A cache** never takes in other people's canisters when it is dropped.
+- **Not done (Jason unsure):** drawing other people's loot differently, which might feed the player too much. No lock-a-canister mode (Jason: too much).
 
 ## NPC miners (5 November 2026)
 

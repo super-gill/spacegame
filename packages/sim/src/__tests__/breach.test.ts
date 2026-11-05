@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { CORE_MIN_RADIUS, oreLeft, rockAt, screeAsteroids } from '../asteroids.js';
+import { CORE_MIN_RADIUS, oreLeft, rockAt, rockCore, screeAsteroids } from '../asteroids.js';
+import { seededRandom } from '../random.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from '../bodies.js';
 import { BLAST_RADIUS, BLOOM_RANGE, CORE_LIFETIME, PLANT_REACH, SAFE_DISTANCE } from '../breach.js';
 import { FIXED_DT } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { LOADOUTS } from '../loadouts.js';
 import { lockReadout } from '../locks.js';
-import { deserializeWorld, migrate7to8, serializeWorld } from '../save.js';
+import { deserializeWorld, migrate7to8, migrate8to9, serializeWorld } from '../save.js';
 import { shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import { activationSlots } from '../systems.js';
@@ -76,6 +77,32 @@ describe('gate-glass cores', () => {
     }
   });
 
+  it('grow with the rock: small cores and fewer points in smaller rocks, and some fractured', () => {
+    const draw = (radius: number) => {
+      const out = [];
+      for (let seed = 1; out.length < 200; seed++) {
+        const core = rockCore(seededRandom(seed), radius);
+        if (core) out.push(core);
+      }
+      return out;
+    };
+    const small = draw(CORE_MIN_RADIUS);
+    const big = draw(80);
+    for (const c of small) {
+      expect(c.glass).toBeGreaterThanOrEqual(8);
+      expect(c.glass).toBeLessThanOrEqual(20);
+      expect([2, 3]).toContain(c.points.length);
+    }
+    for (const c of big) {
+      expect(c.glass).toBeGreaterThanOrEqual(20);
+      expect(c.glass).toBeLessThanOrEqual(40);
+      expect([3, 4]).toContain(c.points.length);
+    }
+    const fractured = [...small, ...big].filter((c) => c.fractured).length / 400;
+    expect(fractured).toBeGreaterThan(0.15);
+    expect(fractured).toBeLessThan(0.35);
+  });
+
   it('only a deep assay reads a core and its breach points', () => {
     const w = setup();
     expect(lockReadout(w, w.ships['s']!, 'big')!.composition!.core).toEqual({ points: [0, Math.PI], glass: 40 });
@@ -120,6 +147,16 @@ describe('breach charges', () => {
     expect(chunks.reduce((n, a) => n + oreLeft(a), 0)).toBe(360);
     for (const c of chunks) expect(c.hardness).toBeCloseTo(0.5);
     expect(w.charges).toEqual([]);
+  });
+
+  it('a fractured core gives half, however clean the breach', () => {
+    let w = setup(0);
+    w = { ...w, asteroids: w.asteroids.map((a) => (a.id === 'big' ? { ...a, core: { ...a.core!, fractured: true as const } } : a)) };
+    expect(lockReadout(w, w.ships['s']!, 'big')!.composition!.core).toMatchObject({ fractured: true });
+    w = press(w);
+    w = press(moveTo(w, Math.PI, 30));
+    w = press(moveTo(w, Math.PI, SAFE_DISTANCE + BLAST_RADIUS));
+    expect(w.events.find((e) => e.type === 'breached')).toMatchObject({ glass: 20, quality: 1 });
   });
 
   it('off the breach points: only a quarter of the glass survives', () => {
@@ -193,6 +230,25 @@ describe('exposed gate-glass', () => {
     expect(heavy.w.loot.some((l) => l.item === 'gate-glass')).toBe(false);
   });
 
+  it('the chunks drift apart, and the breacher\'s drones can reach the glass', () => {
+    let w = exposed();
+    const glass = w.asteroids.find((a) => a.fragile)!;
+    w = run(w, 20).w;
+    const at = rockAt(w, glass.id)!.position;
+    for (const c of w.asteroids.filter((a) => a.id.startsWith('big.') && !a.fragile)) {
+      expect(Math.hypot(rockAt(w, c.id)!.position.x - at.x, rockAt(w, c.id)!.position.y - at.y) - c.radius - glass.radius).toBeGreaterThan(100);
+      // At rest again.
+      expect(Math.hypot(rockAt(w, c.id)!.velocity.x, rockAt(w, c.id)!.velocity.y)).toBeLessThan(0.01);
+    }
+    // Lock the glass, send the drones, tractor on.
+    w = stepWorld(w, { s: { ...emptyInput(), lock: glass.id } });
+    w = run(w, 4).w;
+    w = stepWorld(w, { s: { ...emptyInput(), activateLock: glass.id, droneCommand: { action: 'launch' } } });
+    const r = run(w, 60, { tractor: true });
+    expect(r.events.some((e) => e.type === 'oreFreed' && e.item === 'gate-glass')).toBe(true);
+    expect(r.events.some((e) => e.type === 'glassShattered')).toBe(false);
+  });
+
   it('collapses when its time is up', () => {
     let w = exposed();
     const id = w.asteroids.find((a) => a.fragile)!.id;
@@ -211,7 +267,7 @@ describe('the breacher', () => {
     const stats = shipStats(w, ship);
     expect(stats.powerDraw).toBeLessThanOrEqual(stats.powerOutput);
     expect(stats.readouts).toContain('core');
-    expect(stats.breachTolerance).toBeCloseTo(0.35);
+    expect(stats.breachTolerance).toBeCloseTo(0.21);
     expect(ship.droneBay).toHaveLength(3);
     expect(activationSlots(w, ship).some((s) => s.kind === 'module' && s.moduleKind === 'breachCharger')).toBe(true);
     expect(w.stations['station-ridge']!.shipMart).toContain('rookrivet-breacher');
@@ -233,5 +289,13 @@ describe('saves', () => {
     expect(once.asteroids.filter((a) => a.core).length).toBeGreaterThan(0);
     expect(migrate7to8(old)).toEqual(once);
     expect(once.charges).toEqual([]);
+  });
+
+  it('retune an older belt\'s cores, leaving exposed glass and charged rocks alone', () => {
+    const old = { asteroids: [{ ...bigRock(), id: 'a', radius: 80 }, { ...bigRock(), id: 'b' }, { ...bigRock(), id: 'g', fragile: true }], charges: [{ id: 'c', shipId: 's', rockId: 'b', bearing: 0 }] };
+    const after = migrate8to9(old) as World;
+    expect(after.asteroids.find((a) => a.id === 'b')!.core).toEqual(bigRock().core);
+    expect(after.asteroids.find((a) => a.id === 'g')!.core).toEqual(bigRock().core);
+    expect(migrate8to9(old)).toEqual(after);
   });
 });

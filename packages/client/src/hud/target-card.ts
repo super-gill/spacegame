@@ -242,7 +242,7 @@ export class TargetCard {
     const comp = read?.composition;
     setText(this.name, comp ? `Rock, ${comp.total} units` : 'Rock');
     // A deep assay also reads a gate-glass core and its breach points.
-    const core = comp?.core ? ` · GLASS CORE, ${comp.core.points.length} BREACH POINTS` : comp?.core === null ? ' · no core' : '';
+    const core = comp?.core ? ` · ${comp.core.fractured ? 'FRACTURED ' : ''}GLASS CORE, ${comp.core.points.length} BREACH POINTS` : comp?.core === null ? ' · no core' : '';
     setText(this.who, comp ? `Hardness ${Math.round(comp.hardness * 100)}%${core}` : lock.progress < 1 ? 'Locking…' : 'No composition reading');
     if (comp?.fragile) setText(this.name, `Exposed gate-glass · collapses in ${Math.ceil(comp.fragile.secondsLeft ?? 0)}s`);
     if (this.hullId !== 'rock') {

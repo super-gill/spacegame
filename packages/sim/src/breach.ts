@@ -1,6 +1,6 @@
 import { angleDelta } from './angle.js';
 import { asteroidStates, oreLeft } from './asteroids.js';
-import { CANISTER_UNITS, FRAGILE_STRENGTH, ORE_LOOT_LIFETIME } from './mining.js';
+import { CANISTER_UNITS, FRAGILE_STRENGTH, ORE_LOOT_LIFETIME, claimed } from './mining.js';
 
 export { FRAGILE_STRENGTH };
 import { bodyState, railTime, withOrbitMoving } from './rails.js';
@@ -17,9 +17,10 @@ import { add, distance, fromAngle, scale, sub, toAngle, type Vec2 } from './vec2
  *   at least `SAFE_DISTANCE` from the surface, sets off every charge the
  *   ship has on that rock.
  * - The rock splits into chunks (its ore shared out, a little softer for
- *   the cracking). A rock with a gate-glass core also exposes its glass:
+ *   the cracking) that drift apart, clearing room round the glass. A rock with a gate-glass core also exposes its glass:
  *   all of it if every breach point had a charge within the charger's
- *   tolerance, as little as a quarter if none did. The exposed glass is
+ *   tolerance, as little as a quarter if none did, and half that again
+ *   from a fractured core. The exposed glass is
  *   brittle (a laser stronger than `FRAGILE_STRENGTH` shatters what it
  *   cuts) and collapses after `CORE_LIFETIME` seconds.
  * - The blast hurts every ship within `BLAST_RADIUS`, its owner and its
@@ -37,6 +38,13 @@ export const BLAST_RADIUS = 320;
 export const BLAST_DAMAGE = 450;
 export const BLOOM_RANGE = 9000;
 export const CORE_LIFETIME = 180;
+/**
+ * The chunks drift apart after a breach, clearing room round the glass
+ * for drones: this far beyond where they start, units (plus the rock's
+ * radius), easing to a stop over `DRIFT_SECONDS`.
+ */
+export const DRIFT_DISTANCE = 100;
+export const DRIFT_SECONDS = 20;
 /** Rocks smaller than this in the blast shatter into loose ore; bigger ones lose `KNOCKED_LOOSE` units. */
 const SHATTER_RADIUS = 30;
 const KNOCKED_LOOSE = 10;
@@ -101,6 +109,7 @@ export function detonate(
   tolerance: number,
   tick: number,
   nextId: number,
+  claim?: string,
 ): BlastResult {
   const index = asteroids.findIndex((a) => a.id === rockId);
   if (index < 0) return { asteroids: [...asteroids], charges: charges.filter((c) => c.rockId !== rockId), loot: [], damage: [], npcs: world.npcs, events: [], idsUsed: 0 };
@@ -130,11 +139,15 @@ export function detonate(
       if (share > 0) contents[g] = share;
     }
     if (Object.keys(contents).length === 0) continue;
-    const p = add(at, scale(fromAngle(rock.orbit.phase + 0.3 + (i * Math.PI * 2) / count), rock.radius * 0.75));
-    pieces.push({ id: `${rock.id}.${i + 1}`, orbit: stillAt(p), radius: Math.max(12, Math.round(rock.radius * 0.45)), contents, hardness: Math.max(0.1, Math.round((rock.hardness - 0.2) * 100) / 100), field: rock.field });
+    const out = fromAngle(rock.orbit.phase + 0.3 + (i * Math.PI * 2) / count);
+    const p = add(at, scale(out, rock.radius * 0.75));
+    // Pushed apart by the blast, so the glass in the middle is reachable.
+    const drift = { offset: scale(out, DRIFT_DISTANCE + rock.radius), fromTick: tick, toTick: tick + Math.round(DRIFT_SECONDS / world.dt) };
+    pieces.push({ id: `${rock.id}.${i + 1}`, orbit: stillAt(p), radius: Math.max(12, Math.round(rock.radius * 0.45)), contents, hardness: Math.max(0.1, Math.round((rock.hardness - 0.2) * 100) / 100), field: rock.field, drift });
   }
   // The core, exposed: brittle, and on a clock.
-  const glass = rock.core ? Math.round(rock.core.glass * (0.25 + 0.75 * quality)) : 0;
+  // A fractured core gives half, however clean the breach.
+  const glass = rock.core ? Math.round(rock.core.glass * (0.25 + 0.75 * quality) * (rock.core.fractured ? 0.5 : 1)) : 0;
   if (glass > 0) {
     pieces.push({ id: `${rock.id}.glass`, orbit: stillAt(at), radius: 12, contents: { 'gate-glass': glass }, hardness: 0.3, field: rock.field, fragile: true, expiresTick: tick + Math.round(CORE_LIFETIME / world.dt) });
   }
@@ -150,7 +163,7 @@ export function detonate(
   let idsUsed = 0;
   const spill = (from: Vec2, item: string, amount: number, k: number): void => {
     const dir = fromAngle(toAngle(sub(from, at)) + (k - 1) * 0.4);
-    loot.push({ id: `l${nextId + idsUsed++}`, item, amount, position: from, velocity: scale(dir, DEBRIS_SPEED), ticksLeft: Math.round(ORE_LOOT_LIFETIME / world.dt) });
+    loot.push({ id: `l${nextId + idsUsed++}`, item, amount, position: from, velocity: scale(dir, DEBRIS_SPEED), ticksLeft: Math.round(ORE_LOOT_LIFETIME / world.dt), ...claimed(claim) });
   };
   const rest: Asteroid[] = [];
   const gone = new Set<string>([rock.id]);

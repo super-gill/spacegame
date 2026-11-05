@@ -77,18 +77,24 @@ export function dropCache(
     hold = rest;
     // Fanned out a little so the canisters do not sit on one another.
     const spread = fromAngle(ship.heading + Math.PI + (added.length - 1) * 0.5);
-    added.push({ id: `l${nextId + added.length}`, item: good, amount, position: add(stern, scale(spread, 6 * added.length)), velocity: frame, ticksLeft, cache });
+    added.push({ id: `l${nextId + added.length}`, item: good, amount, position: add(stern, scale(spread, 6 * added.length)), velocity: frame, ticksLeft, cache, claim: ownerId });
     units += amount;
   }
   const reach = Math.max(CACHE_GATHER_RANGE, stats.tractorRange);
   const marked = new Set<string>();
   for (const l of loot) {
     if (!goods[l.item]?.ore || distance(l.position, ship.position) > reach) continue;
+    if (l.claim !== undefined && l.claim !== ownerId) continue; // someone else's stays theirs
     marked.add(l.id);
     units += l.amount;
   }
   if (units === 0) return { ship, added, marked, idsUsed: 0, event: null };
   return { ship: hold === ship.hold ? ship : { ...ship, hold }, added, marked, idsUsed: added.length, event: { type: 'cacheDropped', shipId: ship.id, units } };
+}
+
+/** `{ claim }` when there is one, else nothing (so loot without a claim has no key). */
+export function claimed(claim: string | undefined): { claim?: string } {
+  return claim === undefined ? {} : { claim };
 }
 
 /** The ore an ore hopper's filter leaves behind after `current`, cycling through the ore catalogue and back to none. */
@@ -123,6 +129,7 @@ export function cutRocks(
   beams: readonly BeamShot[],
   dt: number,
   nextId: number,
+  claimFor: (shipId: string) => string | undefined = () => undefined,
 ): CutResult {
   const rocks = asteroids.slice();
   const places = rockAt.slice();
@@ -195,6 +202,7 @@ export function cutRocks(
         // At rest beside the rock, where the laser freed it.
         velocity: places[hit]!.velocity,
         ticksLeft: Math.round(ORE_LOOT_LIFETIME / dt),
+        ...claimed(claimFor(beam.shipId)),
       });
       events.push({ type: 'oreFreed', shipId: beam.shipId, rockId: rock.id, item: good, amount });
     }
