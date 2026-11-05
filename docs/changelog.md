@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-05
+
+Mining grows up and fitting is rebuilt. Drones, NPC miners and breaching for gate-glass; ore holds, sorting hoppers and loot that remembers whose it is; slot tiers (high, mid, low) with placement on the hull, buy then fit, and a new fitting window shared with the fitter page; the first big warships. Saves from 0.12.0 load and are upgraded (save version 12).
+
 ### Added
 - Two big warships at Harbour: the Kessari Injunction, a brig, and the Union Defence Works Walkout, a Free Belt frigate (working names). Large engines, thrusters, shields and armour came with them.
 - A new fitting window: budget bars, your slots by tier, the ship with every slot drawn where it sits (and a swivel's arc and blind spot), and what fits the selected slot from your storage or for sale. Buy modules straight into storage, fit them from there, or buy and fit in one. Fitting and unfitting are free, every station outfits for now, and goods and modules share one storage at each station.
@@ -27,8 +31,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ### Known
 - Drones left out when you dock are lost, so recall them first.
+- Drones still sometimes get stuck on rocks and rub against them; to be looked at.
 
 ### Fixed
+- Waiting drones say why in the drone manager (nothing locked, rocks too hard for them, or out of range), and a locked rock's card says whether your drones can cut it.
 - Drones launch clear of rocks instead of into a rock the mother is parked beside.
 - Buying a drone with full drone bays says the bays are full, not the cargo hold: drones never use cargo.
 - The fitting window shows what each fitted module is (autocannon, shield generator) under its name again.
