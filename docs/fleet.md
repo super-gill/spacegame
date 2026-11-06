@@ -11,12 +11,12 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Builder | Home | Builds | Hulls |
 | --- | --- | --- | --- |
 | Meridian Civil Yards | Everywhere | The small civilian ships everyone starts in | 6 |
-| Tessaract Logistics | Earth | Cargo and passengers at every size | 7 |
+| Tessaract Logistics | Earth | Cargo and passengers at every size | 8 |
 | Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 8 |
 | Seraphine Naval Yards | Mars, naval yard | The Martian Navy | 8 |
 | Arcadia Works | Mars, state yard | Civilian hulls, one per job, no brands | 8 |
 | Ishtar Fleet Works | Venus, naval yard | The Coastguard | 5 |
-| Solace Medical | Venus | Support, repair, rescue | 3 |
+| Solace Medical | Venus | Support, repair, rescue | 4 |
 | Halden Institute | Venus | Survey and exploration | 3 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 4 |
 | Vantage Aerospace | Luna (Earth) | Combat fighters, no hulls | 2 |
@@ -104,6 +104,7 @@ Freight paperwork. The oldest freight line in known space and the best transport
 | Tessaract Lading | Bulk freighter | Large cargo on the long lanes | Slow, deep, and a pirate's dream if it is alone | draft |
 | Tessaract Consignment | Superfreighter | The biggest thing on the lanes | Moves a station's worth of goods; never travels without escort | draft |
 | Tessaract Timetable | Ferry | Scheduled passengers, medium | Earth's ferry; Meridian's Fulmar is the cheaper one | draft |
+| Tessaract Itinerary | Heavy bus | Short-route liner, a hundred seats | The Marches run: a hundred seats and a bar | draft |
 | Tessaract Passage | Liner | Long-route passengers in berths | Comfort, speed and a tempting target | draft |
 
 ## Kessari Orbital Defence
@@ -175,6 +176,7 @@ Comfort and care. Protected everywhere by the Mercy Clause and sold to every sig
 | --- | --- | --- | --- | --- |
 | Solace Respite | Tender (small) | Field repair and shield transfer | Flies with a wing and keeps it alive | draft |
 | Solace Haven | Repair tender (medium) | Repair, rescue, pod recovery | The ship that fishes your pod out | draft |
+| Solace Refuge | Repair ship (heavy) | Field rebuilds | Rebuilds a frigate in the field | draft |
 | Solace Sanctuary | Hospital ship (large) | Fleet support and mass rescue | Attacking one is the crime every power hunts | draft |
 
 ## Halden Institute
@@ -255,7 +257,7 @@ The Belt's ship-born clans build a few hulls each, over generations, and no two 
 | --- | --- | --- | --- | --- |
 | Vesk Vane | Corvette | Stealth raider and escort | Black hull, red vanes, cold-coasts better than anything | draft |
 | Saro Farwalker | Explorer (large) | Long-range exploration | The hull that crossed the Shoals | draft |
-| Long Wake Trawl | Recovery tender (medium) | Deep-space recovery | Trailing cables and nets; finds what everyone else gave up | draft |
+| Long Wake Trawl | Recovery tender (heavy) | Deep-space recovery | Trailing cables and nets; finds what everyone else gave up | draft |
 
 ## Aurel
 
@@ -313,6 +315,32 @@ Decided 6 November 2026. No built module changes maker or stat.
 | The Belt | Whatever it stole or copied | Thin shields, Rook and Rivet Patchplate, speed and running away | Belt hulls have the spare mounts to tank either way |
 
 Shields stay in the game. A shield is a field the drive plume breaks, which is why every ship is open astern.
+
+## Weight bands
+
+Decided 6 November 2026. Military classes carry their weight in the name; civilian jobs do not, so every hull has a second axis. In-world it is the **Ceres Registry rating**, written [weight band]-[function]: Light-Courier, Heavy-Destroyer, Super-heavy-Liner. Subcraft, drones and pods are rated by kind (Subcraft-Fighter, Drone-Mining drone, Pod-Lifeboat). The band is what sets pad size, docking fees, PDC hardpoints and, later, crew; it classifies and never balances. The band names are the UI words; S, M, L stay module sizes.
+
+| Band | Military classes | Civilian examples | Catalogue size today |
+| --- | --- | --- | --- |
+| Light | Corvette | Courier, shuttle, taxi, prospector, tug, light tender | S |
+| Medium | Patrol boat, frigate | Hauler, ferry, miner, repair tender, survey ship | M |
+| Heavy | Destroyer | Freighter, bus, barge, salvage and recovery tenders, explorer, repair ship | L |
+| Super-heavy | Cruiser, battleship | Bulk freighter, liner, refinery ship, hospital ship, shipbreaker | XL |
+| Capital | Carrier, dreadnought | Superfreighter, factory ship, colony ship, mobile dock | capital |
+
+Civilian hulls by job and band, with the gaps filled on 6 November (Tessaract Itinerary, Solace Refuge; the Long Wake Trawl moved to heavy):
+
+| Job | Light | Medium | Heavy | Super-heavy | Capital |
+| --- | --- | --- | --- | --- | --- |
+| Cargo | Docket, Pony, Arcadia Courier | Waybill, Mule, Skua, Arcadia Hauler | Manifest, Adit, Arcadia Freighter | Lading, Dray, Arcadia Bulk Freighter | Consignment |
+| Passengers | Gull, Petrel, Arcadia Shuttle | Timetable, Fulmar, Arcadia Ferry | Tessaract Itinerary (heavy bus) | Passage | later: colony ship, cruise liner |
+| Mining | Prospector | Sinker | Collier | Winder, Smelter | Headframe |
+| Salvage and towing | Shunt, Scrapper | Wrecker, Keel, Arcadia Tug | Long Wake Trawl | Breaker | later: a mobile breaking yard |
+| Support | Respite | Haven, Arcadia Tender | Solace Refuge (repair ship) | Sanctuary | later: mobile dock |
+| Survey and exploration | Query | Inquiry, Waystar | Expedition, Farwalker | | |
+| Drone tender | | Canopy | | | |
+
+The ship registry page shows every hull's rating as a tag.
 
 ## Generations: legacy, production, pattern and clan
 
