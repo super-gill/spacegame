@@ -52,7 +52,7 @@ A world of its own in each server: never saved, never touching the persistent wo
 ## Order of work
 
 1. Release 0.17.0 (the interface pass) so it is a clean point before the server changes.
-2. Mockups on the canvas of the login switch, the mode screen and the arena setup; Jason picks.
+2. Mockups on the canvas of the login switch, the mode screen and the arena setup; Jason picks. **Made** (6 November 2026): https://claude.ai/artifact/CieExkHLJkZieXoAAUgMfm, three working screens and his questions on a sticky.
 3. The Arena world in the server, the mode screen and the arena setup, with Skirmish (moving today's admin arena over).
 4. Waves and To the death.
 5. The two-server setup: the batch files, the login switch, docs in hosting.md. Jason starts the dev server and the live server takes releases from then on.
