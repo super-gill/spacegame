@@ -9,7 +9,7 @@ How the Spacegame chats work together. Every chat working on the repo reads this
 | Who | Does |
 | --- | --- |
 | **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
-| **Lead** (the current lead chat; "Lead 5" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lead** (the current lead chat; "Lead 6" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
 | **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
 | **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
@@ -152,6 +152,11 @@ Turret model step 3 contracts (on `main` from 6 November 2026; `docs/turrets.md`
 - **CIWS** (`types.ts`, `hulls.ts`, `weapons.ts`, `modules.ts`): `MountType` gains `ciws` (ids `d1` to `d4`); weapon `ciws-m` (family `pointDefence`), module `paragon-ciws-m`, numbers in `CIWS`. `swivel-s` and `paragon-turret-s` are gone.
 - **Save format version 15** (`migrate14to15`).
 
+Drone manoeuvring contracts (on `main` from 6 November 2026; `docs/drones.md`):
+
+- **Manoeuvring by hull** (`types.ts`, `stats.ts`, `ship.ts`): `HullSpec.manoeuvre` (optional, 0 to 1) and `ShipStats.manoeuvre`; `manoeuvreShare(rule, stats)` is the share a ship flies by, the higher of `WorldRules.manoeuvreSpeed` and its hull's own. The Knocker drone is 1. NPC steering takes it through `flightOn(world, ship, stats)` (stats now required).
+- **Planning** (`ai/path.ts`): `clear` from inside an obstacle's margin allows legs that lead out or skirt it, never closer (it used to ignore that obstacle).
+
 Turret model step 2 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 2"):
 
 - **Range** (`types.ts`, `weapons.ts`, `combat.ts`): `WeaponSpec.spread`, `WeaponSpec.falloff` (`RangeFalloff`), `Projectile.lifeTicks` and `Projectile.falloff` (optional); `scatter`, `falloffFactor`. `idSeed` in `random.ts` is the one id hash.
@@ -230,6 +235,8 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 ## Log
 
 Newest first. One entry per session that changed something.
+
+- 2026-11-06, lead (Lead 6): took over from Lead 5 (`ws/lore` had nothing new). **Drones, full manoeuvring** (`docs/drones.md`). Built a lab (six most crowded patches; a hulk still, a hulk drifting, a prospector; 90 seconds each) and found three causes: the planner ignored a rock the drone was already close to, so it planned through it and rubbed along the face (a prospector's drone never cut); forward-only drones stalled short of their spots; a sister cutting on the same face boxed a drone in against the rock. Fixed the planner (`clear`, and the grid shrinks round a close start; backs off when there is no way), `HullSpec.manoeuvre` 1 on the drone (ships unchanged), drones ignore sisters and mother in close-in steering. Impacts 2 to none; stalled time hulk 41 to about 1 second, prospector 48 to under 1. NPC miners get the planner fix. For Jason: try drones in the belt. Next: the interface pass (roadmap), then discuss law (7) with Jason before starting it.
 
 - 2026-11-06, lead (Lead 5): **shared world, only what you can see** (`docs/shared-world.md`): `visibleWorld` per player (sensor range plus 500, own ships and caches anywhere, no other players' credits, storage or unlocked holds), per-connection diffs, events filtered; own shots drawn from your guns; fixed updates dropped while a new character read their key ("Unknown hull", reproduced and fixed). Jason: discuss law (7) before starting it; drones and the interface pass next.
 - 2026-11-06, lead (Lead 5): **released 0.16.0, the turret model.** Step 4: stock Injunction and Walkout refit with flank and aft autocannons and more reactor (brig beats one Warrant, loses to two; frigate beats four, loses to six); the Collier's aft slot left free (a gun pushes its turret tiles off keys 1 and 2); missile salvos measured (one or two at a time all shot down, eight half through); no numbers tuned. The kiter target needs the arena. Next: Jason to choose (roadmap, "Plan from here").

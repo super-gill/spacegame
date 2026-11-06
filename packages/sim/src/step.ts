@@ -15,7 +15,7 @@ import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
 import { lootClaim, pilotsAboard } from './ownership.js';
 import { applyCarry, frameVelocity, placeStations, surfacesNext, tickRails } from './rails.js';
-import { stepShip } from './ship.js';
+import { manoeuvreShare, stepShip } from './ship.js';
 import { shipStats } from './stats.js';
 import { add, fromAngle, scale, type Vec2 } from './vec2.js';
 import type { Decoy, DroneCommand, Loot, Munition, Projectile, Ship, ShipInput, ShipStats, World, WorldEvent } from './types.js';
@@ -155,7 +155,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const burnCost = stats.afterburnerDraw * world.dt;
     const lit = !!given?.afterburner && ship.state === 'flying' && stats.afterburnerSpeed > 0 && ship.capacitor >= burnCost;
     const flightStats = lit ? { ...stats, maxSpeed: stats.maxSpeed * (1 + stats.afterburnerSpeed), mainThrust: stats.mainThrust * (1 + stats.afterburnerThrust) } : stats;
-    const burnt = stepShip(ship, flightStats, given, world.dt, frameVelocity(world, ship), pull, world.rules.manoeuvreSpeed);
+    const burnt = stepShip(ship, flightStats, given, world.dt, frameVelocity(world, ship), pull, manoeuvreShare(world.rules.manoeuvreSpeed, stats));
     const stepped = lit ? { ...burnt, capacitor: burnt.capacitor - burnCost, afterburning: true } : burnt.afterburning ? { ...burnt, afterburning: false } : burnt;
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
     const hulls = collideWithStations(flown, stats, stationsNext);

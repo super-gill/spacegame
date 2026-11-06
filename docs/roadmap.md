@@ -33,14 +33,14 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 1. **0.15.0 released: fitting costs and the arena** (`docs/fitting.md`, "As built: step 4" and "The arena"). No damage cuts: big guns struggle against small ships by physics; point defence small only; turreted main guns; signature from kit; swarm fights in the lab; operators fight any fit against any other in the arena.
 2. **0.16.0 released: the turret model** (`docs/turrets.md`, "As built" steps 1 to 4): every main gun a turret firing at the selected lock, traverse by size, hardpoint arcs; spread with range and laser falloff; close-in weapon systems on medium ships and up replacing swivels (save 15); stock big ships refit against the balance targets; steering by mouse or keys offered in the Controls panel. Next: Jason to choose from the items below.
 3. **Shared world:** done on `main`: each player is sent only what their sensors can see (no other players' holds, credits or storage), your own shots drawn from your guns, and a dropped-updates bug fixed (`docs/shared-world.md`, "As built: only what you can see"). Still waiting: full prediction for your own ship, only if steering lags for friends.
-4. **Drones:** try full manoeuvring (Jason's call) for the pathfinding trouble below.
+4. **Drones:** done on `main`: full manoeuvring and a planner fix (`docs/drones.md`); for Jason to try in the belt.
 5. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
 6. The interface passes carry on (6d: contacts and the nav target, aim reticle, munition warnings, shield arcs on the HUD).
 7. Then law (7, with electronic warfare), then the map (8).
 
 ## To check later (from playtests)
 
-- **Drone pathfinding** (Jason, 5 November 2026): drones still often get stuck and rub against rocks. Not yet known whether it is the path (A* round the rocks, `ai/path.ts`) or the piloting (steering a forward-only craft along it, `ai/navigate.ts`, `ai/steer.ts`). Start by replaying a crowded patch with damage events logged, as the "densest part of the belt" test does, and see which one breaks. **Jason's call:** drones may manoeuvre fully (reverse and sideways thrust, like a ship with thrusters) rather than burn only forwards; he suspects the forward-only flying is the cause, and it is the first thing to try.
+- **Drone pathfinding** (Jason, 5 November 2026; on `main` 6 November, waiting for his playtest): it was three things. The path: a drone close to a rock planned straight through it and rubbed along its face. The piloting: forward-only, drones stalled short of their spots. And sisters: a drone steering round a sister cutting on the same face was boxed in against the rock. Fixed the planner, gave drones full manoeuvring and let them ignore their sisters (`docs/drones.md`). In a lab run over the six most crowded patches (a hulk's four drones, still or drifting, or a prospector's one; 90 seconds each): impacts from 2 to none; time stalled short of a spot, hulk 41 to about 1 second in 360 drone-seconds, prospector 48 (one drone that never cut) to under 1.
 
 ## Known gaps in 0.12.0
 

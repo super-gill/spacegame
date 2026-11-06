@@ -1,5 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { shipAxes } from '../flight.js';
+import { manoeuvreShare } from '../ship.js';
 import { asteroidPositions } from '../asteroids.js';
 import { bodyStates, gravityAt, railTime } from '../rails.js';
 import { isLocked } from '../locks.js';
@@ -159,9 +160,9 @@ export interface FlightConditions {
   manoeuvreSpeed: number;
 }
 
-/** The flight conditions for `ship` now (`pullOn` and `WorldRules.manoeuvreSpeed`). */
-export function flightOn(world: Pick<World, 'bodies' | 'tick' | 'dt' | 'rules'>, ship: Ship): FlightConditions {
-  return { pull: pullOn(world, ship), manoeuvreSpeed: world.rules.manoeuvreSpeed };
+/** The flight conditions for `ship` now (`pullOn`, and the world's manoeuvring rule or its hull's own: `manoeuvreShare`). */
+export function flightOn(world: Pick<World, 'bodies' | 'tick' | 'dt' | 'rules'>, ship: Ship, stats: Pick<ShipStats, 'manoeuvre'>): FlightConditions {
+  return { pull: pullOn(world, ship), manoeuvreSpeed: manoeuvreShare(world.rules.manoeuvreSpeed, stats) };
 }
 
 /**

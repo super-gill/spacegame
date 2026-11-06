@@ -536,6 +536,8 @@ export const HULLS: Record<string, HullSpec> = {
     outline: outline([[6, 0], [1, -4], [-5, -3], [-5, 3], [1, 4]]),
     maxSpeed: 220,
     maxTurnRate: 3.5,
+    // Thrusters all round, unlike ships (docs/drones.md): it backs off and sidesteps among rocks.
+    manoeuvre: 1,
     signature: 5,
     class: 'drone',
     capacitor: 50,

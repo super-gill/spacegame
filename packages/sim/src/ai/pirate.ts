@@ -187,7 +187,7 @@ function huntOver(world: World, self: Ship, stats: ShipStats, target: Ship | und
 export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: PirateBrain): PirateThought {
   // What is in the way, and gravity here, for every steering choice below.
   const around = obstacles(world, stats);
-  const pull = flightOn(world, ship);
+  const pull = flightOn(world, ship, stats);
   // Every pirate manoeuvre keeps its speed towards a station low enough to
   // stop before the security zone: a ship that cannot slide cannot swerve
   // round one at speed (WorldRules.manoeuvreSpeed).

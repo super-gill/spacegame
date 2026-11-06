@@ -182,6 +182,7 @@ export function fitStats(cat: Catalogues, hull: HullSpec, fit: Readonly<Record<s
     rotationThrust: totals.rotationThrust,
     maxSpeed: hull.maxSpeed,
     maxTurnRate: hull.maxTurnRate,
+    manoeuvre: hull.manoeuvre ?? 0,
     radius: hull.radius,
     shield: totals.shield,
     shieldRegen: totals.shieldRegen,

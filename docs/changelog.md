@@ -8,7 +8,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - The server sends each player only what they can see: ships and shots within their sensor range (plus a margin), their own ships and caches wherever they are. Other players' credits, storage and ship holds are no longer sent to anyone (a lock whose computer reads cargo still sees a hold).
 - Your own shots and missiles are drawn leaving from your guns, rather than from where your ship was a moment ago.
 
+- Drones thrust backwards and sideways like a ship with thrusters, so they back off and sidestep among rocks instead of only flying where they point. Ships are unchanged.
+
 ### Fixed
+- Drones (and NPC miners) close to a rock no longer plan straight through it and rub along its face; a prospector's drone in a crowded patch could get stuck that way and never cut.
+- Drones no longer get boxed in against a rock by a sister drone cutting on the same face; drones of one mother pass through each other, so they no longer steer round each other.
 - A new character joining while someone else's ship appeared could hit "Unknown hull" errors and see ships that were no longer there: updates that came while the key was on screen were dropped.
 
 ## [0.16.0] - 2026-11-06

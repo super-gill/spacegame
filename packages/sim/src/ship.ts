@@ -40,6 +40,14 @@ function limitThrust(before: Vec2, after: Vec2, max: number): Vec2 {
 }
 
 /**
+ * The manoeuvring share a ship flies by: the world rule, or its hull's
+ * own if that is higher (drones, `HullSpec.manoeuvre`).
+ */
+export function manoeuvreShare(rule: number, stats: Pick<ShipStats, 'manoeuvre'>): number {
+  return Math.max(rule, stats.manoeuvre);
+}
+
+/**
  * The manoeuvring limit (`WorldRules.manoeuvreSpeed`): along the ship's
  * own axes, thrust may push the forward component up to `max`, but the
  * backward and sideways components only up to `share` of it. Like the

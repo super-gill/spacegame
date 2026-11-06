@@ -20,6 +20,8 @@ export interface Circle {
 const CELL = 14;
 /** The search box reaches this far beyond the start and goal, units. */
 const BOX_MARGIN = 260;
+/** Inside an obstacle's grown edge, a leg may dip this much closer, units (rounding, and the curve of a tangent). */
+const INSIDE_SLACK = 0.5;
 /** Give up after expanding this many cells: the goal is walled off or very far. */
 const MAX_EXPANSIONS = 6000;
 
@@ -27,10 +29,18 @@ const MAX_EXPANSIONS = 6000;
  * Waypoints from `start` to `goal` (the goal last) that keep `clearance`
  * units from every obstacle's edge, or null if there is no way within the
  * box. A start or goal inside an obstacle's grown edge is allowed, so a
- * craft that has drifted close can still leave.
+ * craft that has drifted close can still leave: that obstacle's edge is
+ * drawn just inside where the craft (or its goal) is, so the way out is
+ * open but the way through is not; never closer than half the clearance
+ * (closer than that, null, and the craft backs off first: `navigate`).
  */
 export function findPath(start: Vec2, goal: Vec2, obstacles: readonly Circle[], clearance: number): Vec2[] | null {
   if (clear(start, goal, obstacles, clearance)) return [goal];
+  obstacles = obstacles.map((o) => {
+    const room = Math.min(distance(start, o.position), distance(goal, o.position)) - CELL;
+    if (room >= o.radius + clearance) return o;
+    return { position: o.position, radius: Math.max(o.radius - clearance / 2, room - clearance) };
+  });
 
   const minX = Math.min(start.x, goal.x) - BOX_MARGIN;
   const minY = Math.min(start.y, goal.y) - BOX_MARGIN;
@@ -131,14 +141,19 @@ export function findPath(start: Vec2, goal: Vec2, obstacles: readonly Circle[], 
   return out;
 }
 
-/** True if the straight leg from `a` to `b` keeps `clearance` from every obstacle (ignoring ones `a` is already inside). */
+/**
+ * True if the straight leg from `a` to `b` keeps `clearance` from every
+ * obstacle. From inside an obstacle's grown edge, a leg may lead out or
+ * skirt it but never come any closer: it used to ignore that obstacle
+ * altogether, so a drone pressed against a rock planned straight through
+ * it and rubbed along its face (Jason, 5 November 2026).
+ */
 export function clear(a: Vec2, b: Vec2, obstacles: readonly Circle[], clearance: number): boolean {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   const len2 = dx * dx + dy * dy;
   for (const o of obstacles) {
-    const reach = o.radius + clearance;
-    if (distance(a, o.position) < reach) continue;
+    const reach = Math.min(o.radius + clearance, distance(a, o.position) - INSIDE_SLACK);
     const t = len2 > 0 ? Math.max(0, Math.min(1, ((o.position.x - a.x) * dx + (o.position.y - a.y) * dy) / len2)) : 0;
     const px = a.x + dx * t - o.position.x;
     const py = a.y + dy * t - o.position.y;

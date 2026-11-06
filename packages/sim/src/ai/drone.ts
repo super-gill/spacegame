@@ -51,7 +51,7 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
   if (!mother || mother.state !== 'flying') return { input: emptyInput(), brain };
   const motherStats = world.hulls[mother.hullId] ? { radius: world.hulls[mother.hullId]!.radius } : { radius: 20 };
   const range = droneRangeOf(world, mother);
-  const flight = flightOn(world, ship);
+  const flight = flightOn(world, ship, stats);
   const cruise = stats.maxSpeed * DRONE_TUNING.cruise;
 
   // Too far from home: come back, whatever it was doing.
@@ -64,8 +64,12 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
     .map((r) => ({ position: r.position, radius: r.radius }));
   const hull = { position: mother.position, radius: motherStats.radius };
   const clearance = stats.radius + CLEAR_MARGIN;
-  // Drones still give each other room, though they would pass through each other harmlessly.
-  const head = (spot: Vec2, frame: Vec2, avoidHull: boolean) => navigate(world, ship, stats, brain, spot, frame, cruise, { avoid: avoidHull ? [hull] : [] });
+  // Sister drones and the mother are not steered round: they pass through
+  // each other harmlessly, and a sister cutting on the face boxed a drone in
+  // against the rock (6 November 2026). Their spots keep them apart; the
+  // mother's hull is planned round when it is in the way.
+  const family = (other: Ship): boolean => other.id === mother.id || other.motherId === mother.id;
+  const head = (spot: Vec2, frame: Vec2, avoidHull: boolean) => navigate(world, ship, stats, brain, spot, frame, cruise, { avoid: avoidHull ? [hull] : [], ignoreShips: family });
 
   if (mode === 'return') {
     const { velocity, plan } = head(mother.position, mother.velocity, false);
@@ -129,13 +133,15 @@ export function thinkDrone(world: World, ship: Ship, stats: ShipStats, brain: Dr
     }
   }
   const { velocity: desired, plan } = head(spot, rock.velocity, true);
-  // Face the rock only once nearly there: with forward thrust only, a drone flies where it points.
+  // Face the rock only once nearly there: on the way it points where it
+  // goes, so its strong main engine does the work (its side and reverse
+  // thrusters are weaker; `HullSpec.manoeuvre`).
   const near = distance(ship.position, spot) <= DRONE_TUNING.onSpot * 3;
   const input = steerSafely(ship, stats, desired, flight, near ? rock.position : undefined);
   const facing = Math.abs(angleDelta(ship.heading, toAngle(sub(rock.position, ship.position)))) <= DRONE_TUNING.aimTolerance;
   // Cut from wherever it can reach the face, not only from its exact spot:
-  // a drone that ends up a little short of its spot, nose on the rock, has
-  // no reverse thrust to back off and would otherwise wait for ever.
+  // a drone a little short of its spot, nose on the rock, need not shuffle
+  // the last few units before it starts.
   const gap = distance(ship.position, rock.position) - rock.rock.radius;
   const inReach = near && gap <= laserReach * DRONE_TUNING.reachShare;
   return { input: { ...input, fireFixed: facing && inReach }, brain: { ...next, ...plan } };

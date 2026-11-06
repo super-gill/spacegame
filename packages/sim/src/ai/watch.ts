@@ -106,7 +106,7 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
   const events: WorldEvent[] = [];
   let b: WatchBrain = { ...brain, modeTicks: brain.modeTicks + 1 };
   const around = obstacles(world, stats);
-  const pull = flightOn(world, ship);
+  const pull = flightOn(world, ship, stats);
 
   // Docked: a short wait on the pad, then out to start the beat.
   if (ship.state === 'docked') {

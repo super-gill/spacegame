@@ -122,7 +122,7 @@ export function flyToStation(world: World, ship: Ship, stats: ShipStats, station
   // course. Otherwise the station runs the ship down from behind.
   if (left && left.id !== station.id && distance(ship.position, left.position) < left.radius + TRADER_TUNING.departureClearance) {
     const desired = add(left.velocity, scale(awayFromStation(world, ship, left), TRADER_TUNING.departureSpeed));
-    return { input: steerSafely(ship, stats, desired, flightOn(world, ship)), dock: false };
+    return { input: steerSafely(ship, stats, desired, flightOn(world, ship, stats)), dock: false };
   }
   // Aim for the point on the station's near side, just clear of the hull,
   // unless that side faces the body it orbits: then come in from outside.
@@ -145,5 +145,5 @@ export function flyToStation(world: World, ship: Ship, stats: ShipStats, station
   // station may be coming towards the ship.
   const near = distance(ship.position, station.position) < station.dockRange + TRADER_TUNING.creepMargin;
   const desired = add(station.velocity, travelVelocity(ship, stats, waypoint, approach, near ? DOCK_MAX_SPEED * TRADER_TUNING.dockSpeedFraction : cruise));
-  return { input: steerSafely(ship, stats, desired, flightOn(world, ship)), dock: false };
+  return { input: steerSafely(ship, stats, desired, flightOn(world, ship, stats)), dock: false };
 }

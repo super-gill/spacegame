@@ -79,7 +79,7 @@ export function thinkMiner(world: World, ship: Ship, stats: ShipStats, brain: Mi
   const full = holdSpaceFor(ship, stats, world.goods, 'ore') <= 0;
   const threat = hunter(world, ship);
   const cruise = stats.maxSpeed * MINER_TUNING.cruiseFraction;
-  const flight = flightOn(world, ship);
+  const flight = flightOn(world, ship, stats);
 
   // Time to go: full, or hunted.
   if (brain.mode !== 'inbound' && (full || threat)) return thinkMiner(world, ship, stats, switchTo('inbound'));

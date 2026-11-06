@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { asteroidPositions, oreLeft, rockAt } from '../asteroids.js';
 import { slotPlace, thinkDrone } from '../ai/drone.js';
-import { findPath } from '../ai/path.js';
+import { clear, findPath } from '../ai/path.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from '../bodies.js';
 import { FIXED_DT } from '../constants.js';
 import { freePadFor, onPad } from '../docking.js';
@@ -263,6 +263,104 @@ describe('drone bays', () => {
     // Every drone got to a rock and cut it.
     const cutters = new Set(r.events.filter((e) => e.type === 'oreFreed').map((e) => e.shipId));
     expect([...cutters].sort()).toEqual(['h/d1', 'h/d2', 'h/d3', 'h/d4']);
+  });
+
+  it("a prospector's drone pressed against a rock in the densest patch gets round it and cuts", () => {
+    // Its rock's far side was the place to cut from; pressed close to the
+    // rock, the drone planned straight through it and rubbed against its
+    // face for ever, never cutting (6 November 2026).
+    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rockfall: { made: 0, timerTicks: 1e9 } };
+    const rocks = asteroidPositions(base);
+    const gap = (a: { x: number; y: number }, b: { x: number; y: number }): number => Math.hypot(a.x - b.x, a.y - b.y);
+    const crowd = (r: (typeof rocks)[number]): number => rocks.filter((o) => gap(o.position, r.position) < 400).length;
+    const centre = [...rocks].sort((a, b) => crowd(b) - crowd(a) || (a.id < b.id ? -1 : 1))[0]!;
+    const far = rocks
+      .filter((o) => gap(o.position, centre.position) < 450 && o.radius < 45 && rockAt(base, o.id)!.rock.hardness <= 0.5)
+      .sort((a, b) => gap(b.position, centre.position) - gap(a.position, centre.position));
+    let w: World = { ...base, ships: { h: buildShip(base, { id: 'h', loadout: LOADOUTS['rookrivet-prospector']!, ownerId: null, position: { x: centre.position.x + 520, y: centre.position.y }, heading: Math.PI, flightMode: 'assisted' }) } };
+    for (const r of far.slice(0, 2)) w = stepWorld(w, { h: { ...emptyInput(), lock: r.id } });
+    w = run(w, 5).w;
+    w = command(w, { action: 'launch' });
+    const r = run(w, 30);
+    expect(r.events.filter((e) => e.type === 'damaged' && e.shipId === 'h/d1')).toHaveLength(0);
+    expect(r.events.some((e) => e.type === 'oreFreed' && e.shipId === 'h/d1')).toBe(true);
+  });
+
+  it('drones of a hulk drifting through the densest patch never stall short of their spots', () => {
+    // A sister cutting on the same face used to box a drone in against the
+    // rock: pushed out by one and in by the other, it dithered in place
+    // (6 November 2026). Stalled: on its way to a rock, not cutting, all but
+    // still against the rock, its spot more than 25 units off.
+    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], rockfall: { made: 0, timerTicks: 1e9 } };
+    const rocks = asteroidPositions(base);
+    const gap = (a: { x: number; y: number }, b: { x: number; y: number }): number => Math.hypot(a.x - b.x, a.y - b.y);
+    const crowd = (r: (typeof rocks)[number]): number => rocks.filter((o) => gap(o.position, r.position) < 400).length;
+    const centre = [...rocks].sort((a, b) => crowd(b) - crowd(a) || (a.id < b.id ? -1 : 1))[0]!;
+    const far = rocks
+      .filter((o) => gap(o.position, centre.position) < 450 && o.radius < 45 && rockAt(base, o.id)!.rock.hardness <= 0.5)
+      .sort((a, b) => gap(b.position, centre.position) - gap(a.position, centre.position))
+      .slice(0, 6);
+    const hulk = buildShip(base, { id: 'h', loadout: LOADOUTS['rookrivet-hulk']!, ownerId: null, position: { x: centre.position.x + 520, y: centre.position.y }, heading: Math.PI, flightMode: 'manual' });
+    let w: World = { ...base, ships: { h: { ...hulk, velocity: { x: 0, y: 8 } } } };
+    for (const r of far) w = stepWorld(w, { h: { ...emptyInput(), lock: r.id } });
+    w = run(w, 5).w;
+    w = command(w, { action: 'launch' });
+    let stalled = 0;
+    const events: WorldEvent[] = [];
+    for (let t = 0; t < 60 * SECOND; t++) {
+      w = stepWorld(w, { h: emptyInput() });
+      events.push(...w.events);
+      for (const d of Object.values(w.ships).filter((s) => s.motherId === 'h')) {
+        const brain = w.npcs[d.id] as DroneBrain;
+        const rock = brain.rockId ? rockAt(w, brain.rockId) : null;
+        if (!rock || !brain.goal || (d.beams ?? []).length > 0) continue;
+        const still = Math.hypot(d.velocity.x - rock.velocity.x, d.velocity.y - rock.velocity.y) < 5;
+        if (still && gap(brain.goal, d.position) > 25) stalled++;
+      }
+    }
+    expect(events.filter((e) => e.type === 'damaged' && e.shipId.startsWith('h/'))).toHaveLength(0);
+    // Four drones for a minute: under two seconds stalled between them.
+    expect(stalled / SECOND).toBeLessThan(2);
+  });
+
+  it('drones thrust backwards and sideways freely; ships still only along the nose', () => {
+    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [] };
+    expect(base.rules.manoeuvreSpeed).toBe(0);
+    const at = { x: 0, y: 30000 };
+    const drone = buildShip(base, { id: 'd', loadout: LOADOUTS['rookrivet-mining-drone']!, ownerId: null, position: at, heading: 0, flightMode: 'assisted' });
+    const ship = buildShip(base, { id: 's', loadout: LOADOUTS['rookrivet-prospector']!, ownerId: null, position: { x: 500, y: 30000 }, heading: 0, flightMode: 'assisted' });
+    let w: World = { ...base, ships: { d: drone, s: ship } };
+    expect(shipStats(w, w.ships.d!).manoeuvre).toBe(1);
+    expect(shipStats(w, w.ships.s!).manoeuvre).toBe(0);
+    for (let i = 0; i < SECOND; i++) {
+      const input = { ...emptyInput(), thrustReverse: true, strafeLeft: true };
+      w = stepWorld(w, { d: input, s: input });
+    }
+    // Heading 0 is +x; reverse is -x, and the drone moved off both ways.
+    expect(w.ships.d!.velocity.x).toBeLessThan(-60);
+    expect(Math.abs(w.ships.d!.velocity.y)).toBeGreaterThan(60);
+    expect(Math.hypot(w.ships.s!.velocity.x, w.ships.s!.velocity.y)).toBeLessThan(1);
+  });
+
+  it('from beside a rock, plans its way out and round, never through it', () => {
+    const rock = { position: { x: 0, y: 0 }, radius: 30 };
+    // 10 units off the face, inside the 28-unit margin; the goal is on the far side.
+    const start = { x: -46, y: 0 };
+    const goal = { x: 90, y: 0 };
+    expect(clear(start, goal, [rock], 28)).toBe(false);
+    // Out, or along the face, is fine.
+    expect(clear(start, { x: -120, y: 0 }, [rock], 28)).toBe(true);
+    expect(clear(start, { x: -46, y: 40 }, [rock], 28)).toBe(true);
+    const path = findPath(start, goal, [rock], 28)!;
+    expect(path.length).toBeGreaterThan(1);
+    let at = start;
+    for (const p of path) {
+      for (let t = 0; t <= 1; t += 0.05) {
+        const q = { x: at.x + (p.x - at.x) * t, y: at.y + (p.y - at.y) * t };
+        expect(Math.hypot(q.x, q.y)).toBeGreaterThanOrEqual(30 + 6);
+      }
+      at = p;
+    }
   });
 
   it('plans a way round rocks, and straight across open space', () => {

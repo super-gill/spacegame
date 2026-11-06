@@ -1,5 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { leadPoint } from '../combat.js';
+import { manoeuvreShare } from '../ship.js';
 import { fitStats } from '../stats.js';
 import type { RunState, Ship, ShipInput, ShipStats, WeaponSpec, World } from '../types.js';
 import { isGun } from '../weapons.js';
@@ -53,7 +54,7 @@ export function runnerInput(w: World, me: string, foe: string, tick: number, sta
   const range = Math.max(1, ...guns.map((x) => x.range));
   const aimPoint = guns[0] ? leadPoint(mine, them, guns[0].projectileSpeed || 1e6) : them.position;
   const plan = attackRun(w, mine, stats, them, aimPoint, range * 0.9, state, []);
-  const input = steerToVelocity(mine, stats, plan.desired, plan.faceAt, w.rules.manoeuvreSpeed);
+  const input = steerToVelocity(mine, stats, plan.desired, plan.faceAt, manoeuvreShare(w.rules.manoeuvreSpeed, stats));
   const d = distance(mine.position, them.position);
   const group = groupTurn(mine, stats, tick);
   return {

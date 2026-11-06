@@ -364,6 +364,14 @@ export interface HullSpec {
   maxSpeed: number;
   /** Hard spin limit, rad/s, enforced in every flight mode. */
   maxTurnRate: number;
+  /**
+   * How freely its thrusters may push it backwards and sideways, as a
+   * share of top speed (0 to 1), whatever `WorldRules.manoeuvreSpeed`
+   * says: the higher of the two applies. Absent is 0, the world rule
+   * alone. Drones are 1: small craft working among rocks back off and
+   * sidestep like a ship with thrusters (Jason, 6 November 2026).
+   */
+  manoeuvre?: number;
   /** Where the hull sits on the age-of-sail ladder. */
   class: HullClass;
   /**
@@ -430,6 +438,8 @@ export interface ShipStats {
   rotationThrust: number;
   maxSpeed: number;
   maxTurnRate: number;
+  /** The hull's own manoeuvring share (`HullSpec.manoeuvre`, 0 if none); see `manoeuvreShare`. */
+  manoeuvre: number;
   radius: number;
   shield: number;
   /** Shield recharge, points per second, once recharging. */
