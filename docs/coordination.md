@@ -243,6 +243,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-06, lead (Lead 7): Jason approved the worlds mockups as drawn (`docs/worlds.md`, order of work step 2); `v0.17.0` tagged on GitHub. Next: build step 3, the Arena world, the mode screen and the arena setup with Skirmish. Handed over to Lead 8 for the build (this chat was heavy).
 - 2026-11-06, lead (Lead 7): **released 0.17.0** (the interface pass, the shared-world view, drones, colours; save 16, protocol 2). Jason tried the selection window ("looks great"). Next: Jason's answers on the worlds mockups, then the Arena world (`docs/worlds.md`).
 - 2026-11-06, lead (Lead 7): **worlds designed with Jason** (`docs/worlds.md`): a live server on releases (Universe, a fresh copy of Calder until the map, and the Arena) and a dev server on `main` (Jason's current save becomes Dev, operators only); a server switch on the login screen; a mode screen after login; the Arena as its own unsaved world, fed every ship and fit from the code, entered by choosing ship, fit and scenario (Skirmish, Waves, To the death). Next: 0.17.0 once Jason tries the selection window, then mockups.
 - 2026-11-06, lead (Lead 7): the reticle "bug" was keyboard steering being on (the reticle is for mouse steering). Jason likes all four styles: kept as a player preference, Ring the default.

@@ -52,13 +52,13 @@ A world of its own in each server: never saved, never touching the persistent wo
 ## Order of work
 
 1. Release 0.17.0 (the interface pass) so it is a clean point before the server changes.
-2. Mockups on the canvas of the login switch, the mode screen and the arena setup; Jason picks. **Made** (6 November 2026): https://claude.ai/artifact/CieExkHLJkZieXoAAUgMfm, three working screens and his questions on a sticky.
+2. Mockups on the canvas of the login switch, the mode screen and the arena setup; Jason picks. **Made** (6 November 2026): https://claude.ai/artifact/CieExkHLJkZieXoAAUgMfm, three working screens. **Approved as drawn** (Jason, 6 November 2026: "basically exactly what I was after"): the LIVE/DEV switch on the login screen, the three mode cards (Dev greyed for players), ship then fit then scenario then LAUNCH with nothing else to choose before launching, Waves scored on kills and time survived.
 3. The Arena world in the server, the mode screen and the arena setup, with Skirmish (moving today's admin arena over).
 4. Waves and To the death.
 5. The two-server setup: the batch files, the login switch, docs in hosting.md. Jason starts the dev server and the live server takes releases from then on.
 
 ## Open
 
-- Scoring for Waves: kills, time survived, or both; whether scores are kept (a board needs saving, which the Arena does not do).
+- Whether Waves scores are kept (a board needs saving, which the Arena does not do). Scoring itself is decided: kills and time survived.
 - Whether the Arena's enemies can be other than reference fits (any loadout, the NPC fits).
 - Lore names for the Arena and its scenarios (a lore ask when building starts).
