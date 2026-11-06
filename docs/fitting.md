@@ -169,6 +169,8 @@ Step 4 balances big guns against small targets, and there were no big combat hul
 
 ### The arena (6 November 2026)
 
+**Replaced** (0.18, Lead 8): the arena is now the Arena world, open to every player from the mode screen, with the same reference fits and enemies (`docs/worlds.md`, "As built: step 3"). What follows is how the admin arena worked.
+
 Fights on demand, for Jason to feel what the audit measures. In the menu's admin section (operators only): pick a reference fit to fly, an enemy fit and how many (1 to 8), and **Start arena**. You are put in a free ship of that fit far out in empty space (each pilot's arena is 50,000 units from the system and from each other), with a hold full of ammunition and weapons hot; the enemies start 1,400 units off and come for you, flown by the lab's own scripts (`ai/fight.ts`, shared by `fitlab.ts` and the arena brain in `ai/arena.ts`), so the fight is the one the audit measures. **Start arena** again restarts it; **End arena** removes its ships (and your pod, if you lost) and puts you back in the ship you came from. Commands `adminArena` and `adminArenaEnd` (`arena.ts`); `Pilot.arena`, brain kind `arena` (shown as ARENA, hostile).
 
 ## The fitter

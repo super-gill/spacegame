@@ -1,9 +1,9 @@
 import { buyModule, fitModule, sellModule, unfitModule } from './fitting.js';
 import { storeGoods, takeGoods } from './hangar.js';
-import { adminArena, adminArenaEnd } from './arena.js';
+import { leaveArena, startArena } from './arena.js';
 import { adminGrantCredits, adminSetRule, adminSpawnShip, boardShip, buyShip, claimStarterShip, stepOut, wakePilot } from './pilots.js';
 import { buyGood, sellGood } from './trade.js';
-import type { World, WorldEvent, WorldRules } from './types.js';
+import type { ArenaScenario, World, WorldEvent, WorldRules } from './types.js';
 
 /**
  * Pilot commands (docs/shared-world.md): everything a pilot can ask for
@@ -40,9 +40,12 @@ export type PilotCommand =
   | { type: 'adminSetRule'; rule: 'gravity' | 'orbits'; value: boolean }
   | { type: 'adminSetRule'; rule: 'manoeuvreSpeed'; value: number }
   | { type: 'adminSpawnShip'; loadoutId: string }
-  // The arena: fly a reference fit against `count` of another, far out in space (arena.ts).
-  | { type: 'adminArena'; playerFit: string; enemyFit: string; count: number }
-  | { type: 'adminArenaEnd' };
+  // The Arena world only (arena.ts, docs/worlds.md): launch a fight in a reference fit, or leave it for the setup.
+  | { type: 'arenaStart'; fit: string; scenario: ArenaScenario }
+  | { type: 'arenaLeave' };
+
+/** Commands that belong to the Arena world; the server refuses them anywhere else, and every other command there. */
+export const ARENA_COMMANDS: readonly PilotCommand['type'][] = ['arenaStart', 'arenaLeave'];
 
 /** What a command did: the new world and its event, or the old world and why not. `reason` is from the refusal list of the function the command ran. */
 export type CommandOutcome = { ok: true; world: World; event: WorldEvent } | { ok: false; world: World; reason: string };
@@ -84,10 +87,10 @@ export function applyCommand(world: World, pilotId: string, command: PilotComman
         : adminSetRule(world, pilotId, command.rule, command.value as boolean);
     case 'adminSpawnShip':
       return adminSpawnShip(world, pilotId, command.loadoutId);
-    case 'adminArena':
-      return adminArena(world, pilotId, command.playerFit, command.enemyFit, command.count);
-    case 'adminArenaEnd':
-      return adminArenaEnd(world, pilotId);
+    case 'arenaStart':
+      return startArena(world, pilotId, command.fit, command.scenario);
+    case 'arenaLeave':
+      return leaveArena(world, pilotId);
   }
 }
 
@@ -123,12 +126,15 @@ export function readCommand(value: unknown): PilotCommand | null {
     case 'stepOut':
     case 'claimStarter':
     case 'wake':
-    case 'adminArenaEnd':
+    case 'arenaLeave':
       return { type: v['type'] };
-    case 'adminArena':
-      return text('playerFit') && text('enemyFit') && count('count')
-        ? { type: 'adminArena', playerFit: v['playerFit'] as string, enemyFit: v['enemyFit'] as string, count: v['count'] as number }
-        : null;
+    case 'arenaStart': {
+      const scenario = v['scenario'];
+      if (!text('fit') || typeof scenario !== 'object' || scenario === null) return null;
+      const sc = scenario as Record<string, unknown>;
+      const ok = sc['kind'] === 'skirmish' && typeof sc['enemyFit'] === 'string' && sc['enemyFit'].length > 0 && sc['enemyFit'].length <= 64 && typeof sc['count'] === 'number' && Number.isFinite(sc['count']);
+      return ok ? { type: 'arenaStart', fit: v['fit'] as string, scenario: { kind: 'skirmish', enemyFit: sc['enemyFit'] as string, count: sc['count'] as number } } : null;
+    }
     case 'adminGrantCredits':
       return count('amount') ? { type: 'adminGrantCredits', amount: v['amount'] as number } : null;
     case 'adminSetRule':

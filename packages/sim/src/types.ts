@@ -1165,11 +1165,32 @@ export interface Pilot {
   /** The ship this pilot was flying when they logged off, out of the world until they return; its drones back in its bay. */
   stowed?: Ship;
   /**
-   * An arena this pilot is testing in (admin, `adminArena`): the ship they
-   * fly there, the ship to go back to when it ends (null if they had none),
-   * and where it is. Absent: not in an arena.
+   * The fight this pilot is in, in the Arena world only (arena.ts,
+   * docs/worlds.md). Absent: at the arena setup, or not in the Arena.
    */
-  arena?: { shipId: string; fromShipId: string | null; centre: Vec2 };
+  arena?: ArenaState;
+}
+
+/**
+ * An arena scenario (docs/worlds.md, "Scenarios"). Skirmish for now:
+ * `count` ships of the reference fit `enemyFit`. Waves and To the death
+ * join it later as further kinds.
+ */
+export interface ArenaScenario {
+  kind: 'skirmish';
+  enemyFit: string;
+  count: number;
+}
+
+/** A running arena: the pilot's ship there, where it is, what was chosen, and, once decided, how it ended and when. */
+export interface ArenaState {
+  shipId: string;
+  centre: Vec2;
+  /** The reference fit the pilot flies. */
+  fit: string;
+  scenario: ArenaScenario;
+  /** Set when the fight is decided; the arena clears `ARENA_END_DELAY_SECONDS` later (`stepArenas`). */
+  over?: { result: 'won' | 'lost'; atTick: number };
 }
 
 /**
@@ -1506,8 +1527,8 @@ export type WorldEvent =
   | { type: 'adminShipSpawned'; shipId: string; stationId: string; loadoutId: string }
   /** An arena started: the pilot is in `shipId` facing `enemies` ships. */
   | { type: 'arenaStarted'; shipId: string; enemies: number }
-  /** An arena ended: the pilot is back in `shipId` (empty if they had none to go back to). */
-  | { type: 'arenaEnded'; shipId: string }
+  /** A pilot's arena ended and they are back at the setup: they `won` (every enemy gone), `lost` their ship, or `left`. `shipId` is the arena ship, now gone. */
+  | { type: 'arenaEnded'; shipId: string; pilotId: string; result: 'won' | 'lost' | 'left' }
   /** Admin (testing): a world rule switched. `shipId` is the pilot's ship, or empty. */
   | { type: 'adminRuleChanged'; shipId: string; rule: keyof WorldRules; value: boolean | number }
   /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */

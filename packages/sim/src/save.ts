@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 16;
+export const SAVE_VERSION = 17;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -93,6 +93,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   13: (world) => migrate13to14(world),
   14: (world) => migrate14to15(world),
   15: (world) => migrate15to16(world),
+  16: (world) => migrate16to17(world),
 };
 
 /**
@@ -424,6 +425,38 @@ export function migrate13to14(world: unknown): unknown {
     if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
   }
   return { ...world, ships, pilots };
+}
+
+/**
+ * 16 to 17: the Arena becomes a world of its own (docs/worlds.md), so the
+ * admin arena leaves the persistent world. Every arena still running in
+ * the save is ended as `adminArenaEnd` used to: its enemies and the arena
+ * ship go, an escape pod the pilot was left in goes too when they have a
+ * ship to go back to, and the pilot is back in the ship they came from
+ * (or keeps what they are in, or has none).
+ */
+export function migrate16to17(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['ships']) || !isRecord(world['npcs']) || !isRecord(world['pilots'])) return world;
+  const ships: Record<string, unknown> = { ...world['ships'] };
+  const npcs: Record<string, unknown> = {};
+  for (const [id, brain] of Object.entries(world['npcs'])) {
+    if (isRecord(brain) && brain['kind'] === 'arena') delete ships[id];
+    else npcs[id] = brain;
+  }
+  const pilots: Record<string, unknown> = {};
+  for (const [id, pilot] of Object.entries(world['pilots'])) {
+    if (!isRecord(pilot) || !isRecord(pilot['arena'])) {
+      pilots[id] = pilot;
+      continue;
+    }
+    const { arena, ...rest } = pilot as Record<string, unknown> & { arena: Record<string, unknown> };
+    const from = typeof arena['fromShipId'] === 'string' && ships[arena['fromShipId']] ? arena['fromShipId'] : null;
+    if (typeof arena['shipId'] === 'string') delete ships[arena['shipId']];
+    const aboard = typeof rest['shipId'] === 'string' ? rest['shipId'] : null;
+    if (from && aboard && aboard !== from) delete ships[aboard];
+    pilots[id] = { ...rest, shipId: from ?? (aboard && ships[aboard] ? aboard : null) };
+  }
+  return { ...world, ships, npcs, pilots };
 }
 
 /**

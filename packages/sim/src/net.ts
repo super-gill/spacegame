@@ -13,8 +13,19 @@ import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
  */
 
 /** Bumped when the messages change in a way an older client cannot follow. */
-/** 2 (0.17): ships running dark arrive as contacts with no hull (`Ship.contact`). */
-export const PROTOCOL_VERSION = 2;
+/**
+ * 2 (0.17): ships running dark arrive as contacts with no hull (`Ship.contact`).
+ * 3 (0.18): worlds. `welcome` carries no world; the client chooses one with `enter`.
+ */
+export const PROTOCOL_VERSION = 3;
+
+/**
+ * The worlds a server runs (docs/worlds.md): the persistent one, saved
+ * (the Universe on the live server, Dev on the dev server), and the
+ * Arena, never saved.
+ */
+export type WorldId = 'universe' | 'arena';
+export const WORLD_IDS: readonly WorldId[] = ['universe', 'arena'];
 
 /** The longest character name, in characters. */
 export const MAX_NAME_LENGTH = 24;
@@ -29,6 +40,8 @@ export type ClientMessage =
   | { t: 'input'; input: ShipInput }
   /** A pilot command (`PilotCommand`); `id` matches the server's reply. */
   | { t: 'command'; id: number; command: PilotCommand }
+  /** Go into a world (the mode screen); leaves the one the connection was in. */
+  | { t: 'enter'; world: WorldId }
   /** A ping, answered with a pong carrying the same `sent`, for the connection meter. */
   | { t: 'ping'; sent: number };
 
@@ -151,8 +164,10 @@ export type CommandReply = { ok: true; event: WorldEvent } | { ok: false; reason
 
 /** From the server to a client. */
 export type ServerMessage =
-  /** Logged in: who you are, your key (only when the character was just created), and the whole world. */
-  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean; world: World }
+  /** Logged in: who you are and your key (only when the character was just created). No world yet: the client sends `enter`. */
+  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean }
+  /** In a world (after `enter`): which, and the whole of it as this pilot sees it. Updates follow. */
+  | { t: 'entered'; world: WorldId; view: World }
   /** Login or creation refused, with why. */
   | { t: 'refused'; reason: LoginRefusal }
   /** The world as it is now: the parts that changed since the last update, and the events since then. */
@@ -172,6 +187,11 @@ export type LoginRefusal =
 export type KickReason =
   | 'loggedInElsewhere' // the same character logged in from another connection
   | 'serverClosing';
+
+/** A client's `enter`, checked: the world it names, or null. */
+export function readWorldId(value: unknown): WorldId | null {
+  return WORLD_IDS.includes(value as WorldId) ? (value as WorldId) : null;
+}
 
 /** A name as the server will keep it: trimmed, inner spaces single; null if it cannot be a name. */
 export function cleanName(name: unknown): string | null {

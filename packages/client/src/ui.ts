@@ -179,8 +179,11 @@ export class Ui {
    * Refresh the docked and death panels. `ship` is null while the pilot
    * has no ship (destroyed). The flight HUD lives in hud/flight-hud.ts.
    */
+  /** Off in the Arena world, where losing your ship takes you back to the arena setup instead (arena-setup.ts). */
+  showDeathPanel = true;
+
   update(world: World, ship: Ship | null): void {
-    this.deathPanel.classList.toggle('hidden', ship !== null);
+    this.deathPanel.classList.toggle('hidden', ship !== null || !this.showDeathPanel);
     if (!ship) {
       this.dockPanel.classList.add('hidden');
       return;
@@ -349,8 +352,6 @@ export class Ui {
       this.showToast(`Admin: +${e.amount.toLocaleString('en-GB')} cr.`, 2000, 'info');
     } else if (e.type === 'arenaStarted') {
       this.showToast(`Arena: you are in a ${name}, ${e.enemies} ${e.enemies === 1 ? 'enemy' : 'enemies'} incoming.`, 3000, 'warn');
-    } else if (e.type === 'arenaEnded') {
-      this.showToast(ship ? `Arena over: back in your ${name}.` : 'Arena over.', 2500, 'info');
     } else if (e.type === 'adminShipSpawned') {
       const pad = ship?.padId ? ` It is on pad ${ship.padId.toUpperCase()}; board it with B.` : '';
       this.showToast(`Admin: spawned your ${name}.${pad}`, 3000, 'info');

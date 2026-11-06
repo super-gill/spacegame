@@ -238,8 +238,10 @@ export const AFTERBURNER_SIGNATURE_BLOOM = 0.5;
  * squared slower than a small round, so a quick target can slip it at range.
  */
 export const SHOT_SPEED_FALLOFF = 1.15;
-// The arena (admin testing, arena.ts).
+// The Arena world (arena.ts, docs/worlds.md).
 /** How far apart pilots' arenas are, and how far the first is from the system, units. */
 export const ARENA_SEPARATION = 50000;
 /** The most enemies an arena may hold. */
 export const ARENA_MAX_ENEMIES = 8;
+/** Seconds between an arena fight being decided and the pilot going back to the setup: long enough to see the last explosion. */
+export const ARENA_END_DELAY_SECONDS = 3;

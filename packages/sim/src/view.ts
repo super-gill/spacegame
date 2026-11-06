@@ -179,7 +179,8 @@ const PUBLIC_DARK = new WeakMap<Pilot, Pilot>();
 export function visibleEvents(events: readonly WorldEvent[], pilotId: string, ships: Readonly<Record<string, Ship>>): WorldEvent[] {
   return events.filter((e) => {
     const fields = e as unknown as Record<string, unknown>;
-    if (fields['pilotId'] === pilotId) return true;
+    // An event about a pilot is that pilot's alone.
+    if (typeof fields['pilotId'] === 'string') return fields['pilotId'] === pilotId;
     const shipId = fields['shipId'];
     return typeof shipId !== 'string' || ships[shipId] !== undefined;
   });

@@ -4,7 +4,6 @@ import {
   type WorldUpdate,
   type PilotCommand,
   activationSlots,
-  arenaFits,
   type AdminRefusal,
   stepOutRefusal,
   type StepOutRefusal,
@@ -46,6 +45,9 @@ import {
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { chooseCharacter } from './login-screen.js';
+import { chooseMode } from './mode-screen.js';
+import { ArenaSetup, type ArenaResult } from './arena-setup.js';
+import { reloadToModes } from './net/resume.js';
 import { keyFor } from './net/characters.js';
 import { serverAddress } from './net/link.js';
 import { Timeline } from './net/timeline.js';
@@ -110,6 +112,11 @@ import { BOARD_REFUSALS, YourShipsPanel } from './your-ships-panel.js';
  * about 20 times a second, interpolating between the last two updates so
  * motion is smooth. This is the only file that knows about both the sim
  * and the DOM.
+ *
+ * Before any of that: character select (login-screen.ts), then the mode
+ * screen (mode-screen.ts), which picks the world this tab plays in, the
+ * persistent world or the Arena (docs/worlds.md). Leaving a world reloads
+ * the page back to the mode screen (net/resume.ts).
  *
  * The sim has no "player". This client is one pilot in the world: it
  * sends input for that pilot's ship only, and shows events involving
@@ -220,10 +227,18 @@ const radar = new Radar(hudLayer, (id) => {
   select(selectionFor(id));
 });
 
-// Character select first: nothing below runs until this tab is logged in.
+// Character select first, then the mode screen: nothing below runs until this tab is in a world.
 const session = await chooseCharacter();
 const link = session.link;
 const me = { id: session.welcome.pilotId, name: session.welcome.name };
+const worldId = await chooseMode(session.welcome, () => {
+  link.close();
+  location.reload();
+});
+const entered = await link.enter(worldId);
+/** In the Arena world: no ship means the arena setup, not the escape-pod screens. */
+const inArena = entered.world === 'arena';
+ui.showDeathPanel = !inArena;
 const settings = loadSettings();
 canvas.classList.toggle('mouse-steering', settings.mouseSteering);
 input.mouseSteering = settings.mouseSteering;
@@ -325,13 +340,12 @@ function refusalText(command: PilotCommand, reason: string): string | null {
       case 'adminSetRule':
       case 'adminSpawnShip':
         return { ...ADMIN_REFUSALS, notAdmin: 'Only the host can do that.' };
-      case 'adminArena':
-      case 'adminArenaEnd':
+      case 'arenaStart':
+      case 'arenaLeave':
         return {
-          notAdmin: 'Only the host can do that.',
-          unknownFit: 'No reference fit by that name.',
+          unknownFit: 'No ready fit by that name.',
           badCount: 'Pick 1 to 8 enemies.',
-          notInArena: 'You are not in an arena.',
+          notInArena: 'You are not in a fight.',
         };
       // The buttons for these only show when they would work.
       case 'claimStarter':
@@ -339,6 +353,8 @@ function refusalText(command: PilotCommand, reason: string): string | null {
         return null;
     }
   })();
+  // The server refuses another world's commands (worlds.ts); the buttons for them should not be showing.
+  if (reason === 'notHere') return 'That cannot be done in this world.';
   return table ? (table[reason] ?? `Refused: ${reason}.`) : null;
 }
 
@@ -350,6 +366,7 @@ function received(command: PilotCommand, outcome: CommandReply): void {
     return;
   }
   const e = outcome.event;
+  if (e.type === 'arenaEnded' && e.pilotId === me.id) arenaResult = e.result;
   const cr = (n: number) => `${n.toLocaleString('en-GB')} cr`;
   const moduleName = (id: string) => current.modules[id]?.name ?? id;
   const goodName = (id: string) => current.goods[id]?.name ?? id;
@@ -445,13 +462,20 @@ function claimStarter(): void {
 // so uneven arrivals do not stutter (net/timeline.ts). `previous` and
 // `current` are the two drawn between this frame; `current` is also what
 // the HUD and panels read.
-const timeline = new Timeline(session.welcome.world);
+const timeline = new Timeline(entered.view);
 // Your own ship is drawn from the newest update instead, carried forward (net/own-ship.ts).
 const own = new OwnShipView();
-let previous: World = session.welcome.world;
+let previous: World = entered.view;
 let current: World = previous;
 
-const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, settings, {
+const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, entered.world, settings, {
+  backToModes() {
+    link.close();
+    reloadToModes(me.name);
+  },
+  leaveFight() {
+    send({ type: 'arenaLeave' });
+  },
   showMeter() {
     meter.setHidden(false);
   },
@@ -482,17 +506,24 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
   spawnShip(loadoutId) {
     send({ type: 'adminSpawnShip', loadoutId });
   },
-  startArena(playerFit, enemyFit, count) {
-    send({ type: 'adminArena', playerFit, enemyFit, count });
-  },
-  endArena() {
-    send({ type: 'adminArenaEnd' });
-  },
 }, Object.values(current.loadouts)
   // Escape pods are issued, not flown by choice.
   .filter((l) => !current.hulls[l.hullId]?.escapePod)
   .map((l) => ({ id: l.id, name: l.name }))
-  .sort((a, b) => a.name.localeCompare(b.name)), arenaFits());
+  .sort((a, b) => a.name.localeCompare(b.name)));
+
+/** The arena setup (arena-setup.ts): shown in the Arena world whenever this pilot is not in a fight. */
+const arenaSetup = inArena
+  ? new ArenaSetup(document.body, current, {
+      launch: (choice) => send({ type: 'arenaStart', fit: choice.fit, scenario: choice.scenario }),
+      back: () => {
+        link.close();
+        reloadToModes(me.name);
+      },
+    })
+  : null;
+/** How this pilot's last arena fight ended, for the setup's top line. */
+let arenaResult: ArenaResult | null = null;
 
 /**
  * A numbered activation tile was pressed (sim `activationSlots`): select
@@ -706,6 +737,7 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   const flying = new Map(last.munitions.map((m) => [m.id, m]));
   const now: World = applyUpdate(last, changed, events);
   timeline.add(now);
+  for (const e of events) if (e.type === 'arenaEnded' && e.pilotId === me.id) arenaResult = e.result;
   const mineNow = myShip(now);
   if (mineNow) own.update(mineNow, nowMs);
   else own.clear();
@@ -1027,6 +1059,11 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   if (mine && navTarget && mine.state === 'flying') drawNavTarget(mine, navTarget, alpha);
   ui.update(current, mine);
+  if (arenaSetup) {
+    // Between fights: no ship and no arena running (a decided fight still shows for a moment).
+    if (!mine && !current.pilots[me.id]?.arena) arenaSetup.show(arenaResult);
+    else arenaSetup.hide();
+  }
   plot.update(current, mine, me.id, nowMs);
   dronePanel.update(current, mine);
   holdPanel.update(current, mine, me.id);

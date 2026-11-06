@@ -1,10 +1,6 @@
 import {
   applyCommand,
-  pilotLeft,
-  pilotReturned,
-  stepAway,
   emptyInput,
-  joinPilot,
   pilotShip,
   stepWorld,
   type CommandOutcome,
@@ -15,15 +11,28 @@ import {
 } from '@spacegame/sim';
 
 /**
- * The running world (docs/shared-world.md): the one copy of it, stepped
- * 60 times a second, with every pilot's controls and commands applied to
- * it here and nowhere else.
+ * A running world (docs/shared-world.md, docs/worlds.md): the one copy of
+ * it, stepped 60 times a second, with every pilot's controls and commands
+ * applied to it here and nowhere else. The server runs one per world (the
+ * persistent world and the Arena), each stepping on its own.
  *
  * This class knows nothing about sockets or files: it takes controls and
  * commands in, and gives out the world and its events. `main.ts` cuts
  * each player's view from it (`visibleWorld`) and wires it to the
- * network and the disk.
+ * network and the disk. What differs between worlds (how a pilot joins
+ * and leaves, what happens after each step) comes in as `WorldHooks`
+ * (worlds.ts).
  */
+
+/** How one kind of world treats its pilots, beyond stepping. */
+export interface WorldHooks {
+  /** A pilot comes in. */
+  join(world: World, pilotId: string, name: string): World;
+  /** A pilot goes. */
+  leave(world: World, pilotId: string): World;
+  /** After each step of the world. */
+  afterStep(world: World): World;
+}
 
 /**
  * Controls that are held (a key down): if a tick has no fresh message
@@ -64,7 +73,10 @@ export class Game {
   /** Events since they were last taken with `takeEvents`. */
   private events: WorldEvent[] = [];
 
-  constructor(world: World) {
+  constructor(
+    world: World,
+    private readonly hooks: WorldHooks,
+  ) {
     this.world = world;
   }
 
@@ -73,17 +85,18 @@ export class Game {
     return this.world;
   }
 
-  /** Bring a pilot into the world: a new one gets a starter ship; a returning one gets theirs back if it was taken out of space. */
+  /** Bring a pilot into the world, as the world's hooks say. */
   join(pilotId: string, name: string): void {
-    this.world = pilotReturned(joinPilot(this.world, pilotId, name), pilotId);
+    this.world = this.hooks.join(this.world, pilotId, name);
   }
 
   /**
-   * Everyone is logged off: on starting up, before anyone connects. Their
-   * ships in space disappear after the usual grace (away.ts).
+   * Everyone is gone: on starting up, before anyone connects. In the
+   * persistent world their ships in space disappear after the usual grace
+   * (away.ts).
    */
   allAway(): void {
-    for (const id of Object.keys(this.world.pilots)) this.world = pilotLeft(this.world, id);
+    for (const id of Object.keys(this.world.pilots)) this.world = this.hooks.leave(this.world, id);
   }
 
   /** A pilot's controls for one tick. */
@@ -107,11 +120,11 @@ export class Game {
     return outcome;
   }
 
-  /** A pilot logged off: forget their controls; their ship stays in space a while, then disappears until they return (away.ts). */
+  /** A pilot logged off or went to another world: forget their controls, and let the world's hooks deal with them. */
   leave(pilotId: string): void {
     this.queued.delete(pilotId);
     this.last.delete(pilotId);
-    this.world = pilotLeft(this.world, pilotId);
+    this.world = this.hooks.leave(this.world, pilotId);
   }
 
   /** One tick: everyone's controls in, the world stepped. */
@@ -124,7 +137,7 @@ export class Game {
       this.last.set(pilotId, input);
       if (ship) inputs[ship.id] = input;
     }
-    this.world = stepAway(stepWorld(this.world, inputs));
+    this.world = this.hooks.afterStep(stepWorld(this.world, inputs));
     this.events.push(...this.world.events);
   }
 

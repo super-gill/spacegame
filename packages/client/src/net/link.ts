@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type WorldUpdate } from '@spacegame/sim';
+import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type WorldId, type WorldUpdate } from '@spacegame/sim';
 
 /**
  * The client's end of the connection to the server (docs/shared-world.md).
@@ -13,7 +13,12 @@ export interface Welcome {
   /** The character's key, only when it was just created: show it to the player. */
   key: string | null;
   admin: boolean;
-  world: World;
+}
+
+/** In a world: which, and the whole of it as this pilot sees it. */
+export interface Entered {
+  world: WorldId;
+  view: World;
 }
 
 export interface LinkListener {
@@ -50,6 +55,8 @@ export class Link {
   private readonly pending = new Map<number, PilotCommand>();
   private pingTimer: ReturnType<typeof setInterval> | null = null;
   private kickedFor: KickReason | null = null;
+  /** Waiting for the server to say a world was entered (`enter`). */
+  private entering: ((entered: Entered) => void) | null = null;
 
   private constructor(private readonly socket: WebSocket) {}
 
@@ -72,7 +79,7 @@ export class Link {
           if (message.t === 'welcome') {
             settled = true;
             link.startPinging();
-            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin, world: message.world } });
+            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin } });
           } else if (message.t === 'refused') {
             settled = true;
             socket.close();
@@ -90,6 +97,17 @@ export class Link {
         link.stopPinging();
         link.listener?.closed(link.kickedFor);
       });
+    });
+  }
+
+  /**
+   * Go into a world (the mode screen's choice); resolves with the world
+   * as this pilot sees it. Updates from it follow, held until `listen`.
+   */
+  enter(world: WorldId): Promise<Entered> {
+    return new Promise((resolve) => {
+      this.entering = resolve;
+      this.send({ t: 'enter', world });
     });
   }
 
@@ -121,6 +139,11 @@ export class Link {
   }
 
   private receive(message: ServerMessage): void {
+    if (message.t === 'entered') {
+      this.entering?.({ world: message.world, view: message.view });
+      this.entering = null;
+      return;
+    }
     if (!this.listener && message.t !== 'kicked') {
       this.early.push(message);
       return;

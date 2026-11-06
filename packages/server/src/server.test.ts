@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createStarterWorld, diffWorld, emptyInput, pilotShip, visibleWorld } from '@spacegame/sim';
 import { Accounts, newKey } from './accounts.js';
-import { Game } from './game.js';
+import { makeWorlds, allowedIn } from './worlds.js';
 
 /** The server's pieces that do not need a network (docs/shared-world.md). */
 
@@ -44,7 +44,7 @@ describe('characters', () => {
 
 describe('the running world', () => {
   it('gives a new pilot a ship and flies it with their controls', () => {
-    const game = new Game({ ...createStarterWorld(), spawners: [] });
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
     game.join('pilot-a', 'Ana');
     const ship = pilotShip(game.current, 'pilot-a')!;
     for (let i = 0; i < 30; i++) {
@@ -56,7 +56,7 @@ describe('the running world', () => {
   });
 
   it('keeps held controls through a tick with no message, but presses happen once', () => {
-    const game = new Game({ ...createStarterWorld(), spawners: [] });
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
     game.join('pilot-a', 'Ana');
     game.input('pilot-a', { ...emptyInput(), thrustForward: true, cycleFlightMode: true });
     game.step();
@@ -70,7 +70,7 @@ describe('the running world', () => {
   });
 
   it("runs commands for the pilot that sent them; a player's update is what changed in their view", () => {
-    const game = new Game({ ...createStarterWorld(), spawners: [] });
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
     game.join('pilot-a', 'Ana');
     const seen = visibleWorld(game.current, 'pilot-a');
     game.step();
@@ -81,5 +81,38 @@ describe('the running world', () => {
     expect(Object.keys(changed)).not.toContain('events');
     // Not docked: refused, with the sim's reason.
     expect(game.command('pilot-a', { type: 'buyGood', good: 'food', quantity: 1 })).toMatchObject({ ok: false, reason: 'notDocked' });
+  });
+});
+
+describe('the worlds', () => {
+  it('run the persistent world and an Arena side by side; a pilot is in one or the other', () => {
+    const worlds = makeWorlds({ ...createStarterWorld(), spawners: [] });
+    worlds.arena.join('pilot-a', 'Ana');
+    // In the Arena: no ship, at the setup, and the persistent world does not know them.
+    expect(worlds.arena.current.pilots['pilot-a']).toMatchObject({ shipId: null });
+    expect(worlds.universe.current.pilots['pilot-a']).toBeUndefined();
+    const started = worlds.arena.command('pilot-a', { type: 'arenaStart', fit: 'Warrant brawler', scenario: { kind: 'skirmish', enemyFit: 'Warrant kiter', count: 2 } });
+    expect(started.ok).toBe(true);
+    worlds.arena.step();
+    expect(worlds.arena.takeEvents().some((e) => e.type === 'arenaStarted')).toBe(true);
+    // Leaving the Arena clears it all.
+    worlds.arena.leave('pilot-a');
+    expect(Object.keys(worlds.arena.current.ships)).toHaveLength(0);
+    expect(worlds.arena.current.pilots['pilot-a']).toBeUndefined();
+    // Over in the persistent world, they get their starter ship as ever.
+    worlds.universe.join('pilot-a', 'Ana');
+    expect(pilotShip(worlds.universe.current, 'pilot-a')).not.toBeNull();
+  });
+
+  it('take only their own commands', () => {
+    const start = { type: 'arenaStart', fit: 'Warrant brawler', scenario: { kind: 'skirmish', enemyFit: 'Warrant kiter', count: 1 } } as const;
+    expect(allowedIn('arena', start)).toBe(true);
+    expect(allowedIn('arena', { type: 'arenaLeave' })).toBe(true);
+    expect(allowedIn('universe', start)).toBe(false);
+    // Nothing in the Arena can be traded, refitted, bought or switched.
+    expect(allowedIn('arena', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(false);
+    expect(allowedIn('arena', { type: 'fitModule', mountId: 'w1', moduleId: 'x' })).toBe(false);
+    expect(allowedIn('arena', { type: 'adminGrantCredits', amount: 1000 })).toBe(false);
+    expect(allowedIn('universe', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(true);
   });
 });

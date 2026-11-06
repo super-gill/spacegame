@@ -2,12 +2,17 @@ import { MAX_NAME_LENGTH, type LoginRefusal } from '@spacegame/sim';
 import { forgetCharacter, rememberCharacter, rememberedCharacters } from './net/characters.js';
 import { Link, LoginError, serverAddress, type Welcome } from './net/link.js';
 import { suggestName } from './net/names.js';
+import { takeResume } from './net/resume.js';
 
 /**
  * Character select (docs/shared-world.md, "Characters"): the first thing
  * a player sees. Play as a character this browser remembers, log in with
  * a name and key, or make a new character. A new character's key is
  * shown once, to keep, before play starts.
+ *
+ * After leaving a world the page reloads and the character this tab was
+ * playing logs straight back in (net/resume.ts), so the player lands on
+ * the mode screen again rather than here.
  *
  * Each tab logs in on its own, so two tabs can play two characters at
  * once (multiboxing). Logging in as a character already playing
@@ -149,5 +154,10 @@ export function chooseCharacter(): Promise<{ link: Link; welcome: Welcome }> {
       box.append(keyRow, message);
     };
     draw();
+
+    // Back from a world: log the same character straight back in.
+    const resume = takeResume();
+    const again = resume ? rememberedCharacters(server).find((c) => c.name === resume) : undefined;
+    if (again) attempt({ name: again.name, key: again.key });
   });
 }

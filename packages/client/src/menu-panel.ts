@@ -1,6 +1,9 @@
+import type { WorldId } from '@spacegame/sim';
+
 /**
- * Game menu (F2, or the Menu button): your character and key, display
- * settings, and, for the host, admin controls for playtesting. The world
+ * Game menu (F2, or the Menu button): your character and key, the world
+ * you are in and the way back to the mode screen, display settings, and,
+ * for the host in the persistent world, admin controls for playtesting. The world
  * keeps running while it is open: it is shared. Buttons report to
  * main.ts, which sends them to the server.
  */
@@ -21,6 +24,10 @@ export interface MenuActions {
   switchCharacter(): void;
   /** Bring back the connection meter after it was clicked away. */
   showMeter(): void;
+  /** Leave this world for the mode screen. */
+  backToModes(): void;
+  /** Arena world: end the fight now, back to the arena setup. */
+  leaveFight(): void;
   /** Admin (testing): credits from nothing. */
   grantCredits(amount: number): void;
   /** Admin (testing): a free ship from any loadout, docked where you are. */
@@ -31,10 +38,6 @@ export interface MenuActions {
   setOrbits(on: boolean): void;
   /** Admin (testing): how fast thrust pushes ships sideways or backwards, 0 to 1 of top speed. */
   setManoeuvreSpeed(share: number): void;
-  /** Admin (testing): fly `playerFit` against `count` ships of `enemyFit`, far out in space. */
-  startArena(playerFit: string, enemyFit: string, count: number): void;
-  /** Admin (testing): leave the arena, back to the ship you came from. */
-  endArena(): void;
 }
 
 /** A loadout the admin spawner offers. */
@@ -73,10 +76,10 @@ export class MenuPanel {
     root: HTMLElement,
     openButton: HTMLButtonElement,
     character: MenuCharacter,
+    world: WorldId,
     display: { showLabels: boolean; mouseSteering: boolean },
     actions: MenuActions,
     spawnChoices: readonly SpawnChoice[],
-    arenaFits: readonly string[] = [],
   ) {
     const showLabels = display.showLabels;
     this.panel.setAttribute('role', 'dialog');
@@ -106,6 +109,15 @@ export class MenuPanel {
     keyRow.append(button('Switch character', () => actions.switchCharacter()));
     this.panel.append(keyRow);
     this.panel.append(el('p', 'muted', 'Your name and key get this character back from any browser. Another tab can play another character at the same time.'));
+
+    // Where you are, and the way out (docs/worlds.md, "Screens").
+    this.panel.append(el('h2', undefined, 'Mode'));
+    this.panel.append(el('p', undefined, world === 'arena' ? 'In the Arena. Nothing here carries over.' : 'In the Universe.'));
+    const modeRow = el('div', 'menu-row');
+    if (world === 'arena') modeRow.append(button('Leave the fight', () => actions.leaveFight()));
+    modeRow.append(button('Back to modes', () => actions.backToModes()));
+    this.panel.append(modeRow);
+    if (world === 'arena') this.panel.append(el('p', 'muted', 'Leave the fight to go back to the arena setup. Back to modes leaves the Arena.'));
 
     // Display.
     this.panel.append(el('h2', undefined, 'Display'));
@@ -140,9 +152,9 @@ export class MenuPanel {
     fitter.rel = 'noopener';
     this.panel.append(fitter);
 
-    // Admin: playtesting tools, the host's only (the server checks too).
+    // Admin: playtesting tools, the host's only and the persistent world's only (the server checks too).
     const admin = el('div');
-    admin.hidden = !character.admin;
+    admin.hidden = !character.admin || world !== 'universe';
     admin.append(el('h2', undefined, 'Admin (testing)'));
     const creditRow = el('div', 'menu-row');
     for (const amount of GRANTS) creditRow.append(button(`+${amount.toLocaleString('en-GB')} cr`, () => actions.grantCredits(amount)));
@@ -181,39 +193,6 @@ export class MenuPanel {
     admin.append(manoeuvreRow);
     admin.append(el('p', 'muted', 'How fast thrust can push you sideways or backwards, as a share of top speed. 0% flies like Flatspace: only where the nose points. 100%: any direction alike. Default 20%.'));
 
-    // The arena: a fight on demand with the fitting lab's reference fits.
-    admin.append(el('h2', undefined, 'Arena'));
-    const fitSelect = (label: string, chosen: string): HTMLSelectElement => {
-      const s = el('select');
-      s.setAttribute('aria-label', label);
-      for (const name of arenaFits) {
-        const option = el('option', undefined, name);
-        option.value = name;
-        option.selected = name === chosen;
-        s.append(option);
-      }
-      return s;
-    };
-    const yours = fitSelect('Your ship', arenaFits.find((n) => n.startsWith('Frigate anti-small')) ?? arenaFits[0] ?? '');
-    const theirs = fitSelect('Enemy ship', arenaFits.find((n) => n.startsWith('Warrant brawler')) ?? arenaFits[0] ?? '');
-    const howMany = el('input');
-    howMany.type = 'number';
-    howMany.min = '1';
-    howMany.max = '8';
-    howMany.value = '4';
-    howMany.setAttribute('aria-label', 'How many enemies');
-    const youRow = el('label', 'menu-row');
-    youRow.append(document.createTextNode('You fly '), yours);
-    const themRow = el('label', 'menu-row');
-    themRow.append(document.createTextNode('Against '), howMany, document.createTextNode(' x '), theirs);
-    const goRow = el('div', 'menu-row');
-    goRow.append(
-      button('Start arena', () => actions.startArena(yours.value, theirs.value, Math.max(1, Math.min(8, Math.round(Number(howMany.value) || 1))))),
-      button('End arena', () => actions.endArena()),
-    );
-    admin.append(youRow, themRow, goRow);
-    admin.append(el('p', 'muted', 'Puts you in a free ship of that fit far out in empty space, with the enemies 1,400 units off; they come straight for you, flying as the fitting lab flies them. Start again to restart. End arena removes it all and puts you back in the ship you came from.'));
-
     this.panel.append(admin);
 
     root.append(this.panel);
@@ -222,7 +201,7 @@ export class MenuPanel {
   toggle(): void {
     const hidden = this.panel.classList.toggle('hidden');
     // A button clicked in the menu keeps keyboard focus after it closes, and
-    // Space (fire) would click it again: Start arena twice, say. Let it go.
+    // Space (fire) would click it again: spawn a ship twice, say. Let it go.
     const focused = document.activeElement;
     if (hidden && focused instanceof HTMLElement && (this.panel.contains(focused) || focused.closest('button') === focused)) focused.blur();
   }

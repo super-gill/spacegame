@@ -1,6 +1,6 @@
 # Worlds: Live and Dev servers, the Universe and the Arena
 
-Design agreed with Jason on 6 November 2026 (Lead 7). Not built yet: see "Order of work". Related: [shared-world.md](shared-world.md) for how a server sends each player their view; [hosting.md](hosting.md) for running the server; [coordination.md](coordination.md), ideas inbox, for how this came about.
+Design agreed with Jason on 6 November 2026 (Lead 7). Step 3 built (Lead 8, 6 November 2026): see "As built: step 3" and "Order of work". Related: [shared-world.md](shared-world.md) for how a server sends each player their view; [hosting.md](hosting.md) for running the server; [coordination.md](coordination.md), ideas inbox, for how this came about.
 
 ## Why
 
@@ -53,9 +53,21 @@ A world of its own in each server: never saved, never touching the persistent wo
 
 1. Release 0.17.0 (the interface pass) so it is a clean point before the server changes.
 2. Mockups on the canvas of the login switch, the mode screen and the arena setup; Jason picks. **Made** (6 November 2026): https://claude.ai/artifact/CieExkHLJkZieXoAAUgMfm, three working screens. **Approved as drawn** (Jason, 6 November 2026: "basically exactly what I was after"): the LIVE/DEV switch on the login screen, the three mode cards (Dev greyed for players), ship then fit then scenario then LAUNCH with nothing else to choose before launching, Waves scored on kills and time survived.
-3. The Arena world in the server, the mode screen and the arena setup, with Skirmish (moving today's admin arena over).
+3. The Arena world in the server, the mode screen and the arena setup, with Skirmish (moving today's admin arena over). **Built** (Lead 8, 6 November 2026): see "As built: step 3".
 4. Waves and To the death.
 5. The two-server setup: the batch files, the login switch, docs in hosting.md. Jason starts the dev server and the live server takes releases from then on.
+
+## As built: step 3 (6 November 2026, Lead 8)
+
+**Server** (`packages/server/src`). `worlds.ts` makes one `Game` per world with `makeWorlds`: `universe`, loaded from and saved to the data folder as before, and `arena`, made fresh by `createArenaWorld` and never saved. Each `Game` takes `WorldHooks` for what differs (joining, leaving, what runs after each step): the Universe joins with a starter ship and keeps an away pilot's ship a while (away.ts); the Arena joins with no ship, clears a leaving pilot's arena and runs `stepArenas`. Both step every tick. A connection logs in (`welcome`, no world), then sends `enter` with a world id; the server takes it out of the world it was in, joins it to the new one and replies `entered` with the view. Inputs, commands, updates and events all go through the connection's world. `allowedIn` decides which commands a world takes: the Arena only `arenaStart` and `arenaLeave` (no trading, refitting, buying ships or admin), the Universe everything else; others are refused as `notHere`. The console's `who` and `stats` say which world each player is in. Protocol version 3.
+
+**Sim** (`arena.ts`). The Arena world is the starter system's catalogues and space with no ships, NPCs, spawners or pilots. `joinArena` adds a pilot with no ship and no credits. `startArena(world, pilotId, fit, scenario)` (command `arenaStart`) puts them in a reference fit far out in empty space, each pilot in the first free slot along a line 50,000 units apart, so arenas never meet as pilots come and go; for a skirmish, `count` ships of `enemyFit` come for them, flown by the lab's scripts as before. `Pilot.arena` (`ArenaState`) holds the arena ship, centre, fit and scenario. `stepArenas` marks a fight `over` (`lost` when the pilot is no longer in the arena ship, `won` when every enemy is gone) and `ARENA_END_DELAY_SECONDS` (3) later clears it and raises `arenaEnded` (`result` won, lost or left); `leaveArena` (command `arenaLeave`) clears it at once. Clearing removes the enemies, the arena ship, the pilot's pod and anything else they own there, and their shots. `arenaHulls(world)` lists every hull with a reference fit, smallest class first, with its fits. The admin commands `adminArena` and `adminArenaEnd` are gone; `migrate16to17` ends any admin arena left in a save. Save version 17. Events naming a pilot (`pilotId`) now go to that pilot only.
+
+**Client.** After character select, `mode-screen.ts` shows the three cards as drawn; Dev is greyed for everyone until step 5 ("operators only" for players, "not set up yet" for operators). Choosing Arena or Universe sends `enter`. In the Arena, `arena-setup.ts` shows over the empty arena whenever the pilot has no ship and no fight: ship, fit and scenario columns as drawn, Skirmish's enemy fit and count chosen in the scenario column (dropdowns), Waves and To the death greyed ("Coming next"), a summary line and LAUNCH. The last fight's result shows at the top; the last choices are kept for the tab. The escape-pod screens never show in the Arena. The menu (F2) gains a Mode section: Back to modes everywhere, and Leave the fight in the Arena; the admin section shows only in the Universe. **Leaving a world reloads the page**: the tab notes who was playing (`net/resume.ts`, session storage), logs them straight back in and opens the mode screen, so no state from one world leaks into the next.
+
+**Checked** in Chromium on a fresh server: create a character, mode screen, Arena, a Walkout (Frigate anti-small) against two Warrant brawlers (locked on at once), Leave the fight (setup, "You left the fight"), Back to modes, Universe (starter ship, no setup); a Tern against eight Warrant glass cannons, back at the setup 8 seconds after launch with "Lost", launched again with the choices kept. No page errors. Tests: 12 arena tests in the sim (the world, hulls, skirmish, separate arenas, restart, leave, lose, win, refusals, the command, the migration), 2 server tests for the worlds.
+
+**Not done in step 3:** space to fight in (rocks, a station that need not work: the arena is empty space as before); the server switch on the login screen and the LIVE/DEV tag (step 5); Waves and To the death (step 4).
 
 ## Open
 

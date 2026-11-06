@@ -1784,3 +1784,243 @@ button:hover {
 .hud-target[data-plain='yes'] .hud-target-grid > :nth-child(-n + 6) {
   display: none;
 }
+
+/* The mode screen (mode-screen.ts; docs/worlds.md, approved mockup). */
+.login-box.mode-box {
+  width: min(760px, 100%);
+}
+
+.mode-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 4px 0 16px;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 210px;
+  padding: 16px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--ink);
+  cursor: pointer;
+}
+
+.mode-card:hover,
+.mode-card:focus-visible {
+  border-color: var(--ink-bright);
+  outline: none;
+}
+
+.mode-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-bright);
+}
+
+.mode-text {
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+.mode-foot {
+  margin-top: auto;
+  font-size: 11px;
+  color: var(--ink);
+}
+
+.mode-card.mode-dev:not([aria-disabled='true']) {
+  border-color: var(--warn);
+}
+
+.mode-card.mode-dev:not([aria-disabled='true']) .mode-foot {
+  color: var(--warn);
+}
+
+.mode-card[aria-disabled='true'] {
+  background: transparent;
+  border: 1px dashed var(--faint);
+  cursor: not-allowed;
+}
+
+.mode-card[aria-disabled='true'] .mode-title,
+.mode-card[aria-disabled='true'] .mode-foot {
+  color: var(--ink-dim);
+}
+
+.mode-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+/* The arena setup (arena-setup.ts): ship, fit, scenario, launch. Over the empty arena, so the game's own keys still reach the menu. */
+.login-screen.arena-setup {
+  z-index: 40;
+}
+
+.login-box.arena-box {
+  width: min(860px, 100%);
+  height: min(600px, calc(100vh - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.arena-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.arena-head h1 {
+  margin: 0;
+}
+
+.arena-head .muted {
+  font-size: 11px;
+}
+
+.arena-columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 230px 290px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.arena-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--faint);
+}
+
+.login-box .arena-column h2 {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.arena-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.arena-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 12px;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(31, 53, 50, 0.5);
+  cursor: pointer;
+}
+
+.arena-row:hover {
+  background: rgba(159, 211, 199, 0.06);
+}
+
+.arena-row:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: -1px;
+}
+
+.arena-row.on {
+  background: rgba(159, 211, 199, 0.1);
+  border-left-color: var(--ink-bright);
+  color: var(--ink-bright);
+}
+
+.arena-row[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.arena-row-sub {
+  font-size: 10px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+.arena-list .arena-row .arena-row-name {
+  font-weight: 500;
+}
+
+.arena-note {
+  margin: auto 0 0;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--ink-dim);
+  border-top: 1px solid var(--faint);
+}
+
+.arena-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+  padding: 10px 12px;
+  border-top: 1px solid var(--faint);
+}
+
+.arena-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.arena-option select {
+  min-width: 0;
+  max-width: 70%;
+  font: inherit;
+  color: var(--ink-bright);
+  background: var(--bg);
+  border: 1px solid var(--faint);
+  padding: 3px 6px;
+}
+
+.arena-foot button {
+  white-space: nowrap;
+}
+
+.arena-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.arena-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arena-launch {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-bright);
+  background: rgba(12, 24, 24, 0.9);
+  border: 1px solid var(--ink-bright);
+  padding: 8px 18px;
+}

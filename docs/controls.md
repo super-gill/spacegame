@@ -149,7 +149,7 @@ If your pod is destroyed too, a panel offers **Wake at Harbour**: in a new pod i
 | --- | --- | --- |
 | Zoom in and out | Mouse wheel, or = and - | Between about half and one and a half times; eases rather than jumps |
 | Show or hide the controls panel | F1 | Also `, or click Controls in the top right |
-| Show or hide the menu | F2 | Also the Menu button. Your character, Show key, Switch character; show or hide ship labels and the connection meter; mouse steering; the fitter; and, for operators only, Admin (testing): grant credits, spawn any ship free where you are docked (the Aurel Tacet included), the world's switches |
+| Show or hide the menu | F2 | Also the Menu button. Your character, Show key, Switch character; Back to modes (and, in the Arena, Leave the fight); show or hide ship labels and the connection meter; mouse steering; the fitter; and, for operators only and in the Universe only, Admin (testing): grant credits, spawn any ship free where you are docked (the Aurel Tacet included), the world's switches |
 
 While you are typing in a text box (the pilot name), keys go to the box, not the ship.
 

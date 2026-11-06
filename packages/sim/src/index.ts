@@ -143,7 +143,7 @@ export {
 export { starterStations, padRing, HARBOUR_ID, RIDGE_ID, LANTERN_ID, HARBOUR_ORBIT_RADIUS } from './stations.js';
 export { screeAsteroids, asteroidStates, asteroidPositions, rockAt, rockSeam, oreLeft, bestTier, stepRockfall, ROCK_FIELDS, ROCKFALL_SECONDS, SCREE_SEED } from './asteroids.js';
 export { droneIdleReason, dronesOut, droneRoom, droneStrength, stepDrones } from './drones.js';
-export { adminArena, adminArenaEnd, arenaFits, type ArenaRefusal } from './arena.js';
+export { arenaEnemies, arenaFits, arenaHulls, createArenaWorld, joinArena, leaveArena, leaveArenaWorld, startArena, stepArenas, type ArenaHull, type ArenaRefusal } from './arena.js';
 export { duel, skirmish, fitProblems, fitSummary, type SkirmishResult, type SkirmishRun, type DuelResult, type DuelRun, type FitProblem, type FitSpec, type FitSummary } from './fitlab.js';
 export { REFERENCE_FITS } from './reference-fits.js';
 export { storeGoods, takeGoods, storedGoods, type HangarRefusal, type HangarResult } from './hangar.js';
@@ -182,8 +182,8 @@ export {
   type TickRails,
   type LocalFrame,
 } from './rails.js';
-export { applyCommand, readCommand, type PilotCommand, type CommandOutcome } from './commands.js';
-export { PROTOCOL_VERSION, MAX_NAME_LENGTH, applyUpdate, cleanName, diffWorld, readInput, type ClientMessage, type ServerMessage, type CommandReply, type ShipChange, type WorldUpdate, type LoginRefusal, type KickReason } from './net.js';
+export { applyCommand, readCommand, ARENA_COMMANDS, type PilotCommand, type CommandOutcome } from './commands.js';
+export { PROTOCOL_VERSION, MAX_NAME_LENGTH, applyUpdate, cleanName, diffWorld, readInput, readWorldId, WORLD_IDS, type WorldId, type ClientMessage, type ServerMessage, type CommandReply, type ShipChange, type WorldUpdate, type LoginRefusal, type KickReason } from './net.js';
 export { AWAY_GRACE_SECONDS, pilotLeft, pilotReturned, stepAway } from './away.js';
 export { visibleWorld, visibleEvents, VIEW_MARGIN } from './view.js';
 export { contactSize, identifies, runsDark, startsDark, CONTACT_RADIUS } from './colours.js';

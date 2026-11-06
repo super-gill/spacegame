@@ -9,7 +9,7 @@ How the Spacegame chats work together. Every chat working on the repo reads this
 | Who | Does |
 | --- | --- |
 | **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
-| **Lead** (the current lead chat; "Lead 7" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lead** (the current lead chat; "Lead 8" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
 | **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
 | **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
@@ -30,6 +30,8 @@ Chats cannot message each other: this file, branches and commits are the only ch
 ## Lore asks
 
 Names and lore wanted from the lore chat. The game uses working names until these come back; the lead applies the answers. Newest first.
+
+- **The Arena and its scenarios** (2026-11-06, Lead 8; `docs/worlds.md`): what the Arena is in the setting (a place, a simulation, a league?) and its name, and names for its three scenarios: Skirmish (pick the enemy and how many), Waves (survive ever bigger waves; scored on kills and time survived) and To the death (an even one against one). Working names are those three and "Arena"; the mode screen also says Universe and Dev.
 
 - **Big ships** (2026-11-05): the Kessari brig (working name Kessari Injunction, by Kessari Orbital Defence) and the Free Belt frigate (working name Union Defence Works Walkout); the large kit that came with them: the Slagline Runner L and Jink L, the Ito-Marr Bastion L, and the Union Defence Works Bulwark L armour. Union Defence Works names its guns for labour actions (Picket, Lockout), hence the Walkout.
 
@@ -152,6 +154,14 @@ Colours and the Plot contracts (on `main` from 6 November 2026; `docs/interface.
 - **Contacts in a view** (`view.ts`): `Ship.contact` is set only in a pilot's view, for a dark ship they have not identified; `hullId` is then empty and fit, weapons, hold, owner and condition are blank. **Client code must check `ship.contact` before reading a ship's hull or calling `shipStats` on another ship.** `PROTOCOL_VERSION` 2.
 - **Save format version 16** (`migrate15to16`).
 
+Worlds step 3 contracts (on `main` from 6 November 2026; `docs/worlds.md`, "As built: step 3"):
+
+- **Worlds** (`net.ts`): `WorldId` (`universe`, `arena`), `WORLD_IDS`, `readWorldId`. Messages: `welcome` carries no world; client `enter` (`world`); server `entered` (`world`, `view`). `PROTOCOL_VERSION` 3.
+- **The Arena world** (`arena.ts`, `types.ts`): `createArenaWorld`, `joinArena`, `leaveArenaWorld`, `startArena`, `leaveArena`, `stepArenas`, `arenaHulls` (`ArenaHull`), `arenaEnemies`, `arenaFits`; `ArenaScenario` (`kind: 'skirmish'`, `enemyFit`, `count`; Waves and To the death add kinds), `ArenaState` (`shipId`, `centre`, `fit`, `scenario`, `over`), `Pilot.arena` (Arena world only); `ARENA_END_DELAY_SECONDS`. Commands `arenaStart` (`fit`, `scenario`) and `arenaLeave`, listed in `ARENA_COMMANDS`; `adminArena` and `adminArenaEnd` are gone. Event `arenaEnded` is now `shipId` (the arena ship), `pilotId`, `result` (`won`, `lost`, `left`).
+- **Events for one pilot** (`view.ts`): an event with a `pilotId` goes only to that pilot.
+- **Server** (`worlds.ts`, `game.ts`): `makeWorlds`, `allowedIn`, `WorldHooks`; a `Game` takes its hooks. Refusal `notHere` for a command another world owns.
+- **Save format version 17** (`migrate16to17`).
+
 Turret model step 3 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 3"):
 
 - **CIWS** (`types.ts`, `hulls.ts`, `weapons.ts`, `modules.ts`): `MountType` gains `ciws` (ids `d1` to `d4`); weapon `ciws-m` (family `pointDefence`), module `paragon-ciws-m`, numbers in `CIWS`. `swivel-s` and `paragon-turret-s` are gone.
@@ -243,6 +253,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-06, lead (Lead 8): took over from Lead 7 (`ws/lore` already merged). **Built worlds step 3** (`docs/worlds.md`, "As built: step 3"): a `Game` per world in the server (Universe and a never-saved Arena), `enter` and `entered` messages (protocol 3), the mode screen after login, the arena setup as drawn with Skirmish, the admin arena retired (`migrate16to17`, save 17). Leaving a world reloads the page back to the mode screen. Checked in Chromium (launch, leave, lose, back to modes, Universe; no page errors). Lore ask added: names for the Arena and its scenarios. Next: Jason plays it; then step 4, Waves and To the death.
 - 2026-11-06, lead (Lead 7): Jason approved the worlds mockups as drawn (`docs/worlds.md`, order of work step 2); `v0.17.0` tagged on GitHub. Next: build step 3, the Arena world, the mode screen and the arena setup with Skirmish. Handed over to Lead 8 for the build (this chat was heavy).
 - 2026-11-06, lead (Lead 7): **released 0.17.0** (the interface pass, the shared-world view, drones, colours; save 16, protocol 2). Jason tried the selection window ("looks great"). Next: Jason's answers on the worlds mockups, then the Arena world (`docs/worlds.md`).
 - 2026-11-06, lead (Lead 7): **worlds designed with Jason** (`docs/worlds.md`): a live server on releases (Universe, a fresh copy of Calder until the map, and the Arena) and a dev server on `main` (Jason's current save becomes Dev, operators only); a server switch on the login screen; a mode screen after login; the Arena as its own unsaved world, fed every ship and fit from the code, entered by choosing ship, fit and scenario (Skirmish, Waves, To the death). Next: 0.17.0 once Jason tries the selection window, then mockups.
