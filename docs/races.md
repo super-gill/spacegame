@@ -10,13 +10,13 @@ Power, then company, then product. A **power** is one of the four human origins;
 
 | Power | Character | Colours | Shape language | Weapon family | Best industries | Navy |
 | --- | --- | --- | --- | --- | --- | --- |
-| Earth, with Luna | Corporate core; contracts, tolls and courts | Steel blue, white | Sleek wedges, clean panels | Missile; shield tank, electronic warfare | Transport, commerce, patrol | The Charter Fleet (Kessari Orbital Defence) |
+| Earth, with Luna | Corporate core; contracts, tolls and courts | Steel blue, white | Layered panels, chamfered blocks, clean seams | Missile; shield tank, electronic warfare | Transport, commerce, patrol | The Charter Fleet (Kessari Orbital Defence) |
 | Mars | Disciplined, dutiful, the best navy | Rust red, bone | Symmetrical, armour plates, hard edges | Energy; armour tank | Military, security | The Martian Navy (Seraphine Naval Yards) |
 | Venus | Cloud cities; chemistry, biotech, medicine; neutral | Pale gold, green | Smooth curves, domes | Hybrid; regenerative mix, repair, drones | Support, drones, research | The Coastguard (Ishtar Fleet Works) |
 | The Belt | Cooperatives and clans; mining and salvage | Rust orange, gunmetal | Exposed trusses, asymmetric, bolted on | Projectile; whatever tank the hull came with, speed | Mining, salvage, exploration | The Union Militia (Union Defence Works) |
 | The Aurel | Alien, receded, rare | Pale white, cyan glow | Floating segments | Sealed, integrated systems | One-offs | None known |
 
-Colours and shapes for Mars and Venus are first proposals for the design canvas; Jason to confirm.
+Colours and shapes for Mars and Venus are first proposals for the design canvas; Jason to confirm. Style rules, art direction and scale are in `fleet.md`: the company leads the design, the power adds registry markings, no basic shapes or triangles, detail and sensible colour, and a radius range per weight band.
 
 ## Companies
 

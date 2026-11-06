@@ -358,6 +358,32 @@ Decided 6 November 2026. The Belt's combat and transport hulls are stolen, captu
 
 Belt originals, not rebuilt from anything, because nobody else builds them: the mining hulls (Prospector, Sinker, Collier, Winder, Headframe), the salvage hulls (Shunt, Scrapper, Wrecker, Breaker) and every clan hull.
 
+## Art direction
+
+Decided 6 November 2026, for whoever draws hulls (the registry page, the canvas, the client's ship art).
+
+- **No basic shapes, and no triangles.** A hull is never a wedge, a dart or a primitive with a nose on it. Silhouettes are built from several volumes: a spine, a hull, pods, trusses, tanks, a bridge. Earth's shape language is layered panels and chamfered blocks, not wedges.
+- **Good detail.** Panel lines, hatches, docking collars, running lights, antennae, radiators, drive bells, and the company's signature features: Tessaract's container racks, Belt Forge's exposed trusses and clamps, Seraphine's overlapping plates, Arcadia's identical bolted modules, Solace's crosses and floodlights. Detail is for the close-up and the fitting window; the silhouette must still read at game zoom, which is what the registry's full, no-detail and silhouette levels are for.
+- **Colour tells you three things at once:** the role (industrial hazard markings, medical white, freight company liveries, navy grey or the navy's colour), the company (its primary), and the power (the registry flash). A pilot should be able to say "Belt industrial", "Earth navy" or "Venusian medical" from colour alone before reading a name.
+- **Mounts show.** Every fitted module has a visible silhouette at its mount, as today; a hull with spare mounts shows the empty sockets up close.
+
+## Scale
+
+Decided 6 November 2026. Size matters, so each weight band has a scale, with wide room inside it so hulls of one band vary. Radius is the bounding circle the sim uses; proportions are free, so a long thin freighter and a fat barge can share a band. Starting ranges from today's hulls (Tern 18, Warrant 25, Injunction about 34, Walkout 42, Manifest 30, Collier 46, the drawn carrier 150); the lead tunes them.
+
+| Band | Radius, world units | Today |
+| --- | --- | --- |
+| Pod | 5 to 7 | Ark |
+| Drone | 3 to 6 | Knocker |
+| Subcraft | 5 to 10 | the drawn fighters and skiffs, 6 to 8 |
+| Light | 12 to 22 | Tern 18, Prospector |
+| Medium | 22 to 36 | Warrant 25, Manifest 30, Sinker, Injunction |
+| Heavy | 36 to 60 | Walkout 42, Collier 46 |
+| Super-heavy | 60 to 110 | none yet |
+| Capital | 110 to 220 | the drawn Hellas, 150 |
+
+Bands do not overlap, but each is wide enough that two hulls of one band can differ by half again in size. A pattern or legacy mark stays in its base hull's band.
+
 ## Weight bands
 
 Decided 6 November 2026. Military classes carry their weight in the name; civilian jobs do not, so every hull has a second axis. In-world it is the **Ceres Registry rating**, written [weight band]-[function]: Light-Courier, Heavy-Destroyer, Super-heavy-Liner. Subcraft, drones and pods are rated by kind (Subcraft-Fighter, Drone-Mining drone, Pod-Lifeboat). The band is what sets pad size, docking fees, PDC hardpoints and, later, crew; it classifies and never balances. The band names are the UI words; S, M, L stay module sizes.
