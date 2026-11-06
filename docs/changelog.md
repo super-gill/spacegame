@@ -13,6 +13,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Logging in no longer drops you straight into the world: the mode screen comes first. Saves move to version 17. Clients must reload (protocol version 3).
 - The menu's admin controls show only in the Universe.
 
+### Fixed
+- Clicking the warning banner silences the alarm again. With a countdown showing (a collision in 1.3 s) a normal click often did nothing, because the banner redrew under the pointer mid-click; it now silences as the button goes down.
+
 ## [0.17.0] - 2026-11-06
 
 The interface pass and the shared world: each player is sent only what their sensors see, ships running dark are only radar contacts, and the HUD gains the Plot, the selection window, warnings with sounds, turret arcs and aim reticles (docs/interface.md, docs/shared-world.md).

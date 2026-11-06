@@ -166,14 +166,22 @@ export class FlightHud {
    * The warning banner: the conditions holding now (already sorted,
    * highest tier first), at most `WARNING_LINES` lines and a count of the
    * rest. `silenceable` adds a hint that a click silences the alarm;
-   * `onSilence` is called on that click.
+   * `onSilence` is called as the button goes down.
    */
   setWarnings(list: readonly Condition[], silenceable: boolean, onSilence: () => void): void {
     const key = list.map((c) => `${c.tier}|${c.text}`).join('/') + (silenceable ? '/s' : '');
     if (key === this.warningKey) return;
     this.warningKey = key;
     show(this.alert, list.length > 0);
-    this.alert.onclick = silenceable ? onSilence : null;
+    // Silence on the press, not the click: a countdown (collision in 1.3 s)
+    // rebuilds these rows every frame, and a click whose press landed on a
+    // row that was replaced before the release never fires.
+    this.alert.onpointerdown = silenceable
+      ? (e) => {
+          e.preventDefault();
+          onSilence();
+        }
+      : null;
     this.alert.classList.toggle('silenceable', silenceable);
     const rows = list.slice(0, WARNING_LINES).map((c) => el('div', `hud-warning ${c.tier}`, `${c.tier.toUpperCase()} · ${c.text}`));
     if (list.length > WARNING_LINES) rows.push(el('div', 'hud-warning more', `+${list.length - WARNING_LINES} MORE`));
