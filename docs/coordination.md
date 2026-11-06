@@ -143,6 +143,10 @@ Turret model step 1 contracts (on `main` from 6 November 2026; design in `docs/t
 - **Lock readout:** `LockReadout.combat.gunDps` and `pointDefenceDps` replace `fixedDps` and `turretDps`.
 - **Save format version 14** (`migrate13to14`).
 
+Shared world view contracts (on `main` from 6 November 2026; `docs/shared-world.md`, "As built: only what you can see"):
+
+- **Views** (`view.ts`): `visibleWorld(world, pilotId, previous?)`, `visibleEvents(events, pilotId, ships)`, `VIEW_MARGIN`. The server sends each player their view; a client never has other players' credits, storage or (unlocked) holds, or ships out of sensor reach. Client code must not assume every ship or pilot detail is present.
+
 Turret model step 3 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 3"):
 
 - **CIWS** (`types.ts`, `hulls.ts`, `weapons.ts`, `modules.ts`): `MountType` gains `ciws` (ids `d1` to `d4`); weapon `ciws-m` (family `pointDefence`), module `paragon-ciws-m`, numbers in `CIWS`. `swivel-s` and `paragon-turret-s` are gone.
@@ -227,6 +231,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-06, lead (Lead 5): **shared world, only what you can see** (`docs/shared-world.md`): `visibleWorld` per player (sensor range plus 500, own ships and caches anywhere, no other players' credits, storage or unlocked holds), per-connection diffs, events filtered; own shots drawn from your guns; fixed updates dropped while a new character read their key ("Unknown hull", reproduced and fixed). Jason: discuss law (7) before starting it; drones and the interface pass next.
 - 2026-11-06, lead (Lead 5): **released 0.16.0, the turret model.** Step 4: stock Injunction and Walkout refit with flank and aft autocannons and more reactor (brig beats one Warrant, loses to two; frigate beats four, loses to six); the Collier's aft slot left free (a gun pushes its turret tiles off keys 1 and 2); missile salvos measured (one or two at a time all shot down, eight half through); no numbers tuned. The kiter target needs the arena. Next: Jason to choose (roadmap, "Plan from here").
 - 2026-11-06, lead (Lead 5): **turret model step 3, close-in weapon systems** (`docs/turrets.md`, "As built: step 3"): `ciws` hardpoints (brig, Manifest, Collier two on the beams with gaps fore and aft; frigate four, all round), `ciws-m` and the Paragon CIWS M, swivels retired with save 15 (CIWS where hardpoints are free, refunds otherwise). Interim stock refit: the Tern an autocannon S where the swivel was (two pulse lasers lost to the raider), mining ships that slot left free (a gun there takes fire group 1 from the laser), the Manifest a Gunlayer M and a second small reactor; old swivel slots on big ships empty; the crowd clearer retired. Audit `docs/audits/2026-11-06-ciws.md`: the stock Manifest now loses to a raider holding range outside CIWS reach (it needs a forward gun), the brig is weaker with empty swivel slots. 476 sim tests; played in the arena (CIWS engage by arc) and the fitter (D1 to D4 with arcs). Next: step 4, refit and tune, then 0.16.0.
 - 2026-11-06, lead (Lead 5): steering choice in the Controls panel (F1), from Jason (both schemes existed; keyboard steering was only a checkbox in the menu). Checked in a browser: keyboard spin works with turrets; the F1 choice, the menu box and the saved setting stay in step across a reload. Jason's note: furball ranges hide spread; NPCs are not tactical, so kiting is the player's.

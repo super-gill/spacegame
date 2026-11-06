@@ -1,6 +1,6 @@
 # The shared world (milestone 11)
 
-**Status: agreed with Jason, 5 November 2026 (his answers are under "Decisions"); built in 0.14.0 apart from sending only what each player can see (step 4) and full prediction for your own ship (step 6).** Brought forward after 0.13.0: Jason wants to play in one world with friends.
+**Status: agreed with Jason, 5 November 2026 (his answers are under "Decisions"); built in 0.14.0; sending only what each player can see (step 4) on `main` since 6 November (see "As built: only what you can see"); full prediction for your own ship (step 6) waits until lag is felt.** Brought forward after 0.13.0: Jason wants to play in one world with friends.
 
 ## Goal
 
@@ -59,6 +59,14 @@ The game is server and client only (Jason). Playing alone means running the serv
 ### Players and operators
 
 Every character is a **player** or an **operator** (Jason, 5 November 2026). Operators also get the admin controls (credits, spawning ships, the world's switches, which change the whole server); the server refuses admin commands from players, whatever their page sends. The first character made on a new server is an operator; the host makes others with `op <name>` and `deop <name>` in the server's console (`docs/hosting.md`).
+
+## As built: only what you can see (6 November 2026, Lead 5)
+
+- **`visibleWorld(world, pilotId, previous)`** (`sim/src/view.ts`) cuts each pilot's view; the server sends that, not the world. Ships: everything the pilot owns, the drones of the ship they fly, and anything within their ship's sensor range plus `VIEW_MARGIN` (500). Other ships' holds are emptied unless the pilot holds a complete lock on them with a computer that reads cargo (the client works out lock readouts itself). Other pilots carry only id, name, the ship they fly and `away`: no credits, storage, stowed ship or arena. Shots, munitions, decoys, wrecks and loot within the same reach, the pilot's own caches anywhere; charges planted by ships in view; NPC brains for ships in view. Rocks, stations, bodies and catalogues unchanged. A pilot with no ship sees only what they own.
+- **Per player:** each connection keeps the view it was last sent (`seen`) and gets `diffWorld(seen, next view)`. Parts whose contents did not change come back as the same object (`previous`), so the diff does not resend them. Events are filtered by `visibleEvents` against the ships in this view or the last, so a ship destroyed this tick still sends its explosion. `Game.changesSince` is gone.
+- **Measured** with two browsers: the second player's client gets the first's name, ship and an empty hold, never their credits or storage, in the welcome or any update. Updates near Harbour average about 1.7 KB (about 50 KB a second).
+- **Your own shots** are drawn moved by the same amount your ship is drawn ahead of the timeline (`net/own-ship.ts`), so they leave from your guns; a shot can look a little off where it lands, by about your speed times a tenth of a second.
+- **Fixed on the way:** updates that arrived after the welcome but before the game listened (a new character reading their key) were dropped, so that client fell behind what the server thought it had sent, and a ship made in that pause later arrived as changes to a ship it never had ("Unknown hull undefined"). `Link` now holds them and replays them on `listen`. Reproduced twice with two browsers before the fix, clean three times after.
 
 ## Order of work
 

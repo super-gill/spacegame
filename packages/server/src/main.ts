@@ -3,7 +3,7 @@ import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { PROTOCOL_VERSION, readCommand, readInput, type ClientMessage, type KickReason, type ServerMessage, type World } from '@spacegame/sim';
+import { PROTOCOL_VERSION, diffWorld, readCommand, readInput, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type World } from '@spacegame/sim';
 import { Accounts, type Character } from './accounts.js';
 import { Game } from './game.js';
 import { ServerStats } from './stats.js';
@@ -52,7 +52,7 @@ interface Connection {
   socket: WebSocket;
   /** Who it is logged in as, once it has. */
   character: Character | null;
-  /** The world as this player last saw it, so the next update sends only what changed. */
+  /** The world as this player last saw it (their view, `visibleWorld`), so the next update sends only what changed. */
   seen: World | null;
 }
 
@@ -75,8 +75,9 @@ function enter(connection: Connection, character: Character, key: string | null)
   }
   connection.character = character;
   game.join(character.pilotId, character.name);
-  connection.seen = game.current;
-  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true, world: game.current });
+  const view = visibleWorld(game.current, character.pilotId);
+  connection.seen = view;
+  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true, world: view });
   console.log(`${character.name} joined (${connections.size} connected)`);
 }
 
@@ -115,26 +116,30 @@ function received(connection: Connection, message: ClientMessage): void {
   }
 }
 
-/** Send every logged-in player what changed since they last heard. */
+/**
+ * Send every logged-in player what changed in what they can see since
+ * they last heard (`visibleWorld`: their sensor range, their own things,
+ * nobody else's holds or wallet). Each player's view is their own, so
+ * each gets their own message. Events are kept if they concern a ship in
+ * this view or the last one, so a ship destroyed this tick still gets
+ * its explosion.
+ */
 function update(): void {
   const events = game.takeEvents();
   const now = game.current;
-  // Players who last saw the same world get the same message: make it once.
-  const made = new Map<World, string>();
   for (const connection of connections) {
     if (!connection.character || !connection.seen) continue;
     if (connection.socket.bufferedAmount > MAX_BUFFERED_BYTES) continue; // behind: catch up next time
-    let text = made.get(connection.seen);
-    if (text === undefined) {
-      const message: ServerMessage = { t: 'update', tick: now.tick, changed: game.changesSince(connection.seen), events };
-      text = JSON.stringify(message);
-      made.set(connection.seen, text);
-      // Now and then, see how well it compresses, for `stats`.
-      if (now.tick % 300 === 0) stats.compressed(text.length, deflateRawSync(text).length);
-    }
+    const pilotId = connection.character.pilotId;
+    const view = visibleWorld(now, pilotId, connection.seen);
+    const heard = visibleEvents(events, pilotId, { ...connection.seen.ships, ...view.ships });
+    const message: ServerMessage = { t: 'update', tick: now.tick, changed: diffWorld(connection.seen, view), events: heard };
+    const text = JSON.stringify(message);
+    // Now and then, see how well it compresses, for `stats`.
+    if (now.tick % 300 === 0) stats.compressed(text.length, deflateRawSync(text).length);
     connection.socket.send(text);
     stats.sent(performance.now(), text.length, connection.character.name);
-    connection.seen = now;
+    connection.seen = view;
   }
 }
 

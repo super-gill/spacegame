@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createStarterWorld, emptyInput, pilotShip } from '@spacegame/sim';
+import { createStarterWorld, diffWorld, emptyInput, pilotShip, visibleWorld } from '@spacegame/sim';
 import { Accounts, newKey } from './accounts.js';
 import { Game } from './game.js';
 
@@ -69,12 +69,12 @@ describe('the running world', () => {
     expect(Math.hypot(after.velocity.x, after.velocity.y)).toBeGreaterThan(speed);
   });
 
-  it('runs commands for the pilot that sent them, and says what changed since a world it gave out', () => {
+  it("runs commands for the pilot that sent them; a player's update is what changed in their view", () => {
     const game = new Game({ ...createStarterWorld(), spawners: [] });
     game.join('pilot-a', 'Ana');
-    const seen = game.current;
+    const seen = visibleWorld(game.current, 'pilot-a');
     game.step();
-    const changed = game.changesSince(seen);
+    const changed = diffWorld(seen, visibleWorld(game.current, 'pilot-a', seen));
     // The catalogues never change, so they are never sent again.
     expect(Object.keys(changed)).toContain('ships');
     expect(Object.keys(changed)).not.toContain('hulls');

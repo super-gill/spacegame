@@ -13,6 +13,7 @@ import {
   STARTER_STATION_ID,
   occupiedPads,
   type WorldEvent,
+  add,
   distance,
   type TradeRefusal,
   leadPoint,
@@ -37,6 +38,7 @@ import {
   wrapAngle,
   type Ship,
   type ShipInput,
+  sub,
   type Vec2,
   type World,
 } from '@spacegame/sim';
@@ -813,17 +815,24 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     for (const beam of ship.beams) drawMiningBeam(ctx!, camera, shipView.position, beam.bearing, beam.length, beam.cutting, nowMs);
   }
 
+  // Your own ship is drawn ahead of the timeline (net/own-ship.ts); your
+  // own shots and missiles are moved by the same amount, so they leave
+  // from your guns rather than from where the ship was a moment ago.
+  const ownLead = mine && view ? sub(view.position, interpolate(mine, previous.ships[mine.id], alpha).position) : { x: 0, y: 0 };
+  const led = <T extends { position: Vec2 }>(thing: T): T => ({ ...thing, position: add(thing.position, ownLead) });
+
   for (const p of current.projectiles) {
     const isMine = mine && p.ownerShipId === mine.id;
     const shooterBrain = current.npcs[p.ownerShipId];
-    drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' || shooterBrain?.kind === 'arena' ? COLOUR.hostile : COLOUR.neutral);
+    drawProjectile(ctx!, camera, isMine ? led(p) : p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' || shooterBrain?.kind === 'arena' ? COLOUR.hostile : COLOUR.neutral);
   }
 
   for (const d of current.decoys) drawDecoy(ctx!, camera, d, nowMs);
   for (const m of current.munitions) {
     const coming = mine && (m.homingOn === mine.id || m.targetId === mine.id);
-    const colour = mine && m.ownerShipId === mine.id ? COLOUR.inkBright : coming ? COLOUR.hostile : COLOUR.neutral;
-    drawMunition(ctx!, camera, m, current.goods[m.goodId]?.munition?.class === 'torpedo', colour);
+    const ours = mine && m.ownerShipId === mine.id;
+    const colour = ours ? COLOUR.inkBright : coming ? COLOUR.hostile : COLOUR.neutral;
+    drawMunition(ctx!, camera, ours ? led(m) : m, current.goods[m.goodId]?.munition?.class === 'torpedo', colour);
   }
   // Stopgap (lead, 6e part 2): a warning while something is homing on you.
   // The interface workstream's munition warnings replace it.

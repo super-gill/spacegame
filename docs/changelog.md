@@ -4,6 +4,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Changed
+- The server sends each player only what they can see: ships and shots within their sensor range (plus a margin), their own ships and caches wherever they are. Other players' credits, storage and ship holds are no longer sent to anyone (a lock whose computer reads cargo still sees a hold).
+- Your own shots and missiles are drawn leaving from your guns, rather than from where your ship was a moment ago.
+
+### Fixed
+- A new character joining while someone else's ship appeared could hit "Unknown hull" errors and see ships that were no longer there: updates that came while the key was on screen were dropped.
+
 ## [0.16.0] - 2026-11-06
 
 The turret model: every main gun is a turret, range costs shot guns accuracy and lasers power, and close-in weapon systems replace swivels (docs/turrets.md).

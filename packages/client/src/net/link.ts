@@ -38,6 +38,14 @@ export function serverAddress(): string {
 
 export class Link {
   private listener: LinkListener | null = null;
+  /**
+   * Messages that arrived after the welcome but before anyone listened
+   * (a new character reading their key, the game still loading). They
+   * are replayed on `listen`: dropping an update would leave this copy of
+   * the world behind the one the server thinks it has, and later updates
+   * would then change ships this copy has never had.
+   */
+  private early: ServerMessage[] = [];
   private nextCommandId = 1;
   private readonly pending = new Map<number, PilotCommand>();
   private pingTimer: ReturnType<typeof setInterval> | null = null;
@@ -87,6 +95,9 @@ export class Link {
 
   listen(listener: LinkListener): void {
     this.listener = listener;
+    const early = this.early;
+    this.early = [];
+    for (const message of early) this.receive(message);
   }
 
   /** The pilot's controls for this tick. */
@@ -110,6 +121,10 @@ export class Link {
   }
 
   private receive(message: ServerMessage): void {
+    if (!this.listener && message.t !== 'kicked') {
+      this.early.push(message);
+      return;
+    }
     switch (message.t) {
       case 'update':
         this.listener?.update(message.tick, message.changed, message.events);

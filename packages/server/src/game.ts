@@ -3,7 +3,6 @@ import {
   pilotLeft,
   pilotReturned,
   stepAway,
-  diffWorld,
   emptyInput,
   joinPilot,
   pilotShip,
@@ -13,7 +12,6 @@ import {
   type ShipInput,
   type World,
   type WorldEvent,
-  type WorldUpdate,
 } from '@spacegame/sim';
 
 /**
@@ -22,7 +20,8 @@ import {
  * it here and nowhere else.
  *
  * This class knows nothing about sockets or files: it takes controls and
- * commands in, and gives out what changed. `main.ts` wires it to the
+ * commands in, and gives out the world and its events. `main.ts` cuts
+ * each player's view from it (`visibleWorld`) and wires it to the
  * network and the disk.
  */
 
@@ -62,7 +61,7 @@ export class Game {
   private readonly queued = new Map<string, ShipInput[]>();
   /** The last controls used, per pilot, so held keys carry over a tick with no message. */
   private readonly last = new Map<string, ShipInput>();
-  /** Events since the world was last read with `changesSince`. */
+  /** Events since they were last taken with `takeEvents`. */
   private events: WorldEvent[] = [];
 
   constructor(world: World) {
@@ -127,11 +126,6 @@ export class Game {
     }
     this.world = stepAway(stepWorld(this.world, inputs));
     this.events.push(...this.world.events);
-  }
-
-  /** What changed since `before`, a world this game gave out earlier (`diffWorld`). */
-  changesSince(before: World): WorldUpdate {
-    return diffWorld(before, this.world);
   }
 
   /** The events since the last call, and forget them. */
