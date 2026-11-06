@@ -6,7 +6,7 @@ Status column: **built** (in the catalogue today), **named** (a working hull exi
 
 ## The shape of it
 
-Fourteen companies build hulls. Four are naval yards and build only for their navy. The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
+Fifteen companies build hulls. Four are naval yards and build only for their navy. The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
 
 | Builder | Home | Builds | Hulls |
 | --- | --- | --- | --- |
@@ -14,6 +14,7 @@ Fourteen companies build hulls. Four are naval yards and build only for their na
 | Tessaract Logistics | Earth | Cargo and passengers at every size | 7 |
 | Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 7 |
 | Seraphine Naval Yards | Mars, naval yard | The Martian Navy | 8 |
+| Arcadia Works | Mars, state yard | Civilian hulls, one per job, no brands | 5 |
 | Ishtar Fleet Works | Venus, naval yard | The Coastguard | 4 |
 | Solace Medical | Venus | Support, repair, rescue | 3 |
 | Halden Institute | Venus | Survey and exploration | 3 |
@@ -84,6 +85,20 @@ Martian places for the big ships, Martian virtues for the small. Builds the Mart
 | Seraphine Tharsis | Battleship | Line battleship | The best big ship in known space, and Mars knows it | draft |
 | Seraphine Hellas | Carrier | Fighter carrier | Squadrons, not drones: Martian pilots fly | draft |
 | Seraphine Olympus | Dreadnought | Flagship | One exists. It has never fired in anger. | draft |
+
+## Arcadia Works
+
+Mars's state yard. It names hulls what they are and numbers the marks, because Mars does not do brands: ships are built for the common purpose, not for private buyers. One hull per job, standardised and interchangeable, drab, cheap to run, nothing luxurious. On the board a Martian freighter looks like a Martian freighter and nothing else.
+
+| Hull | Class | Job | Character | Status |
+| --- | --- | --- | --- | --- |
+| Arcadia Courier Mk IV | Courier | Documents and small parts between Martian ports | Faster than it looks, and it looks like a brick | draft |
+| Arcadia Hauler Mk III | Hauler | Small cargo | Every Martian colony has a hangar full of them | draft |
+| Arcadia Freighter Mk II | Freighter | Medium cargo | Armoured where a Tessaract hull is roomy | draft |
+| Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
+| Arcadia Tender Mk I | Repair tender (medium) | Field repair for the Navy and anyone Mars is helping that week | The one Martian civilian hull with a navy pattern | draft |
+
+Legacy Arcadia hulls keep the name with an older mark: an Arcadia Hauler Mk II is the cheap one.
 
 ## Ishtar Fleet Works
 
@@ -193,6 +208,19 @@ Silent and musical terms given by human scholars. No yards, no companies; every 
 | Aurel Tacet | Outside the ladders | The sealed development and test ship | A voice that never sang | built |
 | Others | | Husks, the one on the pad, the gifted ship | Named by whoever first sees them: Lament, Hush, Cadence are the kind of words scholars reach for | later |
 
+## How each power tanks
+
+Decided 6 November 2026. No built module changes maker or stat.
+
+| Power | Tank | Kit | Why |
+| --- | --- | --- | --- |
+| Earth | Shields | Ito-Marr Bastion and Ward-class fields: fast recharge, soft hull | Corporate tech: fields over plate |
+| Mars | Armour | Cantor-Vell Vigil and heavier: slow, thick, keeps firing | Terraformers trust plate |
+| Venus | Regenerative mix | Modest shields and armour, the best repair, shield transfer and drones | Keeps everyone else alive, including itself |
+| The Belt | Whatever it stole or copied | Thin shields, Rook and Rivet Patchplate, speed and running away | Belt hulls have the spare mounts to tank either way |
+
+Shields stay in the game. A shield is a field the drive plume breaks, which is why every ship is open astern.
+
 ## Generations: legacy, production and pattern
 
 Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots. Think EVE's tiers, told as production rather than technology.
@@ -230,11 +258,11 @@ Where NPC traffic should vary. Gaps are deliberate; they are the trade between p
 
 | Job | Earth | Mars | Venus | The Belt | Everywhere |
 | --- | --- | --- | --- | --- | --- |
-| Courier | Tessaract Docket | | | | Meridian Tern |
-| Hauler | Tessaract Waybill | | | Belt Forge Mule | Meridian Skua |
-| Freighter | Tessaract Manifest | | | Belt Forge Adit | |
+| Courier | Tessaract Docket | Arcadia Courier | | | Meridian Tern |
+| Hauler | Tessaract Waybill | Arcadia Hauler | | Belt Forge Mule | Meridian Skua |
+| Freighter | Tessaract Manifest | Arcadia Freighter | | Belt Forge Adit | |
 | Bulk freighter | Tessaract Lading | | | Corvane Dray (ore) | |
-| Passengers | Tessaract Timetable, Passage | | | | Meridian Gull, Petrel, Fulmar |
+| Passengers | Tessaract Timetable, Passage | Arcadia Ferry | | | Meridian Gull, Petrel, Fulmar |
 | Patrol boat | Kessari Warrant | Seraphine Phobos | Ishtar Lakshmi | Union Blockade | |
 | Frigate | Kessari Injunction | Seraphine Resolve | Ishtar Maat | Union Boycott | |
 | Destroyer | Kessari Verdict | Seraphine Constancy | Ishtar Maxwell | Union Walkout | |
@@ -242,16 +270,15 @@ Where NPC traffic should vary. Gaps are deliberate; they are the trade between p
 | Mining | | | | Belt Forge Prospector, Sinker, Collier | |
 | Refining | | | | Belt Forge Winder, Corvane Smelter | |
 | Salvage and towing | | | | Rook and Rivet Shunt, Scrapper, Wrecker, Breaker | |
-| Support | | | Solace Respite, Haven, Sanctuary | | |
+| Support | | Arcadia Tender | Solace Respite, Haven, Sanctuary | | |
 | Survey and exploration | | | Halden Query, Inquiry, Expedition | Saro Farwalker | |
 
-Mars builds no civilian hulls at all, which is a statement about Mars. Venus builds no cargo hulls. Earth builds no mining or salvage hulls. The Belt builds no passenger hulls. Every one of those gaps is a reason to cross a border.
+Mars builds civilian hulls through one state yard, one per job, which is a statement about Mars. Venus builds no cargo hulls. Earth builds no mining or salvage hulls. The Belt builds no passenger hulls. Every one of those gaps is a reason to cross a border.
 
 ## Open
 
 - [ ] Jason: confirm the Injunction and the Walkout as final names (they fit their makers' themes, so this draft treats them as such).
 - [ ] Jason: anything in the draft that feels wrong, missing or too many.
-- [ ] Jason: should Mars build any civilian hulls, or does its silence stand?
 - [ ] Jason: the generations model (legacy, production, pattern) and the four first legacy hulls.
 - [ ] Lead: which of these the next build slice needs; everything marked draft waits for a milestone that wants it.
 - [ ] Lore: the drones list and the Arena ask, after this.

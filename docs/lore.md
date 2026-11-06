@@ -346,6 +346,17 @@ Every capability comes from a fitted system, and what a pilot knows comes from a
 
 Paragon Arms sells light guns of every family to anyone, never navy grade.
 
+### How each power tanks
+
+| Power | Tank | Why |
+| --- | --- | --- |
+| Earth | Shields: fast recharge, soft hull | Corporate tech, fields over plate (Ito-Marr) |
+| Mars | Armour: slow, thick, keeps firing | Terraformers trust plate (Cantor-Vell) |
+| Venus | A regenerative mix: modest shields and armour, the best repair and shield transfer | Keeps everyone alive, including itself (Solace) |
+| The Belt | Whatever the hull came with, plus Patchplate and speed | Belt hulls have the spare mounts to tank either way |
+
+Shields stay: a shield is a field the drive plume breaks, which is why every ship is open astern.
+
 ### PDCs
 
 Point defence cannons throw out a storm of light rounds at anything that comes close, missiles and torpedoes first, then ships. Pilots say "PDCs up" for point defence on, and a small ship's whole art against a big one is staying just outside its PDCs. Only medium hulls and bigger carry them; small ships trust their countermeasures. The first PDCs fire rounds; laser PDCs come later, and Mars will build them.
@@ -428,7 +439,7 @@ Belt Forge's mining drone is the **Knocker**. In the old mines of Earth, knocker
 
 ## Companies
 
-Makers are companies with a home power and one or two specialities. The powers do not each get a full set; the gaps are the trade. Venus builds no warships, Earth builds no mining kit, Mars builds no freighters. Overlap only where NPC variety matters most: couriers, haulers, freighters.
+Makers are companies with a home power and one or two specialities. The powers do not each get a full set; the gaps are the trade. Venus builds no warships, Earth builds no mining kit, Mars builds its civilian hulls through one state yard. Overlap only where NPC variety matters most: couriers, haulers, freighters.
 
 | Company | Home | Known for | Founded | Hook |
 | --- | --- | --- | --- | --- |
@@ -441,6 +452,7 @@ Makers are companies with a home power and one or two specialities. The powers d
 | **Novum Systems** | Luna | Sensors, electronic warfare, computers; built the Novum Key | 60 GW | Still chasing a stronger gate-waker and does not care which gates it wakes |
 | **Cantor-Vell Arms** | Mars | Energy weapons, armour | Before the gate | Its best designs come from Aurel husk material Mars will not admit to holding |
 | **Seraphine Naval Yards** | Mars | Warships, from patrol boats to battleships | Before the gate | Builds the Martian Navy; sells nothing to anyone else |
+| **Arcadia Works** | Mars | Civilian hulls, one per job, named what they are and Mk-numbered | Before the gate | The state yard; Mars does not do brands |
 | **Ishtar Fleet Works** | Venus | Railgun and blaster hulls, the Coastguard's ships | 10 GW, after the Ceres Accord | Proud that its ships have never fired first in a war |
 | **Solace Medical** | Venus | Support ships: repair, shield transfer, rescue | Before the gate | Protected by the Mercy Clause |
 | **Arbor Dynamics** | Venus | Drones, drone bays, drone control | 95 GW | Its drones are grown as much as built |
@@ -708,7 +720,9 @@ Lore decisions by Jason, newest first. Decisions from before 6 November that nam
 - 2026-11-06: Names are humanised; Kessari survives as Earth's trading bloc, so Kessari Orbital Defence keeps its name. The contacts list is the board. Cantor-Vell's guns take Martian military names (Volley, Enfilade, Cordon). Commonwealth Fleet Works becomes Ishtar Fleet Works. The calendar is years since the gate woke (GW). The Aurel stay a horizon for now.
 - 2026-11-06: Crew is a direction, not part of the pivot: a system, never a people sim; costs and risks only.
 - 2026-11-06: Backgrounds, not careers, at character creation (agreed in principle with the rewrite): origin plus background, nothing locks.
-- 2026-11-06: Each power has a navy with dedicated hulls from its yard.
+- 2026-11-06: Each power has a navy with dedicated hulls from its yard. Mars's civilian hulls come from one state yard, Arcadia Works, named what they are.
+- 2026-11-06: Shields stay. Earth tanks with shields, Mars with armour, Venus with a regenerative mix, the Belt with whatever it has.
+- 2026-11-06: Generations: legacy hulls out of production on a used market, production hulls, pattern hulls behind standing (`fleet.md`).
 - 2026-11-06: Close-in weapon systems: the ballistic one is the Paragon Sentry M; the later laser one is Cantor-Vell's; the big fire control is Paragon's L. (Words updated by the pivot: PDC, Cordon, Fire Control.)
 - 2026-11-06: The transponder is built into every ship. Running dark is treated differently by each power; each pirate faction has its own way with it. (Words updated by the pivot: transponder, beacon.)
 - 2026-11-05: Mining kit is Belt Forge Collective's, with Corvane's heavy plant on the Collier; Rook and Rivet stays salvage.
