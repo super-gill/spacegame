@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -92,6 +92,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   12: (world) => migrate12to13(world),
   13: (world) => migrate13to14(world),
   14: (world) => migrate14to15(world),
+  15: (world) => migrate15to16(world),
 };
 
 /**
@@ -423,6 +424,23 @@ export function migrate13to14(world: unknown): unknown {
     if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
   }
   return { ...world, ships, pilots };
+}
+
+/**
+ * 15 to 16: colours (colours.ts). Every ship keeps showing its colours,
+ * except NPC pirates and arena enemies already in the save, which start
+ * running dark as new ones do.
+ */
+export function migrate15to16(world: unknown): unknown {
+  if (!isRecord(world) || !isRecord(world['ships']) || !isRecord(world['npcs'])) return world;
+  const npcs = world['npcs'];
+  const ships: Record<string, unknown> = {};
+  for (const [id, ship] of Object.entries(world['ships'])) {
+    const brain = npcs[id];
+    const kind = isRecord(brain) ? brain['kind'] : undefined;
+    ships[id] = isRecord(ship) && (kind === 'pirate' || kind === 'arena') ? { ...ship, dark: true } : ship;
+  }
+  return { ...world, ships };
 }
 
 /** The swivel, retired in `migrate14to15`, and what it cost, refunded where no CIWS takes its place. */

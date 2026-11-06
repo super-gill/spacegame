@@ -32,6 +32,8 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 | Drone manager | N | Launch, recall and send drones (to your active lock), and see each drone's state and condition. Drones work only rocks you have locked; your tractor collects what they cut. Recall them before you dock: drones left out are lost |
 | Heading lock | V | With mouse steering: the nose holds its bearing so you can move the pointer (to the interface, or to pick a target) without turning. Press again to release. A HEADING chip shows the state |
 | Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. The target card's UNLOCK button drops the lock it shows, without the keyboard. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
+| The Plot | P | A window listing what is around you: distance, type, name, closing speed (positive coming towards you), your lock. Tabs GENERAL (ships, stations, caches), COMBAT (ships: hostiles first, then unknown contacts) and MINING (rocks in radar range, caches, your drones); click a column head to sort. Click a row to make it your nav target (click again to clear); right-click a ship or rock to lock it, or to make a lock you hold active. The tab and sort are remembered |
+| Nav target | Click a row in the Plot | A chevron over it on screen, or at the screen edge pointing its way, with its distance and when you get there at your present closing speed (`--` while not closing). Dropped when it leaves your view |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Closes the top window (hold, drones) if one is open; otherwise drops the active lock and the next one takes over |
 
@@ -50,7 +52,7 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 
 ## Windows
 
-Small panels in flight (the hold, the drone manager) are windows: open each with its key or its button on the launcher strip under your status lines, drag the title bar to move it (the place is remembered), close it with its ✕ or Esc. Several can be open at once.
+Small panels in flight (the Plot, the hold, the drone manager) are windows: open each with its key or its button on the launcher strip under your status lines, drag the title bar to move it (the place is remembered), close it with its ✕ or Esc. Several can be open at once.
 
 ## Weapons
 
@@ -118,6 +120,7 @@ You can own several ships and fly one at a time. A ship you are not in is **empt
 
 | Action | Input | Notes |
 | --- | --- | --- |
+| Show colours / run dark | K, or the COLOURS chip on the status lines | Your Registry beacon. Showing colours (the default), anyone in sensor range sees your name and hull. Running dark (the chip says DARK in amber), other pilots see only a radar contact, small, medium or large, until they lock you and their targeting computer identifies you. Pirates run dark |
 | Board your nearest empty ship | B | Docked: any of your ships at the same station. In space: within 150 units and under 20 u/s relative to it |
 | Board a particular ship | Board button in Your ships | Docked only |
 | Step out in an escape pod | G, twice within 2 seconds | In space only. Your ship stays where it is, empty, and keeps any speed it had: slow down first to park it |

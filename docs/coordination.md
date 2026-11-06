@@ -9,7 +9,7 @@ How the Spacegame chats work together. Every chat working on the repo reads this
 | Who | Does |
 | --- | --- |
 | **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
-| **Lead** (the current lead chat; "Lead 6" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lead** (the current lead chat; "Lead 7" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
 | **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
 | **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
@@ -146,6 +146,12 @@ Shared world view contracts (on `main` from 6 November 2026; `docs/shared-world.
 
 - **Views** (`view.ts`): `visibleWorld(world, pilotId, previous?)`, `visibleEvents(events, pilotId, ships)`, `VIEW_MARGIN`. The server sends each player their view; a client never has other players' credits, storage or (unlocked) holds, or ships out of sensor reach. Client code must not assume every ship or pilot detail is present.
 
+Colours and the Plot contracts (on `main` from 6 November 2026; `docs/interface.md`, section 3, "Built"):
+
+- **Colours** (`types.ts`, `colours.ts`): `Ship.dark` (absent: showing colours); read through `runsDark(world, ship)` (a drone follows its mother). Input `ShipInput.toggleColours` (optional, edge-triggered), event `coloursChanged` (`dark`). `startsDark(brain)`, `identifies(world, viewer, targetId)`, `contactSize(hull)`, `ContactSize`, `CONTACT_RADIUS`.
+- **Contacts in a view** (`view.ts`): `Ship.contact` is set only in a pilot's view, for a dark ship they have not identified; `hullId` is then empty and fit, weapons, hold, owner and condition are blank. **Client code must check `ship.contact` before reading a ship's hull or calling `shipStats` on another ship.** `PROTOCOL_VERSION` 2.
+- **Save format version 16** (`migrate15to16`).
+
 Turret model step 3 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 3"):
 
 - **CIWS** (`types.ts`, `hulls.ts`, `weapons.ts`, `modules.ts`): `MountType` gains `ciws` (ids `d1` to `d4`); weapon `ciws-m` (family `pointDefence`), module `paragon-ciws-m`, numbers in `CIWS`. `swivel-s` and `paragon-turret-s` are gone.
@@ -236,6 +242,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-06, lead (Lead 7): took over from Lead 6; merged `ws/lore` (close-in weapon systems are **swivels**: the module is the Paragon Sentry M, the HUD tile says SWIVEL, outfitting "Swivel"). **Colours, the Plot and the nav target** (`docs/interface.md`, section 3, "Built"): `Ship.dark`, K and the COLOURS chip, pirates and arena enemies dark, save 16; dark ships unidentified by a pilot reach that pilot as contacts only (Jason chose a plain contact on screen too, not the real hull); the Plot window (P) with GENERAL, COMBAT and MINING tabs from data, sortable columns, click for nav target, right-click to lock; the nav marker. Checked in the arena (a Walkout against two Warrants: two `RADAR · SMALL` contacts, one locked from the Plot turns into `KESSARI WARRANT · ARENA`, K shows DARK; no page errors). Known gaps for Jason: "pirate hunting you" now needs an identified pirate; shots from unknown ships drawn neutral. Next: the selection window (Jason wants to see the Plot in game first), then the aim reticle (sketches first). 0.17.0 once Jason has played these.
 Newest first. One entry per session that changed something.
 
 - 2026-11-06, lore: answered the close-in weapon systems ask with Jason (`docs/lore.md`, "Swivels", "Names", "Decisions"). Decisions (Jason): CIWS are **swivels** in the setting, the word moving over from the retired turreted swivel ("swivels up" stays); `paragon-ciws-m` is the **Paragon Sentry M**; the later laser CIWS is Cantor-Vell's, the **Cantor-Vell Compline**; the eight-swivel fire control is the **Paragon Gunlayer L**, in line with S and M. **For the lead:** use "swivel" in the HUD and outfitting for CIWS, keep "CIWS" in the docs. Still open in "Lore asks": the big ships. Changelog line: "Name close-in weapon systems swivels, from the lore".

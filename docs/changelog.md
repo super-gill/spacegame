@@ -6,16 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ### Added
 - Name colours, running dark and the Plot from the lore.
-
-### Added
+- Name close-in weapon systems swivels, from the lore.
+- The Plot (P): a window listing what is around you, with distance, type, name, closing speed and your lock. Tabs for general, combat (hostiles first) and mining (rocks, caches, your drones); click a column to sort. Click a row to make it your nav target; right-click a ship or rock to lock it.
+- The nav target: a marker over it, or at the screen edge pointing its way, with its distance and arrival time.
+- Colours: every ship shows its Registry beacon unless it runs dark (K, or click the COLOURS chip by your credits). A ship running dark is only a radar contact, small, medium or large, until someone locks and identifies it; the server sends nothing else about it. Pirates and arena enemies run dark.
 - Warnings with sounds: a banner at the top centre lists what holds now (missiles inbound or about to hit, shields low or down, hull low or critical, someone locking you, a collision ahead with a rock or station, pirates hunting you, an empty capacitor, a full hold with the tractor on, gravity), highest tier first, each with its own tone; alarms repeat until they clear or you click to silence them. Locks completing, targets destroyed, drones lost and the like sound with their toast. Volume and an off switch in the Controls panel (F1).
 
 ### Changed
+- Saves move to version 16: pirates already in a save start running dark; everything else shows its colours. Clients must reload (protocol version 2).
+- The caution "pirate hunting you" now comes only for a pirate you have identified; a dark one warns once it locks you.
 - With weapons hot, a ring round your ship shows where your main guns can bear (thicker where more can, missing in blind spots), with a tick for where each gun points: bright when it bears on your lock, amber while it turns.
 - Outfitting and the fitter draw every fitted main gun's arc faintly, with the selected mount's over them.
 - The server sends each player only what they can see: ships and shots within their sensor range (plus a margin), their own ships and caches wherever they are. Other players' credits, storage and ship holds are no longer sent to anyone (a lock whose computer reads cargo still sees a hold).
 - Your own shots and missiles are drawn leaving from your guns, rather than from where your ship was a moment ago.
-
+- Close-in weapon systems are called swivels in the HUD and outfitting, and the Paragon CIWS M is now the Paragon Sentry M.
 - Drones thrust backwards and sideways like a ship with thrusters, so they back off and sidestep among rocks instead of only flying where they point. Ships are unchanged.
 
 ### Fixed

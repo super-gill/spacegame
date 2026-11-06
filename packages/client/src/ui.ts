@@ -310,6 +310,8 @@ export class Ui {
         this.showToast(`Collision at ${Math.round(e.speed)} u/s`, 1200);
       } else if (e.type === 'weaponsHotChanged') {
         this.showToast(e.hot ? 'Weapons hot' : 'Weapons cold', 1000, e.hot ? 'warn' : 'info');
+      } else if (e.type === 'coloursChanged') {
+        this.showToast(e.dark ? 'Running dark: others see a radar contact until they lock you.' : 'Showing colours.', 2000, e.dark ? 'warn' : 'info');
       } else if (e.type === 'lockRefused') {
         this.showToast(LOCK_REFUSALS[e.reason], 1500);
       } else if (e.type === 'lockLost' && e.reason !== 'unlocked') {

@@ -9,6 +9,9 @@ import type { Vec2 } from './vec2.js';
  * `ShipInput` snapshot per tick.
  */
 
+/** How big an unidentified contact looks: all the radar tells you about a ship running dark (colours.ts). */
+export type ContactSize = 'small' | 'medium' | 'large';
+
 /** Size class of hulls, mounts and modules. */
 export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
 
@@ -906,6 +909,20 @@ export interface Ship {
   fireGroup: number;
   /** Turrets fire on their own at the active lock only while this is true. Fixed guns ignore it. */
   weaponsHot: boolean;
+  /**
+   * Running dark: the Registry beacon is off (colours.ts), so others see
+   * this ship only as a radar contact until they lock and identify it.
+   * Absent: showing colours, the default. Read through `runsDark`.
+   */
+  dark?: true;
+  /**
+   * Set only in a pilot's view (view.ts), never in the world: this is a
+   * ship running dark that the pilot has not identified. Everything but
+   * where it is and how it moves is held back: `hullId` is empty, the
+   * fit, weapons, hold, owner and condition are blank. Draw and list it
+   * as a contact of this size.
+   */
+  contact?: ContactSize;
 }
 
 export interface Station {
@@ -1208,6 +1225,8 @@ export interface ShipInput {
   activateLock: string | null;
   /** Edge-triggered: switch weapons between hot and cold. */
   toggleWeaponsHot: boolean;
+  /** Edge-triggered: switch the Registry beacon, showing colours or running dark (colours.ts). Absent: no change. */
+  toggleColours?: boolean;
   /** Run the tractor beam to pull in nearby loot. */
   tractor: boolean;
   /** A command for this ship's drones (the drone manager), or null. */
@@ -1506,6 +1525,7 @@ export type WorldEvent =
   | { type: 'starterClaimed'; shipId: string; stationId: string }
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
   | { type: 'weaponsHotChanged'; shipId: string; hot: boolean }
+  | { type: 'coloursChanged'; shipId: string; dark: boolean }
   /** `shipId` started locking `targetId`. */
   | { type: 'lockStarted'; shipId: string; targetId: string }
   /** `shipId` completed its lock on `targetId`. */

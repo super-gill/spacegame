@@ -36,6 +36,7 @@ import {
   flightWarnings,
   shipStats,
   wrapAngle,
+  CONTACT_RADIUS,
   type Ship,
   type ShipInput,
   sub,
@@ -80,8 +81,12 @@ import {
   drawTractor,
   drawVelocityVector,
   drawWreck,
+  drawContact,
+  drawNavMarker,
   type ShipStyle,
 } from './render/draw.js';
+import { Plot, type NavTarget } from './hud/plot.js';
+import { arrivalSeconds, clockWords, closingSpeed, plotName, plotPosition } from './hud/plot-rows.js';
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { coverage, drawGunArcs } from './render/gun-arcs.js';
@@ -138,6 +143,7 @@ const input = new InputController(
     else if (action === 'toggleHeadingLock') toggleHeadingLock();
     else if (action === 'toggleDrones') dronePanel.toggle();
     else if (action === 'toggleHold') holdPanel.toggle();
+    else if (action === 'togglePlot') plot.toggle();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
     else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
@@ -155,8 +161,22 @@ const hudLayer = document.getElementById('hud-layer')!;
 // The connection meter (docs/shared-world.md): round trip to the server, in a corner.
 const meter = new ConnectionMeter(hudLayer);
 const flightHud = new FlightHud(hudLayer);
-// Windows (hud/windows.ts): the hold and the drone manager, with a launcher strip.
+// Windows (hud/windows.ts): the Plot, the hold and the drone manager, with a launcher strip.
 const windows = new WindowManager(hudLayer);
+/** The nav target (docs/interface.md, section 3): picked in the Plot, kept by this client alone. */
+let navTarget: NavTarget | null = null;
+const plot = new Plot(
+  windows.add('plot', 'Plot', 'P', { x: 16, y: 120 }),
+  (target) => {
+    // Clicking the nav target again clears it.
+    navTarget = navTarget?.id === target.id ? null : target;
+    plot.navTarget = navTarget;
+    const mine = myShip(current);
+    plot.update(current, mine, me.id, performance.now(), true);
+  },
+  (id) => lockOrActivate(id),
+);
+flightHud.onToggleColours = () => input.requestToggleColours();
 const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120 }), {
   jettison: (good) => input.requestJettison(good),
   setHopper: (drop) => input.requestHopperDrop(drop),
@@ -523,7 +543,7 @@ function clickTarget(point: { x: number; y: number }): void {
   for (const s of targetable(current, mine)) {
     const p = camera.worldToScreen(s.position);
     const d = Math.hypot(p.x - point.x, p.y - point.y);
-    const reach = (current.hulls[s.hullId]?.radius ?? 0) * camera.zoom + CLICK_SLOP_PX;
+    const reach = (s.contact ? CONTACT_RADIUS[s.contact] : (current.hulls[s.hullId]?.radius ?? 0)) * camera.zoom + CLICK_SLOP_PX;
     if (d <= reach && d < bestDist) {
       best = s;
       bestDist = d;
@@ -648,7 +668,7 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   for (const e of events) {
     if (e.type === 'destroyed') {
       const gone = before[e.shipId];
-      if (gone) explosions.push({ at: gone.position, radius: now.hulls[gone.hullId]?.radius ?? 20, startMs: nowMs });
+      if (gone) explosions.push({ at: gone.position, radius: gone.contact ? CONTACT_RADIUS[gone.contact] : (now.hulls[gone.hullId]?.radius ?? 20), startMs: nowMs });
     } else if (e.type === 'breached') {
       // The blast: as wide as it hurts.
       explosions.push({ at: e.position, radius: BLAST_RADIUS, startMs: nowMs });
@@ -762,6 +782,20 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
   return label === 'UNKNOWN' ? { colour: COLOUR.ink } : { colour: COLOUR.ink, label };
 }
 
+/** The nav marker: where the nav target is, how far, and when you get there at this closing speed. */
+function drawNavTarget(mine: Ship, target: NavTarget, alpha: number): void {
+  const now = plotPosition(current, target.kind, target.id);
+  if (!now) return;
+  const before = plotPosition(previous, target.kind, target.id);
+  const at = before ? { x: before.position.x + (now.position.x - before.position.x) * alpha, y: before.position.y + (now.position.y - before.position.y) * alpha } : now.position;
+  const dist = distance(mine.position, now.position);
+  const eta = arrivalSeconds(dist, closingSpeed(mine.position, mine.velocity, now.position, now.velocity));
+  const ship = target.kind === 'ship' || target.kind === 'drone' ? current.ships[target.id] : undefined;
+  const radius = target.kind === 'station' ? (current.stations[target.id]?.radius ?? 40) : target.kind === 'rock' ? (current.asteroids.find((a) => a.id === target.id)?.radius ?? 20) : ship ? (ship.contact ? CONTACT_RADIUS[ship.contact] : (current.hulls[ship.hullId]?.radius ?? 16)) : 8;
+  const label = `${plotName(current, target.kind, target.id, me.id).toUpperCase()} · ${Math.round(dist).toLocaleString('en-GB')} u · ${clockWords(eta)}`;
+  drawNavMarker(ctx!, camera, at, radius, label);
+}
+
 /** Labels are a setting, except on your own empty ships, which you need to find. */
 function labelShown(style: ShipStyle, ship: Ship): boolean {
   return settings.showLabels || (style.empty === true && ship.ownerId === me.id);
@@ -812,6 +846,12 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine) drawNav(ctx!, camera, bodiesAt(alpha)[0], mine, bodiesAt(alpha)[1]);
   // Every ship, flying or docked: a docked ship's position is its pad.
   for (const ship of Object.values(current.ships)) {
+    // Running dark and not identified: all you know is its size and how it moves.
+    if (ship.contact) {
+      const at = interpolate(ship, previous.ships[ship.id], alpha);
+      drawContact(ctx!, camera, at.position, at.heading, CONTACT_RADIUS[ship.contact], settings.showLabels ? `CONTACT · ${ship.contact.toUpperCase()}` : null);
+      continue;
+    }
     const hull = current.hulls[ship.hullId]!;
     const stats = shipStats(current, ship);
     const style = shipStyle(current, ship, mine);
@@ -899,7 +939,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
-    drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
+    drawTargetBracket(ctx!, camera, targetView.position, target.contact ? CONTACT_RADIUS[target.contact] : (current.hulls[target.hullId]?.radius ?? 16), mine.weaponsHot);
     const gun = Object.values(shipStats(current, mine).weapons).find((w) => isMainGun(w));
     if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
       drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
@@ -917,7 +957,14 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     shipMart.invalidate();
     yourShips.invalidate();
   }
+  // The nav target: lost when it leaves your view.
+  if (navTarget && !plotPosition(current, navTarget.kind, navTarget.id)) {
+    navTarget = null;
+    plot.navTarget = null;
+  }
+  if (mine && navTarget && mine.state === 'flying') drawNavTarget(mine, navTarget, alpha);
   ui.update(current, mine);
+  plot.update(current, mine, me.id, nowMs);
   dronePanel.update(current, mine);
   holdPanel.update(current, mine, me.id);
   flightHud.headingLock = settings.mouseSteering ? headingLocked : null;

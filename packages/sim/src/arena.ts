@@ -44,7 +44,8 @@ function fitLoadout(name: string): Loadout | null {
 /** A ship built for the arena: its fit, a hold full of ammunition for it, weapons hot. */
 function arenaShip(world: World, id: string, loadout: Loadout, ownerId: string | null, position: Vec2, heading: number): Ship {
   const ship = buildShip(world, { id, loadout, ownerId, position, heading, flightMode: 'assisted' });
-  return { ...ship, hold: ammunitionHold(world, loadout.hullId, ship.fit), weaponsHot: true };
+  // Enemies (no owner) run dark like the pirates they stand in for (colours.ts).
+  return { ...ship, hold: ammunitionHold(world, loadout.hullId, ship.fit), weaponsHot: true, ...(ownerId === null ? { dark: true as const } : {}) };
 }
 
 /** Ids of the enemy ships in a pilot's arena. */

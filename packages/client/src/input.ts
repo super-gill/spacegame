@@ -17,7 +17,7 @@ import { KEY_BINDINGS, SLOT_ACTIONS, SUPPRESS_DEFAULT, type Action, type UiActio
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'toggleHold', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'toggleHold', 'togglePlot', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {
@@ -115,6 +115,11 @@ export class InputController {
   }
 
   /** Drop an ore cache on the next tick, as J does. */
+  /** The colours chip was clicked: switch the Registry beacon on the next tick. */
+  requestToggleColours(): void {
+    this.latched.add('toggleColours');
+  }
+
   requestDropCache(): void {
     this.latched.add('dropCache');
   }
@@ -138,6 +143,7 @@ export class InputController {
       toggleDock: this.latched.has('toggleDock'),
       fireFixed: this.held.has('fireFixed') || this.mouseFire,
       toggleWeaponsHot: this.latched.has('toggleWeaponsHot'),
+      toggleColours: this.latched.has('toggleColours'),
       launchCountermeasure: this.latched.has('launchCountermeasure'),
       aimHeading: null, // mouse steering is added by main.ts, which knows the camera
       toggleModule: this.pendingToggle,

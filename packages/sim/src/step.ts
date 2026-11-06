@@ -172,6 +172,14 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       targeted = { ...targeted, weaponsHot: !targeted.weaponsHot };
       events.push({ type: 'weaponsHotChanged', shipId: id, hot: targeted.weaponsHot });
     }
+    // The Registry beacon: showing colours or running dark (colours.ts).
+    if (input.toggleColours) {
+      const next: Ship = { ...targeted };
+      if (next.dark) delete next.dark;
+      else next.dark = true;
+      targeted = next;
+      events.push({ type: 'coloursChanged', shipId: id, dark: targeted.dark === true });
+    }
     // Switching a module on or off from its tile (a tractor). A dispenser's
     // tile fires it instead: fireWeapons reads the same input.
     if (input.toggleModule) {

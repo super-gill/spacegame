@@ -7,6 +7,7 @@ import {
   WRECK_LIFETIME,
 } from './constants.js';
 import { freePadFor, onPad } from './docking.js';
+import { startsDark } from './colours.js';
 import { buildShip } from './factory.js';
 import { isEscapePod, lootClaim, pilotsAboard, tractorTakes } from './ownership.js';
 import { hopperRejects, tradeUpFor } from './mining.js';
@@ -357,6 +358,8 @@ function spawn(world: World, sp: Spawner): { world: World; spawner: Spawner } {
     flightMode: 'rotation', // NPC steering handles drift itself; see ai/steer.ts
     hold: sp.hold,
   });
+  // Pirates run dark from the moment they spawn (colours.ts).
+  if (startsDark(brain)) ship = { ...ship, dark: true };
   if (sp.dockedAt) {
     // Starts on a pad. With every fitting pad taken, try again shortly.
     const station = world.stations[sp.dockedAt];

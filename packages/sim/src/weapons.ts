@@ -180,7 +180,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // untouched. Munitions first, ships when weapons are hot (combat.ts).
   'ciws-m': {
     id: 'ciws-m',
-    name: 'CIWS M',
+    name: 'Swivel M',
     size: 'M',
     kind: 'turret',
     family: 'pointDefence',

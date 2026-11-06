@@ -569,3 +569,88 @@ export function drawLeadMarker(ctx: CanvasRenderingContext2D, camera: Camera, le
   ctx.arc(l.x, l.y, 1.5, 0, Math.PI * 2);
   ctx.fill();
 }
+
+/**
+ * A ship running dark that you have not identified (Ship.contact): a
+ * faint amber ring the size of its class, with a short tick for its
+ * heading. Its hull is drawn only once your lock identifies it.
+ */
+export function drawContact(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, heading: number, radius: number, label: string | null): void {
+  const c = camera.worldToScreen(at);
+  const r = Math.max(4, radius * camera.zoom);
+  ctx.save();
+  ctx.strokeStyle = COLOUR.warn;
+  ctx.globalAlpha = 0.75;
+  ctx.lineWidth = 1.2;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(c.x + Math.cos(heading) * r, c.y + Math.sin(heading) * r);
+  ctx.lineTo(c.x + Math.cos(heading) * (r + 6), c.y + Math.sin(heading) * (r + 6));
+  ctx.stroke();
+  if (label) {
+    ctx.fillStyle = COLOUR.warn;
+    ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, c.x, c.y + r + 16);
+  }
+  ctx.restore();
+}
+
+/** How far in from the screen edge the nav marker sits, px. */
+const NAV_EDGE = 36;
+
+/**
+ * The nav target (docs/interface.md, section 3): on screen, a small
+ * chevron over it; off screen, a chevron at the edge pointing its way.
+ * Either way with what it is, its distance and when you get there.
+ */
+export function drawNavMarker(ctx: CanvasRenderingContext2D, camera: Camera, at: { x: number; y: number }, radius: number, label: string): void {
+  const p = camera.worldToScreen(at);
+  const w = camera.viewportWidth;
+  const h = camera.viewportHeight;
+  const onScreen = p.x >= NAV_EDGE && p.x <= w - NAV_EDGE && p.y >= NAV_EDGE && p.y <= h - NAV_EDGE;
+  ctx.save();
+  ctx.strokeStyle = COLOUR.inkBright;
+  ctx.fillStyle = COLOUR.inkBright;
+  ctx.lineWidth = 1.5;
+  ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+  if (onScreen) {
+    const top = p.y - radius * camera.zoom - 14;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 6, top - 6);
+    ctx.lineTo(p.x, top);
+    ctx.lineTo(p.x + 6, top - 6);
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillText(label, p.x, top - 11);
+  } else {
+    // Where the line from the centre to the target leaves the inset screen.
+    const cx = w / 2;
+    const cy = h / 2;
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    const scale = Math.min(Math.abs((cx - NAV_EDGE) / (dx || 1e-9)), Math.abs((cy - NAV_EDGE) / (dy || 1e-9)));
+    const ex = cx + dx * scale;
+    const ey = cy + dy * scale;
+    const angle = Math.atan2(dy, dx);
+    ctx.translate(ex, ey);
+    ctx.save();
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(-4, -7);
+    ctx.lineTo(4, 0);
+    ctx.lineTo(-4, 7);
+    ctx.stroke();
+    ctx.restore();
+    // The words sit on the screen side of the chevron.
+    ctx.textAlign = ex > cx ? 'right' : 'left';
+    const tx = ex > cx ? -12 : 12;
+    const ty = ey > cy ? -10 : 18;
+    ctx.fillText(label, tx, ty);
+  }
+  ctx.restore();
+}

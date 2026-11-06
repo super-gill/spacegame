@@ -67,6 +67,15 @@ Choices for Jason to judge: collision warnings are for rocks and stations only (
 
 **The nav target:** a marker at the edge of the screen with distance and arrival time.
 
+**Built** (6 November 2026, Lead 7; Jason reviews in play):
+
+- **Colours** (`sim/src/colours.ts`): `Ship.dark` (absent: showing colours), input `toggleColours` (K, or click the chip), event `coloursChanged`. Pirates and arena enemies spawn dark; save version 16 puts those already in a save dark. A drone shows its mother's colours. Whether running dark is a crime waits for law (7).
+- **The view** (`view.ts`): a dark ship you have not identified arrives as a contact (`Ship.contact`: small, medium or large) with only its motion; see shared-world.md, "As built". Jason chose a plain contact on screen too (6 November): a dashed amber ring the size of its class with a heading tick, labelled `CONTACT · SMALL` when labels are on; the hull appears once your lock completes. Sizes follow the game's own "medium hulls and up": cutters, sloops, drones and pods small; brigs, the Manifest and the Collier medium; frigates and bigger large.
+- **The Plot** (`hud/plot.ts`, rows in `hud/plot-rows.ts` with tests): as the mockup, a window (P) on the left under the launcher. Tabs and columns are data (`PLOT_PRESETS`, `PLOT_COLUMNS`) ready for saved layouts; the tab and sort are remembered. Rows are updated in place four times a second so a row does not jump from under the pointer. Rocks are those within radar range, nearest 40. A cache is one row however many canisters it has. Right-click acts as on screen: lock, or make a held lock active. Clicking the nav target's row again clears it.
+- **The nav target:** chosen in the Plot, kept by the client (the sim has no nav target). On screen, a chevron over it with name, distance and arrival time; off screen, a chevron at the edge pointing its way with the same words. It is dropped when it leaves your view.
+- **The colours chip:** COLOURS, or DARK in amber, after credits and cargo on the status lines; click to switch.
+- Known gaps for Jason to judge: the caution `PIRATE HUNTING YOU` read the pirate's brain, which is no longer sent for a dark pirate, so it now comes only once you have locked it (`BEING LOCKED` still warns); shots from an unidentified ship are drawn neutral, not red.
+
 **Lock cards and the selection window** (Jason: wants to see it in game before deciding): lock cards stay small and glanceable (who, condition, whether your guns bear). A selection window shows whatever you have clicked in the Plot or on screen, locked or not: everything your sensors and computer give you, and actions (lock, set nav target, dock at a station). A fuller "show info" page later.
 
 ## 4. The aim reticle

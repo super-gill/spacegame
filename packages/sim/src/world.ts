@@ -35,6 +35,7 @@ export function emptyInput(): ShipInput {
     unlock: null,
     activateLock: null,
     toggleWeaponsHot: false,
+    toggleColours: false,
     tractor: false,
     dropCache: false,
   };

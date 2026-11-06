@@ -1531,3 +1531,210 @@ button:hover {
   letter-spacing: 0.1em;
   color: var(--ink-bright);
 }
+
+/* The colours chip on the status lines (docs/interface.md, section 3): COLOURS, or DARK in amber. */
+.hud-wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-colours {
+  pointer-events: auto;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  color: var(--ink-dim);
+  background: transparent;
+  border: 1px solid var(--faint);
+  padding: 0 6px;
+}
+
+.hud-colours:hover,
+.hud-colours:focus-visible {
+  color: var(--ink-bright);
+  border-color: var(--ink-dim);
+}
+
+.hud-colours.dark {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+
+/* The Plot (hud/plot.ts): a wider window, a list that scrolls under fixed heads. */
+.hud-window.hud-plot-window {
+  width: 480px;
+  height: 470px;
+  max-height: calc(100vh - 340px);
+  min-height: 220px;
+}
+
+.hud-window-body.hud-plot-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hud-plot-summary {
+  padding: 4px 12px 0 12px;
+  font-size: 10px;
+}
+
+.hud-plot-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 12px 0 12px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.hud-plot-tab {
+  font: inherit;
+  cursor: pointer;
+  padding: 3px 10px;
+  margin-bottom: -1px;
+  color: var(--ink-dim);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.hud-plot-tab.active {
+  color: var(--ink-bright);
+  background: rgba(5, 10, 12, 1);
+  border-color: var(--faint);
+  border-bottom-color: rgba(5, 10, 12, 1);
+}
+
+.hud-plot-tab:hover,
+.hud-plot-head:hover {
+  color: var(--ink-bright);
+}
+
+.hud-plot-heads {
+  display: grid;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.hud-plot-head {
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  color: var(--ink-dim);
+  background: transparent;
+  border: none;
+}
+
+.hud-plot-head.right,
+.hud-plot-cell.right {
+  text-align: right;
+}
+
+.hud-plot-head.active {
+  color: var(--ink-bright);
+}
+
+.hud-plot-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-plot-empty {
+  padding: 8px 12px;
+}
+
+.hud-plot-row {
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 12px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(31, 53, 50, 0.5);
+}
+
+.hud-plot-row:hover {
+  background: rgba(159, 211, 199, 0.06);
+}
+
+.hud-plot-row:focus-visible,
+.hud-plot-tab:focus-visible,
+.hud-plot-head:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: -1px;
+}
+
+.hud-plot-row.selected {
+  background: rgba(159, 211, 199, 0.1);
+  border-left-color: var(--ink-bright);
+}
+
+.hud-plot-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud-plot-cell.dist {
+  color: var(--ink-bright);
+}
+
+.hud-plot-cell.type {
+  color: var(--ink-dim);
+}
+
+/* Names by side: hostile red, the Watch white, others neutral blue, stations bright, yours ink, unknown amber. */
+.hud-plot-row[data-side='hostile'] .name {
+  color: var(--hostile);
+  font-weight: 600;
+}
+.hud-plot-row[data-side='watch'] .name {
+  color: var(--watch);
+}
+.hud-plot-row[data-side='neutral'] .name {
+  color: var(--neutral);
+}
+.hud-plot-row[data-side='station'] .name {
+  color: var(--ink-bright);
+}
+.hud-plot-row[data-side='unknown'] .name {
+  color: var(--warn);
+}
+
+.hud-plot-row[data-lock='dark'] .lock {
+  color: var(--warn);
+}
+.hud-plot-row[data-lock='active'] .lock {
+  color: var(--ink-bright);
+}
+.hud-plot-row[data-lock='locking'] .lock {
+  opacity: 0.7;
+}
+
+.hud-plot-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 12px;
+  border-top: 1px solid var(--faint);
+  font-size: 10px;
+}
+
+.hud-plot-nav {
+  color: var(--ink-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

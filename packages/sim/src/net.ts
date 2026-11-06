@@ -13,7 +13,8 @@ import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
  */
 
 /** Bumped when the messages change in a way an older client cannot follow. */
-export const PROTOCOL_VERSION = 1;
+/** 2 (0.17): ships running dark arrive as contacts with no hull (`Ship.contact`). */
+export const PROTOCOL_VERSION = 2;
 
 /** The longest character name, in characters. */
 export const MAX_NAME_LENGTH = 24;
@@ -192,7 +193,7 @@ export function readInput(value: unknown): ShipInput | null {
   const v = value as Record<string, unknown>;
   const flag = (k: string): boolean | undefined => (typeof v[k] === 'boolean' ? (v[k] as boolean) : v[k] === undefined ? false : undefined);
   const id = (k: string): string | null | undefined => (v[k] === null || v[k] === undefined ? null : typeof v[k] === 'string' && (v[k] as string).length <= 64 ? (v[k] as string) : undefined);
-  const flags = ['turnLeft', 'turnRight', 'thrustForward', 'thrustReverse', 'strafeLeft', 'strafeRight', 'brake', 'toggleDock', 'cycleFlightMode', 'fireFixed', 'launchCountermeasure', 'afterburner', 'toggleWeaponsHot', 'tractor', 'dropCache'] as const;
+  const flags = ['turnLeft', 'turnRight', 'thrustForward', 'thrustReverse', 'strafeLeft', 'strafeRight', 'brake', 'toggleDock', 'cycleFlightMode', 'fireFixed', 'launchCountermeasure', 'afterburner', 'toggleWeaponsHot', 'toggleColours', 'tractor', 'dropCache'] as const;
   const ids = ['toggleModule', 'lock', 'unlock', 'activateLock', 'jettison'] as const;
   const out: Record<string, unknown> = {};
   for (const k of flags) {

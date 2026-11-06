@@ -587,12 +587,12 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'railgun-l',
   },
-  // Close-in weapon system: Paragon's, on `ciws` hardpoints (medium hulls
-  // and up). Working name until the lore chat names it. Fire control
+  // Close-in weapon system, a "swivel" in the setting (lore.md, "Swivels"):
+  // Paragon's, on `ciws` hardpoints (medium hulls and up). Fire control
   // (the Gunlayers) sets how many a ship can run.
   'paragon-ciws-m': {
     id: 'paragon-ciws-m',
-    name: 'Paragon CIWS M',
+    name: 'Paragon Sentry M',
     kind: 'weapon',
     size: 'M',
     mounts: ['ciws'],

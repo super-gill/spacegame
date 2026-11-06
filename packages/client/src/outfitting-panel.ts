@@ -80,7 +80,7 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   flight: 'Flight computer',
   podBay: 'Pod bay',
   fireControl: 'Fire control',
-  ciws: 'CIWS',
+  ciws: 'Swivel',
 };
 
 /** Table order: core systems first (as the hull lists them), then high, mid and low slots. */
@@ -171,7 +171,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   if (s.flightControl) parts.push(`flight control ${Math.round(s.flightControl * 100)}%: mouse steering and assist`);
-  if (s.turretControl) parts.push(`directs ${s.turretControl} CIWS, tracking ${fixed1(s.turretTracking ?? 1)}x`);
+  if (s.turretControl) parts.push(`directs ${s.turretControl} swivel${s.turretControl === 1 ? '' : 's'}, tracking ${fixed1(s.turretTracking ?? 1)}x`);
   if (s.escapePod) parts.push('an escape pod: without one, losing the ship leaves you with nothing');
   if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
   if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
@@ -252,7 +252,7 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Cap drain', value: (s) => s.capacitorDraw, format: (n) => `${fixed1(n)}/s`, better: 'lower' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
   { label: 'Gun dps', value: (s) => dps(s, true), format: fixed1, better: 'higher' },
-  { label: 'CIWS dps', value: (s) => dps(s, false), format: fixed1, better: 'higher' },
+  { label: 'Swivel dps', value: (s) => dps(s, false), format: fixed1, better: 'higher' },
 ];
 
 /**
@@ -706,7 +706,7 @@ export class OutfittingPanel {
     head.append(el('div', 'fit-picker-title', `${mount.id.toUpperCase()} · ${MOUNT_TYPE_NAME[mount.type].toUpperCase()} ${mount.size}`));
     const detail =
       mount.type === 'ciws'
-        ? `Close-in weapon system hardpoint: arc ${Math.round((mount.arc ?? Math.PI * 2) * DEG)}°, facing ${facingWord(mount.facing)}. Takes a CIWS up to ${mount.size}.`
+        ? `Swivel hardpoint (close-in weapon system): arc ${Math.round((mount.arc ?? Math.PI * 2) * DEG)}°, facing ${facingWord(mount.facing)}. Takes a swivel up to ${mount.size}.`
         : tier === 'core'
         ? `Core system: one ${MOUNT_TYPE_NAME[mount.type].toLowerCase()}, up to ${mount.size}.`
         : tier === 'high'
