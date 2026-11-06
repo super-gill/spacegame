@@ -13,10 +13,13 @@ export interface Settings {
    * A and D spin the ship. On by default since 4 November 2026.
    */
   mouseSteering: boolean;
+  /** Warning sounds (hud/tones.ts): volume 0 to 1, and off altogether. */
+  soundVolume: number;
+  soundMuted: boolean;
 }
 
 const KEY = 'spacegame.settings';
-const DEFAULTS: Settings = { showLabels: true, mouseSteering: true };
+const DEFAULTS: Settings = { showLabels: true, mouseSteering: true, soundVolume: 0.5, soundMuted: false };
 
 export function loadSettings(): Settings {
   try {
@@ -26,6 +29,8 @@ export function loadSettings(): Settings {
       return {
         showLabels: typeof s.showLabels === 'boolean' ? s.showLabels : DEFAULTS.showLabels,
         mouseSteering: typeof s.mouseSteering === 'boolean' ? s.mouseSteering : DEFAULTS.mouseSteering,
+        soundVolume: typeof s.soundVolume === 'number' && s.soundVolume >= 0 && s.soundVolume <= 1 ? s.soundVolume : DEFAULTS.soundVolume,
+        soundMuted: typeof s.soundMuted === 'boolean' ? s.soundMuted : DEFAULTS.soundMuted,
       };
     }
   } catch {

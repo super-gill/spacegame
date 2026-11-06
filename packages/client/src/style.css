@@ -493,6 +493,27 @@ button:hover {
   color: var(--ink-dim);
 }
 
+.controls-panel .sound input[type='range'] {
+  accent-color: var(--ink);
+  vertical-align: middle;
+}
+
+.controls-panel .sound-try {
+  font: inherit;
+  margin-right: 6px;
+  padding: 1px 8px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink-dim);
+  cursor: pointer;
+}
+
+.controls-panel .sound-try:hover,
+.controls-panel .sound-try:focus-visible {
+  color: var(--ink-bright);
+  border-color: var(--ink);
+}
+
 .controls-panel table {
   width: 100%;
   border-collapse: collapse;
@@ -590,17 +611,73 @@ button:hover {
   color: var(--warn);
 }
 
-.hud-alert {
+/* The warning banner (hud/warnings.ts): one line per condition, highest tier first. */
+.hud-warnings {
   position: absolute;
   left: 50%;
   top: 14px;
   transform: translateX(-50%);
-  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.hud-warnings.silenceable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hud-warning {
+  padding: 4px 14px;
   border: 1px solid var(--warn);
   background: var(--panel);
   color: var(--warn);
   font-weight: 600;
   white-space: nowrap;
+}
+
+.hud-warning.alarm {
+  border-color: var(--alarm);
+  color: var(--alarm);
+  background: rgba(255, 92, 92, 0.12);
+  animation: hud-alarm-pulse 0.8s steps(2, jump-none) infinite;
+}
+
+.hud-warning.warning {
+  border-color: var(--hostile);
+  color: var(--hostile);
+}
+
+.hud-warning.advisory {
+  border-color: var(--ink-dim);
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.hud-warning.more,
+.hud-warning.hint {
+  border-color: transparent;
+  background: none;
+  color: var(--ink-dim);
+  font-weight: 400;
+  padding: 0 14px;
+}
+
+@keyframes hud-alarm-pulse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-warning.alarm {
+    animation: none;
+  }
 }
 
 .hud-prompt {

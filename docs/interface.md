@@ -37,6 +37,17 @@ Draft events (to settle while building; thresholds are working numbers):
 | Caution | pirate hunting you; shields under 25%; collision ahead within a few seconds; capacitor empty (afterburner and shields stop); afterburner cut out; too heavy to manoeuvre well; a gun out of ammunition; hold or ore hopper full; a drone lost; gravity tiers when gravity is on |
 | Advisory | your lock complete; docking refused; drones launched or home; survey done; target destroyed |
 
+**Built** (6 November 2026; Jason reviews in play). The banner shows what holds now; things that just happened keep their toasts and only add a sound, so the banner never fills with stale news. `hud/warnings.ts` (the rules, from the client's own view), `hud/warning-sounds.ts` (when to sound), `hud/tones.ts` (the tones). Volume, sounds off and a button to hear each tier in the Controls panel (F1). A condition sounds when it starts or rises a tier; warnings repeat every 3 seconds; alarms every second until they clear or you click the banner to silence them. At most three lines show, then a count.
+
+| Tier | Banner (while it holds) | Sound only (the toast says it) |
+| --- | --- | --- |
+| Alarm | `MISSILE IMPACT` or `TORPEDO IMPACT` (under 2 s); `HULL CRITICAL` (under 25%); `COLLISION · ROCK` or `STATION` (under 1.5 s); gravity `CANNOT ESCAPE` | |
+| Warning | `MISSILE INBOUND ×n · distance`; `SHIELDS DOWN`; `HULL LOW` (under 50%); `BEING LOCKED` or `TARGET LOCK ON YOU ×n`; collision under 3 s; gravity `CLIMB NOW` | |
+| Caution | `PIRATE HUNTING YOU`; `SHIELDS LOW` (under 25%); collision under 6 s; `CAPACITOR EMPTY`; `HOLD FULL` while the tractor is on; gravity pulling hard | a drone lost; a gun out of ammunition |
+| Advisory | gravity well | your lock complete; target destroyed; drones launched or home; survey done; docking refused |
+
+Choices for Jason to judge: collision warnings are for rocks and stations only (against ships a straight-line forecast fires on every attack run, seen in the arena); slow bumps (under the harmless impact speed) never warn, so docking is quiet; "too heavy to manoeuvre" is not built, since it needs a definition (how much slower than empty counts); an afterburner that cuts out is covered by `CAPACITOR EMPTY`. The missile line drawn on the canvas and the "hold full" toast are gone: the banner says both.
+
 ## 3. The Plot, the nav target and the selection window
 
 **The Plot** (named by the lore, `lore.md`, "The Plot") is a sortable, filterable list of what is around you, the job EVE's overview does. Decisions (Jason, 6 November 2026):

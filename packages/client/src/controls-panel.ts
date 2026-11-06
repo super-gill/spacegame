@@ -1,5 +1,6 @@
 import { FLIGHT_MODES, FLIGHT_MODE_LABELS, type FlightMode } from '@spacegame/sim';
 import { KEY_BINDINGS, POINTER_CONTROLS, isMouseCode, keyName } from './bindings.js';
+import type { Tier } from './hud/warnings.js';
 
 /**
  * Developer controls panel: the steering choice (mouse or keys), then
@@ -75,6 +76,42 @@ export class ControlsPanel {
       return radio;
     });
     this.panel.querySelector('.controls-header')!.after(box);
+  }
+
+  /**
+   * The warning sounds' volume and an off switch, below the steering
+   * choice, with a button per tier to hear them. `change` saves the
+   * setting; `hear` plays a tier's sound.
+   */
+  offerSound(volume: number, muted: boolean, change: (volume: number, muted: boolean) => void, hear: (tier: Tier) => void): void {
+    const box = el('fieldset', 'steering sound');
+    box.append(el('legend', undefined, 'Warning sounds'));
+    const slider = el('input');
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '100';
+    slider.value = String(Math.round(volume * 100));
+    slider.setAttribute('aria-label', 'Warning volume');
+    const off = el('input');
+    off.type = 'checkbox';
+    off.checked = muted;
+    const save = () => change(Number(slider.value) / 100, off.checked);
+    slider.addEventListener('input', save);
+    off.addEventListener('change', save);
+    const volumeRow = el('label', 'steering-choice');
+    volumeRow.append(el('strong', undefined, 'Volume '), slider);
+    const offRow = el('label', 'steering-choice');
+    offRow.append(off, el('strong', undefined, ' Sounds off'));
+    const tryRow = el('div', 'steering-choice');
+    tryRow.append(el('span', 'note', 'Hear: '));
+    for (const tier of ['advisory', 'caution', 'warning', 'alarm'] as const) {
+      const b = el('button', 'sound-try', tier);
+      b.type = 'button';
+      b.addEventListener('click', () => hear(tier));
+      tryRow.append(b);
+    }
+    box.append(volumeRow, offRow, tryRow);
+    (this.panel.querySelector('.steering:not(.sound)') ?? this.panel.querySelector('.controls-header')!).after(box);
   }
 
   /** Show the steering scheme chosen elsewhere (the menu). */

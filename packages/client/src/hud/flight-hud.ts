@@ -26,6 +26,7 @@ import {
 import { boardPrompt, shipName } from '../ui.js';
 import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, reloadProgress } from './geometry.js';
+import type { Condition } from './warnings.js';
 
 /**
  * The flight HUD: the always-on instruments at the screen edges.
@@ -56,6 +57,8 @@ const CAP_R = 54;
 /** Hull below these fractions turns to the caution, then the alarm colour. */
 const HULL_CAUTION = 0.5;
 const HULL_ALARM = 0.25;
+/** The warning banner shows this many lines; the rest are counted. */
+const WARNING_LINES = 3;
 
 const NONE = '-';
 
@@ -80,7 +83,9 @@ export class FlightHud {
   private readonly shipLine = el('div', 'hud-ship');
   private readonly zoneLine = el('div', 'hud-dim');
   private readonly walletLine = el('div', 'hud-dim');
-  private readonly alert = el('div', 'hud-alert caution hidden');
+  /** The warning banner (hud/warnings.ts): what holds now, highest tier first. Click to silence alarms. */
+  private readonly alert = el('div', 'hud-warnings hidden');
+  private warningKey = '';
   private readonly cluster = el('div', 'hud-cluster');
   private readonly prompt = el('div', 'hud-prompt');
   private readonly shieldArc = svg('path', { class: 'ring shield' });
@@ -145,6 +150,25 @@ export class FlightHud {
   }
 
   /**
+   * The warning banner: the conditions holding now (already sorted,
+   * highest tier first), at most `WARNING_LINES` lines and a count of the
+   * rest. `silenceable` adds a hint that a click silences the alarm;
+   * `onSilence` is called on that click.
+   */
+  setWarnings(list: readonly Condition[], silenceable: boolean, onSilence: () => void): void {
+    const key = list.map((c) => `${c.tier}|${c.text}`).join('/') + (silenceable ? '/s' : '');
+    if (key === this.warningKey) return;
+    this.warningKey = key;
+    show(this.alert, list.length > 0);
+    this.alert.onclick = silenceable ? onSilence : null;
+    this.alert.classList.toggle('silenceable', silenceable);
+    const rows = list.slice(0, WARNING_LINES).map((c) => el('div', `hud-warning ${c.tier}`, `${c.tier.toUpperCase()} · ${c.text}`));
+    if (list.length > WARNING_LINES) rows.push(el('div', 'hud-warning more', `+${list.length - WARNING_LINES} MORE`));
+    if (silenceable) rows.push(el('div', 'hud-warning hint', 'CLICK TO SILENCE THE ALARM'));
+    this.alert.replaceChildren(...rows);
+  }
+
+  /**
    * Refresh. `ship` is null while the pilot has no ship. `nav` is the
    * ship's `navReadout` (null without a nav computer): speed and frame
    * are shown only through it, never worked out here.
@@ -154,7 +178,6 @@ export class FlightHud {
     show(this.status, ship !== null);
     show(this.cluster, ship !== null && ship.state === 'flying');
     if (!ship) {
-      show(this.alert, false);
       setText(this.prompt, '');
       return;
     }
@@ -173,11 +196,6 @@ export class FlightHud {
     const secure = Object.values(world.stations).find((s) => distance(ship.position, s.position) < s.securityRadius);
     setText(this.zoneLine, secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE');
     setText(this.walletLine, `CR ${(pilot?.credits ?? 0).toLocaleString('en-GB')} · CARGO ${cargoUsed(ship)}/${holdCapacity(stats)}`);
-
-    // Top centre: until warning tiers land, the one warning there is.
-    const hunted = Object.values(world.npcs).some((b) => b.kind === 'pirate' && b.mode === 'hunt' && b.targetId === ship.id);
-    show(this.alert, hunted);
-    setText(this.alert, 'CAUTION · PIRATE HUNTING YOU');
 
     // Above the dial: what you can do now.
     const near = ship.state === 'flying' ? nearestDockableStation(ship, world.stations) : null;

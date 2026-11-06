@@ -154,7 +154,7 @@ The flight HUD sits at the screen edges and leaves the middle clear. Clicks go t
 
 **Top left:** the ship you are in (`ESCAPE POD · DOCK AT A STATION` in a pod, or `· BOARD YOUR SHIP [B]` when one of yours is in reach), the security zone or `OPEN SPACE`, then your credits and cargo space used.
 
-**Top centre:** the warning in force. Today that is `CAUTION · PIRATE HUNTING YOU`; warnings in tiers, with sounds, are coming.
+**Top centre:** the warnings holding now, one line each, highest tier first: alarm (red, pulsing), warning (red), caution (amber), advisory. Each sounds when it starts; warnings repeat every 3 seconds, alarms every second until they clear. Click the banner to silence an alarm. Things that just happened (a drone lost, a lock complete) sound and show as a toast instead. Volume and an off switch are in the Controls panel (F1). The full list is in `docs/interface.md`.
 
 **Bottom centre, in flight** (hidden while docked):
 

@@ -17,7 +17,6 @@ import {
   distance,
   type TradeRefusal,
   leadPoint,
-  incomingMunitions,
   isMainGun,
   gunBearing,
   lockReadout,
@@ -86,6 +85,9 @@ import {
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
 import { coverage, drawGunArcs } from './render/gun-arcs.js';
+import { conditions, eventSounds, type Tier } from './hud/warnings.js';
+import { WarningSounds } from './hud/warning-sounds.js';
+import { Tones } from './hud/tones.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { FlightHud } from './hud/flight-hud.js';
 import { Radar } from './hud/radar.js';
@@ -189,6 +191,26 @@ function setMouseSteering(on: boolean): void {
   menu.setMouseSteering(on);
 }
 controlsPanel.offerSteering(settings.mouseSteering, setMouseSteering);
+
+// Warning sounds (docs/interface.md, "Audible warnings").
+const tones = new Tones();
+tones.setVolume(settings.soundVolume);
+tones.setMuted(settings.soundMuted);
+const warningSounds = new WarningSounds();
+/** Event sounds that came in with updates since the last frame. */
+let pendingSounds: Tier[] = [];
+controlsPanel.offerSound(
+  settings.soundVolume,
+  settings.soundMuted,
+  (volume, muted) => {
+    settings.soundVolume = volume;
+    settings.soundMuted = muted;
+    tones.setVolume(volume);
+    tones.setMuted(muted);
+    saveSettings(settings);
+  },
+  (tier) => tones.play(tier),
+);
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
@@ -539,8 +561,6 @@ interface Explosion {
 const EXPLOSION_MS = 700;
 const WRECK_FADE_SECONDS = 10;
 let explosions: Explosion[] = [];
-/** Whether the hold was full last frame, so "hold full" is said once. */
-let wasHoldFull = false;
 
 function resize(): void {
   const dpr = window.devicePixelRatio || 1;
@@ -644,6 +664,7 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   const ship = myShip(now) ?? myShip(last);
   if (ship) {
     ui.handleEvents(events, ship.id);
+    pendingSounds.push(...eventSounds(events, ship.id, now));
     // Undocking in a ship that cannot fly is allowed, but never silent.
     if (events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
       for (const w of flightWarnings(shipStats(now, ship))) {
@@ -786,8 +807,6 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const pulled = holdFull ? [] : current.loot.filter((l) => !(l.ejectedBy === mine.id && (hopperRejects(mine).includes(l.item) || (l.jettisoned && mine.tractorMode !== 'all'))) && tractorTakes(mine, claim, l));
     drawTractor(ctx!, camera, view.position, shipStats(current, mine).tractorRange, pulled);
   }
-  if (mine?.tractorActive && holdFull && !wasHoldFull) ui.notify('Hold full: the tractor has nowhere to put anything.', 'warn');
-  wasHoldFull = holdFull;
 
   if (mine && view) drawVelocityVector(ctx!, camera, mine, view);
   if (mine) drawNav(ctx!, camera, bodiesAt(alpha)[0], mine, bodiesAt(alpha)[1]);
@@ -849,21 +868,6 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const colour = ours ? COLOUR.inkBright : coming ? COLOUR.hostile : COLOUR.neutral;
     drawMunition(ctx!, camera, ours ? led(m) : m, current.goods[m.goodId]?.munition?.class === 'torpedo', colour);
   }
-  // Stopgap (lead, 6e part 2): a warning while something is homing on you.
-  // The interface workstream's munition warnings replace it.
-  const inbound = mine ? incomingMunitions(current.munitions, mine.id) : [];
-  if (mine && inbound.length > 0) {
-    const nearest = Math.min(...inbound.map((m) => distance(m.position, mine.position)));
-    const kind = inbound.some((m) => m.guidance === 'heat') ? (inbound.some((m) => m.guidance === 'radar') ? 'RADAR + HEAT' : 'HEAT') : 'RADAR';
-    ctx!.save();
-    ctx!.fillStyle = COLOUR.hostile;
-    ctx!.globalAlpha = 0.65 + 0.35 * Math.sin(nowMs / 90);
-    ctx!.font = '13px ui-monospace, monospace';
-    ctx!.textAlign = 'center';
-    ctx!.fillText(`MISSILE INBOUND ×${inbound.length} · ${kind} · ${Math.round(nearest)} u · C COUNTERMEASURE`, camera.viewportWidth / 2, 64);
-    ctx!.restore();
-  }
-
   explosions = explosions.filter((x) => nowMs - x.startMs < EXPLOSION_MS);
   for (const x of explosions) drawExplosion(ctx!, camera, x.at, x.radius, (nowMs - x.startMs) / EXPLOSION_MS);
 
@@ -917,7 +921,13 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   dronePanel.update(current, mine);
   holdPanel.update(current, mine, me.id);
   flightHud.headingLock = settings.mouseSteering ? headingLocked : null;
-  flightHud.update(current, mine, mine ? navReadout(current, mine) : null, fpsSmoothed);
+  const nav = mine ? navReadout(current, mine) : null;
+  flightHud.update(current, mine, nav, fpsSmoothed);
+  // Warnings: the banner shows what holds now; sounds start, repeat or stay quiet (hud/warning-sounds.ts).
+  const holding = mine ? conditions(current, mine, shipStats(current, mine), nav) : [];
+  for (const tier of warningSounds.update(nowMs / 1000, holding, pendingSounds)) tones.play(tier);
+  pendingSounds = [];
+  flightHud.setWarnings(holding, warningSounds.alarmSounding(), () => warningSounds.silence());
   targetCard.update(current, mine);
   radar.update(current, mine, me.id, camera, eye);
 }
