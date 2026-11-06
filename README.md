@@ -30,7 +30,7 @@ Open http://localhost:8080 and make a character (the first one on a new server i
 | Strafe | A / D |
 | Brake | X |
 | Target a ship | Left click it, or Tab to cycle; Esc clears |
-| Fire fixed guns | Space |
+| Fire guns (turrets fire at your lock when they bear) | Space |
 | Weapons hot / cold (turrets engage target) | H |
 | Tractor beam | R |
 | Cycle flight mode | Z |

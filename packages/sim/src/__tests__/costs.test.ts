@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   AFTERBURNER_SIGNATURE_BLOOM,
   KIT_SIGNATURE,
-  MAIN_TURRET_DAMAGE,
-  MAIN_TURRET_SLEW,
   SHOT_SPEED_FALLOFF,
   TURRET_SLEW_FALLOFF,
 } from '../constants.js';
@@ -13,7 +11,7 @@ import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
 import { MODULES } from '../modules.js';
 import { REFERENCE_FITS } from '../reference-fits.js';
-import { migrate12to13 } from '../save.js';
+import { migrate12to13, migrate13to14 } from '../save.js';
 import { fitStats, moduleSignature, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, World } from '../types.js';
@@ -24,7 +22,8 @@ import { TEST_CATALOGUES } from './fixtures.js';
 /**
  * Fitting step 4, the costs (docs/fitting.md, "As built: step 4"). No
  * damage is cut by rule: big guns miss small ships because big turrets
- * slew slowly, big shots fly slowly and fixed guns need the hull to turn.
+ * slew slowly and big shots fly slowly. The turret model's own tests are
+ * in turrets.test.ts.
  */
 
 describe('physics, not damage cuts', () => {
@@ -38,42 +37,6 @@ describe('physics, not damage cuts', () => {
     const pdc = Object.values(WEAPONS).filter((w) => w.family === 'pointDefence');
     expect(pdc.map((w) => w.size)).toEqual(['S']);
     for (const m of Object.values(MODULES)) if (m.weaponId && WEAPONS[m.weaponId]?.family === 'pointDefence') expect(m.size).toBe('S');
-  });
-
-  it('every medium and large main gun also comes turreted: softer, and slow to slew', () => {
-    for (const prefix of ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun']) {
-      for (const [size, step] of [['m', 1], ['l', 2]] as const) {
-        const fixed = WEAPONS[`${prefix}-${size}`]!;
-        const turret = WEAPONS[`${prefix}-turret-${size}`]!;
-        expect(turret.kind).toBe('turret');
-        expect(turret.family).toBe(fixed.family);
-        expect(turret.damage).toBeCloseTo(fixed.damage * MAIN_TURRET_DAMAGE);
-        expect(turret.turretTurnRate).toBeCloseTo(MAIN_TURRET_SLEW / TURRET_SLEW_FALLOFF ** step);
-        expect(turret.turretTurnRate).toBeLessThan(WEAPONS['swivel-s']!.turretTurnRate);
-        expect(Object.values(MODULES).some((m) => m.weaponId === turret.id)).toBe(true);
-      }
-    }
-  });
-
-  it('a turreted main gun fires at its lock off the nose, but only on the trigger', () => {
-    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [] };
-    const at = { x: 0, y: -40000 };
-    const loadout = { ...LOADOUTS['union-frigate']!, fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-picket-l-turret', w2: 'union-picket-l-turret' } };
-    // Facing away from the target, so a fixed gun could not bear.
-    let frigate: Ship = buildShip(base, { id: 'f', loadout, ownerId: null, position: at, heading: 0, flightMode: 'assisted' });
-    const target: Ship = buildShip(base, { id: 't', loadout: LOADOUTS['kessari-raider']!, ownerId: null, position: { x: at.x - 400, y: at.y }, heading: 0, flightMode: 'assisted' });
-    frigate = { ...frigate, hold: { rounds: 10 }, locks: [{ targetId: 't', progress: 1 }], activeLock: 't', weaponsHot: false };
-    const shotsAfter = (fire: boolean): number => {
-      let w: World = { ...base, ships: { f: frigate, t: target } };
-      let shots = 0;
-      for (let i = 0; i < 300; i++) {
-        w = stepWorld(w, { f: { ...emptyInput(), fireFixed: fire }, t: emptyInput() });
-        shots += w.projectiles.filter((p) => p.ownerShipId === 'f').length;
-      }
-      return shots;
-    };
-    expect(shotsAfter(true)).toBeGreaterThan(0);
-    expect(shotsAfter(false)).toBe(0);
   });
 
   it('the Gunlayer L runs more swivels than the M', () => {
@@ -126,6 +89,27 @@ describe('saves from before small-only point defence', () => {
     expect(next.pilots['ana']!.storage['harbour']).toEqual({ 'paragon-turret-s': 3, rounds: 5 });
     // One M and one L fitted, two M stored: (2600 - 800) * 3 + (7000 - 800).
     expect(next.pilots['ana']!.credits).toBe(100 + 1800 * 3 + 6200);
+  });
+});
+
+describe('saves from before the turret model', () => {
+  it('turn turreted gun modules into the gun of the same name and refund the mounting', () => {
+    const old = {
+      ships: {
+        s1: { id: 's1', ownerId: 'ana', fit: { w1: 'union-picket-l-turret', w2: 'union-picket-l', w3: 'paragon-turret-s' } },
+        npc: { id: 'npc', ownerId: null, fit: { w1: 'commonwealth-answer-l-turret' } },
+      },
+      pilots: { ana: { id: 'ana', credits: 100, storage: { harbour: { 'union-autocannon-m-turret': 2, 'union-autocannon-m': 1, rounds: 5 } } } },
+    };
+    const next = migrate13to14(old) as typeof old & { ships: Record<string, { fit: Record<string, string> }>; pilots: Record<string, { credits: number; storage: Record<string, Record<string, number>> }> };
+    expect(next.ships['s1']!.fit).toEqual({ w1: 'union-picket-l', w2: 'union-picket-l', w3: 'paragon-turret-s' });
+    expect(next.ships['npc']!.fit).toEqual({ w1: 'commonwealth-answer-l' });
+    expect(next.pilots['ana']!.storage['harbour']).toEqual({ 'union-autocannon-m': 3, rounds: 5 });
+    // One Picket L turret fitted (3,000 over the gun), two autocannon M turrets stored (1,050 each).
+    expect(next.pilots['ana']!.credits).toBe(100 + 3000 + 1050 * 2);
+    for (const id of [...Object.values(next.ships['s1']!.fit), ...Object.keys(next.pilots['ana']!.storage['harbour']!)]) {
+      if (id !== 'rounds') expect(MODULES[id], id).toBeDefined();
+    }
   });
 });
 

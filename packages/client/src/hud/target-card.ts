@@ -214,9 +214,7 @@ export class TargetCard {
 
     show(this.armed, Boolean(combat));
     if (combat) {
-      const fixed = combat.weapons.filter((w) => w.kind === 'fixed').length;
-      const turrets = combat.weapons.length - fixed;
-      setText(this.armed, combat.weapons.length === 0 ? 'UNARMED' : `ARMED ${fixed} FIXED · ${turrets} TURRET · DPS ${Math.round(combat.fixedDps + combat.turretDps)}`);
+      setText(this.armed, combat.weapons.length === 0 ? 'UNARMED' : `ARMED ${combat.weapons.length} · DPS ${Math.round(combat.gunDps + combat.pointDefenceDps)}`);
     }
     const hold = read?.cargo;
     show(this.cargo, Boolean(hold));

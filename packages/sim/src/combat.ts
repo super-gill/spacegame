@@ -1,7 +1,7 @@
 import { angleDelta, wrapAngle } from './angle.js';
 import { MUNITION_HIT_MARGIN, POINT_DEFENCE_RANGE_FRACTION, SHIELD_CAPACITOR_PER_POINT, TURRET_FIRE_TOLERANCE } from './constants.js';
 import { goodsFitting } from './goods.js';
-import { isLocked } from './locks.js';
+import { isLocked, weaponTarget } from './locks.js';
 import { dropDecoy, launchMunition, type MunitionHit } from './munitions.js';
 import type {
   DamageCause,
@@ -114,9 +114,13 @@ const REFUSAL_PAUSE_SECONDS = 0.5;
 /**
  * Turn turrets, count down cooldowns and reloads, and fire.
  *
- * - Fixed guns fire along the heading when the input asks, if they are in
- *   the selected fire group.
- * - Launchers are fixed too and fire on the same trigger and group, but
+ * - Main guns are turrets (docs/turrets.md): each slews towards the lead
+ *   on its lock (`targetFor`) at its own traverse, never outside its
+ *   mount's arc, and fires when the input asks, if it is in the selected
+ *   fire group, it bears and the target is in range. With no lock it
+ *   settles to its mount's facing and fires straight along it.
+ * - Launchers are fixed (the only fixed weapons, with dispensers and
+ *   light mining lasers) and fire on the same trigger and group, but
  *   only at a complete lock (`targetFor`): the munition needs something to
  *   home on. No lock, no launch (`launchRefused`).
  * - Dispensers drop a countermeasure on `launchCountermeasure`, whatever
@@ -126,9 +130,9 @@ const REFUSAL_PAUSE_SECONDS = 0.5;
  *   a missile while flying. With none coming, or assigned to a lock
  *   (`WeaponState.lockTarget`), they engage ships as turrets always did:
  *   while weapons are hot, the weapon's lock (`targetFor`).
- * - Turrets slew towards the point their shots need to lead to, no faster
- *   than their turn rate and never outside their mount's arc, and fire by
- *   themselves once within TURRET_FIRE_TOLERANCE of it and in range.
+ * - Swivels slew towards their lead point at their turn rate times fire
+ *   control's tracking, and fire by themselves once within
+ *   TURRET_FIRE_TOLERANCE of it and in range.
  * - Every shot costs what its family costs (docs/weapons.md): capacitor
  *   per shot for energy and hybrid guns, a round from the magazine for
  *   ammunition-fed weapons. An empty magazine reloads whole boxes from the
@@ -208,17 +212,23 @@ export function fireWeapons(
         }
       }
     } else if (spec.kind === 'turret' && spec.family !== 'pointDefence') {
-      // A turreted main gun follows its lock at its own slow pace and
-      // fires with its group, like a fixed gun that need not be pointed.
+      // A main gun turret follows its lock at its own pace and fires with
+      // its group when it bears (docs/turrets.md, Option A). With no lock
+      // it settles back to its mount's facing and fires straight along it,
+      // so a ship without a lock (or a targeting computer) can still shoot.
       aim = w.aim;
       const quarry = targetFor(w);
+      const step = spec.turretTurnRate * dt;
       if (quarry) {
         const wanted = toAngle(sub(leadFor(ship.position, ship.velocity, quarry.position, quarry.velocity, spec.projectileSpeed), ship.position));
         if (!mount || withinArc(ship, mount, wanted)) {
-          const step = spec.turretTurnRate * dt;
           aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, wanted))));
           turretReady = Math.abs(angleDelta(aim, wanted)) <= TURRET_FIRE_TOLERANCE && distance(ship.position, quarry.position) <= spec.range;
         }
+      } else {
+        const boresight = wrapAngle(ship.heading + (mount?.facing ?? 0));
+        aim = wrapAngle(aim + Math.max(-step, Math.min(step, angleDelta(aim, boresight))));
+        turretReady = Math.abs(angleDelta(aim, boresight)) <= TURRET_FIRE_TOLERANCE;
       }
     } else if (spec.kind === 'turret' && directed.has(w.mountId)) {
       aim = w.aim;
@@ -357,6 +367,28 @@ export function fireWeapons(
   });
 
   return { ship: { ...ship, weapons, capacitor, hold }, projectiles, munitions, decoys, beams, idsUsed, events };
+}
+
+/** Whether a main gun turret can fire at its lock now (docs/turrets.md), for the HUD's "bears" mark. */
+export type GunBearing = 'noLock' | 'outOfArc' | 'outOfRange' | 'slewing' | 'bears';
+
+/**
+ * How the main gun on `mountId` stands against the lock it follows, by the
+ * same tests `fireWeapons` makes: no complete lock, the lead point outside
+ * the mount's arc, the target out of range, the turret still slewing, or
+ * bearing (it fires on the trigger).
+ */
+export function gunBearing(world: Pick<World, 'ships' | 'hulls'>, ship: Ship, stats: ShipStats, mountId: string): GunBearing {
+  const spec = stats.weapons[mountId];
+  const state = ship.weapons.find((w) => w.mountId === mountId);
+  if (!spec || !state) return 'noLock';
+  const quarry = weaponTarget(world, ship, state);
+  if (!quarry) return 'noLock';
+  const mount = world.hulls[ship.hullId]?.mounts.find((m) => m.id === mountId);
+  const wanted = toAngle(sub(leadFor(ship.position, ship.velocity, quarry.position, quarry.velocity, spec.projectileSpeed), ship.position));
+  if (mount && !withinArc(ship, mount, wanted)) return 'outOfArc';
+  if (distance(ship.position, quarry.position) > spec.range) return 'outOfRange';
+  return Math.abs(angleDelta(state.aim, wanted)) <= TURRET_FIRE_TOLERANCE ? 'bears' : 'slewing';
 }
 
 /**

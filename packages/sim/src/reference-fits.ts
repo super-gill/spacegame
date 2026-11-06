@@ -89,13 +89,6 @@ export const REFERENCE_FITS: FitSpec[] = [
     fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-autocannon-m', w2: 'union-autocannon-m', w6: 'paragon-turret-s', x1: 'paragon-director-l' },
   },
   {
-    name: 'Frigate turrets',
-    hullId: 'union-frigate',
-    role: 'combat',
-    note: 'The militia fit with its two big guns on turrets: they bear without turning the hull, but slew slowly and hit a quarter softer.',
-    fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-picket-l-turret', w2: 'union-picket-l-turret' },
-  },
-  {
     name: 'Frigate crowd clearer',
     hullId: 'union-frigate',
     role: 'combat',

@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -90,6 +90,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   10: (world) => migrate10to11(world),
   11: (world) => migrate11to12(world),
   12: (world) => migrate12to13(world),
+  13: (world) => migrate13to14(world),
 };
 
 /**
@@ -331,6 +332,90 @@ export function migrate12to13(world: unknown): unknown {
       storage[station] = shelf;
     }
     pilots[id] = { ...pilot, ...(isRecord(pilot['storage']) ? { storage } : {}) };
+  }
+  for (const [id, amount] of Object.entries(refunds)) {
+    const pilot = pilots[id];
+    if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
+  }
+  return { ...world, ships, pilots };
+}
+
+/**
+ * Turreted gun modules that no longer exist (every main gun is a turret
+ * now, docs/turrets.md), with what each cost over the gun of the same
+ * name, for the refund in `migrate13to14`.
+ */
+const RETIRED_TURRET_PREMIUM: Record<string, number> = {
+  'union-autocannon-m-turret': 1050,
+  'union-picket-l-turret': 3000,
+  'union-lockout-m-turret': 1600,
+  'union-lockout-l-turret': 4500,
+  'cantorvell-verse-m-turret': 1400,
+  'cantorvell-verse-l-turret': 4000,
+  'cantorvell-litany-m-turret': 2100,
+  'cantorvell-litany-l-turret': 6000,
+  'commonwealth-retort-m-turret': 1600,
+  'commonwealth-retort-l-turret': 4500,
+  'commonwealth-answer-m-turret': 2650,
+  'commonwealth-answer-l-turret': 7500,
+};
+
+/** The gun a retired turret module becomes: the same name without `-turret`. */
+function gunFromTurret(id: string): string {
+  return id.replace(/-turret$/, '');
+}
+
+/**
+ * 13 to 14: the turret model (docs/turrets.md). Every turreted gun module,
+ * fitted or stored, becomes the gun of the same maker, family and size,
+ * which is now a turret itself; the owner gets back what the turret
+ * mounting cost. Weapon states are keyed by mount, so they carry over.
+ * Ships nobody owns (NPCs) are simply refitted.
+ */
+export function migrate13to14(world: unknown): unknown {
+  if (!isRecord(world)) return world;
+  const refunds: Record<string, number> = {};
+  const refund = (pilotId: unknown, oldId: string, count: number): void => {
+    if (typeof pilotId !== 'string') return;
+    refunds[pilotId] = (refunds[pilotId] ?? 0) + RETIRED_TURRET_PREMIUM[oldId]! * count;
+  };
+  const ships: Record<string, unknown> = {};
+  for (const [id, ship] of Object.entries(isRecord(world['ships']) ? world['ships'] : {})) {
+    if (!isRecord(ship) || !isRecord(ship['fit'])) {
+      ships[id] = ship;
+      continue;
+    }
+    const fit: Record<string, unknown> = {};
+    for (const [mount, moduleId] of Object.entries(ship['fit'])) {
+      if (typeof moduleId === 'string' && moduleId in RETIRED_TURRET_PREMIUM) {
+        refund(ship['ownerId'], moduleId, 1);
+        fit[mount] = gunFromTurret(moduleId);
+      } else fit[mount] = moduleId;
+    }
+    ships[id] = { ...ship, fit };
+  }
+  const pilots: Record<string, unknown> = {};
+  for (const [id, pilot] of Object.entries(isRecord(world['pilots']) ? world['pilots'] : {})) {
+    if (!isRecord(pilot) || !isRecord(pilot['storage'])) {
+      pilots[id] = pilot;
+      continue;
+    }
+    const storage: Record<string, unknown> = {};
+    for (const [station, held] of Object.entries(pilot['storage'])) {
+      if (!isRecord(held)) {
+        storage[station] = held;
+        continue;
+      }
+      const shelf: Record<string, unknown> = {};
+      for (const [item, count] of Object.entries(held)) {
+        const to = item in RETIRED_TURRET_PREMIUM && typeof count === 'number' ? gunFromTurret(item) : item;
+        if (to !== item) refund(id, item, count as number);
+        const have = shelf[to];
+        shelf[to] = typeof have === 'number' && typeof count === 'number' ? have + count : count;
+      }
+      storage[station] = shelf;
+    }
+    pilots[id] = { ...pilot, storage };
   }
   for (const [id, amount] of Object.entries(refunds)) {
     const pilot = pilots[id];

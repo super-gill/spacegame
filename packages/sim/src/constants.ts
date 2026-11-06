@@ -200,8 +200,14 @@ export const STOCK_SHIELD_ARC = (3 * Math.PI) / 2;
 
 // Fitting step 4, costs (docs/fitting.md, "Costs that make choices").
 
-/** How much each size up slows a swivel's traverse: S turns this many times faster than M, and so on. */
-export const TURRET_SLEW_FALLOFF = 1.6;
+/**
+ * How much each size up slows a turret's traverse: S turns this many times
+ * faster than M, and M than L (docs/turrets.md: S 3.0, M 1.5, L 0.75 rad/s
+ * for main guns). The main lever that keeps big guns off small ships.
+ */
+export const TURRET_SLEW_FALLOFF = 2;
+/** How fast a small main gun turret slews, rad/s; each size up is `TURRET_SLEW_FALLOFF` slower. */
+export const GUN_TRAVERSE = 3;
 /**
  * Signature fitted kit adds to the hull's, by kind and size, unless the
  * module names its own (`ModuleSpec.stats.signature`). Big drives and big
@@ -218,17 +224,6 @@ export const AFTERBURNER_SIGNATURE_BLOOM = 0.5;
  * squared slower than a small round, so a quick target can slip it at range.
  */
 export const SHOT_SPEED_FALLOFF = 1.15;
-/** A turreted main gun's damage against the fixed gun of its size: less, so fixed guns stay the hardest hitters. */
-export const MAIN_TURRET_DAMAGE = 0.75;
-/**
- * How fast a turreted main gun would slew at size S, rad/s; each size up
- * is `TURRET_SLEW_FALLOFF` slower (M 1.5, L about 0.94). Swivels, the
- * point defence, turn at 4.
- */
-export const MAIN_TURRET_SLEW = 2.4;
-/** What mounting a main gun on a turret costs against the fixed gun: mass, power and price multipliers. */
-export const TURRET_MOUNTING = { mass: 1.4, power: 1.25, price: 1.5 };
-
 // The arena (admin testing, arena.ts).
 /** How far apart pilots' arenas are, and how far the first is from the system, units. */
 export const ARENA_SEPARATION = 50000;

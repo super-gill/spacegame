@@ -323,7 +323,7 @@ const TANGENT_MARGIN = 1.08;
 /**
  * Lock inputs that get and hold a complete, active lock on `targetId`:
  * drop a stray lock if the computer is full, lock, then make it active.
- * Missiles need this; fixed guns do not.
+ * Missiles and main gun turrets need it.
  */
 export function holdLock(ship: Ship, stats: ShipStats, targetId: string): Partial<ShipInput> {
   if (!ship.locks.some((l) => l.targetId === targetId)) {
@@ -334,10 +334,13 @@ export function holdLock(ship: Ship, stats: ShipStats, targetId: string): Partia
   return ship.activeLock !== targetId ? { activateLock: targetId } : {};
 }
 
-/** The fixed gun an NPC aims its nose with: the first fixed mount that is a gun, not a launcher. */
+/**
+ * The main gun an NPC fights by (its range sets how close it comes): the
+ * first mount carrying a gun that is not point defence, else a swivel.
+ */
 export function mainGun(stats: ShipStats): [string, WeaponSpec] | null {
-  const found = Object.entries(stats.weapons).find(([, w]) => w.kind === 'fixed' && isGun(w));
-  return found ?? null;
+  const guns = Object.entries(stats.weapons).filter(([, w]) => isGun(w));
+  return guns.find(([, w]) => w.family !== 'pointDefence') ?? guns[0] ?? null;
 }
 
 /** NPC guns sit in this group; launchers in their own (`weaponStatesFor`). */

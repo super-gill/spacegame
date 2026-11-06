@@ -219,7 +219,11 @@ export class MenuPanel {
   }
 
   toggle(): void {
-    this.panel.classList.toggle('hidden');
+    const hidden = this.panel.classList.toggle('hidden');
+    // A button clicked in the menu keeps keyboard focus after it closes, and
+    // Space (fire) would click it again: Start arena twice, say. Let it go.
+    const focused = document.activeElement;
+    if (hidden && focused instanceof HTMLElement && (this.panel.contains(focused) || focused.closest('button') === focused)) focused.blur();
   }
 
   /** Reflect the world's gravity rule (it changes with loads and imports too). */

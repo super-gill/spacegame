@@ -10,7 +10,7 @@ import { deserializeWorld, serializeWorld } from '../save.js';
 import { fitStats, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, ShipInput, World } from '../types.js';
-import { isGun, WEAPONS, weaponDps } from '../weapons.js';
+import { isGun, isMainGun, weaponDps, WEAPONS } from '../weapons.js';
 import { createStarterWorld, emptyInput } from '../world.js';
 import { TEST_CATALOGUES } from './fixtures.js';
 
@@ -46,10 +46,10 @@ describe('the catalogue', () => {
     }
   });
 
-  it('keeps the rule: every fixed gun hits harder per shot than the small swivel', () => {
+  it('every main gun hits harder per shot than the small swivel', () => {
     const swivel = WEAPONS['swivel-s']!;
     for (const size of ['S', 'M', 'L'] as const) {
-      for (const gun of Object.values(WEAPONS).filter((w) => w.kind === 'fixed' && isGun(w) && w.size === size)) {
+      for (const gun of Object.values(WEAPONS).filter((w) => isMainGun(w) && w.size === size)) {
         expect(gun.damage, `${gun.id} vs ${swivel.id}`).toBeGreaterThan(swivel.damage);
       }
     }

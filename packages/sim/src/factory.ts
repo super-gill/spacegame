@@ -4,6 +4,7 @@ import { LOADOUTS } from './loadouts.js';
 import { fitStats, type Catalogues } from './stats.js';
 import type { FlightMode, Loadout, Ship } from './types.js';
 import type { Vec2 } from './vec2.js';
+import { isMainGun } from './weapons.js';
 
 /**
  * Building ships. One place creates a ship from a loadout, so every ship
@@ -37,9 +38,14 @@ export function buildShip(cat: Catalogues, o: NewShipOptions): Ship {
   const stats = fitStats(cat, hull, fit);
   const docked = o.dockedAt != null;
   const weapons = weaponStatesFor(cat, hull, fit, o.heading);
-  // Start on the lowest group that holds a fixed weapon, so a prospector's
-  // laser (group 3) is ready without a key press.
-  const fixedGroups = weapons.filter((w) => stats.weapons[w.mountId]?.kind === 'fixed').map((w) => w.group);
+  // Start on the lowest group fired on the trigger (main guns, launchers,
+  // light mining lasers), so a prospector's laser (group 3) is ready without a key press.
+  const fixedGroups = weapons
+    .filter((w) => {
+      const spec = stats.weapons[w.mountId];
+      return spec !== undefined && (isMainGun(spec) || spec.kind === 'fixed');
+    })
+    .map((w) => w.group);
   return {
     id: o.id,
     hullId: hull.id,

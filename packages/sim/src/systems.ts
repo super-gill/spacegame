@@ -1,6 +1,6 @@
 import { shipStats, type Catalogues } from './stats.js';
 import type { ModuleKind, Ship } from './types.js';
-import { isGun } from './weapons.js';
+import { isMainGun } from './weapons.js';
 
 /**
  * Ship systems the pilot works (docs/ship-systems.md, "Activation tiles").
@@ -38,7 +38,8 @@ export function activationSlots(cat: Catalogues, ship: Ship): ActivationSlot[] {
   const groups = new Set<number>();
   for (const w of ship.weapons) {
     const spec = stats.weapons[w.mountId];
-    if (spec && spec.kind === 'fixed' && (isGun(spec) || spec.family === 'missile' || spec.family === 'mining')) groups.add(w.group);
+    // Groups fired on the trigger: main guns, launchers and light mining lasers (swivels and mining turrets fire by themselves).
+    if (spec && (isMainGun(spec) || (spec.kind === 'fixed' && (spec.family === 'missile' || spec.family === 'mining')))) groups.add(w.group);
   }
   const out: ActivationSlot[] = [...groups].sort((a, b) => a - b).map((group) => ({ kind: 'group', group }));
   // Mining turrets next: each tile gives its turret the active lock's rock.

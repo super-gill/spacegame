@@ -1,6 +1,6 @@
 # Weapons and power
 
-> **Changing:** the turret model (`docs/turrets.md`, agreed 6 November 2026) drops fixed guns, adds spread and laser falloff, and replaces swivels with close-in weapon systems. This doc describes the game as it is until that lands.
+> **Changing:** the turret model (`docs/turrets.md`, agreed 6 November 2026; step 1, turret guns, built) drops fixed guns, adds spread and laser falloff, and replaces swivels with close-in weapon systems. Main guns are already turrets (step 1): where this doc says fixed gun, read turret, as `docs/turrets.md`, "As built: step 1" describes. The rest stands until the later steps land.
 
 How ships fight: the capacitor, the weapon families, damage and defence, munitions and point defence. Status: agreed design, 4 November 2026, with Jason. Milestone 6e builds it in two parts (see "Build order").
 

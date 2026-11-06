@@ -12,7 +12,7 @@ import { fitStats, flightWarnings, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
 import type { Ship, World } from '../types.js';
 import { distance, length, sub, toAngle } from '../vec2.js';
-import { WEAPONS, weaponDps } from '../weapons.js';
+import { WEAPONS, weaponDps, isMainGun } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, STARTER_LOADOUT_ID } from '../world.js';
 import { TEST_CATALOGUES, loadoutStats } from './fixtures.js';
 import { PIRATE_TUNING } from '../ai/index.js';
@@ -402,7 +402,7 @@ describe('ships in the world', () => {
       const mine = w.ships[me];
       const foe = w.ships[pir];
       if (!mine || !foe) break;
-      const gun = Object.values(shipStats(w, mine).weapons).find((x) => x.kind === 'fixed')!;
+      const gun = Object.values(shipStats(w, mine).weapons).find((x) => isMainGun(x))!;
       const want = toAngle(sub(leadPoint(mine, foe, gun.projectileSpeed), mine.position));
       const err = angleDelta(mine.heading, want);
       const d = distance(mine.position, foe.position);

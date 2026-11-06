@@ -138,10 +138,11 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
       b = { ...b, attack: plan.state };
       const input = { ...steerSafely(ship, stats, plan.desired, pull, plan.faceAt), ...lockInput };
       input.toggleWeaponsHot = !ship.weaponsHot;
-      if (gun && plan.attacking && isLocked(ship, t.id)) {
-        const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
+      // Main guns are turrets: they fire whenever they bear on the lock, so
+      // hold the trigger in range rather than waiting for the nose.
+      if (gun && isLocked(ship, t.id)) {
         const inRange = distance(ship.position, t.position) <= gun.range * WATCH_TUNING.rangeFraction;
-        input.fireFixed = aimError <= WATCH_TUNING.aimTolerance && inRange && !bystanderInLine(world, ship, t, gun.range) && canAfford(ship, stats, gun, gunMount![0]);
+        input.fireFixed = inRange && !bystanderInLine(world, ship, t, gun.range) && canAfford(ship, stats, gun, gunMount![0]);
       }
       // Missiles from further out; they home, so a bystander is less of a worry.
       Object.assign(input, missileInputs(ship, stats, t, WATCH_TUNING.missileMinRange, WATCH_TUNING.missileMaxRange, WATCH_TUNING.missileAimTolerance));

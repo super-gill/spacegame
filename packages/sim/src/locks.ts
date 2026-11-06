@@ -18,7 +18,7 @@ import type {
   WorldEvent,
 } from './types.js';
 import { distance, length, sub, type Vec2 } from './vec2.js';
-import { isGun, weaponDps } from './weapons.js';
+import { isGun, isMainGun, weaponDps } from './weapons.js';
 
 /**
  * Target locks, in the spirit of EVE.
@@ -216,8 +216,10 @@ export interface LockReadout {
     structure: number;
     maxStructure: number;
     weapons: { mountId: string; name: string; kind: WeaponKind }[];
-    fixedDps: number;
-    turretDps: number;
+    /** Main guns' damage per second, held on target. */
+    gunDps: number;
+    /** Swivels' damage per second against ships. */
+    pointDefenceDps: number;
   };
   cargo?: {
     hold: Record<string, number>;
@@ -302,15 +304,15 @@ export function lockReadout(world: World, ship: Ship, targetId: string): LockRea
   }
   if (has('combat')) {
     const weapons = Object.entries(theirs.weapons).map(([mountId, w]) => ({ mountId, name: w.name, kind: w.kind }));
-    const dps = (kind: WeaponKind): number => Object.values(theirs.weapons).filter((w) => w.kind === kind && isGun(w)).reduce((n, w) => n + weaponDps(w), 0);
+    const dps = (main: boolean): number => Object.values(theirs.weapons).filter((w) => isGun(w) && isMainGun(w) === main).reduce((n, w) => n + weaponDps(w), 0);
     out.combat = {
       shield: target.shield,
       maxShield: theirs.shield,
       structure: target.structure,
       maxStructure: theirs.structure,
       weapons,
-      fixedDps: dps('fixed'),
-      turretDps: dps('turret'),
+      gunDps: dps(true),
+      pointDefenceDps: dps(false),
     };
   }
   if (has('cargo')) {

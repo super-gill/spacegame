@@ -16,13 +16,23 @@ import type { Vec2 } from './vec2.js';
 const FORWARD = 0;
 const AFT = Math.PI;
 
+const FULL_ARC = Math.PI * 2;
+const BROAD_ARC = Math.PI * 1.5; // 270 degrees: a blind spot opposite the facing
+const HALF_ARC = Math.PI; // half round, centred on the facing: a bow gun's arc
+
 function mount(id: string, type: MountType, size: ModuleSize, x: number, y: number, services: MountService[], facing = FORWARD): MountPoint {
   return { id, type, size, position: { x, y }, facing, services };
 }
 
-/** A high slot (docs/fitting.md): a hardpoint, facing forward unless told otherwise; a swivel's arc if `arc` is given. */
-function high(id: string, size: ModuleSize, x: number, y: number, facing = FORWARD, arc?: number): MountPoint {
-  return { ...mount(id, 'high', size, x, y, ['power'], facing), ...(arc !== undefined ? { arc } : {}) };
+/**
+ * A high slot (docs/fitting.md): a hardpoint, facing forward unless told
+ * otherwise. Every main gun is a turret (docs/turrets.md), so the arc is
+ * where a gun here can bear: the forward half by default, which makes a
+ * bow mount a nose gun that cannot shoot astern; side and aft mounts name
+ * a wider arc centred on where they face.
+ */
+function high(id: string, size: ModuleSize, x: number, y: number, facing = FORWARD, arc = HALF_ARC): MountPoint {
+  return { ...mount(id, 'high', size, x, y, ['power'], facing), arc };
 }
 
 /** A mid slot: the ship's own active systems. */
@@ -35,9 +45,6 @@ function low(id: string, size: ModuleSize, x: number, y: number): MountPoint {
   return mount(id, 'low', size, x, y, ['power']);
 }
 
-const FULL_ARC = Math.PI * 2;
-const BROAD_ARC = Math.PI * 1.5; // 270 degrees: a blind spot behind
-const HALF_ARC = Math.PI; // the forward half
 
 function outline(points: ReadonlyArray<readonly [number, number]>): Vec2[] {
   return points.map(([x, y]) => ({ x, y }));

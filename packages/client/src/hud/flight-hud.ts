@@ -1,4 +1,4 @@
-import type { NavReadout, Ship, WeaponFamily, World } from '@spacegame/sim';
+import type { GunBearing, NavReadout, Ship, WeaponFamily, World } from '@spacegame/sim';
 import {
   FLIGHT_MODE_LABELS,
   boardableShips,
@@ -9,7 +9,9 @@ import {
   goodsFitting,
   incomingMunitions,
   isEscapePod,
+  gunBearing,
   isGun,
+  isMainGun,
   loadedGoodOf,
   nearestDockableStation,
   shipPilot,
@@ -294,7 +296,8 @@ export class FlightHud {
 
   /** One tile per weapon mount, rebuilt only when the fit changes. */
   private updateWeapons(world: World, ship: Ship): void {
-    const specs = shipStats(world, ship).weapons;
+    const stats = shipStats(world, ship);
+    const specs = stats.weapons;
     const mounts = Object.keys(specs).sort();
     const key = mounts.map((m) => `${m}:${specs[m]!.id}`).join('|');
     if (key !== this.weaponKey) {
@@ -337,6 +340,14 @@ export class FlightHud {
         const beam = ship.beams?.find((b) => b.mountId === mountId);
         setText(tile.state, !state?.lockTarget ? 'NO ROCK' : beam ? (beam.cutting ? (beam.onSeam ? 'ON SEAM' : 'CUTTING') : 'TOO HARD') : 'OUT OF REACH');
         tile.root.classList.toggle('active', Boolean(beam?.cutting));
+      } else if (isMainGun(spec)) {
+        // A main gun turret: its group, and whether it bears on its lock
+        // (docs/turrets.md). With no lock it fires straight ahead.
+        const inGroup = state?.group === ship.fireGroup;
+        const bearing = gunBearing(world, ship, stats, mountId);
+        setText(tile.state, `${inGroup ? 'SPACE · ' : ''}G${state?.group ?? 1} · ${BEARING_WORDS[bearing]}`);
+        tile.root.classList.toggle('active', inGroup);
+        tile.root.classList.toggle('bears', bearing === 'bears');
       } else if (spec.kind === 'turret') {
         // Swivels shoot down munitions coming for you whether hot or cold.
         const defending = incomingMunitions(world.munitions, ship.id).length > 0;
@@ -353,6 +364,9 @@ export class FlightHud {
     }
   }
 }
+
+/** How a main gun stands against its lock, in a tile's few letters. */
+const BEARING_WORDS: Record<GunBearing, string> = { noLock: 'AHEAD', outOfArc: 'NO ARC', outOfRange: 'RANGE', slewing: 'SLEWING', bears: 'BEARS' };
 
 /** The short name of an ammunition good for a tile: 'KOD Summons Breach (box of 4)' is BREACH. */
 function shortGoodName(name: string): string {
@@ -386,8 +400,8 @@ function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : kind === 'fixed' ? gunName(weaponId) : 'SWIVEL');
-  const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : family === 'mining' && kind === 'turret' ? 'NO ROCK' : kind === 'fixed' ? 'SPACE' : 'PD');
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : family === 'pointDefence' ? 'SWIVEL' : gunName(weaponId));
+  const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : family === 'mining' && kind === 'turret' ? 'NO ROCK' : family === 'pointDefence' ? 'PD' : 'SPACE');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);
   return { root, reload, state, ammo };

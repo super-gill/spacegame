@@ -17,7 +17,7 @@ import type { PirateBrain, Projectile, Ship, ShipStats, Station, World, WorldEve
 import { distance, length, sub } from '../vec2.js';
 import { PLANET_ID } from '../bodies.js';
 import { bodyVelocity } from '../rails.js';
-import { isGun, WEAPONS, weaponDps } from '../weapons.js';
+import { isGun, isMainGun, WEAPONS, weaponDps } from '../weapons.js';
 import { createStarterWorld, emptyInput, joinPilot, pilotShip, respawnPilot } from '../world.js';
 
 const SECOND = 60;
@@ -50,27 +50,25 @@ function quietWorld(): { w: World; me: string } {
 }
 
 describe('weapon catalogue', () => {
-  it('fixed guns hit harder per shot than swivels, and out-damage their own turreted version', () => {
+  it('main guns hit harder per shot than swivels', () => {
     const all = Object.values(WEAPONS);
-    // Launchers and dispensers are fixed but not guns: the rule is about guns.
-    for (const fixed of all.filter((w) => w.kind === 'fixed' && isGun(w))) {
-      for (const swivel of all.filter((w) => w.family === 'pointDefence')) {
-        expect(fixed.damage).toBeGreaterThan(swivel.damage);
-      }
-      const turreted = WEAPONS[fixed.id.replace(/-(m|l)$/, '-turret-$1')];
-      if (turreted && turreted !== fixed) expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turreted));
+    for (const gun of all.filter((w) => isMainGun(w))) {
+      for (const swivel of all.filter((w) => w.family === 'pointDefence')) expect(gun.damage).toBeGreaterThan(swivel.damage);
     }
   });
 
-  it('the Aurel Tacet carries one fixed gun and one turret', () => {
+  it('the Aurel Tacet carries a main gun and a swivel, both turrets', () => {
     const s = ship('s');
-    expect(s.weapons.map((w) => sparrow.weapons[w.mountId]!.kind).sort()).toEqual(['fixed', 'turret']);
+    expect(s.weapons.map((w) => sparrow.weapons[w.mountId]!.family === 'pointDefence').sort()).toEqual([false, true]);
+    expect(s.weapons.every((w) => sparrow.weapons[w.mountId]!.kind === 'turret')).toBe(true);
   });
 });
 
 describe('firing', () => {
-  it('fixed guns fire along the heading and inherit the ship velocity', () => {
-    const s = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
+  it('with no lock, a main gun fires along its mount, and shots inherit the ship velocity', () => {
+    const built = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
+    // Turrets settled on the new heading (they slew to it otherwise).
+    const s = { ...built, weapons: built.weapons.map((w) => ({ ...w, aim: Math.PI / 2 })) };
     const r = fireWeapons(s, sparrow, { ...emptyInput(), fireFixed: true }, () => null, FIXED_DT, 1);
     expect(r.projectiles).toHaveLength(1);
     const p = r.projectiles[0]!;
@@ -91,7 +89,7 @@ describe('firing', () => {
     expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
   });
 
-  const turretAim = (s: Ship) => s.weapons.find((w) => sparrow.weapons[w.mountId]!.kind === 'turret')!.aim;
+  const turretAim = (s: Ship) => s.weapons.find((w) => sparrow.weapons[w.mountId]!.family === 'pointDefence')!.aim;
 
   it('hot turrets slew towards the target no faster than their turn rate', () => {
     const s = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });

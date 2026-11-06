@@ -9,6 +9,7 @@ import {
   shipStats,
   storedCount,
   isGun,
+  isMainGun,
   weaponDps,
   type FitRefusal,
   type FlightWarning,
@@ -107,8 +108,9 @@ export function moduleType(m: ModuleSpec, world: World): string {
   if (m.kind === 'weapon') {
     const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
     if (!w) return 'Weapon';
-    if (w.kind === 'turret') return 'Swivel';
-    return WEAPON_NAMES[w.id.replace(/-[sml]$/, '')] ?? 'Fixed gun';
+    if (w.family === 'pointDefence') return 'Swivel';
+    if (w.family === 'mining' && w.kind === 'turret') return 'Mining turret';
+    return WEAPON_NAMES[w.id.replace(/-[sml]$/, '')] ?? 'Gun';
   }
   return MODULE_TYPE_NAME[m.kind];
 }
@@ -195,7 +197,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
     if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
     if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
-    else if (w.kind === 'turret') parts.push(`turreted: follows your lock at ${fixed1(w.turretTurnRate)} rad/s and fires with its group, no fire control needed`);
+    else if (w.kind === 'turret') parts.push(`turret: follows your lock at ${fixed1(w.turretTurnRate)} rad/s and fires with its group when it bears; no fire control needed`);
   }
   if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
   if (m.capacitorDraw) parts.push(`draws ${fixed1(m.capacitorDraw)} cap/s at full size`);
@@ -222,9 +224,10 @@ interface StatRow {
 }
 
 const DEG = 180 / Math.PI;
-const dps = (s: ShipStats, kind: 'fixed' | 'turret'): number =>
+/** Damage per second of the main guns (`main`) or of the swivels. */
+const dps = (s: ShipStats, main: boolean): number =>
   Object.values(s.weapons)
-    .filter((w) => w.kind === kind && isGun(w))
+    .filter((w) => isGun(w) && isMainGun(w) === main)
     .reduce((n, w) => n + weaponDps(w), 0);
 
 const STAT_ROWS: StatRow[] = [
@@ -245,8 +248,8 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Cap recharge', value: (s) => s.capacitorRecharge, format: (n) => `${fixed1(n)}/s`, better: 'higher' },
   { label: 'Cap drain', value: (s) => s.capacitorDraw, format: (n) => `${fixed1(n)}/s`, better: 'lower' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
-  { label: 'Fixed dps', value: (s) => dps(s, 'fixed'), format: fixed1, better: 'higher' },
-  { label: 'Turret dps', value: (s) => dps(s, 'turret'), format: fixed1, better: 'higher' },
+  { label: 'Gun dps', value: (s) => dps(s, true), format: fixed1, better: 'higher' },
+  { label: 'Swivel dps', value: (s) => dps(s, false), format: fixed1, better: 'higher' },
 ];
 
 /**

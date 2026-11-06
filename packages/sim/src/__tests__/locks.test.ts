@@ -302,7 +302,7 @@ describe('what a lock tells you', () => {
     const r = lockReadout(w, w.ships[me]!, 'raider')!;
     expect(r.combat?.structure).toBe(30);
     expect(r.combat?.weapons.length).toBeGreaterThan(0);
-    expect(r.combat?.fixedDps).toBeGreaterThan(0);
+    expect(r.combat?.gunDps).toBeGreaterThan(0);
     expect(r.cargo).toBeUndefined();
   });
 

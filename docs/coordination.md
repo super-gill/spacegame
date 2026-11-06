@@ -9,7 +9,7 @@ How the Spacegame chats work together. Every chat working on the repo reads this
 | Who | Does |
 | --- | --- |
 | **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
-| **Lead** (the current lead chat; "Lead 4" since 5 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lead** (the current lead chat; "Lead 5" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
 | **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
 | **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
@@ -31,7 +31,7 @@ Chats cannot message each other: this file, branches and commits are the only ch
 
 Names and lore wanted from the lore chat. The game uses working names until these come back; the lead applies the answers. Newest first.
 
-- **Turrets and fire control** (2026-11-06): turreted main guns (every M and L gun from Union, Cantor-Vell and Commonwealth now comes turreted; working names like "Union Picket Turret L"), and the Paragon Gunlayer L (fire control for eight swivels).
+- **Close-in weapon systems and fire control** (2026-11-06, changed by Lead 5): the separate turreted guns are gone (every main gun is a turret now, so the guns keep their names). Wanted instead: names for close-in weapon systems (CIWS, replacing the swivel on medium hulls and up, build step 3 of `docs/turrets.md`) and the Paragon Gunlayer L (fire control for eight swivels, later for CIWS).
 - **Big ships** (2026-11-05): the Kessari brig (working name Kessari Injunction, by Kessari Orbital Defence) and the Free Belt frigate (working name Union Defence Works Walkout); the large kit that came with them: the Slagline Runner L and Jink L, the Ito-Marr Bastion L, and the Union Defence Works Bulwark L armour. Union Defence Works names its guns for labour actions (Picket, Lockout), hence the Walkout.
 
 ## Questions for Jason
@@ -135,6 +135,14 @@ Mining part 1 contracts (on `main` from 4 November 2026; design in `docs/mining.
 - **Events:** `dronesLaunched`, `droneStowed`, `droneLost`, `droneRefused`, `surveyed`, `surveyRefused`, `miningTooHard`, `oreFreed`, `rockCrumbled`, `cacheDropped`, `hopperFilterChanged`, `oreEjected`, `laserAssigned`.
 - **Save format version 7** (`migrate6to7`).
 
+Turret model step 1 contracts (on `main` from 6 November 2026; design in `docs/turrets.md`, "As built: step 1"):
+
+- **Main guns are turrets** (`weapons.ts`): `isMainGun`; `WeaponKind` `fixed` is only launchers, dispensers and light mining lasers. `GUN_TRAVERSE`, `TURRET_SLEW_FALLOFF` 2.
+- **Bearing** (`combat.ts`): `gunBearing(world, ship, stats, mountId)` returns `GunBearing` (`noLock`, `outOfArc`, `outOfRange`, `slewing`, `bears`). The client shows whether a gun bears only through it.
+- **Arcs:** every high `MountPoint` has `arc` set.
+- **Lock readout:** `LockReadout.combat.gunDps` and `pointDefenceDps` replace `fixedDps` and `turretDps`.
+- **Save format version 14** (`migrate13to14`).
+
 ## Ideas inbox
 
 Jason's ideas that are not scheduled yet. The lead triages them into the roadmap or "not now".
@@ -208,6 +216,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-06, lead (Lead 5): took over from Lead 4 (`ws/lore` had nothing new). **Turret model step 1, turret guns** (`docs/turrets.md`, "As built: step 1"): every main gun a turret at full damage, traverse S 3.0, M 1.5, L 0.75; turreted modules retired (save 14 refunds the mounting); every high slot has an arc, forward half by default; with no lock guns fire straight along their mount (lead's call, for Jason); `gunBearing` and HUD bears marks; NPC scripts hold the trigger in range; readout `gunDps`/`pointDefenceDps`; menu buttons lose focus when the menu closes (Space was starting a second arena). Audit `docs/audits/2026-11-06-turret-guns.md`: same shape as 0.15 (big ships win one on one, brawler swarms win), small ships a little stronger now their guns track. Play checked in the arena: AHEAD, BEARS on lock, firing, NO ARC astern, no page errors. 466 sim tests. For Jason: judge the arcs and the no-lock rule in the arena. Next: step 2, spread and laser falloff.
 - 2026-11-06, lead (Lead 4): **released 0.15.0**, fitting costs and the arena. Swivels eased to 30 a second, the reference brick made a real brick, Jason's arena results and calls recorded as decisions. Agreed the turret model with Jason (`docs/turrets.md`): next is 0.16.0, step 1 turret guns.
 - 2026-11-06, lead (Lead 4): **the arena** and swivels for crowd clearing (`docs/fitting.md`, "The arena"). Admin `adminArena` and `adminArenaEnd` (`arena.ts`): fly any reference fit against 1 to 8 of another, far out in space, enemies flown by the lab's scripts (moved to `ai/fight.ts`, used by the lab and the new `arena` brain). Swivels fire light, fast rounds (3 a shot, 40 a second) to 900 units; the rule is now per shot. Lab and arena ships carry a hold full of ammunition (`ammunitionHold`), no longer overloaded. The menu scrolls and its rows wrap (the admin tools ran off the screen). Play checked in a browser: crowd clearer against four brawlers, end arena back to the Tern at Harbour, no page errors. 459 sim tests.
 - 2026-11-06, lead (Lead 4): **fitting step 4, the costs**, built then reworked with Jason (`docs/fitting.md`, "As built: step 4"; audit `docs/audits/2026-11-05-costs.md`). Weapon resolution was built and taken out: no damage cuts, physics does it (slower big shots and turrets, fixed guns need the hull to turn). Point defence small only (save 13 swaps and refunds M and L swivels); Gunlayer L runs eight; turreted main guns in M and L; signature from kit and afterburner bloom; the Vigil M fixed; `skirmish` swarm fights with attack-run pilots in the lab and audit. Also from Jason's playtest: the market shows cargo and ore hold apart and greyed Buy buttons say why. Jason's law idea recorded under "Questions for Jason". Findings: the brig sits right against Warrants, the frigate is too strong against a swarm, raiders cannot touch big ships, miners and the Manifest lose to the raider. Lore asks added. Next: Jason's swarm target, then tune.

@@ -103,8 +103,8 @@ export type Resistances = Partial<Record<DamageType, number>>;
 
 /**
  * A weapon family (docs/weapons.md). Each has a character, and hulls
- * carry bonuses to one. `pointDefence` is the swivels: multi-role
- * turreted guns, worse than a fixed gun of their size at everything.
+ * carry bonuses to one. `pointDefence` is the swivels: small, light,
+ * fast-firing turrets that also shoot down munitions.
  */
 export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence' | 'countermeasure' | 'mining';
 
@@ -545,15 +545,13 @@ export interface MarketEntry {
 }
 
 /**
- * How a weapon aims.
- * - `fixed`: fires along the ship's heading. The pilot aims by flying.
- * - `turret`: turns on its own towards the ship's selected target, at a
- *   limited slew rate (its tracking), and fires by itself while weapons
- *   are hot and it is on target and in range.
- *
- * Rule: for weapons of the same size, fixed always does more damage per
- * second than turret. Aiming with the hull is a skill and pays for it.
- * A test enforces this across the whole catalogue.
+ * How a weapon aims (docs/turrets.md).
+ * - `turret`: turns on its own towards its lock at its traverse
+ *   (`turretTurnRate`), inside its mount's arc. Every main gun is one and
+ *   fires on the trigger when it bears; swivels and mining turrets fire by
+ *   themselves.
+ * - `fixed`: fires along the ship's heading. Only launchers, dispensers
+ *   and light mining lasers.
  */
 export type WeaponKind = 'fixed' | 'turret';
 

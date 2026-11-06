@@ -1,5 +1,4 @@
-import { STOCK_SHIELD_ARC, TURRET_MOUNTING } from './constants.js';
-import { WEAPONS } from './weapons.js';
+import { STOCK_SHIELD_ARC } from './constants.js';
 import type { ModuleSpec } from './types.js';
 
 /**
@@ -1340,26 +1339,3 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { navHorizon: 120 },
   },
 };
-
-/**
- * Turreted main guns (weapons.ts, `TURRETED_GUNS`): each medium and large
- * fixed gun also comes on a turret from the same maker, heavier, a little
- * hungrier and dearer for the mounting. Working names until the lore
- * chat names them.
- */
-for (const fixed of Object.values(MODULES)) {
-  const weaponId = fixed.weaponId;
-  if (!weaponId || fixed.size === 'S') continue;
-  const turretWeapon = weaponId.replace(/-(m|l)$/, '-turret-$1');
-  if (turretWeapon === weaponId || !WEAPONS[turretWeapon]) continue;
-  const id = `${fixed.id}-turret`;
-  MODULES[id] = {
-    ...fixed,
-    id,
-    name: fixed.name.replace(/ (M|L)$/, ' Turret $1'),
-    mass: Math.round(fixed.mass * TURRET_MOUNTING.mass * 10) / 10,
-    power: Math.round(fixed.power * TURRET_MOUNTING.power * 10) / 10,
-    price: Math.round((fixed.price * TURRET_MOUNTING.price) / 50) * 50,
-    weaponId: turretWeapon,
-  };
-}

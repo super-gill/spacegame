@@ -794,6 +794,11 @@ button:hover {
   font-size: 9px;
 }
 
+/* A main gun turret bearing on its lock (docs/turrets.md): fires on the trigger now. */
+.hud-weapon.bears .hud-weapon-key {
+  color: var(--hostile);
+}
+
 .hud-debug {
   position: absolute;
   right: 16px;

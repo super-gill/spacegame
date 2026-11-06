@@ -1,4 +1,4 @@
-import { MAIN_TURRET_DAMAGE, MAIN_TURRET_SLEW, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
+import { GUN_TRAVERSE, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
 import type { ModuleSize, WeaponSpec } from './types.js';
 
 /**
@@ -6,18 +6,20 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  * (modules.ts) names the profile it fires, so two makers can share one
  * gun and differ only in mass, power and price.
  *
- * Four families (docs/weapons.md), each in sizes S, M and L:
+ * Four families (docs/weapons.md), each in sizes S, M and L. Every main
+ * gun is a turret (docs/turrets.md): it follows the active lock and fires
+ * with its group when it bears, inside its mount's arc. Traverse by size
+ * is what keeps big guns off small, quick ships.
  * - projectile: autocannon (short) and artillery (long); no capacitor,
  *   fed with rounds from the hold (goods: a unit is a box of rounds).
  * - energy: pulse laser (short) and beam laser (long); never run dry,
  *   spend capacitor per shot.
  * - hybrid: blaster (very short) and railgun (very long); charges and a
  *   little capacitor.
- * - point defence: swivels, small only, turreted and multi-role: light
- *   rounds fired fast (30 a second), so every fixed gun hits harder per shot (the
- *   standing rule, enforced by a test), but a battery of them puts out a
- *   lot of fire. With no ship to shoot at they shoot down incoming munitions
- *   by themselves (combat.ts).
+ * - point defence: swivels, small only, multi-role: light rounds fired
+ *   fast (30 a second). With no ship to shoot at they shoot down incoming
+ *   munitions by themselves (combat.ts). To be replaced by close-in weapon
+ *   systems (docs/turrets.md, build step 3).
  * - missile: launchers (Ito-Marr Magazine) and torpedo tubes (Arsenal).
  *   No capacitor; they load munition goods, which bring their own
  *   airframe and warhead (goods.ts). `damage` here is the warhead base
@@ -35,7 +37,7 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  * gun's damage against a small ship: physics does that. Bigger shots fly
  * slower (`SHOT_SPEED_FALLOFF`), so a quick target slips them at range,
  * and bigger turrets slew slower (`TURRET_SLEW_FALLOFF`), so a small ship
- * crossing close outruns their aim (docs/fitting.md, "As built: step 4").
+ * crossing close outruns their aim (docs/turrets.md, "Main guns").
  */
 
 type Profile = Omit<WeaponSpec, 'id' | 'name' | 'size'>;
@@ -71,28 +73,28 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // Projectile: no capacitor, rounds from the hold. Autocannon fires fast
   // and close; artillery slow, far and hard.
   ...family('autocannon', 'Autocannon', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'projectile',
     damage: 7,
     damageType: 'kinetic',
     fireInterval: 0.2, // 35 dps at S
     projectileSpeed: 850,
     range: 700,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 0,
     ammo: 'rounds',
     magazine: 100,
     reloadSeconds: 4,
   }),
   ...family('artillery', 'Artillery', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'projectile',
     damage: 30,
     damageType: 'kinetic',
     fireInterval: 1.2, // 25 dps at S, in big hits
     projectileSpeed: 1100,
     range: 1300,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 0,
     ammo: 'shells',
     magazine: 20,
@@ -102,28 +104,28 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // Energy: capacitor per shot, never run dry. Pulse close and quick, beam
   // long and steady.
   ...family('pulse-laser', 'Pulse laser', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'energy',
     damage: 6,
     damageType: 'thermal',
     fireInterval: 0.12, // 50 dps at S
     projectileSpeed: 900,
     range: 700,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 1.6,
     ammo: null,
     magazine: 0,
     reloadSeconds: 0,
   }),
   ...family('beam-laser', 'Beam laser', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'energy',
     damage: 16,
     damageType: 'thermal',
     fireInterval: 0.4, // 40 dps at S
     projectileSpeed: 1400,
     range: 1100,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 5,
     ammo: null,
     magazine: 0,
@@ -133,28 +135,28 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   // Hybrid: charges plus a little capacitor. Blaster is point blank and
   // brutal, railgun reaches furthest of all.
   ...family('blaster', 'Blaster', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'hybrid',
     damage: 11,
     damageType: 'thermal',
     fireInterval: 0.18, // about 61 dps at S
     projectileSpeed: 700,
     range: 380,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 1,
     ammo: 'charges',
     magazine: 80,
     reloadSeconds: 4,
   }),
   ...family('railgun', 'Railgun', {
-    kind: 'fixed',
+    kind: 'turret',
     family: 'hybrid',
     damage: 22,
     damageType: 'kinetic',
     fireInterval: 0.9, // about 24 dps at S
     projectileSpeed: 1800,
     range: 1600,
-    turretTurnRate: 0,
+    turretTurnRate: GUN_TRAVERSE,
     capacitorPerShot: 3,
     ammo: 'charges',
     magazine: 40,
@@ -210,32 +212,6 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   'mining-turret-l': miningLaser('mining-turret-l', 'Mining turret L', 'L', 1, 2.2, 10, 480, 0.8),
 };
 
-/** The main guns that also come turreted, by profile prefix. */
-const TURRETED_GUNS = ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun'];
-
-/**
- * Turreted main guns (Jason, 5 November): the fixed gun's profile on a
- * turret, medium and large only. They engage the lock and need no fire
- * control, but they are no point defence, they do less damage than the
- * fixed gun of their size (the standing rule), and they traverse slowly,
- * the large ones very slowly: a small ship crossing close outruns them.
- */
-for (const prefix of TURRETED_GUNS) {
-  for (const size of ['M', 'L'] as const) {
-    const fixed = WEAPONS[`${prefix}-${size.toLowerCase()}`]!;
-    const id = `${prefix}-turret-${size.toLowerCase()}`;
-    const step = { S: 0, M: 1, L: 2, XL: 3 }[size];
-    WEAPONS[id] = {
-      ...fixed,
-      id,
-      name: fixed.name.replace(/ (M|L)$/, ` turret $1`),
-      kind: 'turret',
-      damage: fixed.damage * MAIN_TURRET_DAMAGE,
-      turretTurnRate: MAIN_TURRET_SLEW / Math.pow(TURRET_SLEW_FALLOFF, step),
-    };
-  }
-}
-
 function miningLaser(id: string, name: string, size: ModuleSize, strength: number, yieldPerSecond: number, capacitorPerSecond: number, range: number, turretTurnRate = 0): WeaponSpec {
   return {
     id, name, size, kind: turretTurnRate > 0 ? 'turret' : 'fixed', family: 'mining', damage: yieldPerSecond, damageType: 'thermal', fireInterval: 1,
@@ -261,6 +237,11 @@ function dispenser(id: string, name: string, size: ModuleSize, magazine: number,
 /** True for a weapon that fires a shot: a gun, not a launcher, a dispenser or a mining laser. */
 export function isGun(w: Pick<WeaponSpec, 'family'>): boolean {
   return w.family !== 'missile' && w.family !== 'countermeasure' && w.family !== 'mining';
+}
+
+/** True for a main gun: a turret fired on the trigger at the lock, not a swivel, launcher, dispenser or mining laser. */
+export function isMainGun(w: Pick<WeaponSpec, 'family'>): boolean {
+  return isGun(w) && w.family !== 'pointDefence';
 }
 
 /** Damage per second of a weapon held on target, with its base ammunition. */

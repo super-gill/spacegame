@@ -218,17 +218,18 @@ export function thinkPirate(world: World, ship: Ship, stats: ShipStats, brain: P
       // and match the target's velocity on top.
       const t = target!;
       // Attack runs: in nose-on and firing, break away past it, come round
-      // again. Lock as it closes: its missiles need one, its guns do not.
+      // again. Lock as it closes: its guns and missiles need one.
       const gunMount = mainGun(stats);
       const gun = gunMount?.[1];
       const aimPoint = gun ? leadPoint(ship, t, gun.projectileSpeed) : t.position;
       const plan = attackRun(world, ship, stats, t, aimPoint, gun ? gun.range * PIRATE_TUNING.rangeFraction : 0, b.attack, around);
       b = { ...b, attack: plan.state };
       const input = { ...steer(plan.desired, plan.faceAt), ...holdLock(ship, stats, t.id) };
-      if (gun && plan.attacking) {
-        const aimError = Math.abs(angleDelta(ship.heading, toAngle(sub(aimPoint, ship.position))));
+      // Main guns are turrets: they fire whenever they bear on the lock, so
+      // hold the trigger in range rather than waiting for the nose.
+      if (gun) {
         const inRange = distance(ship.position, t.position) <= gun.range * PIRATE_TUNING.rangeFraction;
-        input.fireFixed = aimError <= PIRATE_TUNING.aimTolerance && inRange && canAfford(ship, stats, gun, gunMount![0]);
+        input.fireFixed = inRange && canAfford(ship, stats, gun, gunMount![0]);
       }
       Object.assign(input, missileInputs(ship, stats, t, PIRATE_TUNING.missileMinRange, PIRATE_TUNING.missileMaxRange, PIRATE_TUNING.missileAimTolerance));
       return { input, brain: b, events };

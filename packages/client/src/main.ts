@@ -17,7 +17,7 @@ import {
   type TradeRefusal,
   leadPoint,
   incomingMunitions,
-  isGun,
+  isMainGun,
   lockReadout,
   cargoUsed,
   holdCapacity,
@@ -864,7 +864,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   if (mine && target && view) {
     const targetView = interpolate(target, previous.ships[target.id], alpha);
     drawTargetBracket(ctx!, camera, targetView.position, current.hulls[target.hullId]?.radius ?? 16, mine.weaponsHot);
-    const gun = Object.values(shipStats(current, mine).weapons).find((w) => w.kind === 'fixed' && isGun(w));
+    const gun = Object.values(shipStats(current, mine).weapons).find((w) => isMainGun(w));
     if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
       drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
     }

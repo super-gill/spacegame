@@ -4,6 +4,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+The turret model, step 1: every main gun is a turret (docs/turrets.md).
+
+Saves move to version 14: turreted gun modules become the gun of the same name, and you get the turret mounting's price back in credits.
+
+### Changed
+- Every main gun is a turret. Its group's guns follow your active lock and fire on Space when they bear; you no longer have to point the nose. Small turrets slew 3 rad/s, medium 1.5, large 0.75, so big guns struggle to follow small, quick ships close in.
+- Where a gun can bear is set by its hardpoint: bow guns cover the forward half, side and stern mounts on big ships cover their side or the stern.
+- With no lock, guns settle along their mount and fire straight ahead.
+- The weapon tiles say whether each gun bears on your lock (`BEARS`, `SLEWING`, `RANGE`, `NO ARC`), or `AHEAD` with no lock.
+- Outfitting shows gun and swivel damage per second instead of fixed and turret; the target card shows weapons and total damage.
+- Pirates, the Calder Watch and the arena's enemies fire whenever you are locked and in range, not only when their nose is on you.
+
+### Removed
+- The separate turreted gun modules (the Picket L Turret and the rest): every gun is a turret now.
+
+### Fixed
+- Closing the menu lets go of the button last clicked, so Space (fire) no longer clicks it again (it started a second arena).
+
 ## [0.15.0] - 2026-11-06
 
 Fitting step 4 (the costs) and the arena.
