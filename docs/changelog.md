@@ -23,6 +23,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Drones thrust backwards and sideways like a ship with thrusters, so they back off and sidestep among rocks instead of only flying where they point. Ships are unchanged.
 
 ### Fixed
+- Rocks no longer stutter beside you when orbits are on: they are drawn smoothly between server updates, like ships and planets.
 - Drones (and NPC miners) close to a rock no longer plan straight through it and rub along its face; a prospector's drone in a crowded patch could get stuck that way and never cut.
 - Drones no longer get boxed in against a rock by a sister drone cutting on the same face; drones of one mother pass through each other, so they no longer steer round each other.
 - A new character joining while someone else's ship appeared could hit "Unknown hull" errors and see ships that were no longer there: updates that came while the key was on screen were dropped.

@@ -816,7 +816,11 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   drawStarfield(ctx!, camera);
 
   drawBodies(ctx!, camera, ...bodiesAt(alpha));
-  drawAsteroids(ctx!, camera, current, mine);
+  // Rocks ride rails like the bodies: draw them at the same in-between
+  // time, or with orbits on they step at the update rate while your
+  // ship glides beside them.
+  const rockTick = previous.tick + (current.tick - previous.tick) * alpha;
+  drawAsteroids(ctx!, camera, { ...current, tick: rockTick }, mine);
 
   // Stations move on rails: draw them between ticks like ships, so docked ships stay on their pads.
   const near = mine ? nearestDockableStation(mine, current.stations) : null;
@@ -916,7 +920,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   // Target bracket on the active lock (locking or locked) and, for fixed guns, the lead marker.
   const target = mine?.activeLock ? current.ships[mine.activeLock] : undefined;
   // A locked rock gets the bracket too.
-  const lockedRock = mine?.activeLock && !target ? rockAt(current, mine.activeLock) : null;
+  const lockedRock = mine?.activeLock && !target ? rockAt(current, mine.activeLock, rockTick) : null;
   if (lockedRock) {
     drawTargetBracket(ctx!, camera, lockedRock.position, lockedRock.rock.radius, false);
     // Its seam, if your mining computer reads it: aim the beam there for half as much ore again.
@@ -931,7 +935,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (lockedRock && points && !planted.has(lockedRock.rock.id)) planted.set(lockedRock.rock.id, []);
     const tolerance = shipStats(current, mine).breachTolerance;
     for (const [rockId, bearings] of planted) {
-      const at = rockAt(current, rockId);
+      const at = rockAt(current, rockId, rockTick);
       if (!at) continue;
       const marks = rockId === lockedRock?.rock.id ? (points ?? []) : [];
       drawBreachPoints(ctx!, camera, at.position, at.rock.radius, marks, tolerance, bearings);
