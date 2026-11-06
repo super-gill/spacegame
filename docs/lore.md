@@ -264,6 +264,46 @@ Each power names its own force (proposed, Jason to confirm):
 | Oru Collective | Brood wardens of the nearest hive | Do not police humans; they quarantine and remove |
 | Drifter Clans | Clan Vesk escorts | Guard the clan ships, nothing else |
 
+### Colours
+
+Every licensed ship carries a **Registry beacon**, built into the hull rather than fitted: the Landfall Accord requires it, and it broadcasts the ship's name, hull and Registry entry. Pilots call it the ship's **colours**, as ships of the age of sail did.
+
+| Saying | Meaning |
+| --- | --- |
+| Showing colours | Beacon on: the ship is named and known at a glance |
+| Running dark | Beacon off: a radar contact of some size, until someone locks and identifies it |
+| False colours | A spoofed identity; the Null Ledger's trade (later) |
+| A station's light | A station's beacon. Stations always show their light, like a lighthouse, and are always named. |
+
+Under Witness Law a dark ship's log entry is just a contact, not a name, unless the witness locked and identified it. That is why pirates run dark.
+
+How each people and faction regards a ship running dark (what the law does about it is milestone 7):
+
+| Who | View | Why |
+| --- | --- | --- |
+| Halcyon Dominion | Criminal | A knight hides nothing. Hiding your colours is cowardice or hostile intent, and house guards treat it so. |
+| Kessari Combine | Suspicious | Legal, but a dark ship pays no tolls and signs no contracts; the Toll Patrol stops and fines it |
+| Oru Collective | Suspicious | Hollow ships in the Dark answer no hail, so to the hives a silent ship might be Unsung-touched. They keep away from it. |
+| Free ports, such as Calder | Suspicious near stations | Fine in the lanes, but the port's watch hails any dark ship near a station |
+| Vael Commonwealth | Rude | A dark ship cannot be found if it is lost. The Coastguard nags, and Vael pilots think it selfish. |
+| Free Belt Union | Normal | Kessari tracked strikers by their beacons in the Strikes; running dark is a Belter's right |
+| Drifter Clans | Normal | Clan ships run dark between harbours by long habit and show colours only to friends |
+
+Pirates and others:
+
+| Who | Colours |
+| --- | --- |
+| Black Strike, Cutloose | Always dark |
+| Red Tithe | Dark until they strike, then they show their red colours: their ritual |
+| Null Ledger | False colours: their trade |
+| Hollow Choir | Dark. Hailed, they answer with song. |
+| Hiveless | No colours to show: drone-bodies carry no beacon |
+| Aurel | No colours to show. Nobody has ever read an Aurel beacon; a voice has no name to give. |
+
+### The Plot
+
+The sortable list of every contact round a ship is **the Plot**, after the plot in a navy operations room: the picture of everything around, kept current. Pilots "check the plot" and "put a contact on the plot".
+
 ### Outfits
 
 Pilots who work together register with the Landfall Pilot Registry as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name. The word is neutral on purpose; "clan" belongs to the Drifters, "company" sounds Kessari and "house" sounds Halcyon.
@@ -746,6 +786,9 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 Lore decisions by Jason, newest first.
 
+- 2026-11-06: The transponder is the Registry beacon, built into every ship; pilots call it colours (showing colours, running dark, false colours), and a station's beacon is its light.
+- 2026-11-06: Running dark is criminal to Halcyon, suspicious to Kessari, the Oru and free ports near their stations, rude to the Vael, and normal to Belters and Drifters; each pirate faction has its own way with colours.
+- 2026-11-06: The contacts list is the Plot.
 - 2026-11-05: Mining kit is Belt Forge Collective's, with Corvane's heavy plant on the Collier; Rook and Rivet stays salvage.
 - 2026-11-05: Mining ships are the Prospector, the Sinker (was Breacher) and the Collier (was Hulk); the drone is the Knocker, in a Cradle or a Cage.
 - 2026-11-05: Breaching: crackers (charges), the Shotfirer (rig), the Sounder (deep assay); a core is a knot, a piece of the gate's frame swallowed by rock.
