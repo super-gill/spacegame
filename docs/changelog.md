@@ -19,6 +19,9 @@ Saves move to version 14: turreted gun modules become the gun of the same name, 
 - Range costs accuracy: every autocannon, blaster, artillery and railgun shot leaves inside a small cone (autocannon 2.0°, blaster 2.5°, artillery 0.8°, railgun 0.3°), so a small ship far away is hard to hit and a big one is hit anyway. Outfitting shows each gun's spread.
 - Lasers lose power with range: full damage to half their range, fading to 40% at full range.
 
+### Added
+- The Controls panel (F1) offers the two steering schemes at the top: steer with the mouse, or steer with the keys (A and D spin the ship). It is the same setting as the menu's checkbox.
+
 ### Removed
 - The separate turreted gun modules (the Picket L Turret and the rest): every gun is a turret now.
 

@@ -471,6 +471,28 @@ button:hover {
   text-transform: uppercase;
 }
 
+/* The steering choice at the top of the Controls panel. */
+.controls-panel .steering {
+  margin: 0 0 14px;
+  padding: 8px 10px;
+  border: 1px solid var(--ink-dim);
+}
+
+.controls-panel .steering legend {
+  padding: 0 4px;
+  color: var(--ink-dim);
+}
+
+.controls-panel .steering-choice {
+  display: block;
+  padding: 3px 0;
+  cursor: pointer;
+}
+
+.controls-panel .steering-choice .note {
+  color: var(--ink-dim);
+}
+
 .controls-panel table {
   width: 100%;
   border-collapse: collapse;

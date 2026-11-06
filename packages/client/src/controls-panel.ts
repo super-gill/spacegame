@@ -2,8 +2,9 @@ import { FLIGHT_MODES, FLIGHT_MODE_LABELS, type FlightMode } from '@spacegame/si
 import { KEY_BINDINGS, POINTER_CONTROLS, isMouseCode, keyName } from './bindings.js';
 
 /**
- * Developer controls panel: lists every control in the game, generated
- * from bindings.ts so it is always accurate. Toggled with F1 or ` or the
+ * Developer controls panel: the steering choice (mouse or keys), then
+ * every control in the game, generated from bindings.ts so it is always
+ * accurate. Toggled with F1 or ` or the
  * button in the top right. Intended to become part of a proper settings
  * menu later; for now it is a testing aid.
  */
@@ -30,8 +31,16 @@ function keyChips(codes: readonly string[]): HTMLElement {
   return cell;
 }
 
+/** The two steering schemes, as the Controls panel offers them. */
+const STEERING_CHOICES: readonly { mouse: boolean; label: string; note: string }[] = [
+  { mouse: true, label: 'Steer with the mouse', note: 'The nose follows the pointer; A and D strafe; left button fires, right click locks.' },
+  { mouse: false, label: 'Steer with the keys', note: 'A and D spin the ship; Space fires; left click locks.' },
+];
+
 export class ControlsPanel {
   private readonly panel: HTMLDivElement;
+  /** The steering choice at the top of the panel, once `offerSteering` has placed it. */
+  private steeringRadios: HTMLInputElement[] = [];
 
   constructor(root: HTMLElement, button: HTMLButtonElement) {
     this.panel = el('div', 'controls-panel hidden');
@@ -44,6 +53,33 @@ export class ControlsPanel {
 
   toggle(): void {
     this.panel.classList.toggle('hidden');
+  }
+
+  /**
+   * Put the steering choice at the top of the panel (the same setting as
+   * the menu's checkbox): `mouse` is the current scheme, `choose` saves a
+   * new one. Called once settings are loaded.
+   */
+  offerSteering(mouse: boolean, choose: (mouse: boolean) => void): void {
+    const box = el('fieldset', 'steering');
+    box.append(el('legend', undefined, 'Steering'));
+    this.steeringRadios = STEERING_CHOICES.map((c) => {
+      const row = el('label', 'steering-choice');
+      const radio = el('input');
+      radio.type = 'radio';
+      radio.name = 'steering';
+      radio.checked = c.mouse === mouse;
+      radio.addEventListener('change', () => radio.checked && choose(c.mouse));
+      row.append(radio, el('strong', undefined, ` ${c.label}`), el('span', 'note', ` ${c.note}`));
+      box.append(row);
+      return radio;
+    });
+    this.panel.querySelector('.controls-header')!.after(box);
+  }
+
+  /** Show the steering scheme chosen elsewhere (the menu). */
+  showSteering(mouse: boolean): void {
+    this.steeringRadios.forEach((r, i) => (r.checked = STEERING_CHOICES[i]!.mouse === mouse));
   }
 
   private build(): void {

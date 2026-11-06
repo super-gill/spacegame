@@ -175,6 +175,17 @@ const settings = loadSettings();
 canvas.classList.toggle('mouse-steering', settings.mouseSteering);
 input.mouseSteering = settings.mouseSteering;
 
+/** Change the steering scheme from either place that offers it (Controls panel, menu) and keep both showing it. */
+function setMouseSteering(on: boolean): void {
+  settings.mouseSteering = on;
+  saveSettings(settings);
+  canvas.classList.toggle('mouse-steering', on);
+  input.mouseSteering = on;
+  controlsPanel.showSteering(on);
+  menu.setMouseSteering(on);
+}
+controlsPanel.offerSteering(settings.mouseSteering, setMouseSteering);
+
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
 const shipMart = new ShipMartPanel(document.getElementById('ship-mart-container')!, (loadoutId) => buy(loadoutId));
@@ -374,10 +385,7 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
     saveSettings(settings);
   },
   setMouseSteering(on) {
-    settings.mouseSteering = on;
-    saveSettings(settings);
-    canvas.classList.toggle('mouse-steering', on);
-    input.mouseSteering = on;
+    setMouseSteering(on);
   },
   grantCredits(amount) {
     send({ type: 'adminGrantCredits', amount });

@@ -64,6 +64,7 @@ export class MenuPanel {
   private readonly panel = el('div', 'menu-panel hidden');
   private readonly labelsBox = el('input');
   private readonly gravityBox = el('input');
+  private readonly steerBox = el('input');
   private readonly orbitsBox = el('input');
   private readonly manoeuvreSlider = el('input');
   private readonly manoeuvreValue = el('span');
@@ -121,13 +122,13 @@ export class MenuPanel {
     // Controls.
     this.panel.append(el('h2', undefined, 'Controls'));
     const steerRow = el('label', 'menu-row');
-    const steerBox = el('input');
+    const steerBox = this.steerBox;
     steerBox.type = 'checkbox';
     steerBox.checked = display.mouseSteering;
     steerBox.addEventListener('change', () => actions.setMouseSteering(steerBox.checked));
     steerRow.append(steerBox, document.createTextNode(' Steer with the mouse'));
     this.panel.append(steerRow);
-    this.panel.append(el('p', 'muted', 'On: the nose follows the pointer and A and D strafe. Off: A and D spin the ship.'));
+    this.panel.append(el('p', 'muted', 'On: the nose follows the pointer and A and D strafe. Off: A and D spin the ship. Also in Controls (F1).'));
 
     // World.
     this.panel.append(el('h2', undefined, 'World'));
@@ -224,6 +225,11 @@ export class MenuPanel {
     // Space (fire) would click it again: Start arena twice, say. Let it go.
     const focused = document.activeElement;
     if (hidden && focused instanceof HTMLElement && (this.panel.contains(focused) || focused.closest('button') === focused)) focused.blur();
+  }
+
+  /** Show the steering scheme chosen elsewhere (the Controls panel). */
+  setMouseSteering(on: boolean): void {
+    this.steerBox.checked = on;
   }
 
   /** Reflect the world's gravity rule (it changes with loads and imports too). */
