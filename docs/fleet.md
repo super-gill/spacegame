@@ -23,7 +23,7 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
 | Corvane Heavy Industries | Earth firm in Belt yards | Heavy ore haulage and refining | 2 |
-| The clans | The Belt | Boutique long-range and stealth hulls | 3 |
+| The clans | The Belt | Boutique long-range and stealth hulls | 6 |
 | Aurel | Beyond the Shoals | Voices | 1 known |
 
 Weapon and module makers that build no hulls: Paragon Arms, Ito-Marr Dynamics, Novum Systems, Cantor-Vell Arms, Slagline Motors.
@@ -275,36 +275,94 @@ Decided 6 November 2026. No built module changes maker or stat.
 
 Shields stay in the game. A shield is a field the drive plume breaks, which is why every ship is open astern.
 
-## Generations: legacy, production and pattern
+## Generations: legacy, production, pattern and clan
 
-Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots. Think EVE's tiers, told as production rather than technology.
+Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots; the generations are where the real variety comes from. Mapped onto EVE's tiers:
 
-| Tier | What it is | Where you get it | Price and quality |
-| --- | --- | --- | --- |
-| **Legacy** | An earlier mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (previous owners, repairs, kitbash) |
-| **Production** | The current mark | Ship marts and the maker's own yards | The catalogue price and the catalogue stats |
-| **Pattern** | A specialised refit of a production hull, built to a navy's or a company's pattern | Standing with the maker or a navy licence | Expensive, better at one thing, often worse at another |
+| Tier | EVE analogue | What it is | Where you get it | Price and quality |
+| --- | --- | --- | --- | --- |
+| **Legacy** | Cheap T1 bought second-hand | An earlier mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
+| **Production** | T1 | The current mark | Ship marts and the maker's own yards | The catalogue price and the catalogue stats |
+| **Pattern** | T2 | A specialised variant of a production hull, built to a navy's or a company's pattern | Standing with the maker, or a navy licence | Expensive, better at one thing, often worse at another |
+| **Clan** | T3 | A bespoke hull built by a Belt clan over generations | Standing with the clan, or a very rare sale | Rare, the best at one thing, and no two alike |
 
-How each power names its marks, which is where the flavour lives:
+For the lead, when wanted: a `generation` on each hull; a legacy hull is its own hull entry (its own mounts and stats) that points at the production hull it preceded; a pattern hull is a hull entry that points at its base; a used market at ship marts stocks legacy hulls at a discount with a little variance; legacy hulls appear in NPC traffic in proportion to how far from the core a system sits, so the Marches fly old ships and Sol flies new ones.
 
-- **Earth companies rename on every mark,** because a new name sells. The Kessari Writ became the Warrant; the Tessaract Ledger became the Manifest. Legacy Earth hulls therefore have their own names and a pilot learns them as the cheap ones.
-- **Mars numbers its marks** and keeps the name: Seraphine Phobos Mk II. A Mk I is still a Phobos, and a Martian will tell you it was better.
-- **Venus dates its marks:** Ishtar Lakshmi '220. Venusians are scientists.
-- **The Belt keeps the name and says "old":** the old Prospector, the old Collier. Belt Forge has never retired a hull on purpose; it just stopped getting parts.
-- **Meridian** moves to the next bird. The Tern replaced the Meridian Knot, which replaced the Meridian Dunlin, and all three are still flying.
+### How each power names its marks
 
-First legacy hulls to exist, one per starter role, so the used market has something in it on day one:
+- **Earth companies rename on every mark,** because a new name sells. Legacy Earth hulls have their own names and a pilot learns them as the cheap ones.
+- **Mars numbers its marks** and keeps the name. A Mk I is still a Phobos, and a Martian will tell you it was better.
+- **Venus dates its marks:** Ishtar Lakshmi '205. Venusians are scientists.
+- **The Belt keeps the name and says "old":** the old Prospector. Belt Forge has never retired a hull on purpose; it just stopped getting parts.
+- **Meridian** moves to the next bird, and all the old birds are still flying.
+- **Patterns** are written after the hull: Kessari Warrant, Toll pattern. Every power uses the same form, because the Ceres Registry does.
 
-| Legacy hull | Replaced by | Why it is still around |
+### Legacy grid
+
+One earlier mark for each hull new pilots and NPC traffic actually use: small and medium classes and the working civilian jobs. Big ships have no legacy marks in circulation; navies scrap them or keep them.
+
+| Production hull | Legacy predecessor | Still around because |
 | --- | --- | --- |
-| Meridian Knot | Meridian Tern | Thirty years of Registry issue; half the Marches learned to fly in one |
-| Kessari Writ | Kessari Warrant | Sold off by the toll patrols in bulk; the Black Strike's other favourite |
-| Tessaract Ledger | Tessaract Manifest | Four bays, not six, and nobody has ever scrapped one that still flew |
-| The old Prospector | Belt Forge Prospector | Belters do not throw ships away |
+| Meridian Tern | Meridian Knot | Thirty years of Registry issue; half the Marches learned to fly in one |
+| Meridian Skua | Meridian Gannet | Slower, roomier, and nobody minds |
+| Meridian Gull | Meridian Auk | Still on half the station hops in Sol |
+| Kessari Citation | Kessari Notice | Sold off by the toll patrols when the Citation came in |
+| Kessari Warrant | Kessari Writ | Sold off in bulk; the Black Strike's other favourite |
+| Kessari Injunction | Kessari Decree | A few in private hands, most in Earth's reserve |
+| Tessaract Docket | Tessaract Memo | Cheap and everywhere |
+| Tessaract Waybill | Tessaract Invoice | The hauler every Marches trader started in |
+| Tessaract Manifest | Tessaract Ledger | Four bays, not six, and nobody has ever scrapped one that still flew |
+| Seraphine Deimos | Seraphine Deimos Mk I | Sold to Martian colonies as picket boats |
+| Seraphine Phobos | Seraphine Phobos Mk II | The Navy's reserve; a Mk I is a museum piece |
+| Arcadia Hauler Mk III | Arcadia Hauler Mk II | Every Martian colony has a hangar full of them |
+| Arcadia Freighter Mk II | Arcadia Freighter Mk I | Built to last forty years and did |
+| Ishtar Sedna | Ishtar Sedna '218 | Handed down to Venusian rescue volunteers |
+| Ishtar Lakshmi | Ishtar Lakshmi '205 | The Coastguard sells them with the guns removed |
+| Union Wildcat | The old Wildcat | The Strikes' original raider, still faster than it should be |
+| Union Blockade | The old Blockade | Militia rotas get the old ones |
+| Belt Forge Pony | The old Pony | Nobody has ever thrown one away |
+| Belt Forge Mule | The old Mule | See the Pony |
+| Belt Forge Prospector | The old Prospector | Belters do not throw ships away |
+| Belt Forge Sinker | The old Sinker | Breaches like the new one, carries less |
+| Rook and Rivet Scrapper | The old Scrapper | Half of them are made of other Scrappers |
 
-Pattern hulls come later, with standing: a navy-pattern Warrant, a deep-space-pattern Manifest, a breaching-pattern Sinker. They are the same hull with a different mount plan, never a new class.
+### Pattern grid
 
-For the lead, when it is wanted: a generation on each hull (legacy, production, pattern), a used market at ship marts that stocks legacy hulls at a discount with a little variance, and legacy hulls appearing in NPC traffic in proportion to how far from the core a system sits.
+A pattern is a specialised variant of a production hull with a different mount plan, never a new class. Behind standing with the maker or a navy licence. One or two per hull where a speciality makes sense; the rest have none.
+
+| Base hull | Pattern | What it is for |
+| --- | --- | --- |
+| Kessari Citation | Pursuit pattern | Interceptor: afterburners and a tackle fit, little else |
+| Kessari Warrant | Toll pattern | Electronic warfare and sensors; stops ships without shooting them |
+| Kessari Injunction | Siege pattern | Torpedo tubes in place of launchers; slow, brutal |
+| Kessari Verdict | Picket pattern | PDC coverage for the line; a swarm's nightmare |
+| Seraphine Phobos | Escort pattern | Heavy armour, convoy work |
+| Seraphine Resolve | Vanguard pattern | More guns, less armour; the ship that goes in first |
+| Seraphine Constancy | Bastion pattern | The thickest armour Mars builds; stands and does not move |
+| Ishtar Lakshmi | Lifeline pattern | Repair and shield transfer; a Solace kit built in |
+| Ishtar Maat | Longbow pattern | Railguns and nothing else; answers from farther than anyone |
+| Union Blockade | Raider pattern | Afterburners, projectile guns, no shields worth the name; the Black Strike's dream |
+| Union Boycott | Picket pattern | PDCs and flak for the Militia's rotas |
+| Meridian Tern | Courier pattern | Faster, lighter, one less mount; Meridian's only pattern |
+| Tessaract Manifest | Deep-space pattern | Jump drive and armour for the Marches and beyond |
+| Tessaract Lading | Convoy pattern | PDCs and a tougher hull; sold to firms that lost a Lading |
+| Belt Forge Sinker | Breaching pattern | Two shotfirer rigs and a Sounder; the knot hunter |
+| Belt Forge Collier | Deep pattern | Jump drive and bunkers; mines where the patrols do not go |
+| Arcadia Freighter Mk II | Navy pattern | The Martian Navy's own supply ship; armoured, PDCs |
+| Solace Haven | Field pattern | Armour over comfort; flies with the Coastguard into the Marches |
+
+### Clan hulls
+
+Bespoke, rare, best at one thing. Standing with the clan, or a very rare sale. Named for the clan, never the Union.
+
+| Hull | Class | What it is best at |
+| --- | --- | --- |
+| Vesk Vane | Corvette | Cold-coasting: the stealthiest hull humans build |
+| Vesk Shade | Frigate | A stealth raider with a destroyer's teeth |
+| Saro Farwalker | Explorer | Range: the hull that crossed the Shoals |
+| Saro Waystar | Survey ship | Charting: finds lanes nobody else can |
+| Long Wake Trawl | Recovery tender | Finding what everyone else gave up |
+| Long Wake Keel | Salvage tender | Bringing back whole what others bring back in pieces |
 
 ## Same job, different hulls
 
@@ -333,6 +391,6 @@ Mars builds civilian hulls through one state yard, one per job, which is a state
 
 - [ ] Jason: confirm the Injunction and the Walkout as final names (they fit their makers' themes, so this draft treats them as such).
 - [ ] Jason: the grid: anything wrong, missing or too many; which gaps should stay gaps.
-- [ ] Jason: the generations model (legacy, production, pattern) and the four first legacy hulls.
+- [ ] Jason: the generations model and the three grids (legacy, pattern, clan); which legacy and pattern hulls the first used market and the first standing rewards should carry.
 - [ ] Lead: which of these the next build slice needs; everything marked draft waits for a milestone that wants it.
 - [ ] Lore: the drones list and the Arena ask, after this.
