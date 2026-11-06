@@ -1,6 +1,6 @@
 {
   "name": "@spacegame/server",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": true,
   "description": "The shared-world server: runs the sim, holds the save, serves the client and talks to it over a WebSocket.",
   "type": "module",
@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@spacegame/sim": "0.16.0",
+    "@spacegame/sim": "0.17.0",
     "tsx": "^4.19.2",
     "ws": "^8.18.0"
   },

@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-06
+
+The interface pass and the shared world: each player is sent only what their sensors see, ships running dark are only radar contacts, and the HUD gains the Plot, the selection window, warnings with sounds, turret arcs and aim reticles (docs/interface.md, docs/shared-world.md).
+
+Saves move to version 16: pirates already in a save start running dark; everything else shows its colours. Clients must reload (protocol version 2).
+
 ### Added
 - Name colours, running dark and the Plot from the lore.
 - Name close-in weapon systems swivels, from the lore.

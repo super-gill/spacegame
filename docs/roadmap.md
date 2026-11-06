@@ -28,14 +28,14 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Plan from here (after 0.16.0)
+## Plan from here (after 0.17.0)
 
 1. **0.15.0 released: fitting costs and the arena** (`docs/fitting.md`, "As built: step 4" and "The arena"). No damage cuts: big guns struggle against small ships by physics; point defence small only; turreted main guns; signature from kit; swarm fights in the lab; operators fight any fit against any other in the arena.
 2. **0.16.0 released: the turret model** (`docs/turrets.md`, "As built" steps 1 to 4): every main gun a turret firing at the selected lock, traverse by size, hardpoint arcs; spread with range and laser falloff; close-in weapon systems on medium ships and up replacing swivels (save 15); stock big ships refit against the balance targets; steering by mouse or keys offered in the Controls panel. Next: Jason to choose from the items below.
 3. **Shared world:** done on `main`: each player is sent only what their sensors can see (no other players' holds, credits or storage), your own shots drawn from your guns, and a dropped-updates bug fixed (`docs/shared-world.md`, "As built: only what you can see"). Still waiting: full prediction for your own ship, only if steering lags for friends.
 4. **Drones:** done on `main`: full manoeuvring and a planner fix (`docs/drones.md`); for Jason to try in the belt.
 5. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
-6. **The interface pass** (6d, agreed 6 November, `docs/interface.md`): built on `main`: turret arcs and aim, audible warnings with messages, the Plot with colours and the nav target, the selection window, aim reticle styles. Release as 0.17.0 once Jason has tried the selection window.
+6. **The interface pass** (6d, agreed 6 November, `docs/interface.md`): built on `main`: turret arcs and aim, audible warnings with messages, the Plot with colours and the nav target, the selection window, aim reticle styles. **Released as 0.17.0** (6 November 2026).
 7. **Worlds: Live and Dev servers, the Universe and the Arena** (agreed 6 November, `docs/worlds.md`): two servers (live on releases, dev on `main`), a mode screen after login, the Arena as its own unsaved world with ship, fit and scenario (Skirmish, Waves, To the death). Mockups first.
 8. Then law (7, with electronic warfare), then the map (8).
 
