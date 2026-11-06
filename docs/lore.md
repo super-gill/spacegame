@@ -365,7 +365,16 @@ Paragon Arms sells light guns of every family to anyone, never navy grade.
 
 ### Swivels
 
-Turreted point defence guns are called **swivels** in the setting, after the small swivel guns of the age of sail. A swivel slews to meet incoming missiles and torpedoes by default, and turns on a ship when assigned to a lock. Pilots say "swivels up" for point defence on. "PDC" stays the technical term in the design docs.
+Close-in weapon systems are called **swivels** in the setting, after the small swivel guns of the age of sail. A swivel throws out a storm of light rounds at anything that comes close, missiles and torpedoes first, then ships. Pilots say "swivels up" for point defence on, and a small ship's whole art against a big one is staying just outside its swivels. "CIWS" stays the technical term in the design docs.
+
+Only medium hulls and bigger carry swivels; small ships trust their countermeasures. The first swivels fire rounds. Laser swivels come later, and Halcyon will build them: a laser swivel never runs out of rounds, which suits a people who think they are owed forever.
+
+| Swivel | Kind | Maker | Note |
+| --- | --- | --- | --- |
+| Paragon Sentry M | Rounds | Paragon Arms | Open market; a sentry guards close in |
+| Cantor-Vell Compline | Laser (later) | Cantor-Vell Arms | Compline is the night prayer asking protection until morning |
+
+Fire control decides how many swivels a ship can run and how well they track: the Paragon Gunlayer S, M and L.
 
 ### Capacitors by hull
 
@@ -649,9 +658,9 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | `meridian-pod-s` | Meridian Carryall S | A small general cargo pod |
 | `tessaract-container-m` | Tessaract Standard M | The standard box every port in the Arm handles |
 | `paragon-pulse-s` | Paragon Fairshot S | Becomes an open-market pulse laser (energy) |
-| `paragon-turret-s` | Paragon Watchman S | Becomes a swivel (point defence) |
+| `paragon-turret-s` | Paragon Watchman S | Retired with the old turreted swivel |
 | `union-autocannon-m` | Union Picket M | Named for the strike picket lines; the Picket line now runs S to L |
-| `paragon-turret-m` | Paragon Sentry M | Becomes a swivel (point defence) |
+| `paragon-turret-m` | Paragon Sentry M | Retired as a turret; the name passes to the CIWS `paragon-ciws-m` |
 
 New system modules (6c and 6d):
 
@@ -683,7 +692,8 @@ Each gun has one name across sizes S, M and L.
 | Railgun | Hybrid | Commonwealth Answer S, M, L | A reply from as far as anyone can shoot |
 | Missile launcher | Missile | Ito-Marr Magazine S, M, L | |
 | Torpedo tube | Missile | Ito-Marr Arsenal L | |
-| Swivel | Point defence | Paragon Watchman S, Paragon Sentry M | Today's turrets |
+| Swivel (CIWS) | Point defence | Paragon Sentry M (`paragon-ciws-m`); Cantor-Vell Compline (laser, later) | Medium hulls and up |
+| Fire control | | Paragon Gunlayer S, M, L | The L runs the most swivels |
 
 Munitions are made by Kessari Orbital Defence and named in its legal voice. A munition's full name is the munition, then the warhead, then the guidance when it is not radar-homing.
 
@@ -786,6 +796,7 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 Lore decisions by Jason, newest first.
 
+- 2026-11-06: Close-in weapon systems are swivels in the setting (the word moves from the retired turreted swivel). The ballistic one is the Paragon Sentry M; the later laser one the Cantor-Vell Compline. The big fire control is the Paragon Gunlayer L.
 - 2026-11-06: The transponder is the Registry beacon, built into every ship; pilots call it colours (showing colours, running dark, false colours), and a station's beacon is its light.
 - 2026-11-06: Running dark is criminal to Halcyon, suspicious to Kessari, the Oru and free ports near their stations, rude to the Vael, and normal to Belters and Drifters; each pirate faction has its own way with colours.
 - 2026-11-06: The contacts list is the Plot.
