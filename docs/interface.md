@@ -44,6 +44,14 @@ Draft events (to settle while building; thresholds are working numbers):
 - **Acting from it:** right-click a row to lock (as on screen: left acts, right chooses); click to select it and make it the nav target.
 - **Colours decide what an unlocked contact shows** (Jason, 6 November 2026; names from `lore.md`, "Colours": the transponder is the Registry beacon, pilots call it colours; HUD words **colours** and **dark** for the switch and its state, **light** for a station's beacon): a ship showing its colours shows its name and hull at once; one running dark, or with no colours to show (Hiveless, Aurel), is a radar contact (size and distance) until locked and identified by your targeting computer. Stations always show their light and are always named; rocks and caches are radar returns by kind. The transponder is an innate part of every ship, not a module (Jason, same day): a switch, on by default. Lead's notes: NPC traders and the Watch broadcast, pirates run dark; whether running dark is legal, suspicious or a crime belongs to law (7). Today the server sends every pilot's name and ship in sensor range: `visibleWorld` will have to hold identity back for ships running dark.
 
+**Mockup approved** (Jason, 6 November 2026): https://claude.ai/artifact/DDLGgW4jx2ADxTcR88hdkX (a working Plot to click through). As drawn:
+
+- A HUD window on the left, between the launcher strip and the radar, opened with P (added to the launcher); the right edge stays for locks and the target card. Movable like every HUD window.
+- Columns DIST (units), TYPE, NAME, CLOSE (units a second, positive coming towards you), LOCK (ACTIVE, LOCKED, LOCKING, or DARK for an unidentified contact).
+- An unidentified dark contact reads `RADAR · SMALL` (or MEDIUM, LARGE) and `Unknown contact` in amber; locked, it shows its hull and who flies it. NPCs are named by role (PIRATE, CALDER WATCH, TRADER), players by name. Colours: hostile red, the Watch white, others neutral blue, stations bright, your own kit ink.
+- Tabs GENERAL (ships, stations, caches), COMBAT (ships, hostiles first, then unknowns), MINING (rocks, caches, your drones). Column heads sort. The selected row is the nav target, named with its arrival time in the footer.
+- The colours chip sits on the status lines beside credits and hold: COLOURS, or DARK in amber while running dark.
+
 **The nav target:** a marker at the edge of the screen with distance and arrival time.
 
 **Lock cards and the selection window** (Jason: wants to see it in game before deciding): lock cards stay small and glanceable (who, condition, whether your guns bear). A selection window shows whatever you have clicked in the Plot or on screen, locked or not: everything your sensors and computer give you, and actions (lock, set nav target, dock at a station). A fuller "show info" page later.
