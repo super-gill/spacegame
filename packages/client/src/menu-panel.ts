@@ -31,6 +31,10 @@ export interface MenuActions {
   setOrbits(on: boolean): void;
   /** Admin (testing): how fast thrust pushes ships sideways or backwards, 0 to 1 of top speed. */
   setManoeuvreSpeed(share: number): void;
+  /** Admin (testing): fly `playerFit` against `count` ships of `enemyFit`, far out in space. */
+  startArena(playerFit: string, enemyFit: string, count: number): void;
+  /** Admin (testing): leave the arena, back to the ship you came from. */
+  endArena(): void;
 }
 
 /** A loadout the admin spawner offers. */
@@ -71,6 +75,7 @@ export class MenuPanel {
     display: { showLabels: boolean; mouseSteering: boolean },
     actions: MenuActions,
     spawnChoices: readonly SpawnChoice[],
+    arenaFits: readonly string[] = [],
   ) {
     const showLabels = display.showLabels;
     this.panel.setAttribute('role', 'dialog');
@@ -174,6 +179,39 @@ export class MenuPanel {
     manoeuvreRow.append(document.createTextNode('Manoeuvring speed '), this.manoeuvreSlider, this.manoeuvreValue);
     admin.append(manoeuvreRow);
     admin.append(el('p', 'muted', 'How fast thrust can push you sideways or backwards, as a share of top speed. 0% flies like Flatspace: only where the nose points. 100%: any direction alike. Default 20%.'));
+
+    // The arena: a fight on demand with the fitting lab's reference fits.
+    admin.append(el('h2', undefined, 'Arena'));
+    const fitSelect = (label: string, chosen: string): HTMLSelectElement => {
+      const s = el('select');
+      s.setAttribute('aria-label', label);
+      for (const name of arenaFits) {
+        const option = el('option', undefined, name);
+        option.value = name;
+        option.selected = name === chosen;
+        s.append(option);
+      }
+      return s;
+    };
+    const yours = fitSelect('Your ship', arenaFits.find((n) => n.startsWith('Frigate crowd clearer')) ?? arenaFits[0] ?? '');
+    const theirs = fitSelect('Enemy ship', arenaFits.find((n) => n.startsWith('Warrant brawler')) ?? arenaFits[0] ?? '');
+    const howMany = el('input');
+    howMany.type = 'number';
+    howMany.min = '1';
+    howMany.max = '8';
+    howMany.value = '4';
+    howMany.setAttribute('aria-label', 'How many enemies');
+    const youRow = el('label', 'menu-row');
+    youRow.append(document.createTextNode('You fly '), yours);
+    const themRow = el('label', 'menu-row');
+    themRow.append(document.createTextNode('Against '), howMany, document.createTextNode(' x '), theirs);
+    const goRow = el('div', 'menu-row');
+    goRow.append(
+      button('Start arena', () => actions.startArena(yours.value, theirs.value, Math.max(1, Math.min(8, Math.round(Number(howMany.value) || 1))))),
+      button('End arena', () => actions.endArena()),
+    );
+    admin.append(youRow, themRow, goRow);
+    admin.append(el('p', 'muted', 'Puts you in a free ship of that fit far out in empty space, with the enemies 1,400 units off; they come straight for you, flying as the fitting lab flies them. Start again to restart. End arena removes it all and puts you back in the ship you came from.'));
 
     this.panel.append(admin);
 

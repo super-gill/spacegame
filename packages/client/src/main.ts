@@ -4,6 +4,7 @@ import {
   type WorldUpdate,
   type PilotCommand,
   activationSlots,
+  arenaFits,
   type AdminRefusal,
   stepOutRefusal,
   type StepOutRefusal,
@@ -233,6 +234,14 @@ function refusalText(command: PilotCommand, reason: string): string | null {
       case 'adminSetRule':
       case 'adminSpawnShip':
         return { ...ADMIN_REFUSALS, notAdmin: 'Only the host can do that.' };
+      case 'adminArena':
+      case 'adminArenaEnd':
+        return {
+          notAdmin: 'Only the host can do that.',
+          unknownFit: 'No reference fit by that name.',
+          badCount: 'Pick 1 to 8 enemies.',
+          notInArena: 'You are not in an arena.',
+        };
       // The buttons for these only show when they would work.
       case 'claimStarter':
       case 'wake':
@@ -385,11 +394,17 @@ const menu = new MenuPanel(document.body, document.getElementById('menu-button')
   spawnShip(loadoutId) {
     send({ type: 'adminSpawnShip', loadoutId });
   },
+  startArena(playerFit, enemyFit, count) {
+    send({ type: 'adminArena', playerFit, enemyFit, count });
+  },
+  endArena() {
+    send({ type: 'adminArenaEnd' });
+  },
 }, Object.values(current.loadouts)
   // Escape pods are issued, not flown by choice.
   .filter((l) => !current.hulls[l.hullId]?.escapePod)
   .map((l) => ({ id: l.id, name: l.name }))
-  .sort((a, b) => a.name.localeCompare(b.name)));
+  .sort((a, b) => a.name.localeCompare(b.name)), arenaFits());
 
 /**
  * A numbered activation tile was pressed (sim `activationSlots`): select
@@ -699,6 +714,7 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
     const hunting = brain.mode === 'hunt' ? (mine && brain.targetId === mine.id ? ' · HUNTING YOU' : ' · HUNTING') : '';
     return { colour: COLOUR.hostile, label: `PIRATE${hunting}` };
   }
+  if (brain?.kind === 'arena') return { colour: COLOUR.hostile, label: 'ARENA' };
   if (brain?.kind === 'trader') return { colour: COLOUR.neutral, label: 'TRADER' };
   if (brain?.kind === 'miner') return { colour: COLOUR.neutral, label: 'MINER' };
   if (brain?.kind === 'drone') return { colour: ship.ownerId === me.id ? COLOUR.ink : COLOUR.inkDim, label: `DRONE ${(ship.droneId ?? '').toUpperCase()}` };
@@ -792,7 +808,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const p of current.projectiles) {
     const isMine = mine && p.ownerShipId === mine.id;
     const shooterBrain = current.npcs[p.ownerShipId];
-    drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' ? COLOUR.hostile : COLOUR.neutral);
+    drawProjectile(ctx!, camera, p, isMine ? COLOUR.inkBright : shooterBrain?.kind === 'pirate' || shooterBrain?.kind === 'arena' ? COLOUR.hostile : COLOUR.neutral);
   }
 
   for (const d of current.decoys) drawDecoy(ctx!, camera, d, nowMs);

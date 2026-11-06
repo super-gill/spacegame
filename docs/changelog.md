@@ -11,10 +11,15 @@ Saves move to version 13: medium and large swivels become small ones, and you ge
 - The Paragon Gunlayer L fire control runs eight swivels, so a heavy ship can carry nothing but point defence.
 - Signature from kit: big engines and guns make a ship easier to lock, the charge rig more so, and a burning afterburner blooms it by half. The fitting window shows it.
 - The market shows cargo and the ore hold separately, and a greyed Buy button says why on hover.
+- The arena (operators): in the menu, pick a fit to fly and a fit and number of enemies, and fight them far out in space; end it to go back to your ship.
+
+### Fixed
+- The menu scrolls when it is taller than the screen (the admin tools ran off the bottom), and long ship names no longer push buttons off it.
 
 ### Changed
 - Point defence is small only: the Paragon Sentry M and Bulwark L are gone (fitted and stored ones become Watchman S, refunded); big ships carry several small swivels. The Walkout's fire control mount is large.
 - Bigger guns fire slower shots, and bigger turrets slew slower, so small, quick ships are hard for big guns to hit.
+- Swivels fire light rounds fast (40 a second each) out to 900 units, so a big ship covered in them is dangerous to small ships.
 - The Cantor-Vell Vigil M armour plate carries 460 structure (was 100, worse than the small plate).
 - Mining ships and kit take their names from the lore: Belt Forge Collective builds the Prospector, Sinker (was Breacher), Collier (was Hulk) and the Knocker drone, with the Pick, Dowser, Assay, Sounder (was Deep Assay), Shotfirer (was Charge Rig), Hopper, Nibbler, Cradle and Cage; Corvane Heavy Industries builds the Excavator and the Furnace. Rook and Rivet stays the salvage firm.
 - Ores and charges renamed: Copperband (was Banded ore), Blackjack (was Black ore), crackers (were breach charges), and the Knocker as a good.

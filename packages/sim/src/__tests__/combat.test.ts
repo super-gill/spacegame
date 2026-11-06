@@ -50,12 +50,12 @@ function quietWorld(): { w: World; me: string } {
 }
 
 describe('weapon catalogue', () => {
-  it('fixed guns always out-damage swivels of the same size, and their own turreted version', () => {
+  it('fixed guns hit harder per shot than swivels, and out-damage their own turreted version', () => {
     const all = Object.values(WEAPONS);
     // Launchers and dispensers are fixed but not guns: the rule is about guns.
     for (const fixed of all.filter((w) => w.kind === 'fixed' && isGun(w))) {
-      for (const swivel of all.filter((w) => w.family === 'pointDefence' && w.size === fixed.size)) {
-        expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(swivel));
+      for (const swivel of all.filter((w) => w.family === 'pointDefence')) {
+        expect(fixed.damage).toBeGreaterThan(swivel.damage);
       }
       const turreted = WEAPONS[fixed.id.replace(/-(m|l)$/, '-turret-$1')];
       if (turreted && turreted !== fixed) expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turreted));

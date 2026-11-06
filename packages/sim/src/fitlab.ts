@@ -1,14 +1,12 @@
-import { angleDelta } from './angle.js';
-import { attackRun, steerToVelocity } from './ai/steer.js';
-import { leadPoint } from './combat.js';
+import { duellistInput, fightInput } from './ai/fight.js';
 import { buildShip } from './factory.js';
 import { mountRefusal, type FitRefusal } from './fitting.js';
 import { fitStats, type Catalogues } from './stats.js';
 import { stepWorld } from './step.js';
 import type { DamageType, Loadout, RunState, ShipInput, ShipStats, World } from './types.js';
 import { weaponDps } from './weapons.js';
-import { createStarterWorld, emptyInput } from './world.js';
-import { distance, fromAngle, scale, sub, toAngle, add } from './vec2.js';
+import { createStarterWorld } from './world.js';
+import { distance, fromAngle, scale, add } from './vec2.js';
 
 /**
  * The fitting lab (docs/fitting.md, "The fitter"): what a fit is worth,
@@ -162,8 +160,6 @@ export interface DuelResult {
   draws: number;
 }
 
-/** How a scripted duellist flies: closes to `preferred` of its longest gun's range (launchers aside), keeps its nose on the lead point, fires when on aim. */
-const DUELLIST = { preferred: 0.6, aimTolerance: 0.08, tooClose: 0.3 };
 
 /**
  * Fly two fits at each other in empty space, from `starts` bearings at
@@ -193,7 +189,7 @@ export function duel(a: FitSpec, b: FitSpec, options: { starts?: number; distanc
     const limit = Math.round(seconds / w.dt);
     for (; t < limit; t++) {
       if (!w.ships['a'] || !w.ships['b']) break;
-      w = stepWorld(w, { a: pilot(w, 'a', 'b', t), b: pilot(w, 'b', 'a', t) });
+      w = stepWorld(w, { a: duellistInput(w, 'a', 'b', t), b: duellistInput(w, 'b', 'a', t) });
     }
     const left = (id: 'a' | 'b'): number => {
       const s = w.ships[id];
@@ -220,6 +216,9 @@ export interface SkirmishRun {
   /** Ships each side lost. */
   aLost: number;
   bLost: number;
+  /** Per ship: gun shots fired, and the damage its shots, munitions and rams did. */
+  fired: Record<string, number>;
+  dealt: Record<string, number>;
 }
 
 export interface SkirmishResult {
@@ -229,11 +228,6 @@ export interface SkirmishResult {
   draws: number;
 }
 
-/**
- * A ship this many times smaller (by signature) than its target flies
- * attack runs at it, as pirates do, instead of closing and sitting nose on.
- */
-const RUNNER_SIGNATURE_RATIO = 1.5;
 
 /**
  * Side against side (Jason: a big ship should win one against one, a
@@ -267,24 +261,21 @@ export function skirmish(sideA: FitSpec[], sideB: FitSpec[], options: { starts?:
     const runState: Record<string, RunState | undefined> = {};
     const alive = (prefix: string) => Object.values(w.ships).filter((sh) => sh.id.startsWith(prefix));
     const limit = Math.round(seconds / w.dt);
+    const fired: Record<string, number> = {};
+    const dealt: Record<string, number> = {};
+    const seen = new Set<string>();
     let t = 0;
     for (; t < limit; t++) {
       if (alive('a').length === 0 || alive('b').length === 0) break;
+      for (const p of w.projectiles) if (!seen.has(p.id)) { seen.add(p.id); fired[p.ownerShipId] = (fired[p.ownerShipId] ?? 0) + 1; }
+      for (const e of w.events) if (e.type === 'damaged' && e.by) dealt[e.by] = (dealt[e.by] ?? 0) + e.amount;
       const inputs: Record<string, ShipInput> = {};
       for (const me of Object.values(w.ships)) {
         const foes = alive(me.id.startsWith('a') ? 'b' : 'a');
         const foe = foes.reduce((best, f) => (distance(f.position, me.position) < distance(best.position, me.position) ? f : best), foes[0]!);
-        const mineSig = fitStats(w, w.hulls[me.hullId]!, me.fit).signature;
-        const theirSig = fitStats(w, w.hulls[foe.hullId]!, foe.fit).signature;
-        if (theirSig >= mineSig * RUNNER_SIGNATURE_RATIO) {
-          const plan = runner(w, me.id, foe.id, t, runState[me.id]);
-          runState[me.id] = plan.state;
-          inputs[me.id] = plan.input;
-        } else {
-          inputs[me.id] = pilot(w, me.id, foe.id, t);
-        }
-        // Keep the lock on whoever this ship is fighting now.
-        if (me.activeLock !== foe.id) inputs[me.id] = { ...inputs[me.id]!, lock: foe.id, activateLock: foe.id };
+        const plan = fightInput(w, me.id, foe.id, t, runState[me.id]);
+        runState[me.id] = plan.state;
+        inputs[me.id] = plan.input;
       }
       w = stepWorld(w, inputs);
     }
@@ -292,7 +283,7 @@ export function skirmish(sideA: FitSpec[], sideB: FitSpec[], options: { starts?:
     const aAlive = alive('a').length;
     const bAlive = alive('b').length;
     const winner = aAlive === 0 && bAlive > 0 ? 'b' : bAlive === 0 && aAlive > 0 ? 'a' : null;
-    runs.push({ winner, seconds: t * w.dt, aLeft: left('a', fullA), bLeft: left('b', fullB), aLost: sideA.length - aAlive, bLost: sideB.length - bAlive });
+    runs.push({ winner, seconds: t * w.dt, aLeft: left('a', fullA), bLeft: left('b', fullB), aLost: sideA.length - aAlive, bLost: sideB.length - bAlive, fired, dealt });
   }
   return {
     runs,
@@ -302,74 +293,30 @@ export function skirmish(sideA: FitSpec[], sideB: FitSpec[], options: { starts?:
   };
 }
 
-/** A small ship making attack passes at a big one: the pirates' runs, firing its guns on aim and its turrets whenever they bear. */
-function runner(w: World, me: string, foe: string, tick: number, state: RunState | undefined): { input: ShipInput; state: RunState } {
-  const mine = w.ships[me]!;
-  const them = w.ships[foe]!;
-  const stats = fitStats(w, w.hulls[mine.hullId]!, mine.fit);
-  const guns = Object.values(stats.weapons).filter((x) => x.family !== 'mining' && x.family !== 'countermeasure' && x.family !== 'missile');
-  const fixed = guns.filter((x) => x.kind === 'fixed');
-  const range = Math.max(1, ...guns.map((x) => x.range));
-  const aimPoint = fixed[0] ? leadPoint(mine, them, fixed[0].projectileSpeed || 1e6) : them.position;
-  const plan = attackRun(w, mine, stats, them, aimPoint, range * 0.9, state, []);
-  const input = steerToVelocity(mine, stats, plan.desired, plan.faceAt, w.rules.manoeuvreSpeed);
-  const err = Math.abs(angleDelta(mine.heading, toAngle(sub(aimPoint, mine.position))));
-  const d = distance(mine.position, them.position);
-  const groups = [...new Set(mine.weapons.filter((s) => stats.weapons[s.mountId]?.kind === 'fixed').map((s) => s.group))].sort();
-  const group = groups.length > 0 ? groups[Math.floor(tick / 120) % groups.length]! : null;
-  return {
-    input: {
-      ...input,
-      fireFixed: (guns.some((x) => x.kind === 'turret' && x.family !== 'pointDefence') || (plan.attacking && err < DUELLIST.aimTolerance)) && d < range * 0.95,
-      selectGroup: group !== null && group !== mine.fireGroup ? group : null,
-    },
-    state: plan.state,
-  };
-}
 
 /** A ship for a duel: the fit, ammunition for every gun and launcher, weapons hot. */
 function build(world: World, spec: FitSpec, id: string, position: { x: number; y: number }, heading: number) {
   const loadout: Loadout = { id: spec.name, name: spec.name, hullId: spec.hullId, fit: spec.fit };
   const ship = buildShip(world, { id, loadout, ownerId: null, position, heading, flightMode: 'assisted' });
-  const hold: Record<string, number> = {};
-  const stats = fitStats(world, world.hulls[spec.hullId]!, ship.fit);
-  for (const w of Object.values(stats.weapons)) {
-    if (!w.ammo) continue;
-    const good = Object.values(world.goods).find((g) => g.ammo?.fits === w.ammo);
-    if (good) hold[good.id] = (hold[good.id] ?? 0) + 4;
-  }
-  return { ...ship, hold, weaponsHot: true };
+  return { ...ship, hold: ammunitionHold(world, ship.hullId, ship.fit), weaponsHot: true };
 }
 
-/** The scripted duellist's input this tick. */
-function pilot(w: World, me: string, foe: string, tick: number): ShipInput {
-  const mine = w.ships[me]!;
-  const them = w.ships[foe]!;
-  const stats = fitStats(w, w.hulls[mine.hullId]!, mine.fit);
-  const guns = Object.values(stats.weapons).filter((x) => x.family !== 'mining' && x.family !== 'countermeasure');
-  const fixed = guns.filter((x) => x.kind === 'fixed');
-  // Close to gun range, not launcher range: a launcher's few missiles are
-  // gone in a minute, and a ship that holds off at missile range with
-  // guns aboard never fires them. A launcher-only fit stands off.
-  const direct = guns.filter((x) => x.family !== 'missile');
-  const longest = Math.max(1, ...(direct.length > 0 ? direct : guns).map((x) => x.range));
-  const lead = fixed[0] ? leadPoint(mine, them, fixed[0].projectileSpeed || 1e6) : them.position;
-  const want = toAngle(sub(lead, mine.position));
-  const err = Math.abs(angleDelta(mine.heading, want));
-  const d = distance(mine.position, them.position);
-  // Fire groups take turns, two seconds each, so launchers get used as well as guns.
-  // Turreted main guns fire with their group whenever they bear, so hold the trigger in range.
-  const turreted = guns.some((x) => x.kind === 'turret' && x.family !== 'pointDefence');
-  const groups = [...new Set(mine.weapons.filter((s) => { const x = stats.weapons[s.mountId]; return x && (fixed.includes(x) || (x.kind === 'turret' && x.family !== 'pointDefence' && x.family !== 'mining')); }).map((s) => s.group))].sort();
-  const group = groups.length > 0 ? groups[Math.floor(tick / 120) % groups.length]! : null;
-  return {
-    ...emptyInput(),
-    aimHeading: want,
-    thrustForward: d > longest * DUELLIST.preferred && err < 0.5,
-    thrustReverse: d < longest * DUELLIST.tooClose,
-    fireFixed: (turreted || err < DUELLIST.aimTolerance) && d < Math.max(longest, ...guns.map((x) => x.range)) * 0.95,
-    lock: tick === 0 ? foe : null,
-    activateLock: tick === 0 ? foe : null,
-    selectGroup: group !== null && group !== mine.fireGroup ? group : null,
-  };
+/**
+ * A hold full of ammunition for a fit, as a pilot would load it for a
+ * fight: the cargo space shared between the guns and launchers by how
+ * many of each there are, whole boxes, at least one each.
+ */
+export function ammunitionHold(cat: Catalogues, hullId: string, fit: Record<string, string>): Record<string, number> {
+  const stats = fitStats(cat, cat.hulls[hullId]!, fit);
+  const wanted: Record<string, number> = {};
+  for (const w of Object.values(stats.weapons)) {
+    if (!w.ammo) continue;
+    const good = Object.values(cat.goods).find((g) => g.ammo?.fits === w.ammo);
+    if (good) wanted[good.id] = (wanted[good.id] ?? 0) + 1;
+  }
+  const shares = Object.values(wanted).reduce((n, k) => n + k, 0);
+  const hold: Record<string, number> = {};
+  for (const [good, k] of Object.entries(wanted)) hold[good] = Math.max(1, Math.floor((stats.cargoCapacity * k) / shares));
+  return hold;
 }
+

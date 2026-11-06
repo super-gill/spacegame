@@ -13,9 +13,10 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  *   spend capacitor per shot.
  * - hybrid: blaster (very short) and railgun (very long); charges and a
  *   little capacitor.
- * - point defence: swivels, turreted and multi-role, worse than a fixed
- *   gun of their size at everything (the standing rule, enforced by a
- *   test). With no ship to shoot at they shoot down incoming munitions
+ * - point defence: swivels, small only, turreted and multi-role: light
+ *   rounds fired fast, so every fixed gun hits harder per shot (the
+ *   standing rule, enforced by a test), but a battery of them puts out a
+ *   lot of fire. With no ship to shoot at they shoot down incoming munitions
  *   by themselves (combat.ts).
  * - missile: launchers (Ito-Marr Magazine) and torpedo tubes (Arsenal).
  *   No capacitor; they load munition goods, which bring their own
@@ -166,11 +167,15 @@ export const WEAPONS: Record<string, WeaponSpec> = {
   'swivel-s': sized('swivel-s', 'Swivel S', 'S', {
     kind: 'turret',
     family: 'pointDefence',
-    damage: 4,
+    // Light rounds, fast (Jason, 6 November): a battery of swivels shreds
+    // small ships, while a big ship's shields and plate shrug them off.
+    damage: 3,
     damageType: 'kinetic',
-    fireInterval: 0.2, // 20 dps at S
+    fireInterval: 0.075, // 40 dps
     projectileSpeed: 800,
-    range: 650,
+    // Further than any small ship's guns reach (Jason, 6 November): a
+    // small ship making passes flies through point defence fire.
+    range: 900,
     turretTurnRate: 4,
     capacitorPerShot: 0,
     ammo: 'rounds',

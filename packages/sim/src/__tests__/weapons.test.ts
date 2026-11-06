@@ -46,11 +46,11 @@ describe('the catalogue', () => {
     }
   });
 
-  it('keeps the rule: every fixed gun out-damages the small swivel', () => {
+  it('keeps the rule: every fixed gun hits harder per shot than the small swivel', () => {
     const swivel = WEAPONS['swivel-s']!;
     for (const size of ['S', 'M', 'L'] as const) {
       for (const gun of Object.values(WEAPONS).filter((w) => w.kind === 'fixed' && isGun(w) && w.size === size)) {
-        expect(weaponDps(gun), `${gun.id} vs ${swivel.id}`).toBeGreaterThan(weaponDps(swivel));
+        expect(gun.damage, `${gun.id} vs ${swivel.id}`).toBeGreaterThan(swivel.damage);
       }
     }
   });

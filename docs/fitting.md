@@ -150,7 +150,7 @@ Step 4 balances big guns against small targets, and there were no big combat hul
 
 **No damage is cut by rule** (Jason). A first build gave weapons a resolution against signature with a 40% floor; it was taken out the same night. Our shots are real projectiles that travel and miss, so physics does the job: big turrets slew slowly, big shots fly slowly, and fixed guns aim with the hull, so a heavy ship's slow turn is their tracking. The design Jason wants: **a big ship wins one against one; a swarm of small ships overwhelms it; a big ship may never get its big guns on a small one; a big ship covered in point defence is a small ship's nightmare and shrugs off against another big ship.**
 
-- **Point defence is small only.** Swivels (the Paragon Watchman S) are the PDCs: turreted, shooting down munitions by themselves, engaging ships too. The Sentry M and Bulwark L are gone; big ships carry several Watchmen. Save 13 (`migrate12to13`) swaps fitted and stored M and L swivels for Watchmen and refunds the price difference.
+- **Point defence is small only.** Swivels (the Paragon Watchman S) are the PDCs: turreted, shooting down munitions by themselves, engaging ships too. Since 6 November they fire light, fast rounds (3 a shot, 40 a second) out to 900 units, beyond any small ship's guns, so a ship making passes flies through their fire; the standing rule is now that every fixed gun hits harder per shot. The Sentry M and Bulwark L are gone; big ships carry several Watchmen. Save 13 (`migrate12to13`) swaps fitted and stored M and L swivels for Watchmen and refunds the price difference.
 - **Fire control sets how many PDCs:** Gunlayer S one, M three, and a new **Gunlayer L** eight, so a heavy ship can fill every high with swivels as a crowd clearer (Jason: that will be a doctrine). The frigate's fire control mount is now L.
 - **Turreted main guns**, separate from PDCs: every medium and large main gun also comes turreted (`<gun>-turret-m`, `-l`; modules `<fixed id>-turret`, from the same maker; working names). They follow the lock with no fire control, fire with their group on the trigger, do no point defence, do 75% of the fixed gun's damage (`MAIN_TURRET_DAMAGE`; fixed guns stay the hardest hitters), cost more to mount (`TURRET_MOUNTING`: mass 1.4, power 1.25, price 1.5 times), and slew slowly: M 1.5 rad/s, L about 0.94 (`MAIN_TURRET_SLEW`), against the swivel's 4.
 - **Slower big shots:** each size up flies 1.15 times slower (`SHOT_SPEED_FALLOFF`); **slower big turrets:** each size up slews 1.6 times slower (`TURRET_SLEW_FALLOFF`, was 1.3).
@@ -159,12 +159,17 @@ Step 4 balances big guns against small targets, and there were no big combat hul
 - **Swarms in the lab:** `skirmish(sideA, sideB)` fights side against side; each ship takes the nearest enemy, and a ship much smaller than its target makes attack passes with the pirates' own `attackRun`. The audit adds a swarm table (brig and frigate fits against one to four Warrants), every fit with guns against the raider, and times and health left in the duels. Reference fits added: Frigate turrets, Frigate crowd clearer. Report: `docs/audits/2026-11-05-costs.md`.
 - **Not done here:** capacitor modules for lows belong with oversizing (step 5).
 
-**What the audit shows:**
+**What the audit shows** (6 November, lab ships carrying a hold full of ammunition):
 
 - **The brig is about right:** the brig brawler beats one or two Warrant brawlers and loses to three; the yard fit beats one and loses to two.
-- **The frigate is too strong against a swarm:** the militia fit beats four Warrant brawlers with 45% left. Of the frigate fits only the crowd clearer (two of four against three, none against four) and the undersized one (none against four) can be swarmed. How many small ships should beat each class is a target for Jason ("Questions for Jason").
-- **Raiders cannot touch big ships:** three Black Strike raiders barely scratch a brig or frigate (their light guns against heavy shields and plate). Fine for pirates, but law ships and players in Warrants will meet the same wall.
-- **Mining ships and the stock Manifest lose to the raider** every time (one swivel each; the Collier's drones do not fly in the lab). The design asks every stock fit with guns to drive it off.
+- **The frigate is strong against a swarm:** the militia fit beats four Warrant brawlers with 10% left. How many small ships should beat each class is a target for Jason ("Questions for Jason").
+- **The crowd clearer is not yet the swarm specialist Jason wants** (it should beat a swarm better than the militia fit, and lose to a peer, which it does): it beats three brawlers with 23% left and loses to four, a little worse than the militia fit. Six fast swivels burn about 80 rounds a second, so a frigate's hold of rounds lasts about 40 seconds of fire: ammunition is now its limit (question for Jason).
+- **Raiders cannot touch big ships:** four Black Strike raiders barely scratch a brig or frigate.
+- **Mining ships and the stock Manifest lose to the raider** every time (one swivel each; the Collier's drones do not fly in the lab).
+
+### The arena (6 November 2026)
+
+Fights on demand, for Jason to feel what the audit measures. In the menu's admin section (operators only): pick a reference fit to fly, an enemy fit and how many (1 to 8), and **Start arena**. You are put in a free ship of that fit far out in empty space (each pilot's arena is 50,000 units from the system and from each other), with a hold full of ammunition and weapons hot; the enemies start 1,400 units off and come for you, flown by the lab's own scripts (`ai/fight.ts`, shared by `fitlab.ts` and the arena brain in `ai/arena.ts`), so the fight is the one the audit measures. **Start arena** again restarts it; **End arena** removes its ships (and your pod, if you lost) and puts you back in the ship you came from. Commands `adminArena` and `adminArenaEnd` (`arena.ts`); `Pilot.arena`, brain kind `arena` (shown as ARENA, hostile).
 
 ## The fitter
 

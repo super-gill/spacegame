@@ -228,3 +228,9 @@ export const MAIN_TURRET_DAMAGE = 0.75;
 export const MAIN_TURRET_SLEW = 2.4;
 /** What mounting a main gun on a turret costs against the fixed gun: mass, power and price multipliers. */
 export const TURRET_MOUNTING = { mass: 1.4, power: 1.25, price: 1.5 };
+
+// The arena (admin testing, arena.ts).
+/** How far apart pilots' arenas are, and how far the first is from the system, units. */
+export const ARENA_SEPARATION = 50000;
+/** The most enemies an arena may hold. */
+export const ARENA_MAX_ENEMIES = 8;

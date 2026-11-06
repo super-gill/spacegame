@@ -30,6 +30,7 @@ export type TargetStance = 'hostile' | 'neutral' | 'watch' | 'pilot' | 'empty' |
 
 const FLOWN_BY_STANCE: Record<NonNullable<LockReadout['identity']>['flownBy'], TargetStance> = {
   pirate: 'hostile',
+  arena: 'hostile',
   trader: 'neutral',
   watch: 'watch',
   pilot: 'pilot',
@@ -50,6 +51,7 @@ const STANCE_WORDS: Record<TargetStance, string> = {
 
 const FLOWN_BY_WORDS: Record<NonNullable<LockReadout['identity']>['flownBy'], string> = {
   pirate: 'PIRATE',
+  arena: 'ARENA',
   trader: 'TRADER',
   watch: 'PATROL',
   pilot: 'PILOT',

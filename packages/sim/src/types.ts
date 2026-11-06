@@ -1112,6 +1112,12 @@ export interface Pilot {
   away?: { sinceTick: number };
   /** The ship this pilot was flying when they logged off, out of the world until they return; its drones back in its bay. */
   stowed?: Ship;
+  /**
+   * An arena this pilot is testing in (admin, `adminArena`): the ship they
+   * fly there, the ship to go back to when it ends (null if they had none),
+   * and where it is. Absent: not in an arena.
+   */
+  arena?: { shipId: string; fromShipId: string | null; centre: Vec2 };
 }
 
 /**
@@ -1190,7 +1196,20 @@ export interface ShipInput {
  * brain flies, so NPC state saves and loads with the world like anything
  * else. The behaviour lives in `ai/`.
  */
-export type NpcBrain = TraderBrain | PirateBrain | WatchBrain | DroneBrain | MinerBrain;
+export type NpcBrain = TraderBrain | PirateBrain | WatchBrain | DroneBrain | MinerBrain | ArenaBrain;
+
+/**
+ * An arena enemy (admin testing, `adminArena`, ai/arena.ts): it fights the
+ * ship the pilot who started the arena is flying, the way the fitting lab
+ * flies its skirmishes, and nothing else.
+ */
+export interface ArenaBrain {
+  kind: 'arena';
+  /** The pilot whose arena this is. */
+  pilotId: string;
+  /** Its attack-run state while it makes passes at a bigger ship. */
+  run?: RunState;
+}
 
 /**
  * An NPC miner (ai/miner.ts, docs/mining.md): works the belt round
@@ -1431,6 +1450,10 @@ export type WorldEvent =
   | { type: 'adminCreditsGranted'; shipId: string; pilotId: string; amount: number }
   /** Admin (testing): a ship from any loadout, free, docked here. */
   | { type: 'adminShipSpawned'; shipId: string; stationId: string; loadoutId: string }
+  /** An arena started: the pilot is in `shipId` facing `enemies` ships. */
+  | { type: 'arenaStarted'; shipId: string; enemies: number }
+  /** An arena ended: the pilot is back in `shipId` (empty if they had none to go back to). */
+  | { type: 'arenaEnded'; shipId: string }
   /** Admin (testing): a world rule switched. `shipId` is the pilot's ship, or empty. */
   | { type: 'adminRuleChanged'; shipId: string; rule: keyof WorldRules; value: boolean | number }
   /** A pilot moved aboard `shipId`. `from` is the ship they left (consumed if it was a pod). */

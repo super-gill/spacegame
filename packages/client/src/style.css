@@ -353,6 +353,10 @@ button:hover {
   top: 48px;
   right: 12px;
   width: min(420px, calc(100vw - 24px));
+  /* The admin tools make it tall: scroll inside rather than run off the screen. */
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  box-sizing: border-box;
   padding: 16px 20px;
   border: 1px solid var(--ink-dim);
   background: rgba(5, 7, 10, 0.94);
@@ -378,9 +382,21 @@ button:hover {
 
 .menu-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
+}
+
+/* Long ship names must not push a row's button off the panel. */
+.menu-row select {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 12em;
+}
+
+.menu-row input[type='number'] {
+  width: 4em;
 }
 
 .menu-panel .muted {

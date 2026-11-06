@@ -5,6 +5,7 @@ import { thinkTrader } from './trader.js';
 import { thinkWatch } from './watch.js';
 import { thinkDrone } from './drone.js';
 import { thinkMiner } from './miner.js';
+import { thinkArena } from './arena.js';
 import { wantsCountermeasure } from './steer.js';
 
 /**
@@ -50,6 +51,10 @@ export function thinkNpcs(world: World): NpcDecisions {
       npcs[shipId] = t.brain;
     } else if (brain.kind === 'drone') {
       const t = thinkDrone(world, ship, stats, brain, npcs);
+      inputs[shipId] = t.input;
+      npcs[shipId] = t.brain;
+    } else if (brain.kind === 'arena') {
+      const t = thinkArena(world, ship, stats, brain);
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
     } else if (brain.kind === 'watch') {

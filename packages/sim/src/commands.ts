@@ -1,5 +1,6 @@
 import { buyModule, fitModule, sellModule, unfitModule } from './fitting.js';
 import { storeGoods, takeGoods } from './hangar.js';
+import { adminArena, adminArenaEnd } from './arena.js';
 import { adminGrantCredits, adminSetRule, adminSpawnShip, boardShip, buyShip, claimStarterShip, stepOut, wakePilot } from './pilots.js';
 import { buyGood, sellGood } from './trade.js';
 import type { World, WorldEvent, WorldRules } from './types.js';
@@ -38,7 +39,10 @@ export type PilotCommand =
   | { type: 'adminGrantCredits'; amount: number }
   | { type: 'adminSetRule'; rule: 'gravity' | 'orbits'; value: boolean }
   | { type: 'adminSetRule'; rule: 'manoeuvreSpeed'; value: number }
-  | { type: 'adminSpawnShip'; loadoutId: string };
+  | { type: 'adminSpawnShip'; loadoutId: string }
+  // The arena: fly a reference fit against `count` of another, far out in space (arena.ts).
+  | { type: 'adminArena'; playerFit: string; enemyFit: string; count: number }
+  | { type: 'adminArenaEnd' };
 
 /** What a command did: the new world and its event, or the old world and why not. `reason` is from the refusal list of the function the command ran. */
 export type CommandOutcome = { ok: true; world: World; event: WorldEvent } | { ok: false; world: World; reason: string };
@@ -80,6 +84,10 @@ export function applyCommand(world: World, pilotId: string, command: PilotComman
         : adminSetRule(world, pilotId, command.rule, command.value as boolean);
     case 'adminSpawnShip':
       return adminSpawnShip(world, pilotId, command.loadoutId);
+    case 'adminArena':
+      return adminArena(world, pilotId, command.playerFit, command.enemyFit, command.count);
+    case 'adminArenaEnd':
+      return adminArenaEnd(world, pilotId);
   }
 }
 
@@ -115,7 +123,12 @@ export function readCommand(value: unknown): PilotCommand | null {
     case 'stepOut':
     case 'claimStarter':
     case 'wake':
+    case 'adminArenaEnd':
       return { type: v['type'] };
+    case 'adminArena':
+      return text('playerFit') && text('enemyFit') && count('count')
+        ? { type: 'adminArena', playerFit: v['playerFit'] as string, enemyFit: v['enemyFit'] as string, count: v['count'] as number }
+        : null;
     case 'adminGrantCredits':
       return count('amount') ? { type: 'adminGrantCredits', amount: v['amount'] as number } : null;
     case 'adminSetRule':
