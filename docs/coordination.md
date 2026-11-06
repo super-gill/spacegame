@@ -156,7 +156,7 @@ Colours and the Plot contracts (on `main` from 6 November 2026; `docs/interface.
 
 Worlds step 3 contracts (on `main` from 6 November 2026; `docs/worlds.md`, "As built: step 3"):
 
-- **Worlds** (`net.ts`): `WorldId` (`universe`, `arena`), `WORLD_IDS`, `readWorldId`. Messages: `welcome` carries no world; client `enter` (`world`); server `entered` (`world`, `view`). `PROTOCOL_VERSION` 3.
+- **Worlds** (`net.ts`): `WorldId` (`persistent`, `arena`), `WORLD_IDS`, `readWorldId`; `ServerKind` (`dev`, `live`; server env `SPACEGAME_SERVER`, default `dev`) and `persistentName` (Dev or Universe). Messages: `welcome` carries no world but `server`; client `enter` (`world`); server `entered` (`world`, `view`). `PROTOCOL_VERSION` 3.
 - **The Arena world** (`arena.ts`, `types.ts`): `createArenaWorld`, `joinArena`, `leaveArenaWorld`, `startArena`, `leaveArena`, `stepArenas`, `arenaHulls` (`ArenaHull`), `arenaEnemies`, `arenaFits`; `ArenaScenario` (`kind: 'skirmish'`, `enemyFit`, `count`; Waves and To the death add kinds), `ArenaState` (`shipId`, `centre`, `fit`, `scenario`, `over`), `Pilot.arena` (Arena world only); `ARENA_END_DELAY_SECONDS`. Commands `arenaStart` (`fit`, `scenario`) and `arenaLeave`, listed in `ARENA_COMMANDS`; `adminArena` and `adminArenaEnd` are gone. Event `arenaEnded` is now `shipId` (the arena ship), `pilotId`, `result` (`won`, `lost`, `left`).
 - **Events for one pilot** (`view.ts`): an event with a `pilotId` goes only to that pilot.
 - **Server** (`worlds.ts`, `game.ts`): `makeWorlds`, `allowedIn`, `WorldHooks`; a `Game` takes its hooks. Refusal `notHere` for a command another world owns.
@@ -205,6 +205,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-06: **No Universe until the map.** Calder (Jason's server today) is the dev world, named Dev; the persistent Universe is built with the map (8). Every server is a dev server until then (`SPACEGAME_SERVER` defaults to `dev`). Jason.
 - 2026-11-06: **A cargo ship that can be attacked losing to a raider is fine.** The stock Manifest now loses to one raider holding range outside its CIWS (350 against the raider's 700), and that stays: in high security space it will call for help (law, 7), and dangerous space gets specialist haulers later. Step 4 does not refit the Manifest to win fights. Jason.
 - 2026-11-06: **Turrets fire at the selected lock** (Option A); fire control governs CIWS only; no XL guns until ships of the line; where a gun bears is each hull's hardpoint positions and arcs. Jason.
 - 2026-11-06: **The turret model** (design in `docs/turrets.md`): fixed guns dropped, every main gun a turret balanced by traverse speed; shot weapons spread with range, lasers lose power with range; close-in weapon systems (huge rate, short range, big magazine, prefer missiles) replace swivels, medium hulls and up only, large hulls well covered; small ships rely on countermeasures. Jason.
@@ -253,6 +254,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-06, lead (Lead 8): Jason: Calder is the dev world; the persistent Universe is built with the map. The persistent world is now `persistent` in code and named by the server's kind (`ServerKind`, default `dev`): the mode screen enters Dev and greys the Universe (`docs/worlds.md`, "Decided: no Universe until the map"). Asked whether Dev is operators only now.
 - 2026-11-06, lead (Lead 8): took over from Lead 7 (`ws/lore` already merged). **Built worlds step 3** (`docs/worlds.md`, "As built: step 3"): a `Game` per world in the server (Universe and a never-saved Arena), `enter` and `entered` messages (protocol 3), the mode screen after login, the arena setup as drawn with Skirmish, the admin arena retired (`migrate16to17`, save 17). Leaving a world reloads the page back to the mode screen. Checked in Chromium (launch, leave, lose, back to modes, Universe; no page errors). Lore ask added: names for the Arena and its scenarios. Next: Jason plays it; then step 4, Waves and To the death.
 - 2026-11-06, lead (Lead 8): Jason reported he could not silence alarms in keyboard mode. Reproduced in both modes with a 150 ms click: the banner's rows are rebuilt every frame while a countdown shows, so the press and release land on different elements and no click fires. Fixed by silencing on `pointerdown`. His other report (cannot fire main guns in keyboard mode) is not reproduced: questions put to him.
 - 2026-11-06, lead (Lead 7): Jason approved the worlds mockups as drawn (`docs/worlds.md`, order of work step 2); `v0.17.0` tagged on GitHub. Next: build step 3, the Arena world, the mode screen and the arena setup with Skirmish. Handed over to Lead 8 for the build (this chat was heavy).

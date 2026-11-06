@@ -6,7 +6,7 @@ Version 0.17.0. Pre-1.0: everything is subject to change and save games are not 
 
 ## Current state
 
-A star system with three stations, traders, pirates, the Calder Watch and NPC miners; modular ships fitted EVE-style (high, mid and low slots); four weapon families, missiles and countermeasures; mining with drones and breaching for gate-glass. Since 0.14.0 the world runs on a server and friends join it over Tailscale (docs/shared-world.md, docs/hosting.md). After login, a mode screen offers the Universe or the Arena, a world of its own where anyone can fly any ready fit against reference enemies (docs/worlds.md). The HUD has the Plot, a selection window and warnings with sounds (docs/interface.md). See [docs/roadmap.md](docs/roadmap.md) and [docs/changelog.md](docs/changelog.md).
+A star system with three stations, traders, pirates, the Calder Watch and NPC miners; modular ships fitted EVE-style (high, mid and low slots); four weapon families, missiles and countermeasures; mining with drones and breaching for gate-glass. Since 0.14.0 the world runs on a server and friends join it over Tailscale (docs/shared-world.md, docs/hosting.md). After login, a mode screen offers Dev (Calder) or the Arena, a world of its own where anyone can fly any ready fit against reference enemies (docs/worlds.md). The HUD has the Plot, a selection window and warnings with sounds (docs/interface.md). See [docs/roadmap.md](docs/roadmap.md) and [docs/changelog.md](docs/changelog.md).
 
 ## Quick start
 

@@ -3,16 +3,18 @@ import type { Welcome } from './net/link.js';
 
 /**
  * The mode screen (docs/worlds.md, "Screens"; approved mockup, 6 November
- * 2026): after a character is chosen, where to go. Three cards:
+ * 2026): after a character is chosen, where to go. Three cards, Universe,
+ * Arena and Dev, with the persistent world open according to the server
+ * (`ServerKind`):
  *
- * - **Universe**, the persistent world;
- * - **Arena**, combat on its own, which opens the arena setup;
- * - **Dev**, the test world on the newest code. It needs the dev server
- *   (docs/worlds.md, "Order of work", step 5), so for now it is greyed
- *   for everyone: "operators only" to players, "not set up yet" to
- *   operators.
+ * - **On the dev server** (every server until the map): Dev, Calder on
+ *   the newest code, is the persistent world you enter; Universe is
+ *   greyed, since it is built with the map (Jason, 6 November 2026).
+ * - **On the live server** (later): Universe is entered; Dev is greyed
+ *   until it can link to the dev server (step 5).
  *
- * Leaving a mode from the menu (F2) comes back here.
+ * Arena is open on both. Leaving a mode from the menu (F2) comes back
+ * here.
  */
 
 interface Card {
@@ -33,16 +35,15 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, t
 
 /** Show the mode screen until the player picks a world; resolves with it. `switchCharacter` goes back to character select. */
 export function chooseMode(welcome: Welcome, switchCharacter: () => void): Promise<WorldId> {
+  const dev = welcome.server === 'dev';
   const cards: Card[] = [
-    { world: 'universe', title: 'UNIVERSE', text: 'The persistent world. Your ships, credits and standing are kept. New features arrive here once tested.', foot: 'ENTER' },
+    dev
+      ? { world: null, title: 'UNIVERSE', text: 'The persistent world, built with the map. Not open yet.', foot: 'COMES WITH THE MAP' }
+      : { world: 'persistent', title: 'UNIVERSE', text: 'The persistent world. Your ships, credits and standing are kept. New features arrive here once tested.', foot: 'ENTER' },
     { world: 'arena', title: 'ARENA', text: 'Combat on its own. Fly any ship with any ready fit, pick a scenario. Nothing carries over.', foot: 'CHOOSE SHIP' },
-    {
-      world: null,
-      title: 'DEV',
-      text: welcome.admin ? 'The test world on the newest code. Comes with the dev server.' : "The test world, for the game's developers.",
-      foot: welcome.admin ? 'NOT SET UP YET' : 'OPERATORS ONLY',
-      dev: true,
-    },
+    dev
+      ? { world: 'persistent', title: 'DEV', text: 'Calder on the newest code: test new features before release.', foot: 'ENTER', dev: true }
+      : { world: null, title: 'DEV', text: welcome.admin ? 'The test world on the newest code. Comes with the dev server.' : "The test world, for the game's developers.", foot: welcome.admin ? 'NOT SET UP YET' : 'OPERATORS ONLY', dev: true },
   ];
 
   const screen = el('div', 'login-screen');
@@ -75,6 +76,6 @@ export function chooseMode(welcome: Welcome, switchCharacter: () => void): Promi
     back.addEventListener('click', switchCharacter);
     foot.append(back, el('span', 'muted', 'Leave a mode from the menu (F2) to come back here.'));
     box.append(foot);
-    grid.querySelector<HTMLButtonElement>('.mode-card')?.focus();
+    grid.querySelector<HTMLButtonElement>('.mode-card:not([aria-disabled])')?.focus();
   });
 }

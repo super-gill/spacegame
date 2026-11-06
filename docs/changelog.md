@@ -5,13 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
-- The mode screen: after choosing a character, pick where to go: the Universe or the Arena (Dev is greyed until the dev server is set up). Leave a mode from the menu (F2, Back to modes) to come back to it.
-- The Arena, a world of its own that is never saved and never touches the Universe, open to every player. Pick a ship (every hull with a ready-to-fly fit), one of its fits and a scenario, then LAUNCH. Skirmish is the first scenario: pick the enemy fit and how many (1 to 8). Losing your ship or destroying every enemy brings you back to the setup three seconds later, with your choices kept; Leave the fight in the menu (F2) does it at once. Waves and To the death are shown, greyed, until they are built.
+- The mode screen: after choosing a character, pick where to go: Dev (Calder, the world you know) or the Arena. The Universe is greyed: it comes with the map. Leave a mode from the menu (F2, Back to modes) to come back to it.
+- The Arena, a world of its own that is never saved and never touches Dev, open to every player. Pick a ship (every hull with a ready-to-fly fit), one of its fits and a scenario, then LAUNCH. Skirmish is the first scenario: pick the enemy fit and how many (1 to 8). Losing your ship or destroying every enemy brings you back to the setup three seconds later, with your choices kept; Leave the fight in the menu (F2) does it at once. Waves and To the death are shown, greyed, until they are built.
 
 ### Changed
 - The admin arena in the menu is gone: the Arena replaces it, for everyone. An admin arena still running in a save is ended when the save loads, and you are back in the ship you came from.
 - Logging in no longer drops you straight into the world: the mode screen comes first. Saves move to version 17. Clients must reload (protocol version 3).
-- The menu's admin controls show only in the Universe.
+- The menu's admin controls show only in Dev, not in the Arena.
 
 ### Fixed
 - Clicking the warning banner silences the alarm again. With a countdown showing (a collision in 1.3 s) a normal click often did nothing, because the banner redrew under the pointer mid-click; it now silences as the button goes down.

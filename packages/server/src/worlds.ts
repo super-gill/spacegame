@@ -18,7 +18,8 @@ import { Game, type WorldHooks } from './game.js';
  * The worlds this server runs (docs/worlds.md), and what makes each one
  * itself.
  *
- * - **The persistent world** (`universe`): loaded and saved. A new pilot
+ * - **The persistent world** (`persistent`; Dev on the dev server, the
+ *   Universe on the live one): loaded and saved. A new pilot
  *   gets a starter ship; one who logs off keeps their ship in space a
  *   while, then it is taken out until they return (away.ts).
  * - **The Arena** (`arena`): made fresh at start, never saved. A pilot
@@ -41,7 +42,7 @@ const ARENA: WorldHooks = {
 
 /** One `Game` per world: the persistent world from its save, and a fresh Arena. */
 export function makeWorlds(persistent: World): Record<WorldId, Game> {
-  return { universe: new Game(persistent, PERSISTENT), arena: new Game(createArenaWorld(), ARENA) };
+  return { persistent: new Game(persistent, PERSISTENT), arena: new Game(createArenaWorld(), ARENA) };
 }
 
 /**

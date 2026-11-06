@@ -20,12 +20,26 @@ import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
 export const PROTOCOL_VERSION = 3;
 
 /**
- * The worlds a server runs (docs/worlds.md): the persistent one, saved
- * (the Universe on the live server, Dev on the dev server), and the
- * Arena, never saved.
+ * The worlds a server runs (docs/worlds.md): the persistent one, saved,
+ * and the Arena, never saved. What the persistent world is called
+ * depends on the server (`ServerKind`): Dev on the dev server, the
+ * Universe on the live one.
  */
-export type WorldId = 'universe' | 'arena';
-export const WORLD_IDS: readonly WorldId[] = ['universe', 'arena'];
+export type WorldId = 'persistent' | 'arena';
+export const WORLD_IDS: readonly WorldId[] = ['persistent', 'arena'];
+
+/**
+ * Which server this is (docs/worlds.md, "The two servers"): `dev` runs
+ * `main` and its persistent world is Dev (Calder, Jason's save); `live`
+ * runs releases and its persistent world is the Universe, which waits
+ * for the map (8). Every server is `dev` until then.
+ */
+export type ServerKind = 'dev' | 'live';
+
+/** What a server's persistent world is called. */
+export function persistentName(server: ServerKind): string {
+  return server === 'dev' ? 'Dev' : 'Universe';
+}
 
 /** The longest character name, in characters. */
 export const MAX_NAME_LENGTH = 24;
@@ -165,7 +179,7 @@ export type CommandReply = { ok: true; event: WorldEvent } | { ok: false; reason
 /** From the server to a client. */
 export type ServerMessage =
   /** Logged in: who you are and your key (only when the character was just created). No world yet: the client sends `enter`. */
-  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean }
+  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean; server: ServerKind }
   /** In a world (after `enter`): which, and the whole of it as this pilot sees it. Updates follow. */
   | { t: 'entered'; world: WorldId; view: World }
   /** Login or creation refused, with why. */

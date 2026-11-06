@@ -4,7 +4,7 @@ import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { PROTOCOL_VERSION, WORLD_IDS, diffWorld, readCommand, readInput, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
+import { PROTOCOL_VERSION, WORLD_IDS, diffWorld, readCommand, readInput, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type ServerKind, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
 import { Accounts, type Character } from './accounts.js';
 import { ServerStats } from './stats.js';
 import { Storage } from './storage.js';
@@ -28,12 +28,15 @@ import { allowedIn, makeWorlds } from './worlds.js';
  * their connection is in one world at a time, and choosing again moves
  * it.
  *
- * Settings come from the environment: `PORT` (default 8080), `HOST`
+ * Settings come from the environment: `PORT` (default 8080),
+ * `SPACEGAME_SERVER` (`dev`, the default, or `live`), `HOST`
  * (default every network) and `SPACEGAME_DATA` (default
  * `packages/server/data`).
  */
 
 const PORT = Number(process.env['PORT'] ?? 8080);
+/** Which server this is: `dev` (the default, and the only kind until the map brings the Universe) or `live` (docs/worlds.md). */
+const SERVER: ServerKind = process.env['SPACEGAME_SERVER'] === 'live' ? 'live' : 'dev';
 /** Which network to listen on: every one by default; `127.0.0.1` for this PC only, when Tailscale Serve passes friends in (docs/hosting.md). */
 const HOST = process.env['HOST'] || undefined;
 const DATA = process.env['SPACEGAME_DATA'] ?? fileURLToPath(new URL('../data', import.meta.url));
@@ -50,7 +53,7 @@ const storage = new Storage(DATA);
 const loaded = storage.loadWorld();
 const games = makeWorlds(loaded.world);
 // Nobody is connected yet: everyone is away, and ships left in space disappear after the grace.
-games.universe.allAway();
+games.persistent.allAway();
 const accounts = new Accounts(storage.loadAccounts());
 const stats = new ServerStats();
 
@@ -93,7 +96,7 @@ function logIn(connection: Connection, character: Character, key: string | null)
     }
   }
   connection.character = character;
-  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true });
+  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true, server: SERVER });
   console.log(`${character.name} logged in (${connections.size} connected)`);
 }
 
@@ -184,7 +187,7 @@ function update(): void {
 }
 
 // The tick loop: catch up on whole ticks, so the worlds run at their own pace whatever the timer does.
-const tickMs = games.universe.current.dt * 1000;
+const tickMs = games.persistent.current.dt * 1000;
 let due = performance.now();
 let ticks = 0;
 setInterval(() => {
@@ -202,7 +205,7 @@ setInterval(() => {
 }, 4);
 
 function save(): void {
-  storage.saveWorld(games.universe.current);
+  storage.saveWorld(games.persistent.current);
 }
 setInterval(save, SAVE_EVERY_MS);
 
@@ -232,7 +235,7 @@ sockets.on('connection', (socket) => {
 });
 
 http.listen(PORT, HOST, () => {
-  console.log(`Spacegame server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}. Build ${serverCommit()}.`);
+  console.log(`Spacegame ${SERVER} server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}. Build ${serverCommit()}.`);
   console.log(`Open http://localhost:${PORT} here, or http://<this machine's Tailscale address>:${PORT} from a friend's.`);
   console.log('Type help for the console commands (op, deop, who, stats, save, stop).');
 });

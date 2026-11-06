@@ -44,7 +44,7 @@ describe('characters', () => {
 
 describe('the running world', () => {
   it('gives a new pilot a ship and flies it with their controls', () => {
-    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).persistent;
     game.join('pilot-a', 'Ana');
     const ship = pilotShip(game.current, 'pilot-a')!;
     for (let i = 0; i < 30; i++) {
@@ -56,7 +56,7 @@ describe('the running world', () => {
   });
 
   it('keeps held controls through a tick with no message, but presses happen once', () => {
-    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).persistent;
     game.join('pilot-a', 'Ana');
     game.input('pilot-a', { ...emptyInput(), thrustForward: true, cycleFlightMode: true });
     game.step();
@@ -70,7 +70,7 @@ describe('the running world', () => {
   });
 
   it("runs commands for the pilot that sent them; a player's update is what changed in their view", () => {
-    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).universe;
+    const game = makeWorlds({ ...createStarterWorld(), spawners: [] }).persistent;
     game.join('pilot-a', 'Ana');
     const seen = visibleWorld(game.current, 'pilot-a');
     game.step();
@@ -90,7 +90,7 @@ describe('the worlds', () => {
     worlds.arena.join('pilot-a', 'Ana');
     // In the Arena: no ship, at the setup, and the persistent world does not know them.
     expect(worlds.arena.current.pilots['pilot-a']).toMatchObject({ shipId: null });
-    expect(worlds.universe.current.pilots['pilot-a']).toBeUndefined();
+    expect(worlds.persistent.current.pilots['pilot-a']).toBeUndefined();
     const started = worlds.arena.command('pilot-a', { type: 'arenaStart', fit: 'Warrant brawler', scenario: { kind: 'skirmish', enemyFit: 'Warrant kiter', count: 2 } });
     expect(started.ok).toBe(true);
     worlds.arena.step();
@@ -100,19 +100,19 @@ describe('the worlds', () => {
     expect(Object.keys(worlds.arena.current.ships)).toHaveLength(0);
     expect(worlds.arena.current.pilots['pilot-a']).toBeUndefined();
     // Over in the persistent world, they get their starter ship as ever.
-    worlds.universe.join('pilot-a', 'Ana');
-    expect(pilotShip(worlds.universe.current, 'pilot-a')).not.toBeNull();
+    worlds.persistent.join('pilot-a', 'Ana');
+    expect(pilotShip(worlds.persistent.current, 'pilot-a')).not.toBeNull();
   });
 
   it('take only their own commands', () => {
     const start = { type: 'arenaStart', fit: 'Warrant brawler', scenario: { kind: 'skirmish', enemyFit: 'Warrant kiter', count: 1 } } as const;
     expect(allowedIn('arena', start)).toBe(true);
     expect(allowedIn('arena', { type: 'arenaLeave' })).toBe(true);
-    expect(allowedIn('universe', start)).toBe(false);
+    expect(allowedIn('persistent', start)).toBe(false);
     // Nothing in the Arena can be traded, refitted, bought or switched.
     expect(allowedIn('arena', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(false);
     expect(allowedIn('arena', { type: 'fitModule', mountId: 'w1', moduleId: 'x' })).toBe(false);
     expect(allowedIn('arena', { type: 'adminGrantCredits', amount: 1000 })).toBe(false);
-    expect(allowedIn('universe', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(true);
+    expect(allowedIn('persistent', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(true);
   });
 });

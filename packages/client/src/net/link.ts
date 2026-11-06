@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type WorldId, type WorldUpdate } from '@spacegame/sim';
+import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type ServerKind, type WorldId, type WorldUpdate } from '@spacegame/sim';
 
 /**
  * The client's end of the connection to the server (docs/shared-world.md).
@@ -13,6 +13,8 @@ export interface Welcome {
   /** The character's key, only when it was just created: show it to the player. */
   key: string | null;
   admin: boolean;
+  /** Which server this is: names the persistent world (`persistentName`). */
+  server: ServerKind;
 }
 
 /** In a world: which, and the whole of it as this pilot sees it. */
@@ -79,7 +81,7 @@ export class Link {
           if (message.t === 'welcome') {
             settled = true;
             link.startPinging();
-            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin } });
+            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin, server: message.server } });
           } else if (message.t === 'refused') {
             settled = true;
             socket.close();

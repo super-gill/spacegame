@@ -89,7 +89,7 @@ export class ArenaSetup {
 
     const box = el('div', 'login-box arena-box');
     const head = el('div', 'arena-head');
-    head.append(el('h1', undefined, 'Arena'), el('span', 'muted', 'Nothing here carries over to the Universe.'));
+    head.append(el('h1', undefined, 'Arena'), el('span', 'muted', 'Nothing here carries over.'));
     box.append(head, this.result);
 
     const columns = el('div', 'arena-columns');

@@ -468,7 +468,7 @@ const own = new OwnShipView();
 let previous: World = entered.view;
 let current: World = previous;
 
-const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, entered.world, settings, {
+const menu = new MenuPanel(document.body, document.getElementById('menu-button') as HTMLButtonElement, { name: me.name, key: keyFor(serverAddress(), me.name), admin: session.welcome.admin }, entered.world, session.welcome.server, settings, {
   backToModes() {
     link.close();
     reloadToModes(me.name);
