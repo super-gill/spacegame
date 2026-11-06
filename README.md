@@ -2,7 +2,7 @@
 
 A 2D free-roam space sim in the spirit of Flatspace, played in the browser in one shared world that one of you hosts, Minecraft style: a small Node server runs the world and everyone joins it from their browser.
 
-Version 0.15.0. Pre-1.0: everything is subject to change and save games are not yet stable.
+Version 0.16.0. Pre-1.0: everything is subject to change and save games are not yet stable.
 
 ## Current state
 

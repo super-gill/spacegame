@@ -83,9 +83,11 @@ export const LOADOUTS: Record<string, Loadout> = {
   },
   'kessari-brig': {
     // Sold at Harbour: a Kessari Orbital Defence brig in its yard fit. A
-    // launcher and an autocannon forward, a CIWS on each beam (the flank
-    // and aft slots left free until the step 4 refit), a medium shield, an afterburner and chaff, plate and a second
-    // reactor below. Fights its own size and still swats small things.
+    // launcher and an autocannon forward, an autocannon on each flank and
+    // one aft, a CIWS on each beam, a medium shield, an afterburner and
+    // chaff, plate, and a second and third reactor below. Fights its own
+    // size and still swats small things: beats one Warrant, loses to two
+    // (docs/turrets.md, "As built: step 4").
     id: 'kessari-brig',
     name: 'Kessari Injunction, yard issue',
     hullId: 'kessari-brig',
@@ -101,6 +103,9 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
       w1: 'itomarr-magazine-m',
       w2: 'union-autocannon-m',
+      w3: 'union-autocannon-m',
+      w4: 'union-autocannon-m',
+      w5: 'union-autocannon-m',
       e1: 'slagline-engine-m',
       e2: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
@@ -112,14 +117,16 @@ export const LOADOUTS: Record<string, Loadout> = {
       i2: 'rookrivet-armour-s',
       i3: 'rookrivet-armour-s',
       i4: 'tessaract-container-m',
+      i5: 'meridian-reactor-s', // a small third reactor for the flank and aft guns
       b1: 'meridian-pod-s',
     },
   },
   'union-frigate': {
     // Sold at Harbour: a Free Belt militia frigate. Two heavy autocannons
-    // forward, a CIWS on every quarter (the flank and aft slots left free
-    // until the step 4 refit), a big shield, a lot of
-    // plate, and a tractor for what is left of the other side.
+    // forward, an autocannon on each flank and one aft, a CIWS on every
+    // quarter, a big shield, a lot of plate, a second medium reactor where
+    // a cargo bay was, and a tractor for what is left of the other side.
+    // Beats four Warrants, loses to six (docs/turrets.md, "As built: step 4").
     id: 'union-frigate',
     name: 'Union Defence Works Walkout, militia issue',
     hullId: 'union-frigate',
@@ -137,6 +144,9 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
       w1: 'union-picket-l',
       w2: 'union-picket-l',
+      w3: 'union-autocannon-m',
+      w4: 'union-autocannon-m',
+      w5: 'union-autocannon-m',
       w6: 'tessaract-gleaner-m',
       e1: 'slagline-engine-l',
       e2: 'slagline-engine-l',
@@ -151,7 +161,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       i3: 'itomarr-reactor-m',
       i4: 'rookrivet-armour-s',
       i5: 'rookrivet-armour-s',
-      i6: 'tessaract-container-m',
+      i6: 'itomarr-reactor-m', // was a cargo bay: the flank and aft guns need the power
       b1: 'meridian-pod-s',
     },
   },

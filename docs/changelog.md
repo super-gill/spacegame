@@ -4,7 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-The turret model, steps 1 to 3: every main gun is a turret, range costs shot guns accuracy and lasers power, and close-in weapon systems replace swivels (docs/turrets.md).
+## [0.16.0] - 2026-11-06
+
+The turret model: every main gun is a turret, range costs shot guns accuracy and lasers power, and close-in weapon systems replace swivels (docs/turrets.md).
 
 Saves move to version 15: turreted gun modules become the gun of the same name, and you get the turret mounting's price back in credits; swivels become close-in weapon systems on ships that have hardpoints for them, and every other swivel, fitted or stored, is refunded at 800 credits.
 
@@ -15,6 +17,7 @@ Saves move to version 15: turreted gun modules become the gun of the same name, 
 - The weapon tiles say whether each gun bears on your lock (`BEARS`, `SLEWING`, `RANGE`, `NO ARC`), or `AHEAD` with no lock.
 - Outfitting shows gun and swivel damage per second instead of fixed and turret; the target card shows weapons and total damage.
 - Pirates, the Calder Watch and the arena's enemies fire whenever you are locked and in range, not only when their nose is on you.
+- Stock big ships refit for the turret model: the Kessari Injunction carries autocannons on both flanks and aft with a small third reactor (it beats one Warrant and loses to two); the Walkout the same, with a second medium reactor where a cargo bay was (it beats four Warrants and loses to six).
 
 - Range costs accuracy: every autocannon, blaster, artillery and railgun shot leaves inside a small cone (autocannon 2.0°, blaster 2.5°, artillery 0.8°, railgun 0.3°), so a small ship far away is hard to hit and a big one is hit anyway. Outfitting shows each gun's spread.
 - Lasers lose power with range: full damage to half their range, fading to 40% at full range.

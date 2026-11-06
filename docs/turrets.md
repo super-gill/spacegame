@@ -1,6 +1,6 @@
 # Turrets (0.16 design, for Jason's sign-off)
 
-Status: **agreed 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. **Steps 1 to 3 built** on `main` by Lead 5, 6 November (turret guns; spread and laser falloff; close-in weapon systems); see "As built". Step 4, the refit and tune, to come.
+Status: **agreed 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. **Built and released in 0.16.0** by Lead 5, 6 November: turret guns; spread and laser falloff; close-in weapon systems; the refit and tune. See "As built" steps 1 to 4.
 
 ## Why
 
@@ -107,6 +107,17 @@ The audit's swarm table and the arena are the measures. Starting targets, to be 
 - **Reference fits:** the Warrant brawler's swivel became a pulse laser S; the Brig brawler's three swivel slots became autocannon M; the Frigate anti-small keeps its four CIWS; the all-swivel **Frigate crowd clearer is retired** (every frigate now has full CIWS cover). The arena defaults to the Frigate anti-small.
 - **Client:** tiles and outfitting say CIWS; the fitting window names the `CIWS` mount type, describes the hardpoint's arc and facing, and draws the selected hardpoint's arc. CIWS hardpoints list under core systems for now (a heading of their own is for the interface pass).
 - **Audit** (`docs/audits/2026-11-06-ciws.md`), for step 4: the stock Manifest now loses to one raider (it won before): its old swivel reached 900, the CIWS reach 350, and the raider's pulse laser reaches 700, so it shoots from outside CIWS range. Jason (6 November): that is fine, a cargo ship that can be attacked calls for help in secure space (law, 7) and specialist haulers come later, so step 4 leaves the Manifest as it is. The Manifest brick lasts 109 s against a raider, inside Jason's survive-to-security goal. The stock brig wins one on one by less (7% left, was 52%) with its swivel slots empty. The militia frigate is unchanged. Played in the arena: the frigate's four CIWS engage Warrants passing inside 350, each only in its own arc.
+
+## As built: step 4 (refit and tune)
+
+- **Stock refit** (`loadouts.ts`), measured in the lab against the balance targets above, starts 4:
+  - **Kessari Injunction, yard issue:** autocannon M on w3, w4 (flanks) and w5 (aft), a Meridian reactor S in its free small low slot (i5). Against Warrant brawlers: beats one (16 s, 52% left; it was 7% with the slots empty), loses to two and three. Target: beats one, loses to three.
+  - **Union Defence Works Walkout, militia issue:** autocannon M on w3, w4 and w5, an Ito-Marr reactor M in i6 in place of the cargo container (it was at 58 of 58 power). Against brawlers: beats four (32% left), beats five three times in four, loses to six. Target: loses to about five or six.
+  - **Belt Forge Collier:** its aft high slot (w1) stays free. A gun there puts a fire-group tile first on its activation bar and pushes the mining turrets off keys 1 and 2, as a gun in group 1 would take the Prospector's laser trigger. Mining ships leave those slots to the pilot.
+  - **Manifest:** unchanged (Jason: a cargo ship that can be attacked may lose; it calls for help in secure space, specialist haulers later).
+- **Missile swarms** (a scripted salvo at the refit frigate, weapons cold): one or two missiles or torpedoes at a time, all a single launcher can manage, are all shot down; eight at once get about half through; sixteen mostly get through. Target met with no tuning.
+- **Not measurable in the lab:** whether a frigate can catch a Warrant that holds 400 to 600 (the lab's pilots close in, so its "kiter" dies in about 7 s), and kiting while turning. Both are for Jason in the arena; turrets make the second true by construction.
+- **No numbers changed:** traverse, spread, falloff and CIWS stay as designed; only fits moved.
 
 ## Open
 
