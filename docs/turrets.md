@@ -1,6 +1,6 @@
 # Turrets (0.16 design, for Jason's sign-off)
 
-Status: **draft, 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. Nothing here is built yet. Points marked **Open** need Jason's answer before the step that needs them.
+Status: **agreed 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. Nothing here is built yet.
 
 ## Why
 
@@ -16,12 +16,15 @@ The arena showed what the fitting step 4 numbers could not:
 2. **Range costs accuracy, not damage, for shot weapons; lasers lose power with range.** Projectile and bolt weapons get a spread; lasers do less damage the further they reach.
 3. **Close-in weapon systems (CIWS)** replace the swivel: a huge rate of fire, short range, a big magazine to feed it for a while; it shoots any target but prefers missiles and torpedoes.
 4. **CIWS is for medium ships and up.** Small ships defend against munitions with countermeasures (dispensers), which they already have. Medium hulls get some CIWS; large hulls good coverage.
+5. **Main turrets fire at your selected lock** (Option A below). Fire control governs CIWS only.
+6. **No XL guns yet:** nothing could carry one; they come with ships of the line.
+7. **Where a gun can bear is a property of the hull:** each hardpoint's position and arc, set hull by hull. A hardpoint with a narrow forward arc is in effect a nose gun; there is no separate weapon type for it.
 
 ## The model
 
 ### Main guns: all turrets
 
-- Every gun family (autocannon, artillery, pulse laser, beam laser, blaster, railgun) comes as a turret in S, M and L (XL later, for ships of the line). The turreted versions built in step 4 become the guns, at full damage: `MAIN_TURRET_DAMAGE` goes.
+- Every gun family (autocannon, artillery, pulse laser, beam laser, blaster, railgun) comes as a turret in S, M and L (XL with ships of the line). The turreted versions built in step 4 become the guns, at full damage: `MAIN_TURRET_DAMAGE` goes.
 - **Traverse by size is the main lever.** Small turrets follow anything; large ones cannot follow a quick ship close in. Starting values: S 3.0, M 1.5, L 0.75 rad/s (each size half the one below, steeper than today's 1.6). Fire control and gun bonuses may speed them.
 - **Arcs come from the mounts.** Each hardpoint already has a position and may have an arc; turrets fire only where their arc and the hull let them. A big hull with guns down its sides fights broadside; one with them forward fights nose on. This is where hull design gives each ship a character.
 - **Launchers stay as they are.** Missiles and torpedoes launch forward and guide themselves; they are not guns. Dispensers (countermeasures) stay too.
@@ -38,15 +41,15 @@ The arena showed what the fitting step 4 numbers could not:
 - A new module kind on a new hardpoint type, `ciws`. **Only medium hulls and up have `ciws` hardpoints**, so a small ship cannot fit one, whatever its slots. Starting coverage: merchantman and brig 2, hulk 2, frigate 4. Each hardpoint has an arc, so coverage has gaps a pilot can find.
 - Behaviour: engages anything hostile inside its range on its own, munitions first, then the nearest ship. Weapons hot or cold decides whether it shoots ships; munitions it always shoots.
 - Starting numbers: range 350, a light round every 0.03 s (about 33 a second, 2 damage each, about 66 a second against a ship), traverse 6 rad/s, a 2,000-round magazine fed from boxes of rounds in the hold. Inside 350 a small ship melts; outside it, it is untouched.
-- Fire control: the Gunlayers set how many CIWS a ship can run and how well they track (as they do swivels today). **Open:** whether fire control also matters for main turrets (tracking, or how many can follow separate targets), or only for CIWS.
+- Fire control: the Gunlayers set how many CIWS a ship can run and how well they track (as they do swivels today). Main turrets need no fire control.
 - The swivel (Watchman S) goes. Saves map fitted and stored swivels: on medium and larger hulls to CIWS on the new hardpoints where they fit, otherwise into storage at the nearest station, refunded where nothing fits.
 
 ### Who aims, and how the player fires
 
-This is the biggest change to how the game feels, so it is the main **Open** question.
+Decided: **Option A** (Jason, 6 November).
 
-- **Option A, turrets follow your lock** (lead's lean). Your selected group's turrets track your active lock with lead; you fire them (Space or left button) when they bear. The mouse keeps steering the ship, as now. Skill is in position, range, arcs and when to fire; the HUD shows each turret's arc and whether it bears. Simple to learn, keeps mouse steering, and NPCs fly by the same rules.
-- **Option B, turrets follow the pointer.** Your selected group aims where the mouse points (twin-stick style); other groups can be set to fire at your lock on their own. More hands-on aiming, but the mouse can no longer steer: steering goes to the keys (A and D spin, W thrust), a big change to the controls Jason has been playing with.
+- **Option A, turrets follow your lock** (chosen). Your selected group's turrets track your active lock with lead; you fire them (Space or left button) when they bear. The mouse keeps steering the ship, as now. Skill is in position, range, arcs and when to fire; the HUD shows each turret's arc and whether it bears. Simple to learn, keeps mouse steering, and NPCs fly by the same rules.
+- **Option B, turrets follow the pointer** (not chosen). Your selected group aims where the mouse points (twin-stick style); other groups can be set to fire at your lock on their own. More hands-on aiming, but the mouse can no longer steer: steering goes to the keys (A and D spin, W thrust), a big change to the controls Jason has been playing with.
 
 ### Balance targets for the audit
 
@@ -67,14 +70,11 @@ The audit's swarm table and the arena are the measures. Starting targets, to be 
 
 ## Build order
 
-1. **Turret guns** (all main guns turreted, traverse by size, arcs; fixed guns retired; save migration), with Option A or B as Jason decides.
+1. **Turret guns** (all main guns turreted, traverse by size, arcs; fixed guns retired; save migration), aiming at the selected lock.
 2. **Spread and laser falloff.**
 3. **CIWS** (hardpoints, module, targeting, swivels retired and migrated).
 4. **Refit and tune:** loadouts, reference fits, NPC scripts; audit and arena against the targets above; release.
 
 ## Open
 
-- **Option A or B** (who aims).
-- Whether fire control matters for main turrets, or only for CIWS.
-- XL turrets now, or with ships of the line.
-- Whether some hulls keep a forward-only main hardpoint (a nose gun that only the hull can aim, with a wide arc turret elsewhere), as a hull trait rather than a weapon type.
+Nothing blocking. Arcs for each hull's hardpoints are set in step 1 and shown to Jason with the first build.

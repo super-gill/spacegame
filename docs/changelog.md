@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-06
+
+Fitting step 4 (the costs) and the arena.
+
 Saves move to version 13: medium and large swivels become small ones, and you get the difference back in credits.
 
 ### Added
