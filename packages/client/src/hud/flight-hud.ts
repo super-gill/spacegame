@@ -28,6 +28,11 @@ import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, reloadProgress } from './geometry.js';
 import type { Condition } from './warnings.js';
 
+
+/** The commit this client was built from (vite.config.ts), so a stale build is easy to spot. */
+declare const __BUILD_COMMIT__: string;
+const BUILD_COMMIT = typeof __BUILD_COMMIT__ === 'string' ? __BUILD_COMMIT__ : 'dev';
+
 /**
  * The flight HUD: the always-on instruments at the screen edges.
  *
@@ -182,7 +187,7 @@ export class FlightHud {
    * are shown only through it, never worked out here.
    */
   update(world: World, ship: Ship | null, nav: NavReadout | null, fps: number): void {
-    setText(this.debug, `${fps.toFixed(0)} fps · tick ${world.tick}`);
+    setText(this.debug, `${fps.toFixed(0)} fps · tick ${world.tick} · build ${BUILD_COMMIT}`);
     show(this.status, ship !== null);
     show(this.cluster, ship !== null && ship.state === 'flying');
     if (!ship) {

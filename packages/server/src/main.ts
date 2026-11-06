@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
@@ -193,7 +194,7 @@ sockets.on('connection', (socket) => {
 });
 
 http.listen(PORT, HOST, () => {
-  console.log(`Spacegame server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}.`);
+  console.log(`Spacegame server on port ${PORT}${loaded.fresh ? ', new world' : ''}. Data in ${DATA}. Build ${serverCommit()}.`);
   console.log(`Open http://localhost:${PORT} here, or http://<this machine's Tailscale address>:${PORT} from a friend's.`);
   console.log('Type help for the console commands (op, deop, who, stats, save, stop).');
 });
@@ -265,3 +266,12 @@ function shutDown(): void {
 }
 process.on('SIGINT', shutDown);
 process.on('SIGTERM', shutDown);
+
+/** The commit the server is running, printed at start so a stale server is easy to spot. "unknown" outside git. */
+function serverCommit(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch {
+    return 'unknown';
+  }
+}

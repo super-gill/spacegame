@@ -15,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Warnings with sounds: a banner at the top centre lists what holds now (missiles inbound or about to hit, shields low or down, hull low or critical, someone locking you, a collision ahead with a rock or station, pirates hunting you, an empty capacitor, a full hold with the tractor on, gravity), highest tier first, each with its own tone; alarms repeat until they clear or you click to silence them. Locks completing, targets destroyed, drones lost and the like sound with their toast. Volume and an off switch in the Controls panel (F1).
 
 ### Changed
+- The corner readout by the fps shows which build the client is (its commit), and the server prints its build when it starts, so a stale client or server is easy to spot.
 - Saves move to version 16: pirates already in a save start running dark; everything else shows its colours. Clients must reload (protocol version 2).
 - The caution "pirate hunting you" now comes only for a pirate you have identified; a dark one warns once it locks you.
 - With weapons hot, a ring round your ship shows where your main guns can bear (thicker where more can, missing in blind spots), with a tick for where each gun points: bright when it bears on your lock, amber while it turns.
