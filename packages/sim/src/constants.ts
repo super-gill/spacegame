@@ -188,7 +188,7 @@ export const DECOY_DROP_SPEED = 40;
 /** Shots hit a munition within this margin of its body: point defence fuzes, units. */
 export const MUNITION_HIT_MARGIN = 3;
 
-/** Point defence engages munitions within this fraction of the swivel's range. */
+/** Point defence engages munitions within this fraction of the CIWS's range. */
 export const POINT_DEFENCE_RANGE_FRACTION = 1;
 
 /**
@@ -214,6 +214,12 @@ export const GUN_TRAVERSE = 3;
  * The same at every size.
  */
 export const GUN_SPREAD_DEGREES = { autocannon: 2.0, blaster: 2.5, artillery: 0.8, railgun: 0.3 } as const;
+/**
+ * Close-in weapon systems (docs/turrets.md): a light round every 0.03 s
+ * (two ticks, so 30 a second) at 2 damage, out to 350 units, traversing
+ * 6 rad/s, with 2,000 rounds before a reload from the hold.
+ */
+export const CIWS = { damage: 2, fireInterval: 0.03, projectileSpeed: 1000, range: 350, traverse: 6, magazine: 2000, reloadSeconds: 6 } as const;
 /** Lasers keep full power to half their range, then fade to 40% at full range: the beam spreads and the energy disperses. */
 export const LASER_FALLOFF = { from: 0.5, floor: 0.4 } as const;
 /**

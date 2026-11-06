@@ -66,7 +66,7 @@ export function runnerInput(w: World, me: string, foe: string, tick: number, sta
   };
 }
 
-/** Main guns: turrets that fire on the trigger (not swivels, launchers, dispensers or mining lasers). */
+/** Main guns: turrets that fire on the trigger (not CIWS, launchers, dispensers or mining lasers). */
 function mainGuns(stats: ShipStats): WeaponSpec[] {
   return Object.values(stats.weapons).filter((x) => isGun(x) && x.family !== 'pointDefence');
 }

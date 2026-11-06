@@ -145,9 +145,10 @@ describe('point defence', () => {
     return { ...m, velocity: scale(fromAngle(Math.PI), 210) };
   }
 
-  it("a trader's swivel shoots down a torpedo coming at it, without a lock and with weapons cold", () => {
+  it("a trader's CIWS shoots down a torpedo coming at its beam, without a lock and with weapons cold", () => {
     let w = quiet();
-    const trader = shipOf(w, 't', 'tessaract-trader', {}, { rounds: 4 });
+    // Facing up the screen, so a torpedo from +x arrives on the starboard beam, where a CIWS covers.
+    const trader = shipOf(w, 't', 'tessaract-trader', {}, { rounds: 4 }, -Math.PI / 2);
     expect(trader.weaponsHot).toBe(false);
     w = { ...withShips(w, trader), munitions: [torpedoAt(trader, 1400)] };
     let downed = null;
@@ -161,7 +162,7 @@ describe('point defence', () => {
     expect(hurt).toBe(false);
   });
 
-  it('a swivel cannot defend a blind spot: a torpedo from astern of the Manifest gets through', () => {
+  it('a CIWS cannot defend a gap: a torpedo from dead astern of the Manifest gets through', () => {
     let w = quiet();
     const trader = shipOf(w, 't', 'tessaract-trader', { u1: 'meridian-pod-s' }, { rounds: 4 }, Math.PI); // facing away
     w = { ...withShips(w, trader), munitions: [torpedoAt(trader, 1400)] };

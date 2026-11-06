@@ -194,7 +194,7 @@ export class MenuPanel {
       }
       return s;
     };
-    const yours = fitSelect('Your ship', arenaFits.find((n) => n.startsWith('Frigate crowd clearer')) ?? arenaFits[0] ?? '');
+    const yours = fitSelect('Your ship', arenaFits.find((n) => n.startsWith('Frigate anti-small')) ?? arenaFits[0] ?? '');
     const theirs = fitSelect('Enemy ship', arenaFits.find((n) => n.startsWith('Warrant brawler')) ?? arenaFits[0] ?? '');
     const howMany = el('input');
     howMany.type = 'number';

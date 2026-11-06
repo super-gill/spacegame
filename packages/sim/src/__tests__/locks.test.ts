@@ -178,10 +178,10 @@ describe('locking', () => {
 });
 
 describe('turrets and locks', () => {
-  it('turrets fire only at a complete active lock, while hot', () => {
+  it('close-in weapon systems engage a ship only at a complete active lock, while hot', () => {
     let { w, me } = open();
-    // Ana in the Tacet dev ship, which has turrets.
-    const dev = buildShip(w, { id: me, loadout: LOADOUTS['aurel-tacet-dev']!, ownerId: 'ana', position: w.ships[me]!.position, heading: 0, flightMode: 'assisted' });
+    // Ana in a Manifest, whose starboard CIWS covers the raider on its beam.
+    const dev = buildShip(w, { id: me, loadout: LOADOUTS['tessaract-trader']!, ownerId: 'ana', position: w.ships[me]!.position, heading: 0, flightMode: 'assisted' });
     w = { ...w, ships: { ...w.ships, [me]: { ...dev, weaponsHot: true } } };
     w = near(w, me, 'raider', { x: 0, y: 300 });
     w = { ...w, ships: { ...w.ships, raider: { ...w.ships['raider']!, shield: 1e6, structure: 1e6 } } };
@@ -196,7 +196,7 @@ describe('turrets and locks', () => {
     }
     expect(quiet).toBe(0);
 
-    // Lock it and wait: the turrets open up once the lock completes.
+    // Lock it and wait: the CIWS open up once the lock completes.
     x = step(w, me, { lock: 'raider' });
     let fired = 0;
     for (let i = 0; i < SECOND * 6; i++) {

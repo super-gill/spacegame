@@ -143,6 +143,11 @@ Turret model step 1 contracts (on `main` from 6 November 2026; design in `docs/t
 - **Lock readout:** `LockReadout.combat.gunDps` and `pointDefenceDps` replace `fixedDps` and `turretDps`.
 - **Save format version 14** (`migrate13to14`).
 
+Turret model step 3 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 3"):
+
+- **CIWS** (`types.ts`, `hulls.ts`, `weapons.ts`, `modules.ts`): `MountType` gains `ciws` (ids `d1` to `d4`); weapon `ciws-m` (family `pointDefence`), module `paragon-ciws-m`, numbers in `CIWS`. `swivel-s` and `paragon-turret-s` are gone.
+- **Save format version 15** (`migrate14to15`).
+
 Turret model step 2 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 2"):
 
 - **Range** (`types.ts`, `weapons.ts`, `combat.ts`): `WeaponSpec.spread`, `WeaponSpec.falloff` (`RangeFalloff`), `Projectile.lifeTicks` and `Projectile.falloff` (optional); `scatter`, `falloffFactor`. `idSeed` in `random.ts` is the one id hash.
@@ -220,6 +225,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-06, lead (Lead 5): **turret model step 3, close-in weapon systems** (`docs/turrets.md`, "As built: step 3"): `ciws` hardpoints (brig, Manifest, Collier two on the beams with gaps fore and aft; frigate four, all round), `ciws-m` and the Paragon CIWS M, swivels retired with save 15 (CIWS where hardpoints are free, refunds otherwise). Interim stock refit: the Tern an autocannon S where the swivel was (two pulse lasers lost to the raider), mining ships that slot left free (a gun there takes fire group 1 from the laser), the Manifest a Gunlayer M and a second small reactor; old swivel slots on big ships empty; the crowd clearer retired. Audit `docs/audits/2026-11-06-ciws.md`: the stock Manifest now loses to a raider holding range outside CIWS reach (it needs a forward gun), the brig is weaker with empty swivel slots. 476 sim tests; played in the arena (CIWS engage by arc) and the fitter (D1 to D4 with arcs). Next: step 4, refit and tune, then 0.16.0.
 - 2026-11-06, lead (Lead 5): steering choice in the Controls panel (F1), from Jason (both schemes existed; keyboard steering was only a checkbox in the menu). Checked in a browser: keyboard spin works with turrets; the F1 choice, the menu box and the saved setting stay in step across a reload. Jason's note: furball ranges hide spread; NPCs are not tactical, so kiting is the player's.
 - 2026-11-06, lead (Lead 5): **turret model step 2, spread and laser falloff** (`docs/turrets.md`, "As built: step 2"): shot guns scatter in a cone seeded from each shot's id (no random state, no save bump), lasers fade from half range to 40% at full range where the shot lands; one shared `idSeed`. Next: step 3, CIWS.
 - 2026-11-06, lead (Lead 5): took over from Lead 4 (`ws/lore` had nothing new). **Turret model step 1, turret guns** (`docs/turrets.md`, "As built: step 1"): every main gun a turret at full damage, traverse S 3.0, M 1.5, L 0.75; turreted modules retired (save 14 refunds the mounting); every high slot has an arc, forward half by default; with no lock guns fire straight along their mount (lead's call, for Jason); `gunBearing` and HUD bears marks; NPC scripts hold the trigger in range; readout `gunDps`/`pointDefenceDps`; menu buttons lose focus when the menu closes (Space was starting a second arena). Audit `docs/audits/2026-11-06-turret-guns.md`: same shape as 0.15 (big ships win one on one, brawler swarms win), small ships a little stronger now their guns track. Play checked in the arena: AHEAD, BEARS on lock, firing, NO ARC astern, no page errors. 466 sim tests. For Jason: judge the arcs and the no-lock rule in the arena. Next: step 2, spread and laser falloff.

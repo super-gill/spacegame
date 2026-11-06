@@ -38,7 +38,7 @@ export function activationSlots(cat: Catalogues, ship: Ship): ActivationSlot[] {
   const groups = new Set<number>();
   for (const w of ship.weapons) {
     const spec = stats.weapons[w.mountId];
-    // Groups fired on the trigger: main guns, launchers and light mining lasers (swivels and mining turrets fire by themselves).
+    // Groups fired on the trigger: main guns, launchers and light mining lasers (CIWS and mining turrets fire by themselves).
     if (spec && (isMainGun(spec) || (spec.kind === 'fixed' && (spec.family === 'missile' || spec.family === 'mining')))) groups.add(w.group);
   }
   const out: ActivationSlot[] = [...groups].sort((a, b) => a - b).map((group) => ({ kind: 'group', group }));

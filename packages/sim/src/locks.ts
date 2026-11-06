@@ -218,7 +218,7 @@ export interface LockReadout {
     weapons: { mountId: string; name: string; kind: WeaponKind }[];
     /** Main guns' damage per second, held on target. */
     gunDps: number;
-    /** Swivels' damage per second against ships. */
+    /** CIWS damage per second against ships. */
     pointDefenceDps: number;
   };
   cargo?: {

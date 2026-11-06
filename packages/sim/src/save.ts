@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 14;
+export const SAVE_VERSION = 15;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -91,6 +91,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   11: (world) => migrate11to12(world),
   12: (world) => migrate12to13(world),
   13: (world) => migrate13to14(world),
+  14: (world) => migrate14to15(world),
 };
 
 /**
@@ -414,6 +415,81 @@ export function migrate13to14(world: unknown): unknown {
         shelf[to] = typeof have === 'number' && typeof count === 'number' ? have + count : count;
       }
       storage[station] = shelf;
+    }
+    pilots[id] = { ...pilot, storage };
+  }
+  for (const [id, amount] of Object.entries(refunds)) {
+    const pilot = pilots[id];
+    if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
+  }
+  return { ...world, ships, pilots };
+}
+
+/** The swivel, retired in `migrate14to15`, and what it cost, refunded where no CIWS takes its place. */
+const RETIRED_SWIVEL = 'paragon-turret-s';
+const RETIRED_SWIVEL_PRICE = 800;
+/** What a swivel becomes on a hull with free CIWS hardpoints. */
+const CIWS_MODULE = 'paragon-ciws-m';
+
+/**
+ * 14 to 15: close-in weapon systems replace swivels (docs/turrets.md,
+ * step 3). Every fitted swivel comes off. On a hull with CIWS hardpoints
+ * (medium and up) each one becomes a CIWS on a free hardpoint, free of
+ * charge, while there are free hardpoints; any other fitted swivel, and
+ * every stored one, is refunded to its owner at its price. Weapon states
+ * are rebuilt for the changed mounts and kept for the rest. Ships nobody
+ * owns (NPCs) are refitted the same way, without refunds.
+ */
+export function migrate14to15(world: unknown): unknown {
+  if (!isRecord(world)) return world;
+  const refunds: Record<string, number> = {};
+  const refund = (pilotId: unknown, count: number): void => {
+    if (typeof pilotId !== 'string' || count <= 0) return;
+    refunds[pilotId] = (refunds[pilotId] ?? 0) + RETIRED_SWIVEL_PRICE * count;
+  };
+  const cat = { modules: MODULES, weapons: WEAPONS, goods: GOODS };
+  const ships: Record<string, unknown> = {};
+  for (const [id, ship] of Object.entries(isRecord(world['ships']) ? world['ships'] : {})) {
+    if (!isRecord(ship) || !isRecord(ship['fit']) || !Object.values(ship['fit']).includes(RETIRED_SWIVEL)) {
+      ships[id] = ship;
+      continue;
+    }
+    const oldFit = ship['fit'] as Record<string, string>;
+    const fit: Record<string, string> = {};
+    let swivels = 0;
+    for (const [mount, moduleId] of Object.entries(oldFit)) {
+      if (moduleId === RETIRED_SWIVEL) swivels++;
+      else fit[mount] = moduleId;
+    }
+    const hull = typeof ship['hullId'] === 'string' ? HULLS[ship['hullId']] : undefined;
+    for (const m of hull?.mounts ?? []) {
+      if (swivels > 0 && m.type === 'ciws' && !fit[m.id]) {
+        fit[m.id] = CIWS_MODULE;
+        swivels--;
+      }
+    }
+    refund(ship['ownerId'], swivels);
+    const heading = typeof ship['heading'] === 'number' ? ship['heading'] : 0;
+    const weapons = hull && Array.isArray(ship['weapons'])
+      ? weaponStatesFor(cat, hull, fit, heading, { fit: oldFit, weapons: ship['weapons'] as Ship['weapons'] })
+      : ship['weapons'];
+    ships[id] = { ...ship, fit, weapons };
+  }
+  const pilots: Record<string, unknown> = {};
+  for (const [id, pilot] of Object.entries(isRecord(world['pilots']) ? world['pilots'] : {})) {
+    if (!isRecord(pilot) || !isRecord(pilot['storage'])) {
+      pilots[id] = pilot;
+      continue;
+    }
+    const storage: Record<string, unknown> = {};
+    for (const [station, held] of Object.entries(pilot['storage'])) {
+      if (!isRecord(held) || !(RETIRED_SWIVEL in held)) {
+        storage[station] = held;
+        continue;
+      }
+      const { [RETIRED_SWIVEL]: count, ...rest } = held;
+      if (typeof count === 'number') refund(id, count);
+      storage[station] = rest;
     }
     pilots[id] = { ...pilot, storage };
   }

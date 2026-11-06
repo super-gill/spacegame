@@ -80,7 +80,7 @@ export function createStarterWorld(): World {
     heading: -0.34,
     dockedAt: harbour.id,
     brain: { kind: 'trader', route: triangle, leg: 0, waitTicks: 3 * 60 },
-    hold: { food: 30, medicine: 10, rounds: 4 }, // a prize worth a pirate's time, and boxes of rounds for the swivel
+    hold: { food: 30, medicine: 10, rounds: 4 }, // a prize worth a pirate's time, and boxes of rounds for its guns
     respawnSeconds: 30,
     shipId: null,
     timerTicks: 0,

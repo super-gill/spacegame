@@ -50,16 +50,16 @@ function quietWorld(): { w: World; me: string } {
 }
 
 describe('weapon catalogue', () => {
-  it('main guns hit harder per shot than swivels', () => {
+  it('main guns hit harder per shot than close-in weapon systems', () => {
     const all = Object.values(WEAPONS);
     for (const gun of all.filter((w) => isMainGun(w))) {
-      for (const swivel of all.filter((w) => w.family === 'pointDefence')) expect(gun.damage).toBeGreaterThan(swivel.damage);
+      for (const ciws of all.filter((w) => w.family === 'pointDefence')) expect(gun.damage).toBeGreaterThan(ciws.damage);
     }
   });
 
-  it('the Aurel Tacet carries a main gun and a swivel, both turrets', () => {
+  it('the Aurel Tacet carries two main guns, both turrets', () => {
     const s = ship('s');
-    expect(s.weapons.map((w) => sparrow.weapons[w.mountId]!.family === 'pointDefence').sort()).toEqual([false, true]);
+    expect(s.weapons.map((w) => isMainGun(sparrow.weapons[w.mountId]!))).toEqual([true, true]);
     expect(s.weapons.every((w) => sparrow.weapons[w.mountId]!.kind === 'turret')).toBe(true);
   });
 });
@@ -68,7 +68,8 @@ describe('firing', () => {
   it('with no lock, a main gun fires along its mount, and shots inherit the ship velocity', () => {
     const built = ship('s', 'sparrow', { heading: Math.PI / 2, velocity: { x: 50, y: 0 } });
     // Turrets settled on the new heading (they slew to it otherwise).
-    const s = { ...built, weapons: built.weapons.map((w) => ({ ...w, aim: Math.PI / 2 })) };
+    // The second gun moved out of the selected group, so only w1 fires.
+    const s = { ...built, weapons: built.weapons.map((w) => ({ ...w, aim: Math.PI / 2, group: w.mountId === 'w2' ? 9 : w.group })) };
     const r = fireWeapons(s, sparrow, { ...emptyInput(), fireFixed: true }, () => null, FIXED_DT, 1);
     expect(r.projectiles).toHaveLength(1);
     const p = r.projectiles[0]!;
@@ -77,7 +78,8 @@ describe('firing', () => {
   });
 
   it('respects the fire interval', () => {
-    let s = ship('s');
+    const built = ship('s');
+    let s = { ...built, weapons: built.weapons.map((w) => (w.mountId === 'w2' ? { ...w, group: 9 } : w)) };
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
       const r = fireWeapons(s, sparrow, { ...emptyInput(), fireFixed: true }, () => null, FIXED_DT, i);
@@ -89,37 +91,38 @@ describe('firing', () => {
     expect(shots).toBeLessThanOrEqual(Math.ceil(1 / interval) + 1);
   });
 
-  const turretAim = (s: Ship) => s.weapons.find((w) => sparrow.weapons[w.mountId]!.family === 'pointDefence')!.aim;
+  // The Manifest's starboard close-in weapon system (d2): a beam CIWS, 150 degrees centred on the right.
+  const ciwsAim = (s: Ship) => s.weapons.find((w) => w.mountId === 'd2')!.aim;
 
-  it('hot turrets slew towards the target no faster than their turn rate', () => {
-    const s = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
-    const t = ship('t', 'sparrow', { position: { x: 0, y: 500 } });
-    const r = fireWeapons(s, sparrow, emptyInput(), () => t, FIXED_DT, 1);
-    expect(turretAim(r.ship)).toBeCloseTo(WEAPONS['swivel-s']!.turretTurnRate * FIXED_DT, 9);
+  it('hot CIWS slew towards the target no faster than their traverse', () => {
+    const s = ship('s', 'hauler', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
+    const t = ship('t', 'sparrow', { position: { x: 0, y: 300 } });
+    const r = fireWeapons(s, hauler, emptyInput(), () => t, FIXED_DT, 1);
+    expect(ciwsAim(r.ship)).toBeCloseTo(WEAPONS['ciws-m']!.turretTurnRate * hauler.turretTracking * FIXED_DT, 9);
     expect(r.projectiles).toEqual([]); // not on target yet
   });
 
-  it('hot turrets fire by themselves once on target and in range', () => {
-    let s = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
-    const t = ship('t', 'sparrow', { position: { x: 0, y: 400 } });
+  it('hot CIWS fire by themselves once on target and in range', () => {
+    let s = ship('s', 'hauler', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
+    const t = ship('t', 'sparrow', { position: { x: 0, y: 300 } });
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const r = fireWeapons(s, sparrow, emptyInput(), () => t, FIXED_DT, i);
+      const r = fireWeapons(s, hauler, emptyInput(), () => t, FIXED_DT, i);
       s = r.ship;
       shots += r.projectiles.length;
     }
-    expect(shots).toBeGreaterThan(2);
+    expect(shots).toBeGreaterThan(10);
   });
 
-  it('cold turrets never fire, and turrets never fire out of range', () => {
-    const t = ship('t', 'sparrow', { position: { x: 400, y: 0 } });
-    const far = ship('far', 'sparrow', { position: { x: 5000, y: 0 } });
-    let cold = ship('s', 'sparrow', { weaponsHot: false, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
-    let outOfRange = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 'far', progress: 1 }], activeLock: 'far' });
+  it('cold CIWS never fire at ships, and CIWS never fire out of range', () => {
+    const t = ship('t', 'sparrow', { position: { x: 0, y: 300 } });
+    const far = ship('far', 'sparrow', { position: { x: 0, y: 600 } });
+    let cold = ship('s', 'hauler', { weaponsHot: false, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
+    let outOfRange = ship('s', 'hauler', { weaponsHot: true, locks: [{ targetId: 'far', progress: 1 }], activeLock: 'far' });
     let shots = 0;
     for (let i = 0; i < SECOND; i++) {
-      const a = fireWeapons(cold, sparrow, emptyInput(), () => t, FIXED_DT, i);
-      const b = fireWeapons(outOfRange, sparrow, emptyInput(), () => far, FIXED_DT, i);
+      const a = fireWeapons(cold, hauler, emptyInput(), () => t, FIXED_DT, i);
+      const b = fireWeapons(outOfRange, hauler, emptyInput(), () => far, FIXED_DT, i);
       cold = a.ship;
       outOfRange = b.ship;
       shots += a.projectiles.length + b.projectiles.length;
@@ -127,8 +130,11 @@ describe('firing', () => {
     expect(shots).toBe(0);
   });
 
+  // The Tacet's second gun (w2): a small main gun turret that turns all the way round.
+  const turretAim = (s: Ship) => s.weapons.find((w) => w.mountId === 'w2')!.aim;
+
   it('a fast target crossing close by can outrun a turret (tracking)', () => {
-    // Target circling 60 units away at 300 u/s needs 5 rad/s of slew; the light turret has 4.
+    // Target circling 60 units away at 300 u/s needs 5 rad/s of slew; a small gun turret has 3.
     const orbitRadius = 60;
     const speed = 300;
     let s = ship('s', 'sparrow', { weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
@@ -374,8 +380,8 @@ describe('NPC combat', () => {
     expect(hunted).toBe(true);
   });
 
-  it('a trader shoots back at a pirate ahead of it, but its swivel cannot cover its stern', () => {
-    // The Manifest's one swivel faces forward with a half-circle arc: a pirate ahead is engaged, one astern is in the blind spot.
+  it('a trader shoots back at a pirate on its beam, but its CIWS cannot cover its stern', () => {
+    // The Manifest's two CIWS cover its beams, 150 degrees each: a pirate abeam is engaged, one dead astern is in the gap.
     const base = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
     const trader = buildShip(base, { id: 't', loadout: LOADOUTS['tessaract-trader']!, ownerId: null, position: { x: -7000, y: -7000 }, heading: 0, flightMode: 'manual' });
     const shots = (where: { x: number; y: number }) => {
@@ -388,7 +394,7 @@ describe('NPC combat', () => {
       }
       return fired;
     };
-    expect(shots({ x: 300, y: 0 })).toBeGreaterThan(5); // ahead
+    expect(shots({ x: 0, y: 300 })).toBeGreaterThan(5); // abeam
     expect(shots({ x: -300, y: 0 })).toBe(0); // astern
   });
 

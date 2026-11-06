@@ -294,7 +294,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
 
   // Weapons.
-  // Weapons (docs/weapons.md). Projectile: Union Defence Works. Energy: Cantor-Vell, and Paragon's open-market Fairshot. Hybrid: Commonwealth Fleet Works. Swivels: Paragon.
+  // Weapons (docs/weapons.md). Projectile: Union Defence Works. Energy: Cantor-Vell, and Paragon's open-market Fairshot. Hybrid: Commonwealth Fleet Works. Close-in weapon systems: Paragon.
   // Union Picket: the autocannon, named for the strike picket lines.
   'union-picket-s': {
     id: 'union-picket-s',
@@ -587,21 +587,23 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'railgun-l',
   },
-  // Swivels: Paragon's turreted point defence guns. They need fire control on the mount.
-  'paragon-turret-s': {
-    id: 'paragon-turret-s',
-    name: 'Paragon Watchman S',
+  // Close-in weapon system: Paragon's, on `ciws` hardpoints (medium hulls
+  // and up). Working name until the lore chat names it. Fire control
+  // (the Gunlayers) sets how many a ship can run.
+  'paragon-ciws-m': {
+    id: 'paragon-ciws-m',
+    name: 'Paragon CIWS M',
     kind: 'weapon',
-    size: 'S',
-    mounts: ['high'],
+    size: 'M',
+    mounts: ['ciws'],
     needs: ['power'],
-    mass: 1.2,
-    power: 2,
-    price: 800,
+    mass: 3,
+    power: 3,
+    price: 3000,
     manufacturer: 'paragon',
     tags: ['pointDefence'],
     stats: {},
-    weaponId: 'swivel-s',
+    weaponId: 'ciws-m',
   },
 
   // Launchers (docs/weapons.md, part 2). Ito-Marr builds the Kessari
@@ -802,7 +804,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { escapePod: 1 },
   },
 
-  // Fire control: how many swivels a ship can direct, and how fast they track.
+  // Fire control: how many close-in weapon systems a ship can direct, and how fast they track.
   'paragon-director-s': {
     id: 'paragon-director-s',
     name: 'Paragon Gunlayer S',
@@ -832,7 +834,7 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { turretControl: 3, turretTracking: 1.25 },
   },
   'paragon-director-l': {
-    // For frigates and up: a big ship carries several small swivels.
+    // For frigates and up: a frigate carries four CIWS.
     id: 'paragon-director-l',
     name: 'Paragon Gunlayer L',
     kind: 'fireControl',

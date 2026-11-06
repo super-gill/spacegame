@@ -336,7 +336,7 @@ export function holdLock(ship: Ship, stats: ShipStats, targetId: string): Partia
 
 /**
  * The main gun an NPC fights by (its range sets how close it comes): the
- * first mount carrying a gun that is not point defence, else a swivel.
+ * first mount carrying a gun that is not point defence, else a CIWS.
  */
 export function mainGun(stats: ShipStats): [string, WeaponSpec] | null {
   const guns = Object.entries(stats.weapons).filter(([, w]) => isGun(w));

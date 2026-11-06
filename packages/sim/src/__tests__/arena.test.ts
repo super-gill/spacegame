@@ -16,7 +16,7 @@ describe('the arena', () => {
   it('puts the pilot in the chosen fit with the enemies, far out in space', () => {
     const w0 = world();
     const before = pilotShip(w0, 'ana')!;
-    const r = adminArena(w0, 'ana', 'Frigate crowd clearer', 'Warrant brawler', 3);
+    const r = adminArena(w0, 'ana', 'Frigate anti-small', 'Warrant brawler', 3);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     const w = r.world;
@@ -81,6 +81,6 @@ describe('the arena', () => {
     expect(command).not.toBeNull();
     expect(applyCommand(world(), 'ana', command!).ok).toBe(true);
     expect(readCommand({ type: 'adminArenaEnd' })).toEqual({ type: 'adminArenaEnd' });
-    expect(arenaFits()).toContain('Frigate crowd clearer');
+    expect(arenaFits()).toContain('Frigate anti-small');
   });
 });

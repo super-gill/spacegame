@@ -36,7 +36,12 @@ export type ModuleSize = 'S' | 'M' | 'L' | 'XL';
  * own active systems (shields, afterburner, countermeasures, scanners,
  * hopper); `low` is passive (armour, cargo, drone bays, extra reactors).
  */
-export type MountType = 'high' | 'mid' | 'low' | 'engine' | 'core' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl';
+/**
+ * Where a mount sits and what it takes. `ciws` is a close-in weapon system
+ * hardpoint (docs/turrets.md): only medium hulls and up have them, so a
+ * small ship cannot carry one whatever its slots.
+ */
+export type MountType = 'high' | 'mid' | 'low' | 'engine' | 'core' | 'radar' | 'computer' | 'nav' | 'flight' | 'podBay' | 'fireControl' | 'ciws';
 
 /**
  * What a mount point provides to the module on it. A module lists the
@@ -103,8 +108,9 @@ export type Resistances = Partial<Record<DamageType, number>>;
 
 /**
  * A weapon family (docs/weapons.md). Each has a character, and hulls
- * carry bonuses to one. `pointDefence` is the swivels: small, light,
- * fast-firing turrets that also shoot down munitions.
+ * carry bonuses to one. `pointDefence` is close-in weapon systems
+ * (CIWS): very fast, short-ranged turrets on their own hardpoints that
+ * shoot down munitions first, and ships when weapons are hot.
  */
 export type WeaponFamily = 'projectile' | 'energy' | 'hybrid' | 'missile' | 'pointDefence' | 'countermeasure' | 'mining';
 
@@ -192,9 +198,9 @@ export type ModuleStat =
   | 'navHorizon'
   /** How well the flight computer flies the hull, 0 to 1: mouse steering and assist. Zero: no computer, manual on the keys. */
   | 'flightControl'
-  /** How many swivels the fire-control computer can direct at once. */
+  /** How many CIWS the fire-control computer can direct at once. */
   | 'turretControl'
-  /** Fire control's tracking: a multiplier on swivels' slew rate (best fitted, not summed). */
+  /** Fire control's tracking: a multiplier on CIWS' slew rate (best fitted, not summed). */
   | 'turretTracking'
   /** A pod bay: 1 if the ship carries an escape pod. */
   | 'escapePod'
@@ -431,9 +437,9 @@ export interface ShipStats {
   /** Seconds after taking damage before shields start recharging. */
   /** Flight computer quality, 0 to 1; 0 with none (manual on the keys, no mouse steering, no assist). */
   flightControl: number;
-  /** Swivels fire control can direct; others stay idle. */
+  /** CIWS fire control can direct; others stay idle. */
   turretControl: number;
-  /** Multiplier on swivels' slew rate from fire control; 0 with none. */
+  /** Multiplier on CIWS' slew rate from fire control; 0 with none. */
   turretTracking: number;
   /** True with a pod bay: the pilot escapes in a pod when the ship is lost. */
   escapePod: boolean;
@@ -548,7 +554,7 @@ export interface MarketEntry {
  * How a weapon aims (docs/turrets.md).
  * - `turret`: turns on its own towards its lock at its traverse
  *   (`turretTurnRate`), inside its mount's arc. Every main gun is one and
- *   fires on the trigger when it bears; swivels and mining turrets fire by
+ *   fires on the trigger when it bears; CIWS and mining turrets fire by
  *   themselves.
  * - `fixed`: fires along the ship's heading. Only launchers, dispensers
  *   and light mining lasers.

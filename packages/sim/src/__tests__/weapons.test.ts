@@ -34,11 +34,11 @@ function shipOf(w: World, id: string, loadoutId: string, fit: Record<string, str
 const fire: ShipInput = { ...emptyInput(), fireFixed: true };
 
 describe('the catalogue', () => {
-  it('has every gun in S, M and L, and the swivel small only', () => {
+  it('has every gun in S, M and L, and one close-in weapon system', () => {
     for (const prefix of ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun']) {
       for (const size of ['s', 'm', 'l']) expect(WEAPONS[`${prefix}-${size}`], `${prefix}-${size}`).toBeDefined();
     }
-    expect(WEAPONS['swivel-s']).toBeDefined();
+    expect(Object.values(WEAPONS).filter((w) => w.family === 'pointDefence').map((w) => w.id)).toEqual(['ciws-m']);
     for (const w of Object.values(WEAPONS)) {
       if (w.family === 'energy') expect(w.ammo).toBeNull();
       if (w.family === 'projectile') expect(w.capacitorPerShot).toBe(0);
@@ -46,8 +46,8 @@ describe('the catalogue', () => {
     }
   });
 
-  it('every main gun hits harder per shot than the small swivel', () => {
-    const swivel = WEAPONS['swivel-s']!;
+  it('every main gun hits harder per shot than a CIWS', () => {
+    const swivel = WEAPONS['ciws-m']!;
     for (const size of ['S', 'M', 'L'] as const) {
       for (const gun of Object.values(WEAPONS).filter((w) => isMainGun(w) && w.size === size)) {
         expect(gun.damage, `${gun.id} vs ${swivel.id}`).toBeGreaterThan(swivel.damage);
@@ -60,7 +60,6 @@ describe('the catalogue', () => {
       const w = WEAPONS[m.weaponId!];
       expect(w, m.id).toBeDefined();
       expect(w!.size, m.id).toBe(m.size);
-      // Since 6f a swivel fits any weapon mount; a fire-control computer directs it.
     }
   });
 
@@ -79,7 +78,8 @@ describe('the capacitor', () => {
   it('energy guns spend it per shot and stop firing when it is empty; projectile guns do not touch it', () => {
     const w = quiet();
     let laser = shipOf(w, 'laser', 'meridian-starter');
-    laser = { ...laser, capacitor: 10 };
+    // Only the pulse laser in the selected group: the Tern's autocannon (w2) moved out of it.
+    laser = { ...laser, capacitor: 10, weapons: laser.weapons.map((x) => (x.mountId === 'w2' ? { ...x, group: 9 } : x)) };
     const stats = shipStats(w, laser);
     let shots = 0;
     let dryEvents = 0;
@@ -94,7 +94,7 @@ describe('the capacitor', () => {
     expect(dryEvents).toBeGreaterThan(0);
 
     let gun = shipOf(w, 'gun', 'meridian-starter', { w1: 'union-picket-s' }, { rounds: 2 });
-    gun = { ...gun, capacitor: 0 };
+    gun = { ...gun, capacitor: 0, weapons: gun.weapons.map((x) => (x.mountId === 'w2' ? { ...x, group: 9 } : x)) };
     const r = fireWeapons(gun, shipStats(w, gun), fire, () => null, FIXED_DT, 1, w);
     expect(r.projectiles.length).toBe(1);
     expect(r.ship.capacitor).toBe(0);
@@ -198,22 +198,24 @@ describe('damage types', () => {
 });
 
 describe('arcs and fire groups', () => {
-  it("a swivel cannot slew outside its mount's arc", () => {
+  it("a turret cannot slew outside its mount's arc", () => {
     const hull = HULLS['tessaract-spine']!;
-    const mount = hull.mounts.find((m) => m.id === 'w1')!;
+    const mount = hull.mounts.find((m) => m.id === 'd2')!; // the starboard CIWS, 150 degrees
     const ship = shipOf(quiet(), 's', 'tessaract-trader');
-    expect(withinArc(ship, mount, 0)).toBe(true); // dead ahead
-    expect(withinArc(ship, mount, Math.PI / 2 - 0.1)).toBe(true); // just inside the half circle
-    expect(withinArc(ship, mount, Math.PI)).toBe(false); // astern
+    expect(withinArc(ship, mount, Math.PI / 2)).toBe(true); // on the beam
+    expect(withinArc(ship, mount, 0.3)).toBe(true); // forward of the beam, inside
+    expect(withinArc(ship, mount, 0)).toBe(false); // dead ahead: the gap
+    expect(withinArc(ship, mount, -Math.PI / 2)).toBe(false); // the other side
   });
 
   it('Space fires only the selected group; a number key changes it', () => {
     let w = quiet();
     let s = shipOf(w, 's', 'meridian-starter', { w1: 'union-picket-s' }, { rounds: 2 });
-    s = { ...s, weapons: s.weapons.map((x) => (x.mountId === 'w1' ? { ...x, group: 2 } : x)) };
+    // The picket in group 2, the Tern's second gun out of the way in group 3.
+    s = { ...s, weapons: s.weapons.map((x) => (x.mountId === 'w1' ? { ...x, group: 2 } : x.mountId === 'w2' ? { ...x, group: 3 } : x)) };
     w = { ...w, ships: { s } };
     let a = stepWorld(w, { s: fire });
-    expect(a.projectiles.length).toBe(0); // group 1 has nothing fixed (w2 is a swivel)
+    expect(a.projectiles.length).toBe(0); // group 1 is empty
     let b = stepWorld(w, { s: { ...fire, selectGroup: 2 } });
     expect(b.events).toContainEqual({ type: 'fireGroupChanged', shipId: 's', group: 2 });
     expect(b.projectiles.length).toBe(1);

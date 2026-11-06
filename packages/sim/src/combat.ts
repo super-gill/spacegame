@@ -137,12 +137,12 @@ const REFUSAL_PAUSE_SECONDS = 0.5;
  *   home on. No lock, no launch (`launchRefused`).
  * - Dispensers drop a countermeasure on `launchCountermeasure`, whatever
  *   the group.
- * - Swivels (point defence) shoot down munitions coming for this ship
+ * - CIWS (point defence) shoot down munitions coming for this ship
  *   (`threats`) by themselves, closest first, hot or not: nobody can click
  *   a missile while flying. With none coming, or assigned to a lock
  *   (`WeaponState.lockTarget`), they engage ships as turrets always did:
  *   while weapons are hot, the weapon's lock (`targetFor`).
- * - Swivels slew towards their lead point at their turn rate times fire
+ * - CIWS slew towards their lead point at their turn rate times fire
  *   control's tracking, and fire by themselves once within
  *   TURRET_FIRE_TOLERANCE of it and in range.
  * - Every shot costs what its family costs (docs/weapons.md): capacitor
@@ -192,7 +192,7 @@ export function fireWeapons(
     return taken;
   };
 
-  // Fire control directs the first `turretControl` swivels, in mount order;
+  // Fire control directs the first `turretControl` CIWS, in mount order;
   // the rest stay idle (docs/ship-systems.md). Turreted main guns need none.
   const directed = new Set(
     ship.weapons

@@ -39,7 +39,7 @@ export const GOODS: Record<string, GoodSpec> = {
   // KOD Summons missiles: Breach (explosive, the all-rounder), Scatter
   // (fragmentation, shreds bare hulls, poor against shields) and Heat
   // (fire and forget). KOD Foreclosure torpedoes: slow, heavy, a big-ship
-  // weapon that a swivel can shoot down.
+  // weapon that a CIWS can shoot down.
   'summons-breach': {
     id: 'summons-breach', name: 'KOD Summons Breach (box of 8)', unitMass: 0.8, basePrice: 200,
     ammo: { perUnit: 8, damageType: 'explosive', damage: 1, fits: 'missile' },

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { angleDelta } from '../angle.js';
-import { fireWeapons, gunBearing } from '../combat.js';
-import { FIXED_DT, GUN_TRAVERSE, TURRET_SLEW_FALLOFF } from '../constants.js';
+import { fireWeapons, gunBearing, withinArc } from '../combat.js';
+import { CIWS, FIXED_DT, GUN_TRAVERSE, TURRET_SLEW_FALLOFF } from '../constants.js';
 import { buildShip } from '../factory.js';
 import { HULLS } from '../hulls.js';
 import { LOADOUTS } from '../loadouts.js';
@@ -127,5 +127,56 @@ describe('main gun turrets in a fight', () => {
     expect(gunBearing(world(frigate, near), frigate, stats, 'w1')).toBe('slewing');
     const settled = run(frigate, near, 120, false).ship;
     expect(gunBearing(world(settled, near), settled, stats, 'w1')).toBe('bears');
+  });
+});
+
+describe('close-in weapon systems (step 3)', () => {
+  it('only medium hulls and up have CIWS hardpoints: two on a beam pair, four on the frigate', () => {
+    const count = (id: string) => HULLS[id]!.mounts.filter((m) => m.type === 'ciws').length;
+    expect(count('kessari-brig')).toBe(2);
+    expect(count('tessaract-spine')).toBe(2);
+    expect(count('rookrivet-hulk')).toBe(2);
+    expect(count('union-frigate')).toBe(4);
+    for (const hull of Object.values(HULLS)) {
+      if (['pod', 'cutter', 'sloop', 'drone', 'aurel'].includes(hull.class)) expect(count(hull.id), hull.id).toBe(0);
+    }
+  });
+
+  it('a beam pair leaves gaps fore and aft; the frigate is covered all round', () => {
+    const covers = (hullId: string, bearing: number) => {
+      const ship = buildShip(TEST_CATALOGUES, { id: 's', loadout: { id: 'x', name: 'x', hullId, fit: {} }, ownerId: null, position: { x: 0, y: 0 }, heading: 0, flightMode: 'assisted' });
+      return HULLS[hullId]!.mounts.filter((m) => m.type === 'ciws').some((m) => withinArc(ship, m, bearing));
+    };
+    for (const id of ['kessari-brig', 'tessaract-spine', 'rookrivet-hulk']) {
+      expect(covers(id, Math.PI / 2), id).toBe(true);
+      expect(covers(id, 0), id).toBe(false);
+      expect(covers(id, Math.PI), id).toBe(false);
+    }
+    for (let b = -Math.PI; b < Math.PI; b += 0.1) expect(covers('union-frigate', b)).toBe(true);
+  });
+
+  it('fires light rounds fast, short-ranged, from a deep magazine', () => {
+    const w = WEAPONS['ciws-m']!;
+    expect(w).toMatchObject({ family: 'pointDefence', kind: 'turret', damage: CIWS.damage, range: 350, turretTurnRate: 6, magazine: 2000, ammo: 'rounds' });
+    // Two ticks a round: 30 a second.
+    expect(Math.round(w.fireInterval / FIXED_DT)).toBe(2);
+  });
+
+  it('a CIWS fits only a CIWS hardpoint, and a CIWS hardpoint takes only a CIWS', () => {
+    const ciws = MODULES['paragon-ciws-m']!;
+    expect(ciws.mounts).toEqual(['ciws']);
+    for (const m of Object.values(MODULES)) if (m.mounts.includes('ciws')) expect(WEAPONS[m.weaponId ?? '']?.family, m.id).toBe('pointDefence');
+    expect(MODULES['paragon-turret-s']).toBeUndefined();
+    expect(WEAPONS['swivel-s']).toBeUndefined();
+  });
+
+  it('stock medium hulls and up fill every CIWS hardpoint and carry fire control to run them all', () => {
+    for (const id of ['kessari-brig', 'union-frigate', 'tessaract-trader', 'rookrivet-hulk']) {
+      const loadout = LOADOUTS[id]!;
+      const hardpoints = HULLS[loadout.hullId]!.mounts.filter((m) => m.type === 'ciws');
+      for (const m of hardpoints) expect(loadout.fit[m.id], `${id} ${m.id}`).toBe('paragon-ciws-m');
+      const ship = buildShip(TEST_CATALOGUES, { id: 's', loadout, ownerId: null, position: { x: 0, y: 0 }, heading: 0, flightMode: 'assisted' });
+      expect(shipStats(TEST_CATALOGUES, ship).turretControl, id).toBeGreaterThanOrEqual(hardpoints.length);
+    }
   });
 });

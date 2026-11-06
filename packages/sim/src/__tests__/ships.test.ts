@@ -126,7 +126,7 @@ describe('derived stats', () => {
   it('gives each weapon mount its own effective weapon', () => {
     const s = loadoutStats(STARTER_LOADOUT_ID);
     expect(s.weapons['w1']!.id).toBe('pulse-laser-s');
-    expect(s.weapons['w2']!.id).toBe('swivel-s');
+    expect(s.weapons['w2']!.id).toBe('autocannon-s');
   });
 });
 
@@ -166,9 +166,10 @@ describe('mount rules', () => {
   it('checks type, size and services', () => {
     expect(mountRefusal(at('meridian-courier', 'u1'), MODULES['meridian-engine-s']!)).toBe('wrongMount');
     expect(mountRefusal(at('meridian-courier', 'w1'), MODULES['union-autocannon-m']!)).toBe('tooBig');
-    // Since 6f any weapon mount takes a swivel: fire control comes from a fire-control computer.
-    expect(mountRefusal(at('meridian-courier', 'w1'), MODULES['paragon-turret-s']!)).toBeNull();
-    expect(mountRefusal(at('meridian-courier', 'w2'), MODULES['paragon-turret-s']!)).toBeNull();
+    // A close-in weapon system goes only on a CIWS hardpoint, which small hulls do not have.
+    expect(mountRefusal(at('meridian-courier', 'w2'), MODULES['paragon-ciws-m']!)).toBe('wrongMount');
+    expect(mountRefusal(at('kessari-brig', 'd1'), MODULES['paragon-ciws-m']!)).toBeNull();
+    expect(mountRefusal(at('kessari-brig', 'd1'), MODULES['union-autocannon-m']!)).toBe('wrongMount');
     expect(mountRefusal(at('kessari-wedge', 'w1'), MODULES['paragon-pulse-s']!)).toBeNull(); // smaller fits
   });
 
@@ -293,14 +294,14 @@ describe('fitting', () => {
   });
 
   it('refuses a fit that draws more power than the reactors make', () => {
-    // Stripped starter: 12 of 13 power drawn. Make room, take a hungrier engine,
-    // then see that 13 of 13 fits and 14 of 13 does not.
+    // Stripped starter: 11 of 13 power drawn. Make room, take a hungrier engine,
+    // then see that 12 of 13 fits and 14 of 13 does not.
     const { w } = dockedAt(HARBOUR, 100_000);
-    const noShield = ok(unfitModule(w, 'ana', 'u1')); // draw 10 of 13
-    const kick = ok(fitModule(noShield, 'ana', 'e1', 'slagline-engine-s')); // draw 11
-    const back = fitModule(kick, 'ana', 'u1', 'meridian-shield-s'); // draw 13: allowed
+    const noShield = ok(unfitModule(w, 'ana', 'u1')); // draw 9 of 13
+    const kick = ok(fitModule(noShield, 'ana', 'e1', 'slagline-engine-s')); // draw 10
+    const back = fitModule(kick, 'ana', 'u1', 'meridian-shield-s'); // draw 12: allowed
     expect(back.ok).toBe(true);
-    const thirsty = { ...kick.modules, 'meridian-shield-s': { ...kick.modules['meridian-shield-s']!, power: 3 } };
+    const thirsty = { ...kick.modules, 'meridian-shield-s': { ...kick.modules['meridian-shield-s']!, power: 4 } };
     const r = fitModule({ ...kick, modules: thirsty }, 'ana', 'u1', 'meridian-shield-s'); // draw 14
     expect(r.ok ? 'ok' : r.reason).toBe('power');
   });
@@ -332,7 +333,7 @@ describe('fitting', () => {
     expect(before.map((s) => s.mountId)).toEqual(['w1', 'w2']);
     const noTurret = ok(unfitModule(w, 'ana', 'w2'));
     expect(myShip(noTurret).weapons).toEqual([before[0]]);
-    const again = ok(fitModule(noTurret, 'ana', 'w2', 'paragon-turret-s'));
+    const again = ok(fitModule(noTurret, 'ana', 'w2', 'paragon-pulse-s'));
     expect(myShip(again).weapons.map((s) => s.mountId)).toEqual(['w1', 'w2']);
   });
 

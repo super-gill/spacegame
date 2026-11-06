@@ -52,7 +52,10 @@ describe('slot budgets', () => {
 
   it('high works on something else, mid runs the ship\'s own systems, low is passive', () => {
     const tier: Record<string, string> = { weapon: 'high', tractor: 'high', breachCharger: 'high', shieldGenerator: 'mid', afterburner: 'mid', countermeasure: 'mid', surveyScanner: 'mid', oreHopper: 'mid', armour: 'low', cargoPod: 'low', droneBay: 'low' };
-    for (const m of Object.values(MODULES)) if (tier[m.kind]) expect(m.mounts, m.id).toEqual([tier[m.kind]]);
+    // A close-in weapon system is a weapon on its own hardpoint, not a high slot.
+    const ciws = (m: (typeof MODULES)[string]) => m.mounts.includes('ciws');
+    for (const m of Object.values(MODULES)) if (tier[m.kind] && !ciws(m)) expect(m.mounts, m.id).toEqual([tier[m.kind]]);
+    expect(MODULES['paragon-ciws-m']!.mounts).toEqual(['ciws']);
     expect(MODULES['itomarr-reactor-m']!.mounts).toEqual(['core', 'low']);
   });
 
@@ -74,7 +77,7 @@ describe('save version 6', () => {
     const w = joinPilot(createStarterWorld(), 'ana', 'Ana');
     const me = pilotShip(w, 'ana')!;
     const oldFit = {
-      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', w1: 'paragon-pulse-s', w2: 'paragon-turret-s',
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', w1: 'paragon-pulse-s', w2: 'paragon-pulse-s',
       e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s', i1: 'meridian-shield-s', u1: 'rookrivet-armour-s', b1: 'meridian-pod-s',
     };
     const old: World = { ...w, ships: { ...w.ships, [me.id]: { ...me, fit: oldFit, state: 'docked', dockedAt: 'station-harbour' } } };
@@ -145,9 +148,22 @@ describe('the flight computer', () => {
 
 describe('fire control', () => {
   const w = createStarterWorld();
-  const target: Ship = { ...starter(w), id: 't', position: { x: -7000 + 300, y: -7000 } };
+  // Dead ahead of the frigate, where its two bow CIWS (d1, d2) both bear.
+  const target: Ship = { ...starter(w), id: 't', position: { x: -7000 + 250, y: -7000 } };
   const hot = (s: Ship): Ship => ({ ...s, weaponsHot: true, locks: [{ targetId: 't', progress: 1 }], activeLock: 't' });
+  /** The militia frigate, flying, with changes to its fit (null removes a module). */
+  const frigate = (fit: Record<string, string | null> = {}): Ship => {
+    const loadout = LOADOUTS['union-frigate']!;
+    const merged: Record<string, string> = { ...loadout.fit };
+    for (const [k, v] of Object.entries(fit)) {
+      if (v === null) delete merged[k];
+      else merged[k] = v;
+    }
+    const s = buildShip(w, { id: 'f', loadout: { ...loadout, fit: merged }, ownerId: null, position: { x: -7000, y: -7000 }, heading: 0, flightMode: 'assisted' });
+    return { ...s, state: 'flying', dockedAt: null };
+  };
 
+  /** Shots in `seconds` with no trigger: only what fires by itself, the CIWS. */
   function shotsIn(s: Ship, seconds: number): number {
     const stats = shipStats(w, s);
     let n = 0;
@@ -159,16 +175,17 @@ describe('fire control', () => {
     return n;
   }
 
-  it('without it swivels stay idle', () => {
-    expect(shotsIn(hot(starter(w)), 2)).toBeGreaterThan(0);
-    expect(shotsIn(hot(starter(w, { x1: null })), 2)).toBe(0);
+  it('without it CIWS stay idle', () => {
+    expect(shotsIn(hot(frigate()), 2)).toBeGreaterThan(0);
+    expect(shotsIn(hot(frigate({ x1: null })), 2)).toBe(0);
   });
 
-  it('a small director runs one swivel: a second stays idle until a bigger one is fitted', () => {
-    const two = hot(starter(w, { w1: 'paragon-turret-s' }));
-    const one = hot(starter(w));
-    expect(shotsIn(two, 3)).toBe(shotsIn(one, 3));
-    expect(shipStats(w, two).turretControl).toBe(1);
+  it('a small Gunlayer runs one CIWS: the second stays idle until a bigger one is fitted', () => {
+    const small = hot(frigate({ x1: 'paragon-director-s' }));
+    const oneFitted = hot(frigate({ d2: null, d3: null, d4: null }));
+    expect(shotsIn(small, 3)).toBe(shotsIn(oneFitted, 3));
+    expect(shotsIn(hot(frigate()), 3)).toBeGreaterThan(shotsIn(small, 3));
+    expect(shipStats(w, small).turretControl).toBe(1);
   });
 });
 
@@ -214,6 +231,7 @@ describe('active modules', () => {
     const { w, id } = solo({ u2: 'paragon-fairwarning-s' });
     const ship = { ...w.ships[id]!, weapons: w.ships[id]!.weapons.map((x) => (x.mountId === 'w1' ? { ...x, group: 2 } : x)) };
     expect(activationSlots(w, ship)).toEqual([
+      { kind: 'group', group: 1 }, // the Tern's second gun
       { kind: 'group', group: 2 },
       { kind: 'module', mountId: 'w3', moduleId: 'meridian-gleaner-s', moduleKind: 'tractor' },
       { kind: 'module', mountId: 'u2', moduleId: 'paragon-fairwarning-s', moduleKind: 'countermeasure' },
@@ -294,10 +312,10 @@ describe('slot placement (docs/fitting.md, "Placement")', () => {
     return best;
   };
 
-  it('puts high slots on the hull edge, and mids and lows inside it', () => {
+  it('puts high slots and CIWS hardpoints on the hull edge, and mids and lows inside it', () => {
     for (const hull of Object.values(HULLS)) {
       for (const m of hull.mounts) {
-        if (m.type === 'high') expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
+        if (m.type === 'high' || m.type === 'ciws') expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
         // A merchantman's cargo pods hang off its spine, outside the outline.
         if ((m.type === 'mid' || m.type === 'low') && !(hull.class === 'merchantman' && m.id.startsWith('b'))) expect(inside(m.position, hull.outline), `${hull.id} ${m.id}`).toBe(true);
       }

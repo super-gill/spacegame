@@ -19,7 +19,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       x1: 'paragon-director-s',
       p1: 'meridian-podbay-s',
       w1: 'paragon-pulse-s',
-      w2: 'paragon-turret-s',
+      w2: 'union-picket-s', // rounds, not capacitor: two lasers would run the Tern's small pool dry
       e1: 'meridian-engine-s',
       c1: 'meridian-thrusters-s',
       c2: 'meridian-reactor-s',
@@ -31,12 +31,15 @@ export const LOADOUTS: Record<string, Loadout> = {
     },
   },
   'tessaract-trader': {
-    // Four of six bays: a working trader that still handles. A swivel
-    // forward and a chaff screen aft.
+    // Four of six bays: a working trader that still handles. A CIWS on
+    // each beam and a chaff screen aft; the forward slot left free.
     id: 'tessaract-trader',
     name: 'Tessaract Manifest, Calder supply run',
     hullId: 'tessaract-spine',
     fit: {
+      // Close-in weapon systems on every CIWS hardpoint (docs/turrets.md).
+      d1: 'paragon-ciws-m',
+      d2: 'paragon-ciws-m',
       n1: 'meridian-nav-s',
       r1: 'tessaract-radar-m',
       t1: 'meridian-computer-s',
@@ -48,10 +51,10 @@ export const LOADOUTS: Record<string, Loadout> = {
       c1: 'slagline-thrusters-m',
       c2: 'itomarr-reactor-m',
       i1: 'itomarr-shield-m',
-      w1: 'paragon-turret-s',
       u1: 'itomarr-screen-m',
       f1: 'meridian-helm-s',
-      x1: 'paragon-director-s',
+      x1: 'paragon-director-m', // runs three CIWS, so both of the Manifest's
+      b5: 'meridian-reactor-s', // a small second reactor in the fifth bay: the two CIWS draw more than the main one spares
       p1: 'meridian-podbay-s',
     },
   },
@@ -80,13 +83,16 @@ export const LOADOUTS: Record<string, Loadout> = {
   },
   'kessari-brig': {
     // Sold at Harbour: a Kessari Orbital Defence brig in its yard fit. A
-    // launcher and an autocannon forward, a swivel on each flank and one
-    // aft, a medium shield, an afterburner and chaff, plate and a second
+    // launcher and an autocannon forward, a CIWS on each beam (the flank
+    // and aft slots left free until the step 4 refit), a medium shield, an afterburner and chaff, plate and a second
     // reactor below. Fights its own size and still swats small things.
     id: 'kessari-brig',
     name: 'Kessari Injunction, yard issue',
     hullId: 'kessari-brig',
     fit: {
+      // Close-in weapon systems on every CIWS hardpoint (docs/turrets.md).
+      d1: 'paragon-ciws-m',
+      d2: 'paragon-ciws-m',
       n1: 'meridian-nav-s',
       r1: 'tessaract-radar-m',
       t1: 'paragon-computer-m',
@@ -95,9 +101,6 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
       w1: 'itomarr-magazine-m',
       w2: 'union-autocannon-m',
-      w3: 'paragon-turret-s',
-      w4: 'paragon-turret-s',
-      w5: 'paragon-turret-s',
       e1: 'slagline-engine-m',
       e2: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
@@ -114,12 +117,18 @@ export const LOADOUTS: Record<string, Loadout> = {
   },
   'union-frigate': {
     // Sold at Harbour: a Free Belt militia frigate. Two heavy autocannons
-    // forward, swivels on the flanks and one aft, a big shield, a lot of
+    // forward, a CIWS on every quarter (the flank and aft slots left free
+    // until the step 4 refit), a big shield, a lot of
     // plate, and a tractor for what is left of the other side.
     id: 'union-frigate',
     name: 'Union Defence Works Walkout, militia issue',
     hullId: 'union-frigate',
     fit: {
+      // Close-in weapon systems on every CIWS hardpoint (docs/turrets.md).
+      d1: 'paragon-ciws-m',
+      d2: 'paragon-ciws-m',
+      d3: 'paragon-ciws-m',
+      d4: 'paragon-ciws-m',
       n1: 'meridian-nav-s',
       r1: 'tessaract-radar-m',
       t1: 'paragon-computer-m',
@@ -128,9 +137,6 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
       w1: 'union-picket-l',
       w2: 'union-picket-l',
-      w3: 'paragon-turret-s',
-      w4: 'paragon-turret-s',
-      w5: 'paragon-turret-s',
       w6: 'tessaract-gleaner-m',
       e1: 'slagline-engine-l',
       e2: 'slagline-engine-l',
@@ -151,7 +157,8 @@ export const LOADOUTS: Record<string, Loadout> = {
   },
   'rookrivet-prospector': {
     // Sold at Ridge and Harbour: everything a new miner needs to find and
-    // cut the easy rocks, and a swivel for company.
+    // cut the easy rocks; the second high slot is free (a gun there would
+    // join fire group 1, ahead of the laser in group 3).
     id: 'rookrivet-prospector',
     name: 'Belt Forge Prospector, Collective issue',
     hullId: 'rookrivet-prospector',
@@ -164,7 +171,6 @@ export const LOADOUTS: Record<string, Loadout> = {
       x1: 'paragon-director-s',
       p1: 'meridian-podbay-s',
       w1: 'rookrivet-pick-s',
-      w2: 'paragon-turret-s',
       e1: 'meridian-engine-s',
       c1: 'meridian-thrusters-s',
       c2: 'meridian-reactor-s',
@@ -194,7 +200,6 @@ export const LOADOUTS: Record<string, Loadout> = {
       p1: 'meridian-podbay-s',
       w1: 'rookrivet-pick-m',
       w2: 'rookrivet-pick-m',
-      w3: 'paragon-turret-s',
       e1: 'slagline-engine-m',
       c1: 'slagline-thrusters-m',
       c2: 'itomarr-reactor-m',
@@ -229,13 +234,15 @@ export const LOADOUTS: Record<string, Loadout> = {
     hullId: 'rookrivet-hulk',
     drones: { loadoutId: 'rookrivet-mining-drone', count: 4 },
     fit: {
+      // Close-in weapon systems on every CIWS hardpoint (docs/turrets.md).
+      d1: 'paragon-ciws-m',
+      d2: 'paragon-ciws-m',
       n1: 'itomarr-nav-m',
       r1: 'tessaract-radar-m',
       t1: 'rookrivet-assay-l',
       f1: 'itomarr-coxswain-m',
       x1: 'paragon-director-m',
       p1: 'meridian-podbay-s',
-      w1: 'paragon-turret-s',
       m1: 'rookrivet-excavator-l',
       m2: 'rookrivet-excavator-l',
       e1: 'slagline-engine-m',
@@ -289,7 +296,7 @@ export const LOADOUTS: Record<string, Loadout> = {
       r1: 'meridian-radar-s',
       t1: 'meridian-computer-s',
       w1: 'paragon-pulse-s',
-      w2: 'paragon-turret-s',
+      w2: 'paragon-pulse-s',
       e1: 'slagline-engine-s',
       c1: 'meridian-thrusters-s',
       c2: 'meridian-reactor-s',

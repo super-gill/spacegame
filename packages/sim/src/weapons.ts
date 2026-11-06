@@ -1,4 +1,4 @@
-import { GUN_SPREAD_DEGREES, GUN_TRAVERSE, LASER_FALLOFF, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
+import { CIWS, GUN_SPREAD_DEGREES, GUN_TRAVERSE, LASER_FALLOFF, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
 import type { ModuleSize, RangeFalloff, WeaponSpec } from './types.js';
 
 /**
@@ -16,10 +16,10 @@ import type { ModuleSize, RangeFalloff, WeaponSpec } from './types.js';
  *   spend capacitor per shot.
  * - hybrid: blaster (very short) and railgun (very long); charges and a
  *   little capacitor.
- * - point defence: swivels, small only, multi-role: light rounds fired
- *   fast (30 a second). With no ship to shoot at they shoot down incoming
- *   munitions by themselves (combat.ts). To be replaced by close-in weapon
- *   systems (docs/turrets.md, build step 3).
+ * - point defence: close-in weapon systems (CIWS), on `ciws` hardpoints
+ *   that only medium hulls and up have. Very fast, short-ranged; they
+ *   shoot down incoming munitions by themselves and engage ships when
+ *   weapons are hot (combat.ts). Small ships rely on dispensers.
  * - missile: launchers (Ito-Marr Magazine) and torpedo tubes (Arsenal).
  *   No capacitor; they load munition goods, which bring their own
  *   airframe and warhead (goods.ts). `damage` here is the warhead base
@@ -173,27 +173,28 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     spread: degrees(GUN_SPREAD_DEGREES.railgun),
   }),
 
-  // Swivels: the point defence family, small only (Jason: a PDC is
-  // always small; a big ship carries several). Turreted, light rounds,
-  // modest damage, but they aim themselves and shoot down munitions.
-  'swivel-s': sized('swivel-s', 'Swivel S', 'S', {
+  // Close-in weapon systems (docs/turrets.md): point defence for medium
+  // hulls and up, on their own hardpoints. A light round about 30 times a
+  // second, short-ranged and quick to traverse, with a deep magazine fed
+  // from boxes of rounds. Inside 350 a small ship melts; outside, it is
+  // untouched. Munitions first, ships when weapons are hot (combat.ts).
+  'ciws-m': {
+    id: 'ciws-m',
+    name: 'CIWS M',
+    size: 'M',
     kind: 'turret',
     family: 'pointDefence',
-    // Light rounds, fast (Jason, 6 November): a battery of swivels shreds
-    // small ships, while a big ship's shields and plate shrug them off.
-    damage: 3,
+    damage: CIWS.damage,
     damageType: 'kinetic',
-    fireInterval: 0.1, // 30 dps (Jason, 6 November: 40 made fixed guns feel secondary)
-    projectileSpeed: 800,
-    // Further than any small ship's guns reach (Jason, 6 November): a
-    // small ship making passes flies through point defence fire.
-    range: 900,
-    turretTurnRate: 4,
+    fireInterval: CIWS.fireInterval,
+    projectileSpeed: CIWS.projectileSpeed,
+    range: CIWS.range,
+    turretTurnRate: CIWS.traverse,
     capacitorPerShot: 0,
     ammo: 'rounds',
-    magazine: 200,
-    reloadSeconds: 3,
-  }),
+    magazine: CIWS.magazine,
+    reloadSeconds: CIWS.reloadSeconds,
+  },
 
   // Launchers: no capacitor, whole boxes of munitions. The munition
   // brings speed, turning and warhead; the launcher brings rate and how
@@ -249,7 +250,7 @@ export function isGun(w: Pick<WeaponSpec, 'family'>): boolean {
   return w.family !== 'missile' && w.family !== 'countermeasure' && w.family !== 'mining';
 }
 
-/** True for a main gun: a turret fired on the trigger at the lock, not a swivel, launcher, dispenser or mining laser. */
+/** True for a main gun: a turret fired on the trigger at the lock, not a CIWS, launcher, dispenser or mining laser. */
 export function isMainGun(w: Pick<WeaponSpec, 'family'>): boolean {
   return isGun(w) && w.family !== 'pointDefence';
 }

@@ -32,8 +32,8 @@ import { RACE_COLOUR } from './render/ship-art.js';
  *   what is fitted.
  * - Middle: the ship as fitted, every slot marked where it sits on the
  *   hull by tier (circle high, diamond mid, square low, outline core) and
- *   size; the selected high slot shows its swivel arc or its line of
- *   fire. Below it, every number the ship has, now and after a change.
+ *   size; the selected high or CIWS slot shows the arc a turret there
+ *   can cover. Below it, every number the ship has, now and after a change.
  * - Right: what fits the selected slot, from storage here first, then for
  *   sale here, with Fit, Buy and fit, and Buy; then everything stored
  *   here, to sell.
@@ -80,6 +80,7 @@ const MOUNT_TYPE_NAME: Record<MountType, string> = {
   flight: 'Flight computer',
   podBay: 'Pod bay',
   fireControl: 'Fire control',
+  ciws: 'CIWS',
 };
 
 /** Table order: core systems first (as the hull lists them), then high, mid and low slots. */
@@ -108,7 +109,7 @@ export function moduleType(m: ModuleSpec, world: World): string {
   if (m.kind === 'weapon') {
     const w = m.weaponId ? world.weapons[m.weaponId] : undefined;
     if (!w) return 'Weapon';
-    if (w.family === 'pointDefence') return 'Swivel';
+    if (w.family === 'pointDefence') return 'Close-in weapon system';
     if (w.family === 'mining' && w.kind === 'turret') return 'Mining turret';
     return WEAPON_NAMES[w.id.replace(/-[sml]$/, '')] ?? 'Gun';
   }
@@ -170,7 +171,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
   if (s.navHorizon) parts.push(`predicts ${s.navHorizon} s ahead`);
   if (s.maxLocks) parts.push(`${s.maxLocks} locks at ${fixed1(s.scanResolution ?? 0)}x speed`);
   if (s.flightControl) parts.push(`flight control ${Math.round(s.flightControl * 100)}%: mouse steering and assist`);
-  if (s.turretControl) parts.push(`directs ${s.turretControl} swivel${s.turretControl === 1 ? '' : 's'}, tracking ${fixed1(s.turretTracking ?? 1)}x`);
+  if (s.turretControl) parts.push(`directs ${s.turretControl} CIWS, tracking ${fixed1(s.turretTracking ?? 1)}x`);
   if (s.escapePod) parts.push('an escape pod: without one, losing the ship leaves you with nothing');
   if (s.tractorRange) parts.push(`tractor reach ${s.tractorRange} u, pull ${s.tractorPull ?? 0} u/s`);
   if (s.afterburnerSpeed) parts.push(`hold Shift: +${Math.round(s.afterburnerSpeed * 100)}% top speed, +${Math.round((s.afterburnerThrust ?? 0) * 100)}% thrust, ${fixed1(s.afterburnerDraw ?? 0)} cap/s`);
@@ -198,7 +199,7 @@ export function describeModule(m: ModuleSpec, world: World): string {
     if (w.spread) parts.push(`spread ±${fixed1((w.spread * 180) / Math.PI)}°`);
     if (w.falloff) parts.push(`full power to ${Math.round(w.falloff.from * 100)}% of range, ${Math.round(w.falloff.floor * 100)}% at full range`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
-    if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
+    if (w.family === 'pointDefence') parts.push(`shoots down missiles by itself, and ships inside its range when weapons are hot; traverse ${fixed1(w.turretTurnRate)} rad/s; fire control sets how many you can run`);
     else if (w.kind === 'turret') parts.push(`turret: follows your lock at ${fixed1(w.turretTurnRate)} rad/s and fires with its group when it bears; no fire control needed`);
   }
   if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
@@ -226,7 +227,7 @@ interface StatRow {
 }
 
 const DEG = 180 / Math.PI;
-/** Damage per second of the main guns (`main`) or of the swivels. */
+/** Damage per second of the main guns (`main`) or of the close-in weapon systems. */
 const dps = (s: ShipStats, main: boolean): number =>
   Object.values(s.weapons)
     .filter((w) => isGun(w) && isMainGun(w) === main)
@@ -251,7 +252,7 @@ const STAT_ROWS: StatRow[] = [
   { label: 'Cap drain', value: (s) => s.capacitorDraw, format: (n) => `${fixed1(n)}/s`, better: 'lower' },
   { label: 'Power spare', value: (s) => s.powerOutput - s.powerDraw, format: (n) => fixed1(n), better: 'budget' },
   { label: 'Gun dps', value: (s) => dps(s, true), format: fixed1, better: 'higher' },
-  { label: 'Swivel dps', value: (s) => dps(s, false), format: fixed1, better: 'higher' },
+  { label: 'CIWS dps', value: (s) => dps(s, false), format: fixed1, better: 'higher' },
 ];
 
 /**
@@ -486,11 +487,11 @@ export class OutfittingPanel {
     this.drawSlots(ctx, hull, fit, scale);
   }
 
-  /** Each slot where it sits, by tier and size; the selected high slot's arc or line of fire. */
+  /** Each slot where it sits, by tier and size; the selected high or CIWS slot's arc. */
   private drawSlots(ctx: CanvasRenderingContext2D, hull: HullSpec, fit: Readonly<Record<string, string>>, scale: number): void {
     const at = (m: MountPoint) => ({ x: PREVIEW_W / 2 + m.position.x * scale, y: PREVIEW_H / 2 + m.position.y * scale });
     const sel = hull.mounts.find((m) => m.id === this.selected);
-    if (sel && sel.type === 'high') {
+    if (sel && (sel.type === 'high' || sel.type === 'ciws')) {
       const p = at(sel);
       ctx.save();
       ctx.strokeStyle = 'rgba(224, 164, 88, 0.6)';
@@ -666,11 +667,13 @@ export class OutfittingPanel {
     const head = el('div', 'fit-picker-head');
     head.append(el('div', 'fit-picker-title', `${mount.id.toUpperCase()} · ${MOUNT_TYPE_NAME[mount.type].toUpperCase()} ${mount.size}`));
     const detail =
-      tier === 'core'
+      mount.type === 'ciws'
+        ? `Close-in weapon system hardpoint: arc ${Math.round((mount.arc ?? Math.PI * 2) * DEG)}°, facing ${facingWord(mount.facing)}. Takes a CIWS up to ${mount.size}.`
+        : tier === 'core'
         ? `Core system: one ${MOUNT_TYPE_NAME[mount.type].toLowerCase()}, up to ${mount.size}.`
         : tier === 'high'
           ? mount.arc !== undefined
-            ? `Swivel arc ${Math.round(mount.arc * DEG)}°, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
+            ? `Arc ${Math.round(mount.arc * DEG)}°, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
             : `Fixed, facing ${facingWord(mount.facing)}. Takes high modules up to ${mount.size}.`
           : `Takes ${tier} modules up to ${mount.size}.`;
     head.append(el('div', 'muted', detail));

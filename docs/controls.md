@@ -26,7 +26,7 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Swivels need no group |
+| Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Close-in weapon systems need no group |
 | Mining turrets (hulk) | Make a rock your active lock, then press a turret's tile | That turret takes the rock and cuts it on its own while it stays locked and in reach. Press the tile again to let it go. Each turret can work a different rock |
 | Hold | I | A window: what is aboard, split into ore hold and cargo. In space, JETTISON throws a whole stack out astern for anyone to take; docked, STORE and TAKE move stacks to and from your storage at that station. Also the ore hopper's sorting and the tractor's mode |
 | Drone manager | N | Launch, recall and send drones (to your active lock), and see each drone's state and condition. Drones work only rocks you have locked; your tractor collects what they cut. Recall them before you dock: drones left out are lost |
@@ -68,7 +68,7 @@ Small panels in flight (the hold, the drone manager) are windows: open each with
 | Tractor beam | R (hold), or its tile | If a tractor is fitted: pulls nearby loot in and scoops it into your hold. Its tile cycles `OFF`, `MINE` (only loot that is yours or nobody's) and `ALL` (other people's too). R alone works in the tile's mode, `MINE` when it is off |
 | Afterburner | Shift (hold) | If one is fitted: a higher top speed and more main thrust while held, paid for from the capacitor; it will not light on an empty one |
 
-Every main gun is a turret (docs/turrets.md). Its group's guns follow your active lock and fire on Space (or the left button) when they bear: inside their mount's arc, in range, and slewed onto the lead point. With no lock they settle along their mount and fire straight. Big turrets slew slowly (S 3.0, M 1.5, L 0.75 rad/s), so a fast target close in can outrun them. Swivels fire by themselves and also shoot down missiles and torpedoes coming for you, hot or cold, if the munition is inside their arc.
+Every main gun is a turret (docs/turrets.md). Its group's guns follow your active lock and fire on Space (or the left button) when they bear: inside their mount's arc, in range, and slewed onto the lead point. With no lock they settle along their mount and fire straight. Big turrets slew slowly (S 3.0, M 1.5, L 0.75 rad/s), so a fast target close in can outrun them. Close-in weapon systems (CIWS, medium hulls and up, on their own hardpoints) fire by themselves: they shoot down missiles and torpedoes coming for you, hot or cold, if the munition is inside their arc, and shoot ships inside 350 units when weapons are hot. Small ships have none; they rely on chaff and flares (C).
 
 ## Flight computer
 
@@ -160,7 +160,7 @@ The flight HUD sits at the screen edges and leaves the middle clear. Clicks go t
 
 - The status dial. The outer blue ring is your shields, the inner ring your structure (it turns amber below half and red below a quarter). The dashed ring inside is reserved for the capacitor. Your speed in units per second is in the middle, relative to your local frame, which is named under the dial (`REL HARBOUR STATION` inside a station's dock range, else the body whose sphere you are in, else `REL SYSTEM`). Both come from your nav computer; without one the dial shows `-` and `NO NAV COMPUTER`. `SHD` and `HUL` values sit under the rings.
 - Under the dial: the flight mode (`Z` to change) and weapons hot or cold (`H`).
-- Right of the dial: a tile for each weapon you have fitted. A main gun says its group (`SPACE · G1` when that group is selected) and how it stands against your lock: `BEARS` (fires on Space), `SLEWING`, `RANGE`, `NO ARC`, or `AHEAD` with no lock. A swivel says `PD`, `AUTO` (hot, no complete active lock), `ENGAGING` or `DEFENDING`. Launchers and mining lasers say their group. A ring round the icon fills as the weapon reloads. Only modules you use in flight get a tile.
+- Right of the dial: a tile for each weapon you have fitted. A main gun says its group (`SPACE · G1` when that group is selected) and how it stands against your lock: `BEARS` (fires on Space), `SLEWING`, `RANGE`, `NO ARC`, or `AHEAD` with no lock. A CIWS says `PD`, `AUTO` (hot, no complete active lock), `ENGAGING` or `DEFENDING`. Launchers and mining lasers say their group. A ring round the icon fills as the weapon reloads. Only modules you use in flight get a tile.
 - Above the dial: what you can do now, `DOCK <station> [F]` and the boarding prompt (see Ships).
 
 **Bottom left: the radar.** North up, your ship at the centre pointing where you face, the rim at your radar's sensor range (named under it, `RADAR 3,000 u`). It replaces the old off-screen markers.

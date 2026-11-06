@@ -349,7 +349,7 @@ export class FlightHud {
         tile.root.classList.toggle('active', inGroup);
         tile.root.classList.toggle('bears', bearing === 'bears');
       } else if (spec.kind === 'turret') {
-        // Swivels shoot down munitions coming for you whether hot or cold.
+        // CIWS shoot down munitions coming for you whether hot or cold.
         const defending = incomingMunitions(world.munitions, ship.id).length > 0;
         setText(tile.state, defending ? 'DEFENDING' : engaging ? 'ENGAGING' : ship.weaponsHot ? 'AUTO' : 'PD');
         tile.root.classList.toggle('active', engaging || defending);
@@ -400,7 +400,7 @@ function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : family === 'pointDefence' ? 'SWIVEL' : gunName(weaponId));
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : family === 'pointDefence' ? 'CIWS' : gunName(weaponId));
   const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : family === 'mining' && kind === 'turret' ? 'NO ROCK' : family === 'pointDefence' ? 'PD' : 'SPACE');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);

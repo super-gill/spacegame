@@ -157,14 +157,14 @@ describe('save 11: slot tiers', () => {
       ships: {
         s: {
           id: 's', hullId: 'meridian-courier', ownerId: null, heading: 0, state: 'flying', weapons: [],
-          fit: { w1: 'paragon-pulse-s', w2: 'paragon-turret-s', i1: 'meridian-shield-s', i2: 'rookrivet-armour-s', u1: 'meridian-gleaner-s', u2: 'slagline-kick-s', b1: 'meridian-pod-s' },
+          fit: { w1: 'paragon-pulse-s', w2: 'paragon-pulse-s', i1: 'meridian-shield-s', i2: 'rookrivet-armour-s', u1: 'meridian-gleaner-s', u2: 'slagline-kick-s', b1: 'meridian-pod-s' },
           switchedOn: ['u1'],
         },
       },
     };
     const after = migrate10to11(old) as { ships: Record<string, Ship> };
     const ship = after.ships['s']!;
-    expect(ship.fit).toEqual({ w1: 'paragon-pulse-s', w2: 'paragon-turret-s', w3: 'meridian-gleaner-s', u1: 'meridian-shield-s', u2: 'slagline-kick-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s' });
+    expect(ship.fit).toEqual({ w1: 'paragon-pulse-s', w2: 'paragon-pulse-s', w3: 'meridian-gleaner-s', u1: 'meridian-shield-s', u2: 'slagline-kick-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s' });
     expect(ship.switchedOn).toEqual(['w3']);
   });
 

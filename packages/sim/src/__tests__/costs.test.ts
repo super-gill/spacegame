@@ -8,7 +8,7 @@ import { skirmish } from '../fitlab.js';
 import { HULLS } from '../hulls.js';
 import { MODULES } from '../modules.js';
 import { REFERENCE_FITS } from '../reference-fits.js';
-import { migrate12to13, migrate13to14 } from '../save.js';
+import { migrate12to13, migrate13to14, migrate14to15 } from '../save.js';
 import { fitStats, moduleSignature, shipStats } from '../stats.js';
 import { WEAPONS } from '../weapons.js';
 import { createStarterWorld, joinPilot, pilotShip } from '../world.js';
@@ -28,13 +28,7 @@ describe('physics, not damage cuts', () => {
     expect(WEAPONS['autocannon-l']!.projectileSpeed).toBeCloseTo(s / SHOT_SPEED_FALLOFF ** 2);
   });
 
-  it('point defence is small only, and every swivel module fires it', () => {
-    const pdc = Object.values(WEAPONS).filter((w) => w.family === 'pointDefence');
-    expect(pdc.map((w) => w.size)).toEqual(['S']);
-    for (const m of Object.values(MODULES)) if (m.weaponId && WEAPONS[m.weaponId]?.family === 'pointDefence') expect(m.size).toBe('S');
-  });
-
-  it('the Gunlayer L runs more swivels than the M', () => {
+  it('the Gunlayer L runs more close-in weapon systems than the M', () => {
     expect(MODULES['paragon-director-l']!.stats.turretControl!).toBeGreaterThan(MODULES['paragon-director-m']!.stats.turretControl!);
   });
 });
@@ -91,13 +85,13 @@ describe('saves from before the turret model', () => {
   it('turn turreted gun modules into the gun of the same name and refund the mounting', () => {
     const old = {
       ships: {
-        s1: { id: 's1', ownerId: 'ana', fit: { w1: 'union-picket-l-turret', w2: 'union-picket-l', w3: 'paragon-turret-s' } },
+        s1: { id: 's1', ownerId: 'ana', fit: { w1: 'union-picket-l-turret', w2: 'union-picket-l', w3: 'paragon-pulse-s' } },
         npc: { id: 'npc', ownerId: null, fit: { w1: 'commonwealth-answer-l-turret' } },
       },
       pilots: { ana: { id: 'ana', credits: 100, storage: { harbour: { 'union-autocannon-m-turret': 2, 'union-autocannon-m': 1, rounds: 5 } } } },
     };
     const next = migrate13to14(old) as typeof old & { ships: Record<string, { fit: Record<string, string> }>; pilots: Record<string, { credits: number; storage: Record<string, Record<string, number>> }> };
-    expect(next.ships['s1']!.fit).toEqual({ w1: 'union-picket-l', w2: 'union-picket-l', w3: 'paragon-turret-s' });
+    expect(next.ships['s1']!.fit).toEqual({ w1: 'union-picket-l', w2: 'union-picket-l', w3: 'paragon-pulse-s' });
     expect(next.ships['npc']!.fit).toEqual({ w1: 'commonwealth-answer-l' });
     expect(next.pilots['ana']!.storage['harbour']).toEqual({ 'union-autocannon-m': 3, rounds: 5 });
     // One Picket L turret fitted (3,000 over the gun), two autocannon M turrets stored (1,050 each).
@@ -105,6 +99,35 @@ describe('saves from before the turret model', () => {
     for (const id of [...Object.values(next.ships['s1']!.fit), ...Object.keys(next.pilots['ana']!.storage['harbour']!)]) {
       if (id !== 'rounds') expect(MODULES[id], id).toBeDefined();
     }
+  });
+});
+
+describe('saves from before close-in weapon systems', () => {
+  it('turn swivels into CIWS on free CIWS hardpoints and refund the rest, fitted or stored', () => {
+    const old = {
+      ships: {
+        // A frigate with three swivels: four free CIWS hardpoints take them all.
+        f: { id: 'f', hullId: 'union-frigate', ownerId: 'ana', heading: 0, fit: { w1: 'union-picket-l', w3: 'paragon-turret-s', w4: 'paragon-turret-s', w5: 'paragon-turret-s' }, weapons: [{ mountId: 'w1', cooldownTicks: 0, aim: 0.3, loaded: 7, reloadTicks: 0, group: 1 }] },
+        // A Tern with one: no CIWS hardpoints, so it is refunded.
+        t: { id: 't', hullId: 'meridian-courier', ownerId: 'ana', heading: 0, fit: { w1: 'paragon-pulse-s', w2: 'paragon-turret-s' }, weapons: [] },
+        // An NPC brig: refitted, nobody refunded.
+        npc: { id: 'npc', hullId: 'kessari-brig', ownerId: null, heading: 0, fit: { w3: 'paragon-turret-s', w4: 'paragon-turret-s', w5: 'paragon-turret-s' }, weapons: [] },
+      },
+      pilots: { ana: { id: 'ana', credits: 100, storage: { harbour: { 'paragon-turret-s': 2, rounds: 5 } } } },
+    };
+    type Next = { ships: Record<string, { fit: Record<string, string>; weapons: { mountId: string; aim: number; loaded: number }[] }>; pilots: Record<string, { credits: number; storage: Record<string, Record<string, number>> }> };
+    const next = migrate14to15(old) as Next;
+    expect(next.ships['f']!.fit).toEqual({ w1: 'union-picket-l', d1: 'paragon-ciws-m', d2: 'paragon-ciws-m', d3: 'paragon-ciws-m' });
+    // The gun that stayed keeps its state; the new CIWS come loaded.
+    expect(next.ships['f']!.weapons.find((w) => w.mountId === 'w1')).toMatchObject({ aim: 0.3, loaded: 7 });
+    expect(next.ships['f']!.weapons.find((w) => w.mountId === 'd1')!.loaded).toBe(WEAPONS['ciws-m']!.magazine);
+    expect(next.ships['f']!.weapons.some((w) => w.mountId === 'w3')).toBe(false);
+    expect(next.ships['t']!.fit).toEqual({ w1: 'paragon-pulse-s' });
+    // Two of the brig's three become CIWS; the third is nobody's to refund.
+    expect(next.ships['npc']!.fit).toEqual({ d1: 'paragon-ciws-m', d2: 'paragon-ciws-m' });
+    expect(next.pilots['ana']!.storage['harbour']).toEqual({ rounds: 5 });
+    // The Tern's one and the two stored, at 800 each.
+    expect(next.pilots['ana']!.credits).toBe(100 + 800 * 3);
   });
 });
 

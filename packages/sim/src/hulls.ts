@@ -35,6 +35,21 @@ function high(id: string, size: ModuleSize, x: number, y: number, facing = FORWA
   return { ...mount(id, 'high', size, x, y, ['power'], facing), arc };
 }
 
+/**
+ * A close-in weapon system hardpoint (docs/turrets.md): on the hull edge,
+ * facing out, covering `arc` centred on where it faces. Medium hulls and
+ * up only. Two on a beam each leave gaps at the bow and stern; four on
+ * the quarters cover all round.
+ */
+function ciws(id: string, x: number, y: number, facing: number, arc: number): MountPoint {
+  return { ...mount(id, 'ciws', 'M', x, y, ['power'], facing), arc };
+}
+
+/** A beam CIWS hardpoint's arc: 150 degrees, so a pair leaves 30 degree gaps fore and aft. */
+const CIWS_BEAM_ARC = (Math.PI * 5) / 6;
+const PORT = -Math.PI / 2;
+const STARBOARD = Math.PI / 2;
+
 /** A mid slot: the ship's own active systems. */
 function mid(id: string, size: ModuleSize, x: number, y: number): MountPoint {
   return mount(id, 'mid', size, x, y, ['power']);
@@ -150,8 +165,9 @@ export const HULLS: Record<string, HullSpec> = {
   'kessari-brig': {
     // Kessari Orbital Defence brig (name provisional, a lore ask): the
     // Warrant's big sister. The same wedge, longer and wider, with two
-    // forward guns at the nose, a swivel on each flank for broadsides, and
-    // one covering the stern. Built to hold a lane, not to chase.
+    // forward guns at the nose, a gun on each flank for broadsides and
+    // one covering the stern, and a CIWS on each beam. Built to hold a
+    // lane, not to chase.
     id: 'kessari-brig',
     name: 'Kessari Injunction',
     race: 'kessari',
@@ -183,6 +199,9 @@ export const HULLS: Record<string, HullSpec> = {
       high('w3', 'M', 0, -13.3, -Math.PI / 2, BROAD_ARC),
       high('w4', 'M', 0, 13.3, Math.PI / 2, BROAD_ARC),
       high('w5', 'M', -27.7, -5, AFT, BROAD_ARC),
+      // Close-in weapon systems on each beam: gaps at the bow and stern.
+      ciws('d1', -10, -14.6, PORT, CIWS_BEAM_ARC),
+      ciws('d2', -10, 14.6, STARBOARD, CIWS_BEAM_ARC),
       mount('e1', 'engine', 'M', -29, -9, ['power'], AFT),
       mount('e2', 'engine', 'M', -29, 9, ['power'], AFT),
       mount('c1', 'core', 'M', -16, -4, ['power']),
@@ -206,7 +225,7 @@ export const HULLS: Record<string, HullSpec> = {
   'union-frigate': {
     // Union Defence Works frigate (name provisional, a lore ask): the Free
     // Belt's militia warship, a slab of plate round two heavy guns. Slow
-    // and hard to kill; swivels on every corner so nothing small sits in
+    // and hard to kill; a CIWS on every quarter so nothing small sits in
     // a blind spot for long.
     id: 'union-frigate',
     name: 'Union Defence Works Walkout',
@@ -239,6 +258,11 @@ export const HULLS: Record<string, HullSpec> = {
       high('w4', 'M', 0, 18, Math.PI / 2, BROAD_ARC),
       high('w5', 'M', -33, -15, AFT, BROAD_ARC),
       high('w6', 'M', -33, 15, AFT, BROAD_ARC),
+      // Close-in weapon systems on the four quarters, each a half circle: covered all round.
+      ciws('d1', 24, -14.7, -Math.PI / 4, Math.PI),
+      ciws('d2', 24, 14.7, Math.PI / 4, Math.PI),
+      ciws('d3', -34, -14.6, (-3 * Math.PI) / 4, Math.PI),
+      ciws('d4', -34, 14.6, (3 * Math.PI) / 4, Math.PI),
       mount('e1', 'engine', 'L', -40, -6, ['power'], AFT),
       mount('e2', 'engine', 'L', -40, 6, ['power'], AFT),
       mount('c1', 'core', 'L', -30, -6, ['power']),
@@ -310,9 +334,12 @@ export const HULLS: Record<string, HullSpec> = {
       low('i2', 'S', 7, 0),
       low('i3', 'S', -10, 0),
       low('i4', 'S', -18, 0),
-      // One swivel forward: a pirate learns to come from behind.
+      // A light gun forward: a pirate learns to come from behind.
       high('w1', 'S', 15, 0, FORWARD, HALF_ARC),
       high('w2', 'S', 20, -3.5),
+      // Close-in weapon systems either side of the spine: gaps at the bow and stern.
+      ciws('d1', 0, -1.6, PORT, CIWS_BEAM_ARC),
+      ciws('d2', 0, 1.6, STARBOARD, CIWS_BEAM_ARC),
     ],
     bonuses: [
       { source: 'role', label: '+25% cargo from full-size containers', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
@@ -324,7 +351,7 @@ export const HULLS: Record<string, HullSpec> = {
     // Belt Forge Prospector (docs/mining.md; names in docs/lore.md):
     // the Collective's belt cutter. A survey scanner, an assay
     // computer and a light mining laser; a small hold, so it finds rock and
-    // picks the easy ones, or scouts for a hulk. A swivel for company.
+    // picks the easy ones, or scouts for a hulk. A second high slot for whatever it needs.
     id: 'rookrivet-prospector',
     name: 'Belt Forge Prospector',
     race: 'freeBelt',
@@ -376,7 +403,7 @@ export const HULLS: Record<string, HullSpec> = {
     // Belt Forge Collier (docs/mining.md, "The hulk"; names in
     // docs/lore.md): a big, slow mining ship you park and work from. Two heavy
     // mining turrets, each assigned a locked rock; an assay that holds
-    // eight rocks; four bays of ore hold. One swivel and a thick hide:
+    // eight rocks; four bays of ore hold. A CIWS on each beam and a thick hide:
     // it wants an escort.
     id: 'rookrivet-hulk',
     name: 'Belt Forge Collier',
@@ -413,6 +440,9 @@ export const HULLS: Record<string, HullSpec> = {
       // On the spine, clear of the hull: each turret turns all the way round, so either can take any rock.
       high('m1', 'L', 6.4, -18.5, -Math.PI / 2, FULL_ARC),
       high('m2', 'L', 6.4, 18.5, Math.PI / 2, FULL_ARC),
+      // Close-in weapon systems on each beam, aft of the mining mounts: gaps at the bow and stern.
+      ciws('d1', -20, -19.2, PORT, CIWS_BEAM_ARC),
+      ciws('d2', -20, 19.2, STARBOARD, CIWS_BEAM_ARC),
       mount('e1', 'engine', 'M', -44.8, -6.4, ['power'], AFT),
       mount('e2', 'engine', 'M', -44.8, 6.4, ['power'], AFT),
       mount('c1', 'core', 'M', -24, -4.8, ['power']),

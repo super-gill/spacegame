@@ -4,9 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-The turret model, steps 1 and 2: every main gun is a turret, and range costs shot guns accuracy and lasers power (docs/turrets.md).
+The turret model, steps 1 to 3: every main gun is a turret, range costs shot guns accuracy and lasers power, and close-in weapon systems replace swivels (docs/turrets.md).
 
-Saves move to version 14: turreted gun modules become the gun of the same name, and you get the turret mounting's price back in credits.
+Saves move to version 15: turreted gun modules become the gun of the same name, and you get the turret mounting's price back in credits; swivels become close-in weapon systems on ships that have hardpoints for them, and every other swivel, fitted or stored, is refunded at 800 credits.
 
 ### Changed
 - Every main gun is a turret. Its group's guns follow your active lock and fire on Space when they bear; you no longer have to point the nose. Small turrets slew 3 rad/s, medium 1.5, large 0.75, so big guns struggle to follow small, quick ships close in.
@@ -20,10 +20,13 @@ Saves move to version 14: turreted gun modules become the gun of the same name, 
 - Lasers lose power with range: full damage to half their range, fading to 40% at full range.
 
 ### Added
+- Close-in weapon systems (CIWS): the Paragon CIWS M, on their own hardpoints that only medium hulls and up have (the brig, the Manifest and the Collier two, one on each beam, with gaps dead ahead and astern; the frigate four, covering all round). About 30 light rounds a second out to 350 units, shooting down missiles and torpedoes first and ships when weapons are hot. Gunlayers set how many you can run.
 - The Controls panel (F1) offers the two steering schemes at the top: steer with the mouse, or steer with the keys (A and D spin the ship). It is the same setting as the menu's checkbox.
 
 ### Removed
 - The separate turreted gun modules (the Picket L Turret and the rest): every gun is a turret now.
+- Swivels (the Paragon Watchman S). Small ships defend against missiles with chaff and flares. The starter Tern carries an autocannon S in its old swivel slot; the Prospector and Sinker leave it free; stock medium and large ships carry CIWS, and their old swivel slots stand empty until the next refit.
+- The Frigate crowd clearer reference fit: every frigate now has full CIWS cover.
 
 ### Fixed
 - Closing the menu lets go of the button last clicked, so Space (fire) no longer clicks it again (it started a second arena).

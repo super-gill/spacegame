@@ -41,7 +41,7 @@ export const REFERENCE_FITS: FitSpec[] = [
     hullId: 'kessari-wedge',
     role: 'combat',
     note: 'Close range: autocannon and blaster, shield and armour.',
-    fit: { ...WARRANT_CORE, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'paragon-turret-s', u1: 'itomarr-shield-m', u2: 'paragon-fairwarning-s', i1: 'cantorvell-armour-m', i3: 'meridian-reactor-s' },
+    fit: { ...WARRANT_CORE, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'paragon-pulse-s', u1: 'itomarr-shield-m', u2: 'paragon-fairwarning-s', i1: 'cantorvell-armour-m', i3: 'meridian-reactor-s' },
   },
   {
     name: 'Warrant kiter',
@@ -79,20 +79,13 @@ export const REFERENCE_FITS: FitSpec[] = [
     hullId: 'kessari-brig',
     role: 'combat',
     note: 'Every high slot a gun for close range, plate below: how hard a brig can hit its own size.',
-    fit: { ...LOADOUTS['kessari-brig']!.fit, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'paragon-turret-s', w4: 'paragon-turret-s', w5: 'paragon-turret-s', u2: 'paragon-fairwarning-s', u3: 'slagline-kick-s', i4: 'itomarr-reactor-m' },
+    fit: { ...LOADOUTS['kessari-brig']!.fit, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'union-autocannon-m', w4: 'union-autocannon-m', w5: 'union-autocannon-m', u2: 'paragon-fairwarning-s', u3: 'slagline-kick-s', i4: 'itomarr-reactor-m' },
   },
   {
     name: 'Frigate anti-small',
     hullId: 'union-frigate',
     role: 'combat',
-    note: 'Undersized guns in the big slots and every swivel manned: built to swat cutters and sloops.',
-    fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-autocannon-m', w2: 'union-autocannon-m', w6: 'paragon-turret-s', x1: 'paragon-director-l' },
-  },
-  {
-    name: 'Frigate crowd clearer',
-    hullId: 'union-frigate',
-    role: 'combat',
-    note: 'Every high a swivel (Jason: a heavy ship fitted only to clear small ships will be a doctrine).',
-    fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'paragon-turret-s', w2: 'paragon-turret-s', w3: 'paragon-turret-s', w4: 'paragon-turret-s', w5: 'paragon-turret-s', w6: 'paragon-turret-s' },
+    note: 'Undersized guns in the big slots and all four close-in weapon systems manned: built to swat cutters and sloops.',
+    fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-autocannon-m', w2: 'union-autocannon-m', x1: 'paragon-director-l' },
   },
 ];
