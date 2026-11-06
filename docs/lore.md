@@ -403,9 +403,9 @@ Two ladders: military and civilian. The class says what a hull was built as; the
 
 The Aurel Tacet sits outside both ladders. Humans call any Aurel ship simply a **voice**.
 
-### Small craft and drones
+### Fighters and drones
 
-Fighters and drones are products carried in bays, built by companies and bought like modules; navy yards build the carriers, not what they carry. Light combat craft sell openly, heavy ones behind standing or a licence. Industrial craft (mining skiffs, Knockers, runabouts) have mining mounts only and can never be armed. Not every power flies crewed fighters: Earth's come from Vantage Aerospace on Luna, Mars builds its own through Arcadia Works, Venus flies Arbor drones instead, and the Belt flies second-hand Vantage fighters and clan-built raiders. Details in `fleet.md`, "Small craft and drones".
+A fighter is any crewed small craft carried in a bay, whatever its job (combat, mining, salvage, rescue), flown by NPC crews and never by the player; a drone is the uncrewed kind. Both are products carried in bays, built by companies and bought like modules; navy yards build the carriers, not what they carry. Light combat craft sell openly, heavy ones behind standing or a licence. Industrial fighters and drones (mining, salvage) have no weapon mounts and can never be armed. Capital-class industrial ships are carriers for them. Not every power flies crewed combat fighters: Earth's come from Vantage Aerospace on Luna, Mars builds its own through Arcadia Works, Venus flies Arbor drones and crewed rescue fighters, and the Belt flies second-hand Vantage fighters and clan-built raiders. Details in `fleet.md`, "Fighters and drones".
 
 Variety comes from companies with overlapping product lines: Earth, Venus and the Belt each build a courier, a hauler and a freighter, so three different hulls do one job, and the system generator picks by who holds the system. The catalogue grows into this, two or three makers' hulls per role and size over time.
 
@@ -726,7 +726,7 @@ Lore decisions by Jason, newest first. Decisions from before 6 November that nam
 - 2026-11-06: Crew is a direction, not part of the pivot: a system, never a people sim; costs and risks only.
 - 2026-11-06: Backgrounds, not careers, at character creation (agreed in principle with the rewrite): origin plus background, nothing locks.
 - 2026-11-06: Each power has a navy with dedicated hulls from its yard. Mars's civilian hulls come from one state yard, Arcadia Works, named what they are.
-- 2026-11-06: Small craft and drones are company-built products in bays, never from navy yards (Mars excepted); light combat craft sell openly, heavy ones behind standing or a licence; industrial craft are never armed. Only Earth (Vantage Aerospace) and Mars (Arcadia) build crewed fighters; Venus flies Arbor drones; the Belt flies second-hand and clan craft.
+- 2026-11-06: "Fighter" means any crewed NPC small craft (combat, mining, salvage, rescue); drones are uncrewed. Both are company-built products in bays, never from navy yards (Mars excepted); light combat craft sell openly, heavy ones behind standing or a licence; industrial fighters and drones are never armed; capital-class industrial ships carry them. Only Earth (Vantage Aerospace) and Mars (Arcadia) build crewed fighters; Venus flies Arbor drones; the Belt flies second-hand and clan craft.
 - 2026-11-06: Shields stay. Earth tanks with shields, Mars with armour, Venus with a regenerative mix, the Belt with whatever it has.
 - 2026-11-06: Generations: legacy hulls out of production on a used market, production hulls, pattern hulls behind standing (`fleet.md`).
 - 2026-11-06: Close-in weapon systems: the ballistic one is the Paragon Sentry M; the later laser one is Cantor-Vell's; the big fire control is Paragon's L. (Words updated by the pivot: PDC, Cordon, Fire Control.)

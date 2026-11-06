@@ -19,7 +19,7 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Solace Medical | Venus | Support, repair, rescue | 3 |
 | Halden Institute | Venus | Survey and exploration | 3 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 4 |
-| Vantage Aerospace | Luna (Earth) | Crewed fighters, no hulls | 2 |
+| Vantage Aerospace | Luna (Earth) | Combat fighters, no hulls | 2 |
 | Union Defence Works | The Belt, naval yard | The Union Militia | 5 |
 | Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
@@ -150,8 +150,8 @@ Mars's state yard. It names hulls what they are and numbers the marks, because M
 | Arcadia Tug Mk II | Tug | Port work | Every Martian port has a dozen | draft |
 | Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
 | Arcadia Tender Mk I | Repair tender (medium) | Field repair for the Navy and anyone Mars is helping that week | The one Martian civilian hull with a navy pattern | draft |
-| Arcadia Fighter Mk V | Small craft | Light fighter for the Navy's carriers | State-built, Navy only | draft |
-| Arcadia Heavy Fighter Mk II | Small craft | Heavy fighter | The same, with more of everything | draft |
+| Arcadia Fighter Mk V | Fighter | Light combat fighter for the Navy's carriers | State-built, Navy only | draft |
+| Arcadia Heavy Fighter Mk II | Fighter | Heavy combat fighter | The same, with more of everything | draft |
 
 Legacy Arcadia hulls keep the name with an older mark: an Arcadia Hauler Mk II is the cheap one.
 
@@ -266,22 +266,38 @@ Silent and musical terms given by human scholars. No yards, no companies; every 
 | Aurel Tacet | Outside the ladders | The sealed development and test ship | A voice that never sang | built |
 | Others | | Husks, the one on the pad, the gifted ship | Named by whoever first sees them: Lament, Hush, Cadence are the kind of words scholars reach for | later |
 
-## Small craft and drones
+## Fighters and drones
 
-Decided 6 November 2026. Fighters are not player-flyable: they are tiny support craft carried in bays, and drones are their uncrewed cousins. Three rules:
+Decided 6 November 2026. A **fighter** is any crewed small craft carried in a bay, whatever its job: combat, mining, salvage, repair, rescue. Fighters are flown by NPC crews, never by the player. A **drone** is the uncrewed kind. Three rules:
 
-1. **Craft and drones are products, not hulls.** They live in bays, are bought like modules, and companies build them. Navy yards build the carriers; what the carriers carry comes from specialist makers. Mars is the exception by character: Arcadia Works builds the Navy's fighters because the state builds everything.
-2. **Military variants come from the same makers.** A maker's civilian line (runabouts, skiffs, utility and repair drones) is open market. Its combat line is sold like navy hulls: light fighters and light combat drones openly, heavy ones behind standing or a navy licence.
-3. **Industrial craft never go military.** A mining skiff or a Knocker has mining mounts and no weapon mounts. It is not a refit of a fighter and cannot become one.
+1. **Fighters and drones are products, not hulls.** They live in bays, are bought like modules, and companies build them. Navy yards build the carriers; what the carriers carry comes from specialist makers. Mars is the exception by character: Arcadia Works builds the Navy's fighters because the state builds everything.
+2. **Military variants come from the same makers.** A maker's civilian line is open market. Its combat line is sold like navy hulls: light combat fighters and light combat drones openly, heavy ones behind standing or a navy licence.
+3. **Industrial fighters and drones never go military.** A mining or salvage fighter has mining or salvage mounts and no weapon mounts. It is not a refit of a combat fighter and cannot become one.
 
-Not everyone flies crewed fighters, which is where the character is:
+Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Breaker) are carriers in all but name: their bays launch mining and salvage fighters and drones the way a Hellas launches combat fighters.
 
-| Power | Crewed fighters | Drones | Industrial craft |
+### Fighters by job and maker
+
+| Job | Maker | Fighters | Who flies them |
 | --- | --- | --- | --- |
-| Earth | Vantage Aerospace (Luna): Vantage Foil (light), Vantage Sabre (heavy). Sold to the Charter Fleet and, the Foil, openly. | Buys Arbor | |
-| Mars | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II. State-built, Navy only. | Buys Arbor, grudgingly | |
-| Venus | None. A Venusian carrier is a drone carrier. | Arbor Dynamics: Arbor Thorn (light combat), Arbor Bramble (heavy combat), Arbor Shoot (repair), Arbor Seed retired in favour of Thorn | |
-| The Belt | No maker. The Militia and the pirates fly legacy Vantage Foils bought cheap or stolen; the clans build Vesk raiders (light and heavy). | Belt Forge Knocker (mining) | Belt Forge mining skiff, Corvane mining runabout, Long Wake salvage skiff |
+| Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy) | The Charter Fleet; the Foil sold openly, so Belt militias and pirates too |
+| Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II | The Martian Navy only |
+| Combat | The clans | Vesk light raider, Vesk heavy raider | The clans, and whoever they sell to |
+| Mining | Belt Forge Collective | Belt Forge Jackleg (a jackleg drill) | Colliers, Winders, Headframes |
+| Mining | Corvane Heavy Industries | Corvane Navvy | Corvane Drays and Smelters |
+| Salvage | Rook and Rivet | Rook and Rivet Grab | Wreckers and Breakers |
+| Salvage | The clans | Long Wake Dredge | The Long Wake's tenders |
+| Rescue and repair | Solace Medical | Solace Stretcher | Havens, Sanctuaries, the Coastguard |
+
+Venus flies no crewed combat fighters; a Venusian carrier is a drone carrier, and the Coastguard's crewed fighters are rescue craft.
+
+### Drones by job and maker
+
+| Job | Maker | Drones |
+| --- | --- | --- |
+| Combat | Arbor Dynamics | Arbor Thorn (light, sold openly), Arbor Bramble (heavy, behind standing) |
+| Repair | Arbor Dynamics | Arbor Shoot |
+| Mining | Belt Forge Collective | Belt Forge Knocker |
 
 Vantage Aerospace is a new company (Luna, founded in the Gate War to arm Earth's first carriers), named for the fencing term and naming its craft for blades. It builds no hulls.
 
