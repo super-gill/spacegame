@@ -80,7 +80,17 @@ Choices for Jason to judge: collision warnings are for rocks and stations only (
 
 **Selection window mockup** (6 November 2026, Lead 7): on the Plot canvas, https://claude.ai/artifact/DDLGgW4jx2ADxTcR88hdkX, "Selection window: first look": one working artboard with four examples (a station, an unknown contact, a locked pirate, a rock), each with what your sensors and computer give and its actions. Questions for Jason on the canvas: where it sits (suggested: on the right under the lock cards, replacing the target card, which it would show when nothing else is selected); whether selecting and the nav target are one thing; how to select in space with mouse steering (left fires, right locks: middle click or Alt+click?); anything missing.
 
-**Lock cards and the selection window** (Jason: wants to see it in game before deciding): lock cards stay small and glanceable (who, condition, whether your guns bear). A selection window shows whatever you have clicked in the Plot or on screen, locked or not: everything your sensors and computer give you, and actions (lock, set nav target, dock at a station). A fuller "show info" page later.
+**Selection window: decided and built** (Jason, 6 November 2026, after the mockup; Lead 7 built it the same evening):
+
+- **It replaces the target card**, on the right under the lock cards, and shows what you selected, or your active lock when nothing is selected. The lock cards stay as they are.
+- **Selecting is always the same as setting the nav target.**
+- **Right click selects in space** (Jason: "it aligns with lock"): right-click a ship or rock locks it (or makes a held lock active) and selects it; right-click a station or a cache selects it. Left click always fires, never selects. In the Plot, a click selects (again to clear) and a right-click locks and selects. Clicking a lock card, Tab and a click on the radar select too.
+- **What it shows:** for a lock, what your targeting computer reads, as the target card did; for something not locked, only the radar's part (range, closing speed, arrival time) and, for a ship showing its colours, its hull and who flies it; a dark ship is a contact of a size. A station adds its services and free pads. Sizes read small, medium or large, the same words as contacts, so identifying a ship no longer changes its size.
+- **Actions:** LOCK, MAKE ACTIVE, DOCK (stations), SEND DRONE (a locked rock, with a drone bay), CLEAR (the selection and nav target); UNLOCK stays in the header.
+- Not movable yet: it sits in the right column like the target card did. Jason assumed windows can be moved; making it a movable window is a small follow-up if he wants it.
+- Code: `hud/target-card.ts` (`TargetCard.update(world, ship, selected)`, `SelectionActions`), `select` and `selectionFor` in `main.ts`.
+
+**Lock cards and the selection window** (the brief before the mockup): lock cards stay small and glanceable (who, condition, whether your guns bear). A selection window shows whatever you have clicked in the Plot or on screen, locked or not: everything your sensors and computer give you, and actions (lock, set nav target, dock at a station). A fuller "show info" page later.
 
 ## 4. The aim reticle
 

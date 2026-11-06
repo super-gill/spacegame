@@ -1743,3 +1743,44 @@ button:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* The selection window's actions (hud/target-card.ts): lock, make active, dock, send a drone, clear. */
+.hud-target-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  margin-top: 6px;
+  border-top: 1px solid var(--faint);
+}
+
+.hud-target-action {
+  pointer-events: auto;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--faint);
+  padding: 3px 8px;
+}
+
+.hud-target-action:hover,
+.hud-target-action:focus-visible {
+  color: var(--ink-bright);
+  border-color: var(--ink-dim);
+}
+
+/* Selected but not locked: a station bright, a dark contact amber. */
+.hud-target[data-stance='station'] .hud-target-stance {
+  color: var(--ink-bright);
+}
+.hud-target[data-stance='unknown'] .hud-target-name {
+  color: var(--warn);
+}
+
+/* Nothing to picture or rate for a station, a cache or anything not locked bar a ship showing colours. */
+.hud-target[data-plain='yes'] .hud-target-pic,
+.hud-target[data-plain='yes'] .hud-target-grid > :nth-child(-n + 6) {
+  display: none;
+}

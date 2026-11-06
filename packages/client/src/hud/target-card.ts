@@ -1,7 +1,9 @@
 import type { LockReadout, Ship, TargetLock, World } from '@spacegame/sim';
-import { FRAGILE_STRENGTH, droneStrength, lockReadout, shipStats } from '@spacegame/sim';
+import { FRAGILE_STRENGTH, contactSize, distance, droneStrength, lockReadout, occupiedPads, shipStats } from '@spacegame/sim';
 import { el, setAttr, setText, show, svg } from './dom.js';
 import { arcPath, fraction, silhouettePoints } from './geometry.js';
+import type { NavTarget } from './plot.js';
+import { arrivalSeconds, clockWords, closingSpeed, plotName, plotPosition } from './plot-rows.js';
 
 /**
  * Target locks on the right edge.
@@ -9,14 +11,37 @@ import { arcPath, fraction, silhouettePoints } from './geometry.js';
  * - The lock strip: one small card per lock, the active one outlined,
  *   a bar on any still locking, and a dashed card per free slot up to
  *   your ship's `maxLocks`. Click a card to make that lock active.
- * - The target card under it, for the active lock.
+ * - The selection window under it (docs/interface.md, section 3): what
+ *   you selected (a click in the Plot, a right-click in space), or your
+ *   active lock when nothing is selected. Selecting is also setting the
+ *   nav target (Jason, 6 November 2026). A row of actions under it:
+ *   lock, make active, dock, send a drone, clear.
  *
- * Everything shown about a target comes from `lockReadout`, so from your
- * targeting computer: nothing until the lock completes, then only the
- * parts your computer reads (identity, motion, rough condition, exact
- * combat figures, cargo). The hull drawing comes from the catalogue
- * once identity says which hull it is. This never reads the target ship.
+ * Everything shown about a locked target comes from `lockReadout`, so
+ * from your targeting computer: nothing until the lock completes, then
+ * only the parts your computer reads (identity, motion, rough condition,
+ * exact combat figures, cargo). The hull drawing comes from the
+ * catalogue once identity says which hull it is. For something not
+ * locked, only what the radar gives: where it is and how it moves, and
+ * what a ship showing its colours tells everyone (its name and hull).
+ * This never reads a locked target ship directly.
  */
+
+/** What the selection window's buttons ask main.ts to do. */
+export interface SelectionActions {
+  /** Make a held lock the active one (a click on its card, or MAKE ACTIVE). */
+  activate: (targetId: string) => void;
+  /** Drop a lock. */
+  unlock: (targetId: string) => void;
+  /** Start a lock. */
+  lock: (targetId: string) => void;
+  /** Ask to dock (the sim docks at the nearest station in range, or refuses). */
+  dock: () => void;
+  /** Send the next free drone to the active lock's rock. */
+  sendDrone: () => void;
+  /** Clear the selection (and with it the nav target). */
+  clear: () => void;
+}
 
 const SIZE_NAMES: Record<string, string> = { S: 'Small', M: 'Medium', L: 'Large' };
 const SILHOUETTE = 120;
@@ -106,14 +131,19 @@ export class TargetCard {
   private hullId = '';
   /** Drops the lock on show, so it can be done without the keyboard. */
   private readonly unlock = el('button', 'hud-target-unlock', 'UNLOCK ✕') as HTMLButtonElement;
+  /** The actions for what is shown, under the readings. */
+  private readonly actions = el('div', 'hud-target-actions');
+  private actionKey = '';
   private shownId: string | null = null;
+  private readonly onActivate: (targetId: string) => void;
+  private readonly onUnlock: (targetId: string) => void;
 
-  /** `onActivate` makes a lock the active one (a click on its card); `onUnlock` drops one (the card's unlock button). */
   constructor(
     parent: HTMLElement,
-    private readonly onActivate: (targetId: string) => void,
-    private readonly onUnlock: (targetId: string) => void = () => {},
+    private readonly act: SelectionActions,
   ) {
+    this.onActivate = act.activate;
+    this.onUnlock = act.unlock;
     this.unlock.type = 'button';
     this.unlock.setAttribute('aria-label', 'Unlock this target');
     this.unlock.title = 'Unlock this target (Esc)';
@@ -148,22 +178,38 @@ export class TargetCard {
       el('span', 'hud-dim', 'CLOSING'), el('span'), this.closing,
     );
 
-    this.root.append(head, this.name, this.who, pic, grid, this.armed, this.cargo, this.reads);
+    this.root.setAttribute('role', 'region');
+    this.root.setAttribute('aria-label', 'Selection');
+    this.root.append(head, this.name, this.who, pic, grid, this.armed, this.cargo, this.reads, this.actions);
     const column = el('div', 'hud-right');
     column.append(this.locks, this.root);
     parent.append(column);
   }
 
-  update(world: World, ship: Ship | null): void {
+  /**
+   * Refresh. `selected` is the client's selection (also the nav
+   * target); with none, the active lock is shown, if there is one.
+   */
+  update(world: World, ship: Ship | null, selected: NavTarget | null = null): void {
     const locks = ship?.locks ?? [];
     show(this.locks, ship !== null && locks.length > 0);
     if (ship && locks.length > 0) this.updateStrip(world, ship, locks);
 
-    const lock = locks.find((l) => l.targetId === ship?.activeLock);
-    show(this.root, Boolean(ship && lock));
-    this.shownId = lock?.targetId ?? null;
-    if (!ship || !lock) return;
+    const target: NavTarget | null = selected ?? (ship?.activeLock ? { kind: isRock(world, ship.activeLock) ? 'rock' : 'ship', id: ship.activeLock } : null);
+    show(this.root, Boolean(ship && target && ship.state === 'flying'));
+    this.shownId = target?.id ?? null;
+    if (!ship || !target || ship.state !== 'flying') return;
 
+    const lock = locks.find((l) => l.targetId === target.id);
+    show(this.unlock, lock !== undefined);
+    // Stations, caches and anything not locked have no condition to show: no picture rows of dashes.
+    const plain = !lock && !(target.kind === 'ship' && world.ships[target.id] && !world.ships[target.id]!.contact) ? 'yes' : 'no';
+    setAttr(this.root, 'data-plain', plain);
+    this.updateActions(world, ship, target, lock, selected !== null);
+    if (!lock) {
+      this.showUnlocked(world, ship, target);
+      return;
+    }
     const read = lockReadout(world, ship, lock.targetId);
     if (isRock(world, lock.targetId)) {
       this.showRock(world, ship, lock, read);
@@ -177,7 +223,9 @@ export class TargetCard {
     // Identity: name, who, size, and the hull drawing from the catalogue.
     const id = read?.identity;
     setText(this.name, id ? (id.escapePod ? 'Escape pod' : id.hullName) : lock.progress < 1 ? 'Locking…' : 'Unidentified');
-    setText(this.who, id ? `${FLOWN_BY_WORDS[id.flownBy]} · ${SIZE_NAMES[id.sizeClass] ?? id.sizeClass}` : 'No identity reading');
+    // Size in the same words a contact shows (small, medium, large), so identifying one does not change its size.
+    const size = id ? contactSize(world.hulls[id.hullId]) : null;
+    setText(this.who, id ? `${FLOWN_BY_WORDS[id.flownBy]} · ${size ? size[0]!.toUpperCase() + size.slice(1) : (SIZE_NAMES[id.sizeClass] ?? id.sizeClass)}` : 'No identity reading');
     const hullId = id?.hullId ?? '';
     if (this.hullId !== hullId) {
       this.hullId = hullId;
@@ -283,6 +331,108 @@ export class TargetCard {
     );
     const kinds = shipStats(world, ship).readouts;
     setText(this.reads, lock.progress < 1 ? 'Readings when locked' : `READS ${kinds.map((k) => k.toUpperCase()).join(' · ')}`);
+  }
+
+  /**
+   * Something selected but not locked: a station, a cache, a ship or a
+   * rock. Only what the radar gives (where it is, how it moves), and for
+   * a ship showing its colours, its name and hull; a dark ship is a
+   * contact of a size. A station adds its services and free pads.
+   */
+  private showUnlocked(world: World, ship: Ship, target: NavTarget): void {
+    const where = plotPosition(world, target.kind, target.id);
+    const other = target.kind === 'ship' || target.kind === 'drone' ? world.ships[target.id] : undefined;
+    const station = target.kind === 'station' ? world.stations[target.id] : undefined;
+    const stance = station ? 'station' : target.kind === 'cache' ? 'cache' : target.kind === 'rock' ? 'rock' : other?.contact ? 'unknown' : 'unlocked';
+    setAttr(this.root, 'data-stance', stance);
+    setText(this.stance, station ? 'STATION' : target.kind === 'cache' ? 'CACHE' : target.kind === 'rock' ? 'ROCK' : other?.contact ? 'CONTACT' : 'NOT LOCKED');
+    setText(this.lockState, station ? 'LIGHT ON' : target.kind === 'cache' || station ? '' : 'NOT LOCKED');
+
+    const name = plotName(world, target.kind, target.id, '');
+    if (other?.contact) {
+      setText(this.name, 'Unknown contact');
+      setText(this.who, `RADAR · ${other.contact.toUpperCase()} · running dark: lock it to identify it`);
+    } else if (other) {
+      const hull = world.hulls[other.hullId];
+      setText(this.name, hull?.name ?? 'Ship');
+      setText(this.who, `${name.toUpperCase()} · showing colours · lock it for more`);
+    } else if (station) {
+      setText(this.name, station.name);
+      setText(this.who, 'Showing its light');
+    } else if (target.kind === 'rock') {
+      const rock = world.asteroids.find((a) => a.id === target.id);
+      setText(this.name, rock ? `Rock, radius ${Math.round(rock.radius)}` : 'Rock');
+      setText(this.who, 'Lock it to read what it holds');
+    } else {
+      setText(this.name, name);
+      setText(this.who, 'Loose canisters: scoop them with a tractor');
+    }
+
+    // The picture: a hull outline for a ship showing colours, a rock's lumps, nothing else.
+    const pic = other && !other.contact ? other.hullId : target.kind === 'rock' ? 'rock' : '';
+    if (this.hullId !== pic) {
+      this.hullId = pic;
+      const hull = other && !other.contact ? world.hulls[other.hullId] : undefined;
+      setAttr(this.outline, 'points', pic === 'rock' ? rockPoints(SIL_RING * 0.8) : hull ? silhouettePoints(hull.outline, SIL_RING * 1.4) : '');
+    }
+    setAttr(this.shieldRing, 'd', '');
+    this.shieldTrack.classList.add('invisible');
+    this.hullTrack.classList.add('invisible');
+    setText(this.shieldValue, NONE);
+    setText(this.hullValue, NONE);
+    this.hullValue.classList.remove('critical');
+
+    const range = where ? distance(ship.position, where.position) : null;
+    const close = where ? closingSpeed(ship.position, ship.velocity, where.position, where.velocity) : null;
+    setText(this.range, range === null ? NONE : Math.round(range).toLocaleString('en-GB'));
+    const c = close === null ? 0 : Math.round(close);
+    setText(this.closing, close === null ? NONE : `${c > 0 ? '+' : ''}${c} u/s`);
+
+    // A third line: when you get there, and for a station what it offers.
+    const eta = range !== null && close !== null ? clockWords(arrivalSeconds(range, close)) : '--';
+    show(this.armed, true);
+    setText(this.armed, `ARRIVE ${eta}`);
+    show(this.cargo, station !== undefined);
+    if (station) {
+      const services = [station.market && Object.keys(station.market).length > 0 ? 'MARKET' : '', station.outfitting ? 'OUTFITTING' : '', station.shipMart.length > 0 ? 'SHIP MART' : ''].filter(Boolean).join(' · ');
+      const free = station.pads.length - occupiedPads(station, world.ships).size;
+      setText(this.cargo, `${services || 'NO SERVICES'} · PADS ${free} of ${station.pads.length} free`);
+    }
+    setText(this.reads, target.kind === 'station' || target.kind === 'cache' ? 'Selected: also your nav target' : 'Not locked: radar only');
+  }
+
+  /**
+   * The buttons for what is shown: lock or make active, dock at a
+   * station, send a drone to a rock, and clear the selection. Rebuilt
+   * only when the set of buttons changes, so one never moves under the
+   * pointer mid-click.
+   */
+  private updateActions(world: World, ship: Ship, target: NavTarget, lock: TargetLock | undefined, selected: boolean): void {
+    const lockable = target.kind === 'ship' || target.kind === 'rock' || target.kind === 'drone';
+    const want: { id: string; label: string; title: string; run: () => void }[] = [];
+    if (lockable && !lock) want.push({ id: 'lock', label: 'LOCK', title: 'Start a lock (right-click does the same)', run: () => this.act.lock(target.id) });
+    if (lock && ship.activeLock !== target.id) want.push({ id: 'active', label: 'MAKE ACTIVE', title: 'Make this the active lock', run: () => this.act.activate(target.id) });
+    if (target.kind === 'station') want.push({ id: 'dock', label: 'DOCK', title: 'Dock here, inside the range ring and slow enough (F)', run: () => this.act.dock() });
+    if (target.kind === 'rock' && lock && lock.progress >= 1 && shipStats(world, ship).droneCapacity > 0) {
+      want.push({ id: 'drone', label: 'SEND DRONE', title: 'Send the next free drone to this rock (make it your active lock first)', run: () => this.act.sendDrone() });
+    }
+    if (selected) want.push({ id: 'clear', label: 'CLEAR', title: 'Clear the selection and the nav target', run: () => this.act.clear() });
+    const key = `${target.id}|${want.map((w) => w.id).join(',')}`;
+    if (key === this.actionKey) return;
+    this.actionKey = key;
+    this.actions.replaceChildren(
+      ...want.map((w) => {
+        const b = el('button', 'hud-target-action', w.label) as HTMLButtonElement;
+        b.type = 'button';
+        b.title = w.title;
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          w.run();
+        });
+        return b;
+      }),
+    );
+    show(this.actions, want.length > 0);
   }
 
   /**

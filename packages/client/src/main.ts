@@ -164,18 +164,35 @@ const meter = new ConnectionMeter(hudLayer);
 const flightHud = new FlightHud(hudLayer);
 // Windows (hud/windows.ts): the Plot, the hold and the drone manager, with a launcher strip.
 const windows = new WindowManager(hudLayer);
-/** The nav target (docs/interface.md, section 3): picked in the Plot, kept by this client alone. */
+/**
+ * The selection, which is also the nav target (docs/interface.md,
+ * section 3; Jason: "selecting always the same"). Kept by this client
+ * alone: the sim has neither. Set by a click in the Plot, a right-click
+ * in space or on the radar, a lock card or Tab; shown in the selection
+ * window and by the nav marker.
+ */
 let navTarget: NavTarget | null = null;
+function select(target: NavTarget | null): void {
+  navTarget = target;
+  plot.navTarget = target;
+  plot.update(current, myShip(current), me.id, performance.now(), true);
+}
+/** What kind of thing an id names, for selecting a lock target: a rock, one of your drones, or a ship. */
+function selectionFor(id: string): NavTarget {
+  const ship = current.ships[id];
+  if (!ship) return { kind: 'rock', id };
+  const mine = myShip(current);
+  return { kind: mine && ship.motherId === mine.id ? 'drone' : 'ship', id };
+}
 const plot = new Plot(
   windows.add('plot', 'Plot', 'P', { x: 16, y: 120 }),
-  (target) => {
-    // Clicking the nav target again clears it.
-    navTarget = navTarget?.id === target.id ? null : target;
-    plot.navTarget = navTarget;
-    const mine = myShip(current);
-    plot.update(current, mine, me.id, performance.now(), true);
+  // A click selects; clicking the selection again clears it.
+  (target) => select(navTarget?.id === target.id ? null : target),
+  // A right-click locks (or activates) and selects, as in space.
+  (id) => {
+    lockOrActivate(id);
+    select(selectionFor(id));
   },
-  (id) => lockOrActivate(id),
 );
 flightHud.onToggleColours = () => input.requestToggleColours();
 const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120 }), {
@@ -187,12 +204,21 @@ const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120
   take: (good, quantity) => send({ type: 'takeGoods', good, quantity }),
 });
 const dronePanel = new DronePanel(windows.add('drones', 'Drones', 'N', { x: 330, y: 120 }), (command) => input.requestDroneCommand(command));
-const targetCard = new TargetCard(
-  hudLayer,
-  (id) => input.requestActivate(id),
-  (id) => input.requestUnlock(id),
-);
-const radar = new Radar(hudLayer, (id) => lockOrActivate(id));
+const targetCard = new TargetCard(hudLayer, {
+  activate: (id) => {
+    input.requestActivate(id);
+    select(selectionFor(id));
+  },
+  unlock: (id) => input.requestUnlock(id),
+  lock: (id) => input.requestLock(id),
+  dock: () => input.requestToggleDock(),
+  sendDrone: () => input.requestDroneCommand({ action: 'send' }),
+  clear: () => select(null),
+});
+const radar = new Radar(hudLayer, (id) => {
+  lockOrActivate(id);
+  select(selectionFor(id));
+});
 
 // Character select first: nothing below runs until this tab is logged in.
 const session = await chooseCharacter();
@@ -526,7 +552,9 @@ function cycleTarget(): void {
   if (!mine) return;
   if (mine.locks.length > 0) {
     const at = mine.locks.findIndex((l) => l.targetId === mine.activeLock);
-    input.requestActivate(mine.locks[(at + 1) % mine.locks.length]!.targetId);
+    const next = mine.locks[(at + 1) % mine.locks.length]!.targetId;
+    input.requestActivate(next);
+    select(selectionFor(next));
     return;
   }
   const range = shipStats(current, mine).sensorRange;
@@ -559,6 +587,7 @@ function clickTarget(point: { x: number; y: number }): void {
   }
   if (best) {
     lockOrActivate(best.id);
+    select(selectionFor(best.id));
     return;
   }
   // No ship there: a rock, for a mining computer to read.
@@ -567,6 +596,23 @@ function clickTarget(point: { x: number; y: number }): void {
     const d = Math.hypot(p.x - point.x, p.y - point.y);
     if (d <= rock.radius * camera.zoom + CLICK_SLOP_PX) {
       lockOrActivate(rock.id);
+      select({ kind: 'rock', id: rock.id });
+      return;
+    }
+  }
+  // Things that cannot be locked are still selected: a station, a cache.
+  for (const station of Object.values(current.stations)) {
+    const p = camera.worldToScreen(station.position);
+    if (Math.hypot(p.x - point.x, p.y - point.y) <= station.radius * camera.zoom + CLICK_SLOP_PX) {
+      select({ kind: 'station', id: station.id });
+      return;
+    }
+  }
+  for (const l of current.loot) {
+    if (!l.cache) continue;
+    const p = camera.worldToScreen(l.position);
+    if (Math.hypot(p.x - point.x, p.y - point.y) <= CLICK_SLOP_PX + 6) {
+      select({ kind: 'cache', id: l.id });
       return;
     }
   }
@@ -992,7 +1038,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   for (const tier of warningSounds.update(nowMs / 1000, holding, pendingSounds)) tones.play(tier);
   pendingSounds = [];
   flightHud.setWarnings(holding, warningSounds.alarmSounding(), () => warningSounds.silence());
-  targetCard.update(current, mine);
+  targetCard.update(current, mine, navTarget);
   radar.update(current, mine, me.id, camera, eye);
 }
 
