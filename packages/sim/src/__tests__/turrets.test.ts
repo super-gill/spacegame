@@ -112,7 +112,9 @@ describe('main gun turrets in a fight', () => {
     const { frigate } = bowGuns();
     const fired = run({ ...frigate, locks: [], activeLock: null }, null, 30);
     expect(fired.firstShotTick).toBe(0);
-    for (const d of fired.directions) expect(Math.abs(angleDelta(d, 0))).toBeLessThan(1e-6);
+    // Straight along the mount, give or take the gun's spread.
+    const spread = WEAPONS['autocannon-l']!.spread!;
+    for (const d of fired.directions) expect(Math.abs(angleDelta(d, 0))).toBeLessThanOrEqual(spread + 1e-9);
   });
 
   it('says whether it bears: no lock, out of range, slewing, then bears', () => {

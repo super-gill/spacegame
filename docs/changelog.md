@@ -4,7 +4,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-The turret model, step 1: every main gun is a turret (docs/turrets.md).
+The turret model, steps 1 and 2: every main gun is a turret, and range costs shot guns accuracy and lasers power (docs/turrets.md).
 
 Saves move to version 14: turreted gun modules become the gun of the same name, and you get the turret mounting's price back in credits.
 
@@ -15,6 +15,9 @@ Saves move to version 14: turreted gun modules become the gun of the same name, 
 - The weapon tiles say whether each gun bears on your lock (`BEARS`, `SLEWING`, `RANGE`, `NO ARC`), or `AHEAD` with no lock.
 - Outfitting shows gun and swivel damage per second instead of fixed and turret; the target card shows weapons and total damage.
 - Pirates, the Calder Watch and the arena's enemies fire whenever you are locked and in range, not only when their nose is on you.
+
+- Range costs accuracy: every autocannon, blaster, artillery and railgun shot leaves inside a small cone (autocannon 2.0°, blaster 2.5°, artillery 0.8°, railgun 0.3°), so a small ship far away is hard to hit and a big one is hit anyway. Outfitting shows each gun's spread.
+- Lasers lose power with range: full damage to half their range, fading to 40% at full range.
 
 ### Removed
 - The separate turreted gun modules (the Picket L Turret and the rest): every gun is a turret now.

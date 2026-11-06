@@ -593,6 +593,23 @@ export interface WeaponSpec {
    * It does nothing to ships.
    */
   mining?: { strength: number };
+  /**
+   * Shot guns (docs/turrets.md, "Range"): the half angle, radians, of the
+   * cone each shot leaves in, so how far it misses grows with range.
+   * Absent: dead straight.
+   */
+  spread?: number;
+  /** Lasers: damage falls with how far the shot has flown (`RangeFalloff`). Absent: full damage all the way. */
+  falloff?: RangeFalloff;
+}
+
+/**
+ * Damage falling with range: full out to `from` of the weapon's range,
+ * then in a straight line down to `floor` of it at full range.
+ */
+export interface RangeFalloff {
+  from: number;
+  floor: number;
 }
 
 /** A fitted weapon's live state, one per weapon module in the fit. */
@@ -641,6 +658,10 @@ export interface Projectile {
   damage: number;
   damageType: DamageType;
   ticksLeft: number;
+  /** Ticks it was fired with (its full range), for range falloff. Absent on older shots. */
+  lifeTicks?: number;
+  /** Its weapon's falloff, if any: damage when it lands depends on how far it flew. */
+  falloff?: RangeFalloff;
 }
 
 /**

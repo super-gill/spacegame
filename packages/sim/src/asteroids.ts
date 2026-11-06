@@ -1,6 +1,6 @@
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS } from './bodies.js';
 import { GOODS, oreGoods } from './goods.js';
-import { seededRandom } from './random.js';
+import { idSeed, seededRandom } from './random.js';
 import { bodyState, orbitAngle, orbitState, railTime, withOrbitMoving } from './rails.js';
 import { RIDGE_ID, RIDGE_PHASE } from './stations.js';
 import type { Asteroid, Body, GoodSpec, Orbit, OreTier, Rockfall, World } from './types.js';
@@ -199,9 +199,7 @@ export function rockAt(world: Pick<World, 'bodies' | 'asteroids' | 'tick' | 'dt'
 
 /** The world bearing of a rock's seam from its centre: fixed for the rock, from its id. Rocks do not turn. */
 export function rockSeam(rockId: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < rockId.length; i++) h = Math.imul(h ^ rockId.charCodeAt(i), 0x01000193);
-  return ((h >>> 0) / 4294967296) * Math.PI * 2 - Math.PI;
+  return (idSeed(rockId) / 4294967296) * Math.PI * 2 - Math.PI;
 }
 
 /** Units of ore left in a rock. */

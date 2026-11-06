@@ -209,6 +209,14 @@ export const TURRET_SLEW_FALLOFF = 2;
 /** How fast a small main gun turret slews, rad/s; each size up is `TURRET_SLEW_FALLOFF` slower. */
 export const GUN_TRAVERSE = 3;
 /**
+ * Half angle of each shot gun's cone, degrees (docs/turrets.md, "Range"):
+ * a big target is hit anyway, a small one at long range mostly is not.
+ * The same at every size.
+ */
+export const GUN_SPREAD_DEGREES = { autocannon: 2.0, blaster: 2.5, artillery: 0.8, railgun: 0.3 } as const;
+/** Lasers keep full power to half their range, then fade to 40% at full range: the beam spreads and the energy disperses. */
+export const LASER_FALLOFF = { from: 0.5, floor: 0.4 } as const;
+/**
  * Signature fitted kit adds to the hull's, by kind and size, unless the
  * module names its own (`ModuleSpec.stats.signature`). Big drives and big
  * guns are hot and bright; small kit adds nothing.

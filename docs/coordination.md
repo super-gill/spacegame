@@ -143,6 +143,10 @@ Turret model step 1 contracts (on `main` from 6 November 2026; design in `docs/t
 - **Lock readout:** `LockReadout.combat.gunDps` and `pointDefenceDps` replace `fixedDps` and `turretDps`.
 - **Save format version 14** (`migrate13to14`).
 
+Turret model step 2 contracts (on `main` from 6 November 2026; `docs/turrets.md`, "As built: step 2"):
+
+- **Range** (`types.ts`, `weapons.ts`, `combat.ts`): `WeaponSpec.spread`, `WeaponSpec.falloff` (`RangeFalloff`), `Projectile.lifeTicks` and `Projectile.falloff` (optional); `scatter`, `falloffFactor`. `idSeed` in `random.ts` is the one id hash.
+
 ## Ideas inbox
 
 Jason's ideas that are not scheduled yet. The lead triages them into the roadmap or "not now".
@@ -216,6 +220,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 Newest first. One entry per session that changed something.
 
+- 2026-11-06, lead (Lead 5): **turret model step 2, spread and laser falloff** (`docs/turrets.md`, "As built: step 2"): shot guns scatter in a cone seeded from each shot's id (no random state, no save bump), lasers fade from half range to 40% at full range where the shot lands; one shared `idSeed`. Next: step 3, CIWS.
 - 2026-11-06, lead (Lead 5): took over from Lead 4 (`ws/lore` had nothing new). **Turret model step 1, turret guns** (`docs/turrets.md`, "As built: step 1"): every main gun a turret at full damage, traverse S 3.0, M 1.5, L 0.75; turreted modules retired (save 14 refunds the mounting); every high slot has an arc, forward half by default; with no lock guns fire straight along their mount (lead's call, for Jason); `gunBearing` and HUD bears marks; NPC scripts hold the trigger in range; readout `gunDps`/`pointDefenceDps`; menu buttons lose focus when the menu closes (Space was starting a second arena). Audit `docs/audits/2026-11-06-turret-guns.md`: same shape as 0.15 (big ships win one on one, brawler swarms win), small ships a little stronger now their guns track. Play checked in the arena: AHEAD, BEARS on lock, firing, NO ARC astern, no page errors. 466 sim tests. For Jason: judge the arcs and the no-lock rule in the arena. Next: step 2, spread and laser falloff.
 - 2026-11-06, lead (Lead 4): **released 0.15.0**, fitting costs and the arena. Swivels eased to 30 a second, the reference brick made a real brick, Jason's arena results and calls recorded as decisions. Agreed the turret model with Jason (`docs/turrets.md`): next is 0.16.0, step 1 turret guns.
 - 2026-11-06, lead (Lead 4): **the arena** and swivels for crowd clearing (`docs/fitting.md`, "The arena"). Admin `adminArena` and `adminArenaEnd` (`arena.ts`): fly any reference fit against 1 to 8 of another, far out in space, enemies flown by the lab's scripts (moved to `ai/fight.ts`, used by the lab and the new `arena` brain). Swivels fire light, fast rounds (3 a shot, 40 a second) to 900 units; the rule is now per shot. Lab and arena ships carry a hold full of ammunition (`ammunitionHold`), no longer overloaded. The menu scrolls and its rows wrap (the admin tools ran off the screen). Play checked in a browser: crowd clearer against four brawlers, end arena back to the Tern at Harbour, no page errors. 459 sim tests.

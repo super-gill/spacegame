@@ -1,5 +1,5 @@
-import { GUN_TRAVERSE, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
-import type { ModuleSize, WeaponSpec } from './types.js';
+import { GUN_SPREAD_DEGREES, GUN_TRAVERSE, LASER_FALLOFF, SHOT_SPEED_FALLOFF, TURRET_SLEW_FALLOFF } from './constants.js';
+import type { ModuleSize, RangeFalloff, WeaponSpec } from './types.js';
 
 /**
  * Weapon catalogue: ballistic profiles. Data only. A weapon module
@@ -41,6 +41,10 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  */
 
 type Profile = Omit<WeaponSpec, 'id' | 'name' | 'size'>;
+
+function degrees(d: number): number {
+  return (d * Math.PI) / 180;
+}
 
 /** Scale a base S profile up a size. */
 function sized(id: string, name: string, size: ModuleSize, base: Profile): WeaponSpec {
@@ -85,6 +89,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: 'rounds',
     magazine: 100,
     reloadSeconds: 4,
+    spread: degrees(GUN_SPREAD_DEGREES.autocannon),
   }),
   ...family('artillery', 'Artillery', {
     kind: 'turret',
@@ -99,6 +104,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: 'shells',
     magazine: 20,
     reloadSeconds: 6,
+    spread: degrees(GUN_SPREAD_DEGREES.artillery),
   }),
 
   // Energy: capacitor per shot, never run dry. Pulse close and quick, beam
@@ -116,6 +122,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: null,
     magazine: 0,
     reloadSeconds: 0,
+    falloff: LASER_FALLOFF,
   }),
   ...family('beam-laser', 'Beam laser', {
     kind: 'turret',
@@ -130,6 +137,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: null,
     magazine: 0,
     reloadSeconds: 0,
+    falloff: LASER_FALLOFF,
   }),
 
   // Hybrid: charges plus a little capacitor. Blaster is point blank and
@@ -147,6 +155,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: 'charges',
     magazine: 80,
     reloadSeconds: 4,
+    spread: degrees(GUN_SPREAD_DEGREES.blaster),
   }),
   ...family('railgun', 'Railgun', {
     kind: 'turret',
@@ -161,6 +170,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     ammo: 'charges',
     magazine: 40,
     reloadSeconds: 5,
+    spread: degrees(GUN_SPREAD_DEGREES.railgun),
   }),
 
   // Swivels: the point defence family, small only (Jason: a PDC is
@@ -242,6 +252,17 @@ export function isGun(w: Pick<WeaponSpec, 'family'>): boolean {
 /** True for a main gun: a turret fired on the trigger at the lock, not a swivel, launcher, dispenser or mining laser. */
 export function isMainGun(w: Pick<WeaponSpec, 'family'>): boolean {
   return isGun(w) && w.family !== 'pointDefence';
+}
+
+/**
+ * What share of its damage a shot does after flying `travelled` (0 to 1)
+ * of its range: 1 with no falloff, else full to `from`, then straight
+ * down to `floor` at full range (docs/turrets.md, "Range").
+ */
+export function falloffFactor(falloff: RangeFalloff | undefined, travelled: number): number {
+  if (!falloff || travelled <= falloff.from) return 1;
+  const t = Math.min(1, (travelled - falloff.from) / (1 - falloff.from));
+  return 1 - t * (1 - falloff.floor);
 }
 
 /** Damage per second of a weapon held on target, with its base ammunition. */

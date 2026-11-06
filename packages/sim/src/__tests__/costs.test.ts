@@ -3,20 +3,15 @@ import {
   AFTERBURNER_SIGNATURE_BLOOM,
   KIT_SIGNATURE,
   SHOT_SPEED_FALLOFF,
-  TURRET_SLEW_FALLOFF,
 } from '../constants.js';
-import { buildShip } from '../factory.js';
 import { skirmish } from '../fitlab.js';
 import { HULLS } from '../hulls.js';
-import { LOADOUTS } from '../loadouts.js';
 import { MODULES } from '../modules.js';
 import { REFERENCE_FITS } from '../reference-fits.js';
 import { migrate12to13, migrate13to14 } from '../save.js';
 import { fitStats, moduleSignature, shipStats } from '../stats.js';
-import { stepWorld } from '../step.js';
-import type { Ship, World } from '../types.js';
 import { WEAPONS } from '../weapons.js';
-import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
+import { createStarterWorld, joinPilot, pilotShip } from '../world.js';
 import { TEST_CATALOGUES } from './fixtures.js';
 
 /**

@@ -1,6 +1,6 @@
 # Turrets (0.16 design, for Jason's sign-off)
 
-Status: **agreed 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. **Step 1 (turret guns) built** on `main` by Lead 5, 6 November; see "As built: step 1". Steps 2 to 4 to come.
+Status: **agreed 6 November 2026**, written by Lead 4 from Jason's decisions in the arena tests. **Steps 1 (turret guns) and 2 (spread and laser falloff) built** on `main` by Lead 5, 6 November; see "As built". Steps 3 and 4 to come.
 
 ## Why
 
@@ -87,6 +87,14 @@ The audit's swarm table and the arena are the measures. Starting targets, to be 
 - **Saves:** version 14 (`migrate13to14`) turns every fitted and stored `<module>-turret` into `<module>` and refunds the turret mounting's price to the owner.
 - **Client:** outfitting names main guns by type and says `turret: follows your lock at x rad/s and fires with its group when it bears`; stat rows `Gun dps` and `Swivel dps`; the lead marker uses the first main gun.
 - **Not yet:** drawing each turret's arc and aim on the ship (HUD and fitting window) is left for a focused interface pass or step 4.
+
+## As built: step 2 (spread and laser falloff)
+
+- **Spread** (`WeaponSpec.spread`, a half angle in radians; `GUN_SPREAD_DEGREES` in `constants.ts`): autocannon 2.0°, blaster 2.5°, artillery 0.8°, railgun 0.3°, the same at every size. Each shot leaves at an even offset inside its cone (`scatter`).
+- **Deterministic without random state:** the sim keeps no random numbers while it runs, so a shot's scatter is seeded from its own id (`idSeed`, now one shared FNV-1a hash in `random.ts`, also used by rocks and munitions). The same world always scatters the same way; nothing new is saved.
+- **Laser falloff** (`WeaponSpec.falloff`, `RangeFalloff`, `LASER_FALLOFF`, `falloffFactor`): pulse and beam lasers keep full damage to half their range, then fade in a straight line to 40% at full range. Each shot carries `Projectile.lifeTicks` and `falloff`, and `stepProjectiles` scales the damage by how far it flew when it lands, on ships and munitions alike. Shots from older saves have neither and land at full damage, so no save bump.
+- **NPCs and aiming** are unchanged: turrets still aim at the lead point; the spread is on top.
+- **Client:** outfitting lists `spread ±x°` and the laser falloff with each gun.
 
 ## Open
 

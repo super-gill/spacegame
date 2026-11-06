@@ -1,6 +1,8 @@
 import { angleDelta, wrapAngle } from './angle.js';
 import { MUNITION_HIT_MARGIN, POINT_DEFENCE_RANGE_FRACTION, SHIELD_CAPACITOR_PER_POINT, TURRET_FIRE_TOLERANCE } from './constants.js';
 import { goodsFitting } from './goods.js';
+import { idSeed, seededRandom } from './random.js';
+import { falloffFactor } from './weapons.js';
 import { isLocked, weaponTarget } from './locks.js';
 import { dropDecoy, launchMunition, type MunitionHit } from './munitions.js';
 import type {
@@ -106,6 +108,16 @@ export function nextAmmo(hold: Readonly<Record<string, number>>, goods: Readonly
 export function loadedGoodOf(w: WeaponState, spec: WeaponSpec, goods: Readonly<Record<string, GoodSpec>>): string | null {
   if (w.loadedGood !== undefined) return w.loadedGood;
   return spec.ammo && goods[spec.ammo] ? spec.ammo : null;
+}
+
+/**
+ * How far off its aim a shot leaves, radians: anywhere in the weapon's
+ * cone (`WeaponSpec.spread`, a half angle), evenly. Seeded from the shot's
+ * id, so the same world always scatters the same way (docs/turrets.md).
+ */
+export function scatter(projectileId: string, spread: number | undefined): number {
+  if (!spread) return 0;
+  return (seededRandom(idSeed(projectileId))() * 2 - 1) * spread;
 }
 
 /** Seconds a launcher waits after refusing to fire, so a held trigger does not flood events. */
@@ -351,15 +363,19 @@ export function fireWeapons(
     capacitor -= spec.capacitorPerShot;
     const round = good?.ammo;
     if (spec.ammo) loaded--;
-    const dir = fromAngle(aim);
+    const id = `p${nextId + idsUsed}`;
+    const dir = fromAngle(aim + scatter(id, spec.spread));
+    const lifeTicks = Math.round(spec.range / spec.projectileSpeed / dt);
     projectiles.push({
-      id: `p${nextId + idsUsed}`,
+      id,
       ownerShipId: ship.id,
       position: add(ship.position, scale(dir, stats.radius + 2)),
       velocity: add(ship.velocity, scale(dir, spec.projectileSpeed)),
       damage: spec.damage * (round?.damage ?? 1),
       damageType: round?.damageType ?? spec.damageType,
-      ticksLeft: Math.round(spec.range / spec.projectileSpeed / dt),
+      ticksLeft: lifeTicks,
+      lifeTicks,
+      ...(spec.falloff ? { falloff: spec.falloff } : {}),
     });
     idsUsed++;
     cooldownTicks = Math.round(spec.fireInterval / dt);
@@ -492,14 +508,16 @@ export function stepProjectiles(
       }
     }
 
+    // What the shot does where it lands: lasers lose power with how far they flew.
+    const landed = p.lifeTicks && p.falloff ? p.damage * falloffFactor(p.falloff, (p.lifeTicks - p.ticksLeft + (len > 0 ? nearest / len : 0)) / p.lifeTicks) : p.damage;
     if (hitMunition) {
-      munitionHits.push({ munitionId: hitMunition.id, amount: p.damage, by: p.ownerShipId });
+      munitionHits.push({ munitionId: hitMunition.id, amount: landed, by: p.ownerShipId });
       // Light munitions die to one hit; a torpedo may take several. Either
       // way this shot is spent; a second shot this tick may hit it too.
       continue;
     }
     if (hitShip) {
-      damage.push({ shipId: hitShip.id, amount: p.damage, by: p.ownerShipId, cause: 'weapon', type: p.damageType, from: p.position });
+      damage.push({ shipId: hitShip.id, amount: landed, by: p.ownerShipId, cause: 'weapon', type: p.damageType, from: p.position });
       continue;
     }
     if (blocked || p.ticksLeft <= 1) continue;

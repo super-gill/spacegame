@@ -195,6 +195,8 @@ export function describeModule(m: ModuleSpec, world: World): string {
   } else if (w) {
     parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
     if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
+    if (w.spread) parts.push(`spread ±${fixed1((w.spread * 180) / Math.PI)}°`);
+    if (w.falloff) parts.push(`full power to ${Math.round(w.falloff.from * 100)}% of range, ${Math.round(w.falloff.floor * 100)}% at full range`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
     if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
     else if (w.kind === 'turret') parts.push(`turret: follows your lock at ${fixed1(w.turretTurnRate)} rad/s and fires with its group when it bears; no fire control needed`);

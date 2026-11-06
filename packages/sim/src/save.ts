@@ -4,7 +4,7 @@ import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
 import { rockCore, rockMakeup, screeAsteroids } from './asteroids.js';
-import { seededRandom } from './random.js';
+import { idSeed, seededRandom } from './random.js';
 import { starterBodies } from './bodies.js';
 import { FIXED_DT, UNDOCK_CLEARANCE } from './constants.js';
 import { idleThrusters } from './flight.js';
@@ -422,13 +422,6 @@ export function migrate13to14(world: unknown): unknown {
     if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
   }
   return { ...world, ships, pilots };
-}
-
-/** A seed from an id, FNV-1a. */
-function idSeed(id: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 0x01000193);
-  return h >>> 0;
 }
 
 /** The stock systems a ship is given free on new fixed mounts in `migrate5to6`, by mount type. */

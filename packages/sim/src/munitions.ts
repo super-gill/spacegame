@@ -9,6 +9,7 @@ import {
   RADAR_SPOOF_RANGE,
 } from './constants.js';
 import { isLocked } from './locks.js';
+import { idSeed } from './random.js';
 import type { Carry } from './rails.js';
 import type { Decoy, GoodSpec, HullSpec, Munition, Ship, Station, WeaponSpec, WorldEvent } from './types.js';
 import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from './vec2.js';
@@ -44,12 +45,7 @@ import type { Damage } from './combat.js';
 
 /** A deterministic number in [0, 1) from two ids. FNV-1a. */
 function chance(a: string, b: string): number {
-  let h = 0x811c9dc5;
-  for (const ch of `${a}|${b}`) {
-    h ^= ch.charCodeAt(0);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h / 0x100000000;
+  return idSeed(`${a}|${b}`) / 0x100000000;
 }
 
 /** How bright a decoy looks now: its full signature when fresh, fading to nothing. */
