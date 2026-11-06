@@ -2,9 +2,9 @@
  * The aim reticle for mouse steering (docs/interface.md, section 4).
  * Jason asked for something subtle and on theme that does not dominate
  * the pointer, so every style is thin lines in the HUD's ink at low
- * opacity. The styles are offered side by side in the Controls panel
- * (F1) so he can choose by flying with them; `plain` keeps the browser's
- * crosshair. Over windows and panels the normal pointer shows: the
+ * opacity. All four are a player preference in the Controls panel (F1),
+ * Ring the default (Jason, 6 November 2026: he liked them all); `plain`
+ * keeps the browser's crosshair. Over windows and panels the normal pointer shows: the
  * reticle is drawn only while the pointer is over open space.
  */
 
