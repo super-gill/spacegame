@@ -316,6 +316,48 @@ Decided 6 November 2026. No built module changes maker or stat.
 
 Shields stay in the game. A shield is a field the drive plume breaks, which is why every ship is open astern.
 
+## Style: company leads, power flavours
+
+Decided 6 November 2026. The company is the leading voice in a ship's design; the power adds the secondary flavour. Three layers:
+
+| Layer | Set by | What it means |
+| --- | --- | --- |
+| Shape | The company | A Tessaract hull is boxy and modular whoever flies it; a Belt Forge hull is trusses and spare mounts; a Seraphine hull is plate and hard edges |
+| Primary colour | The company for civilian hulls; the navy for military hulls | Military ships need not look alike, but every ship of a navy wears its livery: Charter Fleet steel blue and white, Martian Navy rust and bone, Coastguard pale gold, Union Militia rust orange and black |
+| Registry markings | The power | A flash or band in the power's colour, like a tail flag; small, consistent, and what the board reads for standing. Mars needs none: one state yard means everything Martian is uniform already. |
+
+Legacy hulls keep their original shape and colours, worn. Surplus hulls (below) have the navy livery painted over, with the lines still showing through. Pirates kitbash on top of all of it.
+
+## Surplus: the low-tier military
+
+Decommissioned navy hulls sold off and demilitarised: navy-grade mounts pulled, livery painted over, a civilian registry. Surplus is the fighting ship of individuals, mercenary outfits and pirates, and the way a frigate or destroyer reaches private hands without a licence. It sits beside legacy in the used market: legacy is an old civilian mark, surplus is an old navy one.
+
+| Navy | Attitude to surplus | What reaches the market |
+| --- | --- | --- |
+| Earth, the Charter Fleet | Sells everything, by contract | Kessari Notice, Writ, Decree and Ruling: the backbone of the Marches |
+| Mars, the Martian Navy | Sells nothing; scraps or mothballs | Martian surplus exists only as stolen or salvaged, and the Navy wants it back |
+| Venus, the Coastguard | Sells with the guns removed | Ishtar Sedna '218 and Lakshmi '205, unarmed and cheap |
+| The Belt, the Union Militia | Never retires anything | Militia hulls rotate down to the cooperatives and never leave the Belt |
+
+For the lead: surplus is a generation like legacy (its own hull entry pointing at its navy base), with navy-grade hardpoints removed or downgraded and a civilian price.
+
+## Belt hulls: rebuilt, with their own bonuses
+
+Decided 6 November 2026. The Belt's combat and transport hulls are stolen, captured or copied hulls rebuilt into something new: Belt shapes grown over the original, Belt bonuses (projectile guns, speed, spare mounts) and a Belt name. They are new ships in their own right. They come last in the art order because they are drawn over their sources.
+
+| Belt hull | Rebuilt from | How |
+| --- | --- | --- |
+| Union Wildcat | Kessari Notice | Stripped to the frame and re-engined |
+| Union Blockade | Kessari Writ | The Strikes' captured toll boats, still the Militia's patrol hull |
+| Union Boycott | Kessari Decree | Surplus Decrees with the launchers torn out for guns |
+| Union Walkout | Kessari Ruling | Rebuilt so far that Earth no longer recognises it |
+| Union Solidarity | Three Earth cruisers captured in the Gate War | Rebuilt once, by every cooperative at once; never copied since |
+| Belt Forge Pony | Tessaract Memo | A Memo with the brand filed off and a bigger engine |
+| Belt Forge Mule | Tessaract Invoice | Tougher, uglier, cheaper |
+| Belt Forge Adit | Tessaract Ledger | A Ledger with teeth |
+
+Belt originals, not rebuilt from anything, because nobody else builds them: the mining hulls (Prospector, Sinker, Collier, Winder, Headframe), the salvage hulls (Shunt, Scrapper, Wrecker, Breaker) and every clan hull.
+
 ## Weight bands
 
 Decided 6 November 2026. Military classes carry their weight in the name; civilian jobs do not, so every hull has a second axis. In-world it is the **Ceres Registry rating**, written [weight band]-[function]: Light-Courier, Heavy-Destroyer, Super-heavy-Liner. Subcraft, drones and pods are rated by kind (Subcraft-Fighter, Drone-Mining drone, Pod-Lifeboat). The band is what sets pad size, docking fees, PDC hardpoints and, later, crew; it classifies and never balances. The band names are the UI words; S, M, L stay module sizes.
@@ -348,7 +390,8 @@ Jason's direction (6 November): older hulls that are out of production fill a us
 
 | Tier | EVE analogue | What it is | Where you get it | Price and quality |
 | --- | --- | --- | --- | --- |
-| **Legacy** | Cheap T1 bought second-hand | An earlier mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
+| **Legacy** | Cheap T1 bought second-hand | An earlier civilian mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
+| **Surplus** | Cheap T1 warships | A decommissioned navy hull, demilitarised and sold off | The used market, where that navy sells at all | Cheap for a warship; navy-grade mounts pulled; the livery painted over |
 | **Production** | T1 | The current mark | Ship marts and the maker's own yards | The catalogue price and the catalogue stats |
 | **Pattern** | T2 | A specialised variant of a production hull, built to a navy's or a company's pattern | Standing with the maker, or a navy licence | Expensive, better at one thing, often worse at another |
 | **Clan** | T3 | A bespoke hull built by a Belt clan over generations | Standing with the clan, or a very rare sale | Rare, the best at one thing, and no two alike |
