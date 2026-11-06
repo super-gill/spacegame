@@ -278,7 +278,7 @@ More as the catalogue allows: salvager, courier. Every background lands in the s
 
 ### Crew
 
-Crew is a direction, not a mechanic yet (Jason, 6 November 2026): a system, never a people sim. Costs and risks only: shares, quitting, dying with the ship, reputation. No capability changes, no morale, no management beyond signing articles. What the lore sets up now at no cost: small ships fly solo; medium hulls carry a few; big ships need dozens; the captain is always the player; navy crews belong to the navy and the captain earns through missions; private crews sign articles for a share of earnings, and a captain who does not pay finds that crews walk at the next dock and word gets round.
+Crew is a direction, not a mechanic yet (Jason, 6 November 2026): a system, never a people sim. Costs and risks only: shares, quitting, dying with the ship, reputation. No capability changes, no morale, no management beyond signing articles. What the lore sets up now at no cost: small ships fly solo; medium hulls carry a few; big ships need dozens; the captain is always the player; navy crews belong to the navy and the captain earns through missions; private crews sign articles for a share of earnings, and a captain who does not pay finds that crews walk at the next dock and word gets round. Subcraft fit this directly: every subcraft needs a pilot, so a carrier's subcraft are part of its crew, losing one loses a person, and drones stay the crewless, cheaper, more expendable choice.
 
 ### The transponder
 
