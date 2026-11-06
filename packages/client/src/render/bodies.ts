@@ -95,7 +95,11 @@ const SURVEY_INK: Partial<Record<SurveyResult['rocks'][number]['reading'], strin
 export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, world: World, ship: Ship | null = null): void {
   const margin = 120;
   const survey = ship?.survey;
-  const age = survey ? (world.tick - survey.tick) * world.dt : Infinity;
+  // Rocks are drawn at a time between the last two updates, which can be a
+  // moment before the tick the survey happened on: never let its age go
+  // below zero, or the pulse's radius goes negative and the canvas throws,
+  // which stopped the whole frame (Jason, 6 November 2026).
+  const age = survey ? Math.max(0, (world.tick - survey.tick) * world.dt) : Infinity;
   const readings = new Map<string, string>();
   if (survey && age < SURVEY_SHOW_SECONDS) for (const r of survey.rocks) if (SURVEY_INK[r.reading]) readings.set(r.id, SURVEY_INK[r.reading]!);
   const fade = Math.max(0, Math.min(1, (SURVEY_SHOW_SECONDS - age) / 2));
@@ -106,7 +110,7 @@ export function drawAsteroids(ctx: CanvasRenderingContext2D, camera: Camera, wor
     ctx.strokeStyle = SURVEY_INK.rich!;
     ctx.globalAlpha = 1 - age;
     ctx.beginPath();
-    ctx.arc(c.x, c.y, survey.range * camera.zoom * Math.min(1, age * 1.5), 0, Math.PI * 2);
+    ctx.arc(c.x, c.y, Math.max(0, survey.range * camera.zoom * Math.min(1, age * 1.5)), 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
