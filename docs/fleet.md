@@ -12,21 +12,71 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | --- | --- | --- | --- |
 | Meridian Civil Yards | Everywhere | The small civilian ships everyone starts in | 6 |
 | Tessaract Logistics | Earth | Cargo and passengers at every size | 7 |
-| Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 7 |
+| Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 8 |
 | Seraphine Naval Yards | Mars, naval yard | The Martian Navy | 8 |
-| Arcadia Works | Mars, state yard | Civilian hulls, one per job, no brands | 5 |
-| Ishtar Fleet Works | Venus, naval yard | The Coastguard | 4 |
+| Arcadia Works | Mars, state yard | Civilian hulls, one per job, no brands | 8 |
+| Ishtar Fleet Works | Venus, naval yard | The Coastguard | 5 |
 | Solace Medical | Venus | Support, repair, rescue | 3 |
 | Halden Institute | Venus | Survey and exploration | 3 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 3 |
 | Union Defence Works | The Belt, naval yard | The Union Militia | 5 |
-| Belt Forge Collective | The Belt | Mining, ore hauling, refining | 7 |
+| Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
 | Corvane Heavy Industries | Earth firm in Belt yards | Heavy ore haulage and refining | 2 |
 | The clans | The Belt | Boutique long-range and stealth hulls | 3 |
 | Aurel | Beyond the Shoals | Voices | 1 known |
 
 Weapon and module makers that build no hulls: Paragon Arms, Ito-Marr Dynamics, Novum Systems, Cantor-Vell Arms, Slagline Motors.
+
+## The grid
+
+Every hull by class and source. Names only. A blank cell is a deliberate gap: that power does not build that kind of ship, and someone has to cross a border to buy one. Builders are in the name: Kessari and Tessaract are Earth, Seraphine and Arcadia are Mars, Ishtar, Solace, Halden and Arbor are Venus, Union, Belt Forge, Rook and Rivet and the clans are the Belt, Meridian and Corvane sell everywhere.
+
+### Military
+
+| Class | Earth | Mars | Venus | The Belt |
+| --- | --- | --- | --- | --- |
+| Corvette | Kessari Citation | Seraphine Deimos | Ishtar Sedna | Union Wildcat; Vesk Vane (clan, stealth) |
+| Patrol boat | Kessari Warrant | Seraphine Phobos | Ishtar Lakshmi | Union Blockade |
+| Frigate | Kessari Injunction | Seraphine Resolve | Ishtar Maat | Union Boycott |
+| Destroyer | Kessari Verdict | Seraphine Constancy | Ishtar Maxwell | Union Walkout |
+| Cruiser | Kessari Statute | Seraphine Valles | Ishtar Aphrodite | Union Solidarity |
+| Battleship | Kessari Precedent | Seraphine Tharsis | | |
+| Carrier | Kessari Mandate | Seraphine Hellas | | |
+| Dreadnought | Kessari Charter | Seraphine Olympus | | |
+
+Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civilian-grade, which is why it is the starter.
+
+### Civilian
+
+| Job | Earth | Mars | Venus | The Belt | Everywhere |
+| --- | --- | --- | --- | --- | --- |
+| Pod | | | | | Meridian Ark |
+| Shuttle | | Arcadia Shuttle Mk III | | | Meridian Gull |
+| Taxi | | | | | Meridian Petrel |
+| Courier | Tessaract Docket | Arcadia Courier Mk IV | | Belt Forge Pony | Meridian Tern |
+| Hauler | Tessaract Waybill | Arcadia Hauler Mk III | | Belt Forge Mule | Meridian Skua |
+| Freighter | Tessaract Manifest | Arcadia Freighter Mk II | | Belt Forge Adit | |
+| Bulk freighter | Tessaract Lading | Arcadia Bulk Freighter Mk I | | Corvane Dray (ore) | |
+| Superfreighter | Tessaract Consignment | | | | |
+| Ferry or bus | Tessaract Timetable | Arcadia Ferry Mk II | | | Meridian Fulmar |
+| Liner | Tessaract Passage | | | | |
+| Prospector | | | | Belt Forge Prospector | |
+| Miner | | | | Belt Forge Sinker | |
+| Barge | | | | Belt Forge Collier | |
+| Refinery ship | | | | Belt Forge Winder; Corvane Smelter | |
+| Factory ship | | | | Belt Forge Headframe | |
+| Tug | | Arcadia Tug Mk II | | Rook and Rivet Shunt | |
+| Salvage tender | | | | Rook and Rivet Scrapper (S), Wrecker (M) | |
+| Shipbreaker | | | | Rook and Rivet Breaker | |
+| Repair tender | | Arcadia Tender Mk I | Solace Respite (S), Haven (M) | | |
+| Hospital ship | | | Solace Sanctuary | | |
+| Survey ship | | | Halden Query (S), Inquiry (M) | | |
+| Explorer | | | Halden Expedition | Saro Farwalker (clan) | |
+| Recovery tender | | | | Long Wake Trawl (clan) | |
+| Drone tender | | | Arbor Canopy | | |
+
+Reading the gaps: Earth builds no mining, salvage or support hulls. Mars builds every civilian job the state needs and nothing the state does not. Venus builds no cargo hulls at all. The Belt builds no passenger hulls and nothing above a cruiser. Those gaps are the trade.
 
 ## Meridian Civil Yards
 
@@ -61,15 +111,14 @@ Legal and enforcement terms. Earth's naval yard: the Charter Fleet and the toll 
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
-| Kessari Summons | Corvette | Fast interceptor and toll runner | The hull that catches a dark ship before it reaches the gate | draft |
+| Kessari Citation | Corvette | Fast interceptor and toll runner | The hull that catches a dark ship before it reaches the gate | draft |
 | Kessari Warrant | Patrol boat | Toll patrol and escort | Pirates prize captured ones as trophies | built |
 | Kessari Injunction | Frigate | Missile frigate, the Charter Fleet's backbone | Keeps you where it wants you | named (working name confirmed as final, pending Jason) |
 | Kessari Verdict | Destroyer | Heavy missile destroyer | Ends arguments | draft |
 | Kessari Statute | Cruiser | Line cruiser | The law, in bulk | draft |
 | Kessari Precedent | Battleship | The Charter Fleet's heaviest line ship | Earth has never lost one and intends to keep it that way | draft |
 | Kessari Mandate | Carrier | Drone and fighter carrier | Launches the contract and lets it do the work | draft |
-
-Note: KOD Summons is also the name of Earth's standard missile. A corvette named for the missile it carries is deliberate, but the lead may prefer another legal word (Citation, Notice) to avoid two things called Summons on one board.
+| Kessari Charter | Dreadnought | The Charter Fleet's flagship | Named for the document everything else is built on | draft |
 
 ## Seraphine Naval Yards
 
@@ -92,9 +141,12 @@ Mars's state yard. It names hulls what they are and numbers the marks, because M
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
+| Arcadia Shuttle Mk III | Shuttle | Port-to-orbit and station hops | Seats and straps | draft |
 | Arcadia Courier Mk IV | Courier | Documents and small parts between Martian ports | Faster than it looks, and it looks like a brick | draft |
 | Arcadia Hauler Mk III | Hauler | Small cargo | Every Martian colony has a hangar full of them | draft |
 | Arcadia Freighter Mk II | Freighter | Medium cargo | Armoured where a Tessaract hull is roomy | draft |
+| Arcadia Bulk Freighter Mk I | Bulk freighter | Large cargo for the state | New, and already looks twenty years old | draft |
+| Arcadia Tug Mk II | Tug | Port work | Every Martian port has a dozen | draft |
 | Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
 | Arcadia Tender Mk I | Repair tender (medium) | Field repair for the Navy and anyone Mars is helping that week | The one Martian civilian hull with a navy pattern | draft |
 
@@ -106,6 +158,7 @@ Venus highlands for the hulls (its guns are replies). Builds the Coastguard: res
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
+| Ishtar Sedna | Corvette | Fast rescue and picket | Reaches a pod before anyone else does | draft |
 | Ishtar Lakshmi | Patrol boat | Coastguard patrol and rescue escort | Carries a Solace kit and a railgun, in that order | draft |
 | Ishtar Maat | Frigate | Hybrid frigate | Answers from range | draft |
 | Ishtar Maxwell | Destroyer | Hybrid destroyer | The heaviest thing Venus will admit to owning | draft |
@@ -162,6 +215,7 @@ Old mining trades and tools. The best mining kit in known space and the hulls th
 | Belt Forge Prospector | Prospector | Solo mining | The lone digger looking for a strike | built |
 | Belt Forge Sinker | Miner (medium) | Breaching and mid-size mining | Shaft sinkers dug the deep, dangerous bores | built |
 | Belt Forge Collier | Barge | Heavy mining and ore carrying | Big, slow, filthy, and it keeps the world warm | built |
+| Belt Forge Pony | Courier | Small, fast and cheap | A pit pony: small, stubborn, goes anywhere | draft |
 | Belt Forge Mule | Hauler | Small ore and cargo hauler | A Belter's answer to the Waybill: uglier, tougher, cheaper | draft |
 | Belt Forge Adit | Freighter | Medium ore and cargo freighter | Named for a mine's entrance; a Belt freighter with teeth | draft |
 | Belt Forge Winder | Refinery ship (large) | Mobile ore processing | A winding engine for the whole field | draft |
@@ -258,7 +312,7 @@ Where NPC traffic should vary. Gaps are deliberate; they are the trade between p
 
 | Job | Earth | Mars | Venus | The Belt | Everywhere |
 | --- | --- | --- | --- | --- | --- |
-| Courier | Tessaract Docket | Arcadia Courier | | | Meridian Tern |
+| Courier | Tessaract Docket | Arcadia Courier | | Belt Forge Pony | Meridian Tern |
 | Hauler | Tessaract Waybill | Arcadia Hauler | | Belt Forge Mule | Meridian Skua |
 | Freighter | Tessaract Manifest | Arcadia Freighter | | Belt Forge Adit | |
 | Bulk freighter | Tessaract Lading | | | Corvane Dray (ore) | |
@@ -278,7 +332,7 @@ Mars builds civilian hulls through one state yard, one per job, which is a state
 ## Open
 
 - [ ] Jason: confirm the Injunction and the Walkout as final names (they fit their makers' themes, so this draft treats them as such).
-- [ ] Jason: anything in the draft that feels wrong, missing or too many.
+- [ ] Jason: the grid: anything wrong, missing or too many; which gaps should stay gaps.
 - [ ] Jason: the generations model (legacy, production, pattern) and the four first legacy hulls.
 - [ ] Lead: which of these the next build slice needs; everything marked draft waits for a milestone that wants it.
 - [ ] Lore: the drones list and the Arena ask, after this.
