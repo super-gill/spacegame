@@ -50,13 +50,15 @@ function quietWorld(): { w: World; me: string } {
 }
 
 describe('weapon catalogue', () => {
-  it('fixed guns always out-damage turrets of the same size', () => {
+  it('fixed guns always out-damage swivels of the same size, and their own turreted version', () => {
     const all = Object.values(WEAPONS);
     // Launchers and dispensers are fixed but not guns: the rule is about guns.
     for (const fixed of all.filter((w) => w.kind === 'fixed' && isGun(w))) {
-      for (const turret of all.filter((w) => w.kind === 'turret' && w.size === fixed.size)) {
-        expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turret));
+      for (const swivel of all.filter((w) => w.family === 'pointDefence' && w.size === fixed.size)) {
+        expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(swivel));
       }
+      const turreted = WEAPONS[fixed.id.replace(/-(m|l)$/, '-turret-$1')];
+      if (turreted && turreted !== fixed) expect(weaponDps(fixed)).toBeGreaterThan(weaponDps(turreted));
     }
   });
 
@@ -162,7 +164,7 @@ describe('projectiles', () => {
   it('hits a ship in its path even if it would skip past it in one tick', () => {
     // 900 u/s covers 15 units per tick; start just before the hull edge so the path crosses it.
     const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, {}, FIXED_DT);
-    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon', type: 'kinetic', from: { x: 300, y: -25 }, resolution: 0 }]);
+    expect(r.damage).toEqual([{ shipId: 't', amount: 6, by: 'shooter', cause: 'weapon', type: 'kinetic', from: { x: 300, y: -25 } }]);
     expect(r.projectiles).toEqual([]);
   });
 

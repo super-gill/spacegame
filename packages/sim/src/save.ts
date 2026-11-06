@@ -68,7 +68,7 @@ export const SAVE_FORMAT = 'spacegame-world';
  * - 7 (mining part 1): rocks hold ore, have a hardness and belong to a
  *   field. Version 6 saves migrate: see `migrate6to7`.
  */
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 /** Upgrade a world from version N to N + 1, keyed by N. */
 export type Migration = (world: unknown) => unknown;
@@ -89,6 +89,7 @@ export const MIGRATIONS: Record<number, Migration> = {
   9: (world) => migrate9to10(world),
   10: (world) => migrate10to11(world),
   11: (world) => migrate11to12(world),
+  12: (world) => migrate12to13(world),
 };
 
 /**
@@ -271,6 +272,71 @@ export function migrate11to12(world: unknown): unknown {
     pilots[id] = { ...pilot, storage };
   }
   return { ...world, pilots };
+}
+
+/** Swivels that no longer exist (PDCs are small only), with what they cost, for the refund in `migrate12to13`. */
+const RETIRED_SWIVELS: Record<string, number> = { 'paragon-turret-m': 2600, 'paragon-turret-l': 7000 };
+const SMALL_SWIVEL = 'paragon-turret-s';
+const SMALL_SWIVEL_PRICE = 800;
+
+/**
+ * 12 to 13: point defence is small only (Jason, 5 November). Every
+ * Sentry M and Bulwark L, fitted or stored, becomes a Watchman S in the
+ * same place, and the owner gets the price difference back in credits.
+ * Ships nobody owns (NPCs) are simply refitted.
+ */
+export function migrate12to13(world: unknown): unknown {
+  if (!isRecord(world)) return world;
+  const refunds: Record<string, number> = {};
+  const refund = (pilotId: unknown, oldId: string, count: number): void => {
+    if (typeof pilotId !== 'string') return;
+    refunds[pilotId] = (refunds[pilotId] ?? 0) + (RETIRED_SWIVELS[oldId]! - SMALL_SWIVEL_PRICE) * count;
+  };
+  const ships: Record<string, unknown> = {};
+  for (const [id, ship] of Object.entries(isRecord(world['ships']) ? world['ships'] : {})) {
+    if (!isRecord(ship) || !isRecord(ship['fit'])) {
+      ships[id] = ship;
+      continue;
+    }
+    const fit: Record<string, unknown> = {};
+    for (const [mount, moduleId] of Object.entries(ship['fit'])) {
+      if (typeof moduleId === 'string' && moduleId in RETIRED_SWIVELS) {
+        refund(ship['ownerId'], moduleId, 1);
+        fit[mount] = SMALL_SWIVEL;
+      } else fit[mount] = moduleId;
+    }
+    ships[id] = { ...ship, fit };
+  }
+  const pilots: Record<string, unknown> = {};
+  for (const [id, pilot] of Object.entries(isRecord(world['pilots']) ? world['pilots'] : {})) {
+    if (!isRecord(pilot)) {
+      pilots[id] = pilot;
+      continue;
+    }
+    const storage: Record<string, unknown> = {};
+    for (const [station, held] of Object.entries(isRecord(pilot['storage']) ? pilot['storage'] : {})) {
+      if (!isRecord(held)) {
+        storage[station] = held;
+        continue;
+      }
+      const shelf: Record<string, unknown> = {};
+      for (const [item, count] of Object.entries(held)) {
+        if (item in RETIRED_SWIVELS && typeof count === 'number') {
+          refund(id, item, count);
+          shelf[SMALL_SWIVEL] = (typeof shelf[SMALL_SWIVEL] === 'number' ? (shelf[SMALL_SWIVEL] as number) : 0) + count;
+        } else if (item === SMALL_SWIVEL && typeof count === 'number') {
+          shelf[item] = (typeof shelf[item] === 'number' ? (shelf[item] as number) : 0) + count;
+        } else shelf[item] = count;
+      }
+      storage[station] = shelf;
+    }
+    pilots[id] = { ...pilot, ...(isRecord(pilot['storage']) ? { storage } : {}) };
+  }
+  for (const [id, amount] of Object.entries(refunds)) {
+    const pilot = pilots[id];
+    if (isRecord(pilot) && typeof pilot['credits'] === 'number') pilots[id] = { ...pilot, credits: pilot['credits'] + amount };
+  }
+  return { ...world, ships, pilots };
 }
 
 /** A seed from an id, FNV-1a. */

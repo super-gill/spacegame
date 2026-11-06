@@ -1,4 +1,5 @@
-import { STOCK_SHIELD_ARC } from './constants.js';
+import { STOCK_SHIELD_ARC, TURRET_MOUNTING } from './constants.js';
+import { WEAPONS } from './weapons.js';
 import type { ModuleSpec } from './types.js';
 
 /**
@@ -603,36 +604,6 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: {},
     weaponId: 'swivel-s',
   },
-  'paragon-turret-m': {
-    id: 'paragon-turret-m',
-    name: 'Paragon Sentry M',
-    kind: 'weapon',
-    size: 'M',
-    mounts: ['high'],
-    needs: ['power'],
-    mass: 3,
-    power: 4,
-    price: 2600,
-    manufacturer: 'paragon',
-    tags: ['pointDefence'],
-    stats: {},
-    weaponId: 'swivel-m',
-  },
-  'paragon-turret-l': {
-    id: 'paragon-turret-l',
-    name: 'Paragon Bulwark L',
-    kind: 'weapon',
-    size: 'L',
-    mounts: ['high'],
-    needs: ['power'],
-    mass: 7,
-    power: 6,
-    price: 7000,
-    manufacturer: 'paragon',
-    tags: ['pointDefence'],
-    stats: {},
-    weaponId: 'swivel-l',
-  },
 
   // Launchers (docs/weapons.md, part 2). Ito-Marr builds the Kessari
   // missile line; the munitions themselves are goods from KOD.
@@ -860,6 +831,21 @@ export const MODULES: Record<string, ModuleSpec> = {
     manufacturer: 'paragon',
     tags: ['fireControl'],
     stats: { turretControl: 3, turretTracking: 1.25 },
+  },
+  'paragon-director-l': {
+    // For frigates and up: a big ship carries several small swivels.
+    id: 'paragon-director-l',
+    name: 'Paragon Gunlayer L',
+    kind: 'fireControl',
+    size: 'L',
+    mounts: ['fireControl'],
+    needs: ['power'],
+    mass: 1,
+    power: 2,
+    price: 6000,
+    manufacturer: 'paragon',
+    tags: ['fireControl'],
+    stats: { turretControl: 8, turretTracking: 1.5 },
   },
 
   // Mining (docs/mining.md; names in docs/lore.md). Belt Forge Collective
@@ -1354,3 +1340,26 @@ export const MODULES: Record<string, ModuleSpec> = {
     stats: { navHorizon: 120 },
   },
 };
+
+/**
+ * Turreted main guns (weapons.ts, `TURRETED_GUNS`): each medium and large
+ * fixed gun also comes on a turret from the same maker, heavier, a little
+ * hungrier and dearer for the mounting. Working names until the lore
+ * chat names them.
+ */
+for (const fixed of Object.values(MODULES)) {
+  const weaponId = fixed.weaponId;
+  if (!weaponId || fixed.size === 'S') continue;
+  const turretWeapon = weaponId.replace(/-(m|l)$/, '-turret-$1');
+  if (turretWeapon === weaponId || !WEAPONS[turretWeapon]) continue;
+  const id = `${fixed.id}-turret`;
+  MODULES[id] = {
+    ...fixed,
+    id,
+    name: fixed.name.replace(/ (M|L)$/, ' Turret $1'),
+    mass: Math.round(fixed.mass * TURRET_MOUNTING.mass * 10) / 10,
+    power: Math.round(fixed.power * TURRET_MOUNTING.power * 10) / 10,
+    price: Math.round((fixed.price * TURRET_MOUNTING.price) / 50) * 50,
+    weaponId: turretWeapon,
+  };
+}

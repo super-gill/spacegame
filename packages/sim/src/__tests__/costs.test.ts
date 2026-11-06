@@ -1,82 +1,94 @@
 import { describe, expect, it } from 'vitest';
-import { resolutionShare } from '../combat.js';
 import {
   AFTERBURNER_SIGNATURE_BLOOM,
   KIT_SIGNATURE,
-  RESOLUTION_BY_SIZE,
-  RESOLUTION_FLOOR,
-  TORPEDO_RESOLUTION_FACTOR,
+  MAIN_TURRET_DAMAGE,
+  MAIN_TURRET_SLEW,
+  SHOT_SPEED_FALLOFF,
   TURRET_SLEW_FALLOFF,
 } from '../constants.js';
-import { fitSummary, TARGET_SIGNATURES } from '../fitlab.js';
+import { buildShip } from '../factory.js';
+import { skirmish } from '../fitlab.js';
 import { HULLS } from '../hulls.js';
+import { LOADOUTS } from '../loadouts.js';
 import { MODULES } from '../modules.js';
 import { REFERENCE_FITS } from '../reference-fits.js';
+import { migrate12to13 } from '../save.js';
 import { fitStats, moduleSignature, shipStats } from '../stats.js';
 import { stepWorld } from '../step.js';
-import type { World } from '../types.js';
+import type { Ship, World } from '../types.js';
 import { WEAPONS } from '../weapons.js';
-import { createStarterWorld, joinPilot, pilotShip } from '../world.js';
+import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.js';
 import { TEST_CATALOGUES } from './fixtures.js';
 
-/** Fitting step 4, the costs (docs/fitting.md, "Costs that make choices"). */
+/**
+ * Fitting step 4, the costs (docs/fitting.md, "As built: step 4"). No
+ * damage is cut by rule: big guns miss small ships because big turrets
+ * slew slowly, big shots fly slowly and fixed guns need the hull to turn.
+ */
 
-describe('weapon resolution', () => {
-  it('a target at least the resolution takes everything; smaller ones a share, never below the floor', () => {
-    expect(resolutionShare(60, 60)).toBe(1);
-    expect(resolutionShare(90, 60)).toBe(1);
-    expect(resolutionShare(45, 60)).toBeCloseTo(0.75);
-    expect(resolutionShare(5, 60)).toBe(RESOLUTION_FLOOR);
+describe('physics, not damage cuts', () => {
+  it('bigger shots fly slower', () => {
+    const s = WEAPONS['autocannon-s']!.projectileSpeed;
+    expect(WEAPONS['autocannon-m']!.projectileSpeed).toBeCloseTo(s / SHOT_SPEED_FALLOFF);
+    expect(WEAPONS['autocannon-l']!.projectileSpeed).toBeCloseTo(s / SHOT_SPEED_FALLOFF ** 2);
   });
 
-  it('no resolution means full damage to anything', () => {
-    expect(resolutionShare(1, 0)).toBe(1);
-    expect(resolutionShare(1, undefined)).toBe(1);
+  it('point defence is small only, and every swivel module fires it', () => {
+    const pdc = Object.values(WEAPONS).filter((w) => w.family === 'pointDefence');
+    expect(pdc.map((w) => w.size)).toEqual(['S']);
+    for (const m of Object.values(MODULES)) if (m.weaponId && WEAPONS[m.weaponId]?.family === 'pointDefence') expect(m.size).toBe('S');
   });
 
-  it('comes from size: guns and launchers by their size, torpedoes coarser, mining lasers and dispensers none', () => {
-    expect(WEAPONS['autocannon-s']!.resolution).toBe(RESOLUTION_BY_SIZE.S);
-    expect(WEAPONS['autocannon-m']!.resolution).toBe(RESOLUTION_BY_SIZE.M);
-    expect(WEAPONS['autocannon-l']!.resolution).toBe(RESOLUTION_BY_SIZE.L);
-    expect(WEAPONS['missile-launcher-m']!.resolution).toBe(RESOLUTION_BY_SIZE.M);
-    expect(WEAPONS['torpedo-tube-m']!.resolution).toBe(RESOLUTION_BY_SIZE.M * TORPEDO_RESOLUTION_FACTOR);
-    expect(WEAPONS['mining-turret-l']!.resolution).toBe(0);
-    expect(WEAPONS['dispenser-s']!.resolution).toBe(0);
+  it('every medium and large main gun also comes turreted: softer, and slow to slew', () => {
+    for (const prefix of ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun']) {
+      for (const [size, step] of [['m', 1], ['l', 2]] as const) {
+        const fixed = WEAPONS[`${prefix}-${size}`]!;
+        const turret = WEAPONS[`${prefix}-turret-${size}`]!;
+        expect(turret.kind).toBe('turret');
+        expect(turret.family).toBe(fixed.family);
+        expect(turret.damage).toBeCloseTo(fixed.damage * MAIN_TURRET_DAMAGE);
+        expect(turret.turretTurnRate).toBeCloseTo(MAIN_TURRET_SLEW / TURRET_SLEW_FALLOFF ** step);
+        expect(turret.turretTurnRate).toBeLessThan(WEAPONS['swivel-s']!.turretTurnRate);
+        expect(Object.values(MODULES).some((m) => m.weaponId === turret.id)).toBe(true);
+      }
+    }
   });
 
-  it('bigger swivels slew slower', () => {
-    const s = WEAPONS['autocannon-s']!.turretTurnRate;
-    expect(WEAPONS['autocannon-m']!.turretTurnRate).toBeCloseTo(s / TURRET_SLEW_FALLOFF);
-    expect(WEAPONS['autocannon-l']!.turretTurnRate).toBeCloseTo(s / TURRET_SLEW_FALLOFF ** 2);
-  });
-
-  it('a big gun\'s shot does only part of its damage to a small ship', () => {
-    const base = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [] };
-    const w0 = joinPilot(base, 'ana', 'Ana');
-    const me = pilotShip(w0, 'ana')!;
-    const signature = shipStats(w0, me).signature;
-    const hit = (resolution: number): number => {
-      const w: World = {
-        ...w0,
-        projectiles: [{ id: 'px', ownerShipId: 'nobody', position: { x: me.position.x, y: me.position.y - 12 }, velocity: { x: 0, y: 900 }, damage: 50, damageType: 'kinetic', resolution, ticksLeft: 10 }],
-      };
-      const ev = stepWorld(w, {}).events.find((e) => e.type === 'damaged' && e.shipId === me.id);
-      return ev && ev.type === 'damaged' ? ev.amount : 0;
+  it('a turreted main gun fires at its lock off the nose, but only on the trigger', () => {
+    const base: World = { ...createStarterWorld(), ships: {}, npcs: {}, spawners: [], asteroids: [] };
+    const at = { x: 0, y: -40000 };
+    const loadout = { ...LOADOUTS['union-frigate']!, fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-picket-l-turret', w2: 'union-picket-l-turret' } };
+    // Facing away from the target, so a fixed gun could not bear.
+    let frigate: Ship = buildShip(base, { id: 'f', loadout, ownerId: null, position: at, heading: 0, flightMode: 'assisted' });
+    const target: Ship = buildShip(base, { id: 't', loadout: LOADOUTS['kessari-raider']!, ownerId: null, position: { x: at.x - 400, y: at.y }, heading: 0, flightMode: 'assisted' });
+    frigate = { ...frigate, hold: { rounds: 10 }, locks: [{ targetId: 't', progress: 1 }], activeLock: 't', weaponsHot: false };
+    const shotsAfter = (fire: boolean): number => {
+      let w: World = { ...base, ships: { f: frigate, t: target } };
+      let shots = 0;
+      for (let i = 0; i < 300; i++) {
+        w = stepWorld(w, { f: { ...emptyInput(), fireFixed: fire }, t: emptyInput() });
+        shots += w.projectiles.filter((p) => p.ownerShipId === 'f').length;
+      }
+      return shots;
     };
-    expect(hit(0)).toBe(50);
-    expect(hit(signature * 2)).toBeCloseTo(25);
-    expect(hit(signature * 100)).toBeCloseTo(50 * RESOLUTION_FLOOR);
+    expect(shotsAfter(true)).toBeGreaterThan(0);
+    expect(shotsAfter(false)).toBe(0);
+  });
+
+  it('the Gunlayer L runs more swivels than the M', () => {
+    expect(MODULES['paragon-director-l']!.stats.turretControl!).toBeGreaterThan(MODULES['paragon-director-m']!.stats.turretControl!);
   });
 });
 
 describe('signature from kit', () => {
-  const tern = HULLS['meridian-courier']!;
+  const courier = HULLS['meridian-courier']!;
 
   it('a bare hull has its own signature; kit adds by kind and size', () => {
-    expect(fitStats(TEST_CATALOGUES, tern, {}).signature).toBe(tern.signature);
+    expect(fitStats(TEST_CATALOGUES, courier, {}).signature).toBe(courier.signature);
     const engine = Object.values(MODULES).find((m) => m.kind === 'engine' && m.size === 'S')!;
-    const mount = tern.mounts.find((m) => engine.mounts.includes(m.type))!;
-    expect(fitStats(TEST_CATALOGUES, tern, { [mount.id]: engine.id }).signature).toBe(tern.signature + KIT_SIGNATURE['engine']!.S);
+    const mount = courier.mounts.find((m) => engine.mounts.includes(m.type))!;
+    expect(fitStats(TEST_CATALOGUES, courier, { [mount.id]: engine.id }).signature).toBe(courier.signature + KIT_SIGNATURE['engine']!.S);
   });
 
   it('a module can name its own signature: the charge rig is loud', () => {
@@ -93,26 +105,36 @@ describe('signature from kit', () => {
   });
 });
 
-describe('what the costs do to fits', () => {
-  const byName = (name: string) => REFERENCE_FITS.find((f) => f.name.startsWith(name))!;
-
-  it('small guns lose nothing against small targets; large guns lose a lot', () => {
-    const tern = fitSummary(TEST_CATALOGUES, byName('Meridian Tern'))!;
-    expect(tern.dpsAgainst.small).toBeCloseTo(tern.dps);
-    const frigate = fitSummary(TEST_CATALOGUES, byName('Union Defence Works Walkout'))!;
-    expect(frigate.dpsAgainst.large).toBeCloseTo(frigate.dps);
-    expect(frigate.dpsAgainst.small / frigate.dps).toBeLessThan(0.6);
-  });
-
-  it('measures against fixed signatures', () => {
-    expect(TARGET_SIGNATURES.small).toBeLessThan(TARGET_SIGNATURES.medium);
-    expect(TARGET_SIGNATURES.medium).toBeLessThan(TARGET_SIGNATURES.large);
-  });
-
-  it('the medium armour plate beats the small one on structure for its mass', () => {
+describe('the medium armour plate', () => {
+  it('beats the small one on structure, a little worse per tonne', () => {
     const s = MODULES['rookrivet-armour-s']!;
     const m = MODULES['cantorvell-armour-m']!;
     expect(m.stats.structure!).toBeGreaterThan(s.stats.structure!);
     expect(m.stats.structure! / m.mass).toBeLessThanOrEqual(s.stats.structure! / s.mass);
+  });
+});
+
+describe('saves from before small-only point defence', () => {
+  it('turn medium and large swivels into small ones and refund the difference', () => {
+    const old = {
+      ships: { s1: { id: 's1', ownerId: 'ana', fit: { w3: 'paragon-turret-m', w4: 'paragon-turret-l', w1: 'union-picket-l' } }, npc: { id: 'npc', ownerId: null, fit: { w3: 'paragon-turret-m' } } },
+      pilots: { ana: { id: 'ana', credits: 100, storage: { harbour: { 'paragon-turret-m': 2, 'paragon-turret-s': 1, rounds: 5 } } } },
+    };
+    const next = migrate12to13(old) as typeof old & { ships: Record<string, { fit: Record<string, string> }>; pilots: Record<string, { credits: number; storage: Record<string, Record<string, number>> }> };
+    expect(next.ships['s1']!.fit).toEqual({ w3: 'paragon-turret-s', w4: 'paragon-turret-s', w1: 'union-picket-l' });
+    expect(next.ships['npc']!.fit).toEqual({ w3: 'paragon-turret-s' });
+    expect(next.pilots['ana']!.storage['harbour']).toEqual({ 'paragon-turret-s': 3, rounds: 5 });
+    // One M and one L fitted, two M stored: (2600 - 800) * 3 + (7000 - 800).
+    expect(next.pilots['ana']!.credits).toBe(100 + 1800 * 3 + 6200);
+  });
+});
+
+describe('swarms', () => {
+  const byName = (name: string) => REFERENCE_FITS.find((f) => f.name.startsWith(name))!;
+
+  it('a brig beats one Warrant brawler, and three of them beat the brig', () => {
+    const brawler = byName('Warrant brawler');
+    expect(skirmish([byName('Brig brawler')], [brawler], { starts: 1 }).winsA).toBe(1);
+    expect(skirmish([byName('Brig brawler')], [brawler, brawler, brawler], { starts: 1 }).winsB).toBe(1);
   });
 });

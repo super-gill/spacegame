@@ -223,7 +223,7 @@ export const HULLS: Record<string, HullSpec> = {
       mount('r1', 'radar', 'M', 20, -8, ['power']),
       mount('t1', 'computer', 'M', 24, 0, ['power']),
       mount('f1', 'flight', 'M', 32, 0, ['power']),
-      mount('x1', 'fireControl', 'M', 10, -10, ['power']),
+      mount('x1', 'fireControl', 'L', 10, -10, ['power']),
       mount('p1', 'podBay', 'S', 10, 10, []),
       // Frigate template: 6 high, 4 mid, 7 low, M and L.
       high('w1', 'L', 38, -6),

@@ -146,20 +146,25 @@ Step 4 balances big guns against small targets, and there were no big combat hul
 - **What the audit shows, before step 4:** each class beats everything below it every time, quickly and barely scratched (the frigate kills a brig in about nine seconds with 85% left; the brig kills any Warrant). Big guns hit small ships as hard as big ones today. That is what step 4 is for.
 - **Also found:** the Cantor-Vell Vigil M armour (100 structure, 4.5 t) is worse than the Patchplate S (240 structure, 2 t) apart from slightly better resists; step 4 looks at it with the rest.
 
-### As built: step 4, the costs (5 November 2026)
+### As built: step 4, the costs (5 November 2026, reworked with Jason the same night)
 
-- **Resolution** (`WeaponSpec.resolution`, `resolutionShare` in `combat.ts`): S 15, M 30, L 60 (`RESOLUTION_BY_SIZE`); torpedoes twice their tube's size (`TORPEDO_RESOLUTION_FACTOR`); mining lasers and dispensers none. A hit does full damage to a target whose signature is at least the resolution, signature over resolution below that, never less than 40% (`RESOLUTION_FLOOR`). Shots and munitions carry it; it is applied where damage lands (`step.ts`), against the target's `ShipStats.signature`, so the `damaged` event reports what was really done. Rams and blasts ignore it. A steeper curve (the share to the power 1.5) was tried and dropped: with the floor, it made undersized guns worse against small ships, not better.
-- **Signature from kit** (`KIT_SIGNATURE`, `moduleSignature` in `stats.ts`): engines add 2, 4, 8 by size; guns 0, 1, 4; a module can name its own (`stats.signature`; the charge rig adds 6). A burning afterburner blooms the signature by half (`AFTERBURNER_SIGNATURE_BLOOM`, in `shipStats`). Lock time now uses this signature too, not the bare hull's. Heat seekers and decoys still use the hull's.
-- **Slower big swivels:** each size up slews 1.6 times slower (`TURRET_SLEW_FALLOFF`, was 1.3).
-- **Armour:** the Vigil M goes from 100 to 460 structure (a little under the Patchplate S per tonne, with better resists).
-- **The fitter and the audit** show damage per second against a small (20), medium (35) and large (60) target (`FitSummary.dpsAgainst`, `TARGET_SIGNATURES`); the fitting window shows signature and each weapon's resolution. The audit adds those, every fit with guns against the raider, and times and health left in the duels. Report: `docs/audits/2026-11-05-costs.md`.
+**No damage is cut by rule** (Jason). A first build gave weapons a resolution against signature with a 40% floor; it was taken out the same night. Our shots are real projectiles that travel and miss, so physics does the job: big turrets slew slowly, big shots fly slowly, and fixed guns aim with the hull, so a heavy ship's slow turn is their tracking. The design Jason wants: **a big ship wins one against one; a swarm of small ships overwhelms it; a big ship may never get its big guns on a small one; a big ship covered in point defence is a small ship's nightmare and shrugs off against another big ship.**
+
+- **Point defence is small only.** Swivels (the Paragon Watchman S) are the PDCs: turreted, shooting down munitions by themselves, engaging ships too. The Sentry M and Bulwark L are gone; big ships carry several Watchmen. Save 13 (`migrate12to13`) swaps fitted and stored M and L swivels for Watchmen and refunds the price difference.
+- **Fire control sets how many PDCs:** Gunlayer S one, M three, and a new **Gunlayer L** eight, so a heavy ship can fill every high with swivels as a crowd clearer (Jason: that will be a doctrine). The frigate's fire control mount is now L.
+- **Turreted main guns**, separate from PDCs: every medium and large main gun also comes turreted (`<gun>-turret-m`, `-l`; modules `<fixed id>-turret`, from the same maker; working names). They follow the lock with no fire control, fire with their group on the trigger, do no point defence, do 75% of the fixed gun's damage (`MAIN_TURRET_DAMAGE`; fixed guns stay the hardest hitters), cost more to mount (`TURRET_MOUNTING`: mass 1.4, power 1.25, price 1.5 times), and slew slowly: M 1.5 rad/s, L about 0.94 (`MAIN_TURRET_SLEW`), against the swivel's 4.
+- **Slower big shots:** each size up flies 1.15 times slower (`SHOT_SPEED_FALLOFF`); **slower big turrets:** each size up slews 1.6 times slower (`TURRET_SLEW_FALLOFF`, was 1.3).
+- **Signature from kit** (`KIT_SIGNATURE`, `moduleSignature`): engines add 2, 4, 8 by size; guns 0, 1, 4; a module can name its own (the charge rig adds 6). A burning afterburner blooms it by half (`AFTERBURNER_SIGNATURE_BLOOM`). It sets lock time against the ship; heat seekers and decoys still use the hull's.
+- **Armour:** the Vigil M goes from 100 to 460 structure.
+- **Swarms in the lab:** `skirmish(sideA, sideB)` fights side against side; each ship takes the nearest enemy, and a ship much smaller than its target makes attack passes with the pirates' own `attackRun`. The audit adds a swarm table (brig and frigate fits against one to four Warrants), every fit with guns against the raider, and times and health left in the duels. Reference fits added: Frigate turrets, Frigate crowd clearer. Report: `docs/audits/2026-11-05-costs.md`.
 - **Not done here:** capacitor modules for lows belong with oversizing (step 5).
 
-**What the audit shows after step 4:**
+**What the audit shows:**
 
-- The Warrant brawler now beats the brig's yard fit; the brig brawler and the frigate still beat every smaller fit, mostly on hit points (the frigate has six times a Warrant's shield and structure). The duel script closes and sits nose on, so tracking never comes into it.
-- **Undersizing is barely a tactic yet.** The frigate's L guns keep 48% against a small target, its undersized M guns 67%, but the L guns start 1.74 times stronger and carry its +15% bonus, so they still do about as much (167 against 174 a second). With a 40% floor, an L gun at the floor still does 70% of an M gun. This is a question for Jason (coordination, "Questions for Jason").
-- **Mining ships and the stock Manifest lose to the raider** every time (one swivel each; the Collier's drones are not flown in a duel). The design asks every stock fit with guns to drive it off.
+- **The brig is about right:** the brig brawler beats one or two Warrant brawlers and loses to three; the yard fit beats one and loses to two.
+- **The frigate is too strong against a swarm:** the militia fit beats four Warrant brawlers with 45% left. Of the frigate fits only the crowd clearer (two of four against three, none against four) and the undersized one (none against four) can be swarmed. How many small ships should beat each class is a target for Jason ("Questions for Jason").
+- **Raiders cannot touch big ships:** three Black Strike raiders barely scratch a brig or frigate (their light guns against heavy shields and plate). Fine for pirates, but law ships and players in Warrants will meet the same wall.
+- **Mining ships and the stock Manifest lose to the raider** every time (one swivel each; the Collier's drones do not fly in the lab). The design asks every stock fit with guns to drive it off.
 
 ## The fitter
 

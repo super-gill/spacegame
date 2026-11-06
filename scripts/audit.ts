@@ -8,12 +8,12 @@
  * 2. Ladders: a module better in every way than another except price, so
  *    the only question is what you can afford.
  * 3. The reference fits: problems, budgets and the numbers that matter.
- * 4. Damage against small, medium and large targets, after resolution.
- * 5. Every fit with guns against the pirate raider.
+ * 4. Every fit with guns against the pirate raider.
+ * 5. Swarms: big ships against several small ones.
  * 6. Duels between the combat reference fits, with time and health left.
  */
 import { GOODS, HULLS, MODULES, WEAPONS, weaponDps, type ModuleSpec } from '../packages/sim/src/index.js';
-import { duel, fitProblems, fitSummary, TARGET_SIGNATURES, type DuelResult } from '../packages/sim/src/fitlab.js';
+import { duel, fitProblems, fitSummary, skirmish, type DuelResult } from '../packages/sim/src/fitlab.js';
 import { REFERENCE_FITS } from '../packages/sim/src/reference-fits.js';
 import type { Catalogues } from '../packages/sim/src/stats.js';
 
@@ -108,19 +108,6 @@ for (const f of REFERENCE_FITS) {
 }
 say();
 
-say(`## Damage against target sizes`);
-say();
-say(`Damage per second after resolution against a small (signature ${TARGET_SIGNATURES.small}), medium (${TARGET_SIGNATURES.medium}) and large (${TARGET_SIGNATURES.large}) target, and the share kept against small. Swivels and fixed guns alike; tracking is not counted here.`);
-say();
-say(`| Fit | Small | Medium | Large | Kept against small |`);
-say(`| --- | --- | --- | --- | --- |`);
-for (const f of REFERENCE_FITS) {
-  const s = fitSummary(cat, f)!;
-  if (s.dps <= 0) continue;
-  say(`| ${f.name} | ${s.dpsAgainst.small.toFixed(0)} | ${s.dpsAgainst.medium.toFixed(0)} | ${s.dpsAgainst.large.toFixed(0)} | ${Math.round((100 * s.dpsAgainst.small) / s.dps)}% |`);
-}
-say();
-
 /** A duel's runs in one cell: wins, mean seconds and mean health left for the winner. */
 function cell(r: DuelResult, side: 'a' | 'b'): string {
   const won = r.runs.filter((x) => x.winner === side);
@@ -141,6 +128,29 @@ for (const f of REFERENCE_FITS) {
   if (f === raider || fitSummary(cat, f)!.dps <= 0) continue;
   const r = duel(f, raider);
   say(`| ${f.name} | ${cell(r, 'a')} | ${cell(r, 'b')} |`);
+}
+say();
+
+say(`## Swarms`);
+say();
+say(`One big ship against one to four small ones (Jason: a big ship should win one against one; a swarm should overwhelm it). Small ships make attack passes, as pirates do. Wins out of 4 for the big ship, then the mean time and what the winners had left, and how many small ships died on average.`);
+say();
+const swarmers = ['Warrant brawler', 'Kessari Warrant, Black Strike'].map((n) => REFERENCE_FITS.find((f) => f.name.startsWith(n))!);
+const bigOnes = REFERENCE_FITS.filter((f) => f.role === 'combat' && ['kessari-brig', 'union-frigate'].includes(f.hullId));
+say(`| Big ship | Against | 1 | 2 | 3 | 4 |`);
+say(`| --- | --- | --- | --- | --- | --- |`);
+for (const big of bigOnes) {
+  for (const small of swarmers) {
+    const cells = [1, 2, 3, 4].map((n) => {
+      const r = skirmish([big], Array(n).fill(small));
+      const won = r.runs.filter((x) => x.winner === 'a');
+      const lost = r.runs.filter((x) => x.winner === 'b');
+      const killed = r.runs.reduce((m, x) => m + x.bLost, 0) / r.runs.length;
+      if (won.length > 0) return `${r.winsA}/4 (${Math.round(won.reduce((m, x) => m + x.seconds, 0) / won.length)} s, ${Math.round((100 * won.reduce((m, x) => m + x.aLeft, 0)) / won.length)}% left)`;
+      return `${r.winsA}/4 (${lost.length > 0 ? `${Math.round(lost.reduce((m, x) => m + x.seconds, 0) / lost.length)} s, ` : ''}${killed.toFixed(1)} killed)`;
+    });
+    say(`| ${big.name} | ${small.name} | ${cells.join(' | ')} |`);
+  }
 }
 say();
 

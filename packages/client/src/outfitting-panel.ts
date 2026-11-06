@@ -19,7 +19,6 @@ import {
   type Ship,
   type ShipStats,
   type World,
-  RESOLUTION_FLOOR,
 } from '@spacegame/sim';
 import { RACE_COLOUR } from './render/ship-art.js';
 
@@ -190,14 +189,13 @@ export function describeModule(m: ModuleSpec, world: World): string {
     parts.push(`cuts rock up to ${Math.round((w.mining?.strength ?? 0) * 100)}% hard, ${fixed1(w.damage)} ore/s, range ${Math.round(w.range)}, ${fixed1(w.capacitorPerShot)} cap/s`);
   } else if (w && w.family === 'missile') {
     parts.push(`${Math.round(w.damage)} warhead base, one every ${fixed1(w.fireInterval)} s, needs a lock`);
-    parts.push(resolutionNote(w.resolution));
     parts.push(`loads ${w.ammo === 'torpedo' ? 'torpedoes' : 'missiles'}, holds ${w.magazine}`);
   } else if (w) {
     parts.push(`${fixed1(weaponDps(w))} dps, range ${Math.round(w.range)}, ${w.damageType}`);
-    parts.push(resolutionNote(w.resolution));
     if (w.capacitorPerShot > 0) parts.push(`${fixed1(w.capacitorPerShot)} cap/shot`);
     if (w.ammo) parts.push(`loads ${w.ammo}, magazine ${w.magazine}`);
     if (w.family === 'pointDefence') parts.push('shoots down missiles by itself');
+    else if (w.kind === 'turret') parts.push(`turreted: follows your lock at ${fixed1(w.turretTurnRate)} rad/s and fires with its group, no fire control needed`);
   }
   if (m.resists) parts.push('resists ' + Object.entries(m.resists).filter(([, v]) => v > 0).map(([t, v]) => `${t} ${Math.round(v * 100)}%`).join(', '));
   if (m.capacitorDraw) parts.push(`draws ${fixed1(m.capacitorDraw)} cap/s at full size`);
@@ -224,11 +222,6 @@ interface StatRow {
 }
 
 const DEG = 180 / Math.PI;
-/** What a weapon's resolution means for the pilot (docs/fitting.md, "Costs that make choices"). */
-function resolutionNote(resolution: number): string {
-  return `full damage to targets of signature ${resolution} and up, less to smaller ones (at least ${Math.round(RESOLUTION_FLOOR * 100)}%)`;
-}
-
 const dps = (s: ShipStats, kind: 'fixed' | 'turret'): number =>
   Object.values(s.weapons)
     .filter((w) => w.kind === kind && isGun(w))

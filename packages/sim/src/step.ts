@@ -1,5 +1,5 @@
 import { thinkNpcs } from './ai/index.js';
-import { applyDamage, resolutionShare, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
+import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
 import { goodsFitting } from './goods.js';
 import { incomingMunitions, spoofRadar, stepDecoys, stepMunitions } from './munitions.js';
 import { asteroidStates, stepRockfall } from './asteroids.js';
@@ -374,13 +374,11 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const target = ships[d.shipId];
     if (!target || target.structure <= 0) continue;
     const targetStats = shipStats(world, target);
-    // Big guns and warheads do only part of their damage to small ships.
-    const amount = d.amount * resolutionShare(targetStats.signature, d.resolution);
-    ships[d.shipId] = applyDamage(target, targetStats, amount, world.dt, d.type, d.from);
+    ships[d.shipId] = applyDamage(target, targetStats, d.amount, world.dt, d.type, d.from);
     killers[d.shipId] = d.by;
     // Note hits that came in through the open stern while there was a shield to miss.
     const unshielded = d.from && targetStats.shield > 0 && !shieldCovers(target, targetStats, d.from) ? { unshielded: true as const } : {};
-    events.push({ type: 'damaged', shipId: d.shipId, by: d.by, amount, cause: d.cause, ...unshielded });
+    events.push({ type: 'damaged', shipId: d.shipId, by: d.by, amount: d.amount, cause: d.cause, ...unshielded });
 
     // A pirate remembers who attacked it.
     const brain = npcs[d.shipId];

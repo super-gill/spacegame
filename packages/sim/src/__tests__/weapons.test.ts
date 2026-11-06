@@ -34,10 +34,11 @@ function shipOf(w: World, id: string, loadoutId: string, fit: Record<string, str
 const fire: ShipInput = { ...emptyInput(), fireFixed: true };
 
 describe('the catalogue', () => {
-  it('has every family in S, M and L, and a swivel at every size', () => {
-    for (const prefix of ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun', 'swivel']) {
+  it('has every gun in S, M and L, and the swivel small only', () => {
+    for (const prefix of ['autocannon', 'artillery', 'pulse-laser', 'beam-laser', 'blaster', 'railgun']) {
       for (const size of ['s', 'm', 'l']) expect(WEAPONS[`${prefix}-${size}`], `${prefix}-${size}`).toBeDefined();
     }
+    expect(WEAPONS['swivel-s']).toBeDefined();
     for (const w of Object.values(WEAPONS)) {
       if (w.family === 'energy') expect(w.ammo).toBeNull();
       if (w.family === 'projectile') expect(w.capacitorPerShot).toBe(0);
@@ -45,9 +46,9 @@ describe('the catalogue', () => {
     }
   });
 
-  it('keeps the rule: at every size, every fixed gun out-damages the swivel', () => {
+  it('keeps the rule: every fixed gun out-damages the small swivel', () => {
+    const swivel = WEAPONS['swivel-s']!;
     for (const size of ['S', 'M', 'L'] as const) {
-      const swivel = Object.values(WEAPONS).find((w) => w.kind === 'turret' && w.size === size)!;
       for (const gun of Object.values(WEAPONS).filter((w) => w.kind === 'fixed' && isGun(w) && w.size === size)) {
         expect(weaponDps(gun), `${gun.id} vs ${swivel.id}`).toBeGreaterThan(weaponDps(swivel));
       }

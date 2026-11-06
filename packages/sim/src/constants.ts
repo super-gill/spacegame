@@ -200,19 +200,6 @@ export const STOCK_SHIELD_ARC = (3 * Math.PI) / 2;
 
 // Fitting step 4, costs (docs/fitting.md, "Costs that make choices").
 
-/**
- * Weapon resolution by size: the signature a target needs to take a
- * weapon's full damage. Smaller targets take a share, signature over
- * resolution, never below `RESOLUTION_FLOOR`. Big guns are for big ships.
- */
-export const RESOLUTION_BY_SIZE = { S: 15, M: 30, L: 60, XL: 120 } as const;
-/**
- * The least share of its damage a gun or munition ever does, however small
- * the target (Jason: a big ship must still be able to defend itself).
- */
-export const RESOLUTION_FLOOR = 0.4;
-/** Torpedoes are capital killers: their resolution is this many times their tube's size. */
-export const TORPEDO_RESOLUTION_FACTOR = 2;
 /** How much each size up slows a swivel's traverse: S turns this many times faster than M, and so on. */
 export const TURRET_SLEW_FALLOFF = 1.6;
 /**
@@ -226,3 +213,18 @@ export const KIT_SIGNATURE: Partial<Record<string, { S: number; M: number; L: nu
 };
 /** A burning afterburner blooms the ship's signature by this share: fast, but easy to see and to hit. */
 export const AFTERBURNER_SIGNATURE_BLOOM = 0.5;
+/**
+ * How much each size up slows a gun's shot: a large shell flies this
+ * squared slower than a small round, so a quick target can slip it at range.
+ */
+export const SHOT_SPEED_FALLOFF = 1.15;
+/** A turreted main gun's damage against the fixed gun of its size: less, so fixed guns stay the hardest hitters. */
+export const MAIN_TURRET_DAMAGE = 0.75;
+/**
+ * How fast a turreted main gun would slew at size S, rad/s; each size up
+ * is `TURRET_SLEW_FALLOFF` slower (M 1.5, L about 0.94). Swivels, the
+ * point defence, turn at 4.
+ */
+export const MAIN_TURRET_SLEW = 2.4;
+/** What mounting a main gun on a turret costs against the fixed gun: mass, power and price multipliers. */
+export const TURRET_MOUNTING = { mass: 1.4, power: 1.25, price: 1.5 };
