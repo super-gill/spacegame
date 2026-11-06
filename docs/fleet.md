@@ -150,8 +150,8 @@ Mars's state yard. It names hulls what they are and numbers the marks, because M
 | Arcadia Tug Mk II | Tug | Port work | Every Martian port has a dozen | draft |
 | Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
 | Arcadia Tender Mk I | Repair tender (medium) | Field repair for the Navy and anyone Mars is helping that week | The one Martian civilian hull with a navy pattern | draft |
-| Arcadia Fighter Mk V | Fighter | Light combat fighter for the Navy's carriers | State-built, Navy only | draft |
-| Arcadia Heavy Fighter Mk II | Fighter | Heavy combat fighter | The same, with more of everything | draft |
+| Arcadia Fighter Mk V | Subcraft | Light fighter for the Navy's carriers | State-built, Navy only | draft |
+| Arcadia Heavy Fighter Mk II | Subcraft | Heavy fighter | The same, with more of everything | draft |
 
 Legacy Arcadia hulls keep the name with an older mark: an Arcadia Hauler Mk II is the cheap one.
 
@@ -266,19 +266,19 @@ Silent and musical terms given by human scholars. No yards, no companies; every 
 | Aurel Tacet | Outside the ladders | The sealed development and test ship | A voice that never sang | built |
 | Others | | Husks, the one on the pad, the gifted ship | Named by whoever first sees them: Lament, Hush, Cadence are the kind of words scholars reach for | later |
 
-## Fighters and drones
+## Subcraft and drones
 
-Decided 6 November 2026. A **fighter** is any crewed small craft carried in a bay, whatever its job: combat, mining, salvage, repair, rescue. Fighters are flown by NPC crews, never by the player. A **drone** is the uncrewed kind. Three rules:
+Decided 6 November 2026. A **subcraft** is any crewed small craft carried in a bay, whatever its job: combat, mining, salvage, repair, rescue. In effect a subcraft is a very heavy drone with a crew and better capabilities. Subcraft are flown by NPC crews, never by the player. A **fighter** is a combat subcraft. A **drone** is the uncrewed kind. Three rules:
 
-1. **Fighters and drones are products, not hulls.** They live in bays, are bought like modules, and companies build them. Navy yards build the carriers; what the carriers carry comes from specialist makers. Mars is the exception by character: Arcadia Works builds the Navy's fighters because the state builds everything.
+1. **Subcraft and drones are products, not hulls.** They live in bays, are bought like modules, and companies build them. Navy yards build the carriers; what the carriers carry comes from specialist makers. Mars is the exception by character: Arcadia Works builds the Navy's fighters because the state builds everything.
 2. **Military variants come from the same makers.** A maker's civilian line is open market. Its combat line is sold like navy hulls: light combat fighters and light combat drones openly, heavy ones behind standing or a navy licence.
-3. **Industrial fighters and drones never go military.** A mining or salvage fighter has mining or salvage mounts and no weapon mounts. It is not a refit of a combat fighter and cannot become one.
+3. **Industrial subcraft and drones never go military.** A mining or salvage subcraft has mining or salvage mounts and no weapon mounts. It is not a refit of a fighter and cannot become one.
 
-Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Breaker) are carriers in all but name: their bays launch mining and salvage fighters and drones the way a Hellas launches combat fighters.
+Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Breaker) are carriers in all but name: their bays launch mining and salvage subcraft and drones the way a Hellas launches fighters.
 
-### Fighters by job and maker
+### Subcraft by job and maker
 
-| Job | Maker | Fighters | Who flies them |
+| Job | Maker | Subcraft | Who flies them |
 | --- | --- | --- | --- |
 | Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy) | The Charter Fleet; the Foil sold openly, so Belt militias and pirates too |
 | Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II | The Martian Navy only |
@@ -289,7 +289,7 @@ Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Brea
 | Salvage | The clans | Long Wake Dredge | The Long Wake's tenders |
 | Rescue and repair | Solace Medical | Solace Stretcher | Havens, Sanctuaries, the Coastguard |
 
-Venus flies no crewed combat fighters; a Venusian carrier is a drone carrier, and the Coastguard's crewed fighters are rescue craft.
+Venus flies no fighters; a Venusian carrier is a drone carrier, and the Coastguard's crewed subcraft are rescue craft.
 
 ### Drones by job and maker
 
