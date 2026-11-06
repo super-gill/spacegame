@@ -14,7 +14,7 @@ import type { ModuleSize, WeaponSpec } from './types.js';
  * - hybrid: blaster (very short) and railgun (very long); charges and a
  *   little capacitor.
  * - point defence: swivels, small only, turreted and multi-role: light
- *   rounds fired fast, so every fixed gun hits harder per shot (the
+ *   rounds fired fast (30 a second), so every fixed gun hits harder per shot (the
  *   standing rule, enforced by a test), but a battery of them puts out a
  *   lot of fire. With no ship to shoot at they shoot down incoming munitions
  *   by themselves (combat.ts).
@@ -171,7 +171,7 @@ export const WEAPONS: Record<string, WeaponSpec> = {
     // small ships, while a big ship's shields and plate shrug them off.
     damage: 3,
     damageType: 'kinetic',
-    fireInterval: 0.075, // 40 dps
+    fireInterval: 0.1, // 30 dps (Jason, 6 November: 40 made fixed guns feel secondary)
     projectileSpeed: 800,
     // Further than any small ship's guns reach (Jason, 6 November): a
     // small ship making passes flies through point defence fire.

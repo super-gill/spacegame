@@ -19,7 +19,7 @@ Saves move to version 13: medium and large swivels become small ones, and you ge
 ### Changed
 - Point defence is small only: the Paragon Sentry M and Bulwark L are gone (fitted and stored ones become Watchman S, refunded); big ships carry several small swivels. The Walkout's fire control mount is large.
 - Bigger guns fire slower shots, and bigger turrets slew slower, so small, quick ships are hard for big guns to hit.
-- Swivels fire light rounds fast (40 a second each) out to 900 units, so a big ship covered in them is dangerous to small ships.
+- Swivels fire light rounds fast (30 a second each) out to 900 units, so a big ship covered in them is dangerous to small ships.
 - The Cantor-Vell Vigil M armour plate carries 460 structure (was 100, worse than the small plate).
 - Mining ships and kit take their names from the lore: Belt Forge Collective builds the Prospector, Sinker (was Breacher), Collier (was Hulk) and the Knocker drone, with the Pick, Dowser, Assay, Sounder (was Deep Assay), Shotfirer (was Charge Rig), Hopper, Nibbler, Cradle and Cage; Corvane Heavy Industries builds the Excavator and the Furnace. Rook and Rivet stays the salvage firm.
 - Ores and charges renamed: Copperband (was Banded ore), Blackjack (was Black ore), crackers (were breach charges), and the Knocker as a good.
