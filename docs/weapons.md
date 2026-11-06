@@ -1,5 +1,7 @@
 # Weapons and power
 
+> **Changing:** the turret model (`docs/turrets.md`, agreed 6 November 2026) drops fixed guns, adds spread and laser falloff, and replaces swivels with close-in weapon systems. This doc describes the game as it is until that lands.
+
 How ships fight: the capacitor, the weapon families, damage and defence, munitions and point defence. Status: agreed design, 4 November 2026, with Jason. Milestone 6e builds it in two parts (see "Build order").
 
 Related: [ships.md](ships.md) for hulls, mounts and fitting; [design.md](design.md) for combat as it works today; [system.md](system.md) for the living system.
