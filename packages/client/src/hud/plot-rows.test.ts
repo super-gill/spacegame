@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildShip, createStarterWorld, LOADOUTS, visibleWorld, joinPilot, pilotShip, type Ship, type World } from '@spacegame/sim';
-import { arrivalSeconds, clockWords, closingSpeed, lockWords, PLOT_PRESETS, plotPosition, plotRows, plotView } from './plot-rows.js';
+import { arrivalSeconds, clockWords, closingSpeed, lockWords, PLOT_DISTANCE_BAND, PLOT_PRESETS, plotPosition, plotRows, plotView, type PlotRow } from './plot-rows.js';
 
 /** Ana in a starter far out in open space, with whatever ships are passed, and no rocks. */
 function around(...others: Ship[]): { world: World; mine: Ship } {
@@ -69,6 +69,25 @@ describe('the Plot', () => {
     expect(rows.map((r) => r.id)).toEqual(['c1', 'g1']);
     expect(Math.round(rows[0]!.closing)).toBe(50);
     expect(Math.round(rows[1]!.closing)).toBe(-40);
+  });
+
+  it('lists your drones first on the mining tab, so their flying does not shuffle the rocks', () => {
+    const row = (id: string, kind: PlotRow['kind'], dist: number): PlotRow => ({ id, kind, dist, closing: 0, type: '', name: '', side: 'rock', lock: null, dark: false, lockable: true });
+    const mining = PLOT_PRESETS.find((p) => p.id === 'mining')!;
+    const rows = [row('r1', 'rock', 100), row('d1', 'drone', 900), row('r2', 'rock', 300), row('d2', 'drone', 50)];
+    expect(plotView(rows, mining, 'dist').map((r) => r.id)).toEqual(['d2', 'd1', 'r1', 'r2']);
+  });
+
+  it('keeps the shown order for rows within the distance band, and swaps once the gap is real', () => {
+    const row = (id: string, dist: number): PlotRow => ({ id, kind: 'rock', dist, closing: 0, type: '', name: '', side: 'rock', lock: null, dark: false, lockable: true });
+    const mining = PLOT_PRESETS.find((p) => p.id === 'mining')!;
+    const shown = ['a', 'b'];
+    // b is now a little nearer than a, inside the band: no swap.
+    expect(plotView([row('a', 410), row('b', 400)], mining, 'dist', shown).map((r) => r.id)).toEqual(['a', 'b']);
+    // b is clearly nearer: it moves up.
+    expect(plotView([row('a', 400 + PLOT_DISTANCE_BAND + 10), row('b', 400)], mining, 'dist', shown).map((r) => r.id)).toEqual(['b', 'a']);
+    // With nothing shown before, plain distance.
+    expect(plotView([row('a', 410), row('b', 400)], mining, 'dist').map((r) => r.id)).toEqual(['b', 'a']);
   });
 
   it('works out closing speed, arrival and the clock', () => {

@@ -1,3 +1,5 @@
+import { RETICLE_STYLES, type ReticleStyle } from './render/reticle.js';
+
 /**
  * Client settings: how this browser shows the game. Not part of the
  * world, so they are not in saves and are not shared with other pilots.
@@ -16,10 +18,12 @@ export interface Settings {
   /** Warning sounds (hud/tones.ts): volume 0 to 1, and off altogether. */
   soundVolume: number;
   soundMuted: boolean;
+  /** The aim reticle drawn at the pointer with mouse steering (render/reticle.ts); `plain` is the browser's crosshair. */
+  reticle: ReticleStyle;
 }
 
 const KEY = 'spacegame.settings';
-const DEFAULTS: Settings = { showLabels: true, mouseSteering: true, soundVolume: 0.5, soundMuted: false };
+const DEFAULTS: Settings = { showLabels: true, mouseSteering: true, soundVolume: 0.5, soundMuted: false, reticle: 'ring' };
 
 export function loadSettings(): Settings {
   try {
@@ -31,6 +35,7 @@ export function loadSettings(): Settings {
         mouseSteering: typeof s.mouseSteering === 'boolean' ? s.mouseSteering : DEFAULTS.mouseSteering,
         soundVolume: typeof s.soundVolume === 'number' && s.soundVolume >= 0 && s.soundVolume <= 1 ? s.soundVolume : DEFAULTS.soundVolume,
         soundMuted: typeof s.soundMuted === 'boolean' ? s.soundMuted : DEFAULTS.soundMuted,
+        reticle: RETICLE_STYLES.some((r) => r.id === s.reticle) ? s.reticle! : DEFAULTS.reticle,
       };
     }
   } catch {

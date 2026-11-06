@@ -86,6 +86,7 @@ import {
   type ShipStyle,
 } from './render/draw.js';
 import { Plot, type NavTarget } from './hud/plot.js';
+import { drawReticle } from './render/reticle.js';
 import { arrivalSeconds, clockWords, closingSpeed, plotName, plotPosition } from './hud/plot-rows.js';
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
@@ -231,6 +232,13 @@ controlsPanel.offerSound(
   },
   (tier) => tones.play(tier),
 );
+// The aim reticle (render/reticle.ts): drawn at the pointer over open space; the browser's cursor hides there.
+canvas.classList.toggle('reticle-drawn', settings.reticle !== 'plain');
+controlsPanel.offerReticle(settings.reticle, (style) => {
+  settings.reticle = style;
+  saveSettings(settings);
+  canvas.classList.toggle('reticle-drawn', style !== 'plain');
+});
 
 const market = new MarketPanel(document.getElementById('market-container')!, (request) => trade(request));
 const outfitting = new OutfittingPanel(document.getElementById('outfitting-container')!, (request) => refit(request));
@@ -948,6 +956,11 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     if (gun && distance(mine.position, target.position) <= gun.range * 1.5) {
       drawLeadMarker(ctx!, camera, leadPoint(mine, target, gun.projectileSpeed), target.position);
     }
+  }
+  // The aim reticle last, over everything in space, while the pointer steers.
+  // Drawn docked or shipless too: the browser's cursor is hidden over the canvas either way.
+  if (settings.mouseSteering && input.pointer && input.pointerOnGame) {
+    drawReticle(ctx!, settings.reticle, input.pointer, mine?.state === 'flying' ? (view?.heading ?? null) : null, headingLocked);
   }
 
   if (mine?.state === 'docked') {

@@ -48,12 +48,14 @@ export interface PlotPreset {
   kinds: readonly PlotKind[];
   /** Sorted by distance, hostiles come first, then unknown contacts, then the rest. */
   threatsFirst?: boolean;
+  /** Kinds listed ahead of the rest whatever the sort, as their own group (your drones on the mining tab). */
+  groupFirst?: readonly PlotKind[];
 }
 
 export const PLOT_PRESETS: readonly PlotPreset[] = [
   { id: 'general', label: 'GENERAL', kinds: ['ship', 'station', 'cache'] },
   { id: 'combat', label: 'COMBAT', kinds: ['ship'], threatsFirst: true },
-  { id: 'mining', label: 'MINING', kinds: ['rock', 'cache', 'drone'] },
+  { id: 'mining', label: 'MINING', kinds: ['rock', 'cache', 'drone'], groupFirst: ['drone'] },
 ];
 
 export type PlotColumnId = 'dist' | 'type' | 'name' | 'closing' | 'lock';
@@ -149,23 +151,41 @@ export function plotRows(world: World, mine: Ship, pilotId: string): PlotRow[] {
 }
 
 /**
+ * Rows closer together than this in distance, units, keep the order they
+ * were last shown in, so two rocks at nearly the same range do not swap
+ * back and forth as you drift (Jason saw the list fidget in the belt).
+ */
+export const PLOT_DISTANCE_BAND = 50;
+
+/**
  * The rows one tab shows, in order. Column heads sort; distance sorts
  * nearest first, closing speed fastest closing first, lock state locked
  * first. A tab with `threatsFirst` puts hostiles, then unknown contacts,
- * ahead of the rest when sorted by distance.
+ * ahead of the rest when sorted by distance; one with `groupFirst` lists
+ * those kinds first, as their own group. Pass the ids in the order last
+ * shown as `previous`: sorted by distance, rows within
+ * `PLOT_DISTANCE_BAND` of each other keep that order.
  */
-export function plotView(rows: readonly PlotRow[], preset: PlotPreset, sort: PlotColumnId): PlotRow[] {
+export function plotView(rows: readonly PlotRow[], preset: PlotPreset, sort: PlotColumnId, previous: readonly string[] = []): PlotRow[] {
   const listed = rows.filter((r) => preset.kinds.includes(r.kind));
+  const was = new Map(previous.map((id, i) => [id, i]));
+  const group = (r: PlotRow): number => (preset.groupFirst?.includes(r.kind) ? 0 : 1);
+  const byDistance = (a: PlotRow, b: PlotRow): number => {
+    const ia = was.get(a.id);
+    const ib = was.get(b.id);
+    if (ia !== undefined && ib !== undefined && Math.abs(a.dist - b.dist) < PLOT_DISTANCE_BAND) return ia - ib;
+    return a.dist - b.dist;
+  };
   const lockRank = (r: PlotRow): number => (r.lock === 'active' ? 0 : r.lock === 'locked' ? 1 : r.lock === 'locking' ? 2 : 3);
   const threat = (r: PlotRow): number => (r.side === 'hostile' ? 0 : r.side === 'unknown' ? 1 : 2);
   const by: Record<PlotColumnId, (a: PlotRow, b: PlotRow) => number> = {
-    dist: (a, b) => (preset.threatsFirst ? threat(a) - threat(b) : 0) || a.dist - b.dist,
+    dist: (a, b) => (preset.threatsFirst ? threat(a) - threat(b) : 0) || byDistance(a, b),
     type: (a, b) => a.type.localeCompare(b.type) || a.dist - b.dist,
     name: (a, b) => a.name.localeCompare(b.name) || a.dist - b.dist,
     closing: (a, b) => b.closing - a.closing || a.dist - b.dist,
     lock: (a, b) => lockRank(a) - lockRank(b) || a.dist - b.dist,
   };
-  return listed.sort((a, b) => by[sort](a, b) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  return listed.sort((a, b) => group(a) - group(b) || by[sort](a, b) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
 /** The LOCK column's words. A dark contact you are not locking reads DARK. */

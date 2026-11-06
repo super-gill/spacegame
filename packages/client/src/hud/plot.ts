@@ -74,7 +74,7 @@ export class Plot {
 
     const all = plotRows(world, ship, pilotId);
     const preset = PLOT_PRESETS.find((p) => p.id === this.tab) ?? PLOT_PRESETS[0]!;
-    const rows = plotView(all, preset, this.sort);
+    const rows = plotView(all, preset, this.sort, this.order ? this.order.split(' ') : []);
     const range = shipStats(world, ship).sensorRange;
     setText(this.summary, `${rows.length} ${rows.length === 1 ? 'CONTACT' : 'CONTACTS'} · RADAR ${range.toLocaleString('en-GB')} u`);
     this.empty.classList.toggle('hidden', rows.length > 0);

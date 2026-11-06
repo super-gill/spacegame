@@ -1193,6 +1193,11 @@ button:hover {
   cursor: crosshair;
 }
 
+/* A drawn aim reticle (render/reticle.ts) replaces the crosshair over open space; windows keep their own pointer. */
+#game.mouse-steering.reticle-drawn {
+  cursor: none;
+}
+
 /* Windows (hud/windows.ts): one frame for every small in-flight panel. */
 .hud-window {
   position: absolute;

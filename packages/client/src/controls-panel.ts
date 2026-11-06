@@ -1,3 +1,4 @@
+import { RETICLE_STYLES, type ReticleStyle } from './render/reticle.js';
 import { FLIGHT_MODES, FLIGHT_MODE_LABELS, type FlightMode } from '@spacegame/sim';
 import { KEY_BINDINGS, POINTER_CONTROLS, isMouseCode, keyName } from './bindings.js';
 import type { Tier } from './hud/warnings.js';
@@ -112,6 +113,26 @@ export class ControlsPanel {
     }
     box.append(volumeRow, offRow, tryRow);
     (this.panel.querySelector('.steering:not(.sound)') ?? this.panel.querySelector('.controls-header')!).after(box);
+  }
+
+  /**
+   * The aim reticle styles (render/reticle.ts), below the steering
+   * choice, to pick by flying with each. `choose` saves the pick.
+   */
+  offerReticle(current: ReticleStyle, choose: (style: ReticleStyle) => void): void {
+    const box = el('fieldset', 'steering reticle');
+    box.append(el('legend', undefined, 'Aim reticle (mouse steering)'));
+    for (const style of RETICLE_STYLES) {
+      const row = el('label', 'steering-choice');
+      const radio = el('input');
+      radio.type = 'radio';
+      radio.name = 'reticle';
+      radio.checked = style.id === current;
+      radio.addEventListener('change', () => radio.checked && choose(style.id));
+      row.append(radio, el('strong', undefined, ` ${style.label}`), el('span', 'note', ` ${style.note}`));
+      box.append(row);
+    }
+    (this.panel.querySelector('.steering:not(.sound):not(.reticle)') ?? this.panel.querySelector('.controls-header')!).after(box);
   }
 
   /** Show the steering scheme chosen elsewhere (the menu). */

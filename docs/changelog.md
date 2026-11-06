@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Name colours, running dark and the Plot from the lore.
 - Name close-in weapon systems swivels, from the lore.
 - The Plot (P): a window listing what is around you, with distance, type, name, closing speed and your lock. Tabs for general, combat (hostiles first) and mining (rocks, caches, your drones); click a column to sort. Click a row to make it your nav target; right-click a ship or rock to lock it.
+- Aim reticle styles for mouse steering, chosen in the Controls panel (F1): ring, brackets or dot, with a tick where your nose points now, or the plain crosshair. Over windows the normal pointer shows.
 - The nav target: a marker over it, or at the screen edge pointing its way, with its distance and arrival time.
 - Colours: every ship shows its Registry beacon unless it runs dark (K, or click the COLOURS chip by your credits). A ship running dark is only a radar contact, small, medium or large, until someone locks and identifies it; the server sends nothing else about it. Pirates and arena enemies run dark.
 - Warnings with sounds: a banner at the top centre lists what holds now (missiles inbound or about to hit, shields low or down, hull low or critical, someone locking you, a collision ahead with a rock or station, pirates hunting you, an empty capacitor, a full hold with the tractor on, gravity), highest tier first, each with its own tone; alarms repeat until they clear or you click to silence them. Locks completing, targets destroyed, drones lost and the like sound with their toast. Volume and an off switch in the Controls panel (F1).
@@ -23,6 +24,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Drones thrust backwards and sideways like a ship with thrusters, so they back off and sidestep among rocks instead of only flying where they point. Ships are unchanged.
 
 ### Fixed
+- The Plot's mining tab no longer fidgets with drones out: your drones are listed first, and rows at nearly the same range keep their order.
 - Rocks no longer stutter beside you when orbits are on: they are drawn smoothly between server updates, like ships and planets.
 - Drones (and NPC miners) close to a rock no longer plan straight through it and rub along its face; a prospector's drone in a crowded patch could get stuck that way and never cut.
 - Drones no longer get boxed in against a rock by a sister drone cutting on the same face; drones of one mother pass through each other, so they no longer steer round each other.
