@@ -19,6 +19,7 @@ import {
   leadPoint,
   incomingMunitions,
   isMainGun,
+  gunBearing,
   lockReadout,
   cargoUsed,
   holdCapacity,
@@ -84,6 +85,7 @@ import {
 } from './render/draw.js';
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
 import { drawStarfield } from './render/starfield.js';
+import { coverage, drawGunArcs } from './render/gun-arcs.js';
 import { BUY_REFUSALS, ShipMartPanel } from './ship-mart-panel.js';
 import { FlightHud } from './hud/flight-hud.js';
 import { Radar } from './hud/radar.js';
@@ -801,6 +803,19 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
     const reads = mine && ship.id !== mine.id && ship.state === 'flying' ? lockReadout(current, mine, ship.id) : null;
     if (ship.state === 'flying' && (ship.id === mine?.id || reads?.condition?.shield === 'up' || reads?.combat)) {
       drawShieldArc(ctx!, camera, shipView.position, shipView.heading, hull.radius, stats.shieldArc, stats.shield > 0 ? ship.shield / stats.shield : 0);
+    }
+    // Your main guns' coverage ring and where each points, while weapons are hot.
+    if (ship.id === mine?.id && ship.state === 'flying' && ship.weaponsHot) {
+      const guns = ship.weapons.filter((w) => {
+        const spec = stats.weapons[w.mountId];
+        return spec !== undefined && isMainGun(spec);
+      });
+      const arcs = guns.flatMap((w) => {
+        const mount = hull.mounts.find((m) => m.id === w.mountId);
+        return mount ? [{ facing: mount.facing, arc: mount.arc ?? Math.PI * 2 }] : [];
+      });
+      const ticks = guns.map((w) => ({ aim: w.aim, bearing: gunBearing(current, ship, stats, w.mountId) }));
+      drawGunArcs(ctx!, camera, shipView.position, shipView.heading, hull.radius, coverage(arcs), ticks);
     }
     if (hull.escapePod && ship.state === 'flying') drawPodBeacon(ctx!, camera, shipView.position, hull.radius, nowMs);
     // Health bars only for ships your targeting computer can read: a complete lock with combat readout.

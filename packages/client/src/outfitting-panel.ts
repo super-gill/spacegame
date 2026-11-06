@@ -415,7 +415,17 @@ export class OutfittingPanel {
       fit = changed;
       after = fitStats(world, hull, changed, cargo);
     }
-    this.drawShip(hull, fit);
+    // Mounts carrying a main gun in the fit shown: their arcs are drawn faintly.
+    const gunMounts = new Set(
+      Object.entries(fit)
+        .filter(([, moduleId]) => {
+          const weaponId = world.modules[moduleId]?.weaponId;
+          const weapon = weaponId ? world.weapons[weaponId] : undefined;
+          return weapon !== undefined && isMainGun(weapon);
+        })
+        .map(([mountId]) => mountId),
+    );
+    this.drawShip(hull, fit, gunMounts);
     this.renderBudgets(world, ship, now, after);
     this.renderStats(now, after);
   }
@@ -463,7 +473,7 @@ export class OutfittingPanel {
     this.budgets.replaceChildren(...parts);
   }
 
-  private drawShip(hull: HullSpec, fit: Readonly<Record<string, string>>): void {
+  private drawShip(hull: HullSpec, fit: Readonly<Record<string, string>>, gunMounts: ReadonlySet<string>): void {
     const ctx = this.canvas.getContext('2d');
     if (!ctx) return;
     const dpr = window.devicePixelRatio || 1;
@@ -484,7 +494,35 @@ export class OutfittingPanel {
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
+    this.drawGunArcs(ctx, hull, gunMounts, scale);
     this.drawSlots(ctx, hull, fit, scale);
+  }
+
+  /**
+   * Every fitted main gun's arc, faint, so the ship's coverage and blind
+   * spots show at a glance; the selected mount's is drawn over it in amber
+   * (`drawSlots`).
+   */
+  private drawGunArcs(ctx: CanvasRenderingContext2D, hull: HullSpec, gunMounts: ReadonlySet<string>, scale: number): void {
+    const r = Math.min(PREVIEW_W, PREVIEW_H) * 0.42;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(159, 211, 199, 0.25)';
+    ctx.fillStyle = 'rgba(159, 211, 199, 0.035)';
+    ctx.lineWidth = 1;
+    for (const m of hull.mounts) {
+      if (m.id === this.selected || !gunMounts.has(m.id) || m.arc === undefined) continue;
+      const p = { x: PREVIEW_W / 2 + m.position.x * scale, y: PREVIEW_H / 2 + m.position.y * scale };
+      ctx.beginPath();
+      if (m.arc >= Math.PI * 2 - 1e-6) ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      else {
+        ctx.moveTo(p.x, p.y);
+        ctx.arc(p.x, p.y, r, m.facing - m.arc / 2, m.facing + m.arc / 2);
+        ctx.closePath();
+      }
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   /** Each slot where it sits, by tier and size; the selected high or CIWS slot's arc. */

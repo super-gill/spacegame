@@ -13,7 +13,9 @@ Related: [controls.md](controls.md) for what is on screen today; [turrets.md](tu
 
 ## 1. Turret arcs and aim
 
-Draw where each main gun can bear and where it is pointing, on the HUD round your ship and in the fitting window. Comes from `MountPoint.arc`, `WeaponState` and `gunBearing`. Sketches first.
+Draw where each main gun can bear and where it is pointing, on the HUD round your ship and in the fitting window. Comes from `MountPoint.arc`, `WeaponState` and `gunBearing`.
+
+**Built** (Jason chose option B and the fitting view from the sketches on the mockup canvas, 6 November 2026; he judges it in play): a coverage ring round your own ship while weapons are hot (`render/gun-arcs.ts`), thicker where more main guns bear and missing where none can, with a tick per gun at its aim coloured by `gunBearing`; in outfitting and the fitter, every fitted main gun's arc faint under the selected mount's amber one. The sketches' rejected options: A (a wedge per gun, busy) and C (aim lines only, no blind spots shown).
 
 ## 2. Audible warnings
 

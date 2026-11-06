@@ -8,6 +8,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - Name colours, running dark and the Plot from the lore.
 
 ### Changed
+- With weapons hot, a ring round your ship shows where your main guns can bear (thicker where more can, missing in blind spots), with a tick for where each gun points: bright when it bears on your lock, amber while it turns.
+- Outfitting and the fitter draw every fitted main gun's arc faintly, with the selected mount's over them.
 - The server sends each player only what they can see: ships and shots within their sensor range (plus a margin), their own ships and caches wherever they are. Other players' credits, storage and ship holds are no longer sent to anyone (a lock whose computer reads cargo still sees a hold).
 - Your own shots and missiles are drawn leaving from your guns, rather than from where your ship was a moment ago.
 

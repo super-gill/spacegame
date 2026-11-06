@@ -179,6 +179,8 @@ The flight HUD sits at the screen edges and leaves the middle clear. Clicks go t
 
 - Your ship is white. Traders are blue-grey, pirates red. NPC labels (`TRADER`, `PIRATE · HUNTING YOU`) are a development aid and may go later.
 - Each station shows its dock range (inner dashed ring) and security zone (faint outer dashed ring).
+- With weapons hot, a ring round your ship (just outside the blue shield arc) shows where your main guns can bear: thicker where more of them can, missing where none can (your blind spots). A tick on it for each gun shows where it points now: bright when it bears on your lock, amber while it turns, dim when it cannot reach or has no lock.
+- In outfitting and the fitter, every fitted main gun's arc is drawn faintly on the ship; the selected high or CIWS mount's arc is drawn over them in amber, with its blind spot.
 - Damaged ships show shield (top) and structure (bottom) bars. Your shots are white, pirate shots red, trader shots blue-grey.
 - Loot canisters are small orange diamonds. Wrecks are dashed outlines that fade.
 - Stations have landing pads round the rim. Docked ships, yours and others, sit on them.
