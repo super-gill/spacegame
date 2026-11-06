@@ -31,7 +31,7 @@ Chats cannot message each other: this file, branches and commits are the only ch
 
 Names and lore wanted from the lore chat. The game uses working names until these come back; the lead applies the answers. Newest first.
 
-- **The contacts list** (2026-11-06): the in-world name for the sortable list of contacts round your ship (EVE's overview). Working name **the Plot**, after a navy ops room's picture of contacts; keep or replace. `docs/interface.md`.
+- **The contacts list and transponders** (2026-11-06): the in-world name for the sortable list of contacts round your ship (EVE's overview; working name **the Plot**, after a navy ops room's picture of contacts; keep or replace), and the lore of transponders: ships broadcasting their identity, running dark, stations' beacons, and how each people regards a ship that hides itself. `docs/interface.md`.
 
 - **Close-in weapon systems and fire control** (2026-11-06, changed by Lead 5): the separate turreted guns are gone (every main gun is a turret now, so the guns keep their names). Wanted instead: names for close-in weapon systems (CIWS, replacing the swivel on medium hulls and up, build step 3 of `docs/turrets.md`) and the Paragon Gunlayer L (fire control for eight swivels, later for CIWS).
 - **Big ships** (2026-11-05): the Kessari brig (working name Kessari Injunction, by Kessari Orbital Defence) and the Free Belt frigate (working name Union Defence Works Walkout); the large kit that came with them: the Slagline Runner L and Jink L, the Ito-Marr Bastion L, and the Union Defence Works Bulwark L armour. Union Defence Works names its guns for labour actions (Picket, Lockout), hence the Walkout.

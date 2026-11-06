@@ -42,7 +42,7 @@ Draft events (to settle while building; thresholds are working numbers):
 - **Columns:** distance, what it is (hull class, station, rock, cache), name, closing speed, lock state.
 - **Filters:** presets first: General, Combat (ships only, hostiles first), Mining (rocks, caches, your drones), and likely Trading, Nav and anti-drone. Filters and columns are data from the start, so the next step can make them editable and save named layouts in settings for reuse.
 - **Acting from it:** right-click a row to lock (as on screen: left acts, right chooses); click to select it and make it the nav target.
-- **Open:** what an unlocked contact shows. Lead's suggestion: size and distance only, with name and ship once locked, so the list follows the targeting computer; or names at once, as EVE does. Today the server sends every pilot's name and ship in sensor range.
+- **Transponders decide what an unlocked contact shows** (Jason, 6 November 2026): a ship broadcasting its transponder shows its name and hull at once; one running dark, or without one, is a radar contact (size and distance) until locked and identified by your targeting computer. Stations broadcast beacons and are always named; rocks and caches are radar returns by kind. Lead's notes: a switch every ship has for now (a fitted module maybe later); NPC traders and the Watch broadcast, pirates run dark; whether running dark is legal, suspicious or a crime belongs to law (7). Today the server sends every pilot's name and ship in sensor range: `visibleWorld` will have to hold identity back for ships running dark.
 
 **The nav target:** a marker at the edge of the screen with distance and arrival time.
 
