@@ -25,7 +25,7 @@ Naval yards in bold. Specialities in brackets; the gaps between powers are delib
 | Home | Companies |
 | --- | --- |
 | Everywhere | Meridian Civil Yards (starter ships, shuttles, couriers, pods), Paragon Arms (open-market weapons, PDCs, fire control), Corvane Heavy Industries (heavy mining plant; an Earth firm in Belt yards) |
-| Earth | **Kessari Orbital Defence** (patrol hulls, munitions), Ito-Marr Dynamics (launchers, shields, power, countermeasures), Tessaract Logistics (haulers, freighters, containers, survey), Novum Systems (sensors, electronic warfare, decoys; Lunar) |
+| Earth | **Kessari Orbital Defence** (patrol hulls, munitions), Ito-Marr Dynamics (launchers, shields, power, countermeasures), Tessaract Logistics (haulers, freighters, containers, survey), Novum Systems (sensors, electronic warfare, decoys; Lunar), Vantage Aerospace (crewed fighters, no hulls; Lunar) |
 | Mars | **Seraphine Naval Yards** (warships), Arcadia Works (state civilian hulls, one per job), Cantor-Vell Arms (energy weapons, armour) |
 | Venus | **Ishtar Fleet Works** (railgun and blaster hulls), Solace Medical (support, rescue), Arbor Dynamics (drones), Halden Institute (exploration, scanners) |
 | The Belt | **Union Defence Works** (militia gunboats, projectile guns, heavy armour), Belt Forge Collective (mining ships and kit, drones, breaching), Rook and Rivet (salvage, tugs, patch armour), Slagline Motors (engines, thrusters, afterburners, flares) |

@@ -403,6 +403,10 @@ Two ladders: military and civilian. The class says what a hull was built as; the
 
 The Aurel Tacet sits outside both ladders. Humans call any Aurel ship simply a **voice**.
 
+### Small craft and drones
+
+Fighters and drones are products carried in bays, built by companies and bought like modules; navy yards build the carriers, not what they carry. Light combat craft sell openly, heavy ones behind standing or a licence. Industrial craft (mining skiffs, Knockers, runabouts) have mining mounts only and can never be armed. Not every power flies crewed fighters: Earth's come from Vantage Aerospace on Luna, Mars builds its own through Arcadia Works, Venus flies Arbor drones instead, and the Belt flies second-hand Vantage fighters and clan-built raiders. Details in `fleet.md`, "Small craft and drones".
+
 Variety comes from companies with overlapping product lines: Earth, Venus and the Belt each build a courier, a hauler and a freighter, so three different hulls do one job, and the system generator picks by who holds the system. The catalogue grows into this, two or three makers' hulls per role and size over time.
 
 ## Mining and materials
@@ -456,6 +460,7 @@ Makers are companies with a home power and one or two specialities. The powers d
 | **Ishtar Fleet Works** | Venus | Railgun and blaster hulls, the Coastguard's ships | 10 GW, after the Ceres Accord | Proud that its ships have never fired first in a war |
 | **Solace Medical** | Venus | Support ships: repair, shield transfer, rescue | Before the gate | Protected by the Mercy Clause |
 | **Arbor Dynamics** | Venus | Drones, drone bays, drone control | 95 GW | Its drones are grown as much as built |
+| **Vantage Aerospace** | Luna (Earth) | Crewed fighters, light and heavy; builds no hulls | 7 GW, in the Gate War | Names its craft for blades |
 | **Halden Institute** | Venus | Research and exploration ships, scanners | Before the gate | Holds the living voice fragment |
 | **Belt Forge Collective** | The Belt | Mining ships and kit, drones, breaching | After the Strikes | Belt Forge against Corvane is the oldest trade rivalry in known space |
 | **Rook and Rivet** | The Belt | Salvage hulls and gear, tugs | After the Strikes | A thick book of who owes it |
@@ -721,6 +726,7 @@ Lore decisions by Jason, newest first. Decisions from before 6 November that nam
 - 2026-11-06: Crew is a direction, not part of the pivot: a system, never a people sim; costs and risks only.
 - 2026-11-06: Backgrounds, not careers, at character creation (agreed in principle with the rewrite): origin plus background, nothing locks.
 - 2026-11-06: Each power has a navy with dedicated hulls from its yard. Mars's civilian hulls come from one state yard, Arcadia Works, named what they are.
+- 2026-11-06: Small craft and drones are company-built products in bays, never from navy yards (Mars excepted); light combat craft sell openly, heavy ones behind standing or a licence; industrial craft are never armed. Only Earth (Vantage Aerospace) and Mars (Arcadia) build crewed fighters; Venus flies Arbor drones; the Belt flies second-hand and clan craft.
 - 2026-11-06: Shields stay. Earth tanks with shields, Mars with armour, Venus with a regenerative mix, the Belt with whatever it has.
 - 2026-11-06: Generations: legacy hulls out of production on a used market, production hulls, pattern hulls behind standing (`fleet.md`).
 - 2026-11-06: Close-in weapon systems: the ballistic one is the Paragon Sentry M; the later laser one is Cantor-Vell's; the big fire control is Paragon's L. (Words updated by the pivot: PDC, Cordon, Fire Control.)
