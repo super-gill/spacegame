@@ -37,12 +37,12 @@ Draft events (to settle while building; thresholds are working numbers):
 
 ## 3. The Plot, the nav target and the selection window
 
-**The Plot** (working name, after a navy ops room's picture of contacts; lore ask open) is a sortable, filterable list of what is around you, the job EVE's overview does. Decisions (Jason, 6 November 2026):
+**The Plot** (named by the lore, `lore.md`, "The Plot") is a sortable, filterable list of what is around you, the job EVE's overview does. Decisions (Jason, 6 November 2026):
 
 - **Columns:** distance, what it is (hull class, station, rock, cache), name, closing speed, lock state.
 - **Filters:** presets first: General, Combat (ships only, hostiles first), Mining (rocks, caches, your drones), and likely Trading, Nav and anti-drone. Filters and columns are data from the start, so the next step can make them editable and save named layouts in settings for reuse.
 - **Acting from it:** right-click a row to lock (as on screen: left acts, right chooses); click to select it and make it the nav target.
-- **Transponders decide what an unlocked contact shows** (Jason, 6 November 2026): a ship broadcasting its transponder shows its name and hull at once; one running dark, or without one, is a radar contact (size and distance) until locked and identified by your targeting computer. Stations broadcast beacons and are always named; rocks and caches are radar returns by kind. The transponder is an innate part of every ship, not a module (Jason, same day): a switch, on by default. Lead's notes: NPC traders and the Watch broadcast, pirates run dark; whether running dark is legal, suspicious or a crime belongs to law (7). Today the server sends every pilot's name and ship in sensor range: `visibleWorld` will have to hold identity back for ships running dark.
+- **Colours decide what an unlocked contact shows** (Jason, 6 November 2026; names from `lore.md`, "Colours": the transponder is the Registry beacon, pilots call it colours; HUD words **colours** and **dark** for the switch and its state, **light** for a station's beacon): a ship showing its colours shows its name and hull at once; one running dark, or with no colours to show (Hiveless, Aurel), is a radar contact (size and distance) until locked and identified by your targeting computer. Stations always show their light and are always named; rocks and caches are radar returns by kind. The transponder is an innate part of every ship, not a module (Jason, same day): a switch, on by default. Lead's notes: NPC traders and the Watch broadcast, pirates run dark; whether running dark is legal, suspicious or a crime belongs to law (7). Today the server sends every pilot's name and ship in sensor range: `visibleWorld` will have to hold identity back for ships running dark.
 
 **The nav target:** a marker at the edge of the screen with distance and arrival time.
 

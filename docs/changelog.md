@@ -4,6 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+- Name colours, running dark and the Plot from the lore.
+
 ### Changed
 - The server sends each player only what they can see: ships and shots within their sensor range (plus a margin), their own ships and caches wherever they are. Other players' credits, storage and ship holds are no longer sent to anyone (a lock whose computer reads cargo still sees a hold).
 - Your own shots and missiles are drawn leaving from your guns, rather than from where your ship was a moment ago.
