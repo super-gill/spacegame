@@ -1,12 +1,12 @@
 # Lore
 
-Status: canon for the game, 3 November 2026. Owned by the lore workstream (`ws/lore`). Where this file and any claude.ai doc disagree, this file wins. Names are placeholders until Jason confirms them.
+Status: canon for the game, rewritten 6 November 2026 for the Sol pivot. Owned by the lore chat (`ws/lore`). Where this file and any claude.ai doc disagree, this file wins. The proposal that led here is the claude.ai doc "Spacegame: The Sol Pivot"; the pre-pivot setting is summarised under "Retired" at the end.
 
-Related: [races.md](races.md) for what each race and maker does in play, [ships.md](ships.md) for hulls and modules, [design.md](design.md) for rules.
+Related: [races.md](races.md) for the powers and companies as the code sees them, [ships.md](ships.md) for hulls and modules, [design.md](design.md) for rules.
 
 ## The premise in one paragraph
 
-The known universe is the Meridian Arm, a spiral arm laced with an ancient network of gates called the Lattice. The Aurel built the Lattice, then put it to sleep 40,000 years ago to cage something they had created. Humans arrived 612 years ago, woke the gates, and have built six centuries of history on top of a sleeping prison. Every gate woken for profit is another road out of the cage. Almost nobody knows this.
+Humanity grew up in the solar system and found, out past the outer moons, a gate that had been asleep for forty thousand years. A Belter crew woke it by accident. The gate was one of thousands, a network called the Lattice, built by an alien people called the Aurel, who put it to sleep to cage something they had made and then withdrew. Two and a half centuries later humans have woken a few hundred gates, settled the systems behind them, fought one short war over the door and signed a treaty about it. Every gate woken for profit is another road out of the cage. Almost nobody knows this.
 
 ## How to use this file
 
@@ -16,22 +16,30 @@ Lore is written in three layers so the game can reveal it slowly.
 | --- | --- | --- |
 | Canon | What actually happened | Nobody in the game knows all of it |
 | Common knowledge | What any pilot knows from school, news and station gossip | Everyone |
-| Belief | What each people thinks happened, often wrong in useful ways | That people, and scholars |
+| Belief | What each power thinks happened, often wrong in useful ways | That power, and scholars |
 
 Sections mark canon that pilots do not know with **(canon, hidden)**. Everything else is common knowledge unless it says otherwise.
 
 Rules:
 
 - **Every mystery has an answer here,** even if the game never says it, so writers and quests hint consistently.
-- **Lore explains mechanics but never sets them.** Witness-based crime, Vael-only support and unbuyable Aurel ships all have an in-world reason below, but numbers and rules live in the design docs. Lore that needs a mechanic goes to "Requests to the lead" in `coordination.md`.
-- **No people is the villain.** Each has a grievance, a virtue and a secret.
-- **Dates** are years After Landfall (AL). The present day is 612 AL.
+- **Lore explains mechanics but never sets them.** Witness-based crime, Venus-only support and unbuyable Aurel ships all have an in-world reason below, but numbers and rules live in the design docs. Lore that needs a mechanic goes to the lead through `coordination.md`.
+- **No power is the villain.** Each has a grievance, a virtue and a secret.
+- **Humanised names.** People, companies and ships carry names humans would give them. Slang is welcome; an invented language is not.
+- **Expanse-age language.** Burn, flip, coast, float, drum, juice. Military classes are corvette to dreadnought; civilian ones are courier to superfreighter. No age-of-sail words.
+- **Dates** are years since the gate woke (GW). The present day is about 240 GW.
 
-## The Arm and the Lattice
+## Sol and the Lattice
 
-There are no gods in canon. The Meridian Arm formed like any other spiral arm and life rose on a handful of worlds. The one wonder in it is the Lattice, and people made it.
+There are no gods in canon. The solar system is the one outside the window, and life rose on Earth the way the textbooks say. The one wonder in the setting is the Lattice, and people made it.
 
-The Arm's dense inner end is warm, crowded and rich in worlds. Its thin outer end runs into dust and dark. At the far tip, behind a broken belt called the Shoals, lies the Pale Reach, home of the Aurel.
+### The home system
+
+Sol is the safe core of known space: crowded, policed, rich and old. Earth and Luna, Mars, the Venusian clouds, the Belt, the outer moons. Everything humans built before the gate is here, and most of what they have built since still answers to someone here.
+
+Ships never land. Atmosphere and a deep gravity well kill a hull, and no shipwright has ever built one to survive them. Cargo and people go down and up by elevator and shuttle, offscreen; what a pilot docks at is a world's orbital port. Gas giants have a crush depth instead of a surface. Venus's cloud cities are offscreen too; pilots dock at Venus's orbital port. Falling into a well is the end of a ship, and the pod is fished out by the nearest station's rescue service.
+
+### The Lattice
 
 Travel between systems uses the Lattice: paired gates at the edge of each system, linked by lanes. A gate is:
 
@@ -39,28 +47,32 @@ Travel between systems uses the Lattice: paired gates at the edge of each system
 | --- | --- |
 | Awake | Usable |
 | Asleep | Intact but dormant; can be woken |
-| Broken | Destroyed; the gap needs a jump drive |
+| Broken | Destroyed; the gap needs a long-range jump drive, which no human has built (the gate-born hop the navies hide is in-system only) |
 
-Known space is simply the part of the Arm where humans have woken the gates.
+Known space is simply the part of the Lattice where humans have woken the gates. The Sol gate sits out past the outer moons, where a Belter prospector crew found it in year zero.
 
-### What each people believes about the beginning
+### Travel inside a system
 
-| People | Belief | The grain of truth |
+Inside a system there is no faster-than-light travel and no magic. Ships burn, flip at the midpoint and burn again to brake, and a crossing is a committed burn of minutes. A ship under burn is the most visible thing in the sky: its drive plume can be read from across the system, its destination is obvious (there are only so many stations) and at the flip it is at top speed and committed. Interceptors do not chase a burning ship. They lie on its line ahead and match velocity, or they wait at the destination for the braking burn, when the target is slow, close and cannot run. Running dark hides your name, never your plume; true stealth is a cold coast, which is slow.
+
+Orbits are slow enough that no pilot sees a planet move in a sitting, and gravity is steep enough that every pilot feels it near one. Both are the lead's numbers; the lore only asks that they feel like the window.
+
+### What each power believes about the gates
+
+| Power | Belief | The grain of truth |
 | --- | --- | --- |
-| Halcyon Dominion | The Canticle: the Radiant sang the stars into order, and the gates are their hymn made solid. Humans were led here to finish the song. | The Aurel did shape the Arm's travel, and their gates answer song-like signals |
-| Kessari Combine | No creation myth. The founding story is the Charter: the Arm is a frontier, and what you develop you own. | The Lattice was built, so in a sense it is property, just not theirs |
-| Free Belt Union | "Rock is rock." Belters distrust grand stories, having been sold one already. | Closest to canon, oddly |
-| Vael Commonwealth | Natural formation, natural life, and an unknown elder builder of the Lattice to be studied | Correct but incomplete; they badly underestimate how alive the Lattice is |
-| Oru Collective | The Long Patience: the hives were seeded by the Arm itself and watched over by the Singers, who fell silent | Very close. The Singers are the Aurel, and the Oru remember them |
-| Drifter Clans | The Wake: all peoples are travellers, and the Arm is a sea between harbours. Humans came from a harbour now lost. | True. Humans came from elsewhere, through a door that closed |
+| Earth | The Lattice is infrastructure: built, abandoned, and now owned by whoever maintains it | It was built, so in a sense it is property, just not theirs |
+| Mars | The Lattice is a test: a disciplined people will be worthy of it | The Aurel are watching, though not for discipline |
+| Venus | The builders are alive and the Lattice is their nervous system; it should be studied, not strip-mined | Correct, and badly underestimated |
+| The Belt | "Rock is rock." The gate was a rock that opened; Belters found it and Belters got robbed of it. | True, and the closest to canon about everything else |
 
 ## The Aurel
 
-**(canon, hidden)** The Aurel were once a mortal species, the Aur, who merged their minds into one shared people to escape extinction. They are cut off from the rest of the Arm because part of that shared mind went wrong, and they sealed themselves away to keep it caged.
+**(canon, hidden)** The Aurel are a fully alien people, once mortal, who merged their minds into one shared people to escape extinction. They are cut off from the rest of the Lattice because part of that shared mind went wrong, and they sealed themselves away to keep it caged. They never died; they receded.
 
 ### The Joining
 
-The Aur rose in what is now the Pale Reach over a million years ago: long-lived, few and slow to breed. Their great work, the Weaving, was the Lattice, built over thousands of years.
+The Aur rose over a million years ago, far along the Lattice from Sol: long-lived, few and slow to breed. Their great work, the Weaving, was the Lattice, built over thousands of years.
 
 The Lattice passes signals as well as ships, and the Aur learned to send thought through it. As their numbers fell, they chose to join rather than die out one by one. About 900,000 years ago every living Aur linked into the Lattice and became one shared people, the Chorus. They called themselves the Aurel: *the joined*.
 
@@ -70,315 +82,293 @@ An Aurel is the Chorus speaking through many vessels. Each vessel carries a **vo
 | --- | --- |
 | Sealed designs, cannot be refitted | A ship is a voice's body; the voice rejects foreign parts |
 | Each built for one job | Each voice is shaped for one purpose and its hull grows around it |
-| No manufacturers, no yards | The Chorus shapes ships slowly in the Pale Reach; nothing is built in a factory |
+| No manufacturers, no yards | The Chorus shapes ships slowly in its own systems; nothing is built in a factory |
 | Floating segments that do not quite touch | The voice holds the hull together with fields; when it dies, the segments drift apart |
 | Pale white with a cyan glow | The glow is the voice; a dead Aurel hull is dull white |
+| No instruments | A voice simply knows. Human scholars think the Aur built sealed hulls because they never needed to read anything. |
 
 ### The Tending
 
-About 200,000 years ago the first Oru hives rose. The Aurel tended them from a distance and never interfered openly. The Oru knew them only as the Singers: lights at the edge of the sky and a hum in the gates.
+The Aurel watched younger peoples rise along the Lattice and tended them from a distance, never interfering openly. **(canon, hidden)** There were several. The Unsung consumed every one of them. Humans are the last.
 
 ### The Quiet War and the Sundering
 
 About 40,000 years ago part of the Chorus turned. Not even the Aurel fully know why. One account says some voices grew so old they forgot they were part of something larger. Another says joining has a hunger built into it: a joined mind wants to join more.
 
-The broken voices left the Chorus. The Aurel call them the **Unsung**. They wanted to join everything, by force. They reached through the Lattice into the Oru hives and overwrote them mind by mind, and hive after hive went silent.
+The broken voices left the Chorus. The Aurel call them the **Unsung**. They wanted to join everything, by force. They reached through the Lattice into the peoples the Aurel tended and overwrote them mind by mind, and world after world went silent.
 
-The Aurel fought part of themselves, in signal more than fire. The Oru still call it the Quiet War. The Aurel won only by doing three things:
+The Aurel fought part of themselves, in signal more than fire. They won only by doing three things:
 
-1. **They caged the Unsung** in the dark beyond the Arm's outer edge, the region humans now call the Dark.
-2. **They silenced the Lattice.** The Unsung travel as signal through the gates, so the Aurel put every gate in the Arm to sleep.
-3. **They cut themselves off,** shattering the lanes around the Pale Reach and leaving the Shoals, which can only be crossed by jump drive, slowly and at great risk.
+1. **They caged the Unsung** in the far dark of the Lattice, the region humans now call the Dark.
+2. **They silenced the Lattice.** The Unsung travel as signal through the gates, so the Aurel put every gate to sleep. The Sol gate went dark with the rest, forty thousand years before anyone on Earth could have noticed.
+3. **They cut themselves off,** shattering the lanes around their own systems and leaving the Shoals, a belt of broken gates that can only be crossed by jump drive, slowly and at great risk.
 
 That was the **Sundering**. The Aurel stay apart for three reasons, in order of how much they would admit to:
 
-1. **Quarantine.** Any open link to the Reach is a road the Unsung could use.
+1. **Quarantine.** Any open link to their systems is a road the Unsung could use.
 2. **Doubt.** A voice can turn. They watch themselves as closely as they watch the cage.
-3. **Shame.** The Unsung were Aurel, and they nearly destroyed the Oru.
+3. **Shame.** The Unsung were Aurel, and every people the Aurel ever tended died of them.
 
-### The Pale Reach and the Shoals
+### Sol was always on the Lattice
 
-The Pale Reach is a dense cluster of bright stars at the tip of the Arm. The Shoals around it are a maze of broken gates, Quiet War debris and dead Aurel hulls drifting apart. Clan Saro is the only group to have crossed them and come back, once, in 588 AL.
+**(canon, hidden)** There was a sleeping gate past the outer moons for forty thousand years, and humans grew up under it without knowing. The Aurel have known about Earth the whole time. The Tending did not end with the Sundering; it went silent. A Belter crew waking the Sol gate was the first thing to happen in that system that the Chorus had not expected in forty millennia.
 
-### What each people thinks the Aurel are
+### Where they are now
 
-| People | Belief |
+Far out in the Lattice, behind the Shoals. Not the far side of a galaxy, just the far side of a network humans have explored a fraction of. The Dark, where the Unsung are caged, is the other far edge. Known space sits between the two and does not know it. One Belter deep-exploration crew crossed the Shoals in 215 GW and came back with half its people. They do not say what they saw.
+
+### What each power thinks the Aurel are
+
+| Power | Belief |
 | --- | --- |
-| Halcyon Dominion | The Radiant: holy beings who withdrew to judge humanity. Pilgrims travel to the edge of the Shoals to sing to them. |
-| Kessari Combine | An extinct or nearly extinct elder civilisation whose technology is worth a fortune |
-| Free Belt Union | Ghost stories. Every Belter has an uncle who once saw a white ship. |
-| Vael Commonwealth | The Lattice builders, probably living, and the most important research subject in the Arm |
-| Oru Collective | The Singers. The hives remember the Quiet War and fear both the Aurel and the Unsung, and will not say why. |
-| Drifter Clans | Neighbours who do not open the door. Clan Saro knows more than it tells. |
+| Earth | An extinct or nearly extinct elder civilisation whose technology is worth a fortune |
+| Mars | The builders, living, and judging. Martian officers do not say so in public. |
+| Venus | The builders, living, and the most important research subject in known space |
+| The Belt | Ghost stories. Every Belter has an uncle who once saw a white ship, and one crew that did. |
 
 ### Aurel ships in the hands of pilots
 
-Three routes, each rarer than the last (confirmed 4 November 2026). When each opens in play is the lead's call.
+Three routes, each rarer than the last. When each opens in play is the lead's call.
 
 - **Husks.** Dead hulls from the Quiet War drift in the Shoals and the Dark. A husk has no voice: no fields, no glow, unflyable. Its parts are priceless to researchers.
-- **The one on the pad.** Very rarely a living Aurel ship turns up for sale at a remote station at an absurd price. **(canon, hidden)** These are voices the Chorus sends out on purpose, to be flown by younger peoples and to watch them. Whoever buys one is being studied.
+- **The one on the pad.** Very rarely a living Aurel ship turns up for sale at a remote station at an absurd price. **(canon, hidden)** These are voices the Chorus sends out on purpose, to be flown by a younger people and to watch them. Whoever buys one is being studied.
 - **Gifted.** A pilot who fights the Unsung again and again may one day be met at the Shoals by an Aurel ship that simply waits for them. The legendary endgame route.
 
-Today's sealed development ship becomes an Aurel hull, the Tacet: a voice that never left the Reach, used for testing and never issued to anyone. See "Names".
+For now the Aurel are a horizon. Whether players ever cross the Shoals in play is undecided (Jason, 6 November 2026).
+
+### The watcher
+
+A white ship at the edge of sensor range that holds station and burns away if approached. No transponder, so it reads as an unknown contact of a strange size until someone locks it, and most never will. It never fights unless the Unsung or the Hollow Choir are involved. Canon already says the Chorus sends voices to watch younger peoples; this is that, made visible. A note for the lead's list, not a mechanic yet.
+
+The Aurel Tacet, today's sealed development ship, is a voice that never left home: a test ship, outside the economy and never issued.
 
 ## Timeline
 
-Oldest first.
+Oldest first. Dates are years since the gate woke (GW); the present is about 240 GW. The order matters more than the numbers.
 
-| When | Event | Why it matters today |
+| When | Event | What it leaves behind |
 | --- | --- | --- |
 | c. 1.2 million years ago | **The Weaving.** The Aur build the Lattice. | Every gate in the game is Aurel-made |
 | c. 900,000 years ago | **The Joining.** The Aur become the Aurel. | Each Aurel ship carries a voice |
-| c. 200,000 years ago | The first Oru hives rise; the Aurel begin the Tending. | The Oru remember the Singers |
-| c. 40,000 years ago | **The Quiet War and the Sundering.** | Sleeping gates, the Shoals, the Dark |
-| Before 0 AL | The Covenant Fleet, 41 arks, flees a lost human home through a wormhole later called the Mouth. Why they fled is not recorded. | Humans are newcomers with a mystery behind them |
-| 0 AL | **Landfall.** The fleet emerges in the Landfall system; the Mouth collapses behind it. | Landfall is the neutral heart of known space |
-| 3 AL | Seven arks refuse to land and stay in space. | The first Drifter clans |
-| 6 AL | **The Radiant Find.** Fleet chaplains find an Aurel relic on Halcyon. It hums, and a sleeping gate answers. | Gate-waking begins, and so does the Canticle |
-| 9 AL | The first gate is woken. | Known space starts to grow |
-| 31 AL | Vael-to-be biologists make first contact with Hive Thiel. | The Vael remain the Oru's closest human contacts |
-| 58 AL | **The Charter Schism.** The charter companies claim the lanes they paid to wake; fleet command claims every gate by right of the Find. | Kessari and Halcyon split |
-| 90 AL | The Halcyon Dominion is proclaimed; the relic's keepers become its nobility. | Halcyon's aristocracy rests on the gates |
-| 140 to 171 AL | **The Belt Strikes.** Indentured miners rise against Kessari debt. Kessari courts convict strike leaders on invented evidence. | The Free Belt Union is born, and so is distrust of courts |
-| 171 AL | The Slagline Accord ends the Strikes: debts cancelled, Kessari keep most ore rights. | Free Belt independence |
-| 212 AL | **The Halden Heresy.** The Canticle bans study of Aurel relics; Dr Ilse Halden leads the fleet's science and medical corps out of Halcyon. | The Vael Commonwealth is founded |
-| 260 to 275 AL | **The Hive War.** Halcyon crusades into Oru space hunting Radiant relics; Hive Tessh carriers rout the crusade. | Halcyon's lasting humiliation |
-| 275 AL | **The Hive Peace,** brokered by the Vael. The Oru agree to grow station cores for every people in exchange for fixed borders. | Every station has an Oru-grown core |
-| 301 AL | **The Novum Key.** Novum Systems builds a synthetic gate-waker. | Halcyon's gate monopoly ends and expansion explodes |
-| 388 AL | **The Landfall Accord,** signed at Landfall by all six peoples. | Accord space, Witness Law and the Mercy Clause |
-| 402 AL | The Halo Drone Consortium is founded. | The only joint human and Oru firm |
-| 451 AL | **The Dimming** begins: woken gates at the outer edge start falling asleep again. | Patrols pull back; the Marches and the Unclaimed form |
-| 530 AL | **The Kerran Incident.** A white ship destroys a Novum gate-waking expedition at the edge of the Dark, then leaves. | First modern Aurel sighting |
-| 588 AL | Clan Saro crosses the Shoals and returns with half its crews. | The only human sight of the Pale Reach |
-| 604 AL | A living Aurel ship is offered for sale at a remote station and sells within a day. Nobody knows to whom. | Proof that the one on the pad is real |
-| 612 AL | **Present day.** | Where pilots start |
+| c. 40,000 years ago | **The Quiet War and the Sundering.** The Unsung caged, every gate put to sleep, the Shoals shattered. | Sleeping gates, the Shoals, the Dark; the Sol gate goes dark |
+| Long before 0 GW | Humans settle Luna, Mars, the Venusian clouds and the Belt on Earth's money | The Charter: colonies bound to their debts |
+| Before 0 GW | **The Strikes.** Belt crews refuse to keep paying. Earth's courts convict strike leaders on invented evidence. The Belt wins a grudging accord; Earth keeps most ore rights. | Belt independence, distrust of courts, the Black Strike's ancestors |
+| 0 GW | **The find.** A Belter prospector crew, out past the outer moons, finds a sleeping gate and wakes it by accident. | The Belt holds the only door out of Sol |
+| 0 to 6 GW | **The Belt's years.** Only Belters know how to fly the gate; the first systems beyond are Belter-charted. | Belter navigators are still the best, and still remember |
+| 6 to 9 GW | **The Gate War.** Earth and Mars will not leave the door in Belter hands; the Belt cannot hold it. | Short, ugly, and the reason the Belt resents both |
+| 9 GW | **The Ceres Accord,** brokered by Venus. Lanes open to all; the Belt gets a seat and the right to run dark; Earth gets the tolls; Mars gets the patrols; Venus's support ships are protected everywhere. | Witness Law, the Mercy Clause, the Open Lanes, Venus's neutrality |
+| 30 to 90 GW | **Expansion.** Gates woken one after another; Calder and its like settled; the first colonies beyond Sol grow up. | Fieldmark's farmers, Harbour as a free port |
+| 70 GW | **The Novum Key.** A Lunar firm builds a synthetic gate-waker; the Accord's shared gate-waking arrangement ends. | Expansion explodes; Novum still chasing a stronger key |
+| 120 GW | **The Dimming** begins: far gates start falling asleep again. Patrols pull back to protect the core. | The Marches and the Unclaimed form |
+| 180 GW | **The Kerran Incident.** A white ship destroys a Novum expedition at the edge of the Dark and leaves. | The first modern Aurel sighting |
+| c. 200 GW | **The Hollow Choir** forms among colonists on the Dimming's edge who saw too much. | A cult of the Unsung |
+| 215 GW | A Belter deep-exploration crew crosses the Shoals and returns with half its people. | The only human sight of the Aurel's home |
+| 232 GW | A living Aurel ship is offered for sale at a remote station and sells in a day. Nobody knows to whom. | The one on the pad is real |
+| c. 240 GW | **Present day.** | Where pilots start |
 
-## The peoples
+## The four powers
 
-Five of the six major peoples are human, all descended from the one Covenant Fleet. They split by role aboard the fleet, not by blood. The Oru are native to the Arm and 200,000 years older than humanity. "Race" in the game means a people with its own history; the human ones differ only slightly in body (Vael gene-tailoring, Belter low-gravity builds, Drifter pallor).
+Humanity has four powers, all born in Sol. A pilot's origin is one of the four; it sets their home system and starting standing, and nothing else. No pilot bonuses; all bonuses live on ships.
 
-| People | Descended from | Capital | Founded |
+| Power | Role in a line | Navy | Weapon family |
 | --- | --- | --- | --- |
-| Halcyon Dominion | The fleet's command lineage and chaplaincy | Halcyon | 90 AL |
-| Kessari Combine | The charter companies that financed the arks | Kessar Exchange | 58 AL |
-| Free Belt Union | Indentured crews who paid their passage in labour | Slagline | 171 AL |
-| Vael Commonwealth | The fleet's science and medical corps | Halden's Rest | 212 AL |
-| Oru Collective | Native hives of the Arm (pilots are human wards raised among them) | No capital; three great hives | c. 200,000 years ago |
-| Drifter Clans | The seven arks that never landed | The clan ships themselves | 3 AL |
+| **Earth**, with Luna | Owns. The corporate core that runs on contracts, tolls and courts. | The Charter Fleet, mostly contracted | Missile |
+| **Mars** | Polices. Disciplined, dutiful, the best navy, still terraforming after centuries. | The Martian Navy | Energy |
+| **Venus** | Heals. Cloud cities that live or die by life support; the chemists and medics of known space, everyone's neutral. | The Coastguard | Hybrid |
+| **The Belt** | Digs. Cooperatives and crews, anywhere a Belter feels like going; found the gate and lost the door. | The Union Militia | Projectile |
 
-### Halcyon Dominion
+### Earth
 
-The oldest human state, built on one fact: Halcyon held the Radiant relic, and for 300 years only Halcyon could wake gates. Gate-waking made its nobility, and the Canticle made that nobility holy.
+Earth is not a nation but a market with a flag. Its corporations financed every colony in Sol, and the Charter that bound those colonies to their debts is still the root of Earth's law. Earth's courts are commercial courts, its promises are contracts, and its navy is mostly contracted patrols. The old trading bloc that signed the Charter is still called the **Kessari Combine**, and Earth's toll patrols still wear its name.
 
-- **Government.** A Hierarch rules from Halcyon, advised by the Great Houses, which hold systems as fiefs and owe ships to the throne. The Canticle priesthood runs alongside the throne and does not always agree with it.
-- **Values.** Order, ceremony, duty, the sacred.
-- **The Canticle.** Worship of the Radiant through song. Its hymns copy tones the relic makes. Pilgrims travel by liner to the edge of the Shoals to sing to the Pale Reach.
-- **Grievance.** The Novum Key ended their monopoly and, in their eyes, turned a sacrament into a business.
-- **Wants.** To be keepers of the gates again, and first to reach the Radiant.
-- **Secret (canon, hidden).** The hymns are fragments of a dead Aurel voice. The relic is not holy; it is a corpse that still hums. The highest priests suspect it and have buried the evidence for three centuries.
-
-### Kessari Combine
-
-A state run as a holding company. Every citizen holds shares, every service is a contract, and the founding document is the Charter of the ark financiers.
-
-- **Government.** A board of the largest corporations, chaired by the head of the Exchange. Votes weigh by holdings. Courts are commercial courts.
-- **Values.** Contract, competence, profit, punctuality. A Kessari promise is legally binding, and other peoples' casual promises baffle them.
-- **Grievance.** They paid to wake half the early gates and believe the Landfall Accord robbed them of their tolls.
+- **Government.** A board of the largest corporations, chaired by the head of the Exchange. Votes weigh by holdings.
+- **Values.** Contract, competence, profit, punctuality. An Earth promise is legally binding, and other peoples' casual promises baffle them.
+- **Luna** is Earth's first colony and richest suburb: old money, old grievances, and a habit of acting as if it were a fifth power. It is not, and it knows it. Novum Systems is Lunar, which is how the Key broke a monopoly from the inside.
+- **Grievance.** They paid to wake half the early gates and believe the Ceres Accord robbed them of the lanes.
 - **Wants.** To own the Lattice economy: lanes, freight, and above all the next gate-waking technology.
-- **Secret (common among Belters, denied by Kessari).** Kessari courts fabricated the evidence that broke the Belt Strikes. Witness Law exists because of it.
+- **Secret (common among Belters, denied by Earth).** Earth's courts fabricated the evidence that broke the Strikes. Witness Law exists because of it.
 
-### Free Belt Union
+### Mars
 
-Descendants of the fleet's indentured crews, who mined the first asteroid fields to pay off their families' passage and then refused to keep paying.
+Mars took discipline as its creed because the planet demanded it. Centuries of terraforming taught Martians that nothing is owed and everything is earned by duty. Their navy is the best in known space and they believe it should police all of it.
 
-- **Government.** A federation of cooperatives. Each station or crew votes; delegates meet at Slagline. Slow, loud and fiercely democratic.
-- **Values.** Solidarity, fairness, self-reliance. A fixed ship is a good ship. Distrust of anyone in a suit, and of anything with a priest attached.
-- **Grievance.** Kessari still hold ore rights to most of the old Belt under the Slagline Accord.
-- **Wants.** Control of their own fields, and a voice at Landfall to match their share of the work.
-- **Secret (canon, hidden).** Not every cooperative accepted the Accord. Some never stopped striking, and the Union quietly supplies them (the Black Strike).
+- **Government.** A parliament and a general staff that outlasts it. Service is the path to office.
+- **Values.** Duty, order, competence, the long project.
+- **Grievance.** They lost the race to the gate, which Belters found and Earth bought, and have never quite forgiven either.
+- **Wants.** To police the Accord lanes without having to ask, and to be first to understand the Aurel.
+- **Secret (canon, hidden).** The Martian Navy has recovered Aurel husk material from the Kerran wreck field and has been trying to read it for sixty years. It has read enough to be frightened, and has told nobody.
 
-### Vael Commonwealth
+### Venus
 
-Founded by scientists and medics who walked out of Halcyon rather than stop studying the Aurel. A republic that measures itself by what it discovers and who it saves.
+Humans live on Venus in floating cities in the cloud layer, where the pressure and temperature are nearly Earth's and everything below is acid and fire. A civilisation that dies the moment its life support fails became the solar system's masters of atmosphere chemistry, biotech and medicine.
 
 - **Government.** An elected Assembly and a Chancellor. Universities and hospitals hold seats by right.
 - **Values.** Inquiry, care, openness, consent. Gene-tailoring is common and mostly therapeutic.
-- **Medical neutrality.** The Mercy Clause names Vael support ships as protected and obliges the Vael to sell them to every signatory. This is why support is Vael-only and every navy depends on them.
-- **Grievance.** Halcyon still calls them heretics; Kessari treats their research as something to buy.
+- **Neutrality.** Venus brokered the Ceres Accord and holds its neutrality as the one thing keeping it alive. The Mercy Clause names Venusian support ships as protected everywhere and obliges Venus to sell them to every signatory. This is why support is Venus-only and every navy depends on it.
+- **Grievance.** Earth treats its research as something to buy; Mars treats its neutrality as cowardice.
 - **Wants.** To understand the Lattice and reach the Aurel before someone weaponises either.
-- **Secret (canon, hidden).** Halden Institute holds a living Aurel voice fragment, taken from a husk in 597 AL. It speaks, rarely. The Assembly has not been told.
+- **Secret (canon, hidden).** The Halden Institute holds a living Aurel voice fragment, taken from a husk in 225 GW. It speaks, rarely. The Assembly has not been told.
 
-### Oru Collective
+### The Belt
 
-A non-human people living in hives, each hive one slow shared mind spread across millions of bodies. The Oru grow their ships and stations rather than building them.
+The Belt is the people, not the place. Belters are the crews who mined the asteroids to pay off Earth's debts, struck when the debts were never cleared, and won a grudging independence. They are cooperatives and clans, loud and democratic, self-reliant to a fault, and they go wherever the rock is.
 
-- **Government.** None humans recognise. The three great hives, Tessh, Ossk and Thiel, act together when they agree and apart when they do not. Smaller hives follow them.
-- **Values.** Patience, continuity, memory. An Oru negotiation can take a decade, and a hive forgets nothing.
-- **Why they unsettle humans.** They speak through drone-bodies that all say the same thing at once, and they ask questions about death that humans find hard to answer.
-- **What they remember (canon, partly hidden).** The Quiet War. The Unsung overwrote whole hives. The Oru keep each hive's mind separate on purpose and distrust any network that joins minds.
-- **Wants.** For the gates near the Dark to stay asleep. They have said so plainly for 300 years. Nobody listens.
-- **Wards.** Since the Hive Peace, small human communities live in Oru-grown habitats on the hives' borders, mostly Halo Drone Consortium families and Vael researchers' descendants. Their children are Oru wards: fully human, raised among the hives, speaking to drone-bodies as easily as to people. A pilot who starts as Oru is a ward: Oru origin and standing, human body. The hives treat wards as guests they are responsible for, which is the closest thing to citizenship the Oru grant.
-- **Secret (canon, hidden).** The Oru know what the Unsung are and believe humans will wake them. Hive Tessh has begun breeding warships again for the first time since the Hive War.
+- **Government.** A federation of cooperatives. Each station or crew votes; delegates meet at Slagline. Slow, loud and fiercely democratic.
+- **Values.** Solidarity, fairness, self-reliance. A fixed ship is a good ship. Distrust of anyone in a suit.
+- **The clans.** Belters who never settled: ship-born, long-range, the best navigators alive. The clans charted most lanes outside Sol and the clan that crossed the Shoals was Saro.
+- **Grievance.** A Belter crew found the gate. The Belt held the only door out of Sol for six years, lost it in the Gate War, and has carried that loss into every negotiation since. Earth still holds ore rights to most of the old Belt.
+- **Wants.** Control of their own fields, free passage everywhere, and never to be robbed of a find again.
+- **Secret (canon, hidden).** Not every cooperative accepted the accord that ended the Strikes. Some never stopped striking, and the Union quietly supplies them (the Black Strike).
 
-### Drifter Clans
+## Law and powers
 
-The crews of the seven arks that refused to land. Six centuries on, the arks have been rebuilt plate by plate, but they still fly, and each is a clan's home.
+### The Ceres Accord
 
-- **Government.** Each clan's ship council leads it. The clans meet every ten years at a moot in deep space. Clan Vesk keeps the shared fleet that guards them all.
-- **Values.** Freedom, hospitality, memory of the journey. A Drifter owns no land and wants none.
-- **Role in the Arm.** Couriers, scouts, salvagers and the best navigators alive. Clan Saro charted most lanes outside Accord space.
-- **Grievance.** Treated as vagrants in Accord space and as pirates in Halcyon space.
-- **Wants.** Free passage everywhere, and to find the Mouth again: the way home.
-- **Secret (canon, hidden).** On the 588 AL crossing, Clan Saro met the Aurel and was warned off. The elders were told something about the Unsung and have kept it to themselves.
+The Ceres Accord (9 GW) binds all four powers. It is a treaty, not a government and not a police force. It has a small secretariat on Ceres and no ships of its own. Each signatory polices its own systems, and free ports police themselves. Its three clauses that shape play:
 
-## Powers and law
+- **Witness Law.** Nobody can be convicted of a crime without a witness or a recorded distress signal. Belt delegates wrote it, remembering the Strike trials. This is why crime only counts when seen, and why jamming comms is a trade of its own.
+- **The Mercy Clause.** Venusian support ships are protected in all signatory space, and Venus must sell them to every signatory. Attacking a Solace ship is the one crime every power hunts.
+- **The Open Lanes.** Accord gates stay open to every registered pilot of every signatory, whatever their origin.
 
-### The Landfall Accord
-
-The Landfall Accord (388 AL) binds all six peoples. It is a treaty, not a government and not a police force. It has a small secretariat at Landfall and no ships of its own. Each signatory polices its own systems, and free ports police themselves. Its three clauses that shape play:
-
-- **Witness Law.** Nobody can be convicted of a crime without a witness or a recorded distress signal. Free Belt delegates wrote it, remembering the Strike trials. This is why crime only counts when seen, and why jamming comms is a trade of its own.
-- **The Mercy Clause.** Solace ships are protected in all signatory space, and the Vael must sell support ships to every signatory. Attacking a Solace ship is the one crime every people hunts.
-- **The Open Lanes.** Accord gates stay open to every licensed pilot of every signatory, whatever their people.
+The **Ceres Registry** licenses pilots under the Accord, issues new pilots their first ship, and registers outfits.
 
 ### Law enforcement
 
 There is no galactic police. Law is local: whoever holds a system enforces the law there, with ordinary ships flown by ordinary crews. They can be outfought, and they escalate rather than overwhelm.
 
-1. **The local watch answers.** A witnessed crime brings the nearest patrol of whoever holds the system: a port watch, a house guard, a militia rota.
+1. **The local watch answers.** A witnessed crime brings the nearest patrol of whoever holds the system: a port watch, a toll patrol, a militia rota.
 2. **It calls for help.** A watch that is outgunned calls its reserve, and keeps calling.
 3. **The holder's navy comes.** Serious or repeated crime brings the navy of the power that holds the system, slower to arrive and much harder to beat.
 4. **The farther out, the thinner it gets.** In the Marches the answer is late and small. In the Unclaimed nobody comes.
 
 A pilot can win the first fight and still lose to what follows. How fast each step comes, and what triggers it, is milestone 7's design.
 
-Each power names its own force (proposed, Jason to confirm):
-
 | Holder | Local force | Character |
 | --- | --- | --- |
 | Free ports (Calder and its like) | The port's watch, such as the Calder Watch | Paid by the port, answerable to its board |
-| Halcyon Dominion | House guard, under each Great House's colours | Proud, ceremonial and slow to forgive |
-| Kessari Combine | KOD Toll Patrol | Contracted, efficient, and it sends the bill |
-| Free Belt Union | Steward rotas, militia crews taking turns | Fierce near home, thin far out |
-| Vael Commonwealth | The Commonwealth Coastguard | Rescue first, arrest second |
-| Oru Collective | Brood wardens of the nearest hive | Do not police humans; they quarantine and remove |
-| Drifter Clans | Clan Vesk escorts | Guard the clan ships, nothing else |
+| Earth | Kessari toll patrols, then the Charter Fleet | Contracted, efficient, and it sends the bill |
+| Mars | Martian Navy patrols | Proud, thorough and slow to forgive |
+| Venus | The Coastguard | Rescue first, arrest second |
+| The Belt | Militia rotas, working crews taking turns | Fierce near home, thin far out |
 
-### Colours
+### Navies
 
-Every licensed ship carries a **Registry beacon**, built into the hull rather than fitted: the Landfall Accord requires it, and it broadcasts the ship's name, hull and Registry entry. Pilots call it the ship's **colours**, as ships of the age of sail did.
+Each power has a navy with dedicated hulls from its naval yard. Navy hulls sit behind standing and a licence; licence holders owe duties that grow with access; an owned ship is never taken back, and a pilot who walks away from their duty is treated as a deserter by that power. Each naval yard sells its current corvette and patrol boat in two grades: Navy (licence and duties; a **Navy** tag that means better stats) and civilian (the same hull without the tag, on the open market). Frigate and above are built Navy only. Retired navy marks are sold whole on the open market with the Navy tag intact, powerful and expensive, no licence needed; details in `fleet.md` under "Navy grade, civilian grade and retired navy hulls". Above the line sits each navy's special operations: a hunting doctrine of watcher, hunter and striker hulls, a gate-born jump drive the Accord bans and every navy denies, and the top of the standing ladder; `fleet.md`, "Special operations: the T3 line".
 
-| Saying | Meaning |
-| --- | --- |
-| Showing colours | Beacon on: the ship is named and known at a glance |
-| Running dark | Beacon off: a radar contact of some size, until someone locks and identifies it |
-| False colours | A spoofed identity; the Null Ledger's trade (later) |
-| A station's light | A station's beacon. Stations always show their light, like a lighthouse, and are always named. |
-
-Under Witness Law a dark ship's log entry is just a contact, not a name, unless the witness locked and identified it. That is why pirates run dark.
-
-How each people and faction regards a ship running dark (what the law does about it is milestone 7):
-
-| Who | View | Why |
-| --- | --- | --- |
-| Halcyon Dominion | Criminal | A knight hides nothing. Hiding your colours is cowardice or hostile intent, and house guards treat it so. |
-| Kessari Combine | Suspicious | Legal, but a dark ship pays no tolls and signs no contracts; the Toll Patrol stops and fines it |
-| Oru Collective | Suspicious | Hollow ships in the Dark answer no hail, so to the hives a silent ship might be Unsung-touched. They keep away from it. |
-| Free ports, such as Calder | Suspicious near stations | Fine in the lanes, but the port's watch hails any dark ship near a station |
-| Vael Commonwealth | Rude | A dark ship cannot be found if it is lost. The Coastguard nags, and Vael pilots think it selfish. |
-| Free Belt Union | Normal | Kessari tracked strikers by their beacons in the Strikes; running dark is a Belter's right |
-| Drifter Clans | Normal | Clan ships run dark between harbours by long habit and show colours only to friends |
-
-Pirates and others:
-
-| Who | Colours |
-| --- | --- |
-| Black Strike, Cutloose | Always dark |
-| Red Tithe | Dark until they strike, then they show their red colours: their ritual |
-| Null Ledger | False colours: their trade |
-| Hollow Choir | Dark. Hailed, they answer with song. |
-| Hiveless | No colours to show: drone-bodies carry no beacon |
-| Aurel | No colours to show. Nobody has ever read an Aurel beacon; a voice has no name to give. |
-
-### The Plot
-
-The sortable list of every contact round a ship is **the Plot**, after the plot in a navy operations room: the picture of everything around, kept current. Pilots "check the plot" and "put a contact on the plot".
-
-### Outfits
-
-Pilots who work together register with the Landfall Pilot Registry as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name. The word is neutral on purpose; "clan" belongs to the Drifters, "company" sounds Kessari and "house" sounds Halcyon.
-
-### Navy service
-
-Every people raises its navy mostly from licensed private pilots, which is why navy ships are bought with standing and a licence rather than issued.
-
-| People | Form of service | A pilot who walks away |
-| --- | --- | --- |
-| Halcyon | A sworn oath to the Hierarch; licence holders are knights in all but name | Oathbreaker, hunted as a traitor |
-| Kessari | A service contract with Kessari Orbital Defence | In breach of contract, pursued by the courts |
-| Free Belt | Membership of a cooperative militia | Expelled by vote, and remembered |
-| Vael | Enlistment in the Commonwealth Fleet | Deserter |
-| Drifter | Adoption into Clan Vesk's shared fleet | Cut loose (see the Cutloose) |
-| Oru | None yet. The Oru license no humans, not even their wards. | Not applicable |
+| Power | Navy | Yard | Form of service | A pilot who walks away |
+| --- | --- | --- | --- | --- |
+| Earth | The Charter Fleet | Kessari Orbital Defence | A service contract | In breach of contract, pursued by the courts |
+| Mars | The Martian Navy | Seraphine Naval Yards | A commission | Deserter, hunted |
+| Venus | The Coastguard | Ishtar Fleet Works | Enlistment | Struck off, and the Coastguard stops answering your calls |
+| The Belt | The Union Militia | Union Defence Works | Membership of a cooperative militia | Expelled by vote, and remembered |
 
 What navy duties are in play, and how often, is a design question for Jason and the lead.
 
-### The shape of known space
+### Backgrounds
 
-Each security band in `design.md` has an in-world cause.
+A new pilot picks an **origin** (Earth, Mars, Venus, the Belt), which sets their home system and standing, and a **background**, which sets their starting ship, fit and first employer and locks nothing (agreed in principle 6 November 2026; backgrounds as data, duties and ranks are the lead's, with character creation).
+
+| Background | Start | Breaking out |
+| --- | --- | --- |
+| Navy reservist | A Tern in navy colours, an entry-level licence, a little standing with your navy, light duties | Discharge is free until you hold real navy hulls; after that, the desertion rule |
+| Miner | A Prospector and a Pick, standing with Belt Forge or Corvane | Nothing to break |
+| Hauler | A Tern with a Hopper fit, a Tessaract contract, standing with Tessaract | Nothing to break |
+
+More as the catalogue allows: salvager, courier. Every background lands in the same sandbox.
+
+### Crew
+
+Crew is a direction, not a mechanic yet (Jason, 6 November 2026): a system, never a people sim. Costs and risks only: shares, quitting, dying with the ship, reputation. No capability changes, no morale, no management beyond signing articles. What the lore sets up now at no cost: small ships fly solo; medium hulls carry a few; big ships need dozens; the captain is always the player; navy crews belong to the navy and the captain earns through missions; private crews sign articles for a share of earnings, and a captain who does not pay finds that crews walk at the next dock and word gets round. Subcraft fit this directly: every subcraft needs a pilot, so a carrier's subcraft are part of its crew, losing one loses a person, and drones stay the crewless, cheaper, more expendable choice.
+
+### The transponder
+
+Every registered ship carries a **transponder**, built into the hull rather than fitted. The Ceres Accord requires it, and it broadcasts the ship's name, hull and Registry entry. Stations carry a **beacon**, always on, so a station is always named.
+
+| Saying | Meaning |
+| --- | --- |
+| Squawking, or showing | Transponder on: the ship is named and known at a glance |
+| Running dark | Transponder off: a radar contact of some size until someone locks and identifies it |
+| A spoofed transponder | A false identity; the Null Ledger's trade (later) |
+
+Under Witness Law a dark ship's log entry is just a contact, not a name, unless the witness locked and identified it. That is why pirates run dark.
+
+| Who | View of running dark | Why |
+| --- | --- | --- |
+| Earth | Suspicious | Legal, but a dark ship pays no tolls and signs no contracts; the toll patrol stops and fines it |
+| Mars | Hostile intent until proven otherwise | A Martian patrol intercepts any dark ship in its space and expects an answer |
+| Venus | Rude | A dark ship cannot be found if it is lost. The Coastguard nags, and Venusians think it selfish. |
+| The Belt | Normal | Earth tracked strikers by their transponders in the Strikes; the right to run dark is written into the Ceres Accord |
+| Free ports | Suspicious near stations | Fine in the lanes, but the port's watch hails any dark ship close in |
+
+Pirates: the Black Strike and the Cutloose always run dark; the Null Ledger spoofs; the Hollow Choir runs dark and, hailed, answers with song; the Aurel have no transponder to show, and nobody has ever read one.
+
+### The board
+
+The sortable list of every contact round a ship is **the board**. Pilots check the board and put a contact on the board.
+
+### Outfits
+
+Pilots who work together register with the Ceres Registry as an **outfit**: a crew, a convoy, a mining cooperative or a mercenary band, under one name.
+
+### The shape of known space
 
 | Band | In-world name | Why it is like this |
 | --- | --- | --- |
-| High security | Accord space | Gates woken early and well policed by whoever holds them |
+| High security | Sol and the Accord lanes | The home system and the gates woken early, well policed by whoever holds them |
 | Low security | The Marches | Gates still awake, but patrols pulled back during the Dimming to protect the core |
-| Null security | The Unclaimed | Woken by Novum-era prospectors, never covered by the Accord |
-| Unknown space | The Dark | Sleeping or broken gates near the Unsung's cage. Reachable only by jump drive, or by waking gates the Oru beg everyone to leave alone |
-| Aurel region | The Pale Reach | Behind the Shoals, cut off since the Sundering |
+| Null security | The Unclaimed | Woken by Novum-era prospectors, never covered by the Accord, no one's law |
+| Unknown space | The Dark | Sleeping or broken gates near the Unsung's cage. Reachable only by a long-range jump drive nobody has, or by waking gates that keep going back to sleep. |
+| Aurel space | Beyond the Shoals | Cut off since the Sundering |
 
 ## Why ships are built this way
 
 Every capability comes from a fitted system, and what a pilot knows comes from a system reading it (design pillar 5, the window rule). Four things in the setting explain why, and together they are canon.
 
-- **The Covenant Standard.** The arks of the Covenant Fleet were built so any part could replace any other: a voyage with no shipyard behind it could not afford anything else. Every human hull since follows the fleet's mount standard. A ship is a frame full of systems because the first ships had to be.
-- **Witness Law.** Under the Landfall Accord only a certified system's log counts as a witness; a pilot's eyes are not evidence. A ship that sees nothing on its instruments saw nothing, in law. Pilots and courts alike learned to trust the readout, not the window.
+- **The Luna Standard.** Luna's yards built the first colony ships and could not afford a part that fitted only one hull. Every human hull since follows the Lunar mount standard. A ship is a frame full of systems because the first ships had to be.
+- **Witness Law.** Under the Ceres Accord only a certified system's log counts as a witness; a pilot's eyes are not evidence. A ship that sees nothing on its instruments saw nothing, in law. Pilots and courts alike learned to trust the readout, not the window.
 - **Lattice glare.** Gates and gravity wells scatter radio and fine light, so at a distance the window and an untuned sensor alike can tell *that* something is there but not *what* it is: its make, mass, cargo, ore or intent. A tuned instrument reads through the glare. The glare garbles identification, never sight: the window always shows clearly where things are and how they move.
-- **The Aurel contrast.** Aurel ships carry no instruments at all: a voice simply knows. Human scholars think the Aur built sealed hulls because they never needed the window rule. It is the clearest sign of how different they are.
+- **The Aurel contrast.** Aurel ships carry no instruments at all: a voice simply knows.
 
-**For the build:** this lore never asks for a degraded or blurred view. The play area is the captain's window and must look good and show what is going on. What systems add is knowledge (names, numbers, composition, intent), not the ability to see.
+**The stern is open** because a shield cannot be projected through a drive plume: the field collapses where the exhaust passes. Every shipwright knows it and none has solved it, so every ship is softest from behind and every pilot works round to the stern.
+
+**For the build:** this lore never asks for a degraded or blurred view. The play area is the captain's window and must look good and show what is going on. What systems add is knowledge, not the ability to see.
 
 ## Weapons and war
 
-How the peoples fight, in lore terms. The rules and numbers are in `weapons.md`; this section says who builds what and why.
-
 ### Who leans to which weapon family
 
-| People | Family | Main maker | Why |
+| Power | Family | Main maker | Why |
 | --- | --- | --- | --- |
-| Halcyon Dominion | Energy | Cantor-Vell Arms | Their lasers began as copies of Aurel emitters. A gun that never runs dry suits a people who think they are owed forever. |
-| Kessari Combine | Missile | Ito-Marr Dynamics (launchers), Kessari Orbital Defence (munitions and hulls) | Lock, fire, and let the contract do the work: the weapon of a people who pay for precision |
-| Free Belt Union | Projectile | Union Defence Works | Mining rigs became gunboats in the Strikes. Mass drivers need no reactor, and any Belter can make rounds. |
-| Vael Commonwealth | Hybrid | Commonwealth Fleet Works | Railguns reach farthest, so a navy that never fires first can still answer from range |
-| Oru Collective | None of the four | The hives | They fight with drones and fighters (later) |
-| Drifter Clans | None of the four | The clans | They run, hide and salvage rather than fight |
+| Earth | Missile | Ito-Marr Dynamics (launchers), Kessari Orbital Defence (munitions and hulls) | Lock, fire, and let the contract do the work: the weapon of a people who pay for precision |
+| Mars | Energy | Cantor-Vell Arms | A gun that needs no supply line suits a people who grew up with none |
+| Venus | Hybrid | Ishtar Fleet Works | Railguns reach farthest, so a navy that never fires first can still answer from range |
+| The Belt | Projectile | Union Defence Works | Mining rigs became gunboats in the Strikes. Mass drivers need no reactor, and any Belter can make rounds. |
 
 Paragon Arms sells light guns of every family to anyone, never navy grade.
 
-### Swivels
+### How each power tanks
 
-Close-in weapon systems are called **swivels** in the setting, after the small swivel guns of the age of sail. A swivel throws out a storm of light rounds at anything that comes close, missiles and torpedoes first, then ships. Pilots say "swivels up" for point defence on, and a small ship's whole art against a big one is staying just outside its swivels. "CIWS" stays the technical term in the design docs.
+| Power | Tank | Why |
+| --- | --- | --- |
+| Earth | Shields: fast recharge, soft hull | Corporate tech, fields over plate (Ito-Marr) |
+| Mars | Armour: slow, thick, keeps firing | Terraformers trust plate (Cantor-Vell) |
+| Venus | A regenerative mix: modest shields and armour, the best repair and shield transfer | Keeps everyone alive, including itself (Solace) |
+| The Belt | Whatever the hull came with, plus Patchplate and speed | Belt hulls have the spare mounts to tank either way |
 
-Only medium hulls and bigger carry swivels; small ships trust their countermeasures. The first swivels fire rounds. Laser swivels come later, and Halcyon will build them: a laser swivel never runs out of rounds, which suits a people who think they are owed forever.
+Shields stay: a shield is a field the drive plume breaks, which is why every ship is open astern.
 
-| Swivel | Kind | Maker | Note |
-| --- | --- | --- | --- |
-| Paragon Sentry M | Rounds | Paragon Arms | Open market; a sentry guards close in |
-| Cantor-Vell Compline | Laser (later) | Cantor-Vell Arms | Compline is the night prayer asking protection until morning |
+### PDCs
 
-Fire control decides how many swivels a ship can run and how well they track: the Paragon Gunlayer S, M and L.
+Point defence cannons throw out a storm of light rounds at anything that comes close, missiles and torpedoes first, then ships. Pilots say "PDCs up" for point defence on, and a small ship's whole art against a big one is staying just outside its PDCs. Only medium hulls and bigger carry them; small ships trust their countermeasures. The first PDCs fire rounds; laser PDCs come later, and Mars will build them.
+
+| PDC | Kind | Maker |
+| --- | --- | --- |
+| Paragon Sentry M | Rounds | Paragon Arms |
+| Cantor-Vell Cordon | Laser (later) | Cantor-Vell Arms |
+
+Fire control decides how many PDCs a ship can run and how well they track: Paragon Fire Control S, M and L.
 
 ### Capacitors by hull
-
-Each shipwright builds its reactor and capacitor to its own idea of what a ship is for. The lead turns these into numbers.
 
 | Hull | Character | Why |
 | --- | --- | --- |
@@ -390,32 +380,34 @@ Each shipwright builds its reactor and capacitor to its own idea of what a ship 
 
 ### Hull classes
 
-Ships are classed on a ladder borrowed from the Covenant Fleet's old navy, which took it from the age of sail. The class says a ship's role and scale; module sizes (S, M, L, XL) still say only what fits a mount.
+Two ladders: military and civilian. The class says what a hull was built as; the fit says what it is now. A Belt hauler with guns reads as a hauler on the board until a targeting computer reads its mounts, which is exactly what Belt Forge builds for: hulls with spare mounts and no questions asked. Module sizes (S, M, L, XL) still say only what fits a mount.
 
-| Class | What it is | Today's hulls |
+| Military class | What it is | Today's hulls |
 | --- | --- | --- |
-| Pod | A jolly boat: the lifeboat every licensed ship carries | Meridian Ark |
-| Cutter | Small, quick, lightly armed; couriers and starters | Meridian Tern |
-| Sloop | A small warship; patrol and escort | Kessari Warrant |
-| Brig | A heavier small warship | |
-| Frigate | The workhorse warship, fast enough to choose its fights | |
-| Ship of the line | Third and second rates: built to stand in a battle line | |
-| Capital | First-rates and flagships: squadrons, hangars and station services aboard | |
-| Merchantman | Trade and passengers, at any size | Tessaract Manifest |
-| Hulk | Industry at any size: mining barges, refineries, works ships | |
+| Corvette | Small, quick, lightly armed | Meridian Tern (sold civilian-grade) |
+| Patrol boat | A small warship for patrol and escort | Kessari Warrant |
+| Frigate | A heavier small warship | Kessari Injunction (working name) |
+| Destroyer | The workhorse warship, fast enough to choose its fights | Union Walkout (working name) |
+| Cruiser | Built to stand in a battle line | |
+| Battleship | The line's anchor | |
+| Carrier | Squadrons aboard | |
+| Dreadnought | A flagship with station services aboard | |
 
-The Aurel Tacet sits outside the ladder. Humans call any Aurel ship simply a **voice**.
+| Civilian class | Cargo | People | Industry | Other |
+| --- | --- | --- | --- | --- |
+| Smallest | Courier | Shuttle | Prospector | Pod (Meridian Ark) |
+| Small | Hauler | Taxi, shuttle | Prospector (Belt Forge Prospector) | Tug, tender |
+| Medium | Freighter (Tessaract Manifest) | Bus, ferry | Miner (Belt Forge Sinker) | Salvage tender, survey ship |
+| Large | Bulk freighter | Liner | Barge (Belt Forge Collier), refinery ship | Repair tender, explorer |
+| Largest | Superfreighter | Colony ship, cruise liner | Factory ship, yard ship | Mobile dock |
 
-Each people has its own words for the top two rungs:
+The Aurel Tacet sits outside both ladders. Humans call any Aurel ship simply a **voice**.
 
-| People | Ships of the line | Capitals |
-| --- | --- | --- |
-| Halcyon Dominion | Ships of the line (they kept the old navy words) | Cathedrals, the spired flagships of the Great Houses |
-| Kessari Combine | Arbiters | Tribunals |
-| Free Belt Union | Rigs, heavy mining rigs armed for war | Strikehalls, where the cooperatives meet and vote |
-| Vael Commonwealth | Custodians | Sanctuaries, hospital flagships |
-| Oru Collective | Broods | Seedhives |
-| Drifter Clans | None | Homeships: the old arks themselves |
+### Subcraft and drones
+
+A subcraft is any crewed small craft carried in a bay, whatever its job (combat, mining, salvage, rescue): in effect a very heavy drone with a crew and better capabilities, flown by NPC crews and never by the player. A fighter is a combat subcraft; a drone is the uncrewed kind. Both are products carried in bays, built by companies and bought like modules; navy yards build the carriers, not what they carry. Light combat craft sell openly, heavy ones behind standing or a licence. Industrial subcraft and drones (mining, salvage) have no weapon mounts and can never be armed. Capital-class industrial ships are carriers for them. Not every power flies crewed combat fighters: Earth's come from Vantage Aerospace on Luna, Mars builds its own through Arcadia Works, Venus flies Arbor drones and crewed rescue fighters, and the Belt flies second-hand Vantage fighters and clan-built raiders. Details in `fleet.md`, "Subcraft and drones".
+
+Variety comes from companies with overlapping product lines: Earth, Venus and the Belt each build a courier, a hauler and a freighter, so three different hulls do one job, and the system generator picks by who holds the system. The catalogue grows into this, two or three makers' hulls per role and size over time.
 
 ## Mining and materials
 
@@ -423,26 +415,26 @@ Each people has its own words for the top two rungs:
 
 | Maker | What | Why |
 | --- | --- | --- |
-| Belt Forge Collective | The mining ships, lasers, survey scanners, mining computers, hoppers, drones, drone bays and breaching kit | The first cooperative to own its tools after the Strikes; the best mining kit in the Arm is Belter-made |
-| Corvane Heavy Industries | Heavy plant: the Collier's turrets, ore bunkers and furnace reactors | Corvane runs Lantern Works and builds furnaces for a living; its kit is heavier and cheaper than Belt Forge's |
+| Belt Forge Collective | The mining ships, lasers, survey scanners, mining computers, hoppers, drones, drone bays and breaching kit | The first cooperative to own its tools after the Strikes; the best mining kit in known space is Belter-made |
+| Corvane Heavy Industries | Heavy plant: the Collier's turrets, ore bunkers and furnace reactors | An Earth firm in Belt yards; it runs Lantern Works and builds furnaces for a living |
 | Tessaract Logistics | The Deep Dowser, a long-range survey scanner | Tessaract maps freight lanes and sells the same instruments to prospectors |
 
-A Collier is a Belt Forge hull full of Corvane parts. Belters fly it and grumble about it: the oldest trade rivalry in the Arm, bolted into one ship. Rook and Rivet stays a salvage firm.
+A Collier is a Belt Forge hull full of Corvane parts. Belters fly it and grumble about it. Rook and Rivet stays a salvage firm.
 
 ### Ores
 
-| Ore | Grade | Used for |
+Real minerals under their real names from 7 November 2026; the full catalogue, the ice and gas materials, the exotics and the maker alloys are in `materials.md`, which is the authority. Belters keep their own words: copperband for the striped copper rock, blackjack for zinc ore, glint for platinum.
+
+| Material | Grade | Used for |
 | --- | --- | --- |
 | Nickel-iron | Common | Hull plate, frames, everything structural. Lantern Works eats it by the thousand tonnes. |
-| Copperband | Middling | Copper-striped rock: wiring, reactors and every electrical system |
-| Blackjack | Middling | Old miners' slang for zinc ore: zinc and carbon for armour composites and capacitor cells |
-| Glintstone | Valuable, big rocks only | Clear crystal: laser optics and sensor lenses. Cantor-Vell buys all it can. |
-| Gate-glass | Rare, from splinters and knots | No human can make it. Researchers want it, the Canticle reveres it, and Novum needs it for gate-waking. |
+| Copper (copperband) | Middling | Wiring, reactors and every electrical system |
+| Zinc (blackjack) | Middling | Armour composites and capacitor cells |
+| Platinum (glint) | Valuable, big rocks only | Catalysts, sensor contacts, the best electronics; Cantor-Vell and Novum buy all they can |
+| Rare earths | Valuable, worse space | Magnets, drive coils, lasers, sensor arrays |
+| Gate-glass | Exotic, never in Sol | No human can make it. Found where a gate was shattered and in husks; researchers want it, Novum needs it for gate-waking, and the Hollow Choir pays anything for it. |
 
-### More to come (Jason's direction)
-
-- **The ore catalogue grows.** Rarer ores belong in rarer and more dangerous systems, the Marches, the Unclaimed and the Dark, so the best rock is where the worst people are.
-- **Makers have their own alloys.** Each manufacturer blends refined metals into signature alloys of its own, which is part of why two makers' ships of the same size feel different. Alloys are where smelting, founding and later player building begin. Their names and recipes are future lore asks.
+Jason's direction: the ore catalogue grows, with rarer ores in rarer and more dangerous systems, and each maker blends its own alloys, which is where smelting, founding and player building begin. Alloy names and recipes are a future lore ask.
 
 ### Breaching
 
@@ -450,92 +442,52 @@ Belters call a breach charge a **cracker**. The **shotfirer** is the miner who s
 
 ### Drones
 
-Belt Forge's mining drone is the **Knocker**. In the old mines of the human homeworld, knockers were small spirits heard tapping at the rock face; Belters say the drones sound just the same through the hull. Drones ride out and home in a **Cage**, named for the mine cage that carried miners up and down the shaft.
+Belt Forge's mining drone is the **Knocker**. In the old mines of Earth, knockers were small spirits heard tapping at the rock face; Belters say the drones sound just the same through the hull. Drones ride out and home in a **Cage**, named for the mine cage that carried miners up and down the shaft.
 
-## Manufacturers
+## Companies
 
-Specialities and navy roles are set in `races.md`. This section says where each maker came from and gives a hook for quests and contracts.
+Makers are companies with a home power and one or two specialities. The powers do not each get a full set; the gaps are the trade. Venus builds no warships, Earth builds no mining kit, Mars builds its civilian hulls through one state yard. Overlap only where NPC variety matters most: couriers, haulers, freighters.
 
-### Halcyon: the noble houses
+| Company | Home | Known for | Founded | Hook |
+| --- | --- | --- | --- | --- |
+| **Meridian Yards** | Independent; licensed by the Ceres Registry, based at Accord free ports | Starter ships, shuttles, couriers, and armed utility hulls for anyone with a licence: the ship every new pilot gets and the gunboat every outfit starts with | Luna, long before the gate; went flagless after the Accord | Named for the meridian its first yard sat on; every port sells the parts |
+| **Paragon Arms** | Everywhere | Light and medium weapons on the open market, never navy grade | 8 GW, during the Gate War, selling to both sides | Sells to anyone, rumoured to sell to pirates directly |
+| **Corvane Heavy Industries** | Independent; Earth money, Belt yards, nobody's flag | Heavy mining plant, furnaces, and the corporate security hulls that guard them; runs Lantern Works | After the Strikes | Belters call it "the Strike tax with a logo"; its security line is why mercenary outfits exist |
+| **Kessari Orbital Defence** | Earth | Toll patrol hulls, munitions | Before the gate | Its patrol contracts are the backbone of Earth security work |
+| **Ito-Marr Dynamics** | Earth | Missile launchers, shields, power | Before the gate | Armed both sides of the Gate War |
+| **Tessaract Logistics** | Earth | Haulers and freighters, the best transport hulls in known space | Before the gate | Runs the oldest freight lanes and knows every shortcut |
+| **Novum Systems** | Luna | Sensors, electronic warfare, computers; built the Novum Key | 60 GW | Still chasing a stronger gate-waker and does not care which gates it wakes |
+| **Cantor-Vell Arms** | Mars | Energy weapons, armour | Before the gate | Its best designs come from Aurel husk material Mars will not admit to holding |
+| **Seraphine Naval Yards** | Mars | Warships, from patrol boats to battleships | Before the gate | Builds the Martian Navy; sells nothing to anyone else |
+| **Arcadia Works** | Mars | Civilian hulls, one per job, named what they are and Mk-numbered | Before the gate | The state yard; Mars does not do brands |
+| **Ishtar Fleet Works** | Venus | Railgun and blaster hulls, the Coastguard's ships | 10 GW, after the Ceres Accord | Proud that its ships have never fired first in a war |
+| **Solace Medical** | Venus | Support ships: repair, shield transfer, rescue | Before the gate | Protected by the Mercy Clause |
+| **Arbor Dynamics** | Venus | Drones, drone bays, drone control | 95 GW | Its drones are grown as much as built |
+| **Vantage Aerospace** | Luna (Earth) | Crewed fighters, light and heavy; builds no hulls | 7 GW, in the Gate War | Names its craft for blades |
+| **Halden Institute** | Venus | Research and exploration ships, scanners | Before the gate | Holds the living voice fragment |
+| **Belt Forge Collective** | The Belt | Mining ships and kit, drones, breaching | After the Strikes | Belt Forge against Corvane is the oldest trade rivalry in known space |
+| **Rook and Rivet** | The Belt | Salvage hulls and gear, tugs | After the Strikes | A thick book of who owes it |
+| **Slagline Motors** | The Belt | Cheap engines, thrusters, afterburners | After the Strikes | Every pirate's favourite engine |
+| **Union Defence Works** | The Belt | Militia gunboats, projectile guns | During the Strikes | Some of its hidden yards were never closed |
+| **Aurel** | Beyond the Shoals | Every Aurel ship | | Not a company; the catalogue needs a maker on each hull |
 
-| Maker | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Seraphine Shipwrights | 92 AL | House Seraphine commanded the fleet's flagship ark and was granted the right to build the Dominion's warships | Its battleships are built around keel sections from that ark; losing one is national mourning |
-| Cantor-Vell Arms | 140 AL | House Vell armed the Cantors, the priests who carry relic tones to wake gates. Its energy weapons began as copies of Aurel emitter fragments | Its best designs come from relic study the Canticle forbids |
-| Grand Tithe Yards | 118 AL | Owned by the Canticle, paid for by tithes, built to carry pilgrims to the Shoals | Pilgrim liners are the richest targets in the Arm, and the Red Tithe knows it |
-| Sanctum Instruments | 233 AL | The Canticle's survey order, founded after the Halden Heresy to study the Shoals in an approved way | Knows more about the Shoals than anyone but Clan Saro |
-
-### Kessari: the corporations
-
-| Maker | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Kessari Orbital Defence | 61 AL | State corporation formed to guard the Combine's toll gates after the Charter Schism | Its patrol contracts are the backbone of Kessari security work |
-| Ito-Marr Dynamics | 266 AL | Merger of Ito Shielding and Marr Ordnance during the Hive War, while both sold to Halcyon | Armed Halcyon's failed crusade, which the Oru have not forgotten |
-| Tessaract Logistics | 22 AL | The fleet's cargo arm, bought by the charter companies after Landfall | Runs the oldest freight lanes and knows every shortcut |
-| Novum Systems | 288 AL | A sensor start-up that built the Novum Key in 301 AL | Still chasing a stronger gate-waker, and does not care which gates it wakes |
-
-### Free Belt: the cooperatives
-
-| Maker | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Union Defence Works | 144 AL | The Belt Strikes' secret arsenal, turning mining rigs into gunboats | Some of its hidden yards were never closed |
-| Belt Forge Collective | 172 AL | The first mining cooperative to own its tools outright after the Slagline Accord | Belt Forge against Corvane is the Arm's oldest trade rivalry |
-| Rook and Rivet | 203 AL | Ada Rook and Tam Rivet, salvagers who stripped the Strike wrecks and sold the parts back to both sides | Still has a sense of humour, and a thick book of who owes it |
-| Slagline Motors | 175 AL | Named for the Slagline ore run that kept the Strikes alive; built cheap engines so any crew could outrun a Kessari patrol | Every pirate's favourite engine |
-
-### Vael: the institutes
-
-| Maker | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Commonwealth Fleet Works | 214 AL | Built the warships that kept Halcyon from dragging the Vael back after the Heresy | Proud that its ships have never fired first in a war |
-| Arbor Dynamics | 279 AL | Grew from drone research Hive Thiel shared after the Hive Peace | Its drones are not quite human designs, and its engineers know it |
-| Halden Institute | 212 AL | Dr Ilse Halden's own research body, the founding act of the Commonwealth | Holds the living voice fragment |
-| Solace Medical | 213 AL | The fleet's medical corps, carried out of Halcyon by Halden | Protected by the Mercy Clause |
-
-### Oru: the hives
-
-| Hive | Grown | Origin | Hook |
-| --- | --- | --- | --- |
-| Hive Tessh | Before the Quiet War | The war-hive; lost most of itself to the Unsung and regrew | Breeding warships again after 337 years of peace |
-| Hive Ossk | After the Quiet War | The builder-hive, grown to rebuild what the war destroyed | Grows the core of every station in known space under the Hive Peace; each people clads it in its own look. Every pilot docks inside an Oru. |
-| Hive Thiel | After the Quiet War | The smallest great hive, and the one that met humans first | Its drones deliberately do not network with each other, a lesson from the Unsung |
-
-### Drifter: the clans
-
-| Clan | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Clan Vesk | 3 AL | The ark that carried the fleet's escort squadron, kept as the clans' shared guard | Halcyon calls them pirates; they call Halcyon thieves |
-| Clan Saro | 3 AL | The fleet's scout ark | Crossed the Shoals in 588 AL and came back changed |
-| The Long Wake | 3 AL | The rear-guard and recovery ark, which picked up stragglers and wrecks for the whole voyage | Keeps the fleet's original records, including what is known of the Mouth |
-
-### Multi-race firms
-
-| Maker | Founded | Origin | Hook |
-| --- | --- | --- | --- |
-| Meridian Civil Yards | 1 AL | The fleet's civilian shipwrights at Landfall, held in trust under the Landfall Accord since 388 AL | Builds the ship every new pilot starts in; named for the Arm |
-| Corvane Heavy Industries | 171 AL | A Kessari firm that bought into Belt yards under the Slagline Accord | Belters call it "the Strike tax with a logo" |
-| Paragon Arms | 262 AL | Founded in the Hive War by a dealer who sold to both sides, and to the Oru | Sells to anyone, and is rumoured to sell to pirates directly |
-| Halo Drone Consortium | 402 AL | Joint venture of Arbor Dynamics and Hive Thiel | The one place humans and Oru build together, and a target for anyone who wants that to fail |
+Naming themes per company are in "Names".
 
 ## Pirate factions
 
-Six NPC factions work outside the law, each born from a wound in a people's history. Player piracy stays emergent as `design.md` says; these factions give it somewhere to sell, hide and belong. Pilots can earn standing with the Red Tithe, the Null Ledger, the Black Strike and the Cutloose, for safe harbour, fences and contracts. The Hiveless cannot be joined. The Hollow Choir deals only with pilots deep in its trust, and late. All fly kitbashed ships, with a signature on top of the mongrel look so a pilot can tell who is attacking.
+Four NPC factions work outside the law, each born from a wound in a power's history. Player piracy stays emergent as `design.md` says; these factions give it somewhere to sell, hide and belong. All fly kitbashed ships, with a signature on top so a pilot can tell who is attacking. Pilots can earn standing with the Black Strike, the Null Ledger and the Cutloose for safe harbour, fences and contracts. The Hollow Choir deals only with pilots deep in its trust, and late.
 
 | Faction | Born from | Where | What they do | Signature |
 | --- | --- | --- | --- | --- |
-| The Red Tithe | Halcyon navy deserters | The Marches near Halcyon and the pilgrim routes | Raid pilgrim liners and Halcyon convoys | Halcyon hulls with the gold scoured off, painted blood red |
-| The Null Ledger | Kessari corporate crime | Everywhere, quietly; strongest at Marches trade hubs | Smuggling, fencing, contract fraud, comms jamming | Clean, anonymous hulls, serials stripped; heavy electronic warfare |
-| The Black Strike | Belt cooperatives that never accepted the Accord | Marches and Unclaimed mining fields | Claim-jumping, ore theft, raids on Kessari freight | Fast gunboats in black with rust-orange hazard stripes, or captured Kessari hulls kept as trophies |
-| The Cutloose | Drifters exiled by their clans | The Unclaimed and the edge of the Dark | Salvage piracy: disable a ship and strip it | Plates from every people welded around Drifter spars |
-| The Hiveless | Oru drone-bodies cut off from their hives | The Unclaimed near Oru space | Not pirates by choice; feral swarms that attack anything | Violet drones with their glow gone grey |
-| The Hollow Choir | A human cult that worships the Unsung | Hidden bases in the Unclaimed and the Dark | Seek Aurel husks, wake forbidden gates, attack Aurel and Oru | Aurel husk segments bolted onto human ships, faintly glowing |
+| The Black Strike | Belt cooperatives that never accepted the Strikes' accord | Marches and Unclaimed mining fields | Claim-jumping, ore theft, raids on Earth freight | Fast gunboats in black with rust-orange hazard stripes, or captured Kessari hulls kept as trophies |
+| The Null Ledger | Earth corporate crime | Everywhere, quietly; strongest at Marches trade hubs | Smuggling, fencing, contract fraud, comms jamming, spoofed transponders | Clean, anonymous hulls, serials stripped; heavy electronic warfare |
+| The Cutloose | Belters exiled by their clans | The Unclaimed and the edge of the Dark | Salvage piracy: disable a ship and strip it | Plates from every power welded around clan spars |
+| The Hollow Choir | A cult of the Unsung from the Dimming's edge | Hidden bases in the Unclaimed and the Dark | Seek Aurel husks, wake forbidden gates, attack Aurel and anyone who studies them | Aurel husk segments bolted onto human ships, faintly glowing |
 
-- **The Red Tithe.** What Halcyon oathbreakers become when they have nowhere else to go. They keep a twisted knightly ritual and "collect the tithe" by stripping liners. Their leader styles himself the Unhierarch. They hate the Canticle more than they love money and sometimes spare a ship for show.
+- **The Black Strike.** Still on strike, generations later. The Union condemns them in public and resupplies them in private. To Belters they are half outlaws, half folk heroes. They target Earth and Corvane above all, and in theory leave Belters alone; far from Slagline, discipline is thin.
 - **The Null Ledger.** A network rather than a fleet: fixers, fences, forgers and backstreet yards that strip serials and fit modules where they do not belong. It rarely fights; it sells. Its pilots specialise in jamming distress calls, which under Witness Law is the difference between a crime and a rumour.
-- **The Black Strike.** Still on strike 441 years later. The Union condemns them in public and resupplies them in private. To Belters they are half outlaws, half folk heroes. They target Kessari above all, and in theory leave Belters alone; far from Slagline, discipline is thin.
-- **The Cutloose.** A Drifter who breaks clan law is put off the clan ship in a small craft and told never to return. Superb navigators and salvagers; they cripple ships rather than destroy them.
-- **The Hiveless.** When an Oru drone-body is away from its hive too long, it forgets the hive. Nobody can join them. The Oru are ashamed of them and pay bounties for their recovery, not their destruction.
-- **The Hollow Choir.** A Canticle heresy from about 560 AL that believes the Unsung are the true Radiant, betrayed and caged by the Aurel, and that waking every gate will free them. They pay fortunes for husks and voice fragments, and they are right about more than anyone would like. The faction most likely to become a story arc.
+- **The Cutloose.** A Belter who breaks clan law is put off the clan ship in a small craft and told never to return. Superb navigators and salvagers; they cripple ships rather than destroy them.
+- **The Hollow Choir.** Colonists on the Dimming's edge who saw hollow ships and decided the Unsung are the true builders, betrayed and caged by the Aurel, and that waking every gate will free them. They pay fortunes for husks and voice fragments, and they are right about more than anyone would like. The faction most likely to become a story arc.
 
 ## Who NPCs work for
 
@@ -543,157 +495,155 @@ Every NPC pilot, trader, miner or patrol, is either **independent** or works for
 
 | Kind | Who | Flavour |
 | --- | --- | --- |
-| Company crews | Contract crews for a maker or a big firm: Tessaract freight, Corvane hulks, Grand Tithe liners, KOD patrols | Company colours and company hulls, steady routes, and the company sends another when one is lost |
-| Cooperative crews | Free Belt cooperatives such as the Ridge Collective; Drifter clan ships | Their own people's hulls, worked hard and patched often; loyal to their station or clan |
-| House and institute crews | Halcyon houses, Vael institutes, Oru hives | Serve their holder; rarely seen outside its space |
+| Company crews | Contract crews for a maker or a big firm: Tessaract freight, Corvane barges, Kessari patrols | Company colours and company hulls, steady routes, and the company sends another when one is lost |
+| Cooperative crews | Belt cooperatives such as the Ridge Collective; the clans | Their own hulls, worked hard and patched often; loyal to their station or clan |
+| Navy and institute crews | The Martian Navy, the Coastguard, Venusian institutes | Serve their power; rarely seen outside its space |
 | Independents | Owner-pilots and small outfits working for whoever pays | Any hull, any fit, often second-hand; a name of their own rather than a company's |
 
-How the mix shifts, in words (the lead sets the numbers):
-
-- **By holder.** A system takes its flavour from who holds it: Kessari systems run on company crews, Belt systems on cooperatives, Halcyon systems on house crews, free ports like Calder on a bit of everything.
-- **By band.** Accord space is mostly company and cooperative crews on steady routes. The Marches have more independents, taking risks for better pay. In the Unclaimed nearly everyone is independent, and some of them are pirates on a bad day.
-- **By what the system has.** A belt brings miners, a foundry brings haulers, a pilgrim route brings liners, and each draws the employers that fit it.
-- **Pirates follow the money.** Each pirate faction preys hardest on the employers it hates: the Black Strike on Kessari and Corvane, the Red Tithe on Grand Tithe liners and Halcyon houses.
-
-Variation within a kind (hulls, fits, paint, names) is for the lead's generator. Company crews should read as their company; independents should read as people.
+How the mix shifts, in words (the lead sets the numbers): Earth systems run on company crews, Belt systems on cooperatives, Martian systems on the navy and its contractors, Venusian systems on institutes, free ports like Calder on a bit of everything. Accord space is mostly company and cooperative crews on steady routes; the Marches have more independents taking risks for better pay; in the Unclaimed nearly everyone is independent, and some of them are pirates on a bad day. A belt brings miners, a foundry brings haulers, a liner route brings passengers. Each pirate faction preys hardest on the employers it hates.
 
 ## The starter sector
 
-The starter system in lore terms. The set-up was confirmed on 4 November 2026; the bodies, the third station, the Watch and the belt were added the same day for 6c part 2.
-
-**Calder** is an Accord free system on the edge of the Marches, where a Kessari freight lane meets a Free Belt mining belt. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
+**Calder** is an Accord free system on the edge of the Marches, one of the first systems settled through a gate, where an Earth freight lane meets a Belt mining belt. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
 
 ### Bodies
 
-| Placeholder | Name | What it is |
-| --- | --- | --- |
-| Calder I | **Fieldmark** | A temperate garden world farmed by an Accord colony of about two million. Its grain and protein go up the well to Harbour, which is why food is cheap there. |
-| Calder Ia | **Lantern** | Fieldmark's bright, airless ice moon, seen from the surface as a second, smaller lamp in the sky |
-| Calder Belt | **The Scree** | The belt: loose rock, mined by the Ridge Collective |
+| Body | What it is |
+| --- | --- |
+| Calder | The star |
+| **Fieldmark** | A temperate garden world farmed by an Accord colony of about two million. Its grain and protein go up the well to Harbour, which is why food is cheap there. |
+| **Lantern** | Fieldmark's bright, airless ice moon, seen from the surface as a second, smaller lamp in the sky |
+| **The Scree** | The belt: loose rock, mined by the Ridge Collective |
 
-The star keeps the system's name, Calder.
-
-**The Scree's rocks** are mostly nickel-iron and water ice, with Copperband, Blackjack and, in the big rocks, Glintstone (see "Mining and materials"). A few carry **gate-glass**: Aurel-made material, like splinters off a gate, though no broken gate has ever been charted near Calder. **(canon, hidden)** The Scree is the wreck of a gate the Aurel shattered during the Sundering, long before Calder was settled.
-
-Most gate-glass is splinters, scattered and small. A few big rocks hold a **knot**: a piece of the gate's own frame that molten rock swallowed whole in the Sundering and cooled around. A knot is unbroken gate structure, so a well-placed breach brings its glass out clean. Only a Sounder finds one. **(canon, hidden)** A knot still hums, very faintly, on the right frequency. The Hollow Choir would pay anything for one whole, and Novum Systems wants knot glass for its stronger gate-waker.
+The Scree's rocks are mostly nickel-iron and water ice, with Copperband, Blackjack and, in the big rocks, Glintstone. A few carry gate-glass, like splinters off a gate, though no broken gate has ever been charted near Calder. **(canon, hidden)** The Scree is the wreck of a gate the Aurel shattered during the Sundering, long before Calder was settled. Most gate-glass is splinters, scattered and small. A few big rocks hold a **knot**: a piece of the gate's own frame that molten rock swallowed whole in the Sundering and cooled around. A knot is unbroken gate structure, so a well-placed breach brings its glass out clean. Only a Sounder finds one. **(canon, hidden)** A knot still hums, very faintly, on the right frequency.
 
 ### Stations
 
-- **Harbour Station** orbits Fieldmark. It is an Accord free port run by the Calder Port Authority, a board with Kessari and Belt seats. Its core was grown by Hive Ossk under the Hive Peace and clad by Meridian. Fieldmark's harvest makes food cheap, and a Solace clinic makes medicine cheap. Its outfitting floor is a Meridian dealership stocking whatever the free port trade brings in, which is why Harbour sells modules from makers of four peoples. The Landfall Pilot Registry licenses new pilots here and issues them a Meridian Tern.
-- **Lantern Works** orbits Lantern. Corvane Heavy Industries runs it as a foundry: Corvane leases the Ridge Collective's ore rights under the Slagline Accord and smelts the ore here, where ice for cooling is free. It wants ore and scrap, makes machinery cheap, and pays dearly for food and medicine. It has an outfitting floor for Corvane's industrial modules, a second place to refit, and no ship mart. The Belters dig the ore and Corvane profits, which nobody at the Ridge lets Corvane forget.
-- **Ridge Outpost** is a Free Belt cooperative, the Ridge Collective, dug into a big rock in the Scree. Ore is cheap; everything else is shipped in at a premium. It has no outfitting floor because Belters fit their own ships, which suits Belters and annoys everyone else.
+- **Harbour Station** orbits Fieldmark. It is an Accord free port run by the Calder Port Authority, a board with Earth and Belt seats, built and clad by Meridian. Fieldmark's harvest makes food cheap, and a Solace clinic makes medicine cheap. Its outfitting floor is a Meridian dealership stocking whatever the free port trade brings in, which is why Harbour sells modules from makers of every power. The Ceres Registry licenses new pilots here and issues them a Meridian Tern.
+- **Lantern Works** orbits Lantern. Corvane Heavy Industries runs it as a foundry: Corvane leases the Ridge Collective's ore rights under the accord that ended the Strikes and smelts the ore here, where ice for cooling is free. It wants ore and scrap, makes machinery cheap, and pays dearly for food and medicine. It has an outfitting floor for Corvane's industrial modules and no ship mart. The Belters dig the ore and Corvane profits, which nobody at the Ridge lets Corvane forget.
+- **Ridge Outpost** is a Belt cooperative, the Ridge Collective, dug into a big rock in the Scree. Ore is cheap; everything else is shipped in at a premium. It has no outfitting floor because Belters fit their own ships.
 
 The trade triangle: food and medicine from Harbour to the Ridge, ore from the Ridge to Lantern Works, machinery from Lantern Works back out.
 
 ### Who flies in Calder
 
 - **The Calder Watch** is the Port Authority's patrol. It flies Kessari Warrants bought from Kessari Orbital Defence and painted Port Authority white. The pirates fly the same hull, captured, which both sides find funny for different reasons. The Watch hunts pirates in the lanes and near the stations; until law arrives (milestone 7) it does not trouble pilots. It is an ordinary force and can be beaten, and it is the first step of the escalation under "Law enforcement".
-- **The traders** fly supply contracts for Tessaract Logistics in Tessaract Manifests, between all three stations. When one is lost, Tessaract sends another; the contracts pay well enough to absorb it.
-- **The miners** work the Scree round Ridge Outpost. The prospectors are Ridge Collective crews, mining for the cooperative and selling at Ridge. The hulk is a Corvane contract crew in a Belt Forge Collier, hauling to Lantern Works on the long, exposed run; the Black Strike hunts it harder than anything else in Calder.
-- **The pirates** are Black Strike raiders in captured Kessari Warrants, kept as trophies and fitted cheaply. They hunt Kessari freight and, this far from Slagline, anyone else outside the Watch's reach. They lurk in the Scree and the lanes. When badly hurt they limp off to a hidden yard in the Marches (an old Union Defence Works site) and the Strike sends fresh raiders later.
+- **The traders** fly supply contracts for Tessaract Logistics in Tessaract Manifests, between all three stations. When one is lost, Tessaract sends another.
+- **The miners** work the Scree round Ridge Outpost. The prospectors are Ridge Collective crews, mining for the cooperative and selling at Ridge. The barge is a Corvane contract crew in a Belt Forge Collier, hauling to Lantern Works on the long, exposed run; the Black Strike hunts it harder than anything else in Calder.
+- **The pirates** are Black Strike raiders in captured Kessari Warrants, kept as trophies and fitted cheaply. They hunt Earth freight and, this far from Slagline, anyone else outside the Watch's reach. They lurk in the Scree and the lanes. When badly hurt they limp off to a hidden yard in the Marches (an old Union Defence Works site) and the Strike sends fresh raiders later.
 
-## Present day, 612 AL
+## Present day, about 240 GW
 
-The Arm is richer than ever and closer to disaster than anyone but the Aurel and the Oru understand.
+Known space is richer than ever and closer to disaster than anyone but the Aurel understand.
 
-- **The gate rush.** Novum Systems is close to a gate-waker strong enough to open gates inside the Dark. Kessari wants it, Halcyon wants it banned, the Oru want it destroyed.
-- **The Dimming is speeding up.** Edge gates fall asleep faster each year. Common knowledge says the Lattice is decaying. **(canon, hidden)** The Aurel are putting them back to sleep, one by one, because the Unsung have started moving along them.
-- **Tessh is arming.** Halcyon reads it as a threat. It is a preparation.
-- **White ships at the edge.** Aurel sightings have tripled since 590 AL, and some expeditions into the Dark are destroyed. Halcyon calls it judgement, Kessari calls it sabotage; the truth is quarantine.
-- **Hollow ships in the Dark.** Expeditions that do come back from the Dark report ships that answer no hail and carry no crew: Aurel shapes gone dark grey, or human and Oru wrecks moving again. **(canon, hidden)** These are Unsung vessels, voices wearing whatever hull they can take. They appear in play once the Dark is reachable.
-- **The Hollow Choir is growing,** recruiting Red Tithe deserters and desperate Marches colonists.
-- **Halo under strain.** Halcyon pressure on the Vael to end the human and Oru partnership is rising.
+- **The gate rush.** Novum Systems is close to a gate-waker strong enough to open gates inside the Dark. Earth wants it, Mars wants it under naval control, Venus wants it studied first.
+- **The Dimming is speeding up.** Far gates fall asleep faster each year. Common knowledge says the Lattice is decaying. **(canon, hidden)** The Aurel are putting them back to sleep, one by one, because the Unsung have started moving along them.
+- **White ships at the edge.** Aurel sightings have tripled since 225 GW, and some expeditions into the Dark are destroyed. Earth calls it sabotage, Mars calls it a test, Venus calls it a warning; the truth is quarantine.
+- **Hollow ships in the Dark.** Expeditions that do come back report ships that answer no hail and carry no crew: Aurel shapes gone dark grey, or human wrecks moving again. **(canon, hidden)** These are Unsung vessels, voices wearing whatever hull they can take. They appear in play once the Dark is reachable.
+- **The Hollow Choir is growing,** recruiting desperate Marches colonists.
+- **The Belt is restless.** Every new gate woken is a reminder of the one it found and lost.
 
 ### The long arc
 
-Humans keep waking gates because the economy demands it. Each gate woken near the Dark loosens the Unsung's cage. The Aurel cannot explain without opening a channel, so they act in silence and are taken for enemies. The Oru know but are not believed. Pilots sit in the middle, flying ships built by people who do not know what they are standing on.
+Humans keep waking gates because the economy demands it. Each gate woken near the Dark loosens the Unsung's cage. The Aurel cannot explain without opening a channel, so they act in silence and are taken for enemies. Pilots sit in the middle, flying ships built by people who do not know what they are standing on.
 
 ## Names
 
-Every hull, module, manufacturer and loadout in the catalogue, keyed by its id in `packages/sim/src`. Names only; the lead applies them. Hull and module names read "maker, then model", and the UI already shows each module's type, so model names do not repeat it.
+Every hull, module, manufacturer and loadout in the catalogue, keyed by its id in `packages/sim/src`. Names only; the lead applies them. Ids never change. Hull and module names read "maker, then model", and the UI already shows each module's type, so model names do not repeat it.
 
 ### Naming themes
 
 | Maker | Theme for model names | Why |
 | --- | --- | --- |
-| Meridian Civil Yards | Plain, friendly words; small hulls named for seabirds | Civilian, held in trust under the Accord, the first ship anyone flies |
-| Kessari Orbital Defence | Legal and enforcement terms | Its job is enforcing the Combine's contracts and tolls |
+| Meridian Yards | Plain, friendly words; hulls named for seabirds | Independent, the first ship anyone flies and the first gun anyone buys |
+| Kessari Orbital Defence | Legal and enforcement terms | Its job is enforcing Earth's contracts and tolls |
 | Tessaract Logistics | Freight paperwork | The oldest freight line, run on documents |
 | Ito-Marr Dynamics | Strongholds and stores | Shields and power that hold the line |
-| Cantor-Vell Arms | Canticle and vigil words | Armed the Cantors |
-| Slagline Motors | Belter slang for running | Built so crews could outrun Kessari patrols |
+| Novum Systems | Ghosts and absences | Electronic warfare makes things not be there |
+| Cantor-Vell Arms | Military drill and formation | Mars's armourer |
+| Seraphine Naval Yards | Martian places and virtues | The Martian Navy's yard |
+| Ishtar Fleet Works | Replies | Its ships have never fired first, so its guns are named as answers |
+| Solace Medical | Comfort and care | |
+| Slagline Motors | Belter slang for running | Built so crews could outrun Earth's patrols |
 | Rook and Rivet | Salvager's shop talk | Its plate is cut from wrecks |
-| Union Defence Works | Strike words | The Belt Strikes' arsenal |
+| Union Defence Works | Strike words | The Strikes' arsenal |
 | Belt Forge Collective | Old mining trades and tools | The Belt's own mining cooperative |
 | Corvane Heavy Industries | Heavy plant | Foundry and furnace builders |
-| Commonwealth Fleet Works | Replies | Its ships have never fired first, so its guns are named as answers |
 | Paragon Arms | Plain trade names that promise fairness | Sells to anyone, and wants you to feel fine about it |
 | Aurel | Silent and musical terms given by human scholars | The Aurel share no names; humans name what they see |
 
 ### Hulls (`hulls.ts`)
 
-| Id | Name | Maker | Lore |
-| --- | --- | --- | --- |
-| `meridian-courier` | Meridian Tern | Meridian Civil Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
-| `kessari-wedge` | Kessari Warrant | Kessari Orbital Defence | KOD's toll-gate sloop. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
-| `tessaract-spine` | Tessaract Manifest | Tessaract Logistics | The six-bay hauler on half the freight contracts in Accord space |
-| `escape-pod` | Meridian Ark | Meridian Civil Yards | The Landfall Accord requires every licensed ship to carry one. Pilots call it an ark because it brings you home the way the fleet brought everyone here. |
-| `aurel-tacet` | Aurel Tacet | Aurel | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Halcyon Cantors call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship, outside the economy and never issued. |
+| Id | Name | Class | Maker | Lore |
+| --- | --- | --- | --- | --- |
+| `meridian-courier` | Meridian Tern | Corvette | Meridian Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
+| `kessari-wedge` | Kessari Warrant | Patrol boat | Kessari Orbital Defence | Earth's toll patrol boat. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
+| `tessaract-spine` | Tessaract Manifest | Freighter | Tessaract Logistics | The six-bay freighter on half the contracts in Accord space |
+| `escape-pod` | Meridian Ark | Pod | Meridian Yards | The Ceres Accord requires every registered ship to carry one. Meridian called it the Ark because it carries what matters out of the flood, and the name stuck. |
+| `aurel-tacet` | Aurel Tacet | Outside the ladders | Aurel | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Scholars call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship. |
+| `rookrivet-prospector` | Belt Forge Prospector | Prospector | Belt Forge Collective | The lone digger looking for a strike |
+| `rookrivet-breacher` | Belt Forge Sinker | Miner | Belt Forge Collective | Shaft sinkers dug the deep, dangerous bores |
+| `rookrivet-hulk` | Belt Forge Collier | Barge | Belt Forge Collective | Colliers were the old coal ships: big, slow, filthy, and they kept the world warm. Belters kept the word. |
+| `rookrivet-drone` | Belt Forge Knocker | Drone | Belt Forge Collective | The mining drone |
+| working name Kessari Injunction | Open lore ask | Frigate | Kessari Orbital Defence | |
+| working name Union Walkout | Open lore ask | Destroyer | Union Defence Works | |
 
 ### Modules (`modules.ts`)
 
 | Id | Name | Note |
 | --- | --- | --- |
-| `meridian-engine-s` | Meridian Steady S | Unchanged |
-| `slagline-engine-s` | Slagline Kick S | Unchanged |
+| `meridian-engine-s` | Meridian Steady S | |
+| `slagline-engine-s` | Slagline Kick S | |
 | `slagline-engine-m` | Slagline Runner M | The Strike ore runners' engine |
-| `meridian-thrusters-s` | Meridian Trim S | Unchanged |
+| `meridian-thrusters-s` | Meridian Trim S | |
 | `slagline-thrusters-m` | Slagline Jink M | Belter for a sudden sideways dodge |
-| `meridian-reactor-s` | Meridian Cell S | Unchanged |
-| `itomarr-reactor-m` | Ito-Marr Reservoir M | Renamed: "Lattice" is the gate network's name |
-| `meridian-shield-s` | Meridian Ward S | Unchanged |
-| `itomarr-shield-m` | Ito-Marr Bastion M | Unchanged |
+| `meridian-reactor-s` | Meridian Cell S | |
+| `itomarr-reactor-m` | Ito-Marr Reservoir M | |
+| `meridian-shield-s` | Meridian Ward S | |
+| `itomarr-shield-m` | Ito-Marr Bastion M | |
 | `rookrivet-armour-s` | Rook and Rivet Patchplate S | Cut from salvaged hull plate |
-| `cantorvell-armour-m` | Cantor-Vell Vigil M | The armour the Cantors wore on gate-waking voyages |
+| `cantorvell-armour-m` | Cantor-Vell Vigil M | The plate on every Martian picket since the Gate War |
 | `meridian-pod-s` | Meridian Carryall S | A small general cargo pod |
-| `tessaract-container-m` | Tessaract Standard M | The standard box every port in the Arm handles |
-| `paragon-pulse-s` | Paragon Fairshot S | Becomes an open-market pulse laser (energy) |
-| `paragon-turret-s` | Paragon Watchman S | Retired with the old turreted swivel |
-| `union-autocannon-m` | Union Picket M | Named for the strike picket lines; the Picket line now runs S to L |
-| `paragon-turret-m` | Paragon Sentry M | Retired as a turret; the name passes to the CIWS `paragon-ciws-m` |
+| `tessaract-container-m` | Tessaract Standard M | The standard box every port in known space handles |
+| `paragon-pulse-s` | Paragon Fairshot S | Open-market pulse laser |
+| `union-autocannon-m` | Union Picket M | Named for the strike picket lines |
+| `meridian-radar-s` | Meridian Lookout S | |
+| `itomarr-radar-s` | Ito-Marr Watchtower S | |
+| `tessaract-radar-m` | Tessaract Clearance M | Reads traffic as a port clearance office does |
+| `meridian-beacon-s` | Meridian Lifeline S | The pod's radar |
+| `meridian-computer-s` | Meridian Plotter S | |
+| `paragon-computer-s`, `paragon-computer-m` | Paragon Marksman S, M | |
+| `tessaract-scanner-s` | Tessaract Tally S | A tally clerk counts cargo |
+| `meridian-nav-s` | Meridian Wayfinder S | |
+| `itomarr-nav-m` | Ito-Marr Chartvault M | A store of charts |
+| `meridian-helm-s` | Meridian Course S | **Renamed** from Helm S: flight computers are computers, not crew |
+| `paragon-helmsman-s` | Paragon Vector S | **Renamed** from Helmsman S |
+| `itomarr-coxswain-m` | Ito-Marr Trajectory M | **Renamed** from Coxswain M |
+| `meridian-podbay-s` | Meridian Pod Rack S | **Renamed** from Davit S |
+| `paragon-director-s`, `paragon-director-m` | Paragon Fire Control S, M | **Renamed** from Gunlayer; the L follows the same name |
+| `meridian-gleaner-s` | Meridian Gleaner S | |
+| `tessaract-gleaner-m` | Tessaract Collection M | Freight collection |
+| `slagline-kick-s` (afterburner) | Slagline Bolt S | |
+| `itomarr-surge-m` | Ito-Marr Surge M | **Renamed** from Sally M, back to the working name |
+| `paragon-ciws-m` | Paragon Sentry M | PDC |
 
-New system modules (6c and 6d):
-
-| Id | Name | Note |
-| --- | --- | --- |
-| `meridian-radar-s` | Meridian Lookout S | Unchanged |
-| `itomarr-radar-s` | Ito-Marr Watchtower S | Was Farsight |
-| `tessaract-radar-m` | Tessaract Clearance M | Was Traffic Array; reads traffic as a port clearance office does |
-| `meridian-beacon-s` | Meridian Lifeline S | Unchanged; the pod's radar |
-| `meridian-computer-s` | Meridian Plotter S | Unchanged |
-| `paragon-computer-s` | Paragon Marksman S | Was Fire Director S; joins Fairshot, Watchman and Sentry |
-| `paragon-computer-m` | Paragon Marksman M | Was Fire Director M |
-| `tessaract-scanner-s` | Tessaract Tally S | Was Manifest Reader, which clashed with the Tessaract Manifest hull; a tally clerk counts cargo |
-| `meridian-nav-s` | Meridian Wayfinder S | Unchanged |
-| `itomarr-nav-m` | Ito-Marr Chartvault M | Was Deep Reckoner; a store of charts |
-
-### Weapons and munitions (6e, ids for the lead to choose)
+### Weapons and munitions
 
 Each gun has one name across sizes S, M and L.
 
 | Weapon | Family | Name | Note |
 | --- | --- | --- | --- |
-| Autocannon | Projectile | Union Picket S, M, L | Keeps today's Picket M |
+| Autocannon | Projectile | Union Picket S, M, L | |
 | Artillery | Projectile | Union Lockout S, M, L | The strike's heaviest answer |
-| Pulse laser | Energy | Cantor-Vell Verse S, M, L | Short, sung in bursts |
-| Beam laser | Energy | Cantor-Vell Litany S, M, L | One long prayer |
-| Pulse laser, open market | Energy | Paragon Fairshot S | Today's `paragon-pulse-s` |
-| Blaster | Hybrid | Commonwealth Retort S, M, L | A reply at point blank |
-| Railgun | Hybrid | Commonwealth Answer S, M, L | A reply from as far as anyone can shoot |
+| Pulse laser | Energy | Cantor-Vell Volley S, M, L | **Renamed** from Verse |
+| Beam laser | Energy | Cantor-Vell Enfilade S, M, L | **Renamed** from Litany |
+| Pulse laser, open market | Energy | Paragon Fairshot S | |
+| Blaster | Hybrid | Ishtar Retort S, M, L | Maker renamed from Commonwealth |
+| Railgun | Hybrid | Ishtar Answer S, M, L | Maker renamed from Commonwealth |
 | Missile launcher | Missile | Ito-Marr Magazine S, M, L | |
 | Torpedo tube | Missile | Ito-Marr Arsenal L | |
-| Swivel (CIWS) | Point defence | Paragon Sentry M (`paragon-ciws-m`); Cantor-Vell Compline (laser, later) | Medium hulls and up |
-| Fire control | | Paragon Gunlayer S, M, L | The L runs the most swivels |
+| PDC | Point defence | Paragon Sentry M; Cantor-Vell Cordon (laser, later, **renamed** from Compline) | Medium hulls and up |
+| Fire control | | Paragon Fire Control S, M, L | The L runs the most PDCs |
 
 Munitions are made by Kessari Orbital Defence and named in its legal voice. A munition's full name is the munition, then the warhead, then the guidance when it is not radar-homing.
 
@@ -705,84 +655,62 @@ Munitions are made by Kessari Orbital Defence and named in its legal voice. A mu
 | Explosive warhead | Breach | Foreclosure Breach |
 | Heat-seeking guidance | Heat | Summons Scatter Heat |
 
-### Countermeasures (6e part 2)
+### Countermeasures
 
 | Name | Maker | Mix | Why |
 | --- | --- | --- | --- |
-| Ito-Marr Screen | Ito-Marr Dynamics | Mostly chaff, some flares | Ito-Marr builds the Kessari launchers, so it knows radar-homing missiles best |
+| Ito-Marr Screen | Ito-Marr Dynamics | Mostly chaff, some flares | Ito-Marr builds Earth's launchers, so it knows radar-homing missiles best |
 | Slagline Sparkler | Slagline Motors | Mostly flares; cheap | Belter fire-and-forget, sold by the crate |
-| Novum Ghost | Novum Systems | Mostly decoys, a little chaff | Kessari electronic warfare at its finest, and priced like it |
+| Novum Ghost | Novum Systems | Mostly decoys, a little chaff | Lunar electronic warfare at its finest, and priced like it |
 | Paragon Fair Warning | Paragon Arms | Even chaff and flares, no decoys | Sold to anyone |
 
-### Mining (`hulls.ts`, `modules.ts`, `goods.ts`)
+### Mining (`modules.ts`, `goods.ts`)
 
-Ids keep their wording. Every `rookrivet-` mining item changes maker as listed.
-
-| Id | Name | Maker | Note |
-| --- | --- | --- | --- |
-| `rookrivet-prospector` | Belt Forge Prospector | Belt Forge Collective | Cutter; the lone digger looking for a strike |
-| `rookrivet-breacher` | Belt Forge Sinker | Belt Forge Collective | Mid-size; shaft sinkers dug the deep, dangerous bores |
-| `rookrivet-hulk` | Belt Forge Collier | Belt Forge Collective | Hulk class; colliers were the age of sail's coal ships, big, slow and filthy |
-| `rookrivet-drone` | Belt Forge Knocker | Belt Forge Collective | The mining drone |
-| `rookrivet-pick-s`, `rookrivet-pick-m` | Belt Forge Pick S, M | Belt Forge Collective | Mining lasers |
-| `rookrivet-survey-s` | Belt Forge Dowser S | Belt Forge Collective | Survey scanner |
-| `tessaract-survey-m` | Tessaract Deep Dowser M | Tessaract Logistics | Unchanged |
-| `rookrivet-assay-s`, `rookrivet-assay-l` | Belt Forge Assay S, L | Belt Forge Collective | Mining computers |
-| `rookrivet-deepassay-m` | Belt Forge Sounder M | Belt Forge Collective | Was Deep Assay; finds knots |
-| `rookrivet-chargerig-s` | Belt Forge Shotfirer S | Belt Forge Collective | Was Charge Rig |
-| `rookrivet-hopper-s`, `rookrivet-hopper-m` | Belt Forge Hopper S, M | Belt Forge Collective | |
-| `rookrivet-drone-laser` | Belt Forge Nibbler | Belt Forge Collective | The Knocker's laser |
-| `rookrivet-dronebay-s` | Belt Forge Cradle S | Belt Forge Collective | Was Drone Cradle |
-| `rookrivet-dronebay-m` | Belt Forge Cage M | Belt Forge Collective | Was Drone Bay |
-| `rookrivet-excavator-l` | Corvane Excavator L | Corvane Heavy Industries | Mining turret |
-| `rookrivet-orehold-l` | Corvane Bunker L | Corvane Heavy Industries | Was Ore Hold; an ore bunker |
-| `rookrivet-reactor-l` | Corvane Furnace L | Corvane Heavy Industries | Reactor |
-| good `breach-charge` | Cracker | | Was Breach charge, which clashed with KOD's Breach warhead |
-| good `mining-drone` | Knocker (mining drone) | | |
-| good `banded-ore` | Copperband | | Was Banded ore |
-| good `black-ore` | Blackjack | | Was Black ore |
-| good `ore` | Nickel-iron | | Unchanged |
-| good `glintstone` | Glintstone | | Unchanged |
-| good `gate-glass` | Gate-glass | | Unchanged; a core is a knot |
-
-### Ship systems (6f, `modules.ts`)
-
-| Id | Name | Note |
+| Id | Name | Maker |
 | --- | --- | --- |
-| `meridian-helm-s` | Meridian Helm S | Unchanged |
-| `paragon-helmsman-s` | Paragon Helmsman S | Unchanged |
-| `itomarr-coxswain-m` | Ito-Marr Coxswain M | Unchanged; flight computers are named for the crew who steer |
-| `meridian-podbay-s` | Meridian Davit S | Was Ark Bay; davits hold a ship's boats |
-| `paragon-director-s`, `paragon-director-m` | Paragon Gunlayer S, M | Was Director |
-| `meridian-gleaner-s` | Meridian Gleaner S | Unchanged |
-| `tessaract-gleaner-m` | Tessaract Collection M | Was Long Gleaner; freight collection |
-| `slagline-kick-s` (afterburner) | Slagline Bolt S | Was Kick S, which is also the engine `slagline-engine-s` |
-| `itomarr-surge-m` | Ito-Marr Sally M | Was Surge; a sally bursts out of a fortress |
+| `rookrivet-pick-s`, `rookrivet-pick-m` | Belt Forge Pick S, M | Belt Forge Collective |
+| `rookrivet-survey-s` | Belt Forge Dowser S | Belt Forge Collective |
+| `tessaract-survey-m` | Tessaract Deep Dowser M | Tessaract Logistics |
+| `rookrivet-assay-s`, `rookrivet-assay-l` | Belt Forge Assay S, L | Belt Forge Collective |
+| `rookrivet-deepassay-m` | Belt Forge Sounder M | Belt Forge Collective |
+| `rookrivet-chargerig-s` | Belt Forge Shotfirer S | Belt Forge Collective |
+| `rookrivet-hopper-s`, `rookrivet-hopper-m` | Belt Forge Hopper S, M | Belt Forge Collective |
+| `rookrivet-drone-laser` | Belt Forge Nibbler | Belt Forge Collective |
+| `rookrivet-dronebay-s` | Belt Forge Cradle S | Belt Forge Collective |
+| `rookrivet-dronebay-m` | Belt Forge Cage M | Belt Forge Collective |
+| `rookrivet-excavator-l` | Corvane Excavator L | Corvane Heavy Industries |
+| `rookrivet-orehold-l` | Corvane Bunker L | Corvane Heavy Industries |
+| `rookrivet-reactor-l` | Corvane Furnace L | Corvane Heavy Industries |
+| good `breach-charge` | Cracker | |
+| good `mining-drone` | Knocker (mining drone) | |
+| good `ore` | Nickel-iron | |
+| good `banded-ore` | Copperband | |
+| good `black-ore` | Blackjack | |
+| good `glintstone` | Glintstone | |
+| good `gate-glass` | Gate-glass | |
 
 ### Manufacturers (`manufacturers.ts`)
 
-The names already in the catalogue are confirmed. The other makers in `races.md` keep their names for when they enter the catalogue.
-
-| Id | Name | Race |
+| Id | Name | Home |
 | --- | --- | --- |
-| `meridian` | Meridian Civil Yards | none (multi-race) |
-| `paragon` | Paragon Arms | none (multi-race) |
-| `kessariOrbital` | Kessari Orbital Defence | Kessari |
-| `itoMarr` | Ito-Marr Dynamics | Kessari |
-| `tessaract` | Tessaract Logistics | Kessari |
-| `slagline` | Slagline Motors | Free Belt |
-| `rookRivet` | Rook and Rivet | Free Belt |
-| `unionDefence` | Union Defence Works | Free Belt |
-| `cantorVell` | Cantor-Vell Arms | Halcyon |
-| `novum` | Novum Systems | Kessari |
-| `commonwealth` | Commonwealth Fleet Works | Vael |
-| `aurel` | Aurel | Aurel |
-| new, suggested `beltForge` | Belt Forge Collective | Free Belt |
-| new, suggested `corvane` | Corvane Heavy Industries | none (multi-race) |
+| `meridian` | Meridian Yards | Independent |
+| `paragon` | Paragon Arms | Everywhere |
+| `corvane` | Corvane Heavy Industries | Earth firm in Belt yards |
+| `kessariOrbital` | Kessari Orbital Defence | Earth |
+| `itoMarr` | Ito-Marr Dynamics | Earth |
+| `tessaract` | Tessaract Logistics | Earth |
+| `novum` | Novum Systems | Luna (Earth) |
+| `cantorVell` | Cantor-Vell Arms | Mars |
+| `commonwealth` | Ishtar Fleet Works | Venus (**renamed** from Commonwealth Fleet Works; id unchanged) |
+| `slagline` | Slagline Motors | The Belt |
+| `rookRivet` | Rook and Rivet | The Belt |
+| `unionDefence` | Union Defence Works | The Belt |
+| `beltForge` | Belt Forge Collective | The Belt |
+| `aurel` | Aurel | Beyond the Shoals |
 
-The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catalogue still needs a maker on each hull, so the entry is simply "Aurel", and the UI should show it the same way it would show a maker.
+Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dynamics and the Halden Institute (Venus).
 
-### Loadouts (`loadouts.ts`, optional)
+### Loadouts (`loadouts.ts`)
 
 | Id | Name |
 | --- | --- |
@@ -794,47 +722,73 @@ The Aurel have no manufacturers in lore: the Chorus shapes every ship. The catal
 
 ## Decisions
 
-Lore decisions by Jason, newest first.
+Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
-- 2026-11-06: Close-in weapon systems are swivels in the setting (the word moves from the retired turreted swivel). The ballistic one is the Paragon Sentry M; the later laser one the Cantor-Vell Compline. The big fire control is the Paragon Gunlayer L.
-- 2026-11-06: The transponder is the Registry beacon, built into every ship; pilots call it colours (showing colours, running dark, false colours), and a station's beacon is its light.
-- 2026-11-06: Running dark is criminal to Halcyon, suspicious to Kessari, the Oru and free ports near their stations, rude to the Vael, and normal to Belters and Drifters; each pirate faction has its own way with colours.
-- 2026-11-06: The contacts list is the Plot.
+- 2026-11-07: **Fitting stays free.** The `fitting.md` model stands: any hull fits anything its slots take, role bonuses nudge, built-in role equipment is the hull's identity and is never fitted out. The fleet lore maps onto it: builder trade-offs, tags and patterns are frame stats; tool grades are slot sizes with the bonus; holds, hoppers, heat ratings, bays, command suites, beacons, T3 capabilities and Lattice components are built in. Stock fits are what NPCs fly and what the art draws. Shown per hull on the registry page.
+- 2026-11-07: **Capitals never work the site.** A capital cannot manoeuvre among rocks, through a cloud band or around a wreck field, so every capital industrial hull, the T3s included, parks at the edge and reaches in with subcraft, drones or a fleet. The Corvane Colossus is therefore a T3 mining carrier, not a strip-miner: two hangar booms round a receiving dock, gate-glass-lined furnaces, loading cradles for Drays and Pitheads; it processes faster than anything human. The Lodestar finds; the Colossus processes. Supersedes the strip-miner decision below.
+- 2026-11-07: **Materials.** Real minerals under their real names (nickel-iron, copper, zinc, platinum, rare earths; water, ammonia and carbon ice; Venus's carbon dioxide, sulphur and nitrogen; the giants' hydrogen and helium-3 later), with exotics such as gate-glass reserved for other systems; nothing exotic is mined in Sol. Breaching in Sol finds platinum and rare-earth pockets. Field refining at a worse yield than a station; maker alloys named now, recipes at the manufacturing milestone. Full catalogue in `materials.md`.
+- 2026-11-07: **Who mines, by power.** Earth builds no miners: it owns the claims (the Gate War ore rights) and buys the work from Belt cooperatives under licence and from Corvane's corporate fleets. Mars mines itself as a state, in Arcadia hulls: tough, slow, armoured, Martians first. The Belt mines in Belt Forge hulls: the best yield and range, fragile and unarmed. Meridian sells the cheap first miner to anyone. Venus is gas only. The difference between builders is a trade-off (yield, hold, armour, price), not plain efficiency. Agreed additions: Meridian Dunlin, Corvane Pithead, Arcadia Miner Mk II and Mk I, Lavinia Breeze, Belt Forge Rime and the old Rime, Rook and Rivet Gantry, Arcadia Tender Mk 0, Halden Footnote, Arbor Tendril, Halden Probe.
+- 2026-11-07: **Command ships are carriers.** The capital industrial hulls do not do the work; their wing of subcraft, fighters and drones does, and the capital stores, processes, defends and boosts. Fully effective flown alone as a carrier; the fleet bonuses come later. No tool on the hull (the Cyclone and Still lost their intakes). The Belt's military carriers are these same industrial capitals refitted for war by Union Defence Works (Union General Strike over a Headframe).
+- 2026-11-07: the Corvane Colossus is not a second gas refinery. The Still is Corvane's gas command ship; the Colossus, Corvane's civil T3 and the only T3 capital, is a strip-miner that swallows an asteroid whole and feeds it to a gate-glass crusher throat. One hull per role in the prototype line.
+
+- 2026-11-07: **The Belt's military.** The Union Militia is a rota, not a fleet; Union Defence Works is a refit shop, not a yard; the Union pattern is a Militia standard applied to captured, bought or copied hulls (Wildcat, Blockade, Boycott, Walkout, Solidarity, Dirk and Cutlass refits), sold only in the Belt for cooperative standing. No T1/T2 and no civilian grade in the Belt: the Militia tag is a rota state on any Belt hull. The clans are the Belt's quality (T3). Five routes to a warship for a pilot: navy licence, independents, retired navy, Union pattern, clan hull (`fleet.md`).
+- 2026-11-07: **Independents.** Meridian Yards (was Meridian Yards) and Corvane Heavy Industries are independents: no flag, licensed by the Ceres Registry, based at Accord free ports, building civil and combat hulls for anyone at any size, no Navy tag, no licence. Meridian cheap (Kite, Harrier, Osprey added), Corvane a bit pricier (Warden, Bulwark, Foreman added). Paragon Arms stays a module maker. Replaces "held in trust" and "Everywhere".
+- 2026-11-07: **Venus flies fighters after all.** Ishtar Hathor, a light hybrid fighter (Navy or civilian grade; retired Hathor '221 sold with the gun pulled), and the Solace Stretcher recast as a heavy SAR fighter sold to every navy under the Mercy Clause, drawn generic so it fits anyone's bay. No Venusian heavy combat fighter.
+- 2026-11-07: **Navies as a system** (`navy.md`). Local law is the holder's navy patrol on a beat plus station security in its zone; security by influence (Core, Held, Contested, Open); five rungs (station security, patrol, reserve, navy, hunting group); escalation by what was witnessed; ROE (never pods, never first on a lit transponder); wanted follows the hull first and the pilot second, amnesty always purchasable, work-off possible; navies buy civilian hulls for non-offensive roles; no open war, Earth and Mars mostly hostile with skirmishes in Contested systems.
+- 2026-11-07: **Fighters follow the navy rules.** Light fighters Navy or civilian grade (Vantage Foil, Arcadia Fighter Mk V), heavy fighters Navy only, and each has a retired mark sold whole with the Navy tag (Vantage Dirk and Cutlass, Arcadia Fighter Mk IV and Heavy Fighter Mk I).
+- 2026-11-07: **Special operations, the T3 line.** A hull built around one capability, the best at it, worse at something else, never on the open market. The hunting doctrine: watcher (fast, cold, finds and locks), hunter (a brick that jumps onto the lock and pins the target until the fleet arrives), striker (stripped down, bristling, jumps in behind and commits). Jumps are in-system only, need a jump target (a watcher's lock, a fleet or station beacon), use a gate-born drive built on salvaged Lattice material, single digits per power, banned under Open Lanes. Stealth is the line's theme. Earth and Mars field the triad (Kessari Summons, Custody, Sentence; Seraphine Noctis, Cerberus, Medusae); Venus one unacknowledged hunter (Ishtar Hecate) and sells SAR to everyone instead; the clans field watchers and strikers with no drives (Vesk Vane, Vesk Shade). Tiers: T1 legacy and retired navy, T2 production and patterns, T3 special operations and clan. Details in `fleet.md`, "Special operations: the T3 line".
+- 2026-11-07: **Navy is a tag, not a generation.** Current corvettes and patrol boats come Navy grade (licence) or civilian grade (same hull, no tag, open market); frigate and above Navy only. Retired navy marks (Notice, Writ, Decree, Ruling, Deimos Mk I, Phobos Mk II, Sedna '218, Lakshmi '205) sell whole on the open market, Navy tag intact, still powerful and expensive; demilitarised surplus is retired. Mars sells civilian grade to Martians only and releases retired marks once the replacement is in service. On the registry, civilian grade is a livery toggle; retired marks and legacy are their own entries with their own art.
+- 2026-11-06: **The Sol pivot.** Humanity grew up in Sol. Four powers: Earth (with Luna), Mars, Venus, the Belt. The Belt found the gate; a short Gate War; the Ceres Accord brokered by Venus. The Lattice and the Aurel kept; the Oru, Halcyon, Vael and Drifters as peoples retired. Makers are companies with a home power and one or two specialities. EVE-style system collection, current physics, burn, flip, burn travel with interception, no in-system FTL for now. Expanse-age language throughout; slang, not a language. Planets are huge and not landable.
+- 2026-11-06: Names are humanised; Kessari survives as Earth's trading bloc, so Kessari Orbital Defence keeps its name. The contacts list is the board. Cantor-Vell's guns take Martian military names (Volley, Enfilade, Cordon). Commonwealth Fleet Works becomes Ishtar Fleet Works. The calendar is years since the gate woke (GW). The Aurel stay a horizon for now.
+- 2026-11-06: Crew is a direction, not part of the pivot: a system, never a people sim; costs and risks only.
+- 2026-11-06: Backgrounds, not careers, at character creation (agreed in principle with the rewrite): origin plus background, nothing locks.
+- 2026-11-06: Each power has a navy with dedicated hulls from its yard. Mars's civilian hulls come from one state yard, Arcadia Works, named what they are.
+- 2026-11-06: "Subcraft" means any crewed NPC small craft (combat, mining, salvage, rescue), in effect a very heavy drone with better capabilities; a fighter is a combat subcraft; drones are uncrewed. Both are company-built products in bays, never from navy yards (Mars excepted); light combat craft sell openly, heavy ones behind standing or a licence; industrial subcraft and drones are never armed; capital-class industrial ships carry them. Only Earth (Vantage Aerospace) and Mars (Arcadia) build crewed fighters; Venus flies Arbor drones; the Belt flies second-hand and clan craft.
+- 2026-11-06: Art direction: no basic shapes and no triangles; detailed hulls coloured for role, company and power; a radius range per weight band with wide room inside it (`fleet.md`). Belt mining, salvage and clan hulls confirmed as Belt originals.
+- 2026-11-06: Style: the company leads a ship's design (shape, and colour for civilians), navies set the livery of military hulls, and the power adds registry markings. Surplus (decommissioned, demilitarised navy hulls) is the low-tier military of individuals, with each navy's attitude to selling it. Belt combat and transport hulls are rebuilt captures and copies with their own bonuses; Belt mining, salvage and clan hulls are originals (`fleet.md`).
+- 2026-11-06: Weight bands: every hull has a Ceres Registry rating, [weight band]-[function], with bands Light, Medium, Heavy, Super-heavy and Capital; military classes imply theirs, civilian jobs carry theirs (`fleet.md`, "Weight bands").
+- 2026-11-06: Shields stay. Earth tanks with shields, Mars with armour, Venus with a regenerative mix, the Belt with whatever it has.
+- 2026-11-06: Generations: legacy hulls out of production on a used market, production hulls, pattern hulls behind standing (`fleet.md`).
+- 2026-11-06: Close-in weapon systems: the ballistic one is the Paragon Sentry M; the later laser one is Cantor-Vell's; the big fire control is Paragon's L. (Words updated by the pivot: PDC, Cordon, Fire Control.)
+- 2026-11-06: The transponder is built into every ship. Running dark is treated differently by each power; each pirate faction has its own way with it. (Words updated by the pivot: transponder, beacon.)
 - 2026-11-05: Mining kit is Belt Forge Collective's, with Corvane's heavy plant on the Collier; Rook and Rivet stays salvage.
-- 2026-11-05: Mining ships are the Prospector, the Sinker (was Breacher) and the Collier (was Hulk); the drone is the Knocker, in a Cradle or a Cage.
-- 2026-11-05: Breaching: crackers (charges), the Shotfirer (rig), the Sounder (deep assay); a core is a knot, a piece of the gate's frame swallowed by rock.
-- 2026-11-05: Ores: Nickel-iron, Copperband, Blackjack, Glintstone and gate-glass. More ores come later, rarer in more dangerous systems, and makers will have their own alloys, the start of smelting and player building.
-- 2026-11-05: 6f modules: Meridian Davit, Paragon Gunlayer, Tessaract Collection, Slagline Bolt, Ito-Marr Sally; the flight computers keep their names.
-- 2026-11-05: NPC miners: prospectors are Ridge Collective crews; the hulk is a Corvane contract crew hauling to Lantern Works.
-- 2026-11-05: Any NPC can be independent or work for a company; seeded systems vary the mix by holder, security band and what the system has ("Who NPCs work for").
-- 2026-11-04: Weapon families follow canon: Halcyon energy, Kessari missile, Free Belt projectile, Vael hybrid; the Oru and Drifters lean to none; Paragon sells light guns of every family.
-- 2026-11-04: Gun names: Union Picket and Lockout, Cantor-Vell Verse and Litany, Commonwealth Retort and Answer, Paragon Fairshot as the open-market pulse laser.
-- 2026-11-04: Missiles: Ito-Marr Magazine and Arsenal launchers; KOD Summons missiles and Foreclosure torpedoes; Scatter and Breach warheads; Heat for heat-seekers.
-- 2026-11-04: Capacitors: Tern small and steady, Warrant tight and quick, Manifest deep and slow, Tacet near-limitless, Ark a trickle.
-- 2026-11-04: Countermeasures: Ito-Marr Screen, Slagline Sparkler, Novum Ghost, Paragon Fair Warning.
-- 2026-11-04: Turreted point defence guns are swivels in the setting.
-- 2026-11-04: Hull classes keep the age-of-sail ladder, with merchantman for trade and passengers and hulk for industry; the Manifest is a merchantman. Each people names its line ships and capitals in its own words.
-- 2026-11-04: No Concord. The treaty is the Landfall Accord, with no ships of its own. Law is local and escalating: each holder polices its own space with ordinary, beatable ships, calling for more as needed. A deliberate departure from EVE.
-- 2026-11-04: Calder's bodies are Fieldmark (a farmed garden world), Lantern (its ice moon) and the Scree (the belt).
-- 2026-11-04: The third station is Lantern Works, a Corvane foundry round Lantern: wants ore and scrap, makes machinery cheap, has outfitting, no ship mart.
-- 2026-11-04: Calder's patrols are the Calder Watch, the Port Authority's own, in Kessari Warrants.
-- 2026-11-04: The Scree is nickel-iron and ice with rare gate-glass.
-- 2026-11-04: Six system modules renamed to their makers' themes; the four Meridian names stand.
-- 2026-11-04: All four hooks for the systems principle are canon (the Covenant Standard, Witness Law, Lattice glare, the Aurel contrast), with glare never degrading what the window shows.
+- 2026-11-05: Mining ships are the Prospector, the Sinker and the Collier; the drone is the Knocker, in a Cradle or a Cage.
+- 2026-11-05: Breaching: crackers, the Shotfirer, the Sounder; a core is a knot.
+- 2026-11-05: Ores: Nickel-iron, Copperband, Blackjack, Glintstone and gate-glass. More ores later, rarer in dangerous systems, and maker alloys as the start of smelting and player building.
+- 2026-11-05: 6f modules named. (The flight computers, pod bay and fire control were renamed again by the pivot.)
+- 2026-11-05: NPC miners: prospectors are Ridge Collective crews; the barge is a Corvane contract crew. Any NPC can be independent or work for a company; seeded systems vary the mix.
+- 2026-11-04: Weapon families by power (updated by the pivot: Earth missile, Mars energy, Venus hybrid, Belt projectile). Gun, launcher, munition, warhead and countermeasure names as in "Names". Capacitors per hull as written.
+- 2026-11-04: Hull classes are a shared ladder (words replaced by the pivot). Class is what a hull was built as; the fit is what it is now.
+- 2026-11-04: No galactic police. The treaty has no ships of its own. Law is local and escalating with ordinary, beatable ships. A deliberate departure from EVE.
+- 2026-11-04: Calder's bodies are Fieldmark, Lantern and the Scree; the third station is Lantern Works; patrols are the Calder Watch in Kessari Warrants; the Scree is nickel-iron and ice with rare gate-glass.
+- 2026-11-04: The four hooks for the systems principle are canon, with glare never degrading what the window shows. (The Covenant Standard became the Luna Standard.)
 - 2026-11-04: The core premise stands: the Aurel caged the Unsung by silencing the Lattice, and human gate-waking is slowly undoing it.
-- 2026-11-04: Hive Ossk grows the core of every station; each people clads it in its own look.
-- 2026-11-04: A pilot can start as Oru, as a human ward raised among the hives.
-- 2026-11-04: All three routes to an Aurel ship stand (husks, the one on the pad, gifted), and so does the 604 AL sale.
-- 2026-11-04: Player organisations are called outfits.
-- 2026-11-04: The Unsung appear in play later, as hostile hollow ships in the Dark; offscreen until then.
-- 2026-11-04: Pilots can gain standing with the Red Tithe, Null Ledger, Black Strike and Cutloose; never the Hiveless; the Hollow Choir only very late.
-- 2026-11-04: The starter sector stands as written (Calder, Harbour, Ridge, the Tessaract trader, the Black Strike raider).
+- 2026-11-04: All three routes to an Aurel ship stand, and so does the sale on the pad.
+- 2026-11-04: Player organisations are outfits. The Unsung appear in play later, as hostile hollow ships in the Dark. Pilots can gain standing with the Black Strike, Null Ledger and Cutloose; the Hollow Choir only very late.
+- 2026-11-04: The starter sector stands as written.
 
 ## Open questions
 
+- Big ships (open lore ask): names for the Kessari Injunction and the Union Walkout and their large kit.
+- The Arena and its scenarios (open lore ask): what the Arena is in the setting and names for Skirmish, Waves and To the death.
 - Maker alloys: names and what goes into them, when smelting is designed.
-- The local force names under "Law enforcement" are proposed.
-- Place and faction names (the Meridian Arm, the Lattice, the Pale Reach, the Shoals, the Unsung, Calder, the pirate factions) are placeholders until Jason confirms them. Catalogue names are in "Names".
-- Where humans came from and why the Covenant Fleet fled. Leaving it unanswered is a valid choice.
-- Whether the Drifters' search for the Mouth becomes a late-game exploration goal.
-- Whether the Oru ever license human navy pilots, wards included.
+- One word each for Mars, Venus and the Belt's biggest ships, if wanted.
+- Whether players ever cross the Shoals in play.
+
+## Retired
+
+The setting before 6 November 2026, kept so nothing is lost. None of it is canon; any of it can return as a new system, faction or story.
+
+| Retired | Could return as |
+| --- | --- |
+| The Meridian Arm as the setting; the Covenant Fleet, Landfall and the Mouth; years After Landfall | A lost colony fleet found beyond a far gate |
+| The Halcyon Dominion: a Hierarch, Great Houses, the Canticle, the Radiant relic, pilgrim liners, the Hive War | A theocratic breakaway colony in the Marches that worships the gates |
+| The Vael Commonwealth as a people (its science, medicine and neutrality live on in Venus) | |
+| The Oru Collective: hives Tessh, Ossk and Thiel, wards, Hive Peace station cores, the Halo Drone Consortium, the Hiveless | A living alien people found out past the Dimming, if a second alien race is ever wanted |
+| The Drifter Clans as a people (they live on as the Belt's clans: Vesk, Saro, the Long Wake) | |
+| The Charter Schism, the Halden Heresy, the Hive War, the Hive Peace, the Landfall Accord (now the Ceres Accord) | |
+| The Red Tithe (Halcyon deserters raiding pilgrim liners) | A Martian deserter faction |
+| Seraphine Shipwrights, Grand Tithe Yards, Sanctum Instruments as Halcyon houses (Seraphine lives on as Mars's naval yard) | |
+| Each people's words for its big ships: Cathedrals, Tribunals, Rigs, Strikehalls, Custodians, Sanctuaries, Broods, Seedhives, Homeships | One word each for Mars, Venus and the Belt |
+| The age-of-sail vocabulary: cutter, sloop, brig, ship of the line, merchantman, hulk; swivels; colours and lights; davits, gunlayers, helm, helmsman, coxswain; the Plot | |
+| Cantor-Vell's Canticle names: Verse, Litany, Compline | |
