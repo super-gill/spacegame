@@ -254,6 +254,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: who mines by power recorded (`lore.md` decision, `industries.md`); eleven gap-pass hulls agreed, to follow the materials pass.
 - 2026-11-07, lore: tier gap pass per industry in `industries.md` with nine proposed hulls awaiting Jason; `hulls.md` grade fix for the Jackleg and Grab (civilian, open market, not Navy only).
 - 2026-11-07, lore: command ships clarified as carriers (the wing works, the capital stores, processes, defends, boosts; effective solo); `fleet.md` section rewritten with a data shape for the lead. Cyclone and Still redrawn without intakes. New hull Union General Strike (Belt carrier over a Headframe). Catalogue ids unchanged; one new registry key.
 - 2026-11-07, lore: Corvane Colossus re-roled from gas refinery to strip-miner (the T3 capital) after Jason's review; `fleet.md`, `lore.md`, `hulls.md` updated. Catalogue ids unchanged.

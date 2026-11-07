@@ -157,10 +157,24 @@ Jason's question: does the player have enough T1 and T2 to get into each industr
 | Crime | any T1 | Burrow, Osprey; Union pattern | none | none | Fine; crime is a use of hulls, not a line of them |
 | Manufacturing | none | Winder, Smelter, Foreman | Headframe | Lodestar | Fine for now; manufacturing is a later milestone |
 
-### Proposed additions (not yet in `fleet.md` or the registry; Jason to confirm)
+### Who mines, by power (agreed 7 November 2026)
+
+Earth builds no miners. It owns the claims (the Gate War left it the ore rights to most of the old Belt) and buys the work: Belt cooperatives under Earth licence, and Corvane's corporate fleets, which are the nearest thing Earth has to a mining navy. An Earth-start player who wants to mine buys Corvane or Meridian, as an Earth firm would; Tessaract hauls, Kessari escorts, neither cuts rock. Mars mines itself as a state in Arcadia hulls and would never leave its supply to contractors. The Belt mines in Belt Forge hulls. Meridian sells the first miner anyone buys. Venus is gas only.
+
+| Builder | What its miners are good at | What they pay for it |
+| --- | --- | --- |
+| Belt Forge | Yield per hull, range, going where nobody else does; generations of knowing the rock | Fragile, unarmed, every one a little different |
+| Corvane | Throughput at scale; armed; fleets that come home | Expensive; heavy; wants a Bulwark behind it in bad space |
+| Arcadia (Mars) | Survives; works under fire; state support | Slow, small holds, sold to Martians first |
+| Meridian | Cheap and everywhere | Slight; outgrown fast |
+
+For the lead: four knobs per builder (yield, hold, armour, price), not an efficiency scalar.
+
+### Agreed additions (7 November 2026; to be added to `fleet.md` and drawn)
 
 | Gap | Proposal | Builder | Tier, weight | Why this builder |
 | --- | --- | --- | --- | --- |
+| Mars mines itself | **Arcadia Miner Mk II**, a medium cutter in bolted plate, armoured, slow, and **Arcadia Miner Mk I** as its legacy | Arcadia | T2 Medium, T1 Medium | The state's own cutter; Mars never contracts its supply out |
 | Mining entry outside the Belt | **Meridian Dunlin**, a light prospector: a Gull box with a mining laser on the standard ring and a small ore hold | Meridian | T2 Light | Meridian sells everywhere with no licence; the Registry starter's natural second ship |
 | Heavy cutting miner | **Corvane Pithead**, a heavy miner: a dark slab with two heavy lasers, a sorting hopper and ore bays, armed | Corvane | T2 Heavy | Corvane already builds the Navvy and the refineries; fills the step before the Headframe |
 | Gas T1 | **Lavinia Breeze**, the skimmer before the Zephyr: shallow only, small tank, comes back hot | Lavinia | T1 Light (legacy) | Gives Lavinia a used market and the player a cheap first dive |
@@ -171,7 +185,7 @@ Jason's question: does the player have enough T1 and T2 to get into each industr
 | Collector drone | **Arbor Tendril**, a collector drone that gathers cut ore and loose salvage | Arbor | T2 Drone | Arbor builds every drone; the mining loop already assumes a collector |
 | Survey probe | **Halden Probe**, a one-shot survey drone launched from a bay | Halden | T2 Drone | The Expedition's wing needs something to launch |
 
-Nine hulls and drones. With them every industry has a T1 way in, a T2 ladder without a missing weight, a command ship where fleets make sense, and a T3. Without them the gaps that bite first are mining outside the Belt and the two T1s for gas and SAR, because those are the industries the player tries early.
+Eleven hulls and drones. With them every industry has a T1 way in, a T2 ladder without a missing weight, a command ship where fleets make sense, and a T3. Without them the gaps that bite first are mining outside the Belt and the two T1s for gas and SAR, because those are the industries the player tries early.
 
 ## For the lead
 
