@@ -51,6 +51,11 @@ const MAX_BUFFERED_BYTES = 2_000_000;
 
 const storage = new Storage(DATA);
 const loaded = storage.loadWorld();
+if (loaded.calderBackup) {
+  // Sol replaces Calder (docs/sol-build.md): save the new world now, so the next start loads Sol, not the old save again.
+  storage.saveWorld(loaded.world);
+  console.log(`The saved world was Calder: kept as ${loaded.calderBackup}. Sol starts fresh; characters and keys carry over.`);
+}
 const games = makeWorlds(loaded.world);
 // Nobody is connected yet: everyone is away, and ships left in space disappear after the grace.
 games.persistent.allAway();

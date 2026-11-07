@@ -17,6 +17,7 @@ import {
   ownedShips,
   shipPilot,
   sub,
+  homeStationId,
 } from '@spacegame/sim';
 
 /**
@@ -37,7 +38,7 @@ const LOCK_REFUSALS: Record<LockRefusal, string> = {
 
 /** Why docking was refused, in words. */
 const CHARGE_REFUSALS: Record<Extract<WorldEvent, { type: 'chargeRefused' }>['reason'], string> = {
-  noCharges: 'No crackers in the hold. Buy them at Ridge or Harbour.',
+  noCharges: 'No crackers in the hold. Buy them at a station that sells them.',
   noRock: 'Lock a rock and make it your active lock to plant a charge.',
   tooFar: `Get within ${PLANT_REACH} units of the rock's surface to plant a charge.`,
   tooClose: `Too close to set them off: get ${SAFE_DISTANCE} units clear of the rock.`,
@@ -226,12 +227,13 @@ export class Ui {
     const refusal = pilotId ? claimRefusal(world, pilotId) : 'noShip';
     this.podBlock.classList.toggle('hidden', !inPod);
     this.claimButton.classList.toggle('hidden', refusal !== null);
+    const home = world.stations[homeStationId(world)]?.name ?? 'Your home station';
     const text =
       refusal === null
-        ? 'You own no ships. Harbour will give you a Meridian Tern for free.'
+        ? `You own no ships. ${home} will give you a Meridian Tern for free.`
         : refusal === 'ownsShips'
           ? 'You still own a ship, so there is no free Tern. Find it under Your ships and fetch it, or buy another.'
-          : 'The free Tern is given at Harbour Station, to pilots who own no ships.';
+          : `The free Tern is given at ${home}, to pilots who own no ships.`;
     if (this.podText.textContent !== text) this.podText.textContent = text;
   }
 
@@ -376,8 +378,8 @@ export class Ui {
     } else if (e.type === 'pilotWoke') {
       this.showToast(
         ship && isEscapePod(world, ship)
-          ? 'You wake at Harbour in a new escape pod. Your ships are where you left them.'
-          : `You wake at Harbour with a free ${name}.`,
+          ? `You wake at ${world.stations[e.stationId]?.name ?? 'your home station'} in a new escape pod. Your ships are where you left them.`
+          : `You wake at ${world.stations[e.stationId]?.name ?? 'your home station'} with a free ${name}.`,
         3500,
         'info',
       );

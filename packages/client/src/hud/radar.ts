@@ -170,7 +170,8 @@ export class Radar {
       ctx.stroke();
     }
 
-    // Stations: always, pinned to the rim beyond the range, with a short name.
+    // Stations: always, pinned to the rim beyond the range; named only within range, since
+    // in Sol every far port sits on the rim and their names would pile up there.
     ctx.font = '10px "IBM Plex Mono", ui-monospace, monospace';
     for (const station of Object.values(world.stations)) {
       const p = radarPoint(at, station.position, range, DISC);
@@ -179,6 +180,7 @@ export class Radar {
       ctx.lineWidth = 1.4;
       ctx.fillRect(p.x - 4, p.y - 4, 8, 8);
       ctx.strokeRect(p.x - 4, p.y - 4, 8, 8);
+      if (Math.hypot(station.position.x - at.x, station.position.y - at.y) > range) continue;
       const label = station.name.split(' ')[0]!.toUpperCase();
       ctx.fillStyle = C.ink;
       ctx.textAlign = p.x > 30 ? 'right' : 'left';

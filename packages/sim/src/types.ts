@@ -887,6 +887,14 @@ export interface Ship {
   /** True on ticks the afterburner is lit. Absent: not lit. */
   afterburning?: boolean;
   /**
+   * A plotted burn under way (burn.ts, docs/sol-build.md, "Travel: the
+   * burn"): the ship flies itself to `targetId`'s station, turning,
+   * burning, flipping and braking, and arrives at rest a little short of
+   * it. A null target brakes to rest where the ship is. Absent: flying
+   * by hand.
+   */
+  burn?: BurnState;
+  /**
    * Mining lasers running this tick, for drawing: each beam's mount, how
    * long it reached, the rock it touched (null: none in range) and
    * whether it is cutting (false: the rock is too hard). Absent: none.
@@ -1479,7 +1487,43 @@ export interface WorldRules {
   manoeuvreSpeed: number;
 }
 
+/** A plotted burn: where to, and when it began (for the HUD's progress). */
+export interface BurnState {
+  /** The station burned for, or null for a braking burn (stop where you are). */
+  targetId: string | null;
+  /** The tick the burn began. */
+  startTick: number;
+}
+
+/**
+ * A system's rock site as the rock generator and rockfall see it
+ * (asteroids.ts): the belt body whose ring the rocks ride, the station
+ * whose dense field crowds round it on the ring, and where that station
+ * sits on the ring at tick 0. Calder's is the Scree and Ridge Outpost;
+ * Sol's first is the field round Ceres. More sites come with slice 5 of
+ * docs/sol-build.md.
+ */
+export interface RockSite {
+  beltId: string;
+  stationId: string;
+  ringRadius: number;
+  ringWidth: number;
+  /** The belt's turn, seconds, when orbits run. */
+  period: number;
+  /** Where on the ring the station is at tick 0, radians. */
+  phase: number;
+}
+
+/** Which system a world is: Calder (the old start, kept for the Arena and the tests) or Sol. Absent: Calder. */
+export type SystemId = 'calder' | 'sol';
+
 export interface World {
+  /** Which system this is; absent means Calder (worlds saved before Sol). */
+  system?: SystemId;
+  /** Where new pilots start and pods wake; absent means Calder's Harbour Station. */
+  homeStationId?: string;
+  /** The rock site; absent means Calder's Scree. */
+  rockSite?: RockSite;
   /** Mechanics under trial (see `WorldRules`). */
   rules: WorldRules;
   /** Monotonic tick counter. */
@@ -1570,6 +1614,10 @@ export type WorldEvent =
   | { type: 'flightModeChanged'; shipId: string; mode: FlightMode }
   | { type: 'weaponsHotChanged'; shipId: string; hot: boolean }
   | { type: 'coloursChanged'; shipId: string; dark: boolean }
+  /** A plotted burn began (burn.ts); a null target is a braking burn. */
+  | { type: 'burnStarted'; shipId: string; targetId: string | null }
+  /** A burn ended: it arrived, or the pilot cancelled it and the ship coasts. */
+  | { type: 'burnEnded'; shipId: string; reason: 'arrived' | 'cancelled' }
   /** `shipId` started locking `targetId`. */
   | { type: 'lockStarted'; shipId: string; targetId: string }
   /** `shipId` completed its lock on `targetId`. */

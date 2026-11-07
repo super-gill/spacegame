@@ -32,6 +32,11 @@ import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from
 /** The station new pilots start at and pilots wake at. */
 export const STARTER_STATION_ID = HARBOUR_ID;
 
+/** Where a world's new pilots start and pods wake: Sol's Earth Orbital Exchange, or Calder's Harbour Station (`STARTER_STATION_ID`). */
+export function homeStationId(world: Pick<World, 'homeStationId'>): string {
+  return world.homeStationId ?? STARTER_STATION_ID;
+}
+
 /** Loadout every new pilot is given, and the free starter: a Meridian Courier. */
 export const STARTER_LOADOUT_ID = 'meridian-starter';
 
@@ -41,8 +46,9 @@ const STARTER_ROUNDS = 3;
 /** The fixed fit every escape pod has. */
 export const ESCAPE_POD_LOADOUT_ID = 'escape-pod';
 
-/** How far from a fixed starter station a ship placed in space appears, units. */
+/** How far from a fixed starter station a ship placed in space appears, units; at least this much clear of a bigger station's hull. */
 const SPAWN_DISTANCE = 650;
+const SPAWN_CLEARANCE = 300;
 /** On an orbiting station's path: seconds before the station reaches the first pilot placed in space. Short enough that the pilot wakes inside Harbour's security zone. */
 const SPAWN_LEAD_SECONDS = 12;
 /** Each further pilot placed in space is this many seconds further along the orbit. */
@@ -115,7 +121,7 @@ function spawnPlace(world: World, station: Station, index: number): { position: 
     const parentAt = orbit ? bodyState(world.bodies, orbit.parent, railTime(world.tick, world.dt)).position : null;
     const away = parentAt && orbit!.radius > 0 ? toAngle(sub(station.position, parentAt)) : 0;
     const angle = away + (index % 2 === 0 ? 1 : -1) * Math.ceil(index / 2) * (Math.PI / 4);
-    const position = add(station.position, scale(fromAngle(angle), SPAWN_DISTANCE));
+    const position = add(station.position, scale(fromAngle(angle), Math.max(SPAWN_DISTANCE, station.radius + SPAWN_CLEARANCE)));
     return { position, heading: angle + Math.PI, velocity: frameVelocity(world, { position, dockedAt: null }) };
   }
   const now = orbitAngle(orbit, railTime(world.tick, world.dt));
@@ -477,11 +483,11 @@ export function wakePilot(world: World, pilotId: string): CommandResult<WakeRefu
   if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
   if (pilot.shipId && world.ships[pilot.shipId]) return { ok: false, world, reason: 'hasShip' };
   const loadoutId = ownedShips(world, pilotId).length > 0 ? ESCAPE_POD_LOADOUT_ID : STARTER_LOADOUT_ID;
-  const issued = issueShip(world, pilotId, loadoutId, STARTER_STATION_ID);
+  const issued = issueShip(world, pilotId, loadoutId, homeStationId(world));
   return {
     ok: true,
     world: issued.world,
-    event: { type: 'pilotWoke', shipId: issued.ship.id, stationId: STARTER_STATION_ID },
+    event: { type: 'pilotWoke', shipId: issued.ship.id, stationId: homeStationId(world) },
   };
 }
 
@@ -502,7 +508,7 @@ export function claimRefusal(world: World, pilotId: string): ClaimRefusal | null
   const pod = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
   if (!pilot || !pod) return 'noShip';
   if (!isEscapePod(world, pod)) return 'notInPod';
-  if (pod.state !== 'docked' || pod.dockedAt !== STARTER_STATION_ID) return 'notAtStarterStation';
+  if (pod.state !== 'docked' || pod.dockedAt !== homeStationId(world)) return 'notAtStarterStation';
   if (ownedShips(world, pilotId).length > 0) return 'ownsShips';
   return null;
 }
@@ -519,10 +525,10 @@ export function claimStarterShip(world: World, pilotId: string): CommandResult<C
   const ships = { ...world.ships };
   delete ships[podId];
   // The pod's pad is free now, and a starter fits any pad a pod does.
-  const issued = issueShip({ ...world, ships }, pilotId, STARTER_LOADOUT_ID, STARTER_STATION_ID);
+  const issued = issueShip({ ...world, ships }, pilotId, STARTER_LOADOUT_ID, homeStationId(world));
   return {
     ok: true,
     world: issued.world,
-    event: { type: 'starterClaimed', shipId: issued.ship.id, stationId: STARTER_STATION_ID },
+    event: { type: 'starterClaimed', shipId: issued.ship.id, stationId: homeStationId(world) },
   };
 }

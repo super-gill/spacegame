@@ -74,7 +74,7 @@ export class YourShipsPanel {
 
     this.root.replaceChildren();
     if (rows.length === 0) {
-      this.root.append(el('p', 'note', 'You own no ships. Buy one at a ship mart, or claim the free Tern at Harbour if you are in a pod.'));
+      this.root.append(el('p', 'note', 'You own no ships. Buy one at a ship mart, or claim the free Tern at your home station if you are in a pod.'));
       return;
     }
 

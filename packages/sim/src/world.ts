@@ -5,7 +5,7 @@ import { runSpawners } from './lifecycle.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { issueShip, STARTER_LOADOUT_ID, STARTER_STATION_ID } from './pilots.js';
+import { homeStationId, issueShip, STARTER_LOADOUT_ID } from './pilots.js';
 import { screeAsteroids } from './asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
 import { pirateHome, setOrbitsMoving } from './rails.js';
@@ -41,7 +41,7 @@ export function emptyInput(): ShipInput {
   };
 }
 
-export { STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
+export { homeStationId, STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
 
 /** How far inward of Ridge Outpost, towards the star, the pirate's home is, units. */
 const PIRATE_HOME_INWARD = 1300;
@@ -217,7 +217,7 @@ export function joinPilot(world: World, pilotId: string, name: string): World {
   const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS, storage: {} };
   // New pilots arrive in space just off Harbour, facing it, so the first
   // thing they do is fly and dock.
-  return issueShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilotId, STARTER_LOADOUT_ID, STARTER_STATION_ID, true).world;
+  return issueShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilotId, STARTER_LOADOUT_ID, homeStationId(world), true).world;
 }
 
 /** The ship a pilot is currently flying, or null. */

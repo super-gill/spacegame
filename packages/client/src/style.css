@@ -2024,3 +2024,196 @@ button:hover {
   border: 1px solid var(--ink-bright);
   padding: 8px 18px;
 }
+
+/* The chart (hud/chart.ts; docs/sol-build.md, slice 1): all of Sol, full screen, with the burn plan beside it. */
+.chart {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  box-sizing: border-box;
+  background: var(--bg);
+  font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.chart-head {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-title {
+  color: var(--ink-bright);
+  letter-spacing: 0.08em;
+  font-size: 14px;
+}
+
+.chart-views {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.chart-view {
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--faint);
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.chart-view.on {
+  color: var(--ink-bright);
+  background: rgba(159, 211, 199, 0.1);
+  border-color: var(--ink-dim);
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 1px solid var(--faint);
+  cursor: crosshair;
+}
+
+.chart-plan {
+  align-self: start;
+  border: 1px solid var(--ink-dim);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-plan h2 {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  border-bottom: 1px solid var(--faint);
+}
+
+.chart-plan p {
+  margin: 0;
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+
+.chart-plan .chart-plan-to {
+  color: var(--ink-bright);
+}
+
+.chart-plan-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--faint);
+}
+
+.chart-burn {
+  margin: 0 12px 12px;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-bright);
+  background: rgba(12, 24, 24, 0.9);
+  border: 1px solid var(--ink-bright);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.chart-burn:disabled {
+  color: var(--ink-dim);
+  border-color: var(--faint);
+  cursor: not-allowed;
+}
+
+/* The burn on the HUD (hud/burn-panel.ts): a banner across the top while burning. */
+.burn-panel {
+  position: absolute;
+  left: 50%;
+  top: 70px;
+  transform: translateX(-50%);
+  width: min(620px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--warn);
+  background: rgba(5, 7, 10, 0.9);
+  font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.burn-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.burn-state {
+  color: var(--warn);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.burn-to {
+  color: var(--ink-bright);
+}
+
+.burn-bar {
+  position: relative;
+  height: 8px;
+  border: 1px solid var(--faint);
+}
+
+.burn-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--warn);
+}
+
+.burn-flip {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--ink-bright);
+}
+
+.burn-flip.passed {
+  background: var(--ink-dim);
+}
+
+.burn-numbers {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.burn-numbers .bright {
+  color: var(--ink-bright);
+}
+
+.burn-note {
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}

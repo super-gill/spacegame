@@ -1,3 +1,4 @@
+import { stepBurn } from './burn.js';
 import { thinkNpcs } from './ai/index.js';
 import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
 import { goodsFitting } from './goods.js';
@@ -121,6 +122,15 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     // The ship flies as its fit and cargo make it. Fits only change while
     // docked, so these hold for the whole tick.
     const stats = shipStats(world, ship);
+
+    // A burning ship flies itself and does nothing else (burn.ts): no
+    // docking, locks or guns until it arrives or the pilot cancels.
+    if (ship.burn && ship.state === 'flying') {
+      const burned = stepBurn(world, ship, stationsNext);
+      events.push(...burned.events);
+      ships[id] = regenerateShield(rechargeCapacitor(burned.ship, stats, world.dt), stats, world.dt);
+      continue;
+    }
 
     // Docking is handled before movement so a docked ship does not drift.
     if (input.toggleDock) {

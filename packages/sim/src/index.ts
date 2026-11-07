@@ -62,6 +62,7 @@ export {
   pilotShipId,
   starterShipId,
   STARTER_STATION_ID,
+  homeStationId,
   STARTER_LOADOUT_ID,
 } from './world.js';
 export { stepWorld } from './step.js';
@@ -187,3 +188,7 @@ export { PROTOCOL_VERSION, MAX_NAME_LENGTH, applyUpdate, cleanName, diffWorld, r
 export { AWAY_GRACE_SECONDS, pilotLeft, pilotReturned, stepAway } from './away.js';
 export { visibleWorld, visibleEvents, VIEW_MARGIN } from './view.js';
 export { contactSize, identifies, runsDark, startsDark, CONTACT_RADIUS } from './colours.js';
+
+// Sol (docs/sol.md, docs/sol-build.md) and the plotted burn.
+export { createSolWorld, solBodies, solStations, solDistance, EARTH_ORBITAL_EXCHANGE_ID, CERES_ACCORD_ID, ELYSIUM_ID, THETIS_ORBITAL_ID, SLAGLINE_ID, TITAN_FREE_PORT_ID, SUN_ID, EARTH_ID } from './sol.js';
+export { burnAcceleration, burnEndPoint, burnPlan, startBurn, cancelBurn, BURN_ACCELERATION_BY_CLASS, type BurnRefusal } from './burn.js';

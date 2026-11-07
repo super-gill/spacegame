@@ -12,6 +12,9 @@ import type { Vec2 } from '@spacegame/sim';
 export const MIN_ZOOM = 0.55;
 /** Closest in. */
 export const MAX_ZOOM = 1.5;
+/** The furthest the camera trails its target, in screen pixels. */
+const MAX_LAG_PIXELS = 120;
+
 /** Each wheel notch or key press multiplies the zoom by this. */
 export const ZOOM_STEP = 1.15;
 
@@ -28,13 +31,22 @@ export class Camera {
     this.viewportHeight = height;
   }
 
-  /** Move towards the target. `smoothing` is the fraction of the gap closed per second. */
+  /**
+   * Move towards the target. `smoothing` is the fraction of the gap closed
+   * per second. The lag is capped at `MAX_LAG_PIXELS` on screen, so a ship
+   * burning at a hundred thousand units a second stays in view.
+   */
   follow(target: Vec2, dtSeconds: number, smoothing = 6): void {
     const t = 1 - Math.exp(-smoothing * dtSeconds);
-    this.position = {
-      x: this.position.x + (target.x - this.position.x) * t,
-      y: this.position.y + (target.y - this.position.y) * t,
-    };
+    let x = this.position.x + (target.x - this.position.x) * t;
+    let y = this.position.y + (target.y - this.position.y) * t;
+    const gap = Math.hypot(target.x - x, target.y - y);
+    const maxLag = MAX_LAG_PIXELS / this.zoom;
+    if (gap > maxLag) {
+      x = target.x - ((target.x - x) * maxLag) / gap;
+      y = target.y - ((target.y - y) * maxLag) / gap;
+    }
+    this.position = { x, y };
   }
 
   /** Zoom in (`steps` > 0) or out (< 0) by whole steps, within the limits. */

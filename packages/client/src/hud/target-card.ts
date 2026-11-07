@@ -346,7 +346,7 @@ export class TargetCard {
     const stance = station ? 'station' : target.kind === 'cache' ? 'cache' : target.kind === 'rock' ? 'rock' : other?.contact ? 'unknown' : 'unlocked';
     setAttr(this.root, 'data-stance', stance);
     setText(this.stance, station ? 'STATION' : target.kind === 'cache' ? 'CACHE' : target.kind === 'rock' ? 'ROCK' : other?.contact ? 'CONTACT' : 'NOT LOCKED');
-    setText(this.lockState, station ? 'LIGHT ON' : target.kind === 'cache' || station ? '' : 'NOT LOCKED');
+    setText(this.lockState, station ? 'BEACON ON' : target.kind === 'cache' || station ? '' : 'NOT LOCKED');
 
     const name = plotName(world, target.kind, target.id, '');
     if (other?.contact) {
@@ -358,7 +358,7 @@ export class TargetCard {
       setText(this.who, `${name.toUpperCase()} · squawking · lock it for more`);
     } else if (station) {
       setText(this.name, station.name);
-      setText(this.who, 'Showing its light');
+      setText(this.who, 'Broadcasting its beacon');
     } else if (target.kind === 'rock') {
       const rock = world.asteroids.find((a) => a.id === target.id);
       setText(this.name, rock ? `Rock, radius ${Math.round(rock.radius)}` : 'Rock');

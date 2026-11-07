@@ -1,6 +1,7 @@
 import { buyModule, fitModule, sellModule, unfitModule } from './fitting.js';
 import { storeGoods, takeGoods } from './hangar.js';
 import { leaveArena, startArena } from './arena.js';
+import { cancelBurn, startBurn } from './burn.js';
 import { adminGrantCredits, adminSetRule, adminSpawnShip, boardShip, buyShip, claimStarterShip, stepOut, wakePilot } from './pilots.js';
 import { buyGood, sellGood } from './trade.js';
 import type { ArenaScenario, World, WorldEvent, WorldRules } from './types.js';
@@ -40,6 +41,9 @@ export type PilotCommand =
   | { type: 'adminSetRule'; rule: 'gravity' | 'orbits'; value: boolean }
   | { type: 'adminSetRule'; rule: 'manoeuvreSpeed'; value: number }
   | { type: 'adminSpawnShip'; loadoutId: string }
+  // The plotted burn (burn.ts): to a station, or with no target a braking burn; and cancelling one.
+  | { type: 'burnStart'; targetId: string | null }
+  | { type: 'burnCancel' }
   // The Arena world only (arena.ts, docs/worlds.md): launch a fight in a reference fit, or leave it for the setup.
   | { type: 'arenaStart'; fit: string; scenario: ArenaScenario }
   | { type: 'arenaLeave' };
@@ -87,6 +91,10 @@ export function applyCommand(world: World, pilotId: string, command: PilotComman
         : adminSetRule(world, pilotId, command.rule, command.value as boolean);
     case 'adminSpawnShip':
       return adminSpawnShip(world, pilotId, command.loadoutId);
+    case 'burnStart':
+      return startBurn(world, pilotId, command.targetId);
+    case 'burnCancel':
+      return cancelBurn(world, pilotId);
     case 'arenaStart':
       return startArena(world, pilotId, command.fit, command.scenario);
     case 'arenaLeave':
@@ -127,7 +135,10 @@ export function readCommand(value: unknown): PilotCommand | null {
     case 'claimStarter':
     case 'wake':
     case 'arenaLeave':
+    case 'burnCancel':
       return { type: v['type'] };
+    case 'burnStart':
+      return v['targetId'] === null || text('targetId') ? { type: 'burnStart', targetId: (v['targetId'] as string | null) ?? null } : null;
     case 'arenaStart': {
       const scenario = v['scenario'];
       if (!text('fit') || typeof scenario !== 'object' || scenario === null) return null;

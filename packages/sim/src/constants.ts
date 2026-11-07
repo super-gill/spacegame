@@ -238,6 +238,22 @@ export const AFTERBURNER_SIGNATURE_BLOOM = 0.5;
  * squared slower than a small round, so a quick target can slip it at range.
  */
 export const SHOT_SPEED_FALLOFF = 1.15;
+// The burn (burn.ts, docs/sol-build.md, "Travel: the burn").
+/** How hard a ship burns, units/s², by default; freighters, barges and destroyers burn slower (`BURN_ACCELERATION_BY_CLASS`). */
+export const BURN_ACCELERATION = 1000;
+/** A burn ends this far short of its station's centre, plus the station's own dock range: a short fly in to dock. */
+export const BURN_ARRIVE_SHORT = 500;
+/** Below this distance there is nothing to burn for: fly. Units. */
+export const BURN_MIN_DISTANCE = 20000;
+/** A ship turns towards its burn at this rate, radians a second, and only burns once it points within `BURN_ALIGNED`. */
+export const BURN_TURN_RATE = 2.5;
+export const BURN_ALIGNED = 0.15;
+/** A burn has arrived once this close to its end point, units, and this slow relative to it, units a second. */
+export const BURN_DONE_DISTANCE = 150;
+export const BURN_DONE_SPEED = 30;
+/** A burn steers round any body whose surface its line passes closer to than this many of the body's radii. */
+export const BURN_BODY_MARGIN = 1.4;
+
 // The Arena world (arena.ts, docs/worlds.md).
 /** How far apart pilots' arenas are, and how far the first is from the system, units. */
 export const ARENA_SEPARATION = 50000;

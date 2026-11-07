@@ -3,7 +3,7 @@ import { GOODS, oreGoods } from './goods.js';
 import { idSeed, seededRandom } from './random.js';
 import { bodyState, orbitAngle, orbitState, railTime, withOrbitMoving } from './rails.js';
 import { RIDGE_ID, RIDGE_PHASE } from './stations.js';
-import type { Asteroid, Body, GoodSpec, Orbit, OreTier, Rockfall, World } from './types.js';
+import type { Asteroid, Body, GoodSpec, Orbit, OreTier, RockSite, Rockfall, World } from './types.js';
 import type { Vec2 } from './vec2.js';
 
 /**
@@ -17,6 +17,14 @@ import type { Vec2 } from './vec2.js';
  * richer ores, and bigger rocks are harder to cut. Mined out, a rock
  * crumbles away; each field slowly tops itself back up (`stepRockfall`).
  */
+
+/** Calder's rock site: the Scree's ring, with Ridge Outpost's dense field. A world with no `rockSite` has this one. */
+export const CALDER_SITE: RockSite = { beltId: BELT_ID, stationId: RIDGE_ID, ringRadius: BELT_RING_RADIUS, ringWidth: 1400, period: BELT_PERIOD, phase: RIDGE_PHASE };
+
+/** A world's rock site. */
+export function rockSite(world: Pick<World, 'rockSite'>): RockSite {
+  return world.rockSite ?? CALDER_SITE;
+}
 
 /** The seed the starter system's belt is generated from. */
 export const SCREE_SEED = 0x5c7ee;
@@ -126,27 +134,27 @@ export function rockCore(random: () => number, radius: number, goods: Readonly<R
  * `RIDGE_PHASE`), or null if the spot drawn breaks the Collective's
  * clearances.
  */
-function drawRock(random: () => number, field: string, id: string, goods: Readonly<Record<string, GoodSpec>>, ringWidth = RING_WIDTH): Asteroid | null {
-  const ridgeAt = { x: Math.cos(RIDGE_PHASE) * BELT_RING_RADIUS, y: Math.sin(RIDGE_PHASE) * BELT_RING_RADIUS };
-  const phase = field === 'ridge' ? RIDGE_PHASE + (random() * 2 - 1) * RIDGE_FIELD_SPREAD : random() * Math.PI * 2;
-  const radius = BELT_RING_RADIUS + (random() - 0.5) * ringWidth;
+function drawRock(random: () => number, field: string, id: string, goods: Readonly<Record<string, GoodSpec>>, ringWidth = RING_WIDTH, site: RockSite = CALDER_SITE): Asteroid | null {
+  const ridgeAt = { x: Math.cos(site.phase) * site.ringRadius, y: Math.sin(site.phase) * site.ringRadius };
+  const phase = field === 'ridge' ? site.phase + (random() * 2 - 1) * RIDGE_FIELD_SPREAD : random() * Math.PI * 2;
+  const radius = site.ringRadius + (random() - 0.5) * ringWidth;
   // Small rocks are common, big ones rare.
   const size = MIN_RADIUS + (MAX_RADIUS - MIN_RADIUS) * random() * random();
   const at = { x: Math.cos(phase) * radius, y: Math.sin(phase) * radius };
   if (Math.hypot(at.x - ridgeAt.x, at.y - ridgeAt.y) < RIDGE_CLEARANCE + size) return null;
-  const offRidge = Math.abs(Math.atan2(Math.sin(phase - RIDGE_PHASE), Math.cos(phase - RIDGE_PHASE)));
-  if (radius < BELT_RING_RADIUS + size && offRidge < RIDGE_LANE_HALF_ANGLE) return null;
+  const offRidge = Math.abs(Math.atan2(Math.sin(phase - site.phase), Math.cos(phase - site.phase)));
+  if (radius < site.ringRadius + size && offRidge < RIDGE_LANE_HALF_ANGLE) return null;
   const rockRadius = Math.round(size);
   return {
     id,
-    orbit: { parent: BELT_ID, radius, period: BELT_PERIOD, phase, direction: 1 },
+    orbit: { parent: site.beltId, radius, period: site.period, phase, direction: 1 },
     radius: rockRadius,
     ...rockMakeup(random, rockRadius, goods),
     field,
   };
 }
 
-export function screeAsteroids(seed = SCREE_SEED, ringWidth = RING_WIDTH, goods: Readonly<Record<string, GoodSpec>> = GOODS): Asteroid[] {
+export function screeAsteroids(seed = SCREE_SEED, ringWidth = RING_WIDTH, goods: Readonly<Record<string, GoodSpec>> = GOODS, site: RockSite = CALDER_SITE): Asteroid[] {
   const random = seededRandom(seed);
   const out: Asteroid[] = [];
   // The first belt (the ring's rocks, then Ridge's), then each field topped up to its target now.
@@ -157,7 +165,7 @@ export function screeAsteroids(seed = SCREE_SEED, ringWidth = RING_WIDTH, goods:
     tries++;
     let before = 0;
     const field = wanted.find((f) => out.length < (before += f.target))!;
-    const rock = drawRock(random, field.id, `rock-${out.length + 1}`, goods, ringWidth);
+    const rock = drawRock(random, field.id, `rock-${out.length + 1}`, goods, ringWidth, site);
     if (rock) out.push(rock);
   }
   return out;
@@ -231,10 +239,11 @@ export function stepRockfall(world: World): Pick<World, 'asteroids' | 'rockfall'
   if (state.timerTicks > 1) return { asteroids: world.asteroids, rockfall: { ...state, timerTicks: state.timerTicks - 1 } };
 
   const time = railTime(world.tick, world.dt);
-  const ridge = world.stations[RIDGE_ID];
-  // Rocks are drawn as the belt stood at tick 0; turn them to where Ridge is now.
-  const shift = ridge?.orbit ? orbitAngle(ridge.orbit, time) - RIDGE_PHASE : 0;
-  const beltAt = bodyState(world.bodies, BELT_ID, time).position;
+  const site = rockSite(world);
+  const ridge = world.stations[site.stationId];
+  // Rocks are drawn as the belt stood at tick 0; turn them to where the site's station is now.
+  const shift = ridge?.orbit ? orbitAngle(ridge.orbit, time) - site.phase : 0;
+  const beltAt = bodyState(world.bodies, site.beltId, time).position;
   const ships = Object.values(world.ships).filter((s) => s.state === 'flying');
   let asteroids = world.asteroids;
   let made = state.made;
@@ -247,7 +256,7 @@ export function stepRockfall(world: World): Pick<World, 'asteroids' | 'rockfall'
     let best: { rock: Asteroid; angle: number; room: number } | null = null;
     let found = 0;
     for (let t = 0; t < ROCKFALL_TRIES && found < ROCKFALL_CANDIDATES; t++) {
-      const drawn = drawRock(random, field.id, `rock-n${made}`, world.goods);
+      const drawn = drawRock(random, field.id, `rock-n${made}`, world.goods, RING_WIDTH, site);
       if (!drawn) continue;
       const angle = drawn.orbit.phase + shift;
       const at = { x: beltAt.x + Math.cos(angle) * drawn.orbit.radius, y: beltAt.y + Math.sin(angle) * drawn.orbit.radius };

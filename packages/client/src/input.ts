@@ -17,7 +17,7 @@ import { KEY_BINDINGS, SLOT_ACTIONS, SUPPRESS_DEFAULT, type Action, type UiActio
  * straight to a callback.
  */
 
-const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'toggleHold', 'togglePlot', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
+const UI_ACTIONS: ReadonlySet<Action> = new Set<UiAction>(['toggleControls', 'toggleMenu', 'cycleTarget', 'toggleHeadingLock', 'toggleDrones', 'toggleHold', 'togglePlot', 'toggleChart', 'burn', 'clearTarget', 'board', 'stepOut', 'zoomIn', 'zoomOut', ...SLOT_ACTIONS]);
 
 /** True while the person is typing in a text field, when keys must not fly the ship. */
 function typingInField(e: KeyboardEvent): boolean {

@@ -9,7 +9,7 @@ import {
   type StepOutRefusal,
   boardableShips,
   isEmptyShip,
-  STARTER_STATION_ID,
+  homeStationId,
   occupiedPads,
   type WorldEvent,
   add,
@@ -88,6 +88,8 @@ import {
   type ShipStyle,
 } from './render/draw.js';
 import { Plot, type NavTarget } from './hud/plot.js';
+import { Chart } from './hud/chart.js';
+import { BurnPanel } from './hud/burn-panel.js';
 import { drawReticle } from './render/reticle.js';
 import { arrivalSeconds, clockWords, closingSpeed, plotName, plotPosition } from './hud/plot-rows.js';
 import { drawAsteroids, drawBodies, drawNav } from './render/bodies.js';
@@ -152,6 +154,8 @@ const input = new InputController(
     else if (action === 'toggleDrones') dronePanel.toggle();
     else if (action === 'toggleHold') holdPanel.toggle();
     else if (action === 'togglePlot') plot.toggle();
+    else if (action === 'toggleChart') chart.toggle();
+    else if (action === 'burn') burnPressed();
     else if (action === 'board') boardNearest();
     else if (action === 'stepOut') stepOutPressed();
     else if (SLOT_ACTIONS.includes(action)) pressTile(SLOT_ACTIONS.indexOf(action));
@@ -202,6 +206,26 @@ const plot = new Plot(
   },
 );
 flightHud.onToggleColours = () => input.requestToggleColours();
+// The chart (M) and the burn (U): crossing Sol (docs/sol-build.md, slice 1).
+const chart = new Chart(document.body, {
+  pick: (stationId) => select({ kind: 'station', id: stationId }),
+  burn: () => burnPressed(),
+});
+const burnPanel = new BurnPanel(hudLayer);
+/**
+ * The burn key: cancel a burn under way; otherwise burn for the nav
+ * target if it is a port; otherwise, coasting fast after a cancel, brake
+ * to a stop. The sim checks everything again (burn.ts).
+ */
+function burnPressed(): void {
+  const mine = myShip(current);
+  if (!mine) return;
+  if (mine.burn) return send({ type: 'burnCancel' });
+  if (navTarget?.kind === 'station') return send({ type: 'burnStart', targetId: navTarget.id });
+  const speed = Math.hypot(mine.velocity.x, mine.velocity.y);
+  if (speed > 1000) return send({ type: 'burnStart', targetId: null });
+  ui.notify('Pick a port to burn for: on the board (P) or the chart (M).', 'warn');
+}
 const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120 }), {
   jettison: (good) => input.requestJettison(good),
   setHopper: (drop) => input.requestHopperDrop(drop),
@@ -340,6 +364,16 @@ function refusalText(command: PilotCommand, reason: string): string | null {
       case 'adminSetRule':
       case 'adminSpawnShip':
         return { ...ADMIN_REFUSALS, notAdmin: 'Only the host can do that.' };
+      case 'burnStart':
+      case 'burnCancel':
+        return {
+          noShip: 'You have no ship.',
+          notFlying: 'Undock first.',
+          cannotBurn: 'This hull cannot burn.',
+          unknownStation: 'No such port.',
+          tooClose: 'Close enough to fly there.',
+          notBurning: 'You are not burning.',
+        };
       case 'arenaStart':
       case 'arenaLeave':
         return {
@@ -451,7 +485,7 @@ function boardNearest(): void {
   else if (myShip(current)) ui.notify('No ship of yours in reach to board.', 'warn');
 }
 
-/** Pilot command: in a pod at Harbour, owning nothing, take the free starter Tern. */
+/** Pilot command: in a pod at your home station, owning nothing, take the free starter Tern. */
 function claimStarter(): void {
   send({ type: 'claimStarter' });
 }
@@ -558,10 +592,10 @@ function myShip(world: World): Ship | null {
  * lost their pod before the last save loads with no ship at all, so fall
  * back to the station they will wake at.
  */
-let lastSeen: Vec2 = myShip(current)?.position ?? current.stations[STARTER_STATION_ID]?.position ?? { x: 0, y: 0 };
+let lastSeen: Vec2 = myShip(current)?.position ?? current.stations[homeStationId(current)]?.position ?? { x: 0, y: 0 };
 camera.snapTo(lastSeen);
 
-/** Pilot command: wake at Harbour after losing your escape pod. */
+/** Pilot command: wake at your home station after losing your escape pod. */
 function respawn(): void {
   send({ type: 'wake' });
 }
@@ -1059,6 +1093,8 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   if (mine && navTarget && mine.state === 'flying') drawNavTarget(mine, navTarget, alpha);
   ui.update(current, mine);
+  burnPanel.update(current, mine);
+  chart.update(current, mine, navTarget?.kind === 'station' ? navTarget.id : null);
   if (arenaSetup) {
     // Between fights: no ship and no arena running (a decided fight still shows for a moment).
     if (!mine && !current.pilots[me.id]?.arena) arenaSetup.show(arenaResult);

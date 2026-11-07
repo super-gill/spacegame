@@ -36,6 +36,7 @@ The multiplayer rules in `docs/design.md` apply to every milestone from now on, 
 4. **Drones:** done on `main`: full manoeuvring and a planner fix (`docs/drones.md`); for Jason to try in the belt.
 5. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
 6. **The interface pass** (6d, agreed 6 November, `docs/interface.md`): built on `main`: turret arcs and aim, audible warnings with messages, the board (then called the Plot) with the transponder and the nav target, the selection window, aim reticle styles. **Released as 0.17.0** (6 November 2026).
+7a. **The move to Sol** (the lore re-fit, 7 November, `docs/sol-build.md`): all of Sol as the persistent world, crossed by plotted burns. **Slice 1 built on `main`**: Sol's bodies and six ports, the burn (U), the chart (M), Calder kept as a backup. Next: slice 2 (all the stations, lanes and security, NPCs that burn), then the eight starts, the names that ship, materials and sites, hazards. Worlds step 4 waits behind it.
 7. **Worlds: Live and Dev servers, the Universe and the Arena** (agreed 6 November, `docs/worlds.md`): two servers (live on releases, dev on `main`), a mode screen after login, the Arena as its own unsaved world with ship, fit and scenario (Skirmish, Waves, To the death). Mockups approved; step 3 built (the Arena world, the mode screen, the arena setup with Skirmish). Next: Waves and To the death, then the two-server setup.
 8. Then law (7, with electronic warfare), then the map (8).
 

@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createStarterWorld, deserializeWorld, serializeWorld, type World } from '@spacegame/sim';
+import { createSolWorld, deserializeWorld, serializeWorld, type World } from '@spacegame/sim';
 import type { AccountsData } from './accounts.js';
 
 /**
@@ -33,12 +33,27 @@ export class Storage {
     renameSync(temp, target);
   }
 
-  /** The saved world, or a new one if there is none. Refuses to start over a save it cannot read, rather than replace it. */
-  loadWorld(): { world: World; fresh: boolean } {
+  /**
+   * The saved world, or a new Sol if there is none. Refuses to start over
+   * a save it cannot read, rather than replace it.
+   *
+   * A save from before Sol (Calder, docs/sol-build.md, "Decided") cannot
+   * become Sol in place: it is kept beside the new world as
+   * `world-calder-backup.json` and Sol starts fresh. Characters and keys
+   * live in accounts.json and carry over; ships and credits start again.
+   */
+  loadWorld(): { world: World; fresh: boolean; calderBackup?: string } {
     const target = this.path('world.json');
-    if (!existsSync(target)) return { world: createStarterWorld(), fresh: true };
-    const loaded = deserializeWorld(readFileSync(target, 'utf8'));
+    if (!existsSync(target)) return { world: createSolWorld(), fresh: true };
+    const text = readFileSync(target, 'utf8');
+    const loaded = deserializeWorld(text);
     if (!loaded.ok) throw new Error(`Cannot read ${target} (${loaded.reason}). Move it aside to start a new world.`);
+    if (loaded.world.system !== 'sol') {
+      const backup = this.path('world-calder-backup.json');
+      // Never overwrite an earlier backup: the first Calder save kept is the one to keep.
+      if (!existsSync(backup)) writeFileSync(backup, text, 'utf8');
+      return { world: createSolWorld(), fresh: true, calderBackup: backup };
+    }
     return { world: loaded.world, fresh: false };
   }
 

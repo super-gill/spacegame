@@ -116,3 +116,24 @@ describe('the worlds', () => {
     expect(allowedIn('persistent', { type: 'buyGood', good: 'food', quantity: 1 })).toBe(true);
   });
 });
+
+describe('moving to Sol (docs/sol-build.md, "Decided")', () => {
+  it('keeps a Calder save as a backup and starts Sol fresh', async () => {
+    const { mkdtempSync, writeFileSync, existsSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { serializeWorld } = await import('@spacegame/sim');
+    const { Storage } = await import('./storage.js');
+    const folder = mkdtempSync(join(tmpdir(), 'spacegame-'));
+    writeFileSync(join(folder, 'world.json'), serializeWorld(createStarterWorld(), 'then'), 'utf8');
+    const loaded = new Storage(folder).loadWorld();
+    expect(loaded.world.system).toBe('sol');
+    expect(loaded.fresh).toBe(true);
+    expect(loaded.calderBackup && existsSync(loaded.calderBackup)).toBe(true);
+    // Once Sol is saved, it loads as itself.
+    new Storage(folder).saveWorld(loaded.world);
+    const again = new Storage(folder).loadWorld();
+    expect(again).toMatchObject({ fresh: false });
+    expect(again.world.system).toBe('sol');
+  });
+});

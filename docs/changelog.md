@@ -5,10 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
+- **Sol.** The persistent world is Sol: the Sun, the planets, their moons and the big Belt rocks, at enormous sizes and compressed distances. Six ports to begin with: Earth Orbital Exchange, where new pilots start, Thetis Orbital at Venus, Republic Station Elysium at Mars, Ceres Accord Station with a rock field round Ceres, Slagline on Pallas and Titan Free Port. Ships and stations keep their real size; planets stay off the local view.
+- **The burn.** Pick a port on the board or the chart and press U: the ship turns, burns, flips at the midpoint and brakes, arriving at rest beside the port. Earth to Mars takes about three minutes. Weapons, locks and docking are off while burning. U again cancels, and you keep your speed; U with no target while coasting fast brakes you to a stop.
+- **The chart** (M): all of Sol, with local, inner, Belt and whole-system views. Click a port to plot the burn to it.
 - The mode screen: after choosing a character, pick where to go: Dev (Calder, the world you know) or the Arena. The Universe is greyed: it comes with the map. Leave a mode from the menu (F2, Back to modes) to come back to it.
 - The Arena, a world of its own that is never saved and never touches Dev, open to every player. Pick a ship (every hull with a ready-to-fly fit), one of its fits and a scenario, then LAUNCH. Skirmish is the first scenario: pick the enemy fit and how many (1 to 8). Losing your ship or destroying every enemy brings you back to the setup three seconds later, with your choices kept; Leave the fight in the menu (F2) does it at once. Waves and To the death are shown, greyed, until they are built.
 
 ### Changed
+- Calder leaves the persistent world. On the first start of this version, the Calder save is kept as `world-calder-backup.json` and Sol starts fresh: characters and keys carry over, ships and credits start again. The Arena is still fought in Calder's empty space.
+- NPC traders are away until NPCs can burn between ports; the patrol, the miners and a pirate work round Earth Orbital Exchange and Ceres.
 - The setting moves to Sol (the lore pivot): four human powers, Earth, Mars, Venus and the Belt. What you see follows it:
   - Hull classes: the Tern is a corvette, the Warrant a patrol boat, the Injunction a frigate, the Walkout a destroyer, the Manifest a freighter, the Prospector a prospector, the Sinker a miner and the Collier a barge.
   - Close-in weapons are PDCs (they were swivels), in the HUD tile and outfitting.

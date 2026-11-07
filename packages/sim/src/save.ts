@@ -16,6 +16,7 @@ import { mountRefusal, weaponStatesFor } from './fitting.js';
 import { add, fromAngle, scale } from './vec2.js';
 import { setOrbitsMoving } from './rails.js';
 import { createStarterWorld, DEFAULT_RULES } from './world.js';
+import { createSolWorld } from './sol.js';
 import { WEAPONS } from './weapons.js';
 
 /**
@@ -928,13 +929,15 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   // 10): the starter stations' markets are refreshed from the catalogue on
   // load, like hulls and modules, so a save picks up rebalanced prices.
   // Everything else about a station (where it is, its pads) stays as saved.
-  const current = starterStations();
+  // A world's own system is its design data: Sol's ports from Sol, Calder's from Calder.
+  const sol = world.system === 'sol' ? createSolWorld() : null;
+  const current = sol ? sol.stations : starterStations();
   const stations: Record<string, Station> = {};
   // Ship mart stock too: what a starter station sells is design data.
   for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart], outfitting: current[id]!.outfitting } : st;
   // NPC spawners added since the save was made join it (miners, say); those it has keep their state.
   const known = new Set(world.spawners.map((sp) => sp.id));
-  const spawners = [...world.spawners, ...createStarterWorld().spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];
+  const spawners = [...world.spawners, ...(sol ?? createStarterWorld()).spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];
   const loaded: World = {
       ...world,
       ships,
