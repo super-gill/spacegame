@@ -48,7 +48,7 @@ describe('the Arena world', () => {
 
 describe('a skirmish', () => {
   it('puts the pilot in the chosen fit with the enemies, far out in space', () => {
-    const r = startArena(arena('ana'), 'ana', 'Frigate anti-small', skirmish('Warrant brawler', 3));
+    const r = startArena(arena('ana'), 'ana', 'Walkout anti-small', skirmish('Warrant brawler', 3));
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     const w = r.world;

@@ -42,8 +42,8 @@ export interface ArenaHull {
   fits: FitSpec[];
 }
 
-/** Smallest first, so the list reads like the hull ladder (docs/ships.md). */
-const CLASS_ORDER: HullClass[] = ['drone', 'pod', 'cutter', 'sloop', 'brig', 'frigate', 'lineShip', 'capital', 'merchantman', 'hulk', 'aurel'];
+/** Smallest first, military ladder then civilian, so the list reads like the class ladders (docs/lore.md, "Hull classes"). */
+const CLASS_ORDER: HullClass[] = ['pod', 'drone', 'corvette', 'patrolBoat', 'frigate', 'destroyer', 'cruiser', 'battleship', 'carrier', 'dreadnought', 'prospector', 'miner', 'freighter', 'barge', 'aurel'];
 
 /**
  * Every hull the arena can put you in: each hull in the catalogue with at

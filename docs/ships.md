@@ -2,15 +2,15 @@
 
 How ships are built. Status: agreed design, 3 November 2026. Slice 6a is in play from 0.7.0. 6b's sim side is on `main` (4 November 2026) and its client is with the ship mart workstream; the rest of milestone 6 is not built yet. See "First build slice".
 
-Related: [races.md](races.md) for races and manufacturers. Concept art lives on the "Spacegame ship concepts" design canvas; the full race and manufacturer design and the lore are in the "Spacegame: Races and Manufacturers" and "Spacegame: Lore of the Known Universe" docs.
+Related: [races.md](races.md) for powers and companies, [lore.md](lore.md) for the setting. Concept art lives on the "Spacegame ship concepts" design canvas; the two old claude.ai docs on races and lore are superseded by `lore.md` and `races.md` (the Sol pivot).
 
 ## Principles
 
 1. **You build the ship.** A hull is a frame. Every bit of performance (thrust, turning, shields, power, cargo, weapons) comes from modules fitted to it. A bare hull cannot do anything.
-2. **Function by shape, race by style.** Every module type has one universal silhouette, so any pilot can read an enemy's fit at a glance. The race and manufacturer show in line style and colour.
+2. **Function by shape, power by style.** Every module type has one universal silhouette, so any pilot can read an enemy's fit at a glance. The power and the company show in line style and colour.
 3. **The look is the fit.** A ship is drawn as its hull plus each module at its mount point. A freighter with four pods looks like a freighter with four pods.
 4. **Bonuses live on ships, never pilots.** Any pilot can fly any ship they can buy; its bonuses come with it.
-5. **Everything is data.** Hulls, modules, races, manufacturers and industries are catalogue entries. Adding one never needs engine code.
+5. **Everything is data.** Hulls, modules, powers, manufacturers and industries are catalogue entries. Adding one never needs engine code.
 
 ## Hulls
 
@@ -18,13 +18,13 @@ A hull has:
 
 | Field | Meaning |
 | --- | --- |
-| race, manufacturer | Who built it; sets its look and bonuses |
+| power, manufacturer | Who built it; sets its look and bonuses |
 | role | Its intended industry (combat, transport, passengers, mining, salvage, exploration, drones, support, construction, ...) |
 | size class | S, M, L, XL; decides which station pads it fits |
 | mass, structure, outline | Its own body |
 | flight limits | Top speed and spin limits, as now |
 | mount points | See below |
-| bonuses | Role and race bonuses, see below |
+| bonuses | Role and power bonuses, see below |
 
 ### Mount points
 
@@ -84,7 +84,7 @@ A ship's performance is computed from its hull plus its fit (plus cargo mass), n
 ### Bonuses
 
 - **Role bonus**: the hull rewards modules of its role at its mount size (a medium mining hull rewards medium mining lasers).
-- **Race bonus**: the hull rewards its race's tech (Halcyon: energy weapons; Kessari: missiles and shields; Free Belt: projectile weapons and speed; Vael: drones, rail guns, armour repair; Oru: drones and craft; Drifter: scanners, stealth, range).
+- **Power bonus** (`HullBonus.source: 'power'`): the hull rewards its power's tech (Earth: missiles and shields; Mars: energy weapons; Venus: hybrids and drones; the Belt: projectile weapons and speed).
 - A manufacturer's specialist lines get stronger bonuses than its other lines.
 
 ## Ships in the world
@@ -97,7 +97,7 @@ A ship's performance is computed from its hull plus its fit (plus cargo mass), n
 
 - Most stations have a **ship mart**: a few fitted ships parked on the station's pads, physically visible, unowned and flagged for sale. You buy from the list inside the station. Stock is limited by pads and refilled by deliveries over time.
 - A manufacturer's own station sells its full catalogue and bare hulls.
-- Navy hulls need standing and a licence with that race (see races.md).
+- Navy hulls need standing and a licence with that power (see races.md and navy.md).
 - New pilots start in a Meridian Civil Yards starter ship.
 
 ## The Aurel Tacet

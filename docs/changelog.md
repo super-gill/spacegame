@@ -9,6 +9,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - The Arena, a world of its own that is never saved and never touches Dev, open to every player. Pick a ship (every hull with a ready-to-fly fit), one of its fits and a scenario, then LAUNCH. Skirmish is the first scenario: pick the enemy fit and how many (1 to 8). Losing your ship or destroying every enemy brings you back to the setup three seconds later, with your choices kept; Leave the fight in the menu (F2) does it at once. Waves and To the death are shown, greyed, until they are built.
 
 ### Changed
+- The setting moves to Sol (the lore pivot): four human powers, Earth, Mars, Venus and the Belt. What you see follows it:
+  - Hull classes: the Tern is a corvette, the Warrant a patrol boat, the Injunction a frigate, the Walkout a destroyer, the Manifest a freighter, the Prospector a prospector, the Sinker a miner and the Collier a barge.
+  - Close-in weapons are PDCs (they were swivels), in the HUD tile and outfitting.
+  - The Plot is the board (P). Your transponder is squawking or dark: the chip reads SQUAWK or DARK, and K still switches it.
+  - Renamed modules: Meridian Course S, Paragon Vector S, Ito-Marr Trajectory M (flight computers), Meridian Pod Rack S, Paragon Fire Control S, M and L, Ito-Marr Surge M; guns Cantor-Vell Volley and Enfilade, Ishtar Retort and Answer (the maker is Ishtar Fleet Works now); Meridian Yards.
+  - Ores take their real names: copper, zinc and platinum.
+  - The reference fits Brig brawler and Frigate anti-small are Injunction brawler and Walkout anti-small.
+  - Mars's and Venus's makers draw in their powers' colours.
 - The admin arena in the menu is gone: the Arena replaces it, for everyone. An admin arena still running in a save is ended when the save loads, and you are back in the ship you came from.
 - Logging in no longer drops you straight into the world: the mode screen comes first. Saves move to version 17. Clients must reload (protocol version 3).
 - The menu's admin controls show only in Dev, not in the Arena.

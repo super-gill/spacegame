@@ -41,15 +41,19 @@ export function contactSize(hull: Pick<HullSpec, 'class'> | undefined): ContactS
 const CONTACT_SIZE_BY_CLASS: Record<HullClass, ContactSize> = {
   pod: 'small',
   drone: 'small',
-  cutter: 'small',
-  sloop: 'small',
   aurel: 'small',
-  brig: 'medium',
-  merchantman: 'medium',
-  hulk: 'medium',
-  frigate: 'large',
-  lineShip: 'large',
-  capital: 'large',
+  corvette: 'small',
+  patrolBoat: 'small',
+  prospector: 'small',
+  miner: 'small',
+  frigate: 'medium',
+  freighter: 'medium',
+  barge: 'medium',
+  destroyer: 'large',
+  cruiser: 'large',
+  battleship: 'large',
+  carrier: 'large',
+  dreadnought: 'large',
 };
 
 /** Radius to draw and click an unidentified contact at, units: roughly a hull of that size. */

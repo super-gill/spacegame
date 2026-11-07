@@ -28,7 +28,7 @@ describe('physics, not damage cuts', () => {
     expect(WEAPONS['autocannon-l']!.projectileSpeed).toBeCloseTo(s / SHOT_SPEED_FALLOFF ** 2);
   });
 
-  it('the Gunlayer L runs more close-in weapon systems than the M', () => {
+  it('the Fire Control L runs more close-in weapon systems than the M', () => {
     expect(MODULES['paragon-director-l']!.stats.turretControl!).toBeGreaterThan(MODULES['paragon-director-m']!.stats.turretControl!);
   });
 });
@@ -136,7 +136,7 @@ describe('swarms', () => {
 
   it('a brig beats one Warrant brawler, and three of them beat the brig', () => {
     const brawler = byName('Warrant brawler');
-    expect(skirmish([byName('Brig brawler')], [brawler], { starts: 1 }).winsA).toBe(1);
-    expect(skirmish([byName('Brig brawler')], [brawler, brawler, brawler], { starts: 1 }).winsB).toBe(1);
+    expect(skirmish([byName('Injunction brawler')], [brawler], { starts: 1 }).winsA).toBe(1);
+    expect(skirmish([byName('Injunction brawler')], [brawler, brawler, brawler], { starts: 1 }).winsB).toBe(1);
   });
 });

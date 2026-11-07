@@ -1,5 +1,24 @@
-import type { HullSpec, MountPoint, MountService, MountType, ModuleSize } from './types.js';
+import type { HullClass, HullSpec, MountPoint, MountService, MountType, ModuleSize } from './types.js';
 import type { Vec2 } from './vec2.js';
+
+/** What each hull class is called on screen (docs/lore.md, "Hull classes"). */
+export const HULL_CLASS_NAMES: Record<HullClass, string> = {
+  pod: 'Pod',
+  drone: 'Drone',
+  aurel: 'Voice',
+  corvette: 'Corvette',
+  patrolBoat: 'Patrol boat',
+  frigate: 'Frigate',
+  destroyer: 'Destroyer',
+  cruiser: 'Cruiser',
+  battleship: 'Battleship',
+  carrier: 'Carrier',
+  dreadnought: 'Dreadnought',
+  prospector: 'Prospector',
+  miner: 'Miner',
+  freighter: 'Freighter',
+  barge: 'Barge',
+};
 
 /**
  * Hull catalogue. Data only. Add hulls here; nothing else needs to change.
@@ -71,7 +90,7 @@ export const HULLS: Record<string, HullSpec> = {
     // for one upgrade (the empty armour mount).
     id: 'meridian-courier',
     name: 'Meridian Tern',
-    race: null,
+    power: null,
     manufacturer: 'meridian',
     role: 'civilian',
     sizeClass: 'S',
@@ -83,7 +102,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 340,
     maxTurnRate: 2.4, // about 140 degrees per second
     signature: 18,
-    class: 'cutter',
+    class: 'corvette',
     // Small pool, steady recovery: never strands a new pilot, never lets them show off.
     capacitor: 80,
     capacitorRecharge: 5,
@@ -115,7 +134,7 @@ export const HULLS: Record<string, HullSpec> = {
     // wing roots, a light turret on the nose, twin engines.
     id: 'kessari-wedge',
     name: 'Kessari Warrant',
-    race: 'kessari',
+    power: 'earth',
     manufacturer: 'kessariOrbital',
     role: 'combat',
     sizeClass: 'M',
@@ -127,7 +146,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 320,
     maxTurnRate: 2.2,
     signature: 28,
-    class: 'sloop',
+    class: 'patrolBoat',
     // Tight pool, quick recovery: short, sharp exchanges with shields up, then breathe.
     capacitor: 90,
     capacitorRecharge: 9,
@@ -158,7 +177,7 @@ export const HULLS: Record<string, HullSpec> = {
     bonuses: [
       { source: 'role', label: '+25% missile damage from full-size launchers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'missile' },
       { source: 'role', label: '+25% lock speed from a full-size targeting computer', stat: 'scanResolution', amount: 0.25, kind: 'targetingComputer' },
-      { source: 'race', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
+      { source: 'power', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
     ],
   },
 
@@ -170,7 +189,7 @@ export const HULLS: Record<string, HullSpec> = {
     // lane, not to chase.
     id: 'kessari-brig',
     name: 'Kessari Injunction',
-    race: 'kessari',
+    power: 'earth',
     manufacturer: 'kessariOrbital',
     role: 'combat',
     sizeClass: 'L',
@@ -182,7 +201,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 270,
     maxTurnRate: 1.4,
     signature: 42,
-    class: 'brig',
+    class: 'frigate',
     // A deeper pool than the Warrant, the same quick breath.
     capacitor: 220,
     capacitorRecharge: 16,
@@ -218,7 +237,7 @@ export const HULLS: Record<string, HullSpec> = {
     ],
     bonuses: [
       { source: 'role', label: '+25% missile damage from full-size launchers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'missile' },
-      { source: 'race', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
+      { source: 'power', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
     ],
   },
 
@@ -229,7 +248,7 @@ export const HULLS: Record<string, HullSpec> = {
     // a blind spot for long.
     id: 'union-frigate',
     name: 'Union Defence Works Walkout',
-    race: 'freeBelt',
+    power: 'belt',
     manufacturer: 'unionDefence',
     role: 'combat',
     sizeClass: 'L',
@@ -241,7 +260,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 210,
     maxTurnRate: 0.9,
     signature: 56,
-    class: 'frigate',
+    class: 'destroyer',
     capacitor: 380,
     capacitorRecharge: 22,
     mounts: [
@@ -281,7 +300,7 @@ export const HULLS: Record<string, HullSpec> = {
     ],
     bonuses: [
       { source: 'role', label: '+25% structure from full-size armour', stat: 'structure', amount: 0.25, tag: 'armour' },
-      { source: 'race', label: '+15% damage from full-size projectile guns', stat: 'damage', amount: 0.15, kind: 'weapon', tag: 'projectile' },
+      { source: 'power', label: '+15% damage from full-size projectile guns', stat: 'damage', amount: 0.15, kind: 'weapon', tag: 'projectile' },
     ],
   },
 
@@ -291,7 +310,7 @@ export const HULLS: Record<string, HullSpec> = {
     // half loaded.
     id: 'tessaract-spine',
     name: 'Tessaract Manifest',
-    race: 'kessari',
+    power: 'earth',
     manufacturer: 'tessaract',
     role: 'transport',
     sizeClass: 'L',
@@ -306,7 +325,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 220,
     maxTurnRate: 1.2, // about 70 degrees per second
     signature: 40,
-    class: 'merchantman',
+    class: 'freighter',
     // Deep pool, slow recovery: freight reactors are big and lazy.
     capacitor: 160,
     capacitorRecharge: 3,
@@ -343,7 +362,7 @@ export const HULLS: Record<string, HullSpec> = {
     ],
     bonuses: [
       { source: 'role', label: '+25% cargo from full-size containers', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
-      { source: 'race', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
+      { source: 'power', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' },
     ],
   },
 
@@ -354,7 +373,7 @@ export const HULLS: Record<string, HullSpec> = {
     // picks the easy ones, or scouts for a hulk. A second high slot for whatever it needs.
     id: 'rookrivet-prospector',
     name: 'Belt Forge Prospector',
-    race: 'freeBelt',
+    power: 'belt',
     manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'S',
@@ -368,7 +387,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 300,
     maxTurnRate: 2.2,
     signature: 20,
-    class: 'cutter',
+    class: 'prospector',
     // A deeper pool than the Tern's: lasers and pulses run on it.
     capacitor: 110,
     capacitorRecharge: 7,
@@ -407,7 +426,7 @@ export const HULLS: Record<string, HullSpec> = {
     // it wants an escort.
     id: 'rookrivet-hulk',
     name: 'Belt Forge Collier',
-    race: 'freeBelt',
+    power: 'belt',
     manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'L',
@@ -423,7 +442,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 130,
     maxTurnRate: 0.45,
     signature: 70,
-    class: 'hulk',
+    class: 'barge',
     // A deep, quick pool: two heavy lasers run on it all day.
     capacitor: 600,
     capacitorRecharge: 30,
@@ -471,7 +490,7 @@ export const HULLS: Record<string, HullSpec> = {
     // a deep assay, a charge rig, and quick enough to clear its own blast.
     id: 'rookrivet-breacher',
     name: 'Belt Forge Sinker',
-    race: 'freeBelt',
+    power: 'belt',
     manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'M',
@@ -486,7 +505,7 @@ export const HULLS: Record<string, HullSpec> = {
     maxSpeed: 240,
     maxTurnRate: 1.3,
     signature: 32,
-    class: 'sloop',
+    class: 'miner',
     capacitor: 260,
     capacitorRecharge: 14,
     mounts: [
@@ -525,7 +544,7 @@ export const HULLS: Record<string, HullSpec> = {
     // what its mother has locked.
     id: 'rookrivet-drone',
     name: 'Belt Forge Knocker',
-    race: 'freeBelt',
+    power: 'belt',
     manufacturer: 'beltForge',
     role: 'civilian',
     sizeClass: 'S',
@@ -560,7 +579,7 @@ export const HULLS: Record<string, HullSpec> = {
     // the Sparrow it replaced, so tests that lean on it keep their meaning.
     id: 'aurel-tacet',
     name: 'Aurel Tacet',
-    race: 'aurel',
+    power: 'aurel',
     manufacturer: 'aurel',
     role: 'development',
     sizeClass: 'S',
@@ -605,7 +624,7 @@ export const HULLS: Record<string, HullSpec> = {
     // sold or refitted. Slow and fragile, enough to limp home on.
     id: 'escape-pod',
     name: 'Meridian Ark',
-    race: null,
+    power: null,
     manufacturer: 'meridian',
     role: 'civilian',
     sizeClass: 'S',

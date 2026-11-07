@@ -88,7 +88,7 @@ export class FlightHud {
   private readonly shipLine = el('div', 'hud-ship');
   private readonly zoneLine = el('div', 'hud-dim');
   private readonly walletLine = el('span', 'hud-dim');
-  /** The colours chip (docs/interface.md, section 3): COLOURS, or DARK in amber; click to switch. */
+  /** The transponder chip (docs/interface.md, section 3): SQUAWK, or DARK in amber; click to switch. */
   private readonly coloursChip = el('button', 'hud-colours') as HTMLButtonElement;
   /** Called when the colours chip is clicked (main.ts sends the toggle). */
   onToggleColours: () => void = () => {};
@@ -218,9 +218,9 @@ export class FlightHud {
     setText(this.zoneLine, secure ? `${secure.name.toUpperCase()} SECURITY` : 'OPEN SPACE');
     setText(this.walletLine, `CR ${(pilot?.credits ?? 0).toLocaleString('en-GB')} · CARGO ${cargoUsed(ship)}/${holdCapacity(stats)}`);
     const dark = ship.dark === true;
-    setText(this.coloursChip, dark ? 'DARK' : 'COLOURS');
+    setText(this.coloursChip, dark ? 'DARK' : 'SQUAWK');
     this.coloursChip.classList.toggle('dark', dark);
-    const tip = dark ? 'Running dark: others see a radar contact until they lock you. Click or K to show colours' : 'Showing colours: others see your name and hull. Click or K to run dark';
+    const tip = dark ? 'Transponder off, running dark: others see a radar contact until they lock you. Click or K to squawk' : 'Transponder on, squawking: others see your name and hull. Click or K to run dark';
     if (this.coloursChip.title !== tip) this.coloursChip.title = tip;
 
     // Above the dial: what you can do now.
@@ -444,7 +444,7 @@ function weaponTile(kind: 'fixed' | 'turret', family: WeaponFamily, name: string
   }
   const reload = svg('path', { class: 'reload' });
   icon.append(reload);
-  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : family === 'pointDefence' ? 'SWIVEL' : gunName(weaponId));
+  const label = el('span', 'hud-weapon-kind', family === 'missile' ? 'LAUNCHER' : family === 'countermeasure' ? 'DISPENSER' : family === 'mining' && kind === 'turret' ? 'MINING TURRET' : family === 'pointDefence' ? 'PDC' : gunName(weaponId));
   const state = el('span', 'hud-weapon-key', family === 'countermeasure' ? 'C' : family === 'mining' && kind === 'turret' ? 'NO ROCK' : family === 'pointDefence' ? 'PD' : 'SPACE');
   const ammo = el('span', 'hud-weapon-ammo', '');
   root.append(icon, label, state, ammo);

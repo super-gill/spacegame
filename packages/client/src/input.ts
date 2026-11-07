@@ -115,7 +115,7 @@ export class InputController {
   }
 
   /** Drop an ore cache on the next tick, as J does. */
-  /** The colours chip was clicked: switch the Registry beacon on the next tick. */
+  /** The transponder chip was clicked: switch the transponder on the next tick. */
   requestToggleColours(): void {
     this.latched.add('toggleColours');
   }

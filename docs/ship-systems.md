@@ -27,7 +27,7 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [weapons.md](weapon
 | Merchantman (Manifest) | 1 | 2 | 4 | 6 | |
 | Hulk (industry) | 1 | 3 | 4 | 4 | 2 mining mounts |
 
-- **Weapon** slots take any gun, launcher or swivel: fixed or swivel is a property of the weapon, so a pilot can fit all fixed, all swivels or a mix.
+- **Weapon** slots take any gun, launcher or PDC: fixed or turreted is a property of the weapon, so a pilot can fit all fixed, all turreted or a mix.
 - **Utility** slots hold active kit: the tractor beam, the afterburner, countermeasure dispensers, and later electronic warfare.
 - **Internal** slots hold passive kit: shield generators, armour, and later a capacitor battery.
 - **Fixed slots on every ship, outside the budget:** nav computer, radar, targeting computer, flight computer, pod bay, fire control, engine, reactor and thrusters (the `core` mounts). The pod itself has only what it needs to fly.
@@ -37,7 +37,7 @@ Related: [ships.md](ships.md) for hulls, mounts and fitting; [weapons.md](weapon
 
 - **Flight computer** (fixed slot). Thrusters and the hull decide how fast a ship *can* turn and accelerate; the flight computer decides how *well* that is used: how cleanly the nose settles on the mouse and how firmly flight assist and the brake work. No flight computer: no mouse steering and no assist; the ship flies in manual on the keys. A cheap one turns the nose slower and settles loosely; a good one snaps on target.
 - **Pod bay** (fixed slot). The escape pod comes from it. Losing a ship with no pod bay: the pilot wakes at their home station without that ship or its cargo, as after losing a pod today. Pod bays are cheap; leaving one out is a choice.
-- **Fire control** (fixed slot). A fire-control computer decides how many swivels a ship can direct and how fast they track. Swivels beyond its count stay idle. Weapon mounts no longer decide whether a swivel fits.
+- **Fire control** (fixed slot). A fire-control computer decides how many PDCs a ship can direct and how fast they track. PDCs beyond its count stay idle. Weapon mounts no longer decide whether a PDC fits.
 - **Shield recharge timing** comes from the shield generator (how long after a hit it starts recharging).
 - **Tractor beam** (utility). An active module with range, pull and how much it can scoop; R holds it on, or its tile switches it. The starter gets a weak one.
 - **Afterburner** (utility). Held on **Shift**, like sprint: while held it raises the ship's speed cap and main thrust and burns capacitor; when the capacitor runs dry it stops.
@@ -58,10 +58,10 @@ More modules draw more power, so reactors start to matter and fitting becomes a 
 ## As built (4 November 2026)
 
 - **Slots:** the Tern, Warrant and Manifest follow the budget; the Tacet (sealed, dev) has the fixed system mounts and a second internal mount for an extra reactor; pods have only a flight mount. Fixed system mounts are sized by hull (small on the Tern, medium on the Warrant and Manifest).
-- **Modules** (names from the lore): flight computers Meridian Helm S (60%), Paragon Helmsman S (85%), Ito-Marr Coxswain M (100%); Meridian Davit S; Paragon Gunlayer S (one swivel, tracking 1x) and M (three, 1.25x); tractors Meridian Gleaner S (220 units, 120 u/s) and Tessaract Collection M (400, 180); afterburners Slagline Bolt S (+50% top speed, +80% thrust, 9 capacitor a second) and Ito-Marr Sally M (+60%, +100%, 14). Afterburners draw no reactor power: they pay from the capacitor.
+- **Modules** (names from the lore): flight computers Meridian Course S (60%), Paragon Vector S (85%), Ito-Marr Trajectory M (100%); Meridian Pod Rack S; Paragon Fire Control S (one PDC, tracking 1x) and M (three, 1.25x); tractors Meridian Gleaner S (220 units, 120 u/s) and Tessaract Collection M (400, 180); afterburners Slagline Bolt S (+50% top speed, +80% thrust, 9 capacitor a second) and Ito-Marr Sally M (+60%, +100%, 14). Afterburners draw no reactor power: they pay from the capacitor.
 - **Flight computer effects:** with none, assist, the brake and mouse steering do nothing (manual on the keys). Quality q scales how firmly assist and the brake hold (50% to 100%), how fast the nose turns to the mouse (55% to 100% of the hull's turn rate), and how far off the aim it lets the nose sit before acting (up to 0.1 radians at q 0).
 - **Pod bay:** without one, losing the ship leaves the pilot without a ship until they wake at Harbour, as after losing a pod.
-- **Fire control:** directs the first swivels in mount order up to its count; the rest stay idle. Tracking multiplies swivel slew rate.
+- **Fire control:** directs the first PDCs in mount order up to its count; the rest stay idle. Tracking multiplies PDC slew rate.
 - **Shields:** the Ito-Marr Bastion recharges 2.2 seconds after a hit, against 3 for civil generators.
 - **Power:** the starter runs at 13 of 13; upgrading anything now means giving something up. The raider moved to the medium reactor to fit its systems.
 - **Stock fits:** the starter carries a helm, a director, a pod bay, a Gleaner and a Kick (its armour moved to an internal mount); traders a helm, director, pod bay and chaff screen; the Watch a helm, pod bay and chaff; the raider a helm and pod bay.

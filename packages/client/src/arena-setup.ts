@@ -1,4 +1,4 @@
-import { ARENA_MAX_ENEMIES, arenaHulls, type ArenaHull, type ArenaScenario, type World } from '@spacegame/sim';
+import { ARENA_MAX_ENEMIES, HULL_CLASS_NAMES, arenaHulls, type ArenaHull, type ArenaScenario, type World } from '@spacegame/sim';
 
 /**
  * The arena setup (docs/worlds.md, "Screens"; approved mockup, 6 November
@@ -64,10 +64,6 @@ function fitLabel(hull: ArenaHull, fit: string): string {
   return rest.charAt(0).toUpperCase() + rest.slice(1);
 }
 
-/** "lineShip" reads "LINE SHIP". */
-function classLabel(cls: string): string {
-  return cls.replace(/([A-Z])/g, ' $1').toUpperCase();
-}
 
 export class ArenaSetup {
   private readonly screen = el('div', 'login-screen arena-setup hidden');
@@ -190,7 +186,7 @@ export class ArenaSetup {
     const hull = this.hulls.find((h) => h.hullId === c.hullId) ?? this.hulls[0];
     this.shipList.replaceChildren();
     for (const h of this.hulls) {
-      this.row(this.shipList, h.name, classLabel(h.class), h.hullId === hull?.hullId, () => {
+      this.row(this.shipList, h.name, HULL_CLASS_NAMES[h.class].toUpperCase(), h.hullId === hull?.hullId, () => {
         c.hullId = h.hullId;
         c.fit = h.fits[0]!.name;
         this.draw();

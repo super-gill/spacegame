@@ -10,7 +10,7 @@ export * from './types.js';
 export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
-export { HULLS } from './hulls.js';
+export { HULLS, HULL_CLASS_NAMES } from './hulls.js';
 export { MODULES } from './modules.js';
 export { LOADOUTS } from './loadouts.js';
 export { MANUFACTURERS } from './manufacturers.js';

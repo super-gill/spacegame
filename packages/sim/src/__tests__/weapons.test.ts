@@ -69,8 +69,13 @@ describe('the catalogue', () => {
       expect(h.capacitor, h.id).toBeGreaterThan(0);
       expect(h.capacitorRecharge, h.id).toBeGreaterThan(0);
     }
-    expect(HULLS['tessaract-spine']!.class).toBe('merchantman');
-    expect(HULLS['meridian-courier']!.class).toBe('cutter');
+    // The classes from docs/lore.md, "Hull classes" (the Sol pivot): the frigate moved one rung up.
+    expect(HULLS['tessaract-spine']!.class).toBe('freighter');
+    expect(HULLS['meridian-courier']!.class).toBe('corvette');
+    expect(HULLS['kessari-wedge']!.class).toBe('patrolBoat');
+    expect(HULLS['kessari-brig']!.class).toBe('frigate');
+    expect(HULLS['union-frigate']!.class).toBe('destroyer');
+    expect(HULLS['rookrivet-hulk']!.class).toBe('barge');
   });
 });
 

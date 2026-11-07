@@ -18,8 +18,8 @@ function npc(id: string, loadout: string, x: number, over: Partial<Ship> = {}): 
 const general = PLOT_PRESETS.find((p) => p.id === 'general')!;
 const combat = PLOT_PRESETS.find((p) => p.id === 'combat')!;
 
-describe('the Plot', () => {
-  it('names a ship showing colours by hull and role, and lists every station', () => {
+describe('the board (plot-rows.ts)', () => {
+  it('names a squawking ship by hull and role, and lists every station', () => {
     const trader = npc('t1', 'tessaract-trader', 800);
     const { world, mine } = around(trader);
     const w = { ...world, npcs: { t1: { kind: 'trader' } as never } };

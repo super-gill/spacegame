@@ -27,15 +27,15 @@ The mouse is for choosing. It is never captured or hidden, and clicks on on-scre
 | Action | Input | Notes |
 | --- | --- | --- |
 | Activation tiles | 1 to 9 | The numbered tiles above your weapons: fire groups first (the key selects the group the fire button fires; new guns join group 1, launchers group 2), then active modules (switches a tractor on or off, drops a charge from a dispenser, sends a survey pulse). Mining lasers join group 3. Close-in weapon systems need no group |
-| Mining turrets (hulk) | Make a rock your active lock, then press a turret's tile | That turret takes the rock and cuts it on its own while it stays locked and in reach. Press the tile again to let it go. Each turret can work a different rock |
+| Mining turrets (barge) | Make a rock your active lock, then press a turret's tile | That turret takes the rock and cuts it on its own while it stays locked and in reach. Press the tile again to let it go. Each turret can work a different rock |
 | Hold | I | A window: what is aboard, split into ore hold and cargo. In space, JETTISON throws a whole stack out astern for anyone to take; docked, STORE and TAKE move stacks to and from your storage at that station. Also the ore hopper's sorting and the tractor's mode |
 | Drone manager | N | Launch, recall and send drones (to your active lock), and see each drone's state and condition. Drones work only rocks you have locked; your tractor collects what they cut. Recall them before you dock: drones left out are lost |
 | Aim reticle | Controls panel (F1), "Aim reticle" | With mouse steering, what marks the pointer over open space: Ring, Brackets or Dot (drawn, with a tick where your nose points now; amber and dashed while the heading is locked), or Plain (the browser's crosshair). Over windows the normal pointer shows. Remembered in this browser |
 | Heading lock | V | With mouse steering: the nose holds its bearing so you can move the pointer (to the interface, or to pick a target) without turning. Press again to release. A HEADING chip shows the state |
-| Select something | Right click it in space (left click without mouse steering), or click its row in the Plot | Selecting makes it your nav target and shows it in the selection window on the right (under the lock cards): what your computer reads for a lock, the radar's part (range, closing speed, arrival) for anything else, a station's services and free pads. Its buttons lock, make active, dock, send a drone to a locked rock, or CLEAR. Right-clicking a ship or rock also locks it. With nothing selected the window shows your active lock |
+| Select something | Right click it in space (left click without mouse steering), or click its row on the board | Selecting makes it your nav target and shows it in the selection window on the right (under the lock cards): what your computer reads for a lock, the radar's part (range, closing speed, arrival) for anything else, a station's services and free pads. Its buttons lock, make active, dock, send a drone to a locked rock, or CLEAR. Right-clicking a ship or rock also locks it. With nothing selected the window shows your active lock |
 | Lock a ship or a rock | Right click on it (left click without mouse steering) | Locking takes a moment (its lock card fills, and the target card shows LOCKING with a percentage); your targeting computer sets how many you can hold and what the cards show once locked. Clicking a ship you have locked makes it the active lock. Clicking empty space changes nothing. The target card's UNLOCK button drops the lock it shows, without the keyboard. A locked rock shows its range; with a mining computer, what ore it holds, how hard it is and whether your laser can cut it |
-| The Plot | P | A window listing what is around you: distance, type, name, closing speed (positive coming towards you), your lock. Tabs GENERAL (ships, stations, caches), COMBAT (ships: hostiles first, then unknown contacts) and MINING (rocks in radar range, caches, your drones); click a column head to sort. Click a row to make it your nav target (click again to clear); right-click a ship or rock to lock it, or to make a lock you hold active. The tab and sort are remembered |
-| Nav target | Click a row in the Plot | A chevron over it on screen, or at the screen edge pointing its way, with its distance and when you get there at your present closing speed (`--` while not closing). Dropped when it leaves your view |
+| The board | P | A window listing every contact around you: distance, type, name, closing speed (positive coming towards you), your lock. Tabs GENERAL (ships, stations, caches), COMBAT (ships: hostiles first, then unknown contacts) and MINING (rocks in radar range, caches, your drones); click a column head to sort. Click a row to make it your nav target (click again to clear); right-click a ship or rock to lock it, or to make a lock you hold active. The tab and sort are remembered |
+| Nav target | Click a row on the board | A chevron over it on screen, or at the screen edge pointing its way, with its distance and when you get there at your present closing speed (`--` while not closing). Dropped when it leaves your view |
 | Next lock | Tab | Makes the next lock you hold active; with no locks, locks the nearest ship. Clicking a lock card does the same for that lock |
 | Unlock | Esc | Closes the top window (hold, drones) if one is open; otherwise drops the active lock and the next one takes over |
 
@@ -54,7 +54,7 @@ The active lock also gets corner brackets in space (white when cold, red when ho
 
 ## Windows
 
-Small panels in flight (the Plot, the hold, the drone manager) are windows: open each with its key or its button on the launcher strip under your status lines, drag the title bar to move it (the place is remembered), close it with its ✕ or Esc. Several can be open at once.
+Small panels in flight (the board, the hold, the drone manager) are windows: open each with its key or its button on the launcher strip under your status lines, drag the title bar to move it (the place is remembered), close it with its ✕ or Esc. Several can be open at once.
 
 ## Weapons
 
@@ -122,7 +122,7 @@ You can own several ships and fly one at a time. A ship you are not in is **empt
 
 | Action | Input | Notes |
 | --- | --- | --- |
-| Show colours / run dark | K, or the COLOURS chip on the status lines | Your Registry beacon. Showing colours (the default), anyone in sensor range sees your name and hull. Running dark (the chip says DARK in amber), other pilots see only a radar contact, small, medium or large, until they lock you and their targeting computer identifies you. Pirates run dark |
+| Squawk / run dark | K, or the SQUAWK chip on the status lines | Your transponder. Squawking (the default), anyone in sensor range sees your name and hull. Running dark (the chip says DARK in amber), other pilots see only a radar contact, small, medium or large, until they lock you and their targeting computer identifies you. Pirates run dark |
 | Board your nearest empty ship | B | Docked: any of your ships at the same station. In space: within 150 units and under 20 u/s relative to it |
 | Board a particular ship | Board button in Your ships | Docked only |
 | Step out in an escape pod | G, twice within 2 seconds | In space only. Your ship stays where it is, empty, and keeps any speed it had: slow down first to park it |

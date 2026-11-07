@@ -79,25 +79,48 @@ export interface MountPoint {
   arc?: number;
 }
 
-export type RaceId = 'halcyon' | 'kessari' | 'freeBelt' | 'vael' | 'oru' | 'drifter' | 'aurel';
+/**
+ * The powers of the setting (docs/lore.md, "The four powers"; Sol pivot,
+ * 6 November 2026): Earth (with Luna), Mars, Venus and the Belt, plus the
+ * Aurel, who are not a power but whose ships still carry their look.
+ */
+export type PowerId = 'earth' | 'mars' | 'venus' | 'belt' | 'aurel';
 
-/** A ship or module maker. `race` is null for multi-race firms. */
+/** A ship or module maker. `power` is its home power, null for independents (Meridian, Paragon, Corvane). */
 export interface ManufacturerSpec {
   id: string;
   name: string;
-  race: RaceId | null;
+  power: PowerId | null;
 }
 
 /** The industry a hull is built for. Grows as industries arrive. */
 export type HullRole = 'civilian' | 'combat' | 'transport' | 'development';
 
 /**
- * A hull's class on the age-of-sail ladder (docs/weapons.md, "Hull
- * classes"). About role and scale, separate from module size, which is
- * what fits a mount. Merchantmen (trade, passengers) and hulks
- * (industry) come at any size; the Aurel are outside the ladder.
+ * A hull's class (docs/lore.md, "Hull classes"): what it was built as,
+ * on the military or the civilian ladder; the fit says what it is now.
+ * About role and scale, separate from module size, which is what fits a
+ * mount. Pods, drones and the Aurel sit outside both ladders.
  */
-export type HullClass = 'pod' | 'cutter' | 'sloop' | 'brig' | 'frigate' | 'lineShip' | 'capital' | 'merchantman' | 'hulk' | 'aurel' | 'drone';
+export type HullClass =
+  // Outside the ladders.
+  | 'pod'
+  | 'drone'
+  | 'aurel'
+  // The military ladder, smallest first (docs/lore.md, "Hull classes").
+  | 'corvette'
+  | 'patrolBoat'
+  | 'frigate'
+  | 'destroyer'
+  | 'cruiser'
+  | 'battleship'
+  | 'carrier'
+  | 'dreadnought'
+  // The civilian ladder: the classes today's hulls use; more arrive with their hulls.
+  | 'prospector'
+  | 'miner'
+  | 'freighter'
+  | 'barge';
 
 /**
  * What a shot does its damage as. Defences resist each type differently
@@ -333,7 +356,7 @@ export interface ModuleSpec {
  * it sits on: a smaller module works but loses the hull's bonus.
  */
 export interface HullBonus {
-  source: 'role' | 'race';
+  source: 'role' | 'power';
   /** Shown in outfitting, e.g. "+25% cargo from full-size pods". */
   label: string;
   stat: ModuleStat | 'damage';
@@ -351,7 +374,7 @@ export interface HullSpec {
   id: string;
   name: string;
   /** Race whose look and bonuses it carries; null for multi-race makers. */
-  race: RaceId | null;
+  power: PowerId | null;
   manufacturer: string;
   role: HullRole;
   sizeClass: ModuleSize;

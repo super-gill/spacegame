@@ -33,7 +33,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `hulls.ts` | Hull catalogue (data): frame mass, structure, outline, flight limits, mount points and bonuses. Meridian Tern, Kessari Warrant, Tessaract Manifest, Aurel Tacet (sealed dev hull) |
 | `modules.ts` | Module catalogue (data): type, size, mounts it fits, services it needs, mass, power, price, maker, stats |
 | `loadouts.ts` | Named fits (data): the starter, NPC fits, the dev fit |
-| `manufacturers.ts` | Manufacturer catalogue (data): name and race |
+| `manufacturers.ts` | Manufacturer catalogue (data): name and power |
 | `stats.ts` | Derived stats: `fitStats` for any hull and fit, `shipStats` for a ship as it flies, bonus rules |
 | `fitting.ts` | Fitting rules and refits: `mountRefusal`, `planRefit` (previews), `fitModule`, `unfitModule`, `sellModule`, fees (`fitFee`), module storage per station, weapon states across refits |
 | `flight.ts` | Flight computer: input and flight mode to thruster throttles. Assist and brake logic |
@@ -57,7 +57,7 @@ Dependency direction is one way: the client imports the sim. The sim imports not
 | `ai/miner.ts`, `ai/navigate.ts`, `ai/path.ts` | NPC miners; flying small craft through the belt (paths, slowing in clutter, sliding off obstacles); A* round rocks |
 | `mining.ts` | Mining part 1: survey pulses, and mining lasers cutting rocks into canisters of ore |
 | `systems.ts` | Activation tiles: which fire groups and modules get a numbered tile, in order |
-| `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the swivel, each with capacitor cost, ammunition good and damage type |
+| `weapons.ts` | Weapon catalogue (data): six gun families in three sizes plus the PDC, each with capacitor cost, ammunition good and damage type |
 | `goods.ts` | Goods catalogue (data) |
 | `save.ts` | Save format: versioned envelope, serialize, deserialize with validation, migrations, catalogue refresh |
 | `trade.ts` | Price source interface and scripted prices, cargo space used, buy and sell commands |

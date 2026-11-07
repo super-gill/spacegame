@@ -406,7 +406,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Cantor-Vell Verse: the pulse laser, sung in bursts. Lighter than the Fairshot, hungrier for power.
   'cantorvell-verse-s': {
     id: 'cantorvell-verse-s',
-    name: 'Cantor-Vell Verse S',
+    name: 'Cantor-Vell Volley S',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -421,7 +421,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'cantorvell-verse-m': {
     id: 'cantorvell-verse-m',
-    name: 'Cantor-Vell Verse M',
+    name: 'Cantor-Vell Volley M',
     kind: 'weapon',
     size: 'M',
     mounts: ['high'],
@@ -436,7 +436,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'cantorvell-verse-l': {
     id: 'cantorvell-verse-l',
-    name: 'Cantor-Vell Verse L',
+    name: 'Cantor-Vell Volley L',
     kind: 'weapon',
     size: 'L',
     mounts: ['high'],
@@ -452,7 +452,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Cantor-Vell Litany: the beam laser, one long prayer.
   'cantorvell-litany-s': {
     id: 'cantorvell-litany-s',
-    name: 'Cantor-Vell Litany S',
+    name: 'Cantor-Vell Enfilade S',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -467,7 +467,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'cantorvell-litany-m': {
     id: 'cantorvell-litany-m',
-    name: 'Cantor-Vell Litany M',
+    name: 'Cantor-Vell Enfilade M',
     kind: 'weapon',
     size: 'M',
     mounts: ['high'],
@@ -482,7 +482,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'cantorvell-litany-l': {
     id: 'cantorvell-litany-l',
-    name: 'Cantor-Vell Litany L',
+    name: 'Cantor-Vell Enfilade L',
     kind: 'weapon',
     size: 'L',
     mounts: ['high'],
@@ -498,7 +498,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Commonwealth Retort: the blaster, a reply at point blank.
   'commonwealth-retort-s': {
     id: 'commonwealth-retort-s',
-    name: 'Commonwealth Retort S',
+    name: 'Ishtar Retort S',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -513,7 +513,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'commonwealth-retort-m': {
     id: 'commonwealth-retort-m',
-    name: 'Commonwealth Retort M',
+    name: 'Ishtar Retort M',
     kind: 'weapon',
     size: 'M',
     mounts: ['high'],
@@ -528,7 +528,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'commonwealth-retort-l': {
     id: 'commonwealth-retort-l',
-    name: 'Commonwealth Retort L',
+    name: 'Ishtar Retort L',
     kind: 'weapon',
     size: 'L',
     mounts: ['high'],
@@ -544,7 +544,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Commonwealth Answer: the railgun, a reply from as far as anyone can shoot.
   'commonwealth-answer-s': {
     id: 'commonwealth-answer-s',
-    name: 'Commonwealth Answer S',
+    name: 'Ishtar Answer S',
     kind: 'weapon',
     size: 'S',
     mounts: ['high'],
@@ -559,7 +559,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'commonwealth-answer-m': {
     id: 'commonwealth-answer-m',
-    name: 'Commonwealth Answer M',
+    name: 'Ishtar Answer M',
     kind: 'weapon',
     size: 'M',
     mounts: ['high'],
@@ -574,7 +574,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'commonwealth-answer-l': {
     id: 'commonwealth-answer-l',
-    name: 'Commonwealth Answer L',
+    name: 'Ishtar Answer L',
     kind: 'weapon',
     size: 'L',
     mounts: ['high'],
@@ -746,7 +746,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // manual flight on the keys. Names from docs/lore.md.
   'meridian-helm-s': {
     id: 'meridian-helm-s',
-    name: 'Meridian Helm S',
+    name: 'Meridian Course S',
     kind: 'flightComputer',
     size: 'S',
     mounts: ['flight'],
@@ -760,7 +760,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'paragon-helmsman-s': {
     id: 'paragon-helmsman-s',
-    name: 'Paragon Helmsman S',
+    name: 'Paragon Vector S',
     kind: 'flightComputer',
     size: 'S',
     mounts: ['flight'],
@@ -774,7 +774,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'itomarr-coxswain-m': {
     id: 'itomarr-coxswain-m',
-    name: 'Ito-Marr Coxswain M',
+    name: 'Ito-Marr Trajectory M',
     kind: 'flightComputer',
     size: 'M',
     mounts: ['flight'],
@@ -791,7 +791,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // means waking at home without it.
   'meridian-podbay-s': {
     id: 'meridian-podbay-s',
-    name: 'Meridian Davit S',
+    name: 'Meridian Pod Rack S',
     kind: 'podBay',
     size: 'S',
     mounts: ['podBay'],
@@ -807,7 +807,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   // Fire control: how many close-in weapon systems a ship can direct, and how fast they track.
   'paragon-director-s': {
     id: 'paragon-director-s',
-    name: 'Paragon Gunlayer S',
+    name: 'Paragon Fire Control S',
     kind: 'fireControl',
     size: 'S',
     mounts: ['fireControl'],
@@ -821,7 +821,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'paragon-director-m': {
     id: 'paragon-director-m',
-    name: 'Paragon Gunlayer M',
+    name: 'Paragon Fire Control M',
     kind: 'fireControl',
     size: 'M',
     mounts: ['fireControl'],
@@ -836,7 +836,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   'paragon-director-l': {
     // For frigates and up: a frigate carries four CIWS.
     id: 'paragon-director-l',
-    name: 'Paragon Gunlayer L',
+    name: 'Paragon Fire Control L',
     kind: 'fireControl',
     size: 'L',
     mounts: ['fireControl'],
@@ -1122,7 +1122,7 @@ export const MODULES: Record<string, ModuleSpec> = {
   },
   'itomarr-surge-m': {
     id: 'itomarr-surge-m',
-    name: 'Ito-Marr Sally M',
+    name: 'Ito-Marr Surge M',
     kind: 'afterburner',
     size: 'M',
     mounts: ['mid'],

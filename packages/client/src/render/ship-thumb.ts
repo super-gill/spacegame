@@ -1,5 +1,5 @@
 import type { HullSpec, World } from '@spacegame/sim';
-import { RACE_COLOUR, drawShipArt } from './ship-art.js';
+import { POWER_COLOUR, drawShipArt } from './ship-art.js';
 
 /**
  * A small fixed-size drawing of a ship from its hull and fit, nose to the
@@ -35,7 +35,7 @@ export function shipThumb(world: World, hull: HullSpec, fit: Readonly<Record<str
     fit,
     modules: world.modules,
     manufacturers: world.manufacturers,
-    colour: hull.race ? RACE_COLOUR[hull.race] : INK,
+    colour: hull.power ? POWER_COLOUR[hull.power] : INK,
     heading: 0,
   });
   return canvas;

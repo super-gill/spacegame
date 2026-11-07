@@ -1,10 +1,10 @@
-import type { HullSpec, ManufacturerSpec, ModuleKind, ModuleSize, ModuleSpec, MountPoint, RaceId, ShipStats, Thrusters, WeaponState } from '@spacegame/sim';
+import type { HullSpec, ManufacturerSpec, ModuleKind, ModuleSize, ModuleSpec, MountPoint, PowerId, ShipStats, Thrusters, WeaponState } from '@spacegame/sim';
 
 /**
  * Ship art: a ship is drawn as its hull outline plus each fitted module's
  * universal silhouette at its mount point (the "module grammar" board on
  * the ship concepts canvas). Function shows by shape, the same for every
- * maker; the maker's race shows in the module's fill colour.
+ * maker; the maker's home power shows in the module's fill colour.
  *
  * Everything here draws in hull space: the caller has translated the
  * context to the ship centre, rotated it to the heading and scaled it to
@@ -12,14 +12,17 @@ import type { HullSpec, ManufacturerSpec, ModuleKind, ModuleSize, ModuleSpec, Mo
  * units so lines stay crisp at any scale.
  */
 
-/** Race colours from the races design. Multi-race makers use the ship's own colour. */
-export const RACE_COLOUR: Record<RaceId, string> = {
-  halcyon: '#d9b45a',
-  kessari: '#5b8fc7',
-  freeBelt: '#c8642e',
-  vael: '#6fbf8e',
-  oru: '#a77be0',
-  drifter: '#c23a3a',
+/**
+ * Power colours (docs/races.md, "The powers"). Earth keeps Kessari's
+ * steel blue and the Belt the Free Belt's rust orange; Mars's rust red and
+ * Venus's green are first proposals, for Jason to confirm. Independent
+ * makers use the ship's own colour.
+ */
+export const POWER_COLOUR: Record<PowerId, string> = {
+  earth: '#5b8fc7',
+  mars: '#b8483a',
+  venus: '#6fbf8e',
+  belt: '#c8642e',
   aurel: '#cfefff',
 };
 
@@ -53,10 +56,10 @@ export interface ShipArt {
   dashedHull?: boolean;
 }
 
-/** Fill colour for a module: its maker's race, or the line colour for multi-race makers. */
+/** Fill colour for a module: its maker's home power, or the line colour for independents. */
 function moduleFill(art: ShipArt, module: ModuleSpec): string {
-  const race = art.manufacturers[module.manufacturer]?.race;
-  return race ? RACE_COLOUR[race] : art.colour;
+  const power = art.manufacturers[module.manufacturer]?.power;
+  return power ? POWER_COLOUR[power] : art.colour;
 }
 
 /** Draw the whole ship in hull space. `scale` is screen pixels per world unit. */

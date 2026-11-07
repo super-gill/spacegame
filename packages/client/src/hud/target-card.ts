@@ -355,7 +355,7 @@ export class TargetCard {
     } else if (other) {
       const hull = world.hulls[other.hullId];
       setText(this.name, hull?.name ?? 'Ship');
-      setText(this.who, `${name.toUpperCase()} · showing colours · lock it for more`);
+      setText(this.who, `${name.toUpperCase()} · squawking · lock it for more`);
     } else if (station) {
       setText(this.name, station.name);
       setText(this.who, 'Showing its light');

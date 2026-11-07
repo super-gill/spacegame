@@ -138,7 +138,7 @@ describe('close-in weapon systems (step 3)', () => {
     expect(count('rookrivet-hulk')).toBe(2);
     expect(count('union-frigate')).toBe(4);
     for (const hull of Object.values(HULLS)) {
-      if (['pod', 'cutter', 'sloop', 'drone', 'aurel'].includes(hull.class)) expect(count(hull.id), hull.id).toBe(0);
+      if (['pod', 'corvette', 'patrolBoat', 'prospector', 'miner', 'drone', 'aurel'].includes(hull.class)) expect(count(hull.id), hull.id).toBe(0);
     }
   });
 

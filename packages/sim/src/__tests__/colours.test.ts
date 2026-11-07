@@ -11,7 +11,7 @@ import { createStarterWorld, emptyInput, joinPilot, pilotShip } from '../world.j
 
 /**
  * Colours (docs/interface.md, section 3): every ship's Registry beacon.
- * Showing colours, others see its name and hull; running dark, it is a
+ * Squawking, others see its name and hull; running dark, it is a
  * radar contact until locked and identified.
  */
 
@@ -63,13 +63,15 @@ describe('colours', () => {
 
   it('a contact is small, medium or large by hull class', () => {
     const of = (cls: string) => contactSize(Object.values(HULLS).find((h) => h.class === cls));
-    expect(of('cutter')).toBe('small');
+    expect(of('corvette')).toBe('small');
     expect(of('pod')).toBe('small');
-    expect(of('sloop')).toBe('small');
-    expect(of('brig')).toBe('medium');
-    expect(of('merchantman')).toBe('medium');
-    expect(of('hulk')).toBe('medium');
-    expect(of('frigate')).toBe('large');
+    expect(of('patrolBoat')).toBe('small');
+    expect(of('prospector')).toBe('small');
+    expect(of('miner')).toBe('small');
+    expect(of('frigate')).toBe('medium');
+    expect(of('freighter')).toBe('medium');
+    expect(of('barge')).toBe('medium');
+    expect(of('destroyer')).toBe('large');
     expect(contactSize(undefined)).toBe('small');
   });
 

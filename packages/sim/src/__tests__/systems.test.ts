@@ -180,7 +180,7 @@ describe('fire control', () => {
     expect(shotsIn(hot(frigate({ x1: null })), 2)).toBe(0);
   });
 
-  it('a small Gunlayer runs one CIWS: the second stays idle until a bigger one is fitted', () => {
+  it('a small Fire Control runs one CIWS: the second stays idle until a bigger one is fitted', () => {
     const small = hot(frigate({ x1: 'paragon-director-s' }));
     const oneFitted = hot(frigate({ d2: null, d3: null, d4: null }));
     expect(shotsIn(small, 3)).toBe(shotsIn(oneFitted, 3));
@@ -316,8 +316,8 @@ describe('slot placement (docs/fitting.md, "Placement")', () => {
     for (const hull of Object.values(HULLS)) {
       for (const m of hull.mounts) {
         if (m.type === 'high' || m.type === 'ciws') expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
-        // A merchantman's cargo pods hang off its spine, outside the outline.
-        if ((m.type === 'mid' || m.type === 'low') && !(hull.class === 'merchantman' && m.id.startsWith('b'))) expect(inside(m.position, hull.outline), `${hull.id} ${m.id}`).toBe(true);
+        // A freighter's cargo pods hang off its spine, outside the outline.
+        if ((m.type === 'mid' || m.type === 'low') && !(hull.class === 'freighter' && m.id.startsWith('b'))) expect(inside(m.position, hull.outline), `${hull.id} ${m.id}`).toBe(true);
       }
     }
   });

@@ -192,7 +192,7 @@ function selectionFor(id: string): NavTarget {
   return { kind: mine && ship.motherId === mine.id ? 'drone' : 'ship', id };
 }
 const plot = new Plot(
-  windows.add('plot', 'Plot', 'P', { x: 16, y: 120 }),
+  windows.add('plot', 'Board', 'P', { x: 16, y: 120 }),
   // A click selects; clicking the selection again clears it.
   (target) => select(navTarget?.id === target.id ? null : target),
   // A right-click locks (or activates) and selects, as in space.

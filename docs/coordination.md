@@ -154,6 +154,12 @@ Colours and the Plot contracts (on `main` from 6 November 2026; `docs/interface.
 - **Contacts in a view** (`view.ts`): `Ship.contact` is set only in a pilot's view, for a dark ship they have not identified; `hullId` is then empty and fit, weapons, hold, owner and condition are blank. **Client code must check `ship.contact` before reading a ship's hull or calling `shipStats` on another ship.** `PROTOCOL_VERSION` 2.
 - **Save format version 16** (`migrate15to16`).
 
+Sol pivot contracts (on `main` from 7 November 2026; `docs/lore-pivot-audit.md`):
+
+- **Powers** (`types.ts`): `PowerId` (`earth`, `mars`, `venus`, `belt`, `aurel`) replaces `RaceId`; `HullSpec.power` and `ManufacturerSpec.power` replace `race`; `HullBonus.source` is `role` or `power`.
+- **Hull classes** (`types.ts`, `hulls.ts`): `HullClass` is `pod`, `drone`, `aurel`, the military ladder `corvette`, `patrolBoat`, `frigate`, `destroyer`, `cruiser`, `battleship`, `carrier`, `dreadnought`, and the civilian `prospector`, `miner`, `freighter`, `barge`; `HULL_CLASS_NAMES` for the screen. Ids never change (`kessari-brig` is a frigate, `union-frigate` a destroyer).
+- **Reference fits** renamed: `Injunction brawler`, `Walkout anti-small`.
+
 Worlds step 3 contracts (on `main` from 6 November 2026; `docs/worlds.md`, "As built: step 3"):
 
 - **Worlds** (`net.ts`): `WorldId` (`persistent`, `arena`), `WORLD_IDS`, `readWorldId`; `ServerKind` (`dev`, `live`; server env `SPACEGAME_SERVER`, default `dev`) and `persistentName` (Dev or Universe). Messages: `welcome` carries no world but `server`; client `enter` (`world`); server `entered` (`world`, `view`). `PROTOCOL_VERSION` 3.
@@ -254,6 +260,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 8): merged `ws/lore` (the Sol pivot, fleet, materials, navy, hull terms). **Worked the pivot audit** (`docs/lore-pivot-audit.md`, ticked): the "change now" docs and the code pass in one go. `race` is `power` (`PowerId`), class values follow the two ladders (`patrolBoat`, `destroyer`, `freighter`, `barge`, and `prospector` and `miner` for the Prospector and Sinker as the lore's table has them), `HULL_CLASS_NAMES` for the screen; swivel is PDC, the Plot the board, colours the transponder (SQUAWK or DARK); module, gun and maker renames; ores Copper, Zinc, Platinum (`materials.md`). Ids unchanged; no save change (hulls reload from code). Reference fits renamed for their hulls: Injunction brawler, Walkout anti-small. Left in the audit: turrets, fitting, mining and drones docs when next touched; the design canvas. Mars and Venus colours are proposals for Jason.
 - 2026-11-07, lore: fitting stays free; the lore mapped onto `fitting.md`'s frame, role bonuses and built-in role equipment (`hull-terms.md` "Fitting model"). Every hull in `hulls.md` now lists built-in equipment, role bonuses and frame notes (proposals; numbers and final lists are the lead's).
 - 2026-11-07, lore: capitals never work the site (they reach in with a wing or fleet); Corvane Colossus re-roled again, to T3 mining carrier, and redrawn. `fleet.md`, `materials.md`, `lore.md`, `hulls.md` updated.
 - 2026-11-07, lore: `fleet.md` updated with the eleven gap-pass hulls and the carrier, materials and drone decisions; stale rows fixed. `hulls.md` regenerated (178 hulls, 165 drawn). New registry keys: `mer-dunlin`, `cor-pithead`, `arc-miner`, `arc-miner-mk1`, `arc-tender-mk0`, `lav-breeze`, `bf-rime`, `bf-rime-old`, `rr-gantry`, `hal-footnote`, `arb-tendril`, `hal-probe`. No catalogue ids changed.

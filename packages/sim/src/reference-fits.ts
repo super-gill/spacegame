@@ -34,8 +34,8 @@ export const REFERENCE_FITS: FitSpec[] = [
   stock('rookrivet-prospector', 'mining', 'The cheap miner.'),
   stock('rookrivet-breacher', 'mining', 'The breaching miner.'),
   stock('rookrivet-hulk', 'mining', 'The strip miner.'),
-  stock('kessari-brig', 'combat', 'The Kessari brig as the yard sells it.'),
-  stock('union-frigate', 'combat', 'The Free Belt militia frigate as sold.'),
+  stock('kessari-brig', 'combat', 'The Kessari frigate as the yard sells it.'),
+  stock('union-frigate', 'combat', 'The Union Militia destroyer as sold.'),
   {
     name: 'Warrant brawler',
     hullId: 'kessari-wedge',
@@ -75,17 +75,17 @@ export const REFERENCE_FITS: FitSpec[] = [
     },
   },
   {
-    name: 'Brig brawler',
+    name: 'Injunction brawler',
     hullId: 'kessari-brig',
     role: 'combat',
-    note: 'Every high slot a gun for close range, plate below: how hard a brig can hit its own size.',
+    note: 'Every high slot a gun for close range, plate below: how hard a frigate can hit its own size.',
     fit: { ...LOADOUTS['kessari-brig']!.fit, w1: 'union-autocannon-m', w2: 'commonwealth-retort-m', w3: 'union-autocannon-m', w4: 'union-autocannon-m', w5: 'union-autocannon-m', u2: 'paragon-fairwarning-s', u3: 'slagline-kick-s', i4: 'itomarr-reactor-m' },
   },
   {
-    name: 'Frigate anti-small',
+    name: 'Walkout anti-small',
     hullId: 'union-frigate',
     role: 'combat',
-    note: 'Undersized guns in the big slots and all four close-in weapon systems manned: built to swat cutters and sloops.',
+    note: 'Undersized guns in the big slots and all four PDCs manned: built to swat corvettes and patrol boats.',
     fit: { ...LOADOUTS['union-frigate']!.fit, w1: 'union-autocannon-m', w2: 'union-autocannon-m', x1: 'paragon-director-l' },
   },
 ];
