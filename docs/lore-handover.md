@@ -60,6 +60,10 @@ Security by influence (Core, Held, Contested, Open); five rungs with each power'
 
 In dependency order: standing and licences; the Navy tag bonus and the grade flag; the used market with legacy and retired navy; patterns as variants; the Belt rota; security levels, patrol beats, witnessed crime as a record on the hull id, the rungs as task groups, hail and scan, rules of engagement, wanted and amnesty; then, when T3 hulls exist, locks, beacons, jumps, the pin and hunting groups. Fields are listed at the end of `hull-terms.md`.
 
+## Ship art as an asset pipeline (for the lead, when ship art goes into the client)
+
+The registry's hulls are generated SVG (a Python parts library per yard in the lore chat's scratchpad; the registry page is its output). Keep the SVG as the source of truth and **rasterise at build time**: each hull to a sprite at the two or three zoom levels the client draws at (close, flight, chip), packed into PNG or WebP atlases, drawn on canvas. Never parse or filter SVG at runtime: the registry page itself got heavy because it drew 150 hulls' full symbols with blur filters in the grid; it now uses the mid symbols for chips and no filters, and the deployed game should not inherit the problem. Liveries (Navy, civilian, Militia, cooperative) are separate symbols already, so they are separate sprites, not runtime recolours.
+
 ## Still open
 
 - Mars and Venus colours were proposals; they are now drawn (rust and bone; pale gold and green) and stand unless Jason objects.
