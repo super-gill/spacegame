@@ -147,9 +147,6 @@ const BURN_SURFACE_MARGIN = 1.02;
 const BURN_FLIP_SECONDS = Math.PI / BURN_TURN_RATE;
 /** How much of the drive a ship counts on when braking into a bend; the rest goes on turning onto the arc. */
 const BURN_BEND_BRAKE_SHARE = 0.7;
-/** Below the first speed no flip lead is kept; above the second, all of it. Units a second. */
-const BURN_LEAD_FADE_FROM = 1000;
-const BURN_LEAD_FADE_TO = 4000;
 
 function cross(a: Vec2, b: Vec2): number {
   return a.x * b.y - a.y * b.x;
@@ -352,7 +349,7 @@ export function burnStatus(world: World, ship: Ship): BurnStatus | null {
   const speed = length(relative);
   const route = target ? burnRoute(world, ship.position, end, time, accel) : { points: [end], length: 0, direct: 0, bends: [] };
   const timed = routeTime(route, accel, speed);
-  const braking = accel <= 0 || speed >= allowedSpeed(route, accel, speed) * 0.97;
+  const braking = accel <= 0 || speed >= allowedSpeed(route, accel, speed, turnToBrake(ship, relative)) * 0.97;
   const inBend = route.bends.find((b) => b.fromAlong < BURN_DONE_DISTANCE);
   return {
     target,
@@ -417,9 +414,11 @@ export function cancelBurn(world: World, pilotId: string): CommandResult<BurnRef
  * rest and every bend at its bend speed (and the bend speed itself while
  * in one), allowing for the ground the flip covers before it can brake.
  */
-function allowedSpeed(route: BurnRoute, accel: number, speed: number): number {
-  // The lead fades out at low speed: the last of a brake is flown pointing the right way already, and should finish crisply rather than creep.
-  const lead = speed * BURN_FLIP_SECONDS * Math.min(1, Math.max(0, (speed - BURN_LEAD_FADE_FROM) / (BURN_LEAD_FADE_TO - BURN_LEAD_FADE_FROM)));
+function allowedSpeed(route: BurnRoute, accel: number, speed: number, turnSeconds: number): number {
+  // The lead is the ground covered while turning to brake: none for a ship already braking (it finishes crisply), a whole flip for one
+  // still burning forward, and a flip again for one that overshot. (A lead that faded out at low speed, assuming the ship already
+  // pointed the right way, left a ship that came out of a bend fast overshooting its end for ever: Jason, 7 November 2026.)
+  const lead = speed * turnSeconds;
   let allowed = Math.sqrt(2 * accel * Math.max(route.length - lead - BURN_DONE_DISTANCE * 0.5, 0));
   for (const bend of route.bends) {
     // Braking into a bend also has to turn the ship onto the arc, so count on less than the whole drive for it.
@@ -427,6 +426,13 @@ function allowedSpeed(route: BurnRoute, accel: number, speed: number): number {
     allowed = Math.min(allowed, Math.sqrt(bend.speed * bend.speed + 2 * accel * BURN_BEND_BRAKE_SHARE * toBend));
   }
   return allowed;
+}
+
+/** Seconds to turn from the ship's heading to its braking heading (against `relative`), at `BURN_TURN_RATE`; at most a flip. */
+function turnToBrake(ship: Pick<Ship, 'heading'>, relative: Vec2): number {
+  if (length(relative) === 0) return 0;
+  const brake = Math.atan2(-relative.y, -relative.x);
+  return Math.min(Math.abs(angleDelta(ship.heading, brake)), Math.PI) / BURN_TURN_RATE;
 }
 
 /**
@@ -468,7 +474,7 @@ export function stepBurn(world: World, ship: Ship, stations: Readonly<Record<str
   const toAim = sub(aimAt, ship.position);
   const aimDistance = length(toAim);
   // Close at the speed the route ahead allows, a little under so the last ticks are not a scramble.
-  const wantedSpeed = allowedSpeed(route, accel, length(relative)) * 0.97;
+  const wantedSpeed = allowedSpeed(route, accel, length(relative), turnToBrake(ship, relative)) * 0.97;
   const wanted = aimDistance > 0 ? scale(toAim, wantedSpeed / aimDistance) : { x: 0, y: 0 };
   const change = sub(wanted, relative);
   const changeSize = length(change);

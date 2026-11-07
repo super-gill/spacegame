@@ -206,6 +206,28 @@ describe('Sol\'s ports and lanes', () => {
 });
 
 describe('the burn', () => {
+  it('arrives at Ceres Accord from behind Ceres, after bending round it (the ships Jason saw bouncing through the station)', () => {
+    let w: World = { ...createSolWorld(), tick: 60 * 60 * 40, spawners: [], npcs: {} };
+    const template = Object.values(w.ships)[0]!;
+    const fit = w.loadouts['tessaract-trader']!;
+    w = stepWorld({ ...w, ships: {} }, {});
+    const station = w.stations[CERES_ACCORD_ID]!;
+    const ceres = bodyStates(w.bodies, railTime(w.tick, w.dt))[CERES_ID]!.position;
+    // Start 60,000 out on the far side of Ceres, so the burn has to pass round it.
+    const behind = Math.atan2(ceres.y - station.position.y, ceres.x - station.position.x);
+    for (const off of [-0.5, 0, 0.5]) {
+      const a = behind + off;
+      const ship = { ...template, id: 'x', hullId: fit.hullId, fit: { ...fit.fit }, dockedAt: null, state: 'flying' as const,
+        position: { x: station.position.x + Math.cos(a) * 60_000, y: station.position.y + Math.sin(a) * 60_000 }, velocity: { ...station.velocity },
+        burn: { targetId: CERES_ACCORD_ID, startTick: w.tick } };
+      let run: World = { ...w, ships: { x: ship } };
+      let ticks = 0;
+      while (run.ships.x?.burn && ticks < 60 * 60) { run = stepWorld(run, {}); ticks++; }
+      expect(run.ships.x?.burn, `from ${off}`).toBeUndefined();
+      expect(distance(run.ships.x!.position, run.stations[CERES_ACCORD_ID]!.position), `from ${off}`).toBeGreaterThan(900);
+    }
+  });
+
   it('plots Earth to Mars in about three minutes', () => {
     const w = createSolWorld();
     const plan = burnPlan(w, w.stations, w.stations[EARTH_ORBITAL_EXCHANGE_ID]!.position, ELYSIUM_ID, 1000, 0)!;

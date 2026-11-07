@@ -12,6 +12,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - **Ten new ships** (the first fleet): the Kessari Citation, Seraphine Deimos and Phobos, Ishtar Lakshmi and Union Blockade (navy), the Tessaract Waybill, Belt Forge Mule and Meridian Skua (haulers), and the Belt Forge Rime and Meridian Dunlin (miners). Each is sold at its power's yards, and the five warships are in the Arena.
 - **Navies fly their own ships**: Mars patrols in Phobos boats with Deimos pickets, Venus in the Lakshmi, the Belt in the Blockade; Earth adds a Citation picket. Traders fly a mix of haulers, and two more miners work Ceres.
 
+### Fixed
+
+- **Ships bouncing through stations at the end of a burn**: a burn that bent round a world (Ceres, for ships coming in to Ceres Accord from behind it) arrived too fast, overshot, and could never settle, passing through the station again and again. The brake now allows for the turn the ship actually needs, so an overshoot is recovered (found by Jason).
+
 ### Changed
 
 - **Medium pads** sit a little further out from stations (new stations only).
