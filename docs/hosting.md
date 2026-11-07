@@ -30,11 +30,12 @@ One script stops, updates and starts the server (`scripts/server.mjs`), so a new
 
 | Command | What it does |
 | --- | --- |
-| `npm run update`, or double-click `server.bat` | Stops the server if it is running, pulls the newest code, runs `npm install` and `npm run build`, then starts it in this window |
+| `npm run update`, or double-click `server.bat` | Stops the server if it is running, pulls the newest code, runs `npm install` and `npm run build` (which also builds the ship sprites, in a few seconds, only those that changed), then starts it in this window |
 | `npm stop` | Stops it cleanly from any other window: everyone is told, the world is saved |
 | `npm restart` | Stops it, then starts it in this window (no pull, no build) |
 | `npm run status` | Says whether it is running |
 | `npm start` | Starts it, as before |
+| `server.bat ships` (or `node scripts/server.mjs ships`) | Rebuilds the ship sprites from `art/ships` and the game page, without stopping the server; add `--all` to redraw every sprite. `update` already does this, so you only need it after pulling art by hand (docs/ship-pipeline.md) |
 
 How stopping works: when the server starts it writes `server.pid` (its process id) to the data folder, and it watches that folder for a `stop-request` file. `npm stop` writes that file and waits; the server kicks everyone, saves and exits, and removes `server.pid`. Only if it is still running after 20 seconds is it forced, which can lose up to a minute of play (the world saves once a minute).
 

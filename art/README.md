@@ -39,6 +39,8 @@ python3 build.py base/registry-base.html out/registry.html ../../docs/hulls.md
 
 ## Export for the game (stage 1 of the ship pipeline)
 
+The standards every hull must meet to go into the game (identity, frame, levels, mounts, kitbashes, valid SVG) are in `docs/ship-standards.md`.
+
 From `art/registry/`, after any change to a hull's art:
 
 ```

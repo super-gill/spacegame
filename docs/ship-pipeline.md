@@ -79,9 +79,17 @@ First run: 192 hulls (11 in the game), 208 bare pictures (16 hulls have a civili
 
 Turrets at 3 pixels per world unit only. Deterministic: the same SVG gives the same PNG. Skips a file whose source has not changed. Fails loudly, naming the hull, if an SVG will not render.
 
+## Stage 2 as built (7 November 2026, Lead 9)
+
+`scripts/ships.mjs`, run by `npm run ships` and by `npm run build` (between the sim and the client, so the client's build carries the sprites). Writes `packages/client/public/ships/` (ignored by git): `<id>/<livery>-flight.png`, `-far.png`, `-card.png`, `turrets/<gun>-<size>.png`, and `sprites.json` (per hull its radius and, per livery and size, the file, its pixels and world units per pixel; per turret the same and its barrel length; every picture is square and centred on the origin). A hash of each SVG and size is kept in `hashes.json`, so only changed pictures are drawn; pictures of hulls no longer in the art are removed.
+
+- **Measured:** 192 hulls and 30 turrets, 654 pictures, 2.5 seconds from nothing; 0.08 seconds when nothing changed; 10 MB on disk.
+- **No fonts:** `resvg` loads no system fonts (`loadSystemFonts: false`). With them it spent 45 of 50 seconds loading every installed font for every picture. The cost is that stencil text is not drawn in sprites (`ship-standards.md`, "Valid SVG").
+- `@resvg/resvg-js` is a dev dependency at the repo root, installed by `npm install` with a prebuilt binary for Windows, macOS and Linux.
+
 ## The wrapper
 
-`scripts/server.mjs` gains `ships` (rebuild the sprites now; `--all` ignores the hashes) and its `update` runs stage 2 as part of the build. The roadmap's "actual wrapper" (Jason) grows from here; whatever form it takes, the sprite build stays one script it calls.
+Built: `server.bat ships` (or `node scripts/server.mjs ships`, `--all` to ignore the hashes) rebuilds the sprites and the client, with no restart (the server reads the client's files on each request); players press Ctrl+F5. `update` builds the sprites as part of `npm run build`, so a ship the art changed shows after the next update with nothing else to do. The roadmap's "actual wrapper" (Jason) grows from here; whatever form it takes, the sprite build stays one script it calls.
 
 ## What the game side does (the lead)
 

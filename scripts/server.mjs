@@ -8,6 +8,12 @@
  *   node scripts/server.mjs stop      stop cleanly: everyone is told, the world is saved
  *   node scripts/server.mjs restart   stop, then start
  *   node scripts/server.mjs status    is it running?
+ *   node scripts/server.mjs ships     rebuild the ship sprites from art/ships (only what changed;
+ *                                      add --all for everything). Players press Ctrl+F5 to see them.
+ *
+ * `update` builds the sprites too (npm run build runs scripts/ships.mjs),
+ * so a ship the art changed shows after the next update with nothing else
+ * to do (docs/ship-pipeline.md).
  *
  * On Windows, double-click `server.bat` in the repo folder for `update`,
  * or run `server.bat stop` and so on from a terminal.
@@ -125,12 +131,18 @@ switch (command) {
     await stop();
     start();
     break;
+  case 'ships':
+    // The server serves the built client, so rebuild it after the sprites for them to go out.
+    if (!run(`npm run ships${process.argv.includes('--all') ? ' -- --all' : ''}`)) process.exit(1);
+    if (!run('npm run build --workspace=@spacegame/client')) process.exit(1);
+    say('Ship sprites rebuilt. No restart needed; players press Ctrl+F5 to see them.');
+    break;
   case 'status': {
     const pid = runningPid();
     say(pid ? `Running (process ${pid}). Data in ${DATA}.` : 'Not running.');
     break;
   }
   default:
-    say(`Unknown command "${command}". Use update, start, stop, restart or status.`);
+    say(`Unknown command "${command}". Use update, start, stop, restart, status or ships.`);
     process.exit(1);
 }

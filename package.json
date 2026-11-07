@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=@spacegame/client",
-    "build": "npm run build --workspace=@spacegame/sim && npm run build --workspace=@spacegame/client",
+    "build": "npm run build --workspace=@spacegame/sim && npm run ships && npm run build --workspace=@spacegame/client",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
     "preview": "npm run preview --workspace=@spacegame/client",
@@ -17,12 +17,14 @@
     "stop": "node scripts/server.mjs stop",
     "restart": "node scripts/server.mjs restart",
     "update": "node scripts/server.mjs update",
-    "status": "node scripts/server.mjs status"
+    "status": "node scripts/server.mjs status",
+    "ships": "node scripts/ships.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "typescript": "^5.6.3"
   }
 }

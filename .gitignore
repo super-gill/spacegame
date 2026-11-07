@@ -9,3 +9,6 @@ packages/server/data/
 art/registry/out/
 art/**/*.png
 art/**/__pycache__/
+
+# ship sprites, built by scripts/ships.mjs (docs/ship-pipeline.md)
+packages/client/public/ships/
