@@ -4,7 +4,7 @@ Status: rewritten 6 November 2026 for the Sol pivot. The history and politics ar
 
 ## Structure
 
-Power, then company, then product. A **power** is one of the four human origins; it sets a pilot's home system and starting standing, the weapon family its navy hulls are bonused for, its navy and its law. A **company** is a maker with a home power and one or two specialities; it sets which industries it builds for, its house style, where it sells, and whether it is a naval yard. Companies sell everywhere unless they are naval yards. A few are held in trust and belong to no power.
+Power, then company, then product. A **power** is one of the four human origins; it sets a pilot's home system and starting standing, the weapon family its navy hulls are bonused for, its navy and its law. A **company** is a maker with a home power and one or two specialities; it sets which industries it builds for, its house style, where it sells, and whether it is a naval yard. Companies sell everywhere unless they are naval yards. Two are independents with no flag, licensed by the Ceres Registry, building civil and combat hulls for anyone at any size, no Navy tag, no licence (`fleet.md`, "Independents").
 
 ## The powers
 
@@ -24,7 +24,7 @@ Naval yards in bold. Specialities in brackets; the gaps between powers are delib
 
 | Home | Companies |
 | --- | --- |
-| Everywhere | Meridian Civil Yards (starter ships, shuttles, couriers, pods), Paragon Arms (open-market weapons, PDCs, fire control), Corvane Heavy Industries (heavy mining plant; an Earth firm in Belt yards) |
+| Independents (no flag) | Meridian Yards (starter ships, shuttles, couriers, pods, and armed utility: Kite, Harrier, Osprey), Corvane Heavy Industries (heavy mining plant and corporate security: Warden, Bulwark, Foreman; Earth money, Belt yards), Paragon Arms (open-market weapons, PDCs, fire control; modules only) |
 | Earth | **Kessari Orbital Defence** (patrol hulls, munitions), Ito-Marr Dynamics (launchers, shields, power, countermeasures), Tessaract Logistics (haulers, freighters, containers, survey), Novum Systems (sensors, electronic warfare, decoys; Lunar), Vantage Aerospace (crewed fighters, no hulls; Lunar) |
 | Mars | **Seraphine Naval Yards** (warships), Arcadia Works (state civilian hulls, one per job), Cantor-Vell Arms (energy weapons, armour) |
 | Venus | **Ishtar Fleet Works** (railgun and blaster hulls), Solace Medical (support, rescue), Arbor Dynamics (drones), Halden Institute (exploration, scanners) |

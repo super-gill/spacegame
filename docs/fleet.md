@@ -6,11 +6,11 @@ Status column: **built** (in the catalogue today), **named** (a working hull exi
 
 ## The shape of it
 
-Fifteen companies build hulls. Four are naval yards and build only for their navy. The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
+Fifteen companies build hulls. Four are naval yards and build only for their navy. Two are **independents**, companies with no flag that build civil and combat hulls alike and sell to anyone with a Registry licence (see "Independents"). The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
 
 | Builder | Home | Builds | Hulls |
 | --- | --- | --- | --- |
-| Meridian Civil Yards | Everywhere | The small civilian ships everyone starts in | 6 |
+| Meridian Yards | Independent | The small civilian ships everyone starts in, and armed utility for anyone with a licence | 9 |
 | Tessaract Logistics | Earth | Cargo and passengers at every size | 8 |
 | Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 8 |
 | Seraphine Naval Yards | Mars, naval yard | The Martian Navy | 8 |
@@ -23,7 +23,7 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Union Defence Works | The Belt, naval yard | The Union Militia | 5 |
 | Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
-| Corvane Heavy Industries | Earth firm in Belt yards | Heavy ore haulage and refining | 2 |
+| Corvane Heavy Industries | Independent (Earth money, Belt yards) | Heavy ore haulage and refining, and the corporate security that guards it | 5 |
 | The clans | The Belt | Boutique long-range and stealth hulls | 6 |
 | Aurel | Beyond the Shoals | Voices | 1 known |
 
@@ -45,13 +45,14 @@ Every hull by class and source. Names only. A blank cell is a deliberate gap: th
 | Battleship | Kessari Precedent | Seraphine Tharsis | | |
 | Carrier | Kessari Mandate | Seraphine Hellas | | |
 | Dreadnought | Kessari Charter | Seraphine Olympus | | |
+| Independents (no flag, no licence) | Meridian Kite (corvette), Harrier (patrol boat), Osprey (frigate); Corvane Warden (destroyer), Bulwark (cruiser), Foreman (armed factory ship) | | | |
 | Special operations (T3) | Summons, Custody, Sentence | Noctis, Cerberus, Medusae | Hecate (hunter, unacknowledged) | Vesk Vane, Vesk Shade (clan; no drives) |
 
 Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civilian-grade, which is why it is the starter.
 
 ### Civilian
 
-| Job | Earth | Mars | Venus | The Belt | Everywhere |
+| Job | Earth | Mars | Venus | The Belt | Independents |
 | --- | --- | --- | --- | --- | --- |
 | Pod | | | | | Meridian Ark |
 | Shuttle | | Arcadia Shuttle Mk III | | | Meridian Gull |
@@ -80,9 +81,9 @@ Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civ
 
 Reading the gaps: Earth builds no mining, salvage or support hulls. Mars builds every civilian job the state needs and nothing the state does not. Venus builds no cargo hulls at all. The Belt builds no passenger hulls and nothing above a cruiser. Those gaps are the trade.
 
-## Meridian Civil Yards
+## Meridian Yards
 
-Plain, friendly words; small hulls named for seabirds. Held in trust under the Ceres Accord, so every power's new pilots start in one.
+Independent. Plain, friendly words; hulls named for seabirds. The everyman builder and the Registry's default supplier: cheap, everywhere, easy to repair, every part interchangeable, no Navy tag, no licence. Its combat line is armed utility, worse than a navy hull at fighting and better at being owned. Pirates love them because every port sells the parts. Was "Meridian Yards" until 7 November.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
@@ -92,6 +93,9 @@ Plain, friendly words; small hulls named for seabirds. Held in trust under the C
 | Meridian Petrel | Taxi | A fast few-seat passenger runner | What a pilot flies when the fare is in a hurry | draft |
 | Meridian Fulmar | Bus or ferry | Scheduled passenger routes, medium | The commuter run between a world's port and its moon | draft |
 | Meridian Skua | Hauler | A small cargo hauler with a bit of bite | The first step up from a Tern for a trader | draft |
+| Meridian Kite | Corvette, armed courier | A courier with two guns and a point to make | The first ship an outfit buys that can shoot back | draft |
+| Meridian Harrier | Patrol boat, gunboat | The patrol hull for people who are not a navy | Every outfit's security starts with a pair of these | draft |
+| Meridian Osprey | Frigate, armed hauler | Half hold, half launchers; the Q-ship | Looks like a Skua until it opens | draft |
 
 ## Tessaract Logistics
 
@@ -250,12 +254,15 @@ Salvager's shop talk. The Belt's salvage firm: tugs, tenders and shipbreakers, a
 
 ## Corvane Heavy Industries
 
-Heavy plant. An Earth firm in Belt yards; runs Lantern Works. Heavier and cheaper than Belt Forge, and Belters resent every tonne of it.
+Independent: Earth money, Belt yards, Belt labour, nobody's flag. Heavy plant, and a corporate security line to guard it. Runs Lantern Works. Heavier and cheaper than Belt Forge, and Belters resent every tonne of it; Corvane's Belt yards are one of the things Earth and the Belt quarrel over. A bit pricier than Meridian, well built, ugly, no Navy tag, no licence, and the reason mercenary outfits exist: Corvane hires them.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Corvane Dray | Bulk freighter (ore) | Heavy ore haulage to the foundries | The ore truck the Black Strike hunts hardest | draft |
 | Corvane Smelter | Refinery ship (large) | Mobile smelting | A piece of Lantern Works that flies | draft |
+| Corvane Warden | Destroyer, corporate security | Escort for the ore convoys | Paid by the tonne it brings home | draft |
+| Corvane Bulwark | Cruiser, corporate security | A mining fleet's bodyguard | The biggest ship you can buy without a flag | draft |
+| Corvane Foreman | Factory ship, armed | A Smelter with a gun deck | Refines under fire and does not stop | draft |
 
 ## The clans
 
@@ -337,6 +344,19 @@ Decided 6 November 2026. The company is the leading voice in a ship's design; th
 | Registry markings | The power | A flash or band in the power's colour, like a tail flag; small, consistent, and what the board reads for standing. Mars needs none: one state yard means everything Martian is uniform already. |
 
 Legacy hulls keep their original shape and colours, worn. Surplus hulls (below) have the navy livery painted over, with the lines still showing through. Pirates kitbash on top of all of it.
+
+## Independents
+
+Decided 7 November 2026 (Jason: "independent companies that make a combination of combat and civil units, a bit like Drake"). An independent has no flag. It is licensed by the Ceres Registry, bases at Accord free ports, sells to all four powers and is trusted by none. Its hulls carry no Navy tag and need no licence, at any size: independents build whatever size they want. Meridian is the cheap end (Registry-issue prices); Corvane is a bit pricier and still open to anyone. With retired navy hulls expensive and civilian grade stopping at the patrol boat, independents are how an outfit, a mercenary or a pirate reaches a frigate, a destroyer or a cruiser without a navy.
+
+| Independent | Civil | Combat | Character |
+| --- | --- | --- | --- |
+| Meridian Yards | Ark, Tern, Gull, Petrel, Fulmar, Skua | Kite, Harrier, Osprey | Cheap, everywhere, interchangeable parts, legal grey |
+| Corvane Heavy Industries | Dray, Smelter, Navvy | Warden, Bulwark, Foreman | Expensive, well built, ugly; corporate security |
+
+Paragon Arms stays a module maker and is not on the ship registry; it is the independents' arms dealer in spirit.
+
+On the registry: independents sit under their own heading with their own colours (Meridian a registry grey with one safety-yellow stripe, Corvane dark steel with industrial orange), apart from the four powers.
 
 ## Navy grade, civilian grade and retired navy hulls
 
@@ -564,7 +584,7 @@ Bespoke, rare, best at one thing. Standing with the clan, or a very rare sale. N
 
 Where NPC traffic should vary. Gaps are deliberate; they are the trade between powers.
 
-| Job | Earth | Mars | Venus | The Belt | Everywhere |
+| Job | Earth | Mars | Venus | The Belt | Independents |
 | --- | --- | --- | --- | --- | --- |
 | Courier | Tessaract Docket | Arcadia Courier | | Belt Forge Pony | Meridian Tern |
 | Hauler | Tessaract Waybill | Arcadia Hauler | | Belt Forge Mule | Meridian Skua |

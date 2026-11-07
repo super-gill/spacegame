@@ -447,9 +447,9 @@ Makers are companies with a home power and one or two specialities. The powers d
 
 | Company | Home | Known for | Founded | Hook |
 | --- | --- | --- | --- | --- |
-| **Meridian Civil Yards** | Everywhere; held in trust under the Ceres Accord | Civilian starter ships, shuttles, couriers: the ship every new pilot gets | Luna, long before the gate | Named for the meridian its first yard sat on |
+| **Meridian Yards** | Independent; licensed by the Ceres Registry, based at Accord free ports | Starter ships, shuttles, couriers, and armed utility hulls for anyone with a licence: the ship every new pilot gets and the gunboat every outfit starts with | Luna, long before the gate; went flagless after the Accord | Named for the meridian its first yard sat on; every port sells the parts |
 | **Paragon Arms** | Everywhere | Light and medium weapons on the open market, never navy grade | 8 GW, during the Gate War, selling to both sides | Sells to anyone, rumoured to sell to pirates directly |
-| **Corvane Heavy Industries** | Earth firm in Belt yards | Heavy mining plant, furnaces; runs Lantern Works | After the Strikes | Belters call it "the Strike tax with a logo" |
+| **Corvane Heavy Industries** | Independent; Earth money, Belt yards, nobody's flag | Heavy mining plant, furnaces, and the corporate security hulls that guard them; runs Lantern Works | After the Strikes | Belters call it "the Strike tax with a logo"; its security line is why mercenary outfits exist |
 | **Kessari Orbital Defence** | Earth | Toll patrol hulls, munitions | Before the gate | Its patrol contracts are the backbone of Earth security work |
 | **Ito-Marr Dynamics** | Earth | Missile launchers, shields, power | Before the gate | Armed both sides of the Gate War |
 | **Tessaract Logistics** | Earth | Haulers and freighters, the best transport hulls in known space | Before the gate | Runs the oldest freight lanes and knows every shortcut |
@@ -552,7 +552,7 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 
 | Maker | Theme for model names | Why |
 | --- | --- | --- |
-| Meridian Civil Yards | Plain, friendly words; small hulls named for seabirds | Civilian, held in trust, the first ship anyone flies |
+| Meridian Yards | Plain, friendly words; hulls named for seabirds | Independent, the first ship anyone flies and the first gun anyone buys |
 | Kessari Orbital Defence | Legal and enforcement terms | Its job is enforcing Earth's contracts and tolls |
 | Tessaract Logistics | Freight paperwork | The oldest freight line, run on documents |
 | Ito-Marr Dynamics | Strongholds and stores | Shields and power that hold the line |
@@ -573,10 +573,10 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 
 | Id | Name | Class | Maker | Lore |
 | --- | --- | --- | --- | --- |
-| `meridian-courier` | Meridian Tern | Corvette | Meridian Civil Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
+| `meridian-courier` | Meridian Tern | Corvette | Meridian Yards | The Registry-issue starter. Terns cross oceans on almost nothing; so does a new pilot. |
 | `kessari-wedge` | Kessari Warrant | Patrol boat | Kessari Orbital Defence | Earth's toll patrol boat. Pirates prize captured ones as trophies, which is why a Black Strike raider flies one in Calder. |
 | `tessaract-spine` | Tessaract Manifest | Freighter | Tessaract Logistics | The six-bay freighter on half the contracts in Accord space |
-| `escape-pod` | Meridian Ark | Pod | Meridian Civil Yards | The Ceres Accord requires every registered ship to carry one. Meridian called it the Ark because it carries what matters out of the flood, and the name stuck. |
+| `escape-pod` | Meridian Ark | Pod | Meridian Yards | The Ceres Accord requires every registered ship to carry one. Meridian called it the Ark because it carries what matters out of the flood, and the name stuck. |
 | `aurel-tacet` | Aurel Tacet | Outside the ladders | Aurel | A living Aurel ship whose voice has never sung to anyone: it answers no hail and leaves no record. Scholars call such silent voices *tacet*, the musical mark for a part that rests. In play it is the sealed development and test ship. |
 | `rookrivet-prospector` | Belt Forge Prospector | Prospector | Belt Forge Collective | The lone digger looking for a strike |
 | `rookrivet-breacher` | Belt Forge Sinker | Miner | Belt Forge Collective | Shaft sinkers dug the deep, dangerous bores |
@@ -690,7 +690,7 @@ Munitions are made by Kessari Orbital Defence and named in its legal voice. A mu
 
 | Id | Name | Home |
 | --- | --- | --- |
-| `meridian` | Meridian Civil Yards | Everywhere |
+| `meridian` | Meridian Yards | Independent |
 | `paragon` | Paragon Arms | Everywhere |
 | `corvane` | Corvane Heavy Industries | Earth firm in Belt yards |
 | `kessariOrbital` | Kessari Orbital Defence | Earth |
@@ -721,6 +721,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Independents.** Meridian Yards (was Meridian Yards) and Corvane Heavy Industries are independents: no flag, licensed by the Ceres Registry, based at Accord free ports, building civil and combat hulls for anyone at any size, no Navy tag, no licence. Meridian cheap (Kite, Harrier, Osprey added), Corvane a bit pricier (Warden, Bulwark, Foreman added). Paragon Arms stays a module maker. Replaces "held in trust" and "Everywhere".
 - 2026-11-07: **Venus flies fighters after all.** Ishtar Hathor, a light hybrid fighter (Navy or civilian grade; retired Hathor '221 sold with the gun pulled), and the Solace Stretcher recast as a heavy SAR fighter sold to every navy under the Mercy Clause, drawn generic so it fits anyone's bay. No Venusian heavy combat fighter.
 - 2026-11-07: **Navies as a system** (`navy.md`). Local law is the holder's navy patrol on a beat plus station security in its zone; security by influence (Core, Held, Contested, Open); five rungs (station security, patrol, reserve, navy, hunting group); escalation by what was witnessed; ROE (never pods, never first on a lit transponder); wanted follows the hull first and the pilot second, amnesty always purchasable, work-off possible; navies buy civilian hulls for non-offensive roles; no open war, Earth and Mars mostly hostile with skirmishes in Contested systems.
 - 2026-11-07: **Fighters follow the navy rules.** Light fighters Navy or civilian grade (Vantage Foil, Arcadia Fighter Mk V), heavy fighters Navy only, and each has a retired mark sold whole with the Navy tag (Vantage Dirk and Cutlass, Arcadia Fighter Mk IV and Heavy Fighter Mk I).
