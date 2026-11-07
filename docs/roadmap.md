@@ -36,12 +36,14 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 
 1. **Sol's world** (`docs/sol-build.md`, slice 2; **done, released as 0.19.0**, 7 November 2026): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
 2. **The first fleet** (`docs/ship-pipeline.md`, "Step 2"; **done, released as 0.20.0**, 7 November 2026): today's eleven hulls swapped for the lore's in-game set (`docs/hulls.md`), only the hulls the starts, the Sol traffic and the patrols need (about 15 to 20), with stock fits. Before the starts, which need them.
-3. **The eight starts** (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
+3. **The eight starts** (`docs/sol-build.md`, "As built: Open Lanes step 3"; **done, released as 0.21.0**, 7 November 2026) (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
 4. **The money loop across Sol:** trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.
 5. **Law, lite** (discussed with Jason first): patrols respond to crime witnessed in Core and Held space, which under `infrastructure.md` means a witness record uploaded to a live relay there; distress calls reach only through the Relay.
 6. **The release:** Open Lanes, the functional game.
 
 **Parked until after Open Lanes:** Arena Waves and To the death (worlds step 4); the live and dev server split (worlds step 5); moving planets and gravity assists; Sol's hazards and comets; T3 and the navy as a system (`navy.md`); the used market; command ships; industries beyond the five ores; crew; the rest of the 178 hulls; a browser smoke test.
+
+**Released as 0.21.0** (7 November 2026): Open Lanes step 3, the eight starts: a start picker for new pilots; home, first ship, standing and licence per start; waking at your own home; the Union Wildcat and the Ishtar Sedna. Played by Jason, 7 November.
 
 **Released as 0.20.0** (7 November 2026): Open Lanes step 2, the first fleet: the ship art pipeline (the art's export, the sprite build, ships drawn from their artwork with turning turrets), hull shapes and turret spots from the art, and 21 hulls (the 11 on their art plus the Citation, Deimos, Phobos, Lakshmi, Blockade, Waybill, Mule, Skua, Rime and Dunlin), sold by power and flown by the navies, traders and miners. Played by Jason, 7 November.
 

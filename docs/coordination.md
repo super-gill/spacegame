@@ -333,6 +333,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 9): **released 0.21.0** (Open Lanes step 3, the eight starts; played by Jason, "all working"). Next: step 4, the money loop.
 - 2026-11-07, lead (Lead 9): **Open Lanes step 3, push 2: the start picker** (`start-screen.ts`), built to the mockup Jason saw; checked in the browser (Mars navy: the Deimos at MRN Yard Phobos). Step 3 is complete; next: Jason flies a start or two, then release 0.21.0 and step 4, the money loop.
 - 2026-11-07, lead (Lead 9): **the build no longer rewrites `hull-geometry.ts`**: on Jason's Windows checkout (CRLF) the rewritten file showed as changed and blocked `server.bat`'s next pull. Rule: a build never writes a committed file; `npm run geometry` is run by hand after an art export.
 - 2026-11-07, lead (Lead 9): **Open Lanes step 3, push 1: the eight starts in the sim and server** (`docs/sol-build.md`, "As built: Open Lanes step 3"): Jason agreed adding the Wildcat and Sedna and leaving duty and desertion to law. A pilot's start sets home, first ship, standing and licence; they wake at their own home. The start picker's mockup is with Jason; the picker is push 2.

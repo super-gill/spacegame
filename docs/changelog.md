@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-07
+
+Open Lanes step 3, the eight starts (`docs/sol-build.md`, "As built: Open Lanes step 3"): choose a power and a path; your start sets your home, first ship, standing and licence.
+
 ### Added
 
 - **The eight starts** (game side): Earth, Mars, the Belt or Venus, as a private pilot or in the power's service. A start sets your home port, your first ship, your standing with that power and, in service, a licence at the first rung. You wake at your own home after losing everything. A new character chooses one on a start screen the first time they enter the Universe.
