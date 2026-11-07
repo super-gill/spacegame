@@ -138,6 +138,41 @@ Jason: reuse the current mining loop as much as possible; gas mining just has to
 
 Straightforward, with good examples to reference (EVE's bounties and kill rights, Elite's bounty and interdiction loop, Star Citizen's bounty tiers). Ours: the Registry's **bounty board** at every port lists wanted hulls with their last witnessed system and the price by rung; a hunter finds the hull (the board, the contacts list, informants at pirate ports for a cut), **tackles** it with civilian tackle (a burn inhibitor and a lock holder, below navy grade), and either disables and tows the hull in, or pops it and takes the pod into a **cell**; the Registry pays on delivery at a port of the power that posted it, more for the pod than the hull, and the record on the hull clears. Hunters are not navy: they have no rung behind them and no rules of engagement, which is why the Shrike exists and why bounty work is the independent's way into security.
 
+## Tier gap pass, 7 November 2026 (after the art passes)
+
+Jason's question: does the player have enough T1 and T2 to get into each industry cheaply and then improve? Read against the registry's 166 hulls. T1 is the cheap way in (legacy marks on the used market, retired navy for the rich); T2 is the production ladder the player climbs by weight, ending at the command ship; T3 is the prize.
+
+| Industry | T1 way in | T2 ladder | Command ship | T3 | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| Freight | Memo, Invoice, Ledger, Bill; Courier Mk III, Hauler Mk II, Freighter Mk I, Ice Hauler Mk I; old Pony, Mule, Adit; Knot, Gannet | Light to capital at every yard: Docket, Waybill, Manifest, Lading, Tariff; the Arcadia marks; Pony, Mule, Adit; Gull, Skua | Consignment | Covenant, Mk 0 | Complete |
+| Passenger | Almanac, Puffin, Auk | Timetable, Ferry Mk II, Fulmar; Itinerary; Passage | none | none | Fine. Passenger work is routes, not fleet operations; no command ship needed |
+| Rock mining | old Prospector, Sinker, Collier (Belt Forge only) | Prospector (light), Sinker and Auger (medium), Collier barge (heavy hauler); Jackleg, Navvy, Knocker; Winder refinery | Headframe | Lodestar, Colossus | **Two gaps.** No heavy cutting miner: the ladder goes Sinker (medium) straight to the Headframe (capital). And only Belt Forge builds miners, so a player who starts at Earth or Mars has no local way in |
+| Gas | none | Zephyr, Gale; Monsoon tanker | Cyclone, Still | Tempest | **Gap.** No T1: Lavinia is new and has no legacy mark. A player cannot try skimming cheaply |
+| Ice | Ice Hauler Mk I (hauls, does not cut) | Auger (medium cutter); Cistern, Ice Hauler Mk II (haulers) | Cyclone, Still | none | **Gap.** No light ice cutter and no T1 cutter; Auger is the only ice miner at any size |
+| Salvage | old Scrapper | Scrapper (light), Wrecker (medium); Shunt, Grebe, Tug Mk II; Grab; Breaker | Breaker | Lazarus; Keel, Trawl, Dredge | **Gap.** No heavy salvage tender: Wrecker (medium) straight to the Breaker (super-heavy) |
+| SAR and repair | none | Respite, Haven, Refuge; Tender Mk I; Stretcher; Shoot | Sanctuary | Grace | **Gap.** No T1. Solace has no legacy mark and the Tender Mk I is current |
+| Exploration | none | Query, Inquiry | Expedition | Threshold; Farwalker, Waystar | **Gap.** No T1, and Halden is the only builder; the old survey hull a Belt prospector would fly does not exist |
+| Security and bounty | Notice, Writ, Decree, Ruling; Deimos Mk I, Phobos Mk II; Sedna '218, Lakshmi '205; Dirk, Cutlass and the old Arcadia fighters | Civilian-grade Citation, Deimos, Sedna, Warrant, Phobos, Lakshmi; Kite, Harrier, Shrike, Osprey; Warden; Union pattern in the Belt | Bulwark | the navies' T3 | Complete, and the richest ladder in the game |
+| Drones | none (drones are bay products, not hulls) | Thorn, Bramble, Shoot, Knocker; Canopy | Canopy, Grove | Grove | Fine for combat and repair. **Missing kinds:** a collector drone for mining and salvage, a survey probe for exploration |
+| Crime | any T1 | Burrow, Osprey; Union pattern | none | none | Fine; crime is a use of hulls, not a line of them |
+| Manufacturing | none | Winder, Smelter, Foreman | Headframe | Lodestar | Fine for now; manufacturing is a later milestone |
+
+### Proposed additions (not yet in `fleet.md` or the registry; Jason to confirm)
+
+| Gap | Proposal | Builder | Tier, weight | Why this builder |
+| --- | --- | --- | --- | --- |
+| Mining entry outside the Belt | **Meridian Dunlin**, a light prospector: a Gull box with a mining laser on the standard ring and a small ore hold | Meridian | T2 Light | Meridian sells everywhere with no licence; the Registry starter's natural second ship |
+| Heavy cutting miner | **Corvane Pithead**, a heavy miner: a dark slab with two heavy lasers, a sorting hopper and ore bays, armed | Corvane | T2 Heavy | Corvane already builds the Navvy and the refineries; fills the step before the Headframe |
+| Gas T1 | **Lavinia Breeze**, the skimmer before the Zephyr: shallow only, small tank, comes back hot | Lavinia | T1 Light (legacy) | Gives Lavinia a used market and the player a cheap first dive |
+| Ice | **Belt Forge Rime**, a light ice cutter (a Prospector with an ice saw), and **the old Rime** | Belt Forge | T2 Light, T1 Light | Ice is Belt work; a saw on the Prospector frame is how the Belt would do it |
+| Heavy salvage | **Rook and Rivet Gantry**, a heavy salvage tender: a frame with two cranes, a hull cradle and a Grab bay | Rook and Rivet | T2 Heavy | The step between the Wrecker and the Breaker |
+| SAR T1 | **Arcadia Tender Mk 0**, the Martian repair tender before the Mk I | Arcadia | T1 Medium (legacy) | Keeps Solace's hulls current (its marks do not age) and gives Mars a used repair hull |
+| Exploration T1 | **Halden Footnote**, the survey hull before the Query, one dish and no lab | Halden | T1 Light (legacy) | A cheap scanner hull for the prospector and the curious |
+| Collector drone | **Arbor Tendril**, a collector drone that gathers cut ore and loose salvage | Arbor | T2 Drone | Arbor builds every drone; the mining loop already assumes a collector |
+| Survey probe | **Halden Probe**, a one-shot survey drone launched from a bay | Halden | T2 Drone | The Expedition's wing needs something to launch |
+
+Nine hulls and drones. With them every industry has a T1 way in, a T2 ladder without a missing weight, a command ship where fleets make sense, and a T3. Without them the gaps that bite first are mining outside the Belt and the two T1s for gas and SAR, because those are the industries the player tries early.
+
 ## For the lead
 
 Industries map onto systems already on the roadmap; this page adds four things to design when industry comes: ice and gas as resource kinds with the skimming depth game; hidden holds and scan resistance; civilian tackle and the cell with the bounty board (Law); liquid holds. Nothing before milestone 7.

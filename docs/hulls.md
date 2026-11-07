@@ -341,7 +341,7 @@ One entry per hull: the role it fills, the intention behind it (why it exists in
 | `rookrivet-hulk-old` |  | The old Collier | Mining, Barge, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Collier | Heavy | `Heavy-Barge` |  | used market, cheap | yes |
 | `rookrivet-prospector-old` |  | The old Prospector | Mining, Prospector, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Prospector | Light | `Light-Prospector` |  | used market, cheap | yes |
 | `rookrivet-breacher-old` |  | The old Sinker | Mining, Miner, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Sinker | Medium | `Medium-Miner` |  | used market, cheap | yes |
-| `bel-miner` |  | Belt Forge Jackleg | Subcraft, Mining subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Mining subcraft` |  | yard, licence only | yes |
+| `bel-miner` |  | Belt Forge Jackleg | Subcraft, Mining subcraft | T2 | production | none (civilian) |  | Subcraft | `Subcraft-Mining subcraft` |  | yard or ship mart | yes |
 | `bf-burrow` |  | Belt Forge Burrow | Light civil, Courier, blockade runner | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
 | `bf-pony` |  | Belt Forge Pony | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
 | `bf-adit` |  | Belt Forge Adit | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` |  | yard or ship mart | yes |
@@ -386,7 +386,7 @@ One entry per hull: the role it fills, the intention behind it (why it exists in
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `rr-scrapper-old` |  | The old Scrapper | Service, Salvage tender, legacy | T1 | legacy | none (old civilian mark) | Rook and Rivet Scrapper | Light | `Light-Salvage tender` |  | used market, cheap | yes |
-| `rr-grab` |  | Rook and Rivet Grab | Subcraft, Salvage subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Salvage subcraft` |  | yard, licence only | yes |
+| `rr-grab` |  | Rook and Rivet Grab | Subcraft, Salvage subcraft | T2 | production | none (civilian) |  | Subcraft | `Subcraft-Salvage subcraft` |  | yard or ship mart | yes |
 | `rr-breaker` |  | Rook and Rivet Breaker | Industry, Shipbreaker, large (salvage command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Shipbreaker` |  | yard or ship mart | yes |
 | `rr-scrapper` |  | Rook and Rivet Scrapper | Service, Salvage tender, small | T2 | production | none (civilian) |  | Light | `Light-Salvage tender` |  | yard or ship mart | yes |
 | `rr-shunt` |  | Rook and Rivet Shunt | Service, Tug | T2 | production | none (civilian) |  | Light | `Light-Tug` |  | yard or ship mart | yes |
