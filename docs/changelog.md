@@ -4,7 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-Sol slice 2: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes; the Accord's Relay and security worked out from it; traffic that burns, patrols by navy, pirates where nobody answers, and ships on the chart.
+## [0.19.0] - 2026-11-07
+
+Sol slice 2: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes; the Accord's Relay and security worked out from it; traffic that burns, patrols by navy, pirates where nobody answers, and ships on the chart. Played by Jason.
 
 ### Added
 - **Traffic across Sol.** Traders burn along every lane and out to the far ports; each navy patrols its own space (ECF round Earth, VSG round Venus, the MRN on the Accord lanes, the UDF on the Belt Lane), labelled by navy; pirates wait at Psyche Dig, the Ganymede Local and Hilda Moot, where nobody answers a call.

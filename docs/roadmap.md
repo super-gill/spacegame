@@ -34,7 +34,7 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 
 **The rule for new ideas:** anything not on this list goes, as one line, into the ideas inbox in `docs/coordination.md`, marked parked. The inbox is looked at between milestones of this list, not during one. If the lead thinks an idea should jump the queue, the lead says why and Jason decides.
 
-1. **Sol's world** (`docs/sol-build.md`, slice 2; **built** 7 November 2026, to release as 0.19.0 once Jason has flown it): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
+1. **Sol's world** (`docs/sol-build.md`, slice 2; **done, released as 0.19.0**, 7 November 2026): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
 2. **The first fleet:** today's eleven hulls swapped for the lore's in-game set (`docs/hulls.md`), only the hulls the starts, the Sol traffic and the patrols need (about 15 to 20), with stock fits. Before the starts, which need them.
 3. **The eight starts** (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
 4. **The money loop across Sol:** trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.
@@ -42,6 +42,8 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 6. **The release:** Open Lanes, the functional game.
 
 **Parked until after Open Lanes:** Arena Waves and To the death (worlds step 4); the live and dev server split (worlds step 5); moving planets and gravity assists; Sol's hazards and comets; T3 and the navy as a system (`navy.md`); the used market; command ships; industries beyond the five ores; crew; the rest of the 178 hulls; a browser smoke test.
+
+**Released as 0.19.0** (7 November 2026): Open Lanes step 1, Sol slice 2 (`docs/sol-build.md`, "As built: slice 2", pushes 1 to 4): worlds as burn targets and the pass round them, the pod lost at burn speed, the chart's zoom and pan, all 31 ports and the five Accord lanes, the Relay and security computed from it, NPC traffic that burns, patrols by navy, pirates where nobody answers, and ships on the chart by transponder. Played by Jason, 7 November.
 
 **Released as 0.18.0** (7 November 2026), done on the way here: the Arena world, the mode screen and the arena setup with Skirmish (`docs/worlds.md`, "As built: step 3"); the Sol pivot's renames (`docs/lore-pivot-audit.md`); Sol slice 1 (`docs/sol-build.md`, "As built: slice 1"): Sol at scale, six ports, the plotted burn, the chart, falling into a world. Played by Jason, 7 November, in both control modes, without bugs.
 

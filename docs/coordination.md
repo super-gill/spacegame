@@ -311,6 +311,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 9): **released 0.19.0** (Sol slice 2, Open Lanes step 1; played by Jason, "all working, the map addition is a real nice touch"). Next: Open Lanes step 2, the first fleet.
 - 2026-11-07, lead (Lead 9): **built Sol slice 2, push 4, completing slice 2 and Open Lanes step 1** (`docs/sol-build.md`, "As built: slice 2, push 4"): NPCs that burn (traders on every lane and out to the far ports, patrols by navy), pirates at contested and open ports where zones are no longer guarded, no rams at burn speed, ship stats remembered (7.8 to 2.4 ms a tick), and traffic on the chart by Jason's transponder rule. Next: release 0.19.0 when Jason has flown it, then Open Lanes step 2, the first fleet.
 - 2026-11-07, lead (Lead 9): Jason flagged that lane-long Relay coverage will not survive moving planets; parked with moving planets as a tuning pass (ideas inbox), lore ask filed. Nothing changes now.
 - 2026-11-07, lead (Lead 9): the chart stuttered with security shading (Jason): the sampled shading recomputed about 2,000 readings on every pan. Replaced, at Jason's suggestion, by each buoy's reach as a translucent circle, one fill per colour, readings cached until the ports move. Dragging at 4x CPU slowdown went from 93 ms a frame with 200 ms hitches to 53 ms (49 ms with the chart closed).
