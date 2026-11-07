@@ -180,3 +180,32 @@ describe('the burn', () => {
     expect(applyCommand(soloInSol(), 'ana', { type: 'burnStart', targetId: ELYSIUM_ID }).ok).toBe(true);
   });
 });
+
+describe('falling into a world', () => {
+  /** The pilot's ship 200 units above Earth's surface, heading straight down at `speed`. */
+  function diving(speed: number): { world: World; shipId: string } {
+    const w = soloInSol();
+    const shipId = pilotShip(w, 'ana')!.id;
+    const earth = bodyStates(w.bodies, railTime(0, w.dt))[EARTH_ID]!.position;
+    const radius = w.bodies[EARTH_ID]!.radius;
+    const ship = { ...w.ships[shipId]!, position: { x: earth.x, y: earth.y - radius - 200 }, velocity: { x: 0, y: speed } };
+    return { world: { ...w, ships: { ...w.ships, [shipId]: ship } }, shipId };
+  }
+
+  it('at speed is the end of the ship: no wreck, and the nearest port recovers the pod', () => {
+    const { world, shipId } = diving(2000);
+    const after = run(world, 0.5);
+    expect(after.ships[shipId]).toBeUndefined();
+    expect(after.wrecks).toHaveLength(0);
+    const pod = pilotShip(after, 'ana')!;
+    expect(pod.hullId).toBe('escape-pod');
+    expect(pod.state).toBe('docked');
+    expect(pod.dockedAt).toBe(EARTH_ORBITAL_EXCHANGE_ID);
+  });
+
+  it('gently, is a bump: the ship bounces off as before', () => {
+    const { world, shipId } = diving(100);
+    const after = run(world, 4);
+    expect(after.ships[shipId]).toBeDefined();
+  });
+});

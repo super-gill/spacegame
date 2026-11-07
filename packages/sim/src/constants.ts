@@ -254,6 +254,14 @@ export const BURN_DONE_SPEED = 30;
 /** A burn steers round any body whose surface its line passes closer to than this many of the body's radii. */
 export const BURN_BODY_MARGIN = 1.4;
 
+/**
+ * Hitting a world (a planet, moon or big rock, not a belt rock) at this
+ * speed or more is the end of the ship (lore: "falling into a world is the
+ * end of a ship"): no wreck, and the nearest port recovers the pilot's
+ * pod. Units a second, into the surface.
+ */
+export const FALL_FATAL_SPEED = 500;
+
 // The Arena world (arena.ts, docs/worlds.md).
 /** How far apart pilots' arenas are, and how far the first is from the system, units. */
 export const ARENA_SEPARATION = 50000;

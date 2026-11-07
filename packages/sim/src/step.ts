@@ -10,7 +10,7 @@ import { CACHE_LIFETIME, ORE_LOOT_LIFETIME, cutRocks, dropCache, hopperAfterTile
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
-import { DOCK_REPAIR_PER_SECOND } from './constants.js';
+import { DOCK_REPAIR_PER_SECOND, FALL_FATAL_SPEED } from './constants.js';
 import { HOPPER_EJECT_SPEED, departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
@@ -80,6 +80,16 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  * Pure: returns a new World and never mutates the one passed in. The client
  * calls this from a fixed-timestep accumulator; tests call it directly.
  */
+/** A hit on a world (not a belt rock) at `FALL_FATAL_SPEED` or more, from a tick's impacts: the end of the ship. */
+function fallInto(impacts: readonly WorldEvent[], world: World): { bodyId: string; event: WorldEvent } | null {
+  for (const e of impacts) {
+    if (e.type === 'impacted' && world.bodies[e.bodyId] && e.speed >= FALL_FATAL_SPEED) {
+      return { bodyId: e.bodyId, event: { type: 'fellInto', shipId: e.shipId, bodyId: e.bodyId, speed: e.speed } };
+    }
+  }
+  return null;
+}
+
 export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInput>>): World {
   // 0. Rails: what carries what this tick, and where stations will be.
   const rails = tickRails(world.bodies, world.tick, world.dt, world.rules.gravity);
@@ -128,6 +138,13 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     if (ship.burn && ship.state === 'flying') {
       const burned = stepBurn(world, ship, stationsNext);
       events.push(...burned.events);
+      // Worlds are solid even at burn speed: the detour should keep clear, and if it does not, this is a fall.
+      const fall = fallInto(collideWithSurfaces(burned.ship, stats, surfaces).events, world);
+      if (fall) {
+        events.push(fall.event);
+        ships[id] = { ...burned.ship, structure: 0, fellInto: fall.bodyId };
+        continue;
+      }
       ships[id] = regenerateShield(rechargeCapacitor(burned.ship, stats, world.dt), stats, world.dt);
       continue;
     }
@@ -170,6 +187,13 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     const flown = ship.state === 'flying' ? applyCarry(stepped, rails.carryAt(ship.position)) : stepped;
     const hulls = collideWithStations(flown, stats, stationsNext);
     const ground = collideWithSurfaces(hulls.ship, stats, solid);
+    const fall = fallInto(ground.events, world);
+    if (fall) {
+      // Too fast into a world: the ship is gone (lifecycle.ts recovers the pod). No bounce, no damage to count.
+      events.push(...hulls.events, fall.event);
+      ships[id] = { ...ground.ship, structure: 0, fellInto: fall.bodyId };
+      continue;
+    }
     const moved = { ship: ground.ship, events: [...hulls.events, ...ground.events], damage: [...hulls.damage, ...ground.damage] };
     events.push(...moved.events);
     damage.push(...moved.damage);

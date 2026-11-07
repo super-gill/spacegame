@@ -111,6 +111,8 @@ Alongside, small and separate: item 5 of the re-fit (hull identity cannot be fit
 
 **Checked** in Chromium on a fresh server: create a character, Dev, start off Earth Orbital Exchange at real scale; the chart plots Elysium at 9.8 million units, 3:18, flip at 1:39; BURN; 40 seconds in the banner read 39,550 u/s, flip in 0:59, arrive in 2:38; arrived after 201 seconds at rest beside Elysium, inside its security zone. No page errors. Found and fixed on the way: the chart's BURN button was rebuilt every frame and could not be clicked (built once now, updated in place). Tests: 10 in the sim (`sol.test.ts`: layout, ports clear of their worlds, the Ceres field, a save round trip stays Sol, the plan, a full burn Earth to Elysium, the detour round Mars, cancel and brake, refusals, the commands) and 1 on the server (the Calder backup).
 
+**Falling into a world** (added after Jason hit Earth at burn speed and his pod bounced off at 20,000 u/s): hitting a planet, moon or big rock at 500 u/s or more (`FALL_FATAL_SPEED`) loses the ship with no wreck, and the nearest port with a free pad recovers the pilot's pod, docked (`fellInto`, `podRecovered`). Burning ships are checked too. Coasting above 2,000 u/s, the burn banner says COASTING and that U brakes (or burns for the nav target).
+
 **Not in slice 1:** lanes and security as data (the chart has no lanes yet), the other 28 stations, NPC burns, other players' plumes seen from afar, Sol's own names for the patrol and the toll boats' transponders (slice 4).
 
 ## Decided (Jason, 7 November 2026)

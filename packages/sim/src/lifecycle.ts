@@ -58,7 +58,7 @@ export function destroyShips(world: World, killers: Record<string, string | null
   const loot = [...world.loot];
   const events: WorldEvent[] = [];
   const aboard = pilotsAboard(world);
-  const ejections: { pilotId: string; ship: Ship }[] = [];
+  const ejections: { pilotId: string; ship: Ship; recover: boolean }[] = [];
   let nextId = world.nextEntityId;
 
   for (const ship of dead) {
@@ -80,9 +80,12 @@ export function destroyShips(world: World, killers: Record<string, string | null
       if (isEscapePod(world, ship) || !shipStats(world, ship).escapePod) {
         pilots[pilotId] = { ...pilots[pilotId]!, shipId: null };
       } else {
-        ejections.push({ pilotId, ship });
+        // A ship that fell into a world: the pod is picked up by the nearest port, not left to bounce off the surface.
+        ejections.push({ pilotId, ship, recover: Boolean(ship.fellInto) });
       }
     }
+    // Into a world: nothing is left to drift or salvage.
+    if (ship.fellInto) continue;
 
     const wreck: Wreck = {
       id: `w${nextId++}`,
@@ -141,8 +144,33 @@ export function destroyShips(world: World, killers: Record<string, string | null
     const r = ejectPilot(out, e.pilotId, e.ship);
     out = r.world;
     events.push(r.event);
+    if (e.recover) {
+      const recovered = recoverPod(out, e.pilotId);
+      out = recovered.world;
+      if (recovered.event) events.push(recovered.event);
+    }
   }
   return { world: out, events };
+}
+
+/**
+ * The nearest port picks up a pilot's pod (lore: "pod recovery by the
+ * nearest station"): it is put on a free pad there, docked, at rest. A
+ * port with no free pad for it is passed over for the next nearest.
+ */
+function recoverPod(world: World, pilotId: string): { world: World; event: WorldEvent | null } {
+  const podId = world.pilots[pilotId]?.shipId;
+  const pod = podId ? world.ships[podId] : undefined;
+  if (!pod) return { world, event: null };
+  const size = world.hulls[pod.hullId]?.sizeClass ?? 'S';
+  const ports = Object.values(world.stations).sort((a, b) => distance(a.position, pod.position) - distance(b.position, pod.position) || (a.id < b.id ? -1 : 1));
+  for (const station of ports) {
+    const pad = freePadFor(station, size, world.ships);
+    if (!pad) continue;
+    const docked = onPad({ ...pod, velocity: { ...station.velocity }, angularVelocity: 0 }, station, pad);
+    return { world: { ...world, ships: { ...world.ships, [pod.id]: docked } }, event: { type: 'podRecovered', shipId: pod.id, pilotId, stationId: station.id } };
+  }
+  return { world, event: null };
 }
 
 /**

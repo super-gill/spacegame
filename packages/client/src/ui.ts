@@ -249,10 +249,20 @@ export class Ui {
   /** Rocks seen breaking up (breached, mined out, collapsed); their lost locks go unannounced. */
   private brokenRocks = new Set<string>();
 
-  handleEvents(events: WorldEvent[], myShipId: string): void {
+  /** `world` names things in the messages; `lastShipId` is the ship flown before this update, gone if it was just lost. */
+  handleEvents(events: WorldEvent[], myShipId: string, world?: World, lastShipId: string | null = null): void {
     if (this.brokenRocks.size > 200) this.brokenRocks.clear();
     for (const e of events) {
       const mine = e.shipId === myShipId;
+      if (e.type === 'fellInto' && (mine || e.shipId === lastShipId)) {
+        this.showToast(`You hit ${world?.bodies[e.bodyId]?.name ?? 'a world'} at ${Math.round(e.speed).toLocaleString('en-GB')} u/s. Your ship is gone.`, 4000);
+        continue;
+      }
+      // Only the pilot it belongs to is sent this (view.ts).
+      if (e.type === 'podRecovered') {
+        this.showToast(`${world?.stations[e.stationId]?.name ?? 'The nearest port'} picked up your escape pod.`, 4000, 'info');
+        continue;
+      }
       if (e.type === 'podEjected' && e.from === myShipId) {
         this.showToast('Your ship was destroyed. You got away in an escape pod.', 4000);
         continue;

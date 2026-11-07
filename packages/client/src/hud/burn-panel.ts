@@ -7,6 +7,10 @@ import { bigDistance, minutesSeconds } from './chart.js';
  * when the flip comes and when it arrives, with a bar that fills over the
  * burn and a mark at the flip. Cancel is the burn key again.
  *
+ * Coasting fast with no burn (after a cancel, or a pod thrown clear at
+ * speed), the same banner says so and that U brakes: ordinary thrusters
+ * take minutes to kill burn speeds, a braking burn about twenty seconds.
+ *
  * The numbers are worked out from the ship as it is, the same way the
  * sim steers (burn.ts): it closes at the speed it could still brake from,
  * √(2ad), so before that speed it is still accelerating towards the flip,
@@ -38,26 +42,52 @@ export function burnProgress(world: World, ship: Ship): { speed: number; flipIn:
   return { speed, flipIn, arriveIn: flipIn + top / a, left, braking };
 }
 
+/** Faster than this and not burning, the banner says you are coasting and how to stop. Units a second. */
+const COASTING_SPEED = 2000;
+
 export class BurnPanel {
   private readonly root = el('div', 'burn-panel hidden');
   private readonly to = el('span', 'burn-to');
   private readonly fill = el('div', 'burn-fill');
   private readonly flipMark = el('div', 'burn-flip');
   private readonly numbers = el('div', 'burn-numbers');
+  private readonly state = el('span', 'burn-state', 'BURNING');
+  private readonly bar = el('div', 'burn-bar');
+  private readonly note = el('div', 'burn-note');
 
   constructor(parent: HTMLElement) {
     const head = el('div', 'burn-head');
-    head.append(el('span', 'burn-state', 'BURNING'), this.to);
-    const bar = el('div', 'burn-bar');
-    bar.append(this.fill, this.flipMark);
-    this.root.append(head, bar, this.numbers, el('div', 'burn-note', 'WEAPONS, LOCKS AND DOCKING OFF · U TO CANCEL'));
+    head.append(this.state, this.to);
+    this.bar.append(this.fill, this.flipMark);
+    this.root.append(head, this.bar, this.numbers, this.note);
     this.root.setAttribute('role', 'status');
     parent.append(this.root);
   }
 
-  update(world: World, ship: Ship | null): void {
+  /**
+   * `coastingTarget` names the nav target port, if any, for the coasting
+   * line: U burns for it if there is one, and brakes to a stop if not.
+   */
+  update(world: World, ship: Ship | null, coastingTarget: string | null = null): void {
     const progress = ship ? burnProgress(world, ship) : null;
-    this.root.classList.toggle('hidden', !progress);
+    const speed = ship ? Math.hypot(ship.velocity.x, ship.velocity.y) : 0;
+    const coasting = Boolean(ship && !ship.burn && ship.state === 'flying' && speed > COASTING_SPEED);
+    this.root.classList.toggle('hidden', !progress && !coasting);
+    this.bar.classList.toggle('hidden', coasting);
+    if (coasting && ship) {
+      this.state.textContent = 'COASTING';
+      this.to.textContent = '';
+      const target = coastingTarget ? world.stations[coastingTarget] : undefined;
+      const brakeIn = speed / burnAcceleration(world, ship);
+      this.numbers.replaceChildren(
+        el('span', undefined, `${Math.round(speed).toLocaleString('en-GB')} u/s`),
+        el('span', 'bright', target ? `U · BURN FOR ${target.name.toUpperCase()}` : `U · BRAKE TO A STOP IN ${minutesSeconds(brakeIn)}`),
+      );
+      this.note.textContent = 'THRUSTERS ALONE TAKE MINUTES AT THIS SPEED';
+      return;
+    }
+    this.state.textContent = 'BURNING';
+    this.note.textContent = 'WEAPONS, LOCKS AND DOCKING OFF · U TO CANCEL';
     if (!ship?.burn || !progress) return;
     const station = ship.burn.targetId ? world.stations[ship.burn.targetId] : undefined;
     this.to.textContent = station ? `→ ${station.name.toUpperCase()}` : 'BRAKING TO A STOP';

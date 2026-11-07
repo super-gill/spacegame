@@ -27,6 +27,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - The menu's admin controls show only in Dev, not in the Arena.
 
 ### Fixed
+- Hitting a world at speed no longer bounces you, or your escape pod, off it at tens of thousands of units a second. At 500 u/s or more into a planet, moon or big rock the ship is lost with no wreck, and the nearest port picks up your pod, docked. A burning ship can no longer pass through a world either.
+- Coasting fast (after cancelling a burn, say), a COASTING banner shows your speed and that U brakes you to a stop in seconds, or burns for your nav target; thrusters alone take minutes.
 - Clicking the warning banner silences the alarm again. With a countdown showing (a collision in 1.3 s) a normal click often did nothing, because the banner redrew under the pointer mid-click; it now silences as the button goes down.
 
 ## [0.17.0] - 2026-11-06

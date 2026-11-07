@@ -803,7 +803,7 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   }
   const ship = myShip(now) ?? myShip(last);
   if (ship) {
-    ui.handleEvents(events, ship.id);
+    ui.handleEvents(events, ship.id, now, myShip(last)?.id ?? null);
     pendingSounds.push(...eventSounds(events, ship.id, now));
     // Undocking in a ship that cannot fly is allowed, but never silent.
     if (events.some((e) => e.type === 'undocked' && e.shipId === ship.id)) {
@@ -1093,7 +1093,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   if (mine && navTarget && mine.state === 'flying') drawNavTarget(mine, navTarget, alpha);
   ui.update(current, mine);
-  burnPanel.update(current, mine);
+  burnPanel.update(current, mine, navTarget?.kind === 'station' ? navTarget.id : null);
   chart.update(current, mine, navTarget?.kind === 'station' ? navTarget.id : null);
   if (arenaSetup) {
     // Between fights: no ship and no arena running (a decided fight still shows for a moment).
