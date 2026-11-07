@@ -8,8 +8,10 @@
  * over its own numbers, so a ship is hit where it is drawn and fires from
  * where its turrets are.
  *
- * Run by `npm run geometry` and at the start of `npm run build`. The output
- * is committed; a sim test fails if it falls out of step with ships.json.
+ * Run by `npm run geometry` after an art export, never by the build: the
+ * output is committed, and a build that rewrote it would leave a Windows
+ * checkout (CRLF line endings) with a changed file that blocks the next
+ * pull. A sim test fails if it falls out of step with ships.json.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -63,7 +65,8 @@ export function render(ships) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const ships = JSON.parse(fs.readFileSync(source, 'utf8'));
   const text = render(ships);
-  const before = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
+  // Line endings do not count: a Windows checkout has CRLF.
+  const before = fs.existsSync(target) ? fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') : '';
   if (text !== before) fs.writeFileSync(target, text);
   console.log(`hull geometry: ${Object.keys(geometry(ships)).length} hulls${text === before ? ', unchanged' : ' -> packages/sim/src/hull-geometry.ts'}`);
 }

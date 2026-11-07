@@ -25,7 +25,7 @@ function inside(poly: { x: number; y: number }[], p: { x: number; y: number }, m
 
 describe('hull geometry from the art', () => {
   it('is in step with art/ships/ships.json (run `npm run geometry`)', () => {
-    expect(readFileSync(new URL('./hull-geometry.ts', import.meta.url), 'utf8')).toBe(render(ships));
+    expect(readFileSync(new URL('./hull-geometry.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n')).toBe(render(ships));
   });
 
   it('covers every hull in the game, with every weapon and PDC mount marked', () => {

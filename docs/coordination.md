@@ -333,6 +333,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 9): **the build no longer rewrites `hull-geometry.ts`**: on Jason's Windows checkout (CRLF) the rewritten file showed as changed and blocked `server.bat`'s next pull. Rule: a build never writes a committed file; `npm run geometry` is run by hand after an art export.
 - 2026-11-07, lead (Lead 9): **Open Lanes step 3, push 1: the eight starts in the sim and server** (`docs/sol-build.md`, "As built: Open Lanes step 3"): Jason agreed adding the Wildcat and Sedna and leaving duty and desertion to law. A pilot's start sets home, first ship, standing and licence; they wake at their own home. The start picker's mockup is with Jason; the picker is push 2.
 - 2026-11-07, lead (Lead 9): **released 0.20.0** (Open Lanes step 2, the first fleet; played by Jason, "everything is good"). Next: Open Lanes step 3, the eight starts.
 - 2026-11-07, lead (Lead 9): **fixed ships bouncing through stations at the end of a burn** (Jason saw a UDF patrol and a trader at Ceres Accord): the brake's flip lead faded out below 1,000 u/s on the assumption the ship already faced backwards, which is false after an overshoot, so a burn that came out of a bend round Ceres fast overshot its end for ever (burning ships do not collide, so it passed through the station). The lead is now the turn actually needed (`turnToBrake` in `burn.ts`). Every Sol station from twelve directions now arrives (372 burns); test added.
