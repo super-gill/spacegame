@@ -227,4 +227,4 @@ Calder stays canon as the first system through the gate, on the edge of the Marc
 
 ## Open
 
-- [ ] Jason: station names, by the naming rule above (all new except Ceres Accord Station and Slagline).
+Nothing open. Venus as a start, the station names, the navy names and all of Sol as the first build are decided (7 November). Layout, scale and travel times are the lead's.
