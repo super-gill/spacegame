@@ -153,12 +153,10 @@ function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], marks: read
 const CORE_RGB: readonly [number, number, number] = [159, 211, 199];
 const HELD_NEUTRAL_RGB: readonly [number, number, number] = [106, 152, 143];
 const CONTESTED_RGB: readonly [number, number, number] = [224, 164, 88];
-/** How strongly each level is shaded, 0 to 255. Faint: the chart is read over it. */
-const SHADE_ALPHA = { core: 34, held: 30, contested: 46 } as const;
-/** Ports wear level rings until a buoy's reach is this many pixels across; past that the shading shows it. */
+/** How strongly a buoy's reach is filled, 0 to 1. Faint: the chart is read over it. */
+const FILL_ALPHA = { core: 0.09, held: 0.1, contested: 0.14 } as const;
+/** Ports wear level rings until a buoy's reach is this many pixels across; past that the circles show it. */
 const RING_UNTIL_PX = 30;
-/** One shading sample per this many pixels, smoothed when drawn. */
-const SHADE_CELL = 16;
 
 function rgbOf(hex: string): [number, number, number] {
   return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
@@ -173,29 +171,35 @@ function levelRgb(r: Pick<SecurityReading, 'level' | 'holder'>): readonly [numbe
   return r.level === 'core' ? CORE_RGB : r.level === 'contested' ? CONTESTED_RGB : holderRgb(r.holder);
 }
 
-/** A small image, one pixel per cell, of the security across the view; drawn scaled up and smoothed. */
-function shadeImage(net: RelayNet, w: number, h: number, toWorld: (sx: number, sy: number) => { x: number; y: number }): HTMLCanvasElement {
-  const cols = Math.max(1, Math.ceil(w / SHADE_CELL));
-  const rows = Math.max(1, Math.ceil(h / SHADE_CELL));
-  const canvas = document.createElement('canvas');
-  canvas.width = cols;
-  canvas.height = rows;
-  const ctx = canvas.getContext('2d')!;
-  const image = ctx.createImageData(cols, rows);
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const r = securityAt(net, toWorld((col + 0.5) * SHADE_CELL, (row + 0.5) * SHADE_CELL));
-      if (r.level === 'open') continue;
-      const rgb = levelRgb(r);
-      const i = (row * cols + col) * 4;
-      image.data[i] = rgb[0];
-      image.data[i + 1] = rgb[1];
-      image.data[i + 2] = rgb[2];
-      image.data[i + 3] = SHADE_ALPHA[r.level];
-    }
+/** What the chart draws for the Relay: buoys grouped by fill colour, and each port's ring. Built when the ports move. */
+interface RelayDrawing {
+  stations: World['stations'];
+  net: RelayNet;
+  groups: { fill: string; buoys: { x: number; y: number }[] }[];
+  ports: { at: { x: number; y: number }; fill: string; stroke: string }[];
+}
+
+/** Read every buoy and port once and group the buoys by colour, so a frame is a few fills. */
+function relayDrawing(world: World): RelayDrawing {
+  const net = relayNet(world);
+  const groups = new Map<string, { x: number; y: number }[]>();
+  for (const node of net.nodes) {
+    const r = securityAt(net, node.at);
+    if (r.level === 'open') continue;
+    const rgb = levelRgb(r);
+    const fill = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${FILL_ALPHA[r.level]})`;
+    const list = groups.get(fill) ?? [];
+    list.push(node.at);
+    groups.set(fill, list);
   }
-  ctx.putImageData(image, 0, 0);
-  return canvas;
+  const ports: RelayDrawing['ports'] = [];
+  for (const station of Object.values(world.stations)) {
+    const r = securityAt(net, station.position);
+    if (r.level === 'open') continue;
+    const rgb = levelRgb(r);
+    ports.push({ at: station.position, fill: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.07)`, stroke: `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.55)` });
+  }
+  return { stations: world.stations, net, groups: [...groups].map(([fill, buoys]) => ({ fill, buoys })), ports };
 }
 
 /** Names for whoever holds a place, for the screen. */
@@ -276,10 +280,8 @@ export class Chart {
   private readonly plan = el('section', 'chart-plan');
   /** Where you are, in the header: the security level and who holds it. */
   private readonly here = el('span', 'chart-here');
-  /** The Relay, worked out once per set of port positions. */
-  private net: { stations: World['stations']; net: RelayNet } | null = null;
-  /** The shading, kept until the view or the ports change. */
-  private shade: { key: string; image: HTMLCanvasElement } | null = null;
+  /** The Relay and what to draw for it, worked out once per set of port positions. */
+  private relay: RelayDrawing | null = null;
   private readonly viewButtons = new Map<ViewId, HTMLButtonElement>();
   /** Half the chart's width in units, and where its centre is in the world; `follow` keeps the centre on your ship until you drag. */
   private halfWidth = 45_000_000;
@@ -457,33 +459,38 @@ export class Chart {
       ctx.stroke();
     }
 
-    // Security, under everything: what the Relay says about each place.
-    const net = this.relayNetFor(world);
-    if (net) {
-      const key = `${centre.x.toFixed(0)},${centre.y.toFixed(0)},${this.halfWidth.toFixed(0)},${w},${h},${net.nodes.length}`;
-      if (this.shade?.key !== key) this.shade = { key, image: shadeImage(net, w, h, (sx, sy) => ({ x: centre.x + (sx - w / 2) / scale, y: centre.y + (sy - h / 2) / scale })) };
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(this.shade.image, 0, 0, w, h);
-    }
-
-    // Each port's security as a dashed ring (the mockup's), while a buoy's reach is too small for the shading to show it.
-    if (net && RELAY_RANGE * scale < RING_UNTIL_PX) {
-      ctx.setLineDash([2, 4]);
-      ctx.lineWidth = 1;
-      for (const station of Object.values(world.stations)) {
-        const r = securityAt(net, station.position);
-        if (r.level === 'open') continue;
-        const at = toScreen(station.position);
-        if (at.x < -60 || at.y < -60 || at.x > w + 60 || at.y > h + 60) continue;
-        const rgb = levelRgb(r);
-        ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.55)`;
-        ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.07)`;
+    // Security, under everything: each buoy's reach as a translucent circle in the colour of its reading,
+    // one fill per colour so overlaps do not stack. The readings are worked out when the ports move, not per frame.
+    const relay = this.relayFor(world);
+    if (relay) {
+      const reach = RELAY_RANGE * scale;
+      for (const group of relay.groups) {
+        ctx.fillStyle = group.fill;
         ctx.beginPath();
-        ctx.arc(at.x, at.y, Math.max(RELAY_RANGE * scale, 11), 0, Math.PI * 2);
+        for (const at of group.buoys) {
+          const p = toScreen(at);
+          if (p.x < -reach || p.y < -reach || p.x > w + reach || p.y > h + reach) continue;
+          ctx.moveTo(p.x + reach, p.y);
+          ctx.arc(p.x, p.y, reach, 0, Math.PI * 2);
+        }
         ctx.fill();
-        ctx.stroke();
       }
-      ctx.setLineDash([]);
+      // Zoomed out a buoy's reach is a speck: each port wears the mockup's dashed ring in its level's colour instead.
+      if (reach < RING_UNTIL_PX) {
+        ctx.setLineDash([2, 4]);
+        ctx.lineWidth = 1;
+        for (const port of relay.ports) {
+          const at = toScreen(port.at);
+          if (at.x < -60 || at.y < -60 || at.x > w + 60 || at.y > h + 60) continue;
+          ctx.strokeStyle = port.stroke;
+          ctx.fillStyle = port.fill;
+          ctx.beginPath();
+          ctx.arc(at.x, at.y, Math.max(reach, 11), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+      }
     }
 
     // The Accord lanes: wide faint bands under everything else, as in the mockup.
@@ -577,7 +584,7 @@ export class Chart {
     }
     placeLabels(ctx, labels, marks, w, h);
     drawLegend(ctx, h, worldLanes(world).length > 0);
-    const reading = net && ship ? securityAt(net, ship.position) : null;
+    const reading = relay && ship ? securityAt(relay.net, ship.position) : null;
     const hereText = reading ? `YOU ARE IN ${securityWords(reading)}` : '';
     if (this.here.textContent !== hereText) this.here.textContent = hereText;
     this.here.dataset['level'] = reading?.level ?? '';
@@ -631,11 +638,11 @@ export class Chart {
     this.renderPlan(world, ship, plan);
   }
 
-  /** The Relay for this world, rebuilt only when its ports have moved (the stations object is kept while nothing changes). */
-  private relayNetFor(world: World): RelayNet | null {
+  /** The Relay for this world and how to draw it, rebuilt only when its ports have moved (the stations object is kept while nothing changes). */
+  private relayFor(world: World): RelayDrawing | null {
     if (world.system !== 'sol') return null;
-    if (this.net?.stations !== world.stations) this.net = { stations: world.stations, net: relayNet(world) };
-    return this.net.net;
+    if (this.relay?.stations !== world.stations) this.relay = relayDrawing(world);
+    return this.relay;
   }
 
   /** The plan's parts, built once and updated in place, so BURN is never replaced under the pointer mid-click. */
@@ -673,8 +680,8 @@ export class Chart {
     set(parts.to, plan.target.kind === 'body' ? `${plan.target.name.toUpperCase()} · ABOVE THE WELL` : plan.target.name.toUpperCase());
     const passes = plan.route.bends.map((b) => world.bodies[b.bodyId]?.name.toUpperCase() ?? 'A WORLD');
     const route = passes.length === 0 ? 'STRAIGHT' : `ROUND ${passes.join(', ')} · +${minutesSeconds(plan.detourSeconds)}`;
-    const net = this.relayNetFor(world);
-    const arrive = net ? securityWords(securityAt(net, plan.route.points.at(-1) ?? plan.target.position)) : '--';
+    const relay = this.relayFor(world);
+    const arrive = relay ? securityWords(securityAt(relay.net, plan.route.points.at(-1) ?? plan.target.position)) : '--';
     const shown = [bigDistance(plan.distance), minutesSeconds(plan.seconds), minutesSeconds(plan.flipSeconds), `${Math.round(plan.peakSpeed).toLocaleString('en-GB')} u/s`, `${accel.toLocaleString('en-GB')} u/s²`, route, arrive];
     parts.values.forEach((node, i) => set(node, shown[i]!));
     const tooClose = plan.distance < 20_000;
