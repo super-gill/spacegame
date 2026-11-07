@@ -1,6 +1,6 @@
 # The fleet list
 
-Status: first draft, 6 November 2026, by the lore chat for Jason's review. Every shipbuilder in known space and every hull it makes, with the ones already in the catalogue marked. Names and roles only; sizes, mounts, stats and build order are the lead's. Classes are the two ladders in `lore.md`, "Hull classes".
+Status: first draft, 6 November 2026, by the lore chat for Jason's review. Every shipbuilder in known space and every hull it makes, with the ones already in the catalogue marked. Names and roles only; sizes, mounts, stats and build order are the lead's. Classes are the two ladders in `lore.md`, "Hull classes". The per-hull handover for the lead is `hulls.md` (generated from the registry) and the definitions are `hull-terms.md`.
 
 Status column: **built** (in the catalogue today), **named** (a working hull exists and this is its name), **draft** (nothing exists; a name and a role for when it does).
 
