@@ -251,6 +251,7 @@ Decided 7 November 2026. The Belt has no naval yard. **The Union Militia is a ro
 | Union Boycott | Frigate | Kessari Decree | Projectile frigate | The launchers torn out for guns; refuses to deal | draft |
 | Union Walkout | Destroyer | Kessari Ruling | Heavy gun destroyer | Rebuilt so far that Earth no longer recognises it; everyone walks out together | built |
 | Union Solidarity | Cruiser | Three Earth cruisers of the Statute's generation, captured in the Gate War | Line cruiser | Rebuilt once, by every cooperative at once; never copied since. Three exist. | draft |
+| Union General Strike | Carrier | Belt Forge Headframe | Militia carrier and command ship | An industrial capital refitted for war: hangars where the hoppers were, gun decks on the frames, the furnaces capped. On shift a carrier, off shift an ore hauler. When the Belt brings everyone out | draft |
 | Vantage Dirk, Militia refit | Light fighter | Vantage Dirk | Militia fighter | Belt paint, Belt guns, a frame with an engine | built |
 | Vantage Cutlass, Militia refit | Heavy fighter | Vantage Cutlass | Militia heavy fighter | More of everything bolted on | built |
 
@@ -634,21 +635,30 @@ Bespoke, rare, best at one thing. Standing with the clan, or a very rare sale. N
 
 ## Command ships: the capital industrial hulls
 
-Jason's direction, 7 November 2026: the capital industrial ships are fleet support command ships for the later game, when the player is buying ships, hiring captains and supporting them with a large command ship that gives bonuses, defence and capability, particularly for operations in unsafe places. Every industry gets one. A command ship is a hull with a bay (subcraft and drones), a command suite (bonuses to the ships in its fleet), defence for the fleet (PDC coverage and a shield or armour umbrella in its radius), capability the small ships lack (refining, repair, a clinic, a cell block, a survey array), and a **fleet beacon**: a command ship is a jump target for its own fleet's T3 hulls and a rally point for everything else.
+Jason's direction, 7 November 2026 (clarified the same day): the capital industrial ships are **carriers and fleet command vessels**. They do not do the industry's work themselves. Their wing does: subcraft, fighters and drones launched from the capital's bays mine, skim, salvage, survey or rescue, and bring the take back to the capital, which stores it, processes it, defends it and makes everything around it better. The capital mostly sits still. It is a hangar, a hold, a refinery or clinic or lab, a command suite, and a very heavy defensive unit.
 
-| Industry | Command ship | Maker | What it gives the fleet |
-| --- | --- | --- | --- |
-| Rock mining | Belt Forge Headframe | Belt Forge | Mining yield and laser range for its fleet; on-board refining; mining subcraft and drone bays; ore transfer without docking |
-| Gas and ice | Lavinia Cyclone; Corvane Still | Lavinia; Corvane | Skimmer and ice-miner bonuses; gas and water refining; a heat sink that extends how deep its skimmers can go |
-| Freight | Tessaract Consignment (Convoy pattern) | Tessaract | Convoy cohesion: speed matching, PDC umbrella, cargo transfer, a market terminal that trades without docking |
-| Salvage | Rook and Rivet Breaker | Rook and Rivet | Salvage yield; on-board shipbreaking; hulk towing; the Grab's bay |
-| SAR and repair | Solace Sanctuary | Solace | Field repair and nanite resupply for the fleet; a hospital; pod recovery; the Mercy Clause's protection |
-| Exploration | Halden Expedition | Halden | Survey range and charting speed; long-range tanks for the fleet; a lab |
-| Security and bounty | Corvane Bulwark; later a Meridian command hull | Corvane; Meridian | Tackle range and lock speed for the fleet; a cell block; a bounty terminal |
-| Drones | Arbor Canopy (medium) and a capital Arbor hull later | Arbor | Drone control range and count |
-| Military | the carriers (Mandate, Hellas) and dreadnoughts | the naval yards | Fighters, fleet beacon, the navy's own command suite |
+Two ways to use one:
 
-For the lead, later: a **fleet** is a set of owned ships with hired captains (crew, costs and risks); a command ship applies its bonuses to fleet ships within its command radius; fleet ships follow, mine, haul or guard by order; the command ship's bay launches and recovers subcraft and drones; the beacon makes it a jump target. The bonuses are the reason to bring the big slow ship into the unsafe system, and its defence is the reason the fleet survives there. Each command ship also has a T3 prototype (below) at the top of its company's ladder.
+- **Flown alone.** A player in a command ship is a carrier captain: fly to the site, stop, launch the wing, run the operation from the bridge, recover the wing, leave. A command ship is fully effective without a fleet; the wing is the fleet. This is the first way the lead builds it.
+- **At the head of a fleet.** Later, with owned ships and hired captains, the command ship's presence boosts the fleet's ships (yield, range, speed matching, lock speed by industry), its defence covers them (PDC coverage and a shield or armour umbrella in its radius), and its beacon is their jump target and rally point. Fleet ships follow, work and guard by order; the capital still does not work the rock itself.
+
+What every command ship has: a **bay** sized for its wing (subcraft, fighters, drones); **storage** for the collection (ore holds, gas tanks, salvage racks, pods, samples); **processing** that turns the collection into something worth more before it is landed (refining, breaking, treatment, analysis); a **command suite** that boosts the wing and any fleet; **heavy defence** (armour, point defence, turrets, the umbrella; the Sanctuary alone goes unarmed and relies on the Mercy Clause); and the **fleet beacon**. What it does not have: the tool. No mining laser, no intake scoop, no cutting torch on the hull. The Lavinia Cyclone and Corvane Still were redrawn to this rule on 7 November (hangar decks where the intakes were); the Headframe, Breaker, Consignment, Sanctuary and Expedition already fitted it.
+
+| Industry | Command ship | Maker | Its wing | What it gives the wing and the fleet |
+| --- | --- | --- | --- | --- |
+| Rock mining | Belt Forge Headframe | Belt Forge | Jacklegs, Knockers, any mining subcraft | Mining yield and laser range; on-board refining; ore transfer without docking |
+| Gas and ice | Lavinia Cyclone; Corvane Still | Lavinia; Corvane | Skimmers (Zephyr, Gale) and ice miners | Skimmer depth and heat tolerance; gas and water refining; tanks that take a wing's whole run |
+| Freight | Tessaract Consignment (Convoy pattern) | Tessaract | Shuttles and drones for cargo transfer | Convoy cohesion: speed matching, PDC umbrella, a market terminal that trades without docking |
+| Salvage | Rook and Rivet Breaker | Rook and Rivet | Grabs, scrappers, salvage drones | Salvage yield; on-board shipbreaking; hulk storage in the yard |
+| SAR and repair | Solace Sanctuary | Solace | Stretchers, Shoots, repair drones | Field repair and nanite resupply; a hospital; pod recovery; the Mercy Clause's protection |
+| Exploration | Halden Expedition | Halden | Probes, survey drones, a Query in the bay | Survey range and charting speed; long-range tanks; a lab |
+| Security and bounty | Corvane Bulwark; later a Meridian command hull | Corvane; Meridian | Fighters, Shrikes | Tackle range and lock speed; a cell block; a bounty terminal |
+| Drones | Arbor Canopy (medium) and Arbor Grove (T3) | Arbor | Drones, as many as it can control | Drone control range and count |
+| Military | the carriers (Mandate, Hellas, and the Belt's Union General Strike) and dreadnoughts | the naval yards; Union Defence Works | Fighters | The navy's own command suite, the fleet beacon |
+
+**The Belt's carriers are industrial capitals refitted for war.** The Belt has no naval yard, so Union Defence Works takes a Headframe (or a Breaker) and plates the hoppers over into hangars for Militia Dirks and Cutlasses, caps the furnaces, bolts gun decks to the frames: the **Union General Strike**. On shift it is a carrier with the Militia tag and the fleet beacon; off shift it goes back to hauling ore. Same hull, same wing bays, different wing. This is the same move in both directions: a civil command ship is a carrier whose wing works; a Belt carrier is a civil command ship whose wing fights.
+
+For the lead: a command ship is a hull with `bays` (a wing roster by subcraft class), `hold` kinds (what the wing can transfer in without docking), `process` (what it can refine or treat on board), `command` bonuses by industry and a `commandRadius`, `umbrella` (PDC coverage and shield or armour share), and `beacon`. The wing is the first thing to build; the fleet bonuses come with owned ships and hired captains. Each command ship also has a T3 prototype (below) at the top of its company's ladder.
 
 ## Civil T3: prototypes
 
