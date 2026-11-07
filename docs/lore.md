@@ -35,7 +35,7 @@ There are no gods in canon. The solar system is the one outside the window, and 
 
 ### The home system
 
-Sol is the safe core of known space: crowded, policed, rich and old. Earth and Luna, Mars, the Venusian clouds, the Belt, the outer moons. Everything humans built before the gate is here, and most of what they have built since still answers to someone here.
+Sol is the safe core of known space: crowded, policed, rich and old. Earth and Luna, Mars, the Venusian clouds, the Belt, the outer moons. Everything humans built before the gate is here, and most of what they have built since still answers to someone here. Safe is relative: Sol is Core round the capitals and along the Accord lanes, Held and Contested farther out, Open past Saturn. The whole system, its stations, resources, ownership and the starts, is mapped in `sol.md`.
 
 Ships never land. Atmosphere and a deep gravity well kill a hull, and no shipwright has ever built one to survive them. Cargo and people go down and up by elevator and shuttle, offscreen; what a pilot docks at is a world's orbital port. Gas giants have a crush depth instead of a surface. Venus's cloud cities are offscreen too; pilots dock at Venus's orbital port. Falling into a well is the end of a ship, and the pod is fished out by the nearest station's rescue service.
 
@@ -504,6 +504,8 @@ How the mix shifts, in words (the lead sets the numbers): Earth systems run on c
 
 ## The starter sector
 
+The first build starts in Sol (`sol.md`). Calder stays canon as the first system through the gate.
+
 **Calder** is an Accord free system on the edge of the Marches, one of the first systems settled through a gate, where an Earth freight lane meets a Belt mining belt. It is busy enough to be policed near its stations and quiet enough between them to be dangerous.
 
 ### Bodies
@@ -724,6 +726,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Sol mapped** (`sol.md`): bodies inside out with who holds each and its security level; the Accord lanes as Core corridors (Mars patrols them, Earth tolls them, the Belt patrols its own lane); a capital port per power (Thetis High, the Exchange, Elysium High, Slagline) and two Accord free ports (Ceres Station, Titan Port); about thirty stations; resource sites from the Near Field to the Kuiper Belt, with comets as events; hazards; and the starts: a power (Earth, Mars, the Belt, Venus proposed) and a path (private or navy, the Belt's being the Militia rota). Scale and layout are the lead's.
 - 2026-11-07: **Fitting stays free.** The `fitting.md` model stands: any hull fits anything its slots take, role bonuses nudge, built-in role equipment is the hull's identity and is never fitted out. The fleet lore maps onto it: builder trade-offs, tags and patterns are frame stats; tool grades are slot sizes with the bonus; holds, hoppers, heat ratings, bays, command suites, beacons, T3 capabilities and Lattice components are built in. Stock fits are what NPCs fly and what the art draws. Shown per hull on the registry page.
 - 2026-11-07: **Capitals never work the site.** A capital cannot manoeuvre among rocks, through a cloud band or around a wreck field, so every capital industrial hull, the T3s included, parks at the edge and reaches in with subcraft, drones or a fleet. The Corvane Colossus is therefore a T3 mining carrier, not a strip-miner: two hangar booms round a receiving dock, gate-glass-lined furnaces, loading cradles for Drays and Pitheads; it processes faster than anything human. The Lodestar finds; the Colossus processes. Supersedes the strip-miner decision below.
 - 2026-11-07: **Materials.** Real minerals under their real names (nickel-iron, copper, zinc, platinum, rare earths; water, ammonia and carbon ice; Venus's carbon dioxide, sulphur and nitrogen; the giants' hydrogen and helium-3 later), with exotics such as gate-glass reserved for other systems; nothing exotic is mined in Sol. Breaching in Sol finds platinum and rare-earth pockets. Field refining at a worse yield than a station; maker alloys named now, recipes at the manufacturing milestone. Full catalogue in `materials.md`.

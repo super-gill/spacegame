@@ -22,7 +22,7 @@ The old rule was: local system law enforcement, weak but responsive, based on st
 
 ## Security by influence
 
-Sol is the first system built and it is alive. Later systems take a security level from the owning power's influence, which is where the conflicts between Earth, Mars and the Belt happen.
+Sol is the first system built and it is alive. Within Sol the levels vary by region (Core round the capitals and on the Accord lanes, Held and Contested farther out, Open past Saturn); `sol.md` maps them. Later systems take a security level from the owning power's influence, which is where the conflicts between Earth, Mars and the Belt happen.
 
 | Level | Where | Who is there | Response |
 | --- | --- | --- | --- |
