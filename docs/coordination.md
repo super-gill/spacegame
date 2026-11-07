@@ -254,6 +254,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: civil pass 3 fixes from Jason's review (bands, nacelle layering, Lavinia's vacuum hulls as frames); drones recorded as pure machines in `hull-terms.md`. No rule changes.
 - 2026-11-07, lore: civil pass 3 drawn (Solace, Halden, Arbor, Lavinia, and the Saro and Long Wake civil hulls, 16 hulls). Catalogue ids unchanged. `hulls.md` regenerated (159 hulls, 137 drawn). No rule changes.
 - 2026-11-07, lore: civil pass 2 drawn (Belt Forge and Rook and Rivet, production and legacy, 22 hulls; the Prospector, Sinker and Collier outlines replaced). Catalogue ids unchanged. `hulls.md` regenerated (159 hulls, 121 drawn). No rule changes.
 - 2026-11-07, lore: civil pass 1 drawn on the registry (Tessaract and Arcadia, production and legacy, 28 hulls; the Manifest's old outline replaced). Catalogue ids unchanged. `hulls.md` regenerated (152 hulls, 99 drawn). No rule changes.

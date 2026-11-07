@@ -77,7 +77,7 @@ Suggests `generation` and, where it applies, `base` (the hull this one came befo
 
 **Subcraft.** A crewed NPC small craft carried in a bay: fighters (combat subcraft), mining, salvage and rescue subcraft. Bay products from companies. Light combat sold openly; heavy behind the licence; industrial subcraft never armed. Pilots are crew (a later system, costs and risks only).
 
-**Drone.** An uncrewed bay product. Combat drones follow the same grade rules by maker; industrial drones never armed.
+**Drone.** An uncrewed bay product. Combat drones follow the same grade rules by maker; industrial drones never armed. In the art, drones are pure machines, not small fighters: no cockpit, no fighter silhouette; a frame around a sensor, a tool or a weapon, with thrusters where they fit (Jason, 7 November).
 
 **Pod.** The lifeboat every registered ship carries (Meridian Ark). Shooting one is the one crime every power pursues (the Mercy Clause).
 
