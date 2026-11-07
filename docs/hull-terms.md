@@ -24,7 +24,7 @@ Written 7 November 2026 for the lead. Every term the fleet uses, what it is in t
 
 ## Tiers and generations
 
-**Tier.** The price band and rarity of a hull: **T1** cheap or old, **T2** current, **T3** rare and the best at one thing. A tier contains two generations each. Mechanically: a price multiplier and where the hull appears (used market, ship mart, standing reward). Suggests `tier` (1, 2, 3).
+**Tier.** The price band and rarity of a hull (every Aurel and Unsung ship is T3, Jason, 7 November; they are beyond human and never on any market): **T1** cheap or old, **T2** current, **T3** rare and the best at one thing. A tier contains two generations each. Mechanically: a price multiplier and where the hull appears (used market, ship mart, standing reward). Suggests `tier` (1, 2, 3).
 
 **Generation.** What the hull *is*. Six values:
 

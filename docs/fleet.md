@@ -26,7 +26,7 @@ Sixteen companies build hulls. Four are naval yards and build only for their nav
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
 | Corvane Heavy Industries | Independent (Earth money, Belt yards) | Heavy ore haulage and refining, and the corporate security that guards it | 5 |
 | The clans | The Belt | Boutique long-range and stealth hulls | 6 |
-| Aurel | Beyond the Shoals | Voices | 1 known |
+| Aurel | Beyond the Shoals | Voices, all T3 | 9 kinds, and the Unsung's 5 |
 
 Makers that build no hulls: Paragon Arms, Ito-Marr Dynamics, Novum Systems, Cantor-Vell Arms, Slagline Motors (weapons and modules) and Vantage Aerospace (fighters only).
 
@@ -333,12 +333,37 @@ The Belt's ship-born clans build a few hulls each, over generations, and no two 
 
 ## Aurel
 
-Silent and musical terms given by human scholars. No yards, no companies; every ship is a voice. Aurel ships are top tier: each the best at what it does, beyond human technology. In human hands they come only as husks, the one on the pad, or the gift to the Voiced (`lore.md`, "Death and the Return").
+Silent and musical terms given by human scholars, who name each kind as it is seen. No yards, no companies; every ship is a voice. **Every Aurel ship is T3** (Jason, 7 November), beyond human technology and the best at its one job; a ship is what it is, whoever flies it. In human hands they come only as husks, the one on the pad, or the gift to the Voiced (`lore.md`, "Death and the Return"). Sealed: no slots, nothing fitted or fitted out; the fields knit the segments; no transponder.
 
-| Hull | Class | Job | Character | Status |
+**Design language** (Jason, 7 November, from the concept sheet: B and C together): white, hyper-modern. The body is a crisp silhouette fractured into flat tiles by hairline glowing seams; the voice sits in a core inside detached arcs and halos. Everything else floats: drive pods that deliberately do not touch the hull, planes and fins held off the spine, lances held ahead of the bow by nothing. This is the one exception to the fleet's "nothing floats" rule, because floating is what an Aurel ship is. No windows, no engines, no instruments, no markings; the glow is the voice, and there is little of it. A dead hull is dull grey with no glow and its tiles drift.
+
+| Hull | Weight | Job | Character | Status |
 | --- | --- | --- | --- | --- |
-| Aurel Tacet | Outside the ladders | The sealed development and test ship | A voice that never sang | built |
-| Others | | Husks, the one on the pad, the gifted ship | Named by whoever first sees them: Lament, Hush, Cadence are the kind of words scholars reach for | later |
+| Aurel Fermata | Light | Watcher: the voice that holds station | The white ship at the edge of sensor range; it sees everything and burns away; no weapon at all | drawn |
+| Aurel Lament | Medium | Warden: the voice that fights the Unsung | The hull that fought the Quiet War; lances and a field that turns human weapons | drawn |
+| Aurel Refrain | Medium | Tender: the voice that mends ships and retunes the faded | The Tending made a ship: a cradle open forward; carries nothing that can hurt | drawn |
+| Aurel Hush | Heavy | Silencer: the voice that sleeps gates and mutes the Lattice | The instrument of the Sundering; blinds every relay in its range | drawn |
+| Aurel Canticle | Heavy | Wayfarer: the voice that crosses the Shoals | Carries the long-range drive nobody human has built | drawn |
+| Aurel Threnody | Capital | Great voice: the carrier whose wing is its fighters | A keel of tiles carrying three voices, with twelve Notes locked round it as the wing. Deployed, the Notes leave and fight; the keel remains; they return and are the hull again. The Quiet War's line of battle | drawn, with a wing-loosed view |
+| Aurel Note | Subcraft | Fighter: one tile of a Threnody's wing | A fighter that is also a piece of hull; carried by the wing's field, it carries itself when loosed | drawn |
+| Aurel Tacet | Medium | The sealed development and test ship | A voice that never sang; the only Aurel hull whose segments touch | drawn |
+| Aurel husk | Medium | A dead voice; salvage | No fields, no glow, unflyable; priceless parts | drawn |
+
+**The carrier mechanic** (Jason, 7 November; does not exist in game yet, recorded as an intention for the lead): a Threnody's fighters are large units that make up its hull. Launching them takes the hull apart; while they fight, the carrier is a keel with its voices and no wing; recovering them rebuilds the hull. Damage to a Note is damage to the hull it will return to. The Unsung Threnody does the same and its loose Notes are the Dark's swarm.
+
+**The gift.** The Voiced are given one or two voices, chosen by the Chorus, not picked: usually a Fermata to see with and a Lament to fight with; a Refrain or a Canticle for a pilot the Chorus has other uses for. Never a Hush or a Threnody.
+
+### The Unsung: the hollow ships
+
+The broken voices, caged in the Dark, fly the same kinds gone wrong: bone plate instead of white, a violet voice that leaks light through cracks, segments drifted out of true and some missing. The Hollow Choir saw these at the Dimming's edge and called them the true builders. They are the Dark's hostiles (the roadmap's "Unsung as hostile ships in unknown space") and never in human hands.
+
+| Hull | Weight | Job | Status |
+| --- | --- | --- | --- |
+| Unsung Fermata | Light | Hollow watcher: it watches for the other side | drawn |
+| Unsung Lament | Medium | Hollow warden | drawn |
+| Unsung Hush | Heavy | Hollow silencer: where one is, relays die and sleeping gates stir | drawn |
+| Unsung Threnody | Capital | Hollow great voice, the hollow carrier: the thing the Aurel caged; seen once, at Kerran | drawn |
+| Unsung Note | Subcraft | Hollow fighter-tile: a piece of the thing, loose | drawn |
 
 ## Subcraft and drones
 

@@ -44,7 +44,6 @@ OVERRIDE = {
     "mer-shrike": (["Tackle (civilian)", "Tractor"], ["Cell block", "Pod bay with a grab"]),
     "mer-osprey": (["Launchers", "Cargo pods"], ["Launcher pods that read as cargo pods on a scan"]),
     "escape-pod": ([], ["Fixed fit: a lifeboat. Flight mount only"]),
-    "aurel-tacet": ([], ["Sealed: no slots a pilot can reach"]),
     "rr-grab": ([], ["Fixed fit (bay product): claw and tow line"]),
     "lw-dredge": ([], ["Fixed fit (bay product): clan salvage subcraft"]),
 }
@@ -55,6 +54,15 @@ def fit_for(e):
     gen, role = e.get("gen"), e.get("role")
     bonus, builtin, frame = [], [], []
 
+    if race in ("aurel", "unsung"):
+        what = {"watcher": "Sees everything in range and cannot be locked by human sensors", "warden": "Lances that unmake a voice; a field that turns human weapons", "silencer": "Sleeps gates, mutes the Lattice, blinds relays in its range",
+                "tender": "Mends any hull in its cradle; retunes a faded pilot", "wayfarer": "A long-range drive: crosses broken lanes and the Shoals", "great voice": "Five voices: everything the others do, at once",
+                "dead voice": "Nothing: a husk is salvage", "test": "Unknown; it never sang"}
+        job_l = job.lower(); role_w = next((v for kk, v in what.items() if kk in job_l), "Beyond human at its one purpose")
+        builtin = ["Sealed voice: no slots, no modules, nothing fitted or fitted out", role_w, "Self-mending: the fields knit the segments", "No transponder: reads as unknown"]
+        if race == "unsung": builtin[1] = "Hollow: " + role_w.lower() + ", and it reaches for minds"
+        frame = ["T3, beyond human: the best at its one job; a ship is what it is, whoever flies it"]
+        return {"bonus": [], "builtin": builtin, "frame": frame}
     if k in OVERRIDE:
         bonus, builtin = [list(x) for x in OVERRIDE[k]]
     elif cls in ("drone", "pod", "voice"):
