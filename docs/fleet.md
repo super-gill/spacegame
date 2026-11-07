@@ -664,7 +664,7 @@ Jason's direction, 7 November 2026: civil T3s follow the military shape. They ar
 | Solace | Solace Grace | Hospital ship | Keeps a fleet alive under fire: repair and regen at a rate nothing human matches | Regen nanites grown on Lattice seed |
 | Halden | Halden Threshold | Explorer | Reads a broken gate; the first hull built to cross the Shoals, if a drive ever exists | Gate-glass sensors that see the lanes |
 | Arbor | Arbor Grove | Drone tender (capital) | Runs a drone swarm nothing else can control | A Lattice-derived control lattice, literally |
-| Corvane | Corvane Colossus | Gas refinery | Refines at a rate that makes a system's market move | Furnaces lined with gate-glass |
+| Corvane | Corvane Colossus | Strip-miner (capital) | Swallows an asteroid whole and mines it in one pass; the only hull that takes a rock rather than cutting at it | A gate-glass crusher throat that breaks what no cutter can |
 | Meridian | none | | Meridian builds cheap; its prototype is the Tern, thirty years ago | |
 
 The clans' hulls (Saro Farwalker, Waystar; Long Wake Trawl, Dredge) are the Belt's civil T3s and stay as they are: no Lattice, just generations of knowing.

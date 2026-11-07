@@ -254,6 +254,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: Corvane Colossus re-roled from gas refinery to strip-miner (the T3 capital) after Jason's review; `fleet.md`, `lore.md`, `hulls.md` updated. Catalogue ids unchanged.
 - 2026-11-07, lore: civil pass 4 drawn (Meridian, Corvane, the nine prototypes, the drones, the Aurel; 27 hulls, six new legacy entries). `hulls.md` regenerated (165 hulls, 164 drawn) and now carries an entry per hull with role, intention and description. Catalogue ids unchanged. No rule changes.
 - 2026-11-07, lore: civil pass 3 fixes from Jason's review (bands and nacelle layering on every Venusian hull, Coastguard included; Lavinia's vacuum hulls as frames); drones recorded as pure machines in `hull-terms.md`. No rule changes.
 - 2026-11-07, lore: civil pass 3 drawn (Solace, Halden, Arbor, Lavinia, and the Saro and Long Wake civil hulls, 16 hulls). Catalogue ids unchanged. `hulls.md` regenerated (159 hulls, 137 drawn). No rule changes.
