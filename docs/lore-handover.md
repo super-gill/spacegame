@@ -49,7 +49,7 @@ Needed for the re-fit now: `lore-pivot-audit.md` (the renames), `sol.md` (the ma
 
 ## The navy as a system (summary; `navy.md` is the page)
 
-Security by influence (Core, Held, Contested, Open); five rungs with each power's hulls; escalation by what was witnessed, ending on leave, dock and pay, capture or death; rules of engagement (never pods; never first on a lit transponder; one hail for dark); wanted follows the hull first and the pilot second, per power, not omniscient; amnesty always purchasable, work-off possible; stop and scan as the common interaction; task groups with civilian hulls in navy service; each navy's character; no open war, Earth and Mars mostly hostile with skirmishes in Contested systems; bases decide response time.
+Security by connectivity (Core, Held, Contested, Open; read from the Relay, `infrastructure.md`); five rungs with each power's hulls; escalation by what was witnessed, ending on leave, dock and pay, capture or death; rules of engagement (never pods; never first on a lit transponder; one hail for dark); wanted follows the hull first and the pilot second, per power, not omniscient; amnesty always purchasable, work-off possible; stop and scan as the common interaction; task groups with civilian hulls in navy service; each navy's character; no open war, Earth and Mars mostly hostile with skirmishes in Contested systems; bases decide response time.
 
 ## Intentions (direction, not yet designed)
 
