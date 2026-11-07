@@ -93,5 +93,5 @@ Suggests `generation` and, where it applies, `base` (the hull this one came befo
 
 On the hull entry: `class`, `weight`, `tier`, `generation`, `navy` (tag), `role` (T3 only), `base` (successor, source or pattern base), `maker`, `power` or `independent`, `patterns` (list of pattern hull ids), sale route.
 On the owned ship: `grade` (navy / civilian / udf / cooperative / none) and, for Union pattern, the rota state that sets it. Its transponder line (`lore.md`, "What a transponder says"): `name` (the pilot's), `flag` (E, M, V, B or A), `registry` (`CR-` plus flag letter plus six digits, fixed for the hull's life), `hullNumber` (navy and UDF only, class letter plus number) and the prefix, which follows from service, rota state, the Mercy Clause and flag.
-On the pilot: standing per power, company, cooperative and clan; licences and their duty ledgers.
+On the pilot: standing per power, company, cooperative and clan; licences and their duty ledgers; home station; `continuity` (the Fade, one way only) and the flags `ironman` and `voiced` (`lore.md`, "Death and the Return").
 Systems the terms imply, in dependency order: standing and licences; the Navy tag bonus and the grade flag; the used market with legacy and retired navy; patterns as variants; the Belt rota; then, when T3 hulls exist, locks, beacons, jumps, the pin and hunting groups.

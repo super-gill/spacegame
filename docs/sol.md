@@ -4,7 +4,7 @@ Status: canon for the game, written 7 November 2026 by the lore chat (`ws/lore`)
 
 ## The shape
 
-Sol is the home system and the safe core of known space, but it is not safe everywhere. Security follows the powers' reach (the levels are `navy.md`'s):
+Sol is the home system and the safe core of known space, but it is not safe everywhere. Security follows the powers' reach and the Accord's Relay (the levels are `navy.md`'s; security is connectivity, `infrastructure.md`):
 
 - **Core** round each power's home world and capital port, and along the **Accord lanes** between them. The navy is close and does not stop coming.
 - **Held** round the bodies each power owns farther out. Patrols come; the navy comes late.

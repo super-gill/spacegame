@@ -333,7 +333,7 @@ The Belt's ship-born clans build a few hulls each, over generations, and no two 
 
 ## Aurel
 
-Silent and musical terms given by human scholars. No yards, no companies; every ship is a voice.
+Silent and musical terms given by human scholars. No yards, no companies; every ship is a voice. Aurel ships are top tier: each the best at what it does, beyond human technology. In human hands they come only as husks, the one on the pad, or the gift to the Voiced (`lore.md`, "Death and the Return").
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
