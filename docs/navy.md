@@ -20,16 +20,16 @@ Status: first write, 7 November 2026, from Jason's direction. The navy is primar
 
 The old rule was: local system law enforcement, weak but responsive, based on standing; it defends you if it likes you and you raised a distress beacon, then escalates as required. That rule stands, with one change of ownership. There is no separate local law in Sol: the local law is the holder's navy patrol, flying a beat in that power's space, and a station's own security inside its zone. Outside Sol, who holds a system decides whose patrol it is, how many there are and how fast they come; where nobody holds it, there is no law and the pirates know it.
 
-## Security by influence
+## Security by connectivity
 
-Sol is the first system built and it is alive. Within Sol the levels vary by region (Core round the capitals and on the Accord lanes, Held and Contested farther out, Open past Saturn); `sol.md` maps them. Later systems take a security level from the owning power's influence, which is where the conflicts between Earth, Mars and the Belt happen.
+Security is connectivity (Jason, 7 November): a region's level is a live reading of how much of it the Relay covers, how many links lead back to the holder, and how close the holder's bases are (`infrastructure.md`). Cut the relays and the level drops; build them and it rises. Distress calls and witness records travel only on the Relay. Within Sol the levels vary by region (Core round the capitals and on the Accord lanes, Held and Contested farther out, Open past Saturn); `sol.md` maps them. Later systems take their level from the Relay their holder has built and kept, which is where the conflicts between Earth, Mars and the Belt happen.
 
 | Level | Where | Who is there | Response |
 | --- | --- | --- | --- |
 | **Core** | Sol: each power's home volume, the capital ports, the lanes between them | Station security, beat patrols on every lane, a reserve at every major port, the navy within an hour's burn | Fast and heavy. A witnessed crime brings a patrol in minutes and it does not stop coming. |
 | **Held** | A system one power clearly holds | Beat patrols on the main lanes, a reserve at the capital port only | Patrols come; the navy comes for big things, late. |
 | **Contested** | A system two powers claim, or a Marches system with a thin presence | One or two patrols, no reserve, two navies watching each other | Slow and thin, and the two sides may be busier with each other than with you. Skirmishes happen here. |
-| **Open** | Nobody's | Station security where there is a station, nothing else | None. Distress beacons reach nobody who will come. |
+| **Open** | Nobody's; no Relay | Station security where there is a station, nothing else | None. Off the Relay a distress beacon reaches only ships in the caller's own comms range. |
 
 Calder as built is a Held system with one Watch and three ports, which is why one Warrant on a beat is enough.
 
