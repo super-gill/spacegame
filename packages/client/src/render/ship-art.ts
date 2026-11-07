@@ -1,3 +1,4 @@
+import { hullPicture, spritesFor, turretPicture } from './sprites.js';
 import type { HullSpec, ManufacturerSpec, ModuleKind, ModuleSize, ModuleSpec, MountPoint, PowerId, ShipStats, Thrusters, WeaponState } from '@spacegame/sim';
 
 /**
@@ -69,6 +70,8 @@ export function drawShipArt(ctx: CanvasRenderingContext2D, scale: number, art: S
   ctx.lineCap = 'round';
 
   if (art.thrusters) drawThrust(ctx, px, art);
+  // The hull's picture from the art, once it has one and it has loaded (render/sprites.ts); the vector drawing until then.
+  if (drawSprite(ctx, scale, px, art)) return;
   if (art.hull.escapePod) {
     drawPod(ctx, px, art);
     return;
@@ -170,6 +173,47 @@ function drawPod(ctx: CanvasRenderingContext2D, px: (n: number) => number, art: 
   ctx.lineTo(stern - 2, 2.6);
   ctx.lineTo(stern, 2);
   ctx.stroke();
+}
+
+/**
+ * The ship from its sprite (docs/ship-pipeline.md): the bare hull picture,
+ * then each fitted weapon's picture at its mount, turned to its aim. Mounts
+ * sit where the art marks them, else where the game's table has them (a
+ * PDC the art does not draw). Other modules are inside the hull and not
+ * drawn. Returns false, drawing nothing, if the hull has no ready sprite
+ * or its picture has not loaded: the caller draws the vector ship. The
+ * outfitting view keeps the vector drawing for its sockets and highlights.
+ */
+function drawSprite(ctx: CanvasRenderingContext2D, scale: number, px: (n: number) => number, art: ShipArt): boolean {
+  if (art.showMounts) return false;
+  const sprites = spritesFor(art.hull);
+  if (!sprites) return false;
+  const dpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1;
+  const hull = hullPicture(sprites, 2 * sprites.radius * scale * dpr);
+  if (!hull) return false;
+  const across = hull.picture.pixels * hull.picture.unitsPerPixel;
+  ctx.drawImage(hull.img, -across / 2, -across / 2, across, across);
+
+  const marked = new Map(sprites.mounts.map((m) => [m.id, m]));
+  for (const mount of art.hull.mounts) {
+    const id = art.fit[mount.id];
+    const module = id ? art.modules[id] : undefined;
+    if (!module || module.kind !== 'weapon') continue;
+    const at = marked.get(mount.id) ?? mount.position;
+    const aim = turretAim(art, mount) ?? mount.facing;
+    ctx.save();
+    ctx.translate(at.x, at.y);
+    const turret = turretPicture(module);
+    if (turret) {
+      ctx.rotate(aim);
+      const size = turret.picture.pixels * turret.picture.unitsPerPixel;
+      ctx.drawImage(turret.img, -size / 2, -size / 2, size, size);
+    } else {
+      drawModule(ctx, px, module, mount, art, aim);
+    }
+    ctx.restore();
+  }
+  return true;
 }
 
 /** Hull-space aim of the turret on this mount, or null if it is not a turret. */

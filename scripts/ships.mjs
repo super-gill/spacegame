@@ -120,7 +120,8 @@ function main() {
       }
       liveries[livery] = pictures;
     }
-    index.hulls[id] = { radius: hull.radius, liveries };
+    // The mounts the art marks, so the game draws fitted weapons where the picture has its sockets.
+    index.hulls[id] = { radius: hull.radius, liveries, mounts: hull.mounts.map((m) => ({ id: m.id, type: m.type, x: m.x, y: m.y })) };
   }
 
   for (const stem of Object.keys(turrets).sort()) {

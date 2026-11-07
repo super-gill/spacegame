@@ -87,6 +87,17 @@ Turrets at 3 pixels per world unit only. Deterministic: the same SVG gives the s
 - **No fonts:** `resvg` loads no system fonts (`loadSystemFonts: false`). With them it spent 45 of 50 seconds loading every installed font for every picture. The cost is that stencil text is not drawn in sprites (`ship-standards.md`, "Valid SVG").
 - `@resvg/resvg-js` is a dev dependency at the repo root, installed by `npm install` with a prebuilt binary for Windows, macOS and Linux.
 
+## Game side as built (7 November 2026, Lead 9)
+
+`packages/client/src/render/sprites.ts` and `render/ship-art.ts`.
+
+- **Which hulls:** a hull draws from its sprite only when every main weapon mount (`high`) the game has is marked in the art, so turrets never float off the hull. Ready today: the Tern, the Walkout and the Ark. Every other hull keeps the vector drawing until its mounts are marked (step 2's worklist, `art/ships/report.md`).
+- **Loading:** `sprites.json` is fetched once; a hull picture or turret picture is fetched the first time it is needed and kept. Until it arrives the ship draws as vector, so nothing waits on a download.
+- **Size:** the smallest picture at least 90% of the pixels the ship covers on screen (device pixels), else the largest.
+- **Turrets:** at the art's marked mount (the game's mount if the art lacks it), turned to the turret's aim; a weapon with no turret picture draws its vector part there instead.
+- **Kept as vector:** the fitting screen's mount view, plumes, shields and markers. The sprite does not take the role tint or the dashed outline of an empty ship; fading still applies.
+- **Not yet:** the catalogue still takes outlines and mount positions from `hulls.ts`. It reads `ships.json` when step 2's hull list is agreed.
+
 ## The wrapper
 
 Built: `server.bat ships` (or `node scripts/server.mjs ships`, `--all` to ignore the hashes) rebuilds the sprites and the client, with no restart (the server reads the client's files on each request); players press Ctrl+F5. `update` builds the sprites as part of `npm run build`, so a ship the art changed shows after the next update with nothing else to do. The roadmap's "actual wrapper" (Jason) grows from here; whatever form it takes, the sprite build stays one script it calls.

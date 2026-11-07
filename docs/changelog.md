@@ -4,6 +4,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+
+- **Ship art in flight**: the Tern, the Walkout and the Ark are drawn from their artwork, with turrets on top that turn to aim. Other hulls keep the line drawing until their art is ready.
+- **Ship sprite build** (`npm run ships`, `server.bat ships`): builds every hull and turret picture from `art/ships/`, as part of every build and update.
+- **Ship export and standards** (`art/registry/export.py`, `docs/ship-standards.md`, `docs/ship-pipeline.md`).
+
 ## [0.19.0] - 2026-11-07
 
 Sol slice 2: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes; the Accord's Relay and security worked out from it; traffic that burns, patrols by navy, pirates where nobody answers, and ships on the chart. Played by Jason.
