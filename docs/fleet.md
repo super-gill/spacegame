@@ -503,6 +503,10 @@ Decided 6 November 2026, for whoever draws hulls (the registry page, the canvas,
 - **Good detail.** Panel lines, hatches, docking collars, running lights, antennae, radiators, drive bells, and the company's signature features: Tessaract's container racks, Belt Forge's exposed trusses and clamps, Seraphine's overlapping plates, Arcadia's identical bolted modules, Solace's crosses and floodlights. Detail is for the close-up and the fitting window; the silhouette must still read at game zoom, which is what the registry's full, no-detail and silhouette levels are for.
 - **Colour tells you three things at once:** the role (industrial hazard markings, medical white, freight company liveries, navy grey or the navy's colour), the company (its primary), and the power (the registry flash). A pilot should be able to say "Belt industrial", "Earth navy" or "Venusian medical" from colour alone before reading a name.
 - **Mounts show.** Every fitted module has a visible silhouette at its mount, as today; a hull with spare mounts shows the empty sockets up close.
+- **Nothing floats** (7 November): every component ties to the hull or frame it hangs off (struts, posts, pivots); nav lights sit on component edges.
+- **No stern slashes** (Jason, 7 November): the short diagonal radiator strokes at the stern corners read as scratches and are gone from every hull. Radiators, where a hull needs them, are drawn as fins or panels with a mount.
+- **Company bands hug the hull edge** and sit under every fitting; nacelles sit under the hull (7 November).
+- **Drones are machines**, never fighter-shaped; **capitals never carry the tool** of their industry (7 November).
 
 ## Scale
 

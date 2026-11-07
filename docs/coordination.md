@@ -260,6 +260,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: art pass 5 (the twelve gap-pass entries; 177 of 178 drawn); stern radiator slashes removed fleet-wide; art rules gathered in `fleet.md`; Sol Chart page published. `hulls.md` regenerated.
 - 2026-11-07, lore: one name per station (Jason), each in its runner's official style; the full list is in `sol.md`.
 - 2026-11-07, lore: navy names decided by Jason: Earth Charter Fleet (ECF), Martian Republic Navy (MRN), Venusian Space Guard (VSG), Union Defence Force (UDF); the Militia tag becomes the UDF tag. Applied to the lore pages and `hulls.md`; added to the pivot audit word list for the lead's files. No ids changed.
 - 2026-11-07, lore: Sol answers from Jason: all of Sol first, bodies enormous, Venus a start; station naming rule and five renames; navy names proposed (the Vigil, the Lifeline).
