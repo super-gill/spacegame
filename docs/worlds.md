@@ -57,6 +57,10 @@ A world of its own in each server: never saved, never touching the persistent wo
 4. Waves and To the death.
 5. The two-server setup: the batch files, the login switch, docs in hosting.md. Jason starts the dev server and the live server takes releases from then on.
 
+## Decided: no Dev world (Jason, 7 November 2026)
+
+With all of Sol built, Dev as a world of its own is gone: the persistent world is the Universe (Sol) on every server, and the mode screen has two cards, Universe and Arena. A small disconnected scenario system was floated and dropped ("if we don't need it, bin it"). `ServerKind` stays for the live and dev server split, which is parked until the functional game (`roadmap.md`). This supersedes the decision below.
+
 ## Decided: no Universe until the map (Jason, 6 November 2026)
 
 Jason: Calder, the world on his server today, is the dev world; the persistent Universe is built out with the map (8). So every server is a dev server for now: its persistent world is called **Dev** and is what the mode screen enters, and the Universe card is greyed ("comes with the map"). `SPACEGAME_SERVER=live` (unset means `dev`) is there for the live server when it comes: it names the persistent world the Universe and greys Dev instead. Until then the live server of "The two servers" waits; step 5's batch files and login switch move with it. **Open:** whether Dev is operators only now, as the table above says, or open to everyone on his server until the Universe exists (today it is open to everyone).

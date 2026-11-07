@@ -30,15 +30,16 @@ export const WORLD_IDS: readonly WorldId[] = ['persistent', 'arena'];
 
 /**
  * Which server this is (docs/worlds.md, "The two servers"): `dev` runs
- * `main` and its persistent world is Dev (Calder, Jason's save); `live`
- * runs releases and its persistent world is the Universe, which waits
- * for the map (8). Every server is `dev` until then.
+ * `main`, `live` runs releases. Every server is `dev` for now; the split
+ * is parked until the functional game (docs/roadmap.md). Both call their
+ * persistent world the Universe (Jason, 7 November 2026: Dev as a world
+ * of its own is gone).
  */
 export type ServerKind = 'dev' | 'live';
 
-/** What a server's persistent world is called. */
-export function persistentName(server: ServerKind): string {
-  return server === 'dev' ? 'Dev' : 'Universe';
+/** What a server's persistent world is called: the Universe on every server. */
+export function persistentName(_server: ServerKind): string {
+  return 'Universe';
 }
 
 /** The longest character name, in characters. */

@@ -1,4 +1,4 @@
-import { persistentName, type ServerKind, type WorldId } from '@spacegame/sim';
+import type { ServerKind, WorldId } from '@spacegame/sim';
 
 /**
  * Game menu (F2, or the Menu button): your character and key, the world
@@ -113,7 +113,7 @@ export class MenuPanel {
 
     // Where you are, and the way out (docs/worlds.md, "Screens").
     this.panel.append(el('h2', undefined, 'Mode'));
-    this.panel.append(el('p', undefined, world === 'arena' ? 'In the Arena. Nothing here carries over.' : `In ${persistentName(server)}.`));
+    this.panel.append(el('p', undefined, world === 'arena' ? 'In the Arena. Nothing here carries over.' : 'In the Universe.'));
     const modeRow = el('div', 'menu-row');
     if (world === 'arena') modeRow.append(button('Leave the fight', () => actions.leaveFight()));
     modeRow.append(button('Back to modes', () => actions.backToModes()));
