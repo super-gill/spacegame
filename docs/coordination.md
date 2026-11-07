@@ -260,6 +260,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: one name per station (Jason), each in its runner's official style; the full list is in `sol.md`.
 - 2026-11-07, lore: navy names decided by Jason: Earth Charter Fleet (ECF), Martian Republic Navy (MRN), Venusian Space Guard (VSG), Union Defence Force (UDF); the Militia tag becomes the UDF tag. Applied to the lore pages and `hulls.md`; added to the pivot audit word list for the lead's files. No ids changed.
 - 2026-11-07, lore: Sol answers from Jason: all of Sol first, bodies enormous, Venus a start; station naming rule and five renames; navy names proposed (the Vigil, the Lifeline).
 - 2026-11-07, lore: new `docs/sol.md` mapping Sol for the first build (ownership and security by region, lanes, stations, resources, hazards, starts by power and path). Scale and layout left to the lead. `lore.md` and `navy.md` point to it.

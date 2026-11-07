@@ -19,10 +19,10 @@ The Ceres Accord opened the lanes to all: Earth takes the tolls, Mars runs the p
 
 | Lane | From, to | Notes |
 | --- | --- | --- |
-| The Inner Lane | Thetis High (Venus), the Exchange (Earth), Elysium High (Mars) | The busiest lane in known space |
-| The Ceres Lane | Elysium High to Ceres Station | Where Mars meets the Belt |
-| The Belt Lane | Ceres Station to Slagline (Pallas) | Belt patrols here, not Martian; the Belt wrote it into the Accord |
-| The Long Lane | Ceres Station, Surety (Callisto), Titan Free Port | Thin: Held, not Core, past Jupiter |
+| The Inner Lane | Thetis Orbital (Venus), Earth Orbital Exchange (Earth), Republic Station Elysium (Mars) | The busiest lane in known space |
+| The Ceres Lane | Republic Station Elysium to Ceres Accord Station | Where Mars meets the Belt |
+| The Belt Lane | Ceres Accord Station to Slagline (Pallas) | Belt patrols here, not Martian; the Belt wrote it into the Accord |
+| The Long Lane | Ceres Accord Station, Callisto Freight Depot (Callisto), Titan Free Port | Thin: Held, not Core, past Jupiter |
 | The Gate Lane | Titan Free Port to the Gate Reach | Long, empty, Held by MRN patrol, Core at the end |
 
 Off the lanes, security drops a level.
@@ -68,26 +68,26 @@ Real distances from the Sun in astronomical units, for order only.
 
 Stations orbit bodies, sit at Lagrange points or are dug into rock. Each power has one **capital port**, an enormous station in orbit round its home world where its navy's reserve lives (`navy.md`, "Bases"). Every station names who runs it and what it is for; services follow the existing station model (market, outfitting floor, ship mart).
 
-Station names follow the power or company that runs them (Jason, 7 November):
+Every station has **one name**, used on the board, in comms and in dialogue alike (Jason, 7 November: one actual name prevents confusion). The name is in the official style of whoever runs it, so how formal a name sounds is itself flavour:
 
-| Who runs it | Naming flavour | Examples |
+| Who runs it | Official style | Names |
 | --- | --- | --- |
-| Earth | Contracts, law and money | The Exchange, Charter Yard, Surety, Tollgate, Vesta Concession |
+| Earth | Corporate and legal; the navy's acronym on navy stations | Earth Orbital Exchange, ECF Yard L5, Tessaract Freight Yard L4, Callisto Freight Depot, ECF Toll Station, Vesta Concession |
 | Luna | Old Lunar places | Tycho Port |
-| Mars | Martian places and virtues | Elysium High, Stickney Yard, Swift Yard, Eureka, Fortitude |
-| Venus | Venusian highlands, the evening star, care | Thetis High, Alpha Dock, Beta Regio Observatory, Mercy, Vesper Haven |
-| The Belt | Mining trades, strike words, Belter slang | Slagline, Bellows, the Boneyard, Rimehold, Plume, Psyche Dig, the Ganymede Local |
-| The clans | Gatherings | Moot, Triton Moot |
-| The Accord | Plain place names: it owns nothing and claims no flavour | Ceres Station, Titan Free Port |
-| Companies | Their own naming theme (`lore.md`, "Naming themes") | Apollo Works and Caloris Furnace (Corvane heavy plant), Sweep (Rook and Rivet shop talk) |
+| Mars | State and military: Republic, State, MRN | Republic Station Elysium, MRN Yard Phobos, State Yard Deimos, State Mine Eureka, MRN Gate Station |
+| Venus | Civic: the place, the service or the company | Thetis Orbital, Solace Station Mercy, Lavinia Alpha Dock, Halden Beta Regio Observatory, VSG Haven Europa |
+| Companies elsewhere | Company, place, function | Corvane Apollo Works, Corvane Caloris Foundry, Rook and Rivet Shell Station |
+| The Belt | Informal is the Belt's official style: the Belt registers what it calls things | Slagline, Bellows, the Boneyard, Psyche Dig, the Ganymede Local, Rimehold, Plume |
+| The clans | Gatherings | Hilda Moot, Triton Moot |
+| The Accord | Plain treaty language | Ceres Accord Station, Titan Free Port |
 
 ### The navies in Sol
 
 | Power | Navy | Called in the street | Home | In Sol |
 | --- | --- | --- | --- | --- |
-| Earth | **The Earth Charter Fleet (ECF)** | the Charter, the ECF | Charter Yard | Earth's volume, the toll ends of every lane, Tollgate; mostly contracted pilots |
-| Mars | **The Martian Republic Navy (MRN)** | the Navy, the MRN | Stickney Yard | Mars's volume, the Accord lanes Sol-wide, Fortitude at the gate. Doctrinal and militant: a state navy of a parliament and a general staff |
-| Venus | **The Venusian Space Guard (VSG)** | the Guard | Thetis High | Venus's volume and Vesper Haven. A guard, not a force: rescue first, arrest second, never the first to fire |
+| Earth | **The Earth Charter Fleet (ECF)** | the Charter, the ECF | ECF Yard L5 | Earth's volume, the toll ends of every lane, ECF Toll Station; mostly contracted pilots |
+| Mars | **The Martian Republic Navy (MRN)** | the Navy, the MRN | MRN Yard Phobos | Mars's volume, the Accord lanes Sol-wide, MRN Gate Station at the gate. Doctrinal and militant: a state navy of a parliament and a general staff |
+| Venus | **The Venusian Space Guard (VSG)** | the Guard | Thetis Orbital | Venus's volume and VSG Haven Europa. A guard, not a force: rescue first, arrest second, never the first to fire |
 | The Belt | **The Union Defence Force (UDF)** | the Rota (a shift), the UDF | Slagline | The Belt Lane, Pallas, Hygiea, the Belt's Held stations; cooperatives on shift |
 
 Older pages and dated history say the Charter Fleet, the Martian Navy, the Coastguard and the Union Militia; those are the same forces under their old working names. Fitted out by Union Defence Works, crewed by cooperatives on shift: the UDF tag is the Belt's Navy tag.
@@ -96,64 +96,64 @@ Older pages and dated history say the Charter Fleet, the Martian Navy, the Coast
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **Thetis High** | Venus, high orbit | The Venusian Assembly | Venus's capital port and the top of the cloud cities' elevator. The Space Guard's home; Ishtar Fleet Works' ship mart; cheap medicine and chemicals |
-| **Mercy** | Venus, trailing orbit | Solace Medical | Solace's yard and hospital, and the seat of the Mercy Clause. Every navy's support hulls are bought here |
-| **Alpha Dock** | Venus, low orbit, over the cloud tops | Lavinia Atmospherics | The skimmer port: Lavinia's yard, gas market, the first dive for every skimmer pilot |
-| **Beta Regio Observatory** | The Sun-Venus L1 point | The Halden Institute | Research and survey; Halden's yard; Arbor Dynamics' drone works next door |
+| **Thetis Orbital** | Venus, high orbit | The Venusian Assembly | Venus's capital port and the top of the cloud cities' elevator. The Space Guard's home; Ishtar Fleet Works' ship mart; cheap medicine and chemicals |
+| **Solace Station Mercy** | Venus, trailing orbit | Solace Medical | Solace's yard and hospital, and the seat of the Mercy Clause. Every navy's support hulls are bought here |
+| **Lavinia Alpha Dock** | Venus, low orbit, over the cloud tops | Lavinia Atmospherics | The skimmer port: Lavinia's yard, gas market, the first dive for every skimmer pilot |
+| **Halden Beta Regio Observatory** | The Sun-Venus L1 point | The Halden Institute | Research and survey; Halden's yard; Arbor Dynamics' drone works next door |
 
 ### Earth and Luna
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **The Exchange** | Earth, geostationary, at the top of the main elevator | The Board | Earth's capital port. The Exchange itself, the courts, Tessaract's headquarters; the richest market in known space; a Registry office |
-| **Charter Yard** | The Earth-Moon L5 point | Kessari Orbital Defence | Earth's naval yard and the Earth Charter Fleet's reserve. Licence holders only past the outer ring |
-| **Tessaract Yard** | The Earth-Moon L4 point | Tessaract Logistics | The freight yard: haulers to superfreighters, Earth's ship mart for trade |
+| **Earth Orbital Exchange** | Earth, geostationary, at the top of the main elevator | The Board | Earth's capital port. The Exchange (the market) itself, the courts, Tessaract's headquarters; the richest market in known space; a Registry office |
+| **ECF Yard L5** | The Earth-Moon L5 point | Kessari Orbital Defence | Earth's naval yard and the Earth Charter Fleet's reserve. Licence holders only past the outer ring |
+| **Tessaract Freight Yard L4** | The Earth-Moon L4 point | Tessaract Logistics | The freight yard: haulers to superfreighters, Earth's ship mart for trade |
 | **Tycho Port** | Luna | Lunar old money | Luna's port: Novum Systems and Vantage Aerospace, electronics and fighters; Luna acting like a fifth power |
-| **Apollo Works** | The Near Field, in a near-Earth orbit | Corvane Heavy Industries | The foundry for Earth's near-Earth rock, worked by Corvane crews and Belt contractors |
-| **Sweep** | Earth, low orbit, in the Shell | Rook and Rivet, under Earth licence | The debris contractor: a salvage port for the Shell |
+| **Corvane Apollo Works** | The Near Field, in a near-Earth orbit | Corvane Heavy Industries | The foundry for Earth's near-Earth rock, worked by Corvane crews and Belt contractors |
+| **Rook and Rivet Shell Station** | Earth, low orbit, in the Shell | Rook and Rivet, under Earth licence | The debris contractor: a salvage port for the Shell |
 
 ### Mercury
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **Caloris Furnace** | Mercury | Corvane Heavy Industries | A solar smelter: sunlight for heat, buys ore from anywhere and sells metal cheap. Ships come in hot and leave fast |
+| **Corvane Caloris Foundry** | Mercury | Corvane Heavy Industries | A solar smelter: sunlight for heat, buys ore from anywhere and sells metal cheap. Ships come in hot and leave fast |
 
 ### Mars
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **Elysium High** | Mars, high orbit | The Martian parliament | Mars's capital port; the market, the Registry office, the top of the elevator |
-| **Stickney Yard** | Phobos | Seraphine Naval Yards | The Martian Republic Navy's home and naval yard. Licence holders only past the dock |
-| **Swift Yard** | Deimos | Arcadia Works | The state's civil yard; Martians first at the ship mart |
-| **Eureka** | The Mars L5 Trojans | Arcadia Works | The state's mining station over Mars's Trojan rocks |
+| **Republic Station Elysium** | Mars, high orbit | The Martian parliament | Mars's capital port; the market, the Registry office, the top of the elevator |
+| **MRN Yard Phobos** | Phobos | Seraphine Naval Yards | The Martian Republic Navy's home and naval yard. Licence holders only past the dock |
+| **State Yard Deimos** | Deimos | Arcadia Works | The state's civil yard; Martians first at the ship mart |
+| **State Mine Eureka** | The Mars L5 Trojans | Arcadia Works | The state's mining station over Mars's Trojan rocks |
 
 ### The Belt
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **Ceres Station** | Ceres | The Ceres Accord | The Accord's secretariat and the **Ceres Registry**: the free port at the centre of Sol, neutral by treaty, Core security from all four powers. Meridian's main dealership, every maker's modules, the Null Ledger's favourite backstreet |
+| **Ceres Accord Station** | Ceres | The Ceres Accord | The Accord's secretariat and the **Ceres Registry**: the free port at the centre of Sol, neutral by treaty, Core security from all four powers. Meridian's main dealership, every maker's modules, the Null Ledger's favourite backstreet |
 | **Slagline** | Pallas, dug in | The Belt's cooperatives | The Belt's capital port: the delegates' hall, Union Defence Works' refit shop, Slagline Motors. UDF rota office |
 | **Vesta Concession** | Vesta | Corvane, on Earth's ore rights | The inner Belt's foundry. Belt crews cut under Earth licence and resent every tonne |
 | **Psyche Dig** | Psyche | Nobody agrees | The platinum rock's only station, a Belt cooperative with a Corvane lease on half of it and a Earth Charter Fleet frigate parked off the other half |
 | **Bellows** | Hygiea | Belt Forge Collective | Belt Forge's home yard: the mining hulls, the ice cutters, the best mining kit in known space |
 | **The Boneyard** | The outer Belt | Rook and Rivet | The breaking yard: where hulls go to become Patchplate; the salvage market of Sol |
-| **Moot** | The Hildas, wherever the clans anchor it | The clans | A clan gathering: hulks lashed together; the Vesk, Saro and Long Wake trade here, outsiders by invitation |
+| **Hilda Moot** | The Hildas, wherever the clans anchor it | The clans | A clan gathering: hulks lashed together; the Vesk, Saro and Long Wake trade here, outsiders by invitation |
 
 ### The outer system
 
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
-| **Surety** | Callisto, outside Jupiter's radiation | Earth (Tessaract) | Earth's farthest Held port: water and fuel for the Long Lane. Named, like Earth's ports, in the language of contracts |
+| **Callisto Freight Depot** | Callisto, outside Jupiter's radiation | Earth (Tessaract) | Earth's farthest Held port: water and fuel for the Long Lane. Named, like Earth's ports, in the language of contracts |
 | **The Ganymede Local** | Ganymede | A Belt cooperative, Earth claims the ground under it | The biggest settlement past the Belt, named like a union branch; contested in court and sometimes in orbit |
-| **Vesper Haven** | Europa | Solace Medical, under Venus | A Haven (Venusian security zone): rescue for anyone who strays into Jupiter's radiation. Named for Venus as the evening star |
+| **VSG Haven Europa** | Europa | Solace Medical, under Venus | A Haven (Venusian security zone): rescue for anyone who strays into Jupiter's radiation. Named for Venus as the evening star |
 | **Titan Free Port** | Titan | The Ceres Accord | The outer free port: carbon, fuel, crews; the last full market before the Gate Lane |
 | **Rimehold** | Saturn's rings | Belt Forge, for the cooperatives | The ice-cutters' station on the rings |
 | **Plume** | Enceladus | A Belt cooperative | Water harvested from the south-pole plumes |
 | **Triton Moot** | Triton, Neptune | The clans | The clans' far port, the last stop before the Kuiper dark |
-| **Tollgate** | The Gate Reach | Kessari Orbital Defence | The toll station at the gate: Earth collects |
-| **Fortitude** | The Gate Reach | The MRN (Mars) | The navy station at the gate: Mars watches |
+| **ECF Toll Station** | The Gate Reach | Kessari Orbital Defence | The toll station at the gate: Earth collects |
+| **MRN Gate Station** | The Gate Reach | The MRN (Mars) | The navy station at the gate: Mars watches |
 
-Pirate bases are not stations on any chart: the **Black Strike** keeps hidden docks in the Jupiter Trojans and the Hildas' edges; the **Null Ledger** works the backstreets of Ceres, the Exchange and Titan; the **Cutloose** shelter in the Kuiper dark. The Hollow Choir is not in Sol; only rumours of it reach the Gate Reach.
+Pirate bases are not stations on any chart: the **Black Strike** keeps hidden docks in the Jupiter Trojans and the Hildas' edges; the **Null Ledger** works the backstreets of Ceres, Earth Orbital Exchange and Titan; the **Cutloose** shelter in the Kuiper dark. The Hollow Choir is not in Sol; only rumours of it reach the Gate Reach.
 
 ## Resources, by place
 
@@ -189,7 +189,7 @@ No exotic is mined in Sol (`materials.md`); breaching here finds platinum and ra
 
 - **Earth** owns its world, Luna, the near-Earth space and the Lagrange yards (Core), Mercury's orbit (Held), the inner Belt's ore rights (Held, contested by the Belt in every negotiation), Callisto (Held, an island on the Long Lane), and the tolls at the gate. Earth builds no miners: its rock is worked by Corvane and by Belt crews under licence.
 - **Mars** owns its world, its moons and its Trojans (Core). It holds no outer territory, and does not need any: by the Accord, the MRN runs the patrols on every Accord lane in Sol except the Belt Lane, and the picket at the gate. Martian patrols are the commonest navy ship a pilot sees outside Earth's volume.
-- **Venus** owns its world, its orbit and its capital port (Core), and nothing else in Sol but its stations: Mercy, Alpha Dock, the Beta Regio Observatory, and Vesper Haven, a Venusian security zone in Jupiter's radiation because nobody else will run rescue there.
+- **Venus** owns its world, its orbit and its capital port (Core), and nothing else in Sol but its stations: Solace Station Mercy, Lavinia Alpha Dock, Halden Beta Regio Observatory, and VSG Haven Europa, a Venusian security zone in Jupiter's radiation because nobody else will run rescue there.
 - **The Belt** owns the middle and outer Belt from Pallas outward (Slagline Core, Hygiea Held), Ganymede (contested with Earth), Saturn's rings and Enceladus (Held). The clans hold the Hildas, Triton and the Kuiper dark in the only sense anything is held there.
 - **The Accord** owns Ceres and Titan as free ports, and nothing else; it has no ships.
 
@@ -199,14 +199,14 @@ Jason's direction: the new pilot picks a power (Earth, Mars, the Belt or Venus) 
 
 | Start | Home | First ship | Standing | First work nearby |
 | --- | --- | --- | --- | --- |
-| **Earth, private** | The Exchange | Meridian Tern (Registry issue) | Earth and Tessaract | Freight round Earth, Luna and the Lagrange yards; salvage in the Shell; the Near Field with a Dunlin from Tycho |
-| **Earth, ECF** | Charter Yard | Kessari Citation, Navy grade, under contract | Earth, Earth Charter Fleet licence at the first rung | Toll and patrol contracts on the Inner Lane; Earth's navy is contracted, so the duty is a contract, and breaking it is breach, then desertion |
-| **Mars, private** | Elysium High | Meridian Tern | Mars | Freight round Mars and its moons; the Eureka Trojans with an Arcadia Miner Mk I |
-| **Mars, MRN** | Stickney Yard | Seraphine Deimos, Navy grade | Mars, MRN licence at the first rung | Pickets and lane patrols; the strictest duty and the strictest desertion rule |
-| **The Belt, private** | Ceres Station | Meridian Tern | The Belt and one cooperative | The middle Belt with an old Prospector; Belt freight; the Belt Lane |
+| **Earth, private** | Earth Orbital Exchange | Meridian Tern (Registry issue) | Earth and Tessaract | Freight round Earth, Luna and the Lagrange yards; salvage in the Shell; the Near Field with a Dunlin from Tycho |
+| **Earth, ECF** | ECF Yard L5 | Kessari Citation, Navy grade, under contract | Earth, Earth Charter Fleet licence at the first rung | Toll and patrol contracts on the Inner Lane; Earth's navy is contracted, so the duty is a contract, and breaking it is breach, then desertion |
+| **Mars, private** | Republic Station Elysium | Meridian Tern | Mars | Freight round Mars and its moons; the Eureka Trojans with an Arcadia Miner Mk I |
+| **Mars, MRN** | MRN Yard Phobos | Seraphine Deimos, Navy grade | Mars, MRN licence at the first rung | Pickets and lane patrols; the strictest duty and the strictest desertion rule |
+| **The Belt, private** | Ceres Accord Station | Meridian Tern | The Belt and one cooperative | The middle Belt with an old Prospector; Belt freight; the Belt Lane |
 | **The Belt, UDF** | Slagline | Union Wildcat | The Belt, a cooperative, UDF rota at the first rung | Rota shifts on the Belt Lane: the UDF tag on shift, cooperative work off it; no navy licence because the Belt has no navy |
-| **Venus, private** | Alpha Dock | Meridian Tern (Registry issue); a Lavinia Breeze is cheap on the floor | Venus and Lavinia | The first dive in Venus's upper air; chemical and medical freight |
-| **Venus, VSG** | Thetis High | Ishtar Sedna, Navy grade | Venus, VSG licence at the first rung | Rescue: pods, distress beacons, escorts. A career where the guns come second |
+| **Venus, private** | Lavinia Alpha Dock | Meridian Tern (Registry issue); a Lavinia Breeze is cheap on the floor | Venus and Lavinia | The first dive in Venus's upper air; chemical and medical freight |
+| **Venus, VSG** | Thetis Orbital | Ishtar Sedna, Navy grade | Venus, VSG licence at the first rung | Rescue: pods, distress beacons, escorts. A career where the guns come second |
 
 Venus is a start (Jason, 7 November): the only start whose first job is skimming and the only navy whose first job is rescue. Eight starts in all.
 
@@ -220,11 +220,11 @@ Calder stays canon as the first system through the gate, on the edge of the Marc
 
 - **Scale and layout are yours.** The order is: Mercury, Venus, Earth, Mars, the Belt (inner, Psyche, middle, outer), the Hildas, Jupiter with the Trojans at its L-points, Saturn, the Centaurs, Uranus, Neptune, the Kuiper Belt with the Gate Reach in it. Real distances run to about 40 AU for the gate; a logarithmic or per-region compression keeps the inner system busy and the outer system lonely.
 - **Security levels per region** are in the bodies table; the lanes add a corridor of Core (Held on the Long Lane and the Gate Lane) and dropping off a lane drops a level.
-- **Stations** are listed with what orbits what; each power has one capital port (Thetis High, the Exchange, Elysium High, Slagline) plus the two Accord free ports (Ceres Station, Titan Free Port).
+- **Stations** are listed with what orbits what; each power has one capital port (Thetis Orbital, Earth Orbital Exchange, Republic Station Elysium, Slagline) plus the two Accord free ports (Ceres Accord Station, Titan Free Port).
 - **Starts** are a power and a path, setting home station, first ship and standing (table above).
-- **Hazards** worth building as region rules: Mercury's heat and glare (sensors and shields), Jupiter's radiation (strips shields; Vesper Haven runs rescue), the death line in Venus's air.
+- **Hazards** worth building as region rules: Mercury's heat and glare (sensors and shields), Jupiter's radiation (strips shields; VSG Haven Europa runs rescue), the death line in Venus's air.
 - **Events:** comets passing through, as a later ice rush.
 
 ## Open
 
-- [ ] Jason: station names, by the naming rule above (all new except Ceres Station and Slagline).
+- [ ] Jason: station names, by the naming rule above (all new except Ceres Accord Station and Slagline).
