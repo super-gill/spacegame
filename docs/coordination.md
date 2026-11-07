@@ -211,6 +211,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-07: **Sol starts fresh** (the Calder save kept as a backup; characters and keys kept, ships and credits reset), and **crossings are a plotted burn** to a nav target (turn, burn, flip, brake; cancellable; no manual burn for now). `docs/sol-build.md`. Jason.
 - 2026-11-06: **No Universe until the map.** Calder (Jason's server today) is the dev world, named Dev; the persistent Universe is built with the map (8). Every server is a dev server until then (`SPACEGAME_SERVER` defaults to `dev`). Jason.
 - 2026-11-06: **A cargo ship that can be attacked losing to a raider is fine.** The stock Manifest now loses to one raider holding range outside its CIWS (350 against the raider's 700), and that stays: in high security space it will call for help (law, 7), and dangerous space gets specialist haulers later. Step 4 does not refit the Manifest to win fights. Jason.
 - 2026-11-06: **Turrets fire at the selected lock** (Option A); fire control governs CIWS only; no XL guns until ships of the line; where a gun bears is each hull's hardpoint positions and arcs. Jason.

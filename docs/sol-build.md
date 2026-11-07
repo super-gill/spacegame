@@ -97,8 +97,8 @@ Each slice is played before the next starts. Visual slices get mockups first (Ja
 
 Alongside, small and separate: item 5 of the re-fit (hull identity cannot be fitted out), item 6 (the four docs left in the pivot audit), item 7 (where ship art's rasterise step lives: at build time in `art/`, writing an atlas the client loads, when ship art goes into the client).
 
-## Open (Jason's)
+## Decided (Jason, 7 November 2026)
 
-- **Jason's Dev save.** Calder's world cannot become Sol in place. Either Sol starts fresh (the Calder save kept as a backup file; characters and keys kept, ships and credits reset), or pilots are carried over (credits kept, ships moved to Earth Orbital Exchange storage).
-- **How a burn feels.** The proposal above is a plotted burn to a nav target, committed and cancellable. The alternative, or an addition, is a manual burn: hold a key, point and go, flip yourself.
-- The numbers above (sizes, distances, crossing times) are the lead's call by `sol.md`; Jason sees them in the mockups before they are built.
+- **Sol starts fresh.** The Calder save is kept as a backup file beside the new world; characters and keys are kept; ships and credits reset.
+- **A plotted burn.** Pick a nav target and press burn: the ship turns, burns, flips and brakes to arrive at rest; cancellable, and cancelling leaves you coasting fast. No manual burn for now.
+- The numbers (sizes, distances, crossing times) are the lead's; Jason sees them in the mockups before they are built.
