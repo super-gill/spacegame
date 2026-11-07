@@ -16,7 +16,7 @@ Written 7 November 2026 for the lead. Every term the fleet uses, what it is in t
 
 **Fitting model.** Unchanged from `fitting.md` (approved 5 November): every hull can fit anything its slots take, and odd builds are legitimate if they pay their costs. A hull is three things, and the fleet lore maps onto them:
 
-1. **Fitting constraints**: slot counts and sizes, core system sizes, and the frame (mass, structure, speed, turn, capacitor, signature). The weight band, the builder's trade-off (Corvane heavy and armoured, Belt Forge light and far-ranging, Meridian cheap and slight), the Navy and Militia tags (better frame stats) and patterns (frame variants) all live here.
+1. **Fitting constraints**: slot counts and sizes, core system sizes, and the frame (mass, structure, speed, turn, capacitor, signature). The weight band, the builder's trade-off (Corvane heavy and armoured, Belt Forge light and far-ranging, Meridian cheap and slight), the Navy and UDF tags (better frame stats) and patterns (frame variants) all live here.
 2. **Role bonuses**: a few percentages for full-size modules of the kinds the role wants. Nudges, never requirements. The "grades" in `materials.md` (laser L1 to L3, saw S1 to S3, intake D1 to D3) are the size of the hull's tool slots with the role bonus at full size.
 3. **Built-in role equipment**: what a role gets that cannot be fitted elsewhere or fitted out. Few, and each one is the hull's identity: a mining hull's unusually large ore hold, a hopper, a skimmer's heat-rated hull, a carrier's hangar bays and wing control, a command ship's command suite and fleet beacon, the Shrike's cell block, a T3's capability (lock, gate-born jump, pin), a prototype's one Lattice component.
 
@@ -39,15 +39,15 @@ Written 7 November 2026 for the lead. Every term the fleet uses, what it is in t
 
 Suggests `generation` and, where it applies, `base` (the hull this one came before, came from, or varies).
 
-**The Belt has no T1 or T2 of its own.** A Belt hull's generation is its source's (a Union Wildcat over a Notice is T1 underneath), and the Belt never retires anything. Belt rows are **Union pattern** (a Militia standard applied to a rebuilt hull, see below) and **clan**.
+**The Belt has no T1 or T2 of its own.** A Belt hull's generation is its source's (a Union Wildcat over a Notice is T1 underneath), and the Belt never retires anything. Belt rows are **Union pattern** (a UDF standard applied to a rebuilt hull, see below) and **clan**.
 
 ## Tags and grades
 
 **Navy tag.** A tag on a hull meaning "navy grade": better stats than the same hull without it (how much is the lead's call). What a navy licence buys. The tag, not the hull, is what makes a warship a navy warship. Suggests a boolean `navy` on the hull entry, and the stat bonus it applies.
 
-**Militia tag.** The Belt's Navy tag. Carried by any Belt hull while on Militia rota; off rota it comes off. Same mechanic, toggled by a rota state rather than a purchase.
+**UDF tag.** The Belt's Navy tag. Carried by any Belt hull while on UDF rota; off rota it comes off. Same mechanic, toggled by a rota state rather than a purchase.
 
-**Grade.** The state of an *owned ship* built on a hull that can carry a tag: **Navy** (tag on, licence and duties apply) or **civilian** (tag off, open market, no duties). Available on current corvettes, patrol boats and light fighters; frigate and above and heavy fighters are built Navy only. A civilian-grade ship can be brought up to Navy grade later with the licence, so a pilot keeps the ship when they join. For the Belt the grades are **Militia** and **cooperative**, by rota. Independents, legacy and clan hulls have no grade. Suggests `grade` on the owned ship, not the hull.
+**Grade.** The state of an *owned ship* built on a hull that can carry a tag: **Navy** (tag on, licence and duties apply) or **civilian** (tag off, open market, no duties). Available on current corvettes, patrol boats and light fighters; frigate and above and heavy fighters are built Navy only. A civilian-grade ship can be brought up to Navy grade later with the licence, so a pilot keeps the ship when they join. For the Belt the grades are **UDF** and **cooperative**, by rota. Independents, legacy and clan hulls have no grade. Suggests `grade` on the owned ship, not the hull.
 
 **Civilian hull.** A hull built for a civilian job (hauler, shuttle, prospector) with no Navy tag and no grade. Navies buy them as sold for non-offensive roles and fly them in navy livery with no tag.
 
@@ -77,7 +77,7 @@ Suggests `generation` and, where it applies, `base` (the hull this one came befo
 
 **Independent.** A company with no flag: Meridian Yards, Corvane Heavy Industries. Licensed by the Ceres Registry, based at Accord free ports, sells civil and combat hulls to anyone at any size. No Navy tag, no licence, no grade. Meridian cheap (Registry-issue prices), Corvane a bit pricier. Paragon Arms is the module-maker equivalent.
 
-**Union pattern.** The Belt's Militia standard applied by Union Defence Works, the refit shop, to a captured, bought or copied hull. "Wildcat" is a standard, not a slipway. Sold only in the Belt for cooperative standing and cheap credits; every one a little different; old mounts; the Militia tag only while on rota. Points at its source with `base`.
+**Union pattern.** The Belt's UDF standard applied by Union Defence Works, the refit shop, to a captured, bought or copied hull. "Wildcat" is a standard, not a slipway. Sold only in the Belt for cooperative standing and cheap credits; every one a little different; old mounts; the UDF tag only while on rota. Points at its source with `base`.
 
 **Route.** How a pilot reaches a hull. Five for warships: navy licence; independents; retired navy; Union pattern; clan hull. The table in `fleet.md` "Five routes to a warship" says what each costs and what the catch is.
 
@@ -92,6 +92,6 @@ Suggests `generation` and, where it applies, `base` (the hull this one came befo
 ## What the lead needs to carry, in one list
 
 On the hull entry: `class`, `weight`, `tier`, `generation`, `navy` (tag), `role` (T3 only), `base` (successor, source or pattern base), `maker`, `power` or `independent`, `patterns` (list of pattern hull ids), sale route.
-On the owned ship: `grade` (navy / civilian / militia / cooperative / none) and, for Union pattern, the rota state that sets it.
+On the owned ship: `grade` (navy / civilian / udf / cooperative / none) and, for Union pattern, the rota state that sets it.
 On the pilot: standing per power, company, cooperative and clan; licences and their duty ledgers.
 Systems the terms imply, in dependency order: standing and licences; the Navy tag bonus and the grade flag; the used market with legacy and retired navy; patterns as variants; the Belt rota; then, when T3 hulls exist, locks, beacons, jumps, the pin and hunting groups.

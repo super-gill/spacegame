@@ -172,10 +172,10 @@ Humanity has four powers, all born in Sol. A pilot's origin is one of the four; 
 
 | Power | Role in a line | Navy | Weapon family |
 | --- | --- | --- | --- |
-| **Earth**, with Luna | Owns. The corporate core that runs on contracts, tolls and courts. | The Charter Fleet, mostly contracted | Missile |
-| **Mars** | Polices. Disciplined, dutiful, the best navy, still terraforming after centuries. | The Martian Navy | Energy |
-| **Venus** | Heals. Cloud cities that live or die by life support; the chemists and medics of known space, everyone's neutral. | The Coastguard | Hybrid |
-| **The Belt** | Digs. Cooperatives and crews, anywhere a Belter feels like going; found the gate and lost the door. | The Union Militia | Projectile |
+| **Earth**, with Luna | Owns. The corporate core that runs on contracts, tolls and courts. | The Earth Charter Fleet, mostly contracted | Missile |
+| **Mars** | Polices. Disciplined, dutiful, the best navy, still terraforming after centuries. | The Martian Republic Navy | Energy |
+| **Venus** | Heals. Cloud cities that live or die by life support; the chemists and medics of known space, everyone's neutral. | The Space Guard | Hybrid |
+| **The Belt** | Digs. Cooperatives and crews, anywhere a Belter feels like going; found the gate and lost the door. | The Union Defence Force | Projectile |
 
 ### Earth
 
@@ -196,7 +196,7 @@ Mars took discipline as its creed because the planet demanded it. Centuries of t
 - **Values.** Duty, order, competence, the long project.
 - **Grievance.** They lost the race to the gate, which Belters found and Earth bought, and have never quite forgiven either.
 - **Wants.** To police the Accord lanes without having to ask, and to be first to understand the Aurel.
-- **Secret (canon, hidden).** The Martian Navy has recovered Aurel husk material from the Kerran wreck field and has been trying to read it for sixty years. It has read enough to be frightened, and has told nobody.
+- **Secret (canon, hidden).** The Martian Republic Navy has recovered Aurel husk material from the Kerran wreck field and has been trying to read it for sixty years. It has read enough to be frightened, and has told nobody.
 
 ### Venus
 
@@ -236,7 +236,7 @@ The **Ceres Registry** licenses pilots under the Accord, issues new pilots their
 
 There is no galactic police. Law is local: whoever holds a system enforces the law there, with ordinary ships flown by ordinary crews. They can be outfought, and they escalate rather than overwhelm.
 
-1. **The local watch answers.** A witnessed crime brings the nearest patrol of whoever holds the system: a port watch, a toll patrol, a militia rota.
+1. **The local watch answers.** A witnessed crime brings the nearest patrol of whoever holds the system: a port watch, a toll patrol, a UDF rota.
 2. **It calls for help.** A watch that is outgunned calls its reserve, and keeps calling.
 3. **The holder's navy comes.** Serious or repeated crime brings the navy of the power that holds the system, slower to arrive and much harder to beat.
 4. **The farther out, the thinner it gets.** In the Marches the answer is late and small. In the Unclaimed nobody comes.
@@ -246,10 +246,10 @@ A pilot can win the first fight and still lose to what follows. How fast each st
 | Holder | Local force | Character |
 | --- | --- | --- |
 | Free ports (Calder and its like) | The port's watch, such as the Calder Watch | Paid by the port, answerable to its board |
-| Earth | Kessari toll patrols, then the Charter Fleet | Contracted, efficient, and it sends the bill |
-| Mars | Martian Navy patrols | Proud, thorough and slow to forgive |
-| Venus | The Coastguard | Rescue first, arrest second |
-| The Belt | Militia rotas, working crews taking turns | Fierce near home, thin far out |
+| Earth | Kessari toll patrols, then the Earth Charter Fleet | Contracted, efficient, and it sends the bill |
+| Mars | Martian Republic Navy patrols | Proud, thorough and slow to forgive |
+| Venus | The Space Guard | Rescue first, arrest second |
+| The Belt | UDF rotas, working crews taking turns | Fierce near home, thin far out |
 
 ### Navies
 
@@ -257,10 +257,10 @@ Each power has a navy with dedicated hulls from its naval yard. Navy hulls sit b
 
 | Power | Navy | Yard | Form of service | A pilot who walks away |
 | --- | --- | --- | --- | --- |
-| Earth | The Charter Fleet | Kessari Orbital Defence | A service contract | In breach of contract, pursued by the courts |
-| Mars | The Vigil (the Martian Navy; proposed name) | Seraphine Naval Yards | A commission | Deserter, hunted |
-| Venus | The Lifeline (the Venusian Coastguard; proposed name) | Ishtar Fleet Works | Enlistment | Struck off, and the Lifeline stops answering your calls |
-| The Belt | The Union Militia | Union Defence Works | Membership of a cooperative militia | Expelled by vote, and remembered |
+| Earth | The Earth Charter Fleet (ECF) | Kessari Orbital Defence | A service contract | In breach of contract, pursued by the courts |
+| Mars | The Martian Republic Navy (MRN) | Seraphine Naval Yards | A commission | Deserter, hunted |
+| Venus | The Venusian Space Guard (VSG) | Ishtar Fleet Works | Enlistment | Struck off, and the Guard stops answering your calls |
+| The Belt | The Union Defence Force (UDF) | Union Defence Works | Membership of a cooperative's defence force | Expelled by vote, and remembered |
 
 What navy duties are in play, and how often, is a design question for Jason and the lead.
 
@@ -296,7 +296,7 @@ Under Witness Law a dark ship's log entry is just a contact, not a name, unless 
 | --- | --- | --- |
 | Earth | Suspicious | Legal, but a dark ship pays no tolls and signs no contracts; the toll patrol stops and fines it |
 | Mars | Hostile intent until proven otherwise | A Martian patrol intercepts any dark ship in its space and expects an answer |
-| Venus | Rude | A dark ship cannot be found if it is lost. The Coastguard nags, and Venusians think it selfish. |
+| Venus | Rude | A dark ship cannot be found if it is lost. The Space Guard nags, and Venusians think it selfish. |
 | The Belt | Normal | Earth tracked strikers by their transponders in the Strikes; the right to run dark is written into the Ceres Accord |
 | Free ports | Suspicious near stations | Fine in the lanes, but the port's watch hails any dark ship close in |
 
@@ -458,9 +458,9 @@ Makers are companies with a home power and one or two specialities. The powers d
 | **Tessaract Logistics** | Earth | Haulers and freighters, the best transport hulls in known space | Before the gate | Runs the oldest freight lanes and knows every shortcut |
 | **Novum Systems** | Luna | Sensors, electronic warfare, computers; built the Novum Key | 60 GW | Still chasing a stronger gate-waker and does not care which gates it wakes |
 | **Cantor-Vell Arms** | Mars | Energy weapons, armour | Before the gate | Its best designs come from Aurel husk material Mars will not admit to holding |
-| **Seraphine Naval Yards** | Mars | Warships, from patrol boats to battleships | Before the gate | Builds the Martian Navy; sells nothing to anyone else |
+| **Seraphine Naval Yards** | Mars | Warships, from patrol boats to battleships | Before the gate | Builds the Martian Republic Navy; sells nothing to anyone else |
 | **Arcadia Works** | Mars | Civilian hulls, one per job, named what they are and Mk-numbered | Before the gate | The state yard; Mars does not do brands |
-| **Ishtar Fleet Works** | Venus | Railgun and blaster hulls, the Coastguard's ships | 10 GW, after the Ceres Accord | Proud that its ships have never fired first in a war |
+| **Ishtar Fleet Works** | Venus | Railgun and blaster hulls, the Space Guard's ships | 10 GW, after the Ceres Accord | Proud that its ships have never fired first in a war |
 | **Solace Medical** | Venus | Support ships: repair, shield transfer, rescue | Before the gate | Protected by the Mercy Clause |
 | **Arbor Dynamics** | Venus | Drones, drone bays, drone control | 95 GW | Its drones are grown as much as built |
 | **Vantage Aerospace** | Luna (Earth) | Crewed fighters, light and heavy; builds no hulls | 7 GW, in the Gate War | Names its craft for blades |
@@ -468,7 +468,7 @@ Makers are companies with a home power and one or two specialities. The powers d
 | **Belt Forge Collective** | The Belt | Mining ships and kit, drones, breaching | After the Strikes | Belt Forge against Corvane is the oldest trade rivalry in known space |
 | **Rook and Rivet** | The Belt | Salvage hulls and gear, tugs | After the Strikes | A thick book of who owes it |
 | **Slagline Motors** | The Belt | Cheap engines, thrusters, afterburners | After the Strikes | Every pirate's favourite engine |
-| **Union Defence Works** | The Belt | Militia gunboats, projectile guns | During the Strikes | Some of its hidden yards were never closed |
+| **Union Defence Works** | The Belt | UDF gunboats, projectile guns | During the Strikes | Some of its hidden yards were never closed |
 | **Aurel** | Beyond the Shoals | Every Aurel ship | | Not a company; the catalogue needs a maker on each hull |
 
 Naming themes per company are in "Names".
@@ -497,7 +497,7 @@ Every NPC pilot, trader, miner or patrol, is either **independent** or works for
 | --- | --- | --- |
 | Company crews | Contract crews for a maker or a big firm: Tessaract freight, Corvane barges, Kessari patrols | Company colours and company hulls, steady routes, and the company sends another when one is lost |
 | Cooperative crews | Belt cooperatives such as the Ridge Collective; the clans | Their own hulls, worked hard and patched often; loyal to their station or clan |
-| Navy and institute crews | The Martian Navy, the Coastguard, Venusian institutes | Serve their power; rarely seen outside its space |
+| Navy and institute crews | The Martian Republic Navy, the Space Guard, Venusian institutes | Serve their power; rarely seen outside its space |
 | Independents | Owner-pilots and small outfits working for whoever pays | Any hull, any fit, often second-hand; a name of their own rather than a company's |
 
 How the mix shifts, in words (the lead sets the numbers): Earth systems run on company crews, Belt systems on cooperatives, Martian systems on the navy and its contractors, Venusian systems on institutes, free ports like Calder on a bit of everything. Accord space is mostly company and cooperative crews on steady routes; the Marches have more independents taking risks for better pay; in the Unclaimed nearly everyone is independent, and some of them are pirates on a bad day. A belt brings miners, a foundry brings haulers, a liner route brings passengers. Each pirate faction preys hardest on the employers it hates.
@@ -563,7 +563,7 @@ Every hull, module, manufacturer and loadout in the catalogue, keyed by its id i
 | Ito-Marr Dynamics | Strongholds and stores | Shields and power that hold the line |
 | Novum Systems | Ghosts and absences | Electronic warfare makes things not be there |
 | Cantor-Vell Arms | Military drill and formation | Mars's armourer |
-| Seraphine Naval Yards | Martian places and virtues | The Martian Navy's yard |
+| Seraphine Naval Yards | Martian places and virtues | The Martian Republic Navy's yard |
 | Ishtar Fleet Works | Replies | Its ships have never fired first, so its guns are named as answers |
 | Solace Medical | Comfort and care | |
 | Slagline Motors | Belter slang for running | Built so crews could outrun Earth's patrols |
@@ -726,6 +726,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Navy names** (Jason): the **Earth Charter Fleet (ECF)**, the **Martian Republic Navy (MRN)**, the **Venusian Space Guard (VSG)** and the **Union Defence Force (UDF)**, replacing the working names Charter Fleet, Martian Navy, Coastguard and Union Militia (and the proposed Vigil and Lifeline, which also clashed with a Cantor-Vell armour, a Meridian module and a Lakshmi pattern). Belters do not call themselves a militia: the Militia tag is now the UDF tag, the Militia rota the UDF rota, and a shift is still "the Rota". Formal, acronym-led names, the way a state prints them on a hull.
 - 2026-11-07: **Sol: all of it, enormous bodies, named stations and navies.** The first build is all of Sol (Jason); the in-game layout comes from gameplay. Bodies are enormous: a planet's limb fills the screen, stations are specks against their worlds, rendering scale separate from distance. Venus is a start (eight starts). Stations take their runner's naming flavour (Earth contracts and law, Mars places and virtues, Venus highlands and the evening star, the Belt mining and strike words). Navies: the Charter Fleet and the Union Militia stand; proposed for Mars the Vigil and for Venus the Lifeline. Station renames: Surety (Callisto), Vesper Haven (Europa), the Ganymede Local, Titan Free Port, Beta Regio Observatory, Fortitude (the gate; Picket clashed with the Union Picket gun).
 - 2026-11-07: **Sol mapped** (`sol.md`): bodies inside out with who holds each and its security level; the Accord lanes as Core corridors (Mars patrols them, Earth tolls them, the Belt patrols its own lane); a capital port per power (Thetis High, the Exchange, Elysium High, Slagline) and two Accord free ports (Ceres Station, Titan Port); about thirty stations; resource sites from the Near Field to the Kuiper Belt, with comets as events; hazards; and the starts: a power (Earth, Mars, the Belt, Venus proposed) and a path (private or navy, the Belt's being the Militia rota). Scale and layout are the lead's.
 - 2026-11-07: **Fitting stays free.** The `fitting.md` model stands: any hull fits anything its slots take, role bonuses nudge, built-in role equipment is the hull's identity and is never fitted out. The fleet lore maps onto it: builder trade-offs, tags and patterns are frame stats; tool grades are slot sizes with the bonus; holds, hoppers, heat ratings, bays, command suites, beacons, T3 capabilities and Lattice components are built in. Stock fits are what NPCs fly and what the art draws. Shown per hull on the registry page.

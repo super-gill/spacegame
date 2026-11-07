@@ -12,16 +12,16 @@ Sixteen companies build hulls. Four are naval yards and build only for their nav
 | --- | --- | --- | --- |
 | Meridian Yards | Independent | The small civilian ships everyone starts in, and armed utility for anyone with a licence | 9 |
 | Tessaract Logistics | Earth | Cargo and passengers at every size | 8 |
-| Kessari Orbital Defence | Earth, naval yard | The Charter Fleet | 8 |
-| Seraphine Naval Yards | Mars, naval yard | The Martian Navy | 8 |
+| Kessari Orbital Defence | Earth, naval yard | The Earth Charter Fleet | 8 |
+| Seraphine Naval Yards | Mars, naval yard | The Martian Republic Navy | 8 |
 | Arcadia Works | Mars, state yard | Civilian hulls, one per job, no brands | 8 |
-| Ishtar Fleet Works | Venus, naval yard | The Coastguard | 5 |
+| Ishtar Fleet Works | Venus, naval yard | The Space Guard | 5 |
 | Solace Medical | Venus | Support, repair, rescue | 4 |
 | Halden Institute | Venus | Survey and exploration | 3 |
 | Lavinia Atmospherics | Venus | Gas skimming and refining; Venus's civil yard (proposed 7 November, `industries.md`) | 4 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 4 |
 | Vantage Aerospace | Luna (Earth) | Combat fighters, no hulls | 2 |
-| Union Defence Works | The Belt, refit shop | The Union pattern: Militia standards applied to rebuilt hulls | 7 |
+| Union Defence Works | The Belt, refit shop | The Union pattern: UDF standards applied to rebuilt hulls | 7 |
 | Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
 | Corvane Heavy Industries | Independent (Earth money, Belt yards) | Heavy ore haulage and refining, and the corporate security that guards it | 5 |
@@ -126,25 +126,25 @@ Freight paperwork. The oldest freight line in known space and the best transport
 
 ## Kessari Orbital Defence
 
-Legal and enforcement terms. Earth's naval yard: the Charter Fleet and the toll patrols. Navy hulls above the patrol boat need a licence.
+Legal and enforcement terms. Earth's naval yard: the Earth Charter Fleet and the toll patrols. Navy hulls above the patrol boat need a licence.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Kessari Citation | Corvette | Fast interceptor and toll runner | The hull that catches a dark ship before it reaches the gate | draft |
 | Kessari Warrant | Patrol boat | Toll patrol and escort | Pirates prize captured ones as trophies | built |
-| Kessari Injunction | Frigate | Missile frigate, the Charter Fleet's backbone | Keeps you where it wants you | named (working name confirmed as final, pending Jason) |
+| Kessari Injunction | Frigate | Missile frigate, the Earth Charter Fleet's backbone | Keeps you where it wants you | named (working name confirmed as final, pending Jason) |
 | Kessari Verdict | Destroyer | Heavy missile destroyer | Ends arguments | draft |
 | Kessari Statute | Cruiser | Line cruiser | The law, in bulk | draft |
-| Kessari Precedent | Battleship | The Charter Fleet's heaviest line ship | Earth has never lost one and intends to keep it that way | draft |
+| Kessari Precedent | Battleship | The Earth Charter Fleet's heaviest line ship | Earth has never lost one and intends to keep it that way | draft |
 | Kessari Mandate | Carrier | Drone and fighter carrier | Launches the contract and lets it do the work | draft |
-| Kessari Charter | Dreadnought | The Charter Fleet's flagship | Named for the document everything else is built on | draft |
+| Kessari Charter | Dreadnought | The Earth Charter Fleet's flagship | Named for the document everything else is built on | draft |
 | Kessari Summons | Frigate, special operations (watcher) | Finds and marks the target | You never see the one that found you | draft |
 | Kessari Custody | Cruiser, special operations (hunter) | Jumps onto the mark and pins | Grabs and calls for backup | draft |
 | Kessari Sentence | Battleship, special operations (striker) | Jumps in behind the hunter and ends it | Committed the moment it lands | draft |
 
 ## Seraphine Naval Yards
 
-Martian places for the big ships, Martian virtues for the small. Builds the Martian Navy and sells nothing to anyone else.
+Martian places for the big ships, Martian virtues for the small. Builds the Martian Republic Navy and sells nothing to anyone else.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
@@ -183,12 +183,12 @@ Legacy Arcadia hulls keep the name with an older mark: an Arcadia Hauler Mk II i
 
 ## Ishtar Fleet Works
 
-Venus highlands for the hulls (its guns are replies). Builds the Coastguard: rescue first, arrest second, the smallest fleet and the most welcome. No battleships; Venus has never wanted one.
+Venus highlands for the hulls (its guns are replies). Builds the Space Guard: rescue first, arrest second, the smallest fleet and the most welcome. No battleships; Venus has never wanted one.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Ishtar Sedna | Corvette | Fast rescue and picket | Reaches a pod before anyone else does | draft |
-| Ishtar Lakshmi | Patrol boat | Coastguard patrol and rescue escort | Carries a Solace kit and a railgun, in that order | draft |
+| Ishtar Lakshmi | Patrol boat | Space Guard patrol and rescue escort | Carries a Solace kit and a railgun, in that order | draft |
 | Ishtar Maat | Frigate | Hybrid frigate | Answers from range | draft |
 | Ishtar Maxwell | Destroyer | Hybrid destroyer | The heaviest thing Venus will admit to owning | draft |
 | Ishtar Aphrodite | Cruiser | Rescue cruiser and command ship | A hospital with railguns | draft |
@@ -245,23 +245,23 @@ Legacy: Lavinia Breeze (the skimmer before the Zephyr, shallow only; see the leg
 
 ## Union Defence Works and the Union pattern
 
-Decided 7 November 2026. The Belt has no naval yard. **The Union Militia is a rota, not a fleet**: it owns no hulls, and cooperatives and clans contribute ships and crews on shifts. **Union Defence Works is the refit shop**: it takes captured, bought-cheap or copied hulls and rebuilds them to a Militia standard, the **Union pattern**. "Wildcat" is a standard applied to a hull, not a hull from a slipway; two Wildcats can have started life as a Kessari Notice and a Citation, and the source shows under the Belt shapes. Strike words for the standards.
+Decided 7 November 2026. The Belt has no naval yard. **The Union Defence Force is a rota, not a fleet**: it owns no hulls, and cooperatives and clans contribute ships and crews on shifts. **Union Defence Works is the refit shop**: it takes captured, bought-cheap or copied hulls and rebuilds them to a UDF standard, the **Union pattern**. "Wildcat" is a standard applied to a hull, not a hull from a slipway; two Wildcats can have started life as a Kessari Notice and a Citation, and the source shows under the Belt shapes. Strike words for the standards.
 
 - **No T1 or T2 in the Belt.** A Belt hull's generation is its source's, and the Belt never retires anything. The Belt's rows are Union pattern (numbers) and clan (quality).
-- **No civilian grade, because the tag is a state.** Every Belt hull is civilian. On Militia shift it carries the **Militia tag** (the Belt's Navy tag: better stats, hazard stripes and the Union mark painted on); off shift it goes home in cooperative colours with the tag off. The licence is the rota: standing with a cooperative, duty is shifts. Mechanically the same grade flag the other navies use, toggled by rota rather than purchase.
+- **No civilian grade, because the tag is a state.** Every Belt hull is civilian. On UDF shift it carries the **UDF tag** (the Belt's Navy tag: better stats, hazard stripes and the Union mark painted on); off shift it goes home in cooperative colours with the tag off. The licence is the rota: standing with a cooperative, duty is shifts. Mechanically the same grade flag the other navies use, toggled by rota rather than purchase.
 - **Sold only in the Belt**, for cooperative standing and cheap credits. Every one a little different. Rebuilt captures with old mounts: worse than a production hull, cheaper and rougher than a retired navy one. The pirate's favourite source; the Black Strike's Writs are Union-pattern rebuilds in all but paperwork.
 - **Who answers a beacon in the Belt** depends on which cooperative holds the station and which clan is nearby: the same Wildcat in three cooperatives' colours, and sometimes a Vane out of nowhere.
 
 | Standard | Class | Rebuilt from | Job | Character | Status |
 | --- | --- | --- | --- | --- | --- |
 | Union Wildcat | Corvette | Kessari Notice (or any Earth corvette) | Fast raider and picket | A wildcat strike: sudden, unofficial, over before the bosses arrive | draft |
-| Union Blockade | Patrol boat | Kessari Writ | Militia patrol | The Strikes' captured toll boats; holds a lane shut | draft |
+| Union Blockade | Patrol boat | Kessari Writ | UDF patrol | The Strikes' captured toll boats; holds a lane shut | draft |
 | Union Boycott | Frigate | Kessari Decree | Projectile frigate | The launchers torn out for guns; refuses to deal | draft |
 | Union Walkout | Destroyer | Kessari Ruling | Heavy gun destroyer | Rebuilt so far that Earth no longer recognises it; everyone walks out together | built |
 | Union Solidarity | Cruiser | Three Earth cruisers of the Statute's generation, captured in the Gate War | Line cruiser | Rebuilt once, by every cooperative at once; never copied since. Three exist. | draft |
-| Union General Strike | Carrier | Belt Forge Headframe | Militia carrier and command ship | An industrial capital refitted for war: hangars where the hoppers were, gun decks on the frames, the furnaces capped. On shift a carrier, off shift an ore hauler. When the Belt brings everyone out | draft |
-| Vantage Dirk, Militia refit | Light fighter | Vantage Dirk | Militia fighter | Belt paint, Belt guns, a frame with an engine | built |
-| Vantage Cutlass, Militia refit | Heavy fighter | Vantage Cutlass | Militia heavy fighter | More of everything bolted on | built |
+| Union General Strike | Carrier | Belt Forge Headframe | UDF carrier and command ship | An industrial capital refitted for war: hangars where the hoppers were, gun decks on the frames, the furnaces capped. On shift a carrier, off shift an ore hauler. When the Belt brings everyone out | draft |
+| Vantage Dirk, UDF refit | Light fighter | Vantage Dirk | UDF fighter | Belt paint, Belt guns, a frame with an engine | built |
+| Vantage Cutlass, UDF refit | Heavy fighter | Vantage Cutlass | UDF heavy fighter | More of everything bolted on | built |
 
 ### Five routes to a warship
 
@@ -270,7 +270,7 @@ Decided 7 November 2026. The Belt has no naval yard. **The Union Militia is a ro
 | Navy licence | A production hull, the Navy tag, the best stats | Standing, and duties that grow | You owe the navy; desert and you are hunted |
 | Independents (Meridian, Corvane) | A new hull, any size, no tag | Credits; Corvane is pricey | Never as good as a navy hull at fighting |
 | Retired navy | An old navy mark, Navy tag intact | A lot of credits | Old mounts, no yard support |
-| Union pattern | A rebuilt capture to Militia standard | Cooperative standing, cheap credits | Belt only; every one different; the Militia tag only while on shift |
+| Union pattern | A rebuilt capture to UDF standard | Cooperative standing, cheap credits | Belt only; every one different; the UDF tag only while on shift |
 | Clan hull | A T3 one-off | Clan standing, or a very rare sale | Rare, and the clan remembers who has it |
 
 ## Belt Forge Collective
@@ -354,15 +354,15 @@ Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Brea
 
 | Job | Maker | Subcraft | Who flies them |
 | --- | --- | --- | --- |
-| Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy); retired: Vantage Dirk, Vantage Cutlass | The Charter Fleet; the Foil sold Navy or civilian grade, so Belt militias and pirates too; the Sabre Navy only; the Dirk and Cutlass sold whole, Navy tag intact |
-| Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II; retired: Fighter Mk IV, Heavy Fighter Mk I | The Martian Navy; the Mk V civilian grade to Martians only; retired marks released once the replacement flies, Martian buyers first |
-| Combat | Ishtar Fleet Works (Venus) | Ishtar Hathor (light, hybrid); retired: Hathor '221 | The Coastguard; Navy or civilian grade; the '221 sold with the gun pulled |
+| Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy); retired: Vantage Dirk, Vantage Cutlass | The Earth Charter Fleet; the Foil sold Navy or civilian grade, so the UDF and pirates too; the Sabre Navy only; the Dirk and Cutlass sold whole, Navy tag intact |
+| Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II; retired: Fighter Mk IV, Heavy Fighter Mk I | The Martian Republic Navy; the Mk V civilian grade to Martians only; retired marks released once the replacement flies, Martian buyers first |
+| Combat | Ishtar Fleet Works (Venus) | Ishtar Hathor (light, hybrid); retired: Hathor '221 | The Space Guard; Navy or civilian grade; the '221 sold with the gun pulled |
 | Combat | The clans | Vesk light raider, Vesk heavy raider | The clans, and whoever they sell to |
 | Mining | Belt Forge Collective | Belt Forge Jackleg (a jackleg drill) | Colliers, Winders, Headframes |
 | Mining | Corvane Heavy Industries | Corvane Navvy | Corvane Drays and Smelters |
 | Salvage | Rook and Rivet | Rook and Rivet Grab | Wreckers and Breakers |
 | Salvage | The clans | Long Wake Dredge | The Long Wake's tenders |
-| Search and rescue | Solace Medical (Venus) | Solace Stretcher (heavy SAR fighter) | Every navy, under the Mercy Clause; Havens, Sanctuaries, the Coastguard. Drawn generic on purpose so it looks right in anyone's bay |
+| Search and rescue | Solace Medical (Venus) | Solace Stretcher (heavy SAR fighter) | Every navy, under the Mercy Clause; Havens, Sanctuaries, the Space Guard. Drawn generic on purpose so it looks right in anyone's bay |
 
 Venus flies one light fighter and no heavy combat fighter; its heavy is the Stretcher, a SAR craft, and a Venusian carrier is a drone carrier.
 
@@ -398,7 +398,7 @@ Decided 6 November 2026. The company is the leading voice in a ship's design; th
 | Layer | Set by | What it means |
 | --- | --- | --- |
 | Shape | The company | A Tessaract hull is boxy and modular whoever flies it; a Belt Forge hull is trusses and spare mounts; a Seraphine hull is plate and hard edges |
-| Primary colour | The company for civilian hulls; the navy for military hulls | Military ships need not look alike, but every ship of a navy wears its livery: Charter Fleet steel blue and white, Martian Navy rust and bone, Coastguard pale gold, Union Militia rust orange and black |
+| Primary colour | The company for civilian hulls; the navy for military hulls | Military ships need not look alike, but every ship of a navy wears its livery: Earth Charter Fleet steel blue and white, Martian Republic Navy rust and bone, Space Guard pale gold, Union Defence Force rust orange and black |
 | Registry markings | The power | A flash or band in the power's colour, like a tail flag; small, consistent, and what the board reads for standing. Mars needs none: one state yard means everything Martian is uniform already. |
 
 Legacy hulls keep their original shape and colours, worn. Surplus hulls (below) have the navy livery painted over, with the lines still showing through. Pirates kitbash on top of all of it.
@@ -420,17 +420,17 @@ On the registry: independents sit under their own heading with their own colours
 
 Decided 7 November 2026. **Navy** is a tag on a hull, not a generation. A Navy-tagged hull has better stats than the same hull without the tag (how much better is the lead's call). The tag is what a licence buys; it is not a different ship.
 
-- **Civilian-grade navy hulls.** Each naval yard sells its current corvette and patrol boat in two versions: Navy (behind the licence, with duties) and civilian (the same hull, the same mark, no Navy tag, open market, company livery). Frigate and above are built Navy only. A civilian-grade hull can be brought up to Navy grade later with the licence, so a pilot who starts in a civilian Warrant and joins the Charter Fleet keeps the ship. Mechanically: the same hull id with a grade flag, not a second hull.
+- **Civilian-grade navy hulls.** Each naval yard sells its current corvette and patrol boat in two versions: Navy (behind the licence, with duties) and civilian (the same hull, the same mark, no Navy tag, open market, company livery). Frigate and above are built Navy only. A civilian-grade hull can be brought up to Navy grade later with the licence, so a pilot who starts in a civilian Warrant and joins the Earth Charter Fleet keeps the ship. Mechanically: the same hull id with a grade flag, not a second hull.
 - **Retired navy hulls (surplus).** When a navy retires a mark, the old hulls go to the open market whole: Navy tag intact, mounts intact, no licence needed. They are still powerful and still expensive; what they lack is the current mark's refinements and the yard's support. This replaces the earlier idea of demilitarised surplus. The navy livery is painted over because the ship is out of service, and the lines show through.
 - **Legacy** stays what it was: an old civilian mark. Legacy is cheap; retired navy is not.
 - **Fighters follow the same rules.** The light fighter is the corvette of the bays: Navy or civilian grade (Vantage Foil, Arcadia Fighter Mk V). The heavy fighter is Navy only (Vantage Sabre, Arcadia Heavy Fighter Mk II). Each has a retired mark sold whole with the Navy tag: Vantage Dirk and Cutlass, Arcadia Fighter Mk IV and Heavy Fighter Mk I. Vantage names its craft for blades.
 
 | Navy | Civilian grade | Retired marks on the market |
 | --- | --- | --- |
-| Earth, the Charter Fleet | Citation and Warrant, sold openly | Kessari Notice, Writ, Decree and Ruling, sold by contract: the backbone of the Marches |
-| Mars, the Martian Navy | Deimos and Phobos, sold to Martian citizens only | Deimos Mk I and Phobos Mk II, released once the replacement mark is in service, Martian buyers first; the Navy still wants stolen current hulls back |
-| Venus, the Coastguard | Sedna and Lakshmi, sold openly | Sedna '218 and Lakshmi '205, sold with the Coastguard's guns removed but the Navy tag intact; fit your own |
-| The Belt, the Union Militia | No grades: the Militia tag is a rota state on any Belt hull (see "Union Defence Works and the Union pattern") | None; the Militia never retires anything |
+| Earth, the Earth Charter Fleet | Citation and Warrant, sold openly | Kessari Notice, Writ, Decree and Ruling, sold by contract: the backbone of the Marches |
+| Mars, the Martian Republic Navy | Deimos and Phobos, sold to Martian citizens only | Deimos Mk I and Phobos Mk II, released once the replacement mark is in service, Martian buyers first; the Navy still wants stolen current hulls back |
+| Venus, the Space Guard | Sedna and Lakshmi, sold openly | Sedna '218 and Lakshmi '205, sold with the Space Guard's guns removed but the Navy tag intact; fit your own |
+| The Belt, the Union Defence Force | No grades: the UDF tag is a rota state on any Belt hull (see "Union Defence Works and the Union pattern") | None; the UDF never retires anything |
 
 Retired navy hulls go up to destroyer (the Ruling) where a navy retires that big; nobody sells a retired cruiser. The Mars exception above resolves an earlier contradiction: Mars does sell, but only its own retired marks and its own citizens first.
 
@@ -467,12 +467,12 @@ A hunting group is what a power sends after a wanted ship, a dark ship that will
 
 | Power | Watcher | Hunter | Striker | Style |
 | --- | --- | --- | --- | --- |
-| Earth, the Charter Fleet | Kessari Summons | Kessari Custody | Kessari Sentence | Grey legal fictions; the quiet contracts; never acknowledged |
-| Mars, the Martian Navy | Seraphine Noctis | Seraphine Cerberus | Seraphine Medusae | Open about it and still in rust; Mars arrives |
-| Venus, the Coastguard | | Ishtar Hecate | | One hull nobody can account for; Venus sells SAR to everyone instead |
+| Earth, the Earth Charter Fleet | Kessari Summons | Kessari Custody | Kessari Sentence | Grey legal fictions; the quiet contracts; never acknowledged |
+| Mars, the Martian Republic Navy | Seraphine Noctis | Seraphine Cerberus | Seraphine Medusae | Open about it and still in rust; Mars arrives |
+| Venus, the Space Guard | | Ishtar Hecate | | One hull nobody can account for; Venus sells SAR to everyone instead |
 | The Belt, the clans | Vesk Vane | | Vesk Shade | No drives; burns in; the clans' stealth is the best there is |
 
-Venus's search and rescue is a product line, not special operations: Solace Medical's rescue hulls and kit are sold to every navy under the Mercy Clause, and the Coastguard flies the best of them.
+Venus's search and rescue is a product line, not special operations: Solace Medical's rescue hulls and kit are sold to every navy under the Mercy Clause, and the Space Guard flies the best of them.
 
 How a pilot gets one: the top of a navy's standing ladder, with duties that match; stolen; or a one-off story. Owned ships are never taken back, so a deserter in a T3 is a deserter everyone is looking for.
 
@@ -485,7 +485,7 @@ Decided 6 November 2026. The Belt's combat and transport hulls are stolen, captu
 | Belt hull | Rebuilt from | How |
 | --- | --- | --- |
 | Union Wildcat | Kessari Notice | Stripped to the frame and re-engined |
-| Union Blockade | Kessari Writ | The Strikes' captured toll boats, still the Militia's patrol standard |
+| Union Blockade | Kessari Writ | The Strikes' captured toll boats, still the UDF's patrol standard |
 | Union Boycott | Kessari Decree | Surplus Decrees with the launchers torn out for guns |
 | Union Walkout | Kessari Ruling | Rebuilt so far that Earth no longer recognises it |
 | Union Solidarity | Three Earth cruisers of the Statute's generation, captured in the Gate War | Rebuilt once, by every cooperative at once; never copied since |
@@ -592,7 +592,7 @@ One earlier mark for each hull new pilots and NPC traffic actually use, and (Jas
 | Arcadia Hauler Mk III | Arcadia Hauler Mk II | Every Martian colony has a hangar full of them |
 | Arcadia Freighter Mk II | Arcadia Freighter Mk I | Built to last forty years and did |
 | Ishtar Sedna | Ishtar Sedna '218 | Handed down to Venusian rescue volunteers |
-| Ishtar Lakshmi | Ishtar Lakshmi '205 | The Coastguard sells them with the guns removed |
+| Ishtar Lakshmi | Ishtar Lakshmi '205 | The Space Guard sells them with the guns removed |
 | Belt Forge Pony | The old Pony | Nobody has ever thrown one away |
 | Belt Forge Mule | The old Mule | See the Pony |
 | Belt Forge Prospector | The old Prospector | Belters do not throw ships away |
@@ -630,14 +630,14 @@ A pattern is a specialised variant of a production hull with a different mount p
 | Ishtar Lakshmi | Lifeline pattern | Repair and shield transfer; a Solace kit built in |
 | Ishtar Maat | Longbow pattern | Railguns and nothing else; answers from farther than anyone |
 | Union Blockade | Raider pattern | Afterburners, projectile guns, no shields worth the name; the Black Strike's dream |
-| Union Boycott | Picket pattern | PDCs and flak for the Militia's rotas |
+| Union Boycott | Picket pattern | PDCs and flak for the UDF's rotas |
 | Meridian Tern | Courier pattern | Faster, lighter, one less mount; Meridian's only pattern |
 | Tessaract Manifest | Deep-space pattern | Long-range tanks, a nav suite and armour for the Marches and beyond |
 | Tessaract Lading | Convoy pattern | PDCs and a tougher hull; sold to firms that lost a Lading |
 | Belt Forge Sinker | Breaching pattern | Two shotfirer rigs and a Sounder; the knot hunter |
 | Belt Forge Collier | Deep pattern | Long-range tanks and bunkers; mines where the patrols do not go |
-| Arcadia Freighter Mk II | Navy pattern | The Martian Navy's own supply ship; armoured, PDCs |
-| Solace Haven | Field pattern | Armour over comfort; flies with the Coastguard into the Marches |
+| Arcadia Freighter Mk II | Navy pattern | The Martian Republic Navy's own supply ship; armoured, PDCs |
+| Solace Haven | Field pattern | Armour over comfort; flies with the Space Guard into the Marches |
 
 ### Clan hulls
 
@@ -675,7 +675,7 @@ What every command ship has: a **bay** sized for its wing (subcraft, fighters, d
 | Drones | Arbor Canopy (medium) and Arbor Grove (T3) | Arbor | Drones, as many as it can control | Drone control range and count |
 | Military | the carriers (Mandate, Hellas, and the Belt's Union General Strike) and dreadnoughts | the naval yards; Union Defence Works | Fighters | The navy's own command suite, the fleet beacon |
 
-**The Belt's carriers are industrial capitals refitted for war.** The Belt has no naval yard, so Union Defence Works takes a Headframe (or a Breaker) and plates the hoppers over into hangars for Militia Dirks and Cutlasses, caps the furnaces, bolts gun decks to the frames: the **Union General Strike**. On shift it is a carrier with the Militia tag and the fleet beacon; off shift it goes back to hauling ore. Same hull, same wing bays, different wing. This is the same move in both directions: a civil command ship is a carrier whose wing works; a Belt carrier is a civil command ship whose wing fights.
+**The Belt's carriers are industrial capitals refitted for war.** The Belt has no naval yard, so Union Defence Works takes a Headframe (or a Breaker) and plates the hoppers over into hangars for UDF Dirks and Cutlasses, caps the furnaces, bolts gun decks to the frames: the **Union General Strike**. On shift it is a carrier with the UDF tag and the fleet beacon; off shift it goes back to hauling ore. Same hull, same wing bays, different wing. This is the same move in both directions: a civil command ship is a carrier whose wing works; a Belt carrier is a civil command ship whose wing fights.
 
 For the lead (inside the fitting model of `fitting.md`: the bays, hold kinds, processing, command suite, umbrella and beacon are **built-in role equipment**, never fitted out; the rest of the ship fits freely): a command ship is a hull with `bays` (a wing roster by subcraft class), `hold` kinds (what the wing can transfer in without docking), `process` (what it can refine or treat on board), `command` bonuses by industry and a `commandRadius`, `umbrella` (PDC coverage and shield or armour share), and `beacon`. The wing is the first thing to build; the fleet bonuses come with owned ships and hired captains. Each command ship also has a T3 prototype (below) at the top of its company's ladder.
 
