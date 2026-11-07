@@ -9,7 +9,7 @@ How the Spacegame chats work together. Every chat working on the repo reads this
 | Who | Does |
 | --- | --- |
 | **Jason** | The designer. Decides what the game is, sets priorities, plays the builds. Does not code. |
-| **Lead** (the current lead chat; "Lead 8" since 6 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
+| **Lead** (the current lead chat; "Lead 9" from 7 November 2026) | All code: sim, client, tests, docs, versions, releases, `main`. Puts design questions to Jason and keeps this file current. |
 | **Lore** (its own long-lived chat, branch `ws/lore`) | Canon: `docs/lore.md` and `docs/races.md`, names for everything, in conversation with Jason. Never code, catalogue data or numbers. The lead merges its branch and applies its names. |
 | **Focused passes** (occasional) | A chat opened for one job with a clear brief, such as an interface restyle, and closed when it is merged. The lead writes the brief here and the opener for Jason when one is wanted. |
 
@@ -274,6 +274,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 8): **handed over to Lead 9** (the project handover doc is current). Next: Open Lanes step 1, Sol slice 2, as agreed with Jason (`sol-build.md`, "Slices"; `roadmap.md`). Hold the roadmap: new ideas go to the inbox, parked.
 - 2026-11-07, lead (Lead 8): **released 0.18.0** (Sol slice 1, the Arena and mode screen, the Sol pivot renames, the fall fix, the server manager). Next: Open Lanes step 1, Sol slice 2.
 - 2026-11-07, lead (Lead 8): merged `ws/lore` (`infrastructure.md`: security as connectivity, the Accord Relay Network, fuel, death and the Return; `navy.md` "Security by connectivity"). Taken into Open Lanes: relay nodes and computed security in Sol slice 2; distress and witness records through the Relay in law lite (a crime counts once a witness uploads it to a live relay in Core or Held space); a high-speed world impact kills the pod (the pilot wakes at home, the Return without the Fade). The rest parked in the ideas inbox.
 - 2026-11-07, lore: **for the lead**: Jason's rule is pod death = Return = Fade, and at relativistic burn speeds a massive impact kills the pod. f26cc8d recovers the pod after a world impact at speed, which followed the old canon (now changed in `lore.md`): it should become a Return to the home station with Fade; a slow fall can keep the recovery. Death systems in `infrastructure.md`.
