@@ -37,15 +37,20 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `tes-docket` |  | Tessaract Docket | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
-| `tessaract-spine` | tessaract-spine | Tessaract Manifest | Cargo, Freighter, six bays | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Deep-space pattern: Jump drive and armour for the Marches and beyond | yard or ship mart | no |
-| `tes-waybill` |  | Tessaract Waybill | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
-| `tes-consignment` |  | Tessaract Consignment | Bulk, Superfreighter (convoy command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Superfreighter (convoy command ship)` |  | yard or ship mart | no |
-| `tes-lading` |  | Tessaract Lading | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` | Convoy pattern: PDCs and a tougher hull; sold to firms that lost a Lading | yard or ship mart | no |
-| `tes-tariff` |  | Tessaract Tariff | Bulk, Tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Tanker` |  | yard or ship mart | no |
-| `tes-itinerary` |  | Tessaract Itinerary | Passenger, Heavy bus, short-route liner | T2 | production | none (civilian) |  | Heavy | `Heavy-Bus` |  | yard or ship mart | no |
-| `tes-passage` |  | Tessaract Passage | Passenger, Liner | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Liner` |  | yard or ship mart | no |
-| `tes-timetable` |  | Tessaract Timetable | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
+| `tes-memo` |  | Tessaract Memo | Light civil, Courier, legacy | T1 | legacy | none (old civilian mark) | Tessaract Docket | Light | `Light-Courier` |  | used market, cheap | yes |
+| `tes-invoice` |  | Tessaract Invoice | Cargo, Hauler, legacy | T1 | legacy | none (old civilian mark) | Tessaract Waybill | Medium | `Medium-Hauler` |  | used market, cheap | yes |
+| `tes-ledger` |  | Tessaract Ledger | Cargo, Freighter, legacy | T1 | legacy | none (old civilian mark) | Tessaract Manifest | Heavy | `Heavy-Freighter` |  | used market, cheap | yes |
+| `tes-bill` |  | Tessaract Bill | Bulk, Bulk freighter, legacy | T1 | legacy | none (old civilian mark) | Tessaract Lading | Super-heavy | `Super-heavy-Bulk freighter` |  | used market, cheap | yes |
+| `tes-almanac` |  | Tessaract Almanac | Passenger, Ferry, legacy | T1 | legacy | none (old civilian mark) | Tessaract Timetable | Medium | `Medium-Ferry` |  | used market, cheap | yes |
+| `tes-docket` |  | Tessaract Docket | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
+| `tessaract-spine` | tessaract-spine | Tessaract Manifest | Cargo, Freighter, six bays | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Deep-space pattern: Jump drive and armour for the Marches and beyond | yard or ship mart | yes |
+| `tes-waybill` |  | Tessaract Waybill | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | yes |
+| `tes-consignment` |  | Tessaract Consignment | Bulk, Superfreighter (convoy command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Superfreighter (convoy command ship)` |  | yard or ship mart | yes |
+| `tes-lading` |  | Tessaract Lading | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` | Convoy pattern: PDCs and a tougher hull; sold to firms that lost a Lading | yard or ship mart | yes |
+| `tes-tariff` |  | Tessaract Tariff | Bulk, Tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Tanker` |  | yard or ship mart | yes |
+| `tes-itinerary` |  | Tessaract Itinerary | Passenger, Heavy bus, short-route liner | T2 | production | none (civilian) |  | Heavy | `Heavy-Bus` |  | yard or ship mart | yes |
+| `tes-passage` |  | Tessaract Passage | Passenger, Liner | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Liner` |  | yard or ship mart | yes |
+| `tes-timetable` |  | Tessaract Timetable | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | yes |
 | `tes-covenant` |  | Tessaract Covenant | Bulk, Prototype superfreighter | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Capital | `Capital-Prototype Superfreighter` |  | top of company standing, or story | no |
 
 ## Vantage Aerospace (earth)
@@ -81,17 +86,22 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `hal-light-mk4` |  | Arcadia Fighter Mk IV | Subcraft, Light fighter, retired navy | T1 | surplus | Navy tag intact, open market | Arcadia Fighter Mk V | Subcraft | `Subcraft-Light fighter, retired navy` |  | open market, expensive, Martian buyers first | yes |
 | `hal-heavy-mk1` |  | Arcadia Heavy Fighter Mk I | Subcraft, Heavy fighter, retired navy | T1 | surplus | Navy tag intact, open market | Arcadia Heavy Fighter Mk II | Subcraft | `Subcraft-Heavy fighter, retired navy` |  | open market, expensive, Martian buyers first | yes |
+| `arc-courier-mk3` |  | Arcadia Courier Mk III | Light civil, Courier, legacy | T1 | legacy | none (old civilian mark) | Arcadia Courier Mk IV | Light | `Light-Courier` |  | used market, cheap | yes |
+| `arc-shuttle-mk2` |  | Arcadia Shuttle Mk II | Light civil, Shuttle, legacy | T1 | legacy | none (old civilian mark) | Arcadia Shuttle Mk III | Light | `Light-Shuttle` |  | used market, cheap | yes |
+| `arc-freighter-mk1` |  | Arcadia Freighter Mk I | Cargo, Freighter, legacy | T1 | legacy | none (old civilian mark) | Arcadia Freighter Mk II | Heavy | `Heavy-Freighter` |  | used market, cheap | yes |
+| `arc-hauler-mk2` |  | Arcadia Hauler Mk II | Cargo, Hauler, legacy | T1 | legacy | none (old civilian mark) | Arcadia Hauler Mk III | Medium | `Medium-Hauler` |  | used market, cheap | yes |
+| `arc-ice-mk1` |  | Arcadia Ice Hauler Mk I | Bulk, Ice hauler, legacy | T1 | legacy | none (old civilian mark) | Arcadia Ice Hauler Mk II | Heavy | `Heavy-Ice hauler` |  | used market, cheap | yes |
 | `hal-light` |  | Arcadia Fighter Mk V | Subcraft, Light fighter | T2 | production | Navy / civilian |  | Subcraft | `Subcraft-Light fighter` |  | yard, Navy grade behind the licence; civilian grade open to Martians only | yes |
 | `hal-heavy` |  | Arcadia Heavy Fighter Mk II | Subcraft, Heavy fighter | T2 | production | Navy only |  | Subcraft | `Subcraft-Heavy fighter` |  | yard, licence only | yes |
-| `arc-courier` |  | Arcadia Courier Mk IV | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
-| `arc-shuttle` |  | Arcadia Shuttle Mk III | Light civil, Shuttle | T2 | production | none (civilian) |  | Light | `Light-Shuttle` |  | yard or ship mart | no |
-| `arc-freighter` |  | Arcadia Freighter Mk II | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Navy pattern: The Martian Navy's own supply ship; armoured, PDCs | yard or ship mart | no |
-| `arc-hauler` |  | Arcadia Hauler Mk III | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
-| `arc-bulk` |  | Arcadia Bulk Freighter Mk I | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` |  | yard or ship mart | no |
-| `arc-ice` |  | Arcadia Ice Hauler Mk II | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | no |
-| `arc-ferry` |  | Arcadia Ferry Mk II | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
-| `arc-tender` |  | Arcadia Tender Mk I | Service, Repair tender | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` |  | yard or ship mart | no |
-| `arc-tug` |  | Arcadia Tug Mk II | Service, Tug | T2 | production | none (civilian) |  | Medium | `Medium-Tug` |  | yard or ship mart | no |
+| `arc-courier` |  | Arcadia Courier Mk IV | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
+| `arc-shuttle` |  | Arcadia Shuttle Mk III | Light civil, Shuttle | T2 | production | none (civilian) |  | Light | `Light-Shuttle` |  | yard or ship mart | yes |
+| `arc-freighter` |  | Arcadia Freighter Mk II | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Navy pattern: The Martian Navy's own supply ship; armoured, PDCs | yard or ship mart | yes |
+| `arc-hauler` |  | Arcadia Hauler Mk III | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | yes |
+| `arc-bulk` |  | Arcadia Bulk Freighter Mk I | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` |  | yard or ship mart | yes |
+| `arc-ice` |  | Arcadia Ice Hauler Mk II | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | yes |
+| `arc-ferry` |  | Arcadia Ferry Mk II | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | yes |
+| `arc-tender` |  | Arcadia Tender Mk I | Service, Repair tender | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` |  | yard or ship mart | yes |
+| `arc-tug` |  | Arcadia Tug Mk II | Service, Tug | T2 | production | none (civilian) |  | Medium | `Medium-Tug` |  | yard or ship mart | yes |
 | `arc-mk0` |  | Arcadia Prototype Mk 0 | Bulk, Prototype bulk freighter | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Super-heavy | `Super-heavy-Prototype Bulk freighter` |  | top of company standing, or story | no |
 
 ## Ishtar Fleet Works (venus)
