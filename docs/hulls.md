@@ -124,26 +124,26 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `sol-stretcher` |  | Solace Stretcher | Subcraft, Heavy SAR fighter | T2 | production | Navy only |  | Subcraft | `Subcraft-Heavy SAR fighter` |  | yard, licence only | yes |
-| `sol-haven` |  | Solace Haven | Service, Repair tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` | Field pattern: Armour over comfort; flies with the Coastguard into the Marches | yard or ship mart | no |
-| `sol-refuge` |  | Solace Refuge | Service, Repair ship, heavy | T2 | production | none (civilian) |  | Heavy | `Heavy-Repair ship` |  | yard or ship mart | no |
-| `sol-respite` |  | Solace Respite | Service, Tender, small | T2 | production | none (civilian) |  | Light | `Light-Tender` |  | yard or ship mart | no |
-| `sol-sanctuary` |  | Solace Sanctuary | Service, Hospital ship, large (SAR command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Hospital ship` |  | yard or ship mart | no |
+| `sol-haven` |  | Solace Haven | Service, Repair tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` | Field pattern: Armour over comfort; flies with the Coastguard into the Marches | yard or ship mart | yes |
+| `sol-refuge` |  | Solace Refuge | Service, Repair ship, heavy | T2 | production | none (civilian) |  | Heavy | `Heavy-Repair ship` |  | yard or ship mart | yes |
+| `sol-respite` |  | Solace Respite | Service, Tender, small | T2 | production | none (civilian) |  | Light | `Light-Tender` |  | yard or ship mart | yes |
+| `sol-sanctuary` |  | Solace Sanctuary | Service, Hospital ship, large (SAR command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Hospital ship` |  | yard or ship mart | yes |
 | `sol-grace` |  | Solace Grace | Service, Prototype hospital ship | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Super-heavy | `Super-heavy-Prototype Hospital ship` |  | top of company standing, or story | no |
 
 ## Halden Institute (venus)
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `hal-expedition` |  | Halden Expedition | Service, Explorer, large (exploration command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Heavy | `Heavy-Explorer` |  | yard or ship mart | no |
-| `hal-inquiry` |  | Halden Inquiry | Service, Survey ship, medium | T2 | production | none (civilian) |  | Medium | `Medium-Survey ship` |  | yard or ship mart | no |
-| `hal-query` |  | Halden Query | Service, Survey ship, small | T2 | production | none (civilian) |  | Light | `Light-Survey ship` |  | yard or ship mart | no |
+| `hal-expedition` |  | Halden Expedition | Service, Explorer, large (exploration command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Heavy | `Heavy-Explorer` |  | yard or ship mart | yes |
+| `hal-inquiry` |  | Halden Inquiry | Service, Survey ship, medium | T2 | production | none (civilian) |  | Medium | `Medium-Survey ship` |  | yard or ship mart | yes |
+| `hal-query` |  | Halden Query | Service, Survey ship, small | T2 | production | none (civilian) |  | Light | `Light-Survey ship` |  | yard or ship mart | yes |
 | `hal-threshold` |  | Halden Threshold | Service, Prototype explorer | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Explorer` |  | top of company standing, or story | no |
 
 ## Arbor Dynamics (venus)
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `arb-canopy` |  | Arbor Canopy | Service, Drone tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Drone tender` |  | yard or ship mart | no |
+| `arb-canopy` |  | Arbor Canopy | Service, Drone tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Drone tender` |  | yard or ship mart | yes |
 | `vae-heavy` |  | Arbor Bramble | Drone, Heavy combat drone | T2 | production | none (civilian) |  | Drone | `Drone-Heavy combat drone` |  | yard or ship mart | yes |
 | `arb-shoot` |  | Arbor Shoot | Drone, Repair drone | T2 | production | none (civilian) |  | Drone | `Drone-Repair drone` |  | yard or ship mart | no |
 | `vae-light` |  | Arbor Thorn | Drone, Light combat drone | T2 | production | none (civilian) |  | Drone | `Drone-Light combat drone` |  | yard or ship mart | yes |
@@ -153,10 +153,10 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `lav-monsoon` |  | Lavinia Monsoon | Bulk, Gas tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Gas tanker` |  | yard or ship mart | no |
-| `lav-gale` |  | Lavinia Gale | Mining, Skimmer, medium | T2 | production | none (civilian) |  | Medium | `Medium-Skimmer` |  | yard or ship mart | no |
-| `lav-zephyr` |  | Lavinia Zephyr | Mining, Skimmer, small | T2 | production | none (civilian) |  | Light | `Light-Skimmer` |  | yard or ship mart | no |
-| `lav-cyclone` |  | Lavinia Cyclone | Industry, Gas refinery, capital (gas command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Gas refinery` |  | yard or ship mart | no |
+| `lav-monsoon` |  | Lavinia Monsoon | Bulk, Gas tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Gas tanker` |  | yard or ship mart | yes |
+| `lav-gale` |  | Lavinia Gale | Mining, Skimmer, medium | T2 | production | none (civilian) |  | Medium | `Medium-Skimmer` |  | yard or ship mart | yes |
+| `lav-zephyr` |  | Lavinia Zephyr | Mining, Skimmer, small | T2 | production | none (civilian) |  | Light | `Light-Skimmer` |  | yard or ship mart | yes |
+| `lav-cyclone` |  | Lavinia Cyclone | Industry, Gas refinery, capital (gas command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Gas refinery` |  | yard or ship mart | yes |
 | `lav-tempest` |  | Lavinia Tempest | Mining, Prototype skimmer | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Skimmer` |  | top of company standing, or story | no |
 
 ## Union Defence Works (belt)
@@ -217,10 +217,10 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `dri-light` |  | Vesk light raider | Subcraft, Light raider | T3 | clan | none (clan standing) |  | Subcraft | `Subcraft-Light raider` |  | clan standing or a very rare sale | yes |
 | `vesk-vane` |  | Vesk Vane | Corvette, Watcher; stealth raider and escort | T3 | clan, watcher: fast and agile despite size; cold-running; finds the target and holds a lock that is a jump target; no real damage | none (clan standing) |  | Light | `Light-Watcher` |  | clan standing or a very rare sale | yes |
 | `vesk-shade` |  | Vesk Shade | Frigate, Striker; stealth raider | T3 | clan, striker: jumps in behind the hunter, alpha far above its class, low defences, committed once landed | none (clan standing) |  | Medium | `Medium-Striker` |  | clan standing or a very rare sale | yes |
-| `lw-keel` |  | Long Wake Keel | Service, Salvage tender | T3 | clan | none (clan standing) |  | Medium | `Medium-Salvage tender` |  | clan standing or a very rare sale | no |
-| `lw-trawl` |  | Long Wake Trawl | Service, Recovery tender, heavy | T3 | clan | none (clan standing) |  | Heavy | `Heavy-Recovery tender` |  | clan standing or a very rare sale | no |
-| `saro-farwalker` |  | Saro Farwalker | Service, Explorer, large | T3 | clan | none (clan standing) |  | Heavy | `Heavy-Explorer` |  | clan standing or a very rare sale | no |
-| `saro-waystar` |  | Saro Waystar | Service, Survey ship | T3 | clan | none (clan standing) |  | Medium | `Medium-Survey ship` |  | clan standing or a very rare sale | no |
+| `lw-keel` |  | Long Wake Keel | Service, Salvage tender | T3 | clan | none (clan standing) |  | Medium | `Medium-Salvage tender` |  | clan standing or a very rare sale | yes |
+| `lw-trawl` |  | Long Wake Trawl | Service, Recovery tender, heavy | T3 | clan | none (clan standing) |  | Heavy | `Heavy-Recovery tender` |  | clan standing or a very rare sale | yes |
+| `saro-farwalker` |  | Saro Farwalker | Service, Explorer, large | T3 | clan | none (clan standing) |  | Heavy | `Heavy-Explorer` |  | clan standing or a very rare sale | yes |
+| `saro-waystar` |  | Saro Waystar | Service, Survey ship | T3 | clan | none (clan standing) |  | Medium | `Medium-Survey ship` |  | clan standing or a very rare sale | yes |
 
 ## Meridian Yards (indep)
 
