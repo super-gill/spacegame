@@ -83,7 +83,7 @@ An Aurel is the Chorus speaking through many vessels. Each vessel carries a **vo
 | Sealed designs, cannot be refitted | A ship is a voice's body; the voice rejects foreign parts |
 | Each built for one job | Each voice is shaped for one purpose and its hull grows around it |
 | No manufacturers, no yards | The Chorus shapes ships slowly in its own systems; nothing is built in a factory |
-| Floating segments that do not quite touch | The voice holds the hull together with fields; when it dies, the segments drift apart |
+| Floating segments that do not quite touch | The voice holds the hull together with fields; when it dies, the segments drift apart. Nothing touches: drive pods, sensor planes and lances all hang off the hull on field (Jason, 7 November) |
 | Pale white with a cyan glow | The glow is the voice; a dead Aurel hull is dull white |
 | No instruments | A voice simply knows. Human scholars think the Aur built sealed hulls because they never needed to read anything. |
 
@@ -141,6 +141,10 @@ For now the Aurel are a horizon. Whether players ever cross the Shoals in play i
 A white ship at the edge of sensor range that holds station and burns away if approached. No transponder, so it reads as an unknown contact of a strange size until someone locks it, and most never will. It never fights unless the Unsung or the Hollow Choir are involved. Canon already says the Chorus sends voices to watch younger peoples; this is that, made visible. A note for the lead's list, not a mechanic yet.
 
 The Aurel Tacet, today's sealed development ship, is a voice that never left home: a test ship, outside the economy and never issued.
+
+### The voices
+
+The kinds humans have named, each the best at its one purpose (`fleet.md`, "Aurel"): the **Fermata** (the watcher, a hold), the **Lament** (the warden that fought the Quiet War), the **Refrain** (the tender; the Tending made a ship, and where a faded pilot is retuned), the **Hush** (the silencer, the instrument of the Sundering), the **Canticle** (the wayfarer that crosses the Shoals), the **Threnody** (the great voice, a chorus in one hull), and the **Tacet**. The Unsung fly the same kinds gone wrong, the hollow ships: bone plate, a violet voice, segments drifting and missing.
 
 ## Timeline
 
@@ -813,6 +817,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **The Aurel ships** (Jason). Design language: white, hyper-modern, a collection of floating parts; a nacelle deliberately does not touch the hull. Every Aurel ship is T3. Six kinds named and drawn (Fermata, Lament, Refrain, Hush, Canticle, Threnody) plus the Tacet redrawn and a husk; the Unsung fly the same kinds as hollow ships (four drawn). The gift to the Voiced is chosen by the Chorus, usually a Fermata and a Lament, never a Hush or a Threnody.
 - 2026-11-07: **Relativistic speeds and pod death** (Jason). Long burns reach a real fraction of light speed, so massive impacts kill pods outright: hitting a world, a rock or a hull at burn speed is a Return. A slow fall into a well still leaves a pod for rescue. The causes of pod death are a guide; the rule is pod death = Return = Fade. Lanes are swept corridors and approach zones have speed limits for the same reason.
 - 2026-11-07: **Death and the Return, refined** (Jason). Pod death is rare: rammed or caught in the wreck, crashed, killed by a pilot, found by rare pod-hunting NPCs, or stranded too far from help for the pod's small tank and air. Only a Return costs Fade, and the Fade is treated like age or illness: pilots retire from space work when it is too high. No stat penalties. A ship is what it is: a Voiced pilot in a human ship flies a human ship; in an Aurel ship, an Aurel ship, top tier and beyond human tech. The Voiced are marked on the Registry and hunted by most of humanity; Venus is their only real ally, the Belt tolerates them to a degree.
 - 2026-11-07: **Death and the Return** (Jason). Pilots return from pod death, wake at their home station's Registry clinic, and lose the ship, cargo and unuploaded logs. The gift is biological, in all humans, woken in some (pilots, some navy and pirate captains), and works only where the Lattice reaches. Every Return costs some of the Fade: generous early, steep late, dozens in all, then final death; the cost is reach, time and a louder Lattice, never ship or pilot penalties. Losing a ship without losing the pod costs no Fade. Solace treatment slows it. Ironman is a pilot whose gift never woke. The Aurel can take a pilot into the Chorus: the Voiced, who no longer fade, are given one or two Aurel ships (the Gifted route), and pay with an unreadable transponder, the Choir's hunt and the Unsung's attention. Hidden canon: the Aurel made the change in the Tending, as atonement.

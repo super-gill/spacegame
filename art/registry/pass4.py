@@ -557,20 +557,6 @@ def knocker():
 
 # ------------------------------------------------------------------ Aurel
 
-def tacet():
-    """Aurel Tacet, the sealed development and test ship: a long dark seamless spindle with no windows, no doors and no markings, a single ring of pale light amidships, and engines that do not show a flame. A voice that never sang."""
-    h = Hull("aurel-tacet", 1.0, 4.0); h.stroke = "#000000"
-    pts, w = egg(50, 7, 0.2, power=3.0)
-    h.body(pts, "url(#aurelHull)", grid=False, sw=0.3)
-    h.f(circ(0, 0, 5.6, "none", stroke=LATG, sw=0.5, extra='opacity="0.7"')); h.f(circ(0, 0, 5.6, "none", stroke=LAT, sw=0.14))
-    for xx in (-16, -8, 8, 16): h.f(line(xx, -w(xx) + 0.3, xx, w(xx) - 0.3, stroke="#151a22", sw=0.14))
-    for s in (-1, 1):
-        h.f(rect(-27, s * 3.2 - 1.4, 4, 2.8, "#05070a", stroke="#1c2230", sw=0.14, rx=0.4), mid=True)
-    h.f(circ(-25, 0, 0.5, LATG, extra='opacity="0.5"'))
-    h.f(circ(21, 0, 0.8, "#05070a", stroke="#1c2230", sw=0.14))
-    return h, 29
-
-
 DEFS = ('<linearGradient id="merOld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5e6165"></stop><stop offset="0.3" stop-color="#85888c"></stop>'
         '<stop offset="0.5" stop-color="#969a9e"></stop><stop offset="0.7" stop-color="#85888c"></stop><stop offset="1" stop-color="#5e6165"></stop></linearGradient>'
         '<linearGradient id="corOld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1f24"></stop><stop offset="0.3" stop-color="#2f363d"></stop>'
@@ -605,7 +591,6 @@ NOTES = {
     "cor-colossus": ["Corvane Colossus, prototype mining carrier: two long hangar booms reach forward from a dark slab with their bay doors facing inward onto a receiving dock where the wing unloads; a conveyor carries the take down the spine to eight furnaces lined with gate-glass that burn pale; loading cradles along both flanks for Drays and Pitheads; heavy blisters at every corner; the fleet beacon aft; six engines. It parks at the edge of a field and never goes in. Nothing human processes ore faster."],
     "arb-shoot": ["Arbor Shoot, repair drone: a Solace repair kit on a thruster frame. An open green frame round a cream canister of nanite paste, a nozzle arm forward, a regen node aft, four thruster pods at the corners. No cockpit, no wings: a machine."],
     "rookrivet-drone": ["Belt Forge Knocker, mining drone: a dark girder cross with a laser cutter at its head, a battery block in rust at the centre, an ore bag slung under, three cold thrusters at the arm ends. A machine, not a craft; in the old mines knockers were spirits heard tapping at the rock face."],
-    "aurel-tacet": ["Aurel Tacet, the sealed development and test ship: a long dark seamless spindle with no windows, no doors and no markings, a single ring of pale light amidships, and engines that show no flame. A voice that never sang."],
 }
 
 ENTRIES = [
@@ -625,7 +610,7 @@ def all_art():
                 lambda: fulmar(False), lambda: fulmar(True), knot, grebe, shrike,
                 lambda: dray(False), lambda: dray(True), smelter, still,
                 covenant, mk0, tempest, lodestar, lazarus, grace, threshold, grove, colossus,
-                shoot, knocker, tacet]
+                shoot, knocker]
     for fn in builders:
         h, R = fn()
         R = max(R, abs(h.xmin) * 1.08, h.xmax * 1.08)

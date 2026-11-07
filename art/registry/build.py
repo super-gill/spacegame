@@ -8,7 +8,7 @@ import html
 import json
 import re
 import sys
-import kod, vantage, mars, older, specops, venus, indep, belt, civil, beltciv, venciv, pass4, pass5, fitting
+import kod, vantage, mars, older, specops, venus, indep, belt, civil, beltciv, venciv, pass4, pass5, aurel, fitting
 
 SRC = sys.argv[1]
 OUT = sys.argv[2]
@@ -57,7 +57,8 @@ BUILDERS = [
     ("clans", "The clans", "belt", "Vesk, Saro and the Long Wake. Bespoke hulls built over generations; no two alike."),
     ("meridian", "Meridian Yards", "indep", "Independent. The small civilian ships everyone starts in, and armed utility for anyone with a licence. Seabird names. Registry grey with one safety-yellow stripe."),
     ("corvane", "Corvane Heavy Industries", "indep", "Independent: Earth money, Belt yards, nobody's flag. Heavy ore haulage and refining, and the corporate security that guards it. Dark steel and industrial orange."),
-    ("aurel", "Aurel", "aurel", "No yards and no companies. Every ship is a voice."),
+    ("aurel", "Aurel", "aurel", "No yards and no companies. Every ship is a voice: white, hyper-modern, a collection of parts held apart by field, nothing touching. All T3, beyond human."),
+    ("unsung", "The Unsung", "aurel", "The broken voices, caged in the Dark. The same shapes gone wrong: bone plate, a violet voice, segments drifting and missing. The hollow ships."),
 ]
 
 MIL = [("pod", "Pod", "Escape pods and lifeboats."), ("craft", "Subcraft", "Crewed small craft carried in bays, flown by NPC crews: fighters, mining, salvage and rescue subcraft. Not a class in the game yet."),
@@ -225,10 +226,12 @@ add("cor-foreman", "corvane", "industry", "Corvane Foreman", "Factory ship, arme
 add("cor-still", "corvane", "industry", "Corvane Still", "Skimmer carrier, capital (gas command ship)", "Corvane's answer to the Cyclone, uglier; its wing skims, it holds the line")
 add("cor-miner", "corvane", "craft", "Corvane Navvy", "Mining subcraft", "The civilian one: a rounded cab, a laser on the roof, an ore pod each side, nothing that can fight", art="cor-miner")
 # Aurel
-add("aurel-tacet", "aurel", "voice", "Aurel Tacet", "The sealed development and test ship", "A voice that never sang", "game", art="aurel-tacet")
+add("aurel-tacet", "aurel", "voice", "Aurel Tacet", "The sealed development and test ship", "A voice that never sang", "voice", art="aurel-tacet")
+for (k, bb, col, name, job, char) in aurel.ENTRIES: add(k, bb, col, name, job, char, "voice")
+CIV_WEIGHT.update(aurel.WEIGHT)
 
 # ---------------------------------------------------------------- data for the page
-STATUS = {"game": "In game", "named": "Named", "draft": "Draft, not in game", "clan": "Clan hull, draft", "legacy": "Legacy mark, draft", "surplus": "Retired navy, draft", "t3": "Special operations, draft"}
+STATUS = {"game": "In game", "named": "Named", "draft": "Draft, not in game", "clan": "Clan hull, draft", "legacy": "Legacy mark, draft", "surplus": "Retired navy, draft", "t3": "Special operations, draft", "voice": "A voice, draft"}
 GAP_LEGACY = [
     ("arc-miner-mk1", "arcadia", "mining", "Arcadia Miner Mk I", "Miner, legacy", "Mars does not scrap; the colonies cut with these", "legacy", "arc-miner"),
     ("arc-tender-mk0", "arcadia", "service", "Arcadia Tender Mk 0", "Repair tender, legacy", "The only used repair hull anyone can buy; Solace's marks do not age", "legacy", "arc-tender"),
@@ -281,17 +284,18 @@ for s in F:
         "legacy": list(s["legacy"]) if s.get("legacy") else None,
         "patterns": s.get("patterns") or None,
         "base": s.get("base"), "gen": s["status"] if s["status"] in ("legacy", "surplus") else None,
-        "tier": 1 if s["status"] in ("legacy", "surplus") else (3 if s["status"] in ("clan", "t3") else 2), "role": s.get("role"),
+        "tier": 1 if s["status"] in ("legacy", "surplus") else (3 if s["status"] in ("clan", "t3", "voice") else 2), "role": s.get("role"),
         "command": "command ship" in s["job"],
         "navy": (bool(b[2] and s["col"] in MILCOLS and s["col"] not in ("drone", "pod", "voice") and s["status"] != "legacy") or s["builder"] in ("vantage",) or s["key"] == "ish-hathor") and s["builder"] not in ("meridian", "corvane", "beltforge", "rookrivet") and "subcraft" not in s["job"].lower(),
     }
     col = s["col"]
-    if col in ("craft", "drone", "pod", "voice"): w = MIL_WEIGHT[col]
+    if col == "voice": w = CIV_WEIGHT.get(s["key"], MIL_WEIGHT[col])
+    elif col in ("craft", "drone", "pod"): w = MIL_WEIGHT[col]
     elif col in MILCOLS: w = MIL_WEIGHT[col]
     else: w = CIV_WEIGHT.get(s["key"], "Unrated")
     fn = s["job"] if col in ("craft", "drone") else (CLASSES[col] if col in MILCOLS and col != "pod" else s["job"].split(",")[0])
     if col == "pod": fn = "Lifeboat"
-    if col == "voice": fn = "Voice"
+    if col == "voice": fn = s["job"].split(";")[0].split(",")[0].replace("A dead voice", "Husk")
     if s.get("role") and s["role"] != "prototype": fn = s["role"].capitalize()
     if s.get("role") == "prototype": fn = "Prototype " + (s["job"].split("Prototype ")[-1].split(",")[0]).capitalize()
     if fn.lower().startswith(w.lower() + " "): fn = fn[len(w) + 1:].capitalize()
@@ -321,7 +325,8 @@ BC_DEFS, BC_SYMS, BC_META = beltciv.all_art()
 VC_DEFS, VC_SYMS, VC_META = venciv.all_art()
 P4_DEFS, P4_SYMS, P4_META = pass4.all_art()
 P5_DEFS, P5_SYMS, P5_META = pass5.all_art()
-KOD_DEFS += V_DEFS + M_DEFS + O_DEFS + S_DEFS + VE_DEFS + I_DEFS + BE_DEFS + C_DEFS + BC_DEFS + VC_DEFS + P4_DEFS + P5_DEFS; KOD_SYMS += V_SYMS + M_SYMS + O_SYMS + S_SYMS + VE_SYMS + I_SYMS + BE_SYMS + C_SYMS + BC_SYMS + VC_SYMS + P4_SYMS + P5_SYMS; KOD_META = {**KOD_META, **V_META, **M_META, **O_META, **S_META, **VE_META, **I_META, **BE_META, **C_META, **BC_META, **VC_META, **P4_META, **P5_META}
+AU_DEFS, AU_SYMS, AU_META = aurel.all_art()
+KOD_DEFS += V_DEFS + M_DEFS + O_DEFS + S_DEFS + VE_DEFS + I_DEFS + BE_DEFS + C_DEFS + BC_DEFS + VC_DEFS + P4_DEFS + P5_DEFS + AU_DEFS; KOD_SYMS += V_SYMS + M_SYMS + O_SYMS + S_SYMS + VE_SYMS + I_SYMS + BE_SYMS + C_SYMS + BC_SYMS + VC_SYMS + P4_SYMS + P5_SYMS + AU_SYMS; KOD_META = {**KOD_META, **V_META, **M_META, **O_META, **S_META, **VE_META, **I_META, **BE_META, **C_META, **BC_META, **VC_META, **P4_META, **P5_META, **AU_META}
 for k, m in KOD_META.items():
     e = ships[k]
     e["art"] = True
@@ -387,7 +392,7 @@ def chip(s):
     return (f'<a class="{cls}" href="#{s["key"]}" data-key="{s["key"]}" aria-label="{html.escape(s["name"])}, {html.escape(s["tag"])}" title="{html.escape(s["name"])} [{html.escape(s["tag"])}]">'
             f'<svg viewBox="0 0 10 10" aria-hidden="true"><use href="#s-{s["key"]}-mid" style="color:{col}"></use></svg><span>{html.escape(short)}</span></a>')
 
-TIERNAME = {1: "legacy, retired navy", 2: "production, pattern", 3: "special ops, clan"}
+TIERNAME = {1: "legacy, retired navy", 2: "production, pattern", 3: "special ops, clan, voices"}
 
 def table(cols, builders, klass):
     th = "".join(f'<th scope="col"{" class=\"wide\"" if k == "craft" else ""} title="{html.escape(tip)}"><span class="cls">{n}</span></th>' for k, n, tip in cols)
@@ -523,6 +528,7 @@ def handover(path):
     def grades(e):
         if e["race"] == "union" and e.get("civ"): return "UDF (on rota) / cooperative (off)"
         if e["race"] == "clans": return "none (clan standing)"
+        if e["race"] in ("aurel", "unsung"): return "none (a voice; sealed, no grade)"
         if e["race"] in ("meridian", "corvane"): return "none (independent, no licence)"
         if e.get("gen") == "surplus": return "Navy tag intact, open market"
         if e.get("gen") == "legacy": return "none (old civilian mark)"
@@ -533,6 +539,8 @@ def handover(path):
     def route(e):
         if e["race"] == "union": return "Belt only, cooperative standing"
         if e["race"] == "clans": return "clan standing or a very rare sale"
+        if e["race"] == "aurel": return "a husk, the one on the pad, or the gift to the Voiced"
+        if e["race"] == "unsung": return "never; it is the enemy"
         if e["race"] in ("meridian", "corvane"): return "open market, anywhere"
         if e.get("gen") == "surplus": return "open market, expensive" + (", Martian buyers first" if e["power"] == "mars" else "")
         if e.get("gen") == "legacy": return "used market, cheap"
