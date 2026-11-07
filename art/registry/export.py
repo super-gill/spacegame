@@ -227,6 +227,16 @@ def simplify(poly, n):
     return poly
 
 
+SIL_SHARE = 0.6  # below this share of the drawing's area, a silhouette is taken to be incomplete
+
+
+def area(poly):
+    """A polygon's area (shoelace), 0 for fewer than three points."""
+    if len(poly) < 3:
+        return 0.0
+    return abs(sum(poly[i][0] * poly[(i + 1) % len(poly)][1] - poly[(i + 1) % len(poly)][0] * poly[i][1] for i in range(len(poly)))) / 2
+
+
 def faint(svg):
     """An SVG fragment without its faint shapes (glows, washes): they are not hull."""
     return re.sub(r'<(ellipse|circle|rect|polygon|path)\b[^>]*\bopacity="0?\.[0-5]\d*"[^>]*>(</\1>)?', "", svg)
@@ -236,7 +246,11 @@ def outline(sil_svg, full_svg):
     """The silhouette as a convex polygon of at most OUTLINE_POINTS, nose first. From the silhouette
     symbol, or the full drawing's solid shapes when a hull has no silhouette (a builder that drew no body).
     Convex for now: good for hit shapes and the radar; concave detail stays in the picture."""
-    pts = silhouette_points(sil_svg) or silhouette_points(faint(strip_marked(full_svg)))
+    sil = silhouette_points(sil_svg)
+    drawn = silhouette_points(faint(strip_marked(full_svg)))
+    # Some builders' silhouettes are only the core block (the Belt's frame hulls: the cab, not the frame,
+    # hoppers and booms). When the silhouette covers well under the drawing, the drawing is the outline.
+    pts = drawn if not sil or area(convex_hull(sil)) < SIL_SHARE * area(convex_hull(drawn)) else sil
     hull = simplify(convex_hull(pts), OUTLINE_POINTS)
     if not hull:
         return []

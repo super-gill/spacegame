@@ -548,7 +548,8 @@ def knocker():
     for (x0, y0, x1, y1) in ((-3.0, -0.6, -1, -0.6), (1, 0.6, 3.0, 0.6)): h.f(line(x0, y0, x1, y1, stroke=GUN2, sw=0.16))
     h.f(rect(-1.6, -1.4, 3.2, 2.8, GUN, stroke=BSEAM, sw=0.14), mid=True)
     h.f(rect(-1.2, -1.0, 2.4, 2.0, "#c8642e", stroke=BSEAM, sw=0.1))
-    h.f(rect(3.0, -0.5, 1.8, 1.0, GUN, stroke=BSEAM, sw=0.12), mid=True); h.f(circ(5.0, 0, 0.45, "#ff5a3a"))
+    with h.mount("w1", "high", "S", 3.4, 0):
+        h.f(rect(3.0, -0.5, 1.8, 1.0, GUN, stroke=BSEAM, sw=0.12), mid=True); h.f(circ(5.0, 0, 0.45, "#ff5a3a"))
     for (x, y) in ((-3.2, 0), (0, -3.0), (0, 3.0)):
         h.f(rect(x - 0.6, y - 0.6, 1.2, 1.2, "#111317", stroke=BSEAM, sw=0.12), mid=True); h.f(circ(x, y, 0.25, "#ffb060", extra='opacity="0.8"'))
     h.f(ell(0, 2.2, 1.0, 0.6, "#5a4a3a", f'stroke="{BSEAM}" stroke-width="0.1"'))

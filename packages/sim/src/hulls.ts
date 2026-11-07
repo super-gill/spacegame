@@ -1,5 +1,6 @@
 import type { HullClass, HullSpec, MountPoint, MountService, MountType, ModuleSize } from './types.js';
 import type { Vec2 } from './vec2.js';
+import { HULL_GEOMETRY, type HullGeometry } from './hull-geometry.js';
 
 /** What each hull class is called on screen (docs/lore.md, "Hull classes"). */
 export const HULL_CLASS_NAMES: Record<HullClass, string> = {
@@ -84,7 +85,7 @@ function outline(points: ReadonlyArray<readonly [number, number]>): Vec2[] {
   return points.map(([x, y]) => ({ x, y }));
 }
 
-export const HULLS: Record<string, HullSpec> = {
+const TABLE: Record<string, HullSpec> = {
   'meridian-courier': {
     // Civilian starter. Light, forgiving, a little of everything and room
     // for one upgrade (the empty armour mount).
@@ -582,7 +583,8 @@ export const HULLS: Record<string, HullSpec> = {
     power: 'aurel',
     manufacturer: 'aurel',
     role: 'development',
-    sizeClass: 'S',
+    // L: drawn as long as a frigate (the art, radius 38), so it needs a large pad.
+    sizeClass: 'L',
     price: 0,
     mass: 5,
     structure: 260,
@@ -654,3 +656,38 @@ export const HULLS: Record<string, HullSpec> = {
     escapePod: true,
   },
 };
+
+/**
+ * A hull with its shape from the art (scripts/geometry.mjs, docs/ship-pipeline.md):
+ * outline and radius as drawn, weapon and PDC mounts where the art puts
+ * them, so a ship is hit where it is drawn and fires from its turrets.
+ * Sizes, facings, arcs and every number stay this table's. Internal
+ * mounts (no picture of their own) keep their place relative to the
+ * outline, so they stay inside the drawn hull on the fitting screen.
+ */
+/** The x and y ranges of a set of points. */
+function box(points: ReadonlyArray<readonly [number, number]>): { x: [number, number]; y: [number, number] } {
+  const xs = points.map((p) => p[0]);
+  const ys = points.map((p) => p[1]);
+  return { x: [Math.min(...xs), Math.max(...xs)], y: [Math.min(...ys), Math.max(...ys)] };
+}
+
+export function withGeometry(hull: HullSpec, geometry: HullGeometry | undefined): HullSpec {
+  if (!geometry) return hull;
+  // Internal mounts move from the table's outline box to the drawn one, axis by axis.
+  const from = box(hull.outline.map((p) => [p.x, p.y] as const));
+  const to = box(geometry.outline);
+  const along = (v: number, a: readonly [number, number], b: readonly [number, number]) =>
+    a[1] > a[0] ? b[0] + ((v - a[0]) / (a[1] - a[0])) * (b[1] - b[0]) : v;
+  const mounts = hull.mounts.map((m) => {
+    const drawn = geometry.mounts[m.id];
+    if (drawn) return { ...m, position: { x: drawn[0], y: drawn[1] } };
+    if (m.type === 'high' || m.type === 'ciws') return m;
+    return { ...m, position: { x: along(m.position.x, from.x, to.x), y: along(m.position.y, from.y, to.y) } };
+  });
+  return { ...hull, radius: geometry.radius, outline: outline(geometry.outline), mounts };
+}
+
+export const HULLS: Record<string, HullSpec> = Object.fromEntries(
+  Object.entries(TABLE).map(([id, hull]) => [id, withGeometry(hull, HULL_GEOMETRY[id])]),
+);

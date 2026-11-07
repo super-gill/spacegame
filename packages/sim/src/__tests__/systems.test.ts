@@ -1,3 +1,4 @@
+import { HULL_GEOMETRY } from '../hull-geometry.js';
 import { describe, expect, it } from 'vitest';
 import { angleDelta } from '../angle.js';
 import { fireWeapons } from '../combat.js';
@@ -315,7 +316,9 @@ describe('slot placement (docs/fitting.md, "Placement")', () => {
   it('puts high slots and CIWS hardpoints on the hull edge, and mids and lows inside it', () => {
     for (const hull of Object.values(HULLS)) {
       for (const m of hull.mounts) {
-        if (m.type === 'high' || m.type === 'ciws') expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
+        // Hulls drawn from art put turrets where the art marks them, often on top of the hull
+        // (hull-geometry.test.ts checks they sit on it); the edge rule is for hand-placed mounts.
+        if ((m.type === 'high' || m.type === 'ciws') && !HULL_GEOMETRY[hull.id]) expect(toEdge(m.position, hull.outline), `${hull.id} ${m.id}`).toBeLessThanOrEqual(hull.radius * 0.2);
         // A freighter's cargo pods hang off its spine, outside the outline.
         if ((m.type === 'mid' || m.type === 'low') && !(hull.class === 'freighter' && m.id.startsWith('b'))) expect(inside(m.position, hull.outline), `${hull.id} ${m.id}`).toBe(true);
       }

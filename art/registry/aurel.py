@@ -266,6 +266,8 @@ def tacet():
     h.tiles([[(26, 0), (16, -4), (16, 4)], [(15, -4), (0, -6), (0, 6), (15, 4)], [(-1, -6), (-16, -6), (-16, 6), (-1, 6)], [(-17, -6), (-28, -3.5), (-28, 3.5), (-17, 6)]])
     for s in (-1, 1): h.pod(-38, s * 3.5, 7, 2.8)
     h.f(circ(0, 0, 2.0, CY, extra='opacity="0.35"'), mid=True); h.f(circ(0, 0, 0.9, CY2, extra='opacity="0.6"'))
+    # The test rig's three human guns (the game's dev fit), bolted on where a voice would carry none.
+    h.weapon("w1", "high", "S", 20, 0); h.weapon("w2", "high", "S", 4, -3.4); h.weapon("w3", "high", "S", 10, 2.6)
     return h, 42
 
 

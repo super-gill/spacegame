@@ -91,12 +91,34 @@ Turrets at 3 pixels per world unit only. Deterministic: the same SVG gives the s
 
 `packages/client/src/render/sprites.ts` and `render/ship-art.ts`.
 
-- **Which hulls:** a hull draws from its sprite only when every main weapon mount (`high`) the game has is marked in the art, so turrets never float off the hull. Ready today: the Tern, the Walkout and the Ark. Every other hull keeps the vector drawing until its mounts are marked (step 2's worklist, `art/ships/report.md`).
+- **Which hulls:** a hull draws from its sprite only when every main weapon mount (`high`) the game has is marked in the art, so turrets never float off the hull. Since step 2, push 1, that is every hull in the game; a new hull keeps the vector drawing until its mounts are marked.
 - **Loading:** `sprites.json` is fetched once; a hull picture or turret picture is fetched the first time it is needed and kept. Until it arrives the ship draws as vector, so nothing waits on a download.
 - **Size:** the smallest picture at least 90% of the pixels the ship covers on screen (device pixels), else the largest.
 - **Turrets:** at the art's marked mount (the game's mount if the art lacks it), turned to the turret's aim; a weapon with no turret picture draws its vector part there instead.
 - **Kept as vector:** the fitting screen's mount view, plumes, shields and markers. The sprite does not take the role tint or the dashed outline of an empty ship; fading still applies.
-- **Not yet:** the catalogue still takes outlines and mount positions from `hulls.ts`. It reads `ships.json` when step 2's hull list is agreed.
+- **Catalogue** (step 2, push 1): `scripts/geometry.mjs` (`npm run geometry`, first in `npm run build`) writes `packages/sim/src/hull-geometry.ts` from `ships.json`: per hull in the game its outline, its radius (the outline's farthest point, so glows do not count) and the positions of its weapon and PDC mounts. `withGeometry` in `hulls.ts` lays these over the table: a ship is hit where it is drawn and fires from its turrets. Sizes, facings, arcs and every number stay the table's; internal mounts keep their place relative to the outline. The file is committed; a test fails if it falls out of step with `ships.json`, and another if a game hull's weapon mount is not marked in the art.
+
+## Step 2: the first fleet (agreed with Jason, 7 November 2026)
+
+21 hulls: the 11 in the game, and ten more picked by the lead (Jason: "a selection for the existing NPCs, a few navy hulls, mining and cargo hulls").
+
+| Group | Hulls |
+| --- | --- |
+| In the game (ids kept) | Meridian Tern, Meridian Ark, Kessari Warrant, Kessari Injunction, Union Walkout, Tessaract Manifest, Belt Forge Prospector, Collier, Sinker and Knocker, Aurel Tacet |
+| Navy, a small hull for every power holding ports | Kessari Citation (Earth corvette), Seraphine Deimos (Mars corvette), Seraphine Phobos (Mars patrol boat), Ishtar Lakshmi (Venus patrol boat), Union Blockade (Belt patrol boat) |
+| Cargo | Tessaract Waybill, Belt Forge Mule, Meridian Skua |
+| Mining | Belt Forge Rime, Meridian Dunlin |
+
+Left out on purpose: capitals and cruisers (nothing in Open Lanes needs them), T3 specials (their hull abilities do not exist), and the Jackleg and other subcraft (they wait for carrying, so a Collier can launch one as it launches a Knocker).
+
+**Push 1 as built (7 November 2026, Lead 9):** every weapon and PDC mount of the 11 game hulls is marked in the art (`Hull.weapon` in `kod.py`: a socket as hull, a stock turret as the mount; `boom(..., mount=...)` in `beltciv.py` makes a mining boom's head the mount), and the catalogue takes its shapes from the art. Where the game's spots fitted the drawing (the Warrant, the Injunction) they were kept; the Belt hulls' art matches nothing in the old table, so their mounts are placed on the drawing, the lasers on the booms. What changed in play:
+
+- **Radius** (collisions, hits, culling): Tacet 18 to 38, Manifest 30 to 40, Collier 46 to 50, Prospector 19 to 13, Sinker 26 to 22, Knocker 6 to 3. The rest within a unit.
+- **The Tacet is a large hull** (`sizeClass` L, was S): drawn as long as a frigate, it needs a large pad.
+- **Large pads sit 36 units off a station's rim** (was 32), to keep room between a Collier and the pad beside it. Saved stations keep their pads.
+- **Outlines come from the art for 35 hulls** where they were wrong: the export now takes the whole drawing when a silhouette covers under 60% of it (the Belt's frame hulls drew only their cab).
+
+Next: the ten new hulls (marks, a line of numbers each, a stock fit, ships to buy and NPCs to fly them).
 
 ## The wrapper
 

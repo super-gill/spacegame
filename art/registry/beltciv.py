@@ -48,13 +48,19 @@ class BeltCivil(Hull):
         self.f(rect(x + w * 0.55, y + h * 0.2, w * 0.35, h * 0.6, CAB, stroke=BSEAM, sw=0.12, rx=0.3), mid=True)
         self.f(line(x + w * 0.6, y + h * 0.35, x + w * 0.85, y + h * 0.3, stroke="#2fb3b0", sw=0.1, extra='opacity="0.6"'))
 
-    def boom(self, x, y, L, side, tool="laser"):
-        """A boom off the hull, with a laser head, a drill or an ice saw on the end."""
+    def boom(self, x, y, L, side, tool="laser", mount=None):
+        """A boom off the hull, with a laser head, a drill or an ice saw on the end. `mount=(id, size)` makes
+        a laser head a game mount: the boom stays hull, the head is the fitted mining laser."""
         self.f(rect(x, y - 0.5, L, 1.0, GUN2, stroke=BSEAM, sw=0.14), mid=True)
         for k in (0.3, 0.6): self.f(line(x + L * k, y - 0.5, x + L * k, y + 0.5, stroke=BSEAM, sw=0.1))
         self.f(circ(x, y, 1.1, DARKG, stroke=BSEAM, sw=0.16), mid=True); self.f(circ(x, y, 0.4, GUN2))
         ex = x + L
-        if tool == "laser":
+        if tool == "laser" and mount:
+            self.f(rect(ex - 0.9, y - 0.9, 1.8, 1.8, DARKG, stroke=BSEAM, sw=0.14, rx=0.9), mid=True)
+            with self.mount(mount[0], "high", mount[1], ex, y):
+                self.f(rect(ex - 0.6, y - 1.1, 2.2, 2.2, DARKG, stroke=BSEAM, sw=0.14, rx=0.3), mid=True)
+                self.f(circ(ex + 1.9, y, 0.5, "#ff9a3a")); self.f(circ(ex + 1.9, y, 1.0, "#ff9a3a", extra='opacity="0.3"'))
+        elif tool == "laser":
             self.f(rect(ex - 0.6, y - 1.1, 2.2, 2.2, DARKG, stroke=BSEAM, sw=0.14, rx=0.3), mid=True)
             self.f(circ(ex + 1.9, y, 0.5, "#ff9a3a")); self.f(circ(ex + 1.9, y, 1.0, "#ff9a3a", extra='opacity="0.3"'))
         elif tool == "drill":
@@ -194,11 +200,12 @@ def prospector(old=False):
     h.frame(-10, 6, -1.8, 1.8, 2.5)
     h.hull(cham(-3, -3.2, 10, 6.4, 1.0))
     h.cab(1, -2.0, 5.5, 4.0)
-    h.boom(3, -3.0, 8, -1, "laser")
+    h.boom(3, -3.0, 8, -1, "laser", mount=("w1", "S"))
     h.hopper(-9, 2.2, 8, 3.2, 0.5 if not old else 0.2, tie=1.8)
     h.f(rect(-6.4, -3.2, 0.8, 1.6, TRUSS, stroke=BSEAM, sw=0.1), mid=True); h.f(circ(-6, -4.2, 1.6, "none", stroke=GUN2, sw=0.3)); h.f(circ(-6, -4.2, 0.4, GUN2))
     B.engine(h, -11, 0, 2.2)
     h.spare_mount(-1, 4.6, 0.9)
+    h.weapon("w2", "high", "S", -1.5, -1.6); h.weapon("w3", "high", "S", -1, 4.6, socket=False)
     h.finish((-4, 0.8), "PROSPECTOR", 0.8, ((-2.6, -3.5), (-8.6, 5.6)), hazard=(2, 3.6, 4, 0.5))
     return h, 14
 
@@ -209,11 +216,13 @@ def sinker(old=False):
     h.frame(-18, 10, -2.6, 2.6, 3.2)
     h.hull(cham(-6, -5.0, 16, 10, 1.4))
     h.cab(4, 2.5, 7, 4.5, tie=2.6)
-    h.boom(8, -3.5, 8, -1, "laser"); h.boom(1, -4.8, 10, -1, "laser" if not old else "drill")
+    h.boom(8, -3.5, 8, -1, "laser", mount=("w1", "M")); h.boom(1, -4.8, 10, -1, "laser" if not old else "drill", mount=("w2", "M"))
     if not old: h.boom(10, 0.5, 6, 1, "drill")
     h.hopper(-17, -6.5, 10, 4.5, 0.6, tie=2.6); h.hopper(-17, 2.0, 10, 4.5, 0.6, tie=2.6)
     h.bunker(-4, 8.0, 12, 1.8, tie=2.6)
     h.engines(-19, [-2.8, 2.8], 2.2)
+    if old: h.weapon("w2", "high", "M", 6, -2.4)
+    h.weapon("w3", "high", "S", -12, 0, math.pi); h.weapon("w4", "high", "M", -1, -2.4); h.weapon("w5", "high", "S", -1, 2.8)
     h.finish((-2, 0.9), "SINKER", 1.1, ((-16, -6.8), (-5, 10.1)), hazard=(-16, 7.2, 8, 0.8))
     h.ymax = 10
     return h, 24
@@ -230,9 +239,13 @@ def collier(old=False):
         for sg in (-1, 1): h.f(rect(xx - 0.6, min(sg * 4, sg * 8.4), 1.2, 4.4, TRUSS, stroke=BSEAM, sw=0.12), mid=True)
     h.hull(cham(30, -7.5, 12, 15, 1.6))
     h.cab(32, -5.5, 8, 5)
-    h.boom(41, -2.0, 8, 1, "laser")
+    h.boom(41, -2.0, 8, 1, "laser", mount=("w2", "M"))
     h.engines(-41, [-6, -2, 2, 6], 2.4)
     for xx in (-20, 4): h.spare_mount(xx, -8.2, 1.4)
+    h.spare_mount(4, 8.2, 1.4)
+    h.weapon("w1", "high", "M", -20, -8.2, math.pi, socket=False)
+    h.weapon("m1", "high", "L", 4, -8.2, -math.pi / 2, socket=False); h.weapon("m2", "high", "L", 4, 8.2, math.pi / 2, socket=False)
+    h.weapon("d1", "ciws", "M", -26, -12.3, -math.pi / 2); h.weapon("d2", "ciws", "M", -26, 12.3, math.pi / 2)
     h.finish((34, 7.5 + 1.2), "COLLIER", 1.4, ((-38, -14.2), (-38, 14.2)), hazard=(-36, 13.6, 20, 1.0))
     return h, 50
 

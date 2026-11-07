@@ -55,7 +55,7 @@ python3 export.py
 
 A weapon or PDC drawn on a hull is a **mount**: the game draws whatever is fitted there instead, turning a turret to aim. Mark it so the export records it and leaves it out of the bare picture:
 
-- In Python: draw it inside `with h.mount("w1", "high", "M", x, y, facing):` (`kod.py`). `high` is a weapon, `ciws` a PDC; the size is the game's (S, M, L, XL); the id matches the game's mount (`w1`, `w2`, `d1`; see `art/ships/report.md`).
+- In Python: draw it inside `with h.mount("w1", "high", "M", x, y, facing):` (`kod.py`), or call `h.weapon("w1", "high", "M", x, y, facing)` for a socket and a stock turret in one go. `high` is a weapon, `ciws` a PDC; the size is the game's (S, M, L, XL); the id matches the game's mount (`w1`, `w2`, `d1`; see `art/ships/report.md`).
 - In hand-written SVG (`base/registry-base.html`): put `data-mount="w1" data-type="high" data-size="M" data-x="..." data-y="..." data-facing="..."` on the group that draws it.
 
 A hull only needs its mounts marked when it goes into the game; `report.md` says which mounts each game hull still lacks.

@@ -210,7 +210,8 @@ def tes_manifest(old=False):
     h.t_cab(40, 6.5, 12)
     h.t_band(29.5, 9.0)
     h.t_engines(-40, [-3.6, 0, 3.6], 2.2)
-    h.pdc(32, -7.6); h.pdc(32, 7.6)
+    h.weapon("w1", "high", "S", 35, 0); h.weapon("w2", "high", "S", 22, -3.0)
+    h.weapon("d1", "ciws", "M", 32, -7.6, -math.pi / 2); h.weapon("d2", "ciws", "M", 32, 7.6, math.pi / 2)
     h.t_livery((-4, 0.6), "LEDGER" if old else "MANIFEST", 1.3, ((-30, -10.4), (-30, 10.4)))
     h.ymax = 11
     return h, 42

@@ -6,7 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ### Added
 
-- **Ship art in flight**: the Tern, the Walkout and the Ark are drawn from their artwork, with turrets on top that turn to aim. Other hulls keep the line drawing until their art is ready.
+- **Ship art in flight**: every ship in the game is drawn from its artwork, with turrets on top that turn to aim.
+- **Hull shapes from the art** (`hull-geometry.ts`, `npm run geometry`): ships are hit where they are drawn and fire from where their turrets are.
+
+### Changed
+
+- **Hull sizes follow the art**: the Aurel Tacet is much longer (radius 38, now a large hull that needs a large pad), the Manifest and Collier are bigger, and the Prospector, Sinker and Knocker smaller.
+- **Large pads** sit a little further out from stations (new stations only).
+- **Belt mining hulls** carry their lasers on the booms, where the art draws them.
 - **Ship sprite build** (`npm run ships`, `server.bat ships`): builds every hull and turret picture from `art/ships/`, as part of every build and update.
 - **Ship export and standards** (`art/registry/export.py`, `docs/ship-standards.md`, `docs/ship-pipeline.md`).
 

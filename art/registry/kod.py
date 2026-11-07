@@ -7,11 +7,13 @@ raised modules, a panel grid, the Earth Charter Fleet livery. The silhouettes ar
 driven by role, area of operation, equipment and date of commission.
 """
 
+import math
 INK = "#0b1724"
 T0 = "#152a40"; T1 = "#24445f"; T2 = "#33597c"; T3 = "#4a7aa6"; T4 = "#5f8fbd"
 SPON = "#1f3b56"; HEAD = "#1a3249"; PLATE = "#2a4b6b"; OLD = "#263f57"; PATCH = "#355d82"
 WHITE = "#e6eef5"; GLASS = "#0a1420"; BLUE = "#8fd6ff"; YELLOW = "#e8c547"; RED = "#ff6a5a"; GREEN = "#6affa8"
 SHADOW = "rgba(3,8,14,0.55)"; GIRDER = "#6f8aa6"
+MOUNT_RADIUS = {"S": 1.5, "M": 2.25, "L": 3.0, "XL": 3.9}  # the game turret picture sizes, turrets.py RADIUS
 
 
 def P(pts): return " ".join(f"{x:.2f},{y:.2f}" for x, y in pts)
@@ -110,6 +112,24 @@ class Hull:
         `kind` is the game's mount type (`high` for a weapon, `ciws` for a PDC), `size` S to XL, `facing`
         and `arc` in radians. Do not insert at the front of a layer inside one (engine glows): draw those outside."""
         return Mount(self, mid, kind, size, x, y, facing, arc)
+
+    def weapon(self, mid, kind, size, x, y, facing=0.0, socket=True):
+        """A game mount with its stock weapon: an empty socket drawn as hull (`socket=False` when the hull
+        already draws one), and a turret or PDC inside the marker, at the game's size (turrets.py RADIUS)."""
+        import math
+        r = MOUNT_RADIUS[size]
+        if socket:
+            self.f(circ(x, y, r * 1.15, "#0e1824", stroke="#4a6580", sw=0.18), mid=True)
+        c, s = math.cos(facing), math.sin(facing)
+        with self.mount(mid, kind, size, x, y, facing):
+            if kind == "ciws":
+                self.f(rect(x - r * 0.7, y - r * 0.7, r * 1.4, r * 1.4, "#16283b", sw=0.14, rx=0.2))
+                self.f(circ(x, y, r * 0.48, "#5b8fc7", stroke="#cfe0f0", sw=0.14))
+            else:
+                self.f(circ(x, y, r * 0.85, "#2a3b4d", stroke="#9fb4c8", sw=0.15))
+            tip, w = r * 1.6, r * 0.14
+            bx, by = -s * w, c * w
+            self.f(poly([(x + bx, y + by), (x + c * tip + bx, y + s * tip + by), (x + c * tip - bx, y + s * tip - by), (x - bx, y - by)], "#cfe0f0", sw=0.1))
 
     def f(self, svg, mid=False):
         self.full.append(svg)
@@ -298,7 +318,8 @@ def warrant(civ=False):
     h.visor(hx, nb, head_b, 4.3)
     h.antennae(19, -head_b * 0.55, 4.3, -1.2); h.antennae(19, head_b * 0.55, 4.3, 1.2)
     for (x, y) in [(10.6, -4.6), (10.6, 4.6), (-21.4, -4.6), (-21.4, 4.6)]: h.emitter(x, y)
-    h.gun(17.8, 0); h.gun(-14.4, 4.6)
+    h.weapon("w1", "high", "M", -6, -6.5); h.weapon("w2", "high", "M", -6, 6.5)
+    h.weapon("w3", "high", "S", 14, 0); h.weapon("w4", "high", "S", -14, -8.5, math.pi)
     h.livery([(-20, -2.2), (-20, 2.2)], (-5.5, -hb * 0.72 + 0.5), "KOD W", 1.4, ((-16.8, -b + 0.5), (-16.8, b - 0.5)), toll=(hx - 9.6, head_b * 0.96, 0.6))
     return h, 26.4, 22 / 48
 
@@ -317,7 +338,6 @@ def injunction():
         h.doors(-25, 11, s * 14.5, 4, 2.6)
         h.f(line(-6.5, s * 11, -6.5, s * 17.3, sw=0.24))
         h.emitter(-25.2, s * 12.4); h.emitter(13.2, s * 12.6)
-        h.pdc(-22, s * 11.9); h.pdc(8, s * 11.9)
         h.radiators(-26.4, s * 17.5, 2, -0.8, 0, 2.0 * s)
         h.engines(-27, [s * 13], 1.6)
     h.f(poly([(-31.6, -4.4), (-31.6, 4.4), (-33.2, 2.9), (-33.2, -2.9)], T0, sw=0.2), mid=True)
@@ -328,6 +348,10 @@ def injunction():
     h.spine(-31, 19, 0.6)
     h.visor(hx, 3.4, 5.2, 5.5, n_eyes=2)
     h.antennae(26, -4.8, 4.5, -1.5); h.antennae(26, 4.8, 4.5, 1.5)
+    h.weapon("w1", "high", "M", 24, -5); h.weapon("w2", "high", "M", 24, 5)
+    h.weapon("w3", "high", "M", 0, -13.3, -math.pi / 2); h.weapon("w4", "high", "M", 0, 13.3, math.pi / 2)
+    h.weapon("w5", "high", "M", -27.7, -5, math.pi)
+    h.weapon("d1", "ciws", "M", -10, -14.6, -math.pi / 2); h.weapon("d2", "ciws", "M", -10, 14.6, math.pi / 2)
     h.livery([(-28.5, -3.0), (-28.5, 3.0)], (-2, -6.4 + 0.3 - 1.6), "KOD F", 1.5, ((-26.5, -17.9), (-26.5, 17.9)))
     return h, 36.5, 35 / 68
 

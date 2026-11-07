@@ -4,9 +4,9 @@ Written by `art/registry/export.py`. For each hull in the game, the weapon and P
 
 ## Aurel Tacet (`aurel-tacet`)
 
-- `w1`: game only, S at (14.0, 0.0); not marked in the art
-- `w2`: game only, S at (0.0, -2.5); not marked in the art
-- `w3`: game only, S at (10.0, 2.0); not marked in the art
+- `w1`: art S at (20.0, 0.0), game S at (14.0, 0.0)
+- `w2`: art S at (4.0, -3.4), game S at (0.0, -2.5)
+- `w3`: art S at (10.0, 2.6), game S at (10.0, 2.0)
 
 ## Meridian Ark (`escape-pod`)
 
@@ -14,20 +14,20 @@ No weapon or PDC mounts in either.
 
 ## Kessari Injunction (`kessari-brig`)
 
-- `d1`: game only, M at (-10.0, -14.6); not marked in the art
-- `d2`: game only, M at (-10.0, 14.6); not marked in the art
-- `w1`: game only, M at (24.0, -5.0); not marked in the art
-- `w2`: game only, M at (24.0, 5.0); not marked in the art
-- `w3`: game only, M at (0.0, -13.3); not marked in the art
-- `w4`: game only, M at (0.0, 13.3); not marked in the art
-- `w5`: game only, M at (-27.7, -5.0); not marked in the art
+- `d1`: art M at (-10.0, -14.6), game M at (-10.0, -14.6)
+- `d2`: art M at (-10.0, 14.6), game M at (-10.0, 14.6)
+- `w1`: art M at (24.0, -5.0), game M at (24.0, -5.0)
+- `w2`: art M at (24.0, 5.0), game M at (24.0, 5.0)
+- `w3`: art M at (0.0, -13.3), game M at (0.0, -13.3)
+- `w4`: art M at (0.0, 13.3), game M at (0.0, 13.3)
+- `w5`: art M at (-27.7, -5.0), game M at (-27.7, -5.0)
 
 ## Kessari Warrant (`kessari-wedge`)
 
-- `w1`: game only, M at (-6.0, -6.5); not marked in the art
-- `w2`: game only, M at (-6.0, 6.5); not marked in the art
-- `w3`: game only, S at (14.0, 0.0); not marked in the art
-- `w4`: game only, S at (-14.0, -8.5); not marked in the art
+- `w1`: art M at (-6.0, -6.5), game M at (-6.0, -6.5)
+- `w2`: art M at (-6.0, 6.5), game M at (-6.0, 6.5)
+- `w3`: art S at (14.0, 0.0), game S at (14.0, 0.0)
+- `w4`: art S at (-14.0, -8.5), game S at (-14.0, -8.5)
 
 ## Meridian Tern (`meridian-courier`)
 
@@ -37,44 +37,44 @@ No weapon or PDC mounts in either.
 
 ## Belt Forge Sinker (`rookrivet-breacher`)
 
-- `w1`: game only, M at (21.0, -5.0); not marked in the art
-- `w2`: game only, M at (21.0, 5.0); not marked in the art
-- `w3`: game only, S at (-18.0, -9.0); not marked in the art
-- `w4`: game only, M at (6.0, -12.5); not marked in the art
-- `w5`: game only, S at (6.0, 12.5); not marked in the art
+- `w1`: art M at (16.0, -3.5), game M at (21.0, -5.0)
+- `w2`: art M at (11.0, -4.8), game M at (21.0, 5.0)
+- `w3`: art S at (-12.0, 0.0), game S at (-18.0, -9.0)
+- `w4`: art M at (-1.0, -2.4), game M at (6.0, -12.5)
+- `w5`: art S at (-1.0, 2.8), game S at (6.0, 12.5)
 
 ## Belt Forge Knocker (`rookrivet-drone`)
 
-- `w1`: game only, S at (5.0, 0.0); not marked in the art
+- `w1`: art S at (3.4, 0.0), game S at (5.0, 0.0)
 
 ## Belt Forge Collier (`rookrivet-hulk`)
 
-- `d1`: game only, M at (-20.0, -19.2); not marked in the art
-- `d2`: game only, M at (-20.0, 19.2); not marked in the art
-- `m1`: game only, L at (6.4, -18.5); not marked in the art
-- `m2`: game only, L at (6.4, 18.5); not marked in the art
-- `w1`: game only, M at (-36.0, -15.0); not marked in the art
-- `w2`: game only, M at (38.0, -10.0); not marked in the art
+- `d1`: art M at (-26.0, -12.3), game M at (-20.0, -19.2)
+- `d2`: art M at (-26.0, 12.3), game M at (-20.0, 19.2)
+- `m1`: art L at (4.0, -8.2), game L at (6.4, -18.5)
+- `m2`: art L at (4.0, 8.2), game L at (6.4, 18.5)
+- `w1`: art M at (-20.0, -8.2), game M at (-36.0, -15.0)
+- `w2`: art M at (49.0, -2.0), game M at (38.0, -10.0)
 
 ## Belt Forge Prospector (`rookrivet-prospector`)
 
-- `w1`: game only, S at (15.0, 0.0); not marked in the art
-- `w2`: game only, S at (4.0, -10.0); not marked in the art
-- `w3`: game only, S at (4.0, 10.0); not marked in the art
+- `w1`: art S at (11.0, -3.0), game S at (15.0, 0.0)
+- `w2`: art S at (-1.5, -1.6), game S at (4.0, -10.0)
+- `w3`: art S at (-1.0, 4.6), game S at (4.0, 10.0)
 
 ## Tessaract Manifest (`tessaract-spine`)
 
-- `d1`: game only, M at (0.0, -1.6); not marked in the art
-- `d2`: game only, M at (0.0, 1.6); not marked in the art
-- `w1`: game only, S at (15.0, 0.0); not marked in the art
-- `w2`: game only, S at (20.0, -3.5); not marked in the art
+- `d1`: art M at (32.0, -7.6), game M at (0.0, -1.6)
+- `d2`: art M at (32.0, 7.6), game M at (0.0, 1.6)
+- `w1`: art S at (35.0, 0.0), game S at (15.0, 0.0)
+- `w2`: art S at (22.0, -3.0), game S at (20.0, -3.5)
 
 ## Union Walkout (`union-frigate`)
 
-- `d1`: game only, M at (24.0, -14.7); not marked in the art
-- `d2`: game only, M at (24.0, 14.7); not marked in the art
-- `d3`: game only, M at (-34.0, -14.6); not marked in the art
-- `d4`: game only, M at (-34.0, 14.6); not marked in the art
+- `d1`: art M at (24.0, -14.7), game M at (24.0, -14.7)
+- `d2`: art M at (24.0, 14.7), game M at (24.0, 14.7)
+- `d3`: art M at (-34.0, -14.6), game M at (-34.0, -14.6)
+- `d4`: art M at (-34.0, 14.6), game M at (-34.0, 14.6)
 - `w1`: art L at (37.5, -6.0), game L at (38.0, -6.0)
 - `w2`: art L at (37.5, 6.0), game L at (38.0, 6.0)
 - `w3`: art M at (0.0, -17.0), game M at (0.0, -18.0)

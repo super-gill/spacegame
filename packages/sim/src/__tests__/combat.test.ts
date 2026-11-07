@@ -179,8 +179,10 @@ describe('projectiles', () => {
   });
 
   it('is absorbed by a station in the way', () => {
-    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -10 }, velocity: { x: 0, y: 0 }, orbit: null, radius: 10, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
-    const r = stepProjectiles([shot({ position: { x: 300, y: -25 } })], { t: target }, HULLS, { st }, FIXED_DT);
+    // Clear of the target's hull circle, so the station is all the shot can meet this tick.
+    const edge = HULLS['aurel-tacet']!.radius;
+    const st: Station = { id: 'st', name: 'St', position: { x: 300, y: -edge - 10 }, velocity: { x: 0, y: 0 }, orbit: null, radius: 6, dockRange: 0, securityRadius: 0, market: {}, outfitting: false, pads: [], shipMart: [] };
+    const r = stepProjectiles([shot({ position: { x: 300, y: -edge - 18 } })], { t: target }, HULLS, { st }, FIXED_DT);
     expect(r.damage).toEqual([]);
     expect(r.projectiles).toEqual([]);
   });
