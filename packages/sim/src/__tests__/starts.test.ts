@@ -15,7 +15,7 @@ describe('the eight starts (Open Lanes step 3)', () => {
       expect(ids.filter((id) => STARTS[id].power === power).map((id) => STARTS[id].path).sort()).toEqual(['navy', 'private']);
     }
     for (const s of Object.values(STARTS)) {
-      expect(sol.stations[s.home], s.id).toBeDefined();
+      expect(sol.stations[s.home]?.name, s.id).toBe(s.homeName);
       expect(sol.loadouts[s.loadoutId], s.id).toBeDefined();
     }
   });

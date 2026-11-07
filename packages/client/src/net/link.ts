@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type ServerKind, type WorldId, type WorldUpdate, type TrafficContact } from '@spacegame/sim';
+import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type StartId, type World, type WorldEvent, type ServerKind, type WorldId, type WorldUpdate, type TrafficContact } from '@spacegame/sim';
 
 /**
  * The client's end of the connection to the server (docs/shared-world.md).
@@ -15,6 +15,8 @@ export interface Welcome {
   admin: boolean;
   /** Which server this is: names the persistent world (`persistentName`). */
   server: ServerKind;
+  /** Not yet in Sol: show the start picker before entering it (start-screen.ts). */
+  needsStart: boolean;
 }
 
 /** In a world: which, and the whole of it as this pilot sees it. */
@@ -83,7 +85,7 @@ export class Link {
           if (message.t === 'welcome') {
             settled = true;
             link.startPinging();
-            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin, server: message.server } });
+            resolve({ link, welcome: { pilotId: message.pilotId, name: message.name, key: message.key, admin: message.admin, server: message.server, needsStart: message.needsStart === true } });
           } else if (message.t === 'refused') {
             settled = true;
             socket.close();
@@ -108,10 +110,10 @@ export class Link {
    * Go into a world (the mode screen's choice); resolves with the world
    * as this pilot sees it. Updates from it follow, held until `listen`.
    */
-  enter(world: WorldId): Promise<Entered> {
+  enter(world: WorldId, start?: StartId | null): Promise<Entered> {
     return new Promise((resolve) => {
       this.entering = resolve;
-      this.send({ t: 'enter', world });
+      this.send(start ? { t: 'enter', world, start } : { t: 'enter', world });
     });
   }
 

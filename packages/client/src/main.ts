@@ -43,11 +43,15 @@ import {
   type World,
   NAVY_NAMES,
   type TrafficContact,
+  STARTING_CREDITS,
+  type StartId,
+  type WorldId,
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
 import { chooseCharacter } from './login-screen.js';
 import { chooseMode } from './mode-screen.js';
+import { chooseStart } from './start-screen.js';
 import { ArenaSetup, type ArenaResult } from './arena-setup.js';
 import { reloadToModes } from './net/resume.js';
 import { keyFor } from './net/characters.js';
@@ -257,11 +261,19 @@ const radar = new Radar(hudLayer, (id) => {
 const session = await chooseCharacter();
 const link = session.link;
 const me = { id: session.welcome.pilotId, name: session.welcome.name };
-const worldId = await chooseMode(session.welcome, () => {
-  link.close();
-  location.reload();
-});
-const entered = await link.enter(worldId);
+// The mode screen, and before a new pilot's first time in Sol, the start picker (Back goes to the modes again).
+let worldId: WorldId;
+let start: StartId | null = null;
+for (;;) {
+  worldId = await chooseMode(session.welcome, () => {
+    link.close();
+    location.reload();
+  });
+  if (worldId !== 'persistent' || !session.welcome.needsStart) break;
+  start = await chooseStart(STARTING_CREDITS);
+  if (start) break;
+}
+const entered = await link.enter(worldId, start);
 /** In the Arena world: no ship means the arena setup, not the escape-pod screens. */
 const inArena = entered.world === 'arena';
 ui.showDeathPanel = !inArena;

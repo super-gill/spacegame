@@ -2242,3 +2242,65 @@ button:hover {
   font-size: 11px;
   letter-spacing: 0.06em;
 }
+
+/* The start picker (start-screen.ts): the Arena setup's columns, with the start's facts in the third. */
+.login-box.start-box {
+  width: min(1040px, 94vw);
+}
+
+.start-columns {
+  grid-template-columns: 190px 220px minmax(0, 1fr);
+}
+
+.start-columns .arena-column {
+  min-width: 0;
+}
+
+.start-detail {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 4px 14px 14px;
+}
+
+.start-ship {
+  width: 170px;
+  height: 170px;
+  justify-self: center;
+  margin: -20px 0 -26px;
+}
+
+.start-ship.missing {
+  visibility: hidden;
+}
+
+.start-pair {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 4px 10px;
+  overflow-wrap: anywhere;
+}
+
+.start-key {
+  color: var(--ink-dim);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.start-value {
+  color: var(--ink-bright);
+}
+
+.start-standing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: var(--ink-bright);
+}
+
+.start-note {
+  margin: 8px 0 0;
+  color: var(--ink-dim);
+  font-size: 12px;
+  line-height: 1.5;
+}

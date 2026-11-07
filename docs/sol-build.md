@@ -198,7 +198,8 @@ The eight starts of `sol.md`, "Where a new pilot starts", agreed with Jason with
 - **Home** (`pilotHome` in `pilots.ts`): a pilot arrives off their home, wakes there after losing their pod, and claims the free Tern there. The first ship of a service start is the pilot's and is never taken back; it is not issued again.
 - **Joining** (`joinPilot(world, pilotId, name, startId?)`): in Sol a new pilot takes the start chosen, or Earth, private when none came (an older client). Calder and the Arena are unchanged.
 - **Network** (additions only, protocol 3 unchanged): `welcome.needsStart` (the persistent world is Sol and this pilot is not in it yet), and `enter.start`. The server reads it with `readStartId`.
-- **Not yet:** the picker (push 2, after Jason's look at the mockup), Navy grade as a flag on the ship, cooperative and company standing (Tessaract, Lavinia, the Belt cooperatives), anything that moves standing.
+- **The picker** (push 2, `client/src/start-screen.ts`): shown after the mode screen's UNIVERSE when `welcome.needsStart`; the Arena setup's three columns (power, path, the start: the first ship's card sprite, home, first ship, standing, licence, credits, first work, a line on what the path means). Back returns to the mode screen; LAUNCH sends `enter` with the start. Every line comes from `STARTS` (`homeName` included), so the picker and the server agree.
+- **Not yet:** Navy grade as a flag on the ship, cooperative and company standing (Tessaract, Lavinia, the Belt cooperatives), anything that moves standing.
 
 ## Decided (Jason, 7 November 2026)
 
