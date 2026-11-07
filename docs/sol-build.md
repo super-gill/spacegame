@@ -21,7 +21,7 @@ Units stay what they are: a Tern is 18 across, a station 70 to 90. Distances are
 | Jupiter | 450,000 | | Its moons orbit inside its radiation |
 | Saturn | 380,000 | | Rings out to about 2.3 radii |
 | Uranus, Neptune | 160,000 | | |
-| Earth, Venus | 60,000 | 3,300 Terns | At flight zoom (2,000 units on screen) the limb is a gentle curve across the screen |
+| Earth, Venus | 60,000 | 3,300 Terns | Never drawn in the local view (decided below); stations orbit well clear of it |
 | Mars | 32,000 | | |
 | Ganymede, Titan, Mercury | 24,000 | | Moons are worlds too |
 | Luna, Callisto, Europa | 16,000 | | |
@@ -88,7 +88,7 @@ Security by region from `sol.md` becomes data: each body (and each lane) carries
 
 Each slice is played before the next starts. Visual slices get mockups first (Jason's rule).
 
-1. **Sol's skeleton.** Mockups first: the flight view near Earth (the limb, a capital port as a speck, approach), the chart with a burn plotted, the burn on the HUD. **Drawn** (7 November, for Jason's review): https://claude.ai/artifact/FVyc8p6Rt1v442zeQS71bv. Keys proposed: M for the chart, U to burn and to cancel. Then: the bodies at scale on rails; camera-relative drawing; the burn; the chart as a working map; the four capital ports and the two free ports with markets moved over from Calder's stations; the patrol is Earth's toll boats (the Calder Watch's Warrants, renamed); one start (Earth, private) at Earth Orbital Exchange. Calder leaves the persistent world (it stays canon through the gate).
+1. **Sol's skeleton.** Mockups first: the flight view at a capital port (ship and station at real size, no planet; redrawn after Jason's review), the chart with a burn plotted, the burn on the HUD. **Drawn** (7 November, for Jason's review): https://claude.ai/artifact/FVyc8p6Rt1v442zeQS71bv. Keys proposed: M for the chart, U to burn and to cancel. Then: the bodies at scale on rails; camera-relative drawing; the burn; the chart as a working map; the four capital ports and the two free ports with markets moved over from Calder's stations; the patrol is Earth's toll boats (the Calder Watch's Warrants, renamed); one start (Earth, private) at Earth Orbital Exchange. Calder leaves the persistent world (it stays canon through the gate).
 2. **All the stations and the lanes.** The other 28 stations with their runners and markets, security by region and lane, NPC traffic that burns along the lanes, pirates waiting at lane ends in Open and Contested space.
 3. **The eight starts.** Power and path at character creation; home station, first ship, starting standing. Needs the four navy start hulls (Kessari Citation, Seraphine Deimos, Union Wildcat, Ishtar Sedna) and standing as a number per power.
 4. **Names that ship.** Navies ECF, MRN, VSG, UDF; the transponder line (prefix, ship name, hull number, hull, Registry number) on lock, hail, log and witness record; one name per station (mostly lands in slices 1 and 2).
@@ -98,6 +98,9 @@ Each slice is played before the next starts. Visual slices get mockups first (Ja
 Alongside, small and separate: item 5 of the re-fit (hull identity cannot be fitted out), item 6 (the four docs left in the pivot audit), item 7 (where ship art's rasterise step lives: at build time in `art/`, writing an atlas the client loads, when ship art goes into the client).
 
 ## Decided (Jason, 7 November 2026)
+
+- **The local view shows ships and stations at their real size, and no planet** (Jason, after the first mockup): where a pilot flies, docks and fights, ship and station have actual size and detail; the body a station orbits is not on screen. Bodies are places: on the chart, and on screen only where a pilot has business with them (skimming a giant's or Venus's air, a station dug into a rock, falling too low), reached by navigating to them. This replaces `sol.md`'s "a planet's limb fills the screen" for the flight view; bodies stay enormous on the chart and in their own neighbourhoods.
+- **Physics stays local to the ship.** Orbits run on rails (planets too slowly to see in a sitting, stations round their worlds in hours); gravity bites only near a body's surface, steep enough that diving too low is fatal; between and around worlds bodies can be ignored.
 
 - **Sol starts fresh.** The Calder save is kept as a backup file beside the new world; characters and keys are kept; ships and credits reset.
 - **A plotted burn.** Pick a nav target and press burn: the ship turns, burns, flips and brakes to arrive at rest; cancellable, and cancelling leaves you coasting fast. No manual burn for now.
