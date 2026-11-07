@@ -12,7 +12,7 @@ Three sources, each with its own way of getting at it, and two stages of process
 | Ice | The outer Belt, the outer moons, the rings | **Saw** with an ice cutter (a laser boils ice off and wastes it) | Ice saw (light, heavy), collector drones | Ice blocks |
 | Gas | Venus's upper air now; the gas giants later | **Skim** a depth band with an intake; deeper is denser and hotter, and below the death line the hull dies | Intake (by depth rating), heat sink, tanks | Gas in tanks |
 
-A mining ship is therefore defined by four things: **which method it carries**, **what grade of target it can take** (laser strength against hardness, saw grade against ice density, intake depth rating against the band), **how much it holds**, and **whether it processes anything on board**. The industrial ships and command ships are defined by the processing.
+Capitals never work the site: they cannot manoeuvre among rocks or through a cloud band, so they park at the edge and reach in with subcraft, drones or a fleet. A mining ship is therefore defined by four things: **which method it carries**, **what grade of target it can take** (laser strength against hardness, saw grade against ice density, intake depth rating against the band), **how much it holds**, and **whether it processes anything on board**. The industrial ships and command ships are defined by the processing.
 
 Skimming is the one exception to "ships never land": a skimmer works the top of the air where a hull survives for minutes, comes back hot, and the death line below is where the exception ends.
 
@@ -124,7 +124,7 @@ Method, grade, hold and processing per hull, including the eleven hulls agreed i
 | Belt Forge Headframe | Belt Forge | None; its wing cuts | | Huge | Refining; ore transfer without docking | Mining command ship |
 | Lavinia Cyclone; Corvane Still | | None; their wings skim | | Huge, gas | Refining gas to propellant and feedstock | Gas command ships |
 | Belt Forge Lodestar (T3) | Belt Forge | None; its wing cuts | | Huge | Refining; a survey array that finds platinum and rare-earth pockets where scanners read nothing (the gate-glass reading moves to other systems) | T3 mining command ship |
-| Corvane Colossus (T3) | Corvane | Takes a whole rock | Any hardness | Huge | Crushes and refines what it swallows | Open: whether it follows the carrier rule (see `lore-handover.md`) |
+| Corvane Colossus (T3) | Corvane | None; its wing and fleet cut | | Huge, with loading cradles for Drays and Pitheads | Refining at a rate nothing human matches; furnaces lined with gate-glass | T3 mining carrier: the Lodestar finds, the Colossus processes |
 
 Salvage and exploration are not materials industries, but their hulls use the same shape: a Grab collects, a Scrapper cuts, a Breaker processes; a Query scans, an Expedition stores and analyses.
 

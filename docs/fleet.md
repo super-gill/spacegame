@@ -661,7 +661,7 @@ Two ways to use one:
 - **Flown alone.** A player in a command ship is a carrier captain: fly to the site, stop, launch the wing, run the operation from the bridge, recover the wing, leave. A command ship is fully effective without a fleet; the wing is the fleet. This is the first way the lead builds it.
 - **At the head of a fleet.** Later, with owned ships and hired captains, the command ship's presence boosts the fleet's ships (yield, range, speed matching, lock speed by industry), its defence covers them (PDC coverage and a shield or armour umbrella in its radius), and its beacon is their jump target and rally point. Fleet ships follow, work and guard by order; the capital still does not work the rock itself.
 
-What every command ship has: a **bay** sized for its wing (subcraft, fighters, drones); **storage** for the collection (ore holds, gas tanks, salvage racks, pods, samples); **processing** that turns the collection into something worth more before it is landed (refining, breaking, treatment, analysis); a **command suite** that boosts the wing and any fleet; **heavy defence** (armour, point defence, turrets, the umbrella; the Sanctuary alone goes unarmed and relies on the Mercy Clause); and the **fleet beacon**. What it does not have: the tool. No mining laser, no intake scoop, no cutting torch on the hull. The Lavinia Cyclone and Corvane Still were redrawn to this rule on 7 November (hangar decks where the intakes were); the Headframe, Breaker, Consignment, Sanctuary and Expedition already fitted it.
+What every command ship has: a **bay** sized for its wing (subcraft, fighters, drones); **storage** for the collection (ore holds, gas tanks, salvage racks, pods, samples); **processing** that turns the collection into something worth more before it is landed (refining, breaking, treatment, analysis); a **command suite** that boosts the wing and any fleet; **heavy defence** (armour, point defence, turrets, the umbrella; the Sanctuary alone goes unarmed and relies on the Mercy Clause); and the **fleet beacon**. What it does not have: the tool. No mining laser, no intake scoop, no cutting torch on the hull. The reason is physical as well as a rule (Jason, 7 November): a capital cannot manoeuvre among rocks, through a cloud band or around a wreck field, so it parks at the edge and reaches in with its wing or its fleet. This holds for the T3 capitals too. The Lavinia Cyclone and Corvane Still were redrawn to this rule on 7 November (hangar decks where the intakes were); the Headframe, Breaker, Consignment, Sanctuary and Expedition already fitted it.
 
 | Industry | Command ship | Maker | Its wing | What it gives the wing and the fleet |
 | --- | --- | --- | --- | --- |
@@ -693,7 +693,7 @@ Jason's direction, 7 November 2026: civil T3s follow the military shape. They ar
 | Solace | Solace Grace | Hospital ship | Keeps a fleet alive under fire: repair and regen at a rate nothing human matches | Regen nanites grown on Lattice seed |
 | Halden | Halden Threshold | Explorer | Reads a broken gate; the first hull built to cross the Shoals, if a drive ever exists | Gate-glass sensors that see the lanes |
 | Arbor | Arbor Grove | Drone tender (capital) | Runs a drone swarm nothing else can control | A Lattice-derived control lattice, literally |
-| Corvane | Corvane Colossus | Strip-miner (capital) | Swallows an asteroid whole and mines it in one pass; the only hull that takes a rock rather than cutting at it | A gate-glass crusher throat that breaks what no cutter can |
+| Corvane | Corvane Colossus | Mining carrier (capital) | Parks at the edge of a field and processes what its wing and fleet bring in faster than anything human; loading cradles for Drays and Pitheads, a receiving dock between two hangar booms | Furnaces lined with gate-glass |
 | Meridian | none | | Meridian builds cheap; its prototype is the Tern, thirty years ago | |
 
 The clans' hulls (Saro Farwalker, Waystar; Long Wake Trawl, Dredge) are the Belt's civil T3s and stay as they are: no Lattice, just generations of knowing.
@@ -730,5 +730,4 @@ Mars builds civilian hulls through one state yard, one per job, which is a state
 - [ ] Jason: the generations model and the three grids (legacy, pattern, clan); which legacy and pattern hulls the first used market and the first standing rewards should carry.
 - [ ] Lead: which of these the next build slice needs; everything marked draft waits for a milestone that wants it.
 - [ ] Lore: the Arena ask.
-- [ ] Jason: the Corvane Colossus (a T3 capital that works the rock itself) against the carrier rule for command ships.
 - [ ] Art: draw the eleven gap-pass hulls (Dunlin, Pithead, Arcadia Miner Mk II and Mk I, Breeze, Rime and the old Rime, Gantry, Tender Mk 0, Footnote, Tendril, Probe).
