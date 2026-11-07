@@ -132,7 +132,7 @@ Three routes, each rarer than the last. When each opens in play is the lead's ca
 
 - **Husks.** Dead hulls from the Quiet War drift in the Shoals and the Dark. A husk has no voice: no fields, no glow, unflyable. Its parts are priceless to researchers.
 - **The one on the pad.** Very rarely a living Aurel ship turns up for sale at a remote station at an absurd price. **(canon, hidden)** These are voices the Chorus sends out on purpose, to be flown by a younger people and to watch them. Whoever buys one is being studied.
-- **Gifted.** A pilot who fights the Unsung again and again may one day be met at the Shoals by an Aurel ship that simply waits for them. The legendary endgame route.
+- **Gifted.** A pilot who fights the Unsung again and again, and does what the Aurel ask, may one day be met at the Shoals by an Aurel ship that simply waits for them. The legendary endgame route, and the same moment as becoming Voiced ("Death and the Return"): the Chorus takes the pilot in and gives them one or two of its voices to fly.
 
 For now the Aurel are a horizon. Whether players ever cross the Shoals in play is undecided (Jason, 6 November 2026).
 
@@ -270,11 +270,47 @@ A new pilot picks an **origin** (Earth, Mars, Venus, the Belt), which sets their
 
 | Background | Start | Breaking out |
 | --- | --- | --- |
-| Navy reservist | A Tern in navy colours, an entry-level licence, a little standing with your navy, light duties | Discharge is free until you hold real navy hulls; after that, the desertion rule |
+| Navy reservist | The navy path in `sol.md`: the power's Navy-grade corvette (the UDF's Wildcat on rota for the Belt), an entry-level licence, a little standing with your navy, light duties | Discharge is free until you hold real navy hulls; after that, the desertion rule |
 | Miner | A Prospector and a Pick, standing with Belt Forge or Corvane | Nothing to break |
 | Hauler | A Tern with a Hopper fit, a Tessaract contract, standing with Tessaract | Nothing to break |
 
 More as the catalogue allows: salvager, courier. Every background lands in the same sandbox.
+
+### Death and the Return
+
+Decided 7 November 2026 (Jason). Pilots come back from death, a limited number of times, and nobody human knows why.
+
+**The Return.** A licensed pilot whose pod is destroyed wakes in the Registry clinic at their home station. The Ceres Registry calls it continuity of licence and bills for it. Losing a ship is not a death: the pod ejects, and a pilot whose pod survives simply flies it home. Only pod death is a Return.
+
+**Who returns.** The change is in human biology, so it is always present, in everyone; but it only wakes in some. It wakes in people who live their lives in Lattice-touched space: spacers, and above all pilots. The Registry's licence exam includes a test it calls aptitude, which is a test for this. So licensed pilots return, and so do some navy pilots and pirate captains; most crews and civilians do not, and their deaths are final. A navy prizes its returners.
+
+**Where it works.** Wherever the Lattice reaches: Sol and every system joined to it by woken gates. Beyond a sleeping or broken gate (the Dark, the Shoals, past them) death is final, even for a returner.
+
+**What dies with the pilot.** The ship, its cargo, and its logs: witness records, charts, survey data and evidence not yet uploaded to the Relay (`infrastructure.md`) are gone. The mind comes back; the data does not.
+
+**The Fade.** Every Return costs something that does not come back. Spacers call it the Fade; Venusian doctors call it attenuation; the Registry records it as continuity loss and shows it on a pilot's scan. The first Returns barely mark a pilot, because the gift is strongest when it is young; the cost climbs with each crossing, and after enough of them there is not enough left to return, and that death is final. How many is the lead's number; it is dozens, not a handful. As a pilot fades:
+
+- **Reach shrinks.** A fresh pilot returns from anywhere the Lattice reaches; a faded one only from near a woken gate, then only from well-connected space, at the end only from Core.
+- **The Return slows.** Longer in the clinic before waking: time and money.
+- **The Lattice gets louder.** In the last few Returns it gets into the ship: a whisper on comms, sensor ghosts, a contact on the board that is not there. Flavour and warning only, never a penalty to the ship or the pilot (all bonuses and penalties live on ships, and a death spiral helps nobody).
+
+**Slowing it.** Solace clinics treat the Fade: expensive, slow, and it never reverses anything. Venus is where faded pilots go.
+
+**How the powers explain it**, as with the gates:
+
+| Who | Explanation |
+| --- | --- |
+| Earth | A Registry service, licensed and billed |
+| Mars | The Lattice testing the worthy |
+| Venus | A biological response to the Lattice, studied for two centuries and not understood |
+| The Belt | You come back if the rock wants you |
+| The Hollow Choir | The Unsung calling their own |
+
+**Ironman.** A pilot whose gift never woke, who passed the licence anyway. No Returns: the first pod death is the last. Chosen at the start and marked on the Registry entry. Whether Ironman pilots share the persistent world or play in their own is Jason's and the lead's call.
+
+**The Voiced.** The way out of the Fade is the Aurel. A pilot who does what the Aurel ask (the long arc: husks, the voice fragment, the watcher, the Shoals, fighting the Unsung) may be taken into the Chorus: they carry a voice, part Aurel, and the Fade stops. The Voiced do not die for good. They are also given one or two Aurel ships: this is the Gifted route under "Aurel ships in the hands of pilots". The price: a Voiced pilot's transponder reads as pale nothing, like an Aurel ship's, so every navy treats them as unknown (Mars will not let one keep a commission; Venus wants to understand them; Earth wants to own the process); the Hollow Choir hunts them; and near the Dark, the Unsung notice them.
+
+**(canon, hidden)** The change is the Aurel's work, made during the Tending, long before the gate, and dormant until the Sol gate woke and the Lattice's energy reached Sol. It is atonement, or something like it: the Aurel failed every younger people before humans, and they will not let the last one die the same way. A returning mind crosses the Lattice as signal, and a little of it stays in the Lattice each time; that is the Fade, and the Aurel can hand it back, which is what taking a pilot into the Chorus does. The Unsung also travel as signal through the Lattice. Near the Dark, something listens to every crossing. Whether the Aurel's kindness to the Voiced is entirely kindness is left open on purpose.
 
 ### Crew
 
@@ -763,6 +799,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Death and the Return** (Jason). Pilots return from pod death, wake at their home station's Registry clinic, and lose the ship, cargo and unuploaded logs. The gift is biological, in all humans, woken in some (pilots, some navy and pirate captains), and works only where the Lattice reaches. Every Return costs some of the Fade: generous early, steep late, dozens in all, then final death; the cost is reach, time and a louder Lattice, never ship or pilot penalties. Losing a ship without losing the pod costs no Fade. Solace treatment slows it. Ironman is a pilot whose gift never woke. The Aurel can take a pilot into the Chorus: the Voiced, who no longer fade, are given one or two Aurel ships (the Gifted route), and pay with an unreadable transponder, the Choir's hunt and the Unsung's attention. Hidden canon: the Aurel made the change in the Tending, as atonement.
 - 2026-11-07: **Infrastructure** (`infrastructure.md`). Security is connectivity: the **Accord Relay Network (ARN)**, "the Relay", carries distress calls, witness records, wanted status, prices and contracts at once; off it a ship reaches only its own comms range. A witness record counts only when it reaches the Relay, and distress response relies on it. The Relay is physical and contestable: cut, jammed, taken, built; in Sol attacking it is a crime against all four powers, beyond Sol it is what sovereignty is fought over. Gates carry signals between systems. One fuel (hydrogen); tanks have mass; range runs the inner system on a tank, Jupiter on a top-up, beyond Saturn on long-range tanks. Star scooping allowed everywhere at a heat cost; it matters beyond Sol.
 - 2026-11-07: **Transponders get formal names** (Jason). A squawking ship broadcasts `[prefix] [name] ([hull number]) · [hull] · [Registry number]`. Prefixes: ECFS, MRNS, VSGS, UDFS (on rota only), VMS (any Mercy Clause hull: the prefix is the protection), and by flag EMS, MCS, VCS, BCV, ARS (Accord). Navy hull numbers by class letter; special operations squawk as auxiliaries. Registry number `CR-` plus flag letter plus six digits, for the life of the hull. Details under "The transponder".
 - 2026-11-07: **One name per station** (Jason): a single actual name in game, on the board, in comms and in dialogue, to prevent confusion. Each is in its runner's official style: Earth corporate and legal (Earth Orbital Exchange, ECF Yard L5), Mars state and military (Republic Station Elysium, MRN Yard Phobos), Venus civic (Thetis Orbital, VSG Haven Europa), companies by company, place and function, the Accord plain (Ceres Accord Station); the Belt and the clans keep their informal names because that is their official style (Slagline, Bellows, Hilda Moot). Full list in `sol.md`.

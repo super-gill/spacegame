@@ -80,6 +80,20 @@ Allowed everywhere, Sol included; it matters beyond Sol.
 - **In Sol** it is legal and rarely worth it: fuel is cheap at every station, and the Sun's corona is inside Mercury's glare. Pilots try it once, near Corvane Caloris Foundry, and remember it.
 - **Beyond Sol** it is the explorer's lifeline: off the Relay there are no stations, and a star is the only pump. It is what lets a Query or a Farwalker go far past where anyone could rescue it.
 
+## Death, pods and the Return
+
+The lore is `lore.md`, "Death and the Return". What it needs from the systems:
+
+- **Ship death** ejects the pod (Meridian Ark, `fleet.md`). A pod that survives flies home: no Return, no Fade, the ship and its cargo lost.
+- **Pod death** is the Return: the pilot wakes at their home station's Registry clinic. Lost with the ship: cargo, and the ship's log (witness records, charts, survey data, evidence) except what already reached the Relay.
+- **Reach**: a Return works only where the Lattice reaches (Sol and gate-joined systems). The pilot's Fade narrows it further: from anywhere, to near a woken gate, to well-connected space, to Core only. A pod death outside the pilot's reach is final.
+- **The Fade** is a pilot value that only goes one way, except by Aurel retuning. The cost per Return is small early and climbs; the count is in the dozens. Visible on the Registry scan as a rough reading, never a precise number.
+- **Costs** per Return, all the lead's to tune: time in the clinic (longer as the pilot fades), a Registry fee, insurance only in covered space.
+- **Late warnings**: in the last few Returns, comms whispers, sensor ghosts and a phantom contact on the board. Never a stat change.
+- **Ironman**: a pilot flag set at creation; the first pod death is final.
+- **The Voiced**: a pilot flag set by the Aurel arc; the Fade stops and Returns always work; the transponder reads as unknown; one or two Aurel ships granted.
+- **NPCs**: returner NPCs (some navy pilots, some pirate captains) fade by the same rules, which gives veterans a reason to be careful; everyone else dies.
+
 ## The other infrastructure
 
 - **Approach control.** Every station runs an approach zone on its own transmitter. In Core and Held space: docking clearance, a speed limit inside the zone, transponder on. Breaking them is the cheapest crime and the commonest patrol stop (`navy.md`, "Stop and scan"). Belt stations ask nothing and say so.
@@ -104,3 +118,4 @@ Allowed everywhere, Sol included; it matters beyond Sol.
 - [ ] Numbers: coverage radius, comms range, tank sizes, burn rates, scoop heat (the lead).
 - [ ] Whether a pod has fuel; whether flight assist burns fuel (from the coordination note; Jason and the lead).
 - [ ] Who may build relays in Sol beyond the Accord (proposal: nobody; Sol's Relay is the Accord's alone).
+- [ ] Death: whether Ironman pilots share the persistent world; whether an Aurel retuning is partial or whole (the Voiced as written are whole); the Fade count and curve (Jason and the lead).
