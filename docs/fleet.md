@@ -20,7 +20,7 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Halden Institute | Venus | Survey and exploration | 3 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 4 |
 | Vantage Aerospace | Luna (Earth) | Combat fighters, no hulls | 2 |
-| Union Defence Works | The Belt, naval yard | The Union Militia | 5 |
+| Union Defence Works | The Belt, refit shop | The Union pattern: Militia standards applied to rebuilt hulls | 7 |
 | Belt Forge Collective | The Belt | Mining, ore hauling, refining | 8 |
 | Rook and Rivet | The Belt | Salvage, towing, shipbreaking | 4 |
 | Corvane Heavy Industries | Independent (Earth money, Belt yards) | Heavy ore haulage and refining, and the corporate security that guards it | 5 |
@@ -212,17 +212,34 @@ Venus's drone house. Drones are craft, not hulls, but Arbor builds one tender to
 | Arbor Shoot | Repair drone | Hull and shield repair | A Solace kit with wings | draft |
 | Arbor Canopy | Drone tender (medium) | Carries and controls drone swarms | A civilian hull that fights like a small carrier | draft |
 
-## Union Defence Works
+## Union Defence Works and the Union pattern
 
-Strike words. The Belt's naval yard: the Union Militia's gunboats, built from the Strikes' secret arsenal. No battleships; the Militia is rotas of working crews, not a fleet.
+Decided 7 November 2026. The Belt has no naval yard. **The Union Militia is a rota, not a fleet**: it owns no hulls, and cooperatives and clans contribute ships and crews on shifts. **Union Defence Works is the refit shop**: it takes captured, bought-cheap or copied hulls and rebuilds them to a Militia standard, the **Union pattern**. "Wildcat" is a standard applied to a hull, not a hull from a slipway; two Wildcats can have started life as a Kessari Notice and a Citation, and the source shows under the Belt shapes. Strike words for the standards.
 
-| Hull | Class | Job | Character | Status |
-| --- | --- | --- | --- | --- |
-| Union Wildcat | Corvette | Fast raider and picket | A wildcat strike: sudden, unofficial, over before the bosses arrive | draft |
-| Union Blockade | Patrol boat | Militia patrol | Holds a lane shut | draft |
-| Union Boycott | Frigate | Projectile frigate | Refuses to deal | draft |
-| Union Walkout | Destroyer | Heavy gun destroyer | The Militia's heaviest; everyone walks out together | named (working name confirmed as final, pending Jason) |
-| Union Solidarity | Cruiser | Line cruiser | Built once, by every cooperative at once, for the Gate War. Three exist. | draft |
+- **No T1 or T2 in the Belt.** A Belt hull's generation is its source's, and the Belt never retires anything. The Belt's rows are Union pattern (numbers) and clan (quality).
+- **No civilian grade, because the tag is a state.** Every Belt hull is civilian. On Militia shift it carries the **Militia tag** (the Belt's Navy tag: better stats, hazard stripes and the Union mark painted on); off shift it goes home in cooperative colours with the tag off. The licence is the rota: standing with a cooperative, duty is shifts. Mechanically the same grade flag the other navies use, toggled by rota rather than purchase.
+- **Sold only in the Belt**, for cooperative standing and cheap credits. Every one a little different. Rebuilt captures with old mounts: worse than a production hull, cheaper and rougher than a retired navy one. The pirate's favourite source; the Black Strike's Writs are Union-pattern rebuilds in all but paperwork.
+- **Who answers a beacon in the Belt** depends on which cooperative holds the station and which clan is nearby: the same Wildcat in three cooperatives' colours, and sometimes a Vane out of nowhere.
+
+| Standard | Class | Rebuilt from | Job | Character | Status |
+| --- | --- | --- | --- | --- | --- |
+| Union Wildcat | Corvette | Kessari Notice (or any Earth corvette) | Fast raider and picket | A wildcat strike: sudden, unofficial, over before the bosses arrive | draft |
+| Union Blockade | Patrol boat | Kessari Writ | Militia patrol | The Strikes' captured toll boats; holds a lane shut | draft |
+| Union Boycott | Frigate | Kessari Decree | Projectile frigate | The launchers torn out for guns; refuses to deal | draft |
+| Union Walkout | Destroyer | Kessari Ruling | Heavy gun destroyer | Rebuilt so far that Earth no longer recognises it; everyone walks out together | built |
+| Union Solidarity | Cruiser | Three Earth cruisers of the Statute's generation, captured in the Gate War | Line cruiser | Rebuilt once, by every cooperative at once; never copied since. Three exist. | draft |
+| Vantage Dirk, Militia refit | Light fighter | Vantage Dirk | Militia fighter | Belt paint, Belt guns, a frame with an engine | built |
+| Vantage Cutlass, Militia refit | Heavy fighter | Vantage Cutlass | Militia heavy fighter | More of everything bolted on | built |
+
+### Five routes to a warship
+
+| Route | What you get | What it costs | The catch |
+| --- | --- | --- | --- |
+| Navy licence | A production hull, the Navy tag, the best stats | Standing, and duties that grow | You owe the navy; desert and you are hunted |
+| Independents (Meridian, Corvane) | A new hull, any size, no tag | Credits; Corvane is pricey | Never as good as a navy hull at fighting |
+| Retired navy | An old navy mark, Navy tag intact | A lot of credits | Old mounts, no yard support |
+| Union pattern | A rebuilt capture to Militia standard | Cooperative standing, cheap credits | Belt only; every one different; the Militia tag only while on shift |
+| Clan hull | A T3 one-off | Clan standing, or a very rare sale | Rare, and the clan remembers who has it |
 
 ## Belt Forge Collective
 
@@ -372,7 +389,7 @@ Decided 7 November 2026. **Navy** is a tag on a hull, not a generation. A Navy-t
 | Earth, the Charter Fleet | Citation and Warrant, sold openly | Kessari Notice, Writ, Decree and Ruling, sold by contract: the backbone of the Marches |
 | Mars, the Martian Navy | Deimos and Phobos, sold to Martian citizens only | Deimos Mk I and Phobos Mk II, released once the replacement mark is in service, Martian buyers first; the Navy still wants stolen current hulls back |
 | Venus, the Coastguard | Sedna and Lakshmi, sold openly | Sedna '218 and Lakshmi '205, sold with the Coastguard's guns removed but the Navy tag intact; fit your own |
-| The Belt, the Union Militia | Wildcat and Blockade, sold openly | None; the Militia never retires anything, old hulls rotate down to the cooperatives and never leave the Belt |
+| The Belt, the Union Militia | No grades: the Militia tag is a rota state on any Belt hull (see "Union Defence Works and the Union pattern") | None; the Militia never retires anything |
 
 Retired navy hulls go up to destroyer (the Ruling) where a navy retires that big; nobody sells a retired cruiser. The Mars exception above resolves an earlier contradiction: Mars does sell, but only its own retired marks and its own citizens first.
 
@@ -427,10 +444,10 @@ Decided 6 November 2026. The Belt's combat and transport hulls are stolen, captu
 | Belt hull | Rebuilt from | How |
 | --- | --- | --- |
 | Union Wildcat | Kessari Notice | Stripped to the frame and re-engined |
-| Union Blockade | Kessari Writ | The Strikes' captured toll boats, still the Militia's patrol hull |
+| Union Blockade | Kessari Writ | The Strikes' captured toll boats, still the Militia's patrol standard |
 | Union Boycott | Kessari Decree | Surplus Decrees with the launchers torn out for guns |
 | Union Walkout | Kessari Ruling | Rebuilt so far that Earth no longer recognises it |
-| Union Solidarity | Three Earth cruisers captured in the Gate War | Rebuilt once, by every cooperative at once; never copied since |
+| Union Solidarity | Three Earth cruisers of the Statute's generation, captured in the Gate War | Rebuilt once, by every cooperative at once; never copied since |
 | Belt Forge Pony | Tessaract Memo | A Memo with the brand filed off and a bigger engine |
 | Belt Forge Mule | Tessaract Invoice | Tougher, uglier, cheaper |
 | Belt Forge Adit | Tessaract Ledger | A Ledger with teeth |
@@ -534,8 +551,6 @@ One earlier mark for each hull new pilots and NPC traffic actually use: small an
 | Arcadia Freighter Mk II | Arcadia Freighter Mk I | Built to last forty years and did |
 | Ishtar Sedna | Ishtar Sedna '218 | Handed down to Venusian rescue volunteers |
 | Ishtar Lakshmi | Ishtar Lakshmi '205 | The Coastguard sells them with the guns removed |
-| Union Wildcat | The old Wildcat | The Strikes' original raider, still faster than it should be |
-| Union Blockade | The old Blockade | Militia rotas get the old ones |
 | Belt Forge Pony | The old Pony | Nobody has ever thrown one away |
 | Belt Forge Mule | The old Mule | See the Pony |
 | Belt Forge Prospector | The old Prospector | Belters do not throw ships away |
