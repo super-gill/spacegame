@@ -17,6 +17,7 @@ export const MANUFACTURERS: Record<string, ManufacturerSpec> = {
   corvane: { id: 'corvane', name: 'Corvane Heavy Industries', power: null },
   unionDefence: { id: 'unionDefence', name: 'Union Defence Works', power: 'belt' },
   cantorVell: { id: 'cantorVell', name: 'Cantor-Vell Arms', power: 'mars' },
+  seraphine: { id: 'seraphine', name: 'Seraphine Naval Yards', power: 'mars' },
   commonwealth: { id: 'commonwealth', name: 'Ishtar Fleet Works', power: 'venus' },
   // The Aurel have no manufacturers: the Chorus shapes every ship. Every hull needs a maker, so this is simply "Aurel".
   aurel: { id: 'aurel', name: 'Aurel', power: 'aurel' },

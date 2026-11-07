@@ -28,7 +28,8 @@ def dunlin():
     for k in range(3): h.f(line(-8 + k * 2.4, -2.6, -8 + k * 2.4, 2.6, stroke=MSEAM, sw=0.1))
     h.f(circ(-5, 0, 1.4, "none", stroke=YEL, sw=0.25))
     h.ring_mount(4, -2.4, 1.5)
-    h.f(rect(4, -2.75, 4.6, 0.7, MER2, stroke=MSEAM, sw=0.1), mid=True); h.f(circ(8.8, -2.4, 0.4, "#ff9a3a")); h.f(circ(8.8, -2.4, 0.8, "#ff9a3a", extra='opacity="0.3"'))
+    with h.mount("w1", "high", "S", 4, -2.4):
+        h.f(rect(4, -2.75, 4.6, 0.7, MER2, stroke=MSEAM, sw=0.1), mid=True); h.f(circ(8.8, -2.4, 0.4, "#ff9a3a")); h.f(circ(8.8, -2.4, 0.8, "#ff9a3a", extra='opacity="0.3"'))
     h.f(circ(4, 2.6, 0.9, MER1, stroke=MSEAM, sw=0.12), mid=True); h.f(line(4, 2.6, 5.4, 2.6, stroke=MSEAM, sw=0.12))
     h.box_engine(-11, 0, 3.6, 4.4)
     h.band(1, 4.5)
@@ -89,10 +90,10 @@ def rime(old=False):
     h.frame(-10, 6, -1.8, 1.8, 2.5)
     h.hull(cham(-3, -3.2, 10, 6.4, 1.0))
     h.cab(1, -2.0, 5.5, 4.0)
-    h.boom(3, -3.0, 7 if old else 8, -1, "saw")
+    h.boom(3, -3.0, 7 if old else 8, -1, "saw", mount=("w1", "S"))
     h.hopper(-9, 2.2, 8, 3.2, 0.6, ice=True, tie=1.8)
     B.engine(h, -11, 0, 2.2)
-    if not old: h.spare_mount(-1, 4.6, 0.9)
+    if not old: h.spare_mount(-1, 4.6, 0.9); h.weapon("w2", "high", "S", -1, 4.6, socket=False)
     h.finish((-4, 0.8), "RIME", 0.8, ((-2.6, -3.5), (-8.6, 5.6)), hazard=(2, 3.6, 4, 0.5))
     return h, 14
 

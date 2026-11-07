@@ -269,13 +269,15 @@ for (k, bb, col, name, job, char, w) in CIVT3:
 for s in F:
     if s["key"] == "vesk-vane": s["role"] = "watcher"; s["job"] = "Watcher; stealth raider and escort"
     if s["key"] == "vesk-shade": s["role"] = "striker"; s["job"] = "Striker; stealth raider"
+# Hulls the game added after the first eleven: their game id is their registry key (docs/ship-pipeline.md, "Step 2").
+IN_GAME = {"kes-citation", "ser-deimos", "ser-phobos", "ish-lakshmi", "uni-blockade", "tes-waybill", "bf-mule", "mer-skua", "bf-rime", "mer-dunlin"}
 ships = {}
 for s in F:
     old = old_ships.get(s.get("art", ""), None)
     b = dict(BUILDERS_MAP := {k: (n, p, bl) for k, n, p, bl in BUILDERS}).get(s["builder"])
     pname, power, _ = b
     entry = {
-        "key": s["key"], "id": old["id"] if old and old.get("id") else None, "race": s["builder"], "power": power,
+        "key": s["key"], "id": old["id"] if old and old.get("id") else (s["key"] if s["key"] in IN_GAME else None), "race": s["builder"], "power": power,
         "name": s["name"], "working": False, "status": STATUS[s["status"]] + (", drawn" if old and old.get("art") else (", today's outline" if old else "")),
         "art": bool(old and old.get("art")), "maker": pname, "cls": s["col"], "type": s["job"],
         "size": old["size"] if old else "", "radius": old["radius"] if old else RADIUS[s["col"]],

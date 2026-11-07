@@ -194,6 +194,7 @@ def tes_waybill(old=False):
     h.t_cab(24, 4.6, 9)
     h.t_band(13.5, 6.4)
     h.t_engines(-24, [-2.6, 2.6], 1.9)
+    h.weapon("w1", "high", "S", 10, 0); h.weapon("w2", "high", "S", -10, 0, math.pi)
     h.t_livery((-4, 0.5), "INVOICE" if old else "WAYBILL", 1.1, ((-14, -6.8), (-14, 6.8)))
     return h, 26
 

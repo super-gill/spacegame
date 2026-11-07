@@ -29,7 +29,7 @@ A mount is where the game draws whatever is fitted, turning a turret to aim. A s
 - **Ids follow the game's scheme**: `w1`, `w2` and on for weapons (`high`), `d1` to `d4` for PDCs (`ciws`); numbered nose to stern, port before starboard. For a hull already in the game, the ids and sizes are the game's (`hulls.ts`; `art/ships/report.md` lists them); a new hull's ids are agreed with the lead when it goes into the game.
 - **Size** is the game's module size (S, M, L, XL), given at the marker, never guessed from how big it is drawn. Draw it at that size: the game's turret pictures are a ring of 1.5, 2.25, 3 and 3.9 units for S to XL (`turrets.py`, `RADIUS`).
 - **Facing** is the centre of the mount's arc, in radians (0 forward, plus or minus pi/2 to the sides, pi aft); the arc itself is the game's to set.
-- **A mount sits on the hull**: the export fails if one is outside the outline.
+- **A mount is part of the hull's shape**: the outline reaches every marked mount, so a gun on a boom or a truss is hit where it is drawn. The export fails if a mount is outside the drawing's frame.
 - Things that are not fitted modules (antennae, sensor domes, radiators, lights, hangar doors, mining hoppers that are part of a hull's identity) stay painted and unmarked.
 
 ## Engines and lights

@@ -36,6 +36,17 @@ export const REFERENCE_FITS: FitSpec[] = [
   stock('rookrivet-hulk', 'mining', 'The strip miner.'),
   stock('kessari-brig', 'combat', 'The Kessari frigate as the yard sells it.'),
   stock('union-frigate', 'combat', 'The Union Militia destroyer as sold.'),
+  // The first fleet (Open Lanes step 2).
+  stock('kessari-citation', 'combat', "Earth's interceptor."),
+  stock('seraphine-picket', 'combat', "Mars's picket."),
+  stock('seraphine-patrol', 'combat', "Mars's patrol boat."),
+  stock('ishtar-guard', 'combat', "Venus's Space Guard."),
+  stock('union-blockade', 'combat', "The Belt's patrol boat."),
+  stock('tessaract-hauler', 'hauling', "Earth's medium hauler."),
+  stock('beltforge-hauler', 'hauling', "The Belt's hauler."),
+  stock('meridian-hauler', 'hauling', 'The first step up for a trader.'),
+  stock('beltforge-rime', 'mining', "The Belt's light cutter."),
+  stock('meridian-dunlin', 'mining', 'The first miner anyone buys.'),
   {
     name: 'Warrant brawler',
     hullId: 'kessari-wedge',

@@ -129,6 +129,7 @@ def skua(old=False):
     h.rack(-L / 2 + 5, -4.2, L - 18, 8.4, 3 if not old else 4, 2, (MER2, YEL, MER3, MER2) if not old else (MOLD, MPATCH, MOLD, MOLD))
     h.yband(L / 2 - 8, 6.5)
     h.glass(L / 2 - 4, 0, 3.4, 2.6)
+    if not old: h.weapon("w1", "high", "S", 7.5, 0); h.weapon("w2", "high", "S", -6, 0)
     h.oldpatch(-L / 2 + 3, -6.0, 4, 2.2)
     h.nav((-L / 2 + 4, -6.8), (-L / 2 + 4, 6.8))
     h.stencil(L / 2 - 10, 0.4 if not old else -5.0, "MY" if not old else "GANNET", 1.1, MSEAM)

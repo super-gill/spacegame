@@ -136,8 +136,11 @@ def blockade(militia=True):
     B.patch(h, [(-18, -1.5), (-9, -1.0), (-9.5, 2.0), (-18.5, 1.5)])
     B.truss(h, -2, 10, -12.5, -8.5, 3.0)
     for xx in (-1, 9): h.f(rect(xx - 0.6, -8.6, 1.2, 1.0, GUN2, stroke=BSEAM, sw=0.12), mid=True)
-    B.gunmount(h, 4, -12.5, 1.6)
-    B.gunmount(h, 14.5, 0, 1.6); B.gunmount(h, -10, 6.2, 1.4, long=False); B.gunmount(h, -3, -6.3, 1.4, long=False)
+    for mid, kind, size, x, y, r, long_ in (("w1", "high", "M", 14.5, 0, 1.6, True), ("w2", "high", "S", 4, -12.5, 1.6, True),
+                                            ("w3", "high", "S", -3, -6.3, 1.4, False), ("w4", "high", "S", -10, 6.2, 1.4, False)):
+        h.f(rect(x - r, y - r, 2 * r, 2 * r, DARKG, stroke=BSEAM, sw=0.16, rx=0.2), mid=True)  # the bolted base stays: the socket
+        with h.mount(mid, kind, size, x, y, 0.0):
+            B.gunmount(h, x, y, r, long=long_)
     for yy in (-4.0, 0, 4.0): B.engine(h, -23, yy, 1.9)
     B.hazard(h, -16, -8.3, 10, 1.1); B.hazard(h, -16, 7.2, 10, 1.1)
     B.mark(h, 11, 5.6, 1.1)

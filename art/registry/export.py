@@ -242,7 +242,7 @@ def faint(svg):
     return re.sub(r'<(ellipse|circle|rect|polygon|path)\b[^>]*\bopacity="0?\.[0-5]\d*"[^>]*>(</\1>)?', "", svg)
 
 
-def outline(sil_svg, full_svg):
+def outline(sil_svg, full_svg, extra=()):
     """The silhouette as a convex polygon of at most OUTLINE_POINTS, nose first. From the silhouette
     symbol, or the full drawing's solid shapes when a hull has no silhouette (a builder that drew no body).
     Convex for now: good for hit shapes and the radar; concave detail stays in the picture."""
@@ -251,7 +251,7 @@ def outline(sil_svg, full_svg):
     # Some builders' silhouettes are only the core block (the Belt's frame hulls: the cab, not the frame,
     # hoppers and booms). When the silhouette covers well under the drawing, the drawing is the outline.
     pts = drawn if not sil or area(convex_hull(sil)) < SIL_SHARE * area(convex_hull(drawn)) else sil
-    hull = simplify(convex_hull(pts), OUTLINE_POINTS)
+    hull = simplify(convex_hull(list(pts) + list(extra)), OUTLINE_POINTS)
     if not hull:
         return []
     nose = max(range(len(hull)), key=lambda i: (hull[i][0], -abs(hull[i][1])))
@@ -309,14 +309,16 @@ def main():
         vb, body = full
         radius = round(float(vb.split()[2]) / 2, 2)
         sil = syms.get(f"s-{key}-sil", (vb, body))[1]
-        shape = outline(sil, body)
+        mounts = mounts_in(body)
+        # A mount is part of the hull's shape: a gun on a boom or a truss (the Blockade's flak) is hit
+        # where it is drawn, so the outline reaches it.
+        shape = outline(sil, body, [(m["x"], m["y"]) for m in mounts])
         if len(shape) < 3:
             problems.append(f"{gid}: no outline")
             continue
-        mounts = mounts_in(body)
         for m in mounts:
-            if not inside(shape, m["x"], m["y"], radius * 0.15):
-                problems.append(f"{gid}: mount {m['id']} at ({m['x']}, {m['y']}) is outside the hull")
+            if math.hypot(m["x"], m["y"]) > radius:
+                problems.append(f"{gid}: mount {m['id']} at ({m['x']}, {m['y']}) is outside the drawing")
         liveries = ["base"] + (["civ"] if f"s-{key}-civ-full" in syms else [])
         for livery in liveries:
             vbl, bl = syms[f"s-{key}-full"] if livery == "base" else syms[f"s-{key}-civ-full"]

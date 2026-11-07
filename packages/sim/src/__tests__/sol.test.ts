@@ -94,7 +94,20 @@ describe('Sol', () => {
     expect(w.asteroids.length).toBeGreaterThan(100);
     expect(w.asteroids.every((a) => a.orbit.parent === 'body-sol-ceres-field')).toBe(true);
     expect(distance(w.stations[CERES_ACCORD_ID]!.position, ceres)).toBeCloseTo(16_000, -1);
-    expect(Object.values(w.npcs).filter((b) => b.kind === 'miner')).toHaveLength(3);
+    expect(Object.values(w.npcs).filter((b) => b.kind === 'miner')).toHaveLength(5);
+  });
+
+  it('sells every hull of the first fleet somewhere, and flies each navy in its own hulls', () => {
+    const w = createSolWorld();
+    const sold = new Set(Object.values(w.stations).flatMap((st) => st.shipMart.map((id) => w.loadouts[id]!.hullId)));
+    for (const hull of ['kes-citation', 'ser-deimos', 'ser-phobos', 'ish-lakshmi', 'uni-blockade', 'tes-waybill', 'bf-mule', 'mer-skua', 'bf-rime', 'mer-dunlin']) {
+      expect(sold.has(hull), hull).toBe(true);
+    }
+    const navyHulls = (power: string) =>
+      new Set(w.spawners.filter((sp) => sp.brain.kind === 'watch' && sp.brain.power === power).map((sp) => w.loadouts[sp.loadoutId]!.hullId));
+    expect(navyHulls('mars')).toEqual(new Set(['ser-phobos', 'ser-deimos']));
+    expect(navyHulls('venus')).toEqual(new Set(['ish-lakshmi']));
+    expect(navyHulls('belt')).toEqual(new Set(['uni-blockade']));
   });
 
   it('stays Sol through a save, with no Calder stations or NPCs slipped in', () => {

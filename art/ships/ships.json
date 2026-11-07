@@ -2746,12 +2746,29 @@
   "bf-mule": {
    "class": "cargo",
    "id": "bf-mule",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base"
    ],
    "maker": "Belt Forge Collective",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 10.0,
+     "y": 2.5
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 1.0,
+     "y": -1.8
+    }
+   ],
    "name": "Belt Forge Mule",
    "outline": [
     [
@@ -2835,7 +2852,24 @@
     "base"
    ],
    "maker": "Belt Forge Collective",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 10.0,
+     "y": 2.5
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 1.0,
+     "y": -1.8
+    }
+   ],
    "name": "The old Mule",
    "outline": [
     [
@@ -3070,25 +3104,34 @@
   "bf-rime": {
    "class": "mining",
    "id": "bf-rime",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base"
    ],
    "maker": "Belt Forge Collective",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 11.0,
+     "y": -3.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -1.0,
+     "y": 4.6
+    }
+   ],
    "name": "Belt Forge Rime",
    "outline": [
     [
-     14.0,
-     -3.0
-    ],
-    [
-     13.79,
-     -2.2
-    ],
-    [
-     13.2,
-     -1.61
+     11.9,
+     -2.1
     ],
     [
      6.0,
@@ -3139,16 +3182,8 @@
      -4.1
     ],
     [
-     12.4,
-     -4.6
-    ],
-    [
-     13.2,
-     -4.39
-    ],
-    [
-     13.79,
-     -3.8
+     11.9,
+     -3.9
     ]
    ],
    "power": "belt",
@@ -3163,20 +3198,21 @@
     "base"
    ],
    "maker": "Belt Forge Collective",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 10.0,
+     "y": -3.0
+    }
+   ],
    "name": "The old Rime",
    "outline": [
     [
-     13.0,
-     -3.0
-    ],
-    [
-     12.79,
-     -2.2
-    ],
-    [
-     12.2,
-     -1.61
+     10.9,
+     -2.1
     ],
     [
      6.0,
@@ -3227,16 +3263,8 @@
      -4.1
     ],
     [
-     11.4,
-     -4.6
-    ],
-    [
-     12.2,
-     -4.39
-    ],
-    [
-     12.79,
-     -3.8
+     10.9,
+     -3.9
     ]
    ],
    "power": "belt",
@@ -5576,13 +5604,38 @@
   "ish-lakshmi": {
    "class": "patrol",
    "id": "ish-lakshmi",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Ishtar Fleet Works",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 12.0,
+     "y": -4.76
+    },
+    {
+     "facing": 0.0,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": 12.0,
+     "y": 4.76
+    },
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "M",
+     "type": "high",
+     "x": 14.0,
+     "y": 0.0
+    }
+   ],
    "name": "Ishtar Lakshmi",
    "outline": [
     [
@@ -6314,13 +6367,38 @@
   "kes-citation": {
    "class": "corvette",
    "id": "kes-citation",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Kessari Orbital Defence",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 12.2,
+     "y": 0.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -5.0,
+     "y": -5.9
+    },
+    {
+     "facing": 0.0,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": -5.0,
+     "y": 5.9
+    }
+   ],
    "name": "Kessari Citation",
    "outline": [
     [
@@ -8279,12 +8357,21 @@
   "mer-dunlin": {
    "class": "mining",
    "id": "mer-dunlin",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base"
    ],
    "maker": "Meridian Yards",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 4.0,
+     "y": -2.4
+    }
+   ],
    "name": "Meridian Dunlin",
    "outline": [
     [
@@ -9735,12 +9822,29 @@
   "mer-skua": {
    "class": "cargo",
    "id": "mer-skua",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base"
    ],
    "maker": "Meridian Yards",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 7.5,
+     "y": 0.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -6.0,
+     "y": 0.0
+    }
+   ],
    "name": "Meridian Skua",
    "outline": [
     [
@@ -10120,6 +10224,14 @@
      "id": "w2",
      "size": "M",
      "type": "high",
+     "x": 11.0,
+     "y": -4.8
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "M",
+     "type": "high",
      "x": 6.0,
      "y": -2.4
     },
@@ -10203,8 +10315,8 @@
      -7.12
     ],
     [
-     11.0,
-     -6.1
+     11.9,
+     -5.7
     ],
     [
      16.9,
@@ -10236,8 +10348,8 @@
    "name": "Belt Forge Knocker",
    "outline": [
     [
-     3.2,
-     -0.8
+     3.4,
+     0.0
     ],
     [
      3.2,
@@ -10266,6 +10378,10 @@
     [
      0.8,
      -3.0
+    ],
+    [
+     3.2,
+     -0.8
     ]
    ],
    "power": "belt",
@@ -11619,13 +11735,38 @@
   "ser-deimos": {
    "class": "corvette",
    "id": "ser-deimos",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Seraphine Naval Yards",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 3.142,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -11.5,
+     "y": -2.8
+    },
+    {
+     "facing": 3.142,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": -11.5,
+     "y": 2.8
+    },
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "M",
+     "type": "high",
+     "x": 6.5,
+     "y": 0.0
+    }
+   ],
    "name": "Seraphine Deimos",
    "outline": [
     [
@@ -11892,13 +12033,46 @@
   "ser-phobos": {
    "class": "patrol",
    "id": "ser-phobos",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Seraphine Naval Yards",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": 12.0,
+     "y": -5.6
+    },
+    {
+     "facing": 0.0,
+     "id": "w4",
+     "size": "S",
+     "type": "high",
+     "x": 12.0,
+     "y": 5.6
+    },
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "M",
+     "type": "high",
+     "x": 12.0,
+     "y": 0.0
+    },
+    {
+     "facing": 3.142,
+     "id": "w2",
+     "size": "M",
+     "type": "high",
+     "x": -9.0,
+     "y": 0.0
+    }
+   ],
    "name": "Seraphine Phobos",
    "outline": [
     [
@@ -13106,7 +13280,24 @@
     "base"
    ],
    "maker": "Tessaract Logistics",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 10.0,
+     "y": 0.0
+    },
+    {
+     "facing": 3.142,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -10.0,
+     "y": 0.0
+    }
+   ],
    "name": "Tessaract Invoice",
    "outline": [
     [
@@ -13590,12 +13781,29 @@
   "tes-waybill": {
    "class": "cargo",
    "id": "tes-waybill",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base"
    ],
    "maker": "Tessaract Logistics",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 10.0,
+     "y": 0.0
+    },
+    {
+     "facing": 3.142,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": -10.0,
+     "y": 0.0
+    }
+   ],
    "name": "Tessaract Waybill",
    "outline": [
     [
@@ -13735,13 +13943,46 @@
   "uni-blockade": {
    "class": "patrol",
    "id": "uni-blockade",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Union Defence Works",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "M",
+     "type": "high",
+     "x": 14.5,
+     "y": 0.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 4.0,
+     "y": -12.5
+    },
+    {
+     "facing": 0.0,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": -3.0,
+     "y": -6.3
+    },
+    {
+     "facing": 0.0,
+     "id": "w4",
+     "size": "S",
+     "type": "high",
+     "x": -10.0,
+     "y": 6.2
+    }
+   ],
    "name": "Union Blockade",
    "outline": [
     [
@@ -13771,6 +14012,10 @@
     [
      -19.0,
      -8.0
+    ],
+    [
+     4.0,
+     -12.5
     ],
     [
      20.0,
@@ -14150,12 +14395,20 @@
      18.0
     ],
     [
+     -34.0,
+     14.6
+    ],
+    [
      -40.0,
      12.0
     ],
     [
      -40.0,
      -12.0
+    ],
+    [
+     -34.0,
+     -14.6
     ],
     [
      -26.0,

@@ -6,6 +6,7 @@ radiator fins because lasers dump heat. No shield emitters, no visor: a buried
 bridge behind a conning slit. Symmetrical always. A bone pennant stripe across
 the bow and a hull number. Nose points +x.
 """
+import math
 from kod import Hull, cham, sym_pts, poly, rect, line, circ, ell, mirror, P, clamp, fade, INK, WHITE, RED, GREEN, SHADOW
 
 RUST0 = "#3a1a12"; RUST1 = "#5e2a1d"; RUST2 = "#7d3826"; RUST3 = "#9a4a31"; RUST4 = "#b25d3e"
@@ -127,11 +128,11 @@ def deimos(civ=False):
     for s in (-1, 1):
         h.plate([(10, s * 2.6), (3, s * 5.6), (-8, s * 5.6), (-10.5, s * 3.6), (-10.5, s * 2.6)], RUST2)
         h.fins(-9, -2, s * 6.2, 4, 2.2, s)
-        h.pdc(-11.5, s * 2.4)
+        h.weapon("w2" if s < 0 else "w3", "high", "S", -11.5, s * 2.8, math.pi)
     h.skirt(-15, 4.4, 2.5)
     h.marsengines(-15, [-2.0, 2.0], 1.5)
     h.dorsal(-9, 1, 4, 0.9)
-    h.barbette(6.5, 0, 2.6, heavy=True)
+    h.barbette(6.5, 0, 2.6, heavy=True); h.weapon("w1", "high", "M", 6.5, 0, socket=False)
     h.slit(10.5, 1.6)
     h.antennae(2, -5.9, 2.0, -2.0); h.antennae(2, 5.9, 2.0, 2.0)
     h.pennant(13.2, 3.4, "D-07", 1.1, (-4, 5.6 - 0.4 - 4.3))
@@ -148,11 +149,13 @@ def phobos(civ=False):
         h.plate([(18, s * 4.4), (15, s * 8.0), (-16, s * 8.0), (-19, s * 5.4), (-19, s * 4.4)], RUST2)
         h.plate([(8, s * 4.0), (6, s * 6.6), (-10, s * 6.6), (-12, s * 4.0)], RUST3, bolts=False)
         h.fins(-14, -3, s * 8.5, 5, 2.4, s)
-        h.pdc(12, s * 5.6); h.pdc(-15.5, s * 5.6)
+        # Patrol boats carry no PDCs (docs/turrets.md): the forward pair are light guns, the aft pair are gone.
+        h.weapon("w3" if s < 0 else "w4", "high", "S", 12, s * 5.6)
     h.skirt(-24, 6.2, 3.0)
     h.marsengines(-24, [-2.8, 2.8], 1.9)
     h.dorsal(-4.5, 7.5, 4, 1.0)
     h.barbette(12, 0, 3.2); h.barbette(-9, 0, 3.0)
+    h.weapon("w1", "high", "M", 12, 0, socket=False); h.weapon("w2", "high", "M", -9, 0, math.pi, socket=False)
     h.slit(17.5, 2.6)
     h.antennae(16, -8.2, 2.5, -2.2); h.antennae(16, 8.2, 2.5, 2.2)
     h.pennant(21.5, 5.6, "P-114", 1.3, (2, -8.5 - 0.6))

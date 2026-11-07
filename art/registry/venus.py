@@ -181,9 +181,13 @@ def lakshmi(civ=False):
         h.port(-12, s * (w(-12) - 1.6), 1.1)
         h.nodes([(-16 + i * 5, s * (w(-16 + i * 5) - 4.2)) for i in range(6)], 6)
         h.blaster(12, s * (w(12) - 2.2), 1.5)
+        h.weapon("w2" if s < 0 else "w3", "high", "S", 12, s * (w(12) - 2.2), socket=False)
     h.dome(-9, 0, 4.6, big=True)
     h.dome(6, 0, 2.6)
-    h.rail(-3, 17, 0, 0.7)
+    # The railgun is the mount: the empty rails are hull, the gun at their muzzle is what is fitted.
+    h.empty_rail(-3, 17, 0, 0.7)
+    with h.mount("w1", "high", "M", 14, 0):
+        h.rail(-3, 17, 0, 0.7)
     h.window(21, w(21) * 0.8)
     h.stripe(-18, 14, 0.5, w, 0.6)
     h.livery((-20, 0), (0, -5.6), "CG P", 1.2, ((-14, -w(-14) - 0.3), (-14, w(-14) + 0.3)))

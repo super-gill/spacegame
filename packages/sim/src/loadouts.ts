@@ -318,6 +318,132 @@ export const LOADOUTS: Record<string, Loadout> = {
       i2: 'meridian-reactor-s',
     },
   },
+  // Open Lanes step 2, the first fleet (docs/ship-pipeline.md, "Step 2"): a stock fit for every new hull.
+  'kessari-citation': {
+    // Earth's toll runner: three cheap guns on rounds, an afterburner to catch with, a small shield.
+    id: 'kessari-citation',
+    name: 'Kessari Citation, toll patrol',
+    hullId: 'kes-citation',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'union-lockout-s', w2: 'union-picket-s', w3: 'union-picket-s',
+      e1: 'slagline-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'meridian-shield-s', u2: 'slagline-kick-s', i2: 'rookrivet-armour-s',
+    },
+  },
+  'seraphine-picket': {
+    // Mars's picket: the heavy barbette is an energy gun, two light guns cover the stern, a long-range radar.
+    id: 'seraphine-picket',
+    name: 'Seraphine Deimos, Mars picket',
+    hullId: 'ser-deimos',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'itomarr-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'cantorvell-verse-m', w2: 'union-picket-s', w3: 'union-picket-s',
+      e1: 'meridian-engine-s', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'meridian-shield-s', i2: 'rookrivet-armour-s',
+    },
+  },
+  'seraphine-patrol': {
+    // Mars's patrol: two energy barbettes and a laser forward, a medium shield and armour.
+    id: 'seraphine-patrol',
+    name: 'Seraphine Phobos, Mars patrol',
+    hullId: 'ser-phobos',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'paragon-computer-m', f1: 'meridian-helm-s', x1: 'paragon-director-m', p1: 'meridian-podbay-s',
+      w1: 'cantorvell-verse-m', w2: 'cantorvell-verse-m', w3: 'paragon-pulse-s',
+      e1: 'slagline-engine-m', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'itomarr-shield-m', u2: 'paragon-fairwarning-s', i1: 'cantorvell-armour-m',
+      b1: 'meridian-reactor-s', // a second small reactor: two energy barbettes draw more than the main one spares
+    },
+  },
+  'ishtar-guard': {
+    // Venus's Space Guard: the railgun forward, two light hybrids, a big shield for standing over a wreck.
+    id: 'ishtar-guard',
+    name: 'Ishtar Lakshmi, Space Guard',
+    hullId: 'ish-lakshmi',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'paragon-computer-m', f1: 'meridian-helm-s', x1: 'paragon-director-m', p1: 'meridian-podbay-s',
+      w1: 'commonwealth-answer-m', w2: 'commonwealth-retort-s', w3: 'commonwealth-retort-s',
+      e1: 'slagline-engine-m', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'itomarr-shield-m', i1: 'cantorvell-armour-m',
+      b1: 'meridian-reactor-s', // a second small reactor, as on the Phobos
+    },
+  },
+  'union-blockade': {
+    // The UDF's patrol: rounds, not capacitor. An autocannon, three light guns, armour over shields.
+    id: 'union-blockade',
+    name: 'Union Blockade, UDF patrol',
+    hullId: 'uni-blockade',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-m', p1: 'meridian-podbay-s',
+      w1: 'union-autocannon-m', w2: 'union-picket-s', w3: 'union-lockout-s', w4: 'union-lockout-s',
+      e1: 'slagline-engine-m', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'meridian-shield-s', i1: 'cantorvell-armour-m', i2: 'cantorvell-armour-m',
+    },
+  },
+  'tessaract-hauler': {
+    // Earth's hauler on a short run: four containers, one light gun, a medium shield.
+    id: 'tessaract-hauler',
+    name: 'Tessaract Waybill, short-run hauler',
+    hullId: 'tes-waybill',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'union-picket-s',
+      e1: 'slagline-engine-m', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'itomarr-shield-m', u2: 'paragon-fairwarning-s',
+      b1: 'tessaract-container-m', b2: 'tessaract-container-m', b3: 'tessaract-container-m', b4: 'tessaract-container-m',
+    },
+  },
+  'beltforge-hauler': {
+    // The Belt's hauler: four containers, two guns, armour where a Waybill has a shield.
+    id: 'beltforge-hauler',
+    name: 'Belt Forge Mule, Collective freight',
+    hullId: 'bf-mule',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'union-picket-s', w2: 'union-picket-s',
+      e1: 'slagline-engine-m', c1: 'slagline-thrusters-m', c2: 'itomarr-reactor-m',
+      u1: 'meridian-shield-s', i1: 'rookrivet-armour-s',
+      b1: 'tessaract-container-m', b2: 'tessaract-container-m', b3: 'tessaract-container-m', b4: 'tessaract-container-m',
+    },
+  },
+  'meridian-hauler': {
+    // The independents' hauler: four small pods, one gun, a small shield. Cheap to run.
+    id: 'meridian-hauler',
+    name: 'Meridian Skua, independent hauler',
+    hullId: 'mer-skua',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'union-picket-s',
+      e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'meridian-shield-s',
+      b1: 'meridian-pod-s', b2: 'meridian-pod-s', b3: 'meridian-pod-s', b4: 'meridian-pod-s',
+    },
+  },
+  'beltforge-rime': {
+    // The Belt's light cutter: the saw on the boom (a pick), a gleaner, a survey scanner and a hopper; armour, no shield.
+    id: 'beltforge-rime',
+    name: 'Belt Forge Rime, Collective issue',
+    hullId: 'bf-rime',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'rookrivet-assay-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'rookrivet-pick-s', w2: 'meridian-gleaner-s',
+      e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'rookrivet-survey-s', u2: 'rookrivet-hopper-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s',
+    },
+  },
+  'meridian-dunlin': {
+    // The first miner anyone buys: one laser, an assay computer, a survey scanner, a small shield.
+    id: 'meridian-dunlin',
+    name: 'Meridian Dunlin, first miner',
+    hullId: 'mer-dunlin',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'rookrivet-assay-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'rookrivet-pick-s',
+      e1: 'meridian-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'rookrivet-survey-s', u2: 'meridian-shield-s', b1: 'meridian-pod-s',
+    },
+  },
   'escape-pod': {
     // The fixed fit every pod has: a small engine and thrusters, power for
     // them, nothing else. No guns, no cargo, no shield.

@@ -20,7 +20,7 @@ import { fromAngle, scale } from './vec2.js';
 export const HARBOUR_ORBIT_RADIUS = 1100;
 
 /** How far beyond the station hull a pad's centre sits, by pad size, units. */
-const PAD_REACH: Record<ModuleSize, number> = { S: 14, M: 22, L: 36, XL: 44 };
+const PAD_REACH: Record<ModuleSize, number> = { S: 14, M: 24, L: 36, XL: 44 };
 
 /**
  * Pads spaced evenly round a station's rim, facing straight out, in the

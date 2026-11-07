@@ -9,8 +9,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 - **Ship art in flight**: every ship in the game is drawn from its artwork, with turrets on top that turn to aim.
 - **Hull shapes from the art** (`hull-geometry.ts`, `npm run geometry`): ships are hit where they are drawn and fire from where their turrets are.
 
+- **Ten new ships** (the first fleet): the Kessari Citation, Seraphine Deimos and Phobos, Ishtar Lakshmi and Union Blockade (navy), the Tessaract Waybill, Belt Forge Mule and Meridian Skua (haulers), and the Belt Forge Rime and Meridian Dunlin (miners). Each is sold at its power's yards, and the five warships are in the Arena.
+- **Navies fly their own ships**: Mars patrols in Phobos boats with Deimos pickets, Venus in the Lakshmi, the Belt in the Blockade; Earth adds a Citation picket. Traders fly a mix of haulers, and two more miners work Ceres.
+
 ### Changed
 
+- **Medium pads** sit a little further out from stations (new stations only).
 - **Hull sizes follow the art**: the Aurel Tacet is much longer (radius 38, now a large hull that needs a large pad), the Manifest and Collier are bigger, and the Prospector, Sinker and Knocker smaller.
 - **Large pads** sit a little further out from stations (new stations only).
 - **Belt mining hulls** carry their lasers on the booms, where the art draws them.

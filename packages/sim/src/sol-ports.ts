@@ -123,11 +123,17 @@ const PORT_PADS: readonly ModuleSize[] = ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'M'
 /** An outpost's: a few. */
 const OUTPOST_PADS: readonly ModuleSize[] = ['L', 'S', 'M', 'S', 'M'];
 
-/** Ship marts by kind, from today's catalogue until the first fleet (Open Lanes step 2). The capitals keep Harbour's. */
+/**
+ * Ship marts by kind, with the first fleet (Open Lanes step 2, docs/ship-pipeline.md): each navy's
+ * yard sells its own hulls first, the civil yards the independents' haulers and first miner, the
+ * Belt's yard its cutters, hauler and patrol boat. The capitals keep Harbour's; Thetis adds the Lakshmi.
+ */
 const NAVAL_MART = ['kessari-raider', 'kessari-brig', 'union-frigate'];
-const CIVIL_MART = ['meridian-starter', 'tessaract-trader', 'kessari-raider'];
-const FREIGHT_MART = ['meridian-starter', 'tessaract-trader'];
-const MINING_MART = ['rookrivet-prospector', 'rookrivet-breacher', 'rookrivet-hulk'];
+const EARTH_NAVAL_MART = ['kessari-citation', ...NAVAL_MART];
+const MARS_NAVAL_MART = ['seraphine-picket', 'seraphine-patrol', ...NAVAL_MART];
+const CIVIL_MART = ['meridian-starter', 'meridian-dunlin', 'meridian-hauler', 'tessaract-trader', 'kessari-raider'];
+const FREIGHT_MART = ['meridian-starter', 'tessaract-hauler', 'tessaract-trader'];
+const MINING_MART = ['rookrivet-prospector', 'beltforge-rime', 'beltforge-hauler', 'union-blockade', 'rookrivet-breacher', 'rookrivet-hulk'];
 
 type Market = Record<string, MarketEntry>;
 
@@ -239,6 +245,7 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
       runBy: 'The Venusian Assembly',
       holder: 'venus',
       rank: 'capital',
+      shipMart: [...capital.shipMart, 'ishtar-guard'],
     },
     {
       ...sized(capital, 450, CAPITAL_PADS),
@@ -307,7 +314,7 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
       holder: 'earth',
       rank: 'navalYard',
       outfitting: true,
-      shipMart: NAVAL_MART,
+      shipMart: EARTH_NAVAL_MART,
     }),
     port(TESSARACT_L4_ID, 'Tessaract Freight Yard L4', lagrange(bodies, LUNA_ID, Math.PI / 3), 400, YARD_PADS, with_(YARD, { food: { ask: 18, bid: 15 }, machinery: { ask: 92, bid: 80 } }), {
       runBy: 'Tessaract Logistics',
@@ -320,7 +327,7 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
       runBy: 'Lunar old money',
       holder: 'earth',
       outfitting: true,
-      shipMart: ['meridian-starter', 'kessari-raider'],
+      shipMart: ['meridian-starter', 'meridian-dunlin', 'meridian-hauler', 'kessari-raider'],
     }),
     // The Near Field: on Earth's own path round the Sun, a short burn behind it.
     port(APOLLO_WORKS_ID, 'Corvane Apollo Works', lagrange(bodies, EARTH_ID, -0.05), 240, PORT_PADS, FOUNDRY, {
@@ -354,7 +361,7 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
       holder: 'mars',
       rank: 'navalYard',
       outfitting: true,
-      shipMart: NAVAL_MART,
+      shipMart: MARS_NAVAL_MART,
     }),
     port(STATE_YARD_DEIMOS_ID, 'State Yard Deimos', orbitRound(bodies, DEIMOS_ID, 3_000, -0.8), 320, YARD_PADS, YARD, {
       runBy: 'Arcadia Works',

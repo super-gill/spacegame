@@ -118,7 +118,17 @@ Left out on purpose: capitals and cruisers (nothing in Open Lanes needs them), T
 - **Large pads sit 36 units off a station's rim** (was 32), to keep room between a Collier and the pad beside it. Saved stations keep their pads.
 - **Outlines come from the art for 35 hulls** where they were wrong: the export now takes the whole drawing when a silhouette covers under 60% of it (the Belt's frame hulls drew only their cab).
 
-Next: the ten new hulls (marks, a line of numbers each, a stock fit, ships to buy and NPCs to fly them).
+**Push 2 as built (7 November 2026, Lead 9):** the ten new hulls are in the game, with the registry key as the game id (`IN_GAME` in `build.py`).
+
+- **Marks:** every drawn gun marked (`Hull.weapon`, or a hull's own ring, barbette or bolted base kept as the socket with the gun inside the marker). The game allows no PDCs on corvettes and patrol boats (`docs/turrets.md`), so the Deimos's and Blockade's drawn PDCs became light guns and the Phobos lost its aft pair. The Lakshmi's railgun is a mount on empty rails. The Rime's saw is its mining mount (`boom(..., mount=...)` takes any head).
+- **Outline:** a marked mount is part of the hull's shape, so the outline reaches it (the Blockade's flak gun on its truss). The export now fails only if a mount is outside the drawing's frame.
+- **Numbers** (`FLEET` in `hulls.ts`): between the hulls of the same class. Internal slots are laid out on the drawing (`onDrawing`). Earth hulls get the shield bonus, Mars energy damage, Venus shield and hybrid damage, the Belt projectile damage. New maker: Seraphine Naval Yards.
+- **Stock fits** (`loadouts.ts`, and `reference-fits.ts` so the five warships are in the Arena): `kessari-citation`, `seraphine-picket`, `seraphine-patrol`, `ishtar-guard`, `union-blockade`, `tessaract-hauler`, `beltforge-hauler`, `meridian-hauler`, `beltforge-rime`, `meridian-dunlin`.
+- **For sale** (`sol-ports.ts`): ECF Yard L5 the Citation; MRN Yard Phobos the Deimos and Phobos; Thetis Orbital the Lakshmi; Bellows the Rime, Mule and Blockade; Tessaract L4 the Waybill; State Yard Deimos and Tycho the Skua and Dunlin.
+- **Flown** (`sol.ts`): each navy patrols in its own hulls (Mars the Phobos, Venus the Lakshmi, the Belt the Blockade; Earth keeps the Warrant), with new pickets (`picket-earth` a Citation, `picket-mars` a Deimos). Five traders fly the Waybill, Mule or Skua; two more miners at Ceres fly the Rime and the Dunlin.
+- **Medium pads** sit 24 units off a station's rim (was 22), for the new patrol boats.
+
+Next (step 3 of Open Lanes, per the roadmap), with the art's tier and grade rules (`hull-terms.md`) still to apply: Navy grades, licences and patterns are not in the game yet.
 
 ## The wrapper
 

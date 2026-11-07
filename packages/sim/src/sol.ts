@@ -151,6 +151,15 @@ export const SOL_ROCK_SITE: RockSite = {
 };
 
 /** Every Sol body, keyed by id. */
+/** Each navy's patrol fit (Open Lanes step 2): Earth keeps the Calder Watch's Warrant. */
+const NAVY_PATROL: Record<PowerId, string> = {
+  earth: 'calder-watch',
+  mars: 'seraphine-patrol',
+  venus: 'ishtar-guard',
+  belt: 'union-blockade',
+  aurel: 'calder-watch',
+};
+
 export function solBodies(): Record<string, Body> {
   const sun: Body = { id: SUN_ID, name: 'The Sun', kind: 'star', orbit: null, radius: 1_500_000, gravity: gm(1_500_000, 100), sphere: 1_500_000 * 1.5 };
   const bodies: Body[] = [sun];
@@ -224,9 +233,9 @@ function solSpawners(stations: Readonly<Record<string, Station>>): Spawner[] {
   });
 
   /** A trader on a loop of ports, starting docked at the first, waiting `waitSeconds` so they do not all leave at once. */
-  const trader = (id: string, route: string[], waitSeconds: number): Spawner => ({
+  const trader = (id: string, route: string[], waitSeconds: number, loadoutId = 'tessaract-trader'): Spawner => ({
     id,
-    loadoutId: 'tessaract-trader',
+    loadoutId,
     ...docked(route[0]!),
     brain: { kind: 'trader', route, leg: 0, waitTicks: Math.round(waitSeconds * 60) },
     hold: { rounds: 4 },
@@ -234,10 +243,10 @@ function solSpawners(stations: Readonly<Record<string, Station>>): Spawner[] {
     ...blank,
   });
 
-  /** A navy patrol on a beat of ports. */
-  const patrol = (id: string, power: PowerId, beat: string[]): Spawner => ({
+  /** A navy patrol on a beat of ports, in its own navy's hull (the first fleet). */
+  const patrol = (id: string, power: PowerId, beat: string[], loadoutId = NAVY_PATROL[power]): Spawner => ({
     id,
-    loadoutId: 'calder-watch',
+    loadoutId,
     ...docked(beat[0]!),
     brain: { kind: 'watch', power, beat, leg: 0, mode: 'patrol', targetId: null, modeTicks: 0 },
     hold: { rounds: 10 },
@@ -273,26 +282,31 @@ function solSpawners(stations: Readonly<Record<string, Station>>): Spawner[] {
     patrol('patrol-mars-inner', 'mars', [THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID, ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID]),
     patrol('patrol-mars-ceres', 'mars', [ELYSIUM_ID, CERES_ACCORD_ID]),
     patrol('patrol-belt', 'belt', [CERES_ACCORD_ID, SLAGLINE_ID]),
+    // Pickets: the light hulls, on short beats near home.
+    patrol('picket-earth', 'earth', [EARTH_ORBITAL_EXCHANGE_ID, TYCHO_PORT_ID], 'kessari-citation'),
+    patrol('picket-mars', 'mars', [ELYSIUM_ID, STATE_YARD_DEIMOS_ID], 'seraphine-picket'),
 
     // Lane traffic. Start ports are spread so no port runs out of pads at the start (Ceres keeps room for its miners).
     trader('trader-inner', [THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID, ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID], 5),
     trader('trader-inner-2', [ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID, THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID], 25),
     trader('trader-ceres', [ELYSIUM_ID, CERES_ACCORD_ID], 15),
-    trader('trader-belt', [CERES_ACCORD_ID, SLAGLINE_ID], 10),
+    trader('trader-belt', [CERES_ACCORD_ID, SLAGLINE_ID], 10, 'beltforge-hauler'),
     trader('trader-long', [CALLISTO_DEPOT_ID, TITAN_FREE_PORT_ID, CALLISTO_DEPOT_ID, CERES_ACCORD_ID], 20),
     trader('trader-gate', [TITAN_FREE_PORT_ID, ECF_TOLL_ID], 30),
     // Local runs off the lanes, in held space.
-    trader('trader-earth', [EARTH_ORBITAL_EXCHANGE_ID, TYCHO_PORT_ID, TESSARACT_L4_ID], 12),
-    trader('trader-mars', [ELYSIUM_ID, STATE_YARD_DEIMOS_ID], 18),
+    trader('trader-earth', [EARTH_ORBITAL_EXCHANGE_ID, TYCHO_PORT_ID, TESSARACT_L4_ID], 12, 'tessaract-hauler'),
+    trader('trader-mars', [ELYSIUM_ID, STATE_YARD_DEIMOS_ID], 18, 'meridian-hauler'),
     // Out where nobody answers: the pirates' prey.
-    trader('trader-psyche', [PSYCHE_DIG_ID, CERES_ACCORD_ID], 8),
+    trader('trader-psyche', [PSYCHE_DIG_ID, CERES_ACCORD_ID], 8, 'beltforge-hauler'),
     trader('trader-jupiter', [CALLISTO_DEPOT_ID, GANYMEDE_LOCAL_ID, HAVEN_EUROPA_ID], 14),
-    trader('trader-hilda', [HILDA_MOOT_ID, CERES_ACCORD_ID], 35),
+    trader('trader-hilda', [HILDA_MOOT_ID, CERES_ACCORD_ID], 35, 'meridian-hauler'),
 
     // Miners at Ceres.
     miner('miner-ceres-prospector', 'rookrivet-prospector', 5, 90),
     miner('miner-ceres-prospector-2', 'rookrivet-prospector', 40, 90),
     miner('miner-ceres-barge', 'rookrivet-hulk', 20, 180),
+    miner('miner-ceres-rime', 'beltforge-rime', 60, 120),
+    miner('miner-ceres-dunlin', 'meridian-dunlin', 80, 120),
 
     // Pirates where the lore puts them.
     pirate('pirate-psyche', PSYCHE_DIG_ID, 0.15),

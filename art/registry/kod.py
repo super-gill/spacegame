@@ -291,7 +291,8 @@ def citation(civ=False):
     h.visor(17, 2.6, 3.8, 3.2, n_eyes=1)
     h.antennae(10, -3.6, 3, -1.2); h.antennae(10, 3.6, 3, 1.2)
     h.emitter(6, -2.4); h.emitter(6, 2.4)
-    h.gun(12.2, 0)
+    h.weapon("w1", "high", "S", 12.2, 0)
+    h.weapon("w2", "high", "S", -5, -5.9); h.weapon("w3", "high", "S", -5, 5.9)
     h.livery([(-9, -6.2), (-9, 6.2)], (1, -2.9 + 0.35), "KOD C", 1.0, ((-15, -7.4), (-15, 7.4)))
     return h, 18.5, 14.4 / 35
 

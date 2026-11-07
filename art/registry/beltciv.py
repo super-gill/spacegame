@@ -8,6 +8,7 @@ cranes, claws, cutting torches, tow clamps, scrap racks, patch plate on patch
 plate. Legacy marks: fewer parts, more patches, the old rust gone brown.
 Nose points +x.
 """
+import contextlib
 import math
 from kod import Hull, cham, sym_pts, poly, rect, line, circ, ell, P, clamp, fade, INK, WHITE, RED, GREEN, SHADOW, GLASS
 from belt import BeltParts as B, RUST, RUST2, GUN, GUN2, DARKG, BSEAM, HAZY, HAZK, COOP, COOP2
@@ -50,17 +51,20 @@ class BeltCivil(Hull):
 
     def boom(self, x, y, L, side, tool="laser", mount=None):
         """A boom off the hull, with a laser head, a drill or an ice saw on the end. `mount=(id, size)` makes
-        a laser head a game mount: the boom stays hull, the head is the fitted mining laser."""
+        its head a game mount: the boom stays hull, the head is the fitted mining laser."""
         self.f(rect(x, y - 0.5, L, 1.0, GUN2, stroke=BSEAM, sw=0.14), mid=True)
         for k in (0.3, 0.6): self.f(line(x + L * k, y - 0.5, x + L * k, y + 0.5, stroke=BSEAM, sw=0.1))
         self.f(circ(x, y, 1.1, DARKG, stroke=BSEAM, sw=0.16), mid=True); self.f(circ(x, y, 0.4, GUN2))
         ex = x + L
-        if tool == "laser" and mount:
+        if mount:
+            # The head is the fitted tool: a bare collar stays as the socket.
             self.f(rect(ex - 0.9, y - 0.9, 1.8, 1.8, DARKG, stroke=BSEAM, sw=0.14, rx=0.9), mid=True)
-            with self.mount(mount[0], "high", mount[1], ex, y):
-                self.f(rect(ex - 0.6, y - 1.1, 2.2, 2.2, DARKG, stroke=BSEAM, sw=0.14, rx=0.3), mid=True)
-                self.f(circ(ex + 1.9, y, 0.5, "#ff9a3a")); self.f(circ(ex + 1.9, y, 1.0, "#ff9a3a", extra='opacity="0.3"'))
-        elif tool == "laser":
+        with (self.mount(mount[0], "high", mount[1], ex, y) if mount else contextlib.nullcontext()):
+            self._head(ex, y, tool)
+
+    def _head(self, ex, y, tool):
+        """A boom's working head."""
+        if tool == "laser":
             self.f(rect(ex - 0.6, y - 1.1, 2.2, 2.2, DARKG, stroke=BSEAM, sw=0.14, rx=0.3), mid=True)
             self.f(circ(ex + 1.9, y, 0.5, "#ff9a3a")); self.f(circ(ex + 1.9, y, 1.0, "#ff9a3a", extra='opacity="0.3"'))
         elif tool == "drill":
@@ -175,6 +179,7 @@ def mule(old=False):
     h.hopper(-18, -2.0, 12, 4.0, 0.6 if not old else 0.3, tie=2.4)
     h.engines(-21, [-2.6, 2.6], 2.2)
     h.spare_mount(10, 2.5, 1.2)
+    h.weapon("w1", "high", "S", 10, 2.5, socket=False); h.weapon("w2", "high", "S", 1, -1.8)
     h.finish((3, 1.0), "MULE", 1.1, ((-17, -7.8), (-17, 7.8)), hazard=(-18, 7.6, 10, 0.8))
     return h, 24
 

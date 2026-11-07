@@ -1,4 +1,4 @@
-import type { HullClass, HullSpec, MountPoint, MountService, MountType, ModuleSize } from './types.js';
+import type { HullBonus, HullClass, HullSpec, MountPoint, MountService, MountType, ModuleSize } from './types.js';
 import type { Vec2 } from './vec2.js';
 import { HULL_GEOMETRY, type HullGeometry } from './hull-geometry.js';
 
@@ -84,6 +84,194 @@ function low(id: string, size: ModuleSize, x: number, y: number): MountPoint {
 function outline(points: ReadonlyArray<readonly [number, number]>): Vec2[] {
   return points.map(([x, y]) => ({ x, y }));
 }
+
+/**
+ * Where to put a new hull's internal mounts: a point on its drawn shape,
+ * `u` and `v` from -1 to 1 across the middle of its outline box (art
+ * coordinates, from hull-geometry.ts). Weapon mounts need no position here:
+ * the art gives it.
+ */
+function onDrawing(id: string): (u: number, v: number) => [number, number] {
+  const b = box(HULL_GEOMETRY[id]!.outline);
+  const cx = (b.x[0] + b.x[1]) / 2;
+  const cy = (b.y[0] + b.y[1]) / 2;
+  const hw = ((b.x[1] - b.x[0]) / 2) * 0.6;
+  const hh = ((b.y[1] - b.y[0]) / 2) * 0.45;
+  return (u, v) => [Math.round((cx + u * hw) * 10) / 10, Math.round((cy + v * hh) * 10) / 10];
+}
+
+/** The drawn outline of a hull, for a table entry whose shape is the art's from the start. */
+function drawnOutline(id: string): Vec2[] {
+  return outline(HULL_GEOMETRY[id]!.outline);
+}
+
+/** A corvette's or prospector's internal mounts (the Tern's set), placed on the drawing. */
+function smallInternals(id: string, sizes: { core: ModuleSize; engine: ModuleSize }): MountPoint[] {
+  const at = onDrawing(id);
+  return [
+    mount('n1', 'nav', 'S', ...at(-0.1, 0), ['power']),
+    mount('r1', 'radar', 'S', ...at(0.6, -0.5), ['power']),
+    mount('t1', 'computer', 'S', ...at(0.6, 0.5), ['power']),
+    mount('f1', 'flight', 'S', ...at(0.3, -0.7), ['power']),
+    mount('x1', 'fireControl', 'S', ...at(0.3, 0.7), ['power']),
+    mount('p1', 'podBay', 'S', ...at(-0.8, -0.6), []),
+    mount('e1', 'engine', sizes.engine, ...at(-1, 0), ['power'], AFT),
+    mount('c1', 'core', sizes.core, ...at(-0.5, -0.5), ['power']),
+    mount('c2', 'core', sizes.core, ...at(-0.5, 0.5), ['power']),
+    mid('u1', 'S', ...at(0, -0.8)),
+    mid('u2', 'S', ...at(0, 0.8)),
+    low('i2', 'S', ...at(-0.2, -0.4)),
+    low('i3', 'S', ...at(-0.2, 0.4)),
+    low('b1', 'S', ...at(-0.8, 0.6)),
+  ];
+}
+
+/** A patrol boat's internal mounts (the Warrant's set), placed on the drawing. */
+function patrolInternals(id: string): MountPoint[] {
+  const at = onDrawing(id);
+  return [
+    mount('n1', 'nav', 'S', ...at(-0.1, 0), ['power']),
+    mount('r1', 'radar', 'S', ...at(0.7, -0.3), ['power']),
+    mount('t1', 'computer', 'M', ...at(0.7, 0.3), ['power']),
+    mount('f1', 'flight', 'M', ...at(0.5, -0.5), ['power']),
+    mount('x1', 'fireControl', 'M', ...at(0.5, 0.5), ['power']),
+    mount('p1', 'podBay', 'S', ...at(-0.8, -0.6), []),
+    mount('e1', 'engine', 'M', ...at(-1, -0.4), ['power'], AFT),
+    mount('e2', 'engine', 'M', ...at(-1, 0.4), ['power'], AFT),
+    mount('c1', 'core', 'M', ...at(-0.5, -0.4), ['power']),
+    mount('c2', 'core', 'M', ...at(-0.5, 0.4), ['power']),
+    mid('u1', 'M', ...at(0.2, -0.3)),
+    mid('u2', 'S', ...at(0.2, 0.3)),
+    mid('u3', 'S', ...at(-0.3, 0)),
+    low('i1', 'M', ...at(-0.7, 0)),
+    low('i2', 'M', ...at(-0.4, -0.8)),
+    low('i3', 'S', ...at(-0.4, 0.8)),
+    low('b1', 'S', ...at(-0.8, 0.6)),
+  ];
+}
+
+/** A medium hauler's internal mounts: a small ship's systems and `bays` cargo bays along the hull. */
+function haulerInternals(id: string, bays: number, bay: ModuleSize): MountPoint[] {
+  const at = onDrawing(id);
+  const out = [
+    mount('n1', 'nav', 'S', ...at(0.8, 0), ['power']),
+    mount('r1', 'radar', 'S', ...at(0.9, -0.4), ['power']),
+    mount('t1', 'computer', 'S', ...at(0.9, 0.4), ['power']),
+    mount('f1', 'flight', 'S', ...at(0.7, -0.6), ['power']),
+    mount('x1', 'fireControl', 'S', ...at(0.7, 0.6), ['power']),
+    mount('p1', 'podBay', 'S', ...at(-0.9, 0), []),
+    mount('e1', 'engine', 'M', ...at(-1, -0.4), ['power'], AFT),
+    mount('e2', 'engine', 'M', ...at(-1, 0.4), ['power'], AFT),
+    mount('c1', 'core', 'M', ...at(-0.7, -0.5), ['power']),
+    mount('c2', 'core', 'M', ...at(-0.7, 0.5), ['power']),
+    mid('u1', 'M', ...at(0.5, 0)),
+    mid('u2', 'S', ...at(-0.5, 0)),
+    low('i1', 'S', ...at(0.3, 0)),
+  ];
+  for (let k = 0; k < bays; k++) {
+    const u = 0.3 - (k >> 1) * 0.7;
+    out.push(low(`b${k + 1}`, bay, ...at(u, k % 2 === 0 ? -0.8 : 0.8)));
+  }
+  return out;
+}
+
+const ENERGY_POWER: HullBonus = { source: 'power', label: '+20% damage from full-size energy weapons', stat: 'damage', amount: 0.2, kind: 'weapon', tag: 'energy' };
+const HYBRID_POWER: HullBonus = { source: 'power', label: '+20% damage from full-size hybrid weapons', stat: 'damage', amount: 0.2, kind: 'weapon', tag: 'hybrid' };
+const PROJECTILE_POWER: HullBonus = { source: 'power', label: '+20% damage from full-size projectile weapons', stat: 'damage', amount: 0.2, kind: 'weapon', tag: 'projectile' };
+const SHIELD_POWER: HullBonus = { source: 'power', label: '+20% shield from full-size shield tech', stat: 'shield', amount: 0.2, tag: 'shield' };
+const CARGO_ROLE: HullBonus = { source: 'role', label: '+25% cargo from full-size containers', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' };
+const MINING_ROLE: HullBonus = { source: 'role', label: '+25% ore cut from full-size mining lasers', stat: 'damage', amount: 0.25, kind: 'weapon', tag: 'mining' };
+
+/**
+ * Open Lanes step 2, the first fleet (docs/ship-pipeline.md, "Step 2"):
+ * ten hulls beside the first eleven. Their shapes and weapon mounts are the
+ * art's; their numbers sit between the hulls of the same class above.
+ */
+const FLEET: Record<string, HullSpec> = {
+  'kes-citation': {
+    // Earth's fast interceptor and toll runner: more engine than ship.
+    id: 'kes-citation', name: 'Kessari Citation', power: 'earth', manufacturer: 'kessariOrbital', role: 'combat', class: 'corvette',
+    sizeClass: 'S', price: 4200, mass: 4.5, structure: 200, radius: 0, outline: drawnOutline('kes-citation'),
+    maxSpeed: 390, maxTurnRate: 2.7, signature: 16, capacitor: 80, capacitorRecharge: 7,
+    mounts: [...smallInternals('kes-citation', { core: 'S', engine: 'M' }), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC), high('w3', 'S', 0, 0)],
+    bonuses: [
+      { source: 'role', label: '+25% lock speed from a full-size targeting computer', stat: 'scanResolution', amount: 0.25, kind: 'targetingComputer' },
+      SHIELD_POWER,
+    ],
+  },
+  'ser-deimos': {
+    // Mars's picket and scout: one heavy barbette forward, two light guns aft.
+    id: 'ser-deimos', name: 'Seraphine Deimos', power: 'mars', manufacturer: 'seraphine', role: 'combat', class: 'corvette',
+    sizeClass: 'S', price: 4500, mass: 5.5, structure: 240, radius: 0, outline: drawnOutline('ser-deimos'),
+    maxSpeed: 350, maxTurnRate: 2.4, signature: 17, capacitor: 100, capacitorRecharge: 7,
+    mounts: [...smallInternals('ser-deimos', { core: 'M', engine: 'S' }), high('w1', 'M', 0, 0), high('w2', 'S', 0, 0, AFT, BROAD_ARC), high('w3', 'S', 0, 0, AFT, BROAD_ARC)],
+    bonuses: [{ source: 'role', label: '+25% sensor range from a full-size radar', stat: 'sensorRange', amount: 0.25, kind: 'radar' }, ENERGY_POWER],
+  },
+  'ser-phobos': {
+    // Mars's patrol and escort: barbettes fore and aft, light guns forward.
+    id: 'ser-phobos', name: 'Seraphine Phobos', power: 'mars', manufacturer: 'seraphine', role: 'combat', class: 'patrolBoat',
+    sizeClass: 'M', price: 6800, mass: 13, structure: 320, radius: 0, outline: drawnOutline('ser-phobos'),
+    maxSpeed: 300, maxTurnRate: 2.0, signature: 29, capacitor: 120, capacitorRecharge: 9,
+    mounts: [...patrolInternals('ser-phobos'), high('w1', 'M', 0, 0), high('w2', 'M', 0, 0, FORWARD, BROAD_ARC), high('w3', 'S', 0, 0), high('w4', 'S', 0, 0)],
+    bonuses: [ENERGY_POWER],
+  },
+  'ish-lakshmi': {
+    // Venus's Space Guard patrol and rescue escort: the kit first, then the railgun.
+    id: 'ish-lakshmi', name: 'Ishtar Lakshmi', power: 'venus', manufacturer: 'commonwealth', role: 'combat', class: 'patrolBoat',
+    sizeClass: 'M', price: 6500, mass: 12, structure: 330, radius: 0, outline: drawnOutline('ish-lakshmi'),
+    maxSpeed: 310, maxTurnRate: 2.0, signature: 30, capacitor: 110, capacitorRecharge: 10,
+    mounts: [...patrolInternals('ish-lakshmi'), high('w1', 'M', 0, 0), high('w2', 'S', 0, 0), high('w3', 'S', 0, 0)],
+    bonuses: [SHIELD_POWER, HYBRID_POWER],
+  },
+  'uni-blockade': {
+    // The Belt's UDF patrol: a captured Kessari Writ, guns in the old door frames, flak on a boom.
+    id: 'uni-blockade', name: 'Union Blockade', power: 'belt', manufacturer: 'unionDefence', role: 'combat', class: 'patrolBoat',
+    sizeClass: 'M', price: 5200, mass: 13, structure: 340, radius: 0, outline: drawnOutline('uni-blockade'),
+    maxSpeed: 290, maxTurnRate: 2.0, signature: 30, capacitor: 90, capacitorRecharge: 8,
+    mounts: [...patrolInternals('uni-blockade'), high('w1', 'M', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC), high('w3', 'S', 0, 0), high('w4', 'S', 0, 0)],
+    bonuses: [PROJECTILE_POWER],
+  },
+  'tes-waybill': {
+    // Earth's medium hauler: the workhorse of a trade triangle.
+    id: 'tes-waybill', name: 'Tessaract Waybill', power: 'earth', manufacturer: 'tessaract', role: 'transport', class: 'freighter',
+    sizeClass: 'M', price: 5200, mass: 11, structure: 340, radius: 0, outline: drawnOutline('tes-waybill'),
+    maxSpeed: 250, maxTurnRate: 1.5, signature: 32, capacitor: 120, capacitorRecharge: 3,
+    mounts: [...haulerInternals('tes-waybill', 4, 'M'), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, AFT)],
+    bonuses: [CARGO_ROLE, SHIELD_POWER],
+  },
+  'bf-mule': {
+    // The Belt's hauler: uglier, tougher and cheaper than a Waybill.
+    id: 'bf-mule', name: 'Belt Forge Mule', power: 'belt', manufacturer: 'beltForge', role: 'transport', class: 'freighter',
+    sizeClass: 'M', price: 4200, mass: 12, structure: 400, radius: 0, outline: drawnOutline('bf-mule'),
+    maxSpeed: 230, maxTurnRate: 1.4, signature: 33, capacitor: 110, capacitorRecharge: 3,
+    mounts: [...haulerInternals('bf-mule', 4, 'M'), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC)],
+    bonuses: [CARGO_ROLE, PROJECTILE_POWER],
+  },
+  'mer-skua': {
+    // The independents' hauler: a Tern's cab on a container rack, the first step up for a trader.
+    id: 'mer-skua', name: 'Meridian Skua', power: null, manufacturer: 'meridian', role: 'transport', class: 'freighter',
+    sizeClass: 'M', price: 3600, mass: 8, structure: 280, radius: 0, outline: drawnOutline('mer-skua'),
+    maxSpeed: 290, maxTurnRate: 1.8, signature: 26, capacitor: 90, capacitorRecharge: 4,
+    mounts: [...haulerInternals('mer-skua', 4, 'S'), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC)],
+    bonuses: [CARGO_ROLE],
+  },
+  'bf-rime': {
+    // The Belt's light ice cutter: a Prospector frame with a saw where the laser was.
+    id: 'bf-rime', name: 'Belt Forge Rime', power: 'belt', manufacturer: 'beltForge', role: 'civilian', class: 'prospector',
+    sizeClass: 'S', price: 2400, mass: 6, structure: 210, oreHold: 120, radius: 0, outline: drawnOutline('bf-rime'),
+    maxSpeed: 290, maxTurnRate: 2.1, signature: 20, capacitor: 110, capacitorRecharge: 7,
+    mounts: [...smallInternals('bf-rime', { core: 'S', engine: 'S' }), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC)],
+    bonuses: [MINING_ROLE],
+  },
+  'mer-dunlin': {
+    // The independents' prospector: one laser on the standard ring. The first miner anyone buys.
+    id: 'mer-dunlin', name: 'Meridian Dunlin', power: null, manufacturer: 'meridian', role: 'civilian', class: 'prospector',
+    sizeClass: 'S', price: 1900, mass: 5, structure: 180, oreHold: 80, radius: 0, outline: drawnOutline('mer-dunlin'),
+    maxSpeed: 320, maxTurnRate: 2.3, signature: 18, capacitor: 90, capacitorRecharge: 6,
+    mounts: [...smallInternals('mer-dunlin', { core: 'S', engine: 'S' }), high('w1', 'S', 0, 0)],
+    bonuses: [MINING_ROLE, { source: 'role', label: '+25% cargo from full-size pods', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' }],
+  },
+};
 
 const TABLE: Record<string, HullSpec> = {
   'meridian-courier': {
@@ -655,6 +843,7 @@ const TABLE: Record<string, HullSpec> = {
     sealed: true,
     escapePod: true,
   },
+  ...FLEET,
 };
 
 /**
