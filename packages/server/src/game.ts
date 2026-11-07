@@ -6,6 +6,7 @@ import {
   type CommandOutcome,
   type PilotCommand,
   type ShipInput,
+  type StartId,
   type World,
   type WorldEvent,
 } from '@spacegame/sim';
@@ -26,8 +27,8 @@ import {
 
 /** How one kind of world treats its pilots, beyond stepping. */
 export interface WorldHooks {
-  /** A pilot comes in. */
-  join(world: World, pilotId: string, name: string): World;
+  /** A pilot comes in; `start` is a new pilot's chosen start (starts.ts), where the world has starts. */
+  join(world: World, pilotId: string, name: string, start?: StartId | null): World;
   /** A pilot goes. */
   leave(world: World, pilotId: string): World;
   /** After each step of the world. */
@@ -86,8 +87,8 @@ export class Game {
   }
 
   /** Bring a pilot into the world, as the world's hooks say. */
-  join(pilotId: string, name: string): void {
-    this.world = this.hooks.join(this.world, pilotId, name);
+  join(pilotId: string, name: string, start?: StartId | null): void {
+    this.world = this.hooks.join(this.world, pilotId, name, start);
   }
 
   /**

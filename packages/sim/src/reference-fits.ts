@@ -47,6 +47,8 @@ export const REFERENCE_FITS: FitSpec[] = [
   stock('meridian-hauler', 'hauling', 'The first step up for a trader.'),
   stock('beltforge-rime', 'mining', "The Belt's light cutter."),
   stock('meridian-dunlin', 'mining', 'The first miner anyone buys.'),
+  stock('union-wildcat-rota', 'combat', "The UDF rota's corvette."),
+  stock('ishtar-sedna-vsg', 'combat', "The Space Guard's rescue corvette."),
   {
     name: 'Warrant brawler',
     hullId: 'kessari-wedge',

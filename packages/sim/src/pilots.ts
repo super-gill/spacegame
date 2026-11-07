@@ -24,9 +24,9 @@ import { add, distance, fromAngle, length, scale, sub, toAngle, type Vec2 } from
  *                      empty, to be boarded again later
  *   ship destroyed  -> the pilot is ejected in a pod at the wreck
  *   pod destroyed   -> the pilot has no ship until they wake (`wakePilot`)
- *   wake            -> at Harbour, in a pod if they own a ship anywhere,
+ *   wake            -> at home (pilotHome), in a pod if they own a ship anywhere,
  *                      or in a free starter Courier if they own none
- *   in a pod at Harbour, owning nothing -> may claim the free starter
+ *   in a pod at home, owning nothing -> may claim the free starter
  */
 
 /** The station new pilots start at and pilots wake at. */
@@ -38,6 +38,12 @@ export function homeStationId(world: Pick<World, 'homeStationId'>): string {
 }
 
 /** Loadout every new pilot is given, and the free starter: a Meridian Courier. */
+/** Where a pilot wakes and claims a free starter: their own home (their start's), or the world's. */
+export function pilotHome(world: Pick<World, 'homeStationId' | 'pilots' | 'stations'>, pilotId: string): string {
+  const home = world.pilots[pilotId]?.home;
+  return home && world.stations[home] ? home : homeStationId(world);
+}
+
 export const STARTER_LOADOUT_ID = 'meridian-starter';
 
 /** Boxes of rounds a new pilot's starter carries, for its autocannon. */
@@ -472,7 +478,7 @@ export function stepOut(world: World, pilotId: string): CommandResult<StepOutRef
 export type WakeRefusal = 'unknownPilot' | 'hasShip';
 
 /**
- * A pilot who has lost their escape pod wakes at Harbour: in a new pod if
+ * A pilot who has lost their escape pod wakes at home (`pilotHome`): in a new pod if
  * they own a ship somewhere (fetching it is up to them), or in a free
  * starter Courier if they own none. Docked on a free pad, or just off the
  * station if every fitting pad is taken. Does nothing for a pilot who is
@@ -483,11 +489,11 @@ export function wakePilot(world: World, pilotId: string): CommandResult<WakeRefu
   if (!pilot) return { ok: false, world, reason: 'unknownPilot' };
   if (pilot.shipId && world.ships[pilot.shipId]) return { ok: false, world, reason: 'hasShip' };
   const loadoutId = ownedShips(world, pilotId).length > 0 ? ESCAPE_POD_LOADOUT_ID : STARTER_LOADOUT_ID;
-  const issued = issueShip(world, pilotId, loadoutId, homeStationId(world));
+  const issued = issueShip(world, pilotId, loadoutId, pilotHome(world, pilotId));
   return {
     ok: true,
     world: issued.world,
-    event: { type: 'pilotWoke', shipId: issued.ship.id, stationId: homeStationId(world) },
+    event: { type: 'pilotWoke', shipId: issued.ship.id, stationId: pilotHome(world, pilotId) },
   };
 }
 
@@ -499,7 +505,7 @@ export function respawnPilot(world: World, pilotId: string): World {
 export type ClaimRefusal =
   | 'noShip' // the pilot is flying nothing
   | 'notInPod' // the pilot is not in an escape pod
-  | 'notAtStarterStation' // the pod is not docked at Harbour
+  | 'notAtStarterStation' // the pod is not docked at the pilot's home
   | 'ownsShips'; // the pilot owns a ship and must fetch it
 
 /** Why the pilot could not claim the free starter right now, or null if they could. */
@@ -508,13 +514,13 @@ export function claimRefusal(world: World, pilotId: string): ClaimRefusal | null
   const pod = pilot?.shipId ? world.ships[pilot.shipId] : undefined;
   if (!pilot || !pod) return 'noShip';
   if (!isEscapePod(world, pod)) return 'notInPod';
-  if (pod.state !== 'docked' || pod.dockedAt !== homeStationId(world)) return 'notAtStarterStation';
+  if (pod.state !== 'docked' || pod.dockedAt !== pilotHome(world, pilotId)) return 'notAtStarterStation';
   if (ownedShips(world, pilotId).length > 0) return 'ownsShips';
   return null;
 }
 
 /**
- * A pilot in an escape pod docked at Harbour who owns no ship takes a
+ * A pilot in an escape pod docked at home who owns no ship takes a
  * free starter Courier. The pod is used up; the starter is docked and the
  * pilot is aboard it.
  */
@@ -525,10 +531,10 @@ export function claimStarterShip(world: World, pilotId: string): CommandResult<C
   const ships = { ...world.ships };
   delete ships[podId];
   // The pod's pad is free now, and a starter fits any pad a pod does.
-  const issued = issueShip({ ...world, ships }, pilotId, STARTER_LOADOUT_ID, homeStationId(world));
+  const issued = issueShip({ ...world, ships }, pilotId, STARTER_LOADOUT_ID, pilotHome(world, pilotId));
   return {
     ok: true,
     world: issued.world,
-    event: { type: 'starterClaimed', shipId: issued.ship.id, stationId: homeStationId(world) },
+    event: { type: 'starterClaimed', shipId: issued.ship.id, stationId: pilotHome(world, pilotId) },
   };
 }

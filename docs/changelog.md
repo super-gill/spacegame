@@ -4,6 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+
+- **The eight starts** (game side): Earth, Mars, the Belt or Venus, as a private pilot or in the power's service. A start sets your home port, your first ship, your standing with that power and, in service, a licence at the first rung. You wake at your own home after losing everything. The screen to choose one comes next; until then everyone starts as Earth, private.
+- **Two more ships**: the Union Wildcat (the UDF rota's corvette) and the Ishtar Sedna (the Space Guard's rescue corvette), sold at Bellows and Thetis Orbital.
+
 ## [0.20.0] - 2026-11-07
 
 Open Lanes step 2, the first fleet (`docs/ship-pipeline.md`, `docs/ship-standards.md`): ships drawn from their artwork, hull shapes from the art, and ten new hulls.

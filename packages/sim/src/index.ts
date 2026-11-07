@@ -10,6 +10,7 @@ export * from './types.js';
 export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
+export { STARTS, START_STANDING, DEFAULT_START, readStartId, type StartSpec } from './starts.js';
 export { HULLS, HULL_CLASS_NAMES } from './hulls.js';
 export { MODULES } from './modules.js';
 export { LOADOUTS } from './loadouts.js';
@@ -63,6 +64,7 @@ export {
   starterShipId,
   STARTER_STATION_ID,
   homeStationId,
+  pilotHome,
   STARTER_LOADOUT_ID,
 } from './world.js';
 export { stepWorld } from './step.js';

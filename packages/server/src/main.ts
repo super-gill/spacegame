@@ -6,7 +6,7 @@ import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { PROTOCOL_VERSION, WORLD_IDS, chartTraffic, diffWorld, readCommand, readInput, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type ServerKind, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
+import { PROTOCOL_VERSION, WORLD_IDS, chartTraffic, diffWorld, readCommand, readInput, readStartId, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type ServerKind, type StartId, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
 import { Accounts, type Character } from './accounts.js';
 import { ServerStats } from './stats.js';
 import { Storage } from './storage.js';
@@ -103,17 +103,19 @@ function logIn(connection: Connection, character: Character, key: string | null)
     }
   }
   connection.character = character;
-  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true, server: SERVER });
+  const persistent = games.persistent.current;
+  const needsStart = persistent.system === 'sol' && !persistent.pilots[character.pilotId];
+  send(connection, { t: 'welcome', pilotId: character.pilotId, name: character.name, key, admin: character.admin === true, server: SERVER, needsStart });
   console.log(`${character.name} logged in (${connections.size} connected)`);
 }
 
 /** Put a logged-in connection into a world (the mode screen's choice), out of the one it was in. */
-function enterWorld(connection: Connection, worldId: WorldId): void {
+function enterWorld(connection: Connection, worldId: WorldId, start: StartId | null): void {
   const character = connection.character;
   if (!character) return;
   leaveWorld(connection);
   const game = games[worldId];
-  game.join(character.pilotId, character.name);
+  game.join(character.pilotId, character.name, start);
   const view = visibleWorld(game.current, character.pilotId);
   connection.worldId = worldId;
   connection.seen = view;
@@ -138,7 +140,7 @@ function received(connection: Connection, message: ClientMessage): void {
     }
     case 'enter': {
       const worldId = readWorldId(message.world);
-      if (worldId) enterWorld(connection, worldId);
+      if (worldId) enterWorld(connection, worldId, readStartId(message.start));
       return;
     }
     case 'input': {

@@ -10,13 +10,13 @@ Written by `art/registry/export.py`. For each hull in the game, the weapon and P
 
 ## Belt Forge Mule (`bf-mule`)
 
-- `w1`: art only, S at (10.0, 2.5); not in the game
-- `w2`: art only, S at (1.0, -1.8); not in the game
+- `w1`: art S at (10.0, 2.5), game S at (0.0, 0.0)
+- `w2`: art S at (1.0, -1.8), game S at (0.0, 0.0)
 
 ## Belt Forge Rime (`bf-rime`)
 
-- `w1`: art only, S at (11.0, -3.0); not in the game
-- `w2`: art only, S at (-1.0, 4.6); not in the game
+- `w1`: art S at (11.0, -3.0), game S at (0.0, 0.0)
+- `w2`: art S at (-1.0, 4.6), game S at (0.0, 0.0)
 
 ## Meridian Ark (`escape-pod`)
 
@@ -24,15 +24,19 @@ No weapon or PDC mounts in either.
 
 ## Ishtar Lakshmi (`ish-lakshmi`)
 
-- `w1`: art only, M at (14.0, 0.0); not in the game
-- `w2`: art only, S at (12.0, -4.76); not in the game
-- `w3`: art only, S at (12.0, 4.76); not in the game
+- `w1`: art M at (14.0, 0.0), game M at (0.0, 0.0)
+- `w2`: art S at (12.0, -4.76), game S at (0.0, 0.0)
+- `w3`: art S at (12.0, 4.76), game S at (0.0, 0.0)
+
+## Ishtar Sedna (`ish-sedna`)
+
+- `w1`: art only, S at (1.0, 0.0); not in the game
 
 ## Kessari Citation (`kes-citation`)
 
-- `w1`: art only, S at (12.2, 0.0); not in the game
-- `w2`: art only, S at (-5.0, -5.9); not in the game
-- `w3`: art only, S at (-5.0, 5.9); not in the game
+- `w1`: art S at (12.2, 0.0), game S at (0.0, 0.0)
+- `w2`: art S at (-5.0, -5.9), game S at (0.0, 0.0)
+- `w3`: art S at (-5.0, 5.9), game S at (0.0, 0.0)
 
 ## Kessari Injunction (`kessari-brig`)
 
@@ -53,12 +57,12 @@ No weapon or PDC mounts in either.
 
 ## Meridian Dunlin (`mer-dunlin`)
 
-- `w1`: art only, S at (4.0, -2.4); not in the game
+- `w1`: art S at (4.0, -2.4), game S at (0.0, 0.0)
 
 ## Meridian Skua (`mer-skua`)
 
-- `w1`: art only, S at (7.5, 0.0); not in the game
-- `w2`: art only, S at (-6.0, 0.0); not in the game
+- `w1`: art S at (7.5, 0.0), game S at (0.0, 0.0)
+- `w2`: art S at (-6.0, 0.0), game S at (0.0, 0.0)
 
 ## Meridian Tern (`meridian-courier`)
 
@@ -95,21 +99,21 @@ No weapon or PDC mounts in either.
 
 ## Seraphine Deimos (`ser-deimos`)
 
-- `w1`: art only, M at (6.5, 0.0); not in the game
-- `w2`: art only, S at (-11.5, -2.8); not in the game
-- `w3`: art only, S at (-11.5, 2.8); not in the game
+- `w1`: art M at (6.5, 0.0), game M at (0.0, 0.0)
+- `w2`: art S at (-11.5, -2.8), game S at (0.0, 0.0)
+- `w3`: art S at (-11.5, 2.8), game S at (0.0, 0.0)
 
 ## Seraphine Phobos (`ser-phobos`)
 
-- `w1`: art only, M at (12.0, 0.0); not in the game
-- `w2`: art only, M at (-9.0, 0.0); not in the game
-- `w3`: art only, S at (12.0, -5.6); not in the game
-- `w4`: art only, S at (12.0, 5.6); not in the game
+- `w1`: art M at (12.0, 0.0), game M at (0.0, 0.0)
+- `w2`: art M at (-9.0, 0.0), game M at (0.0, 0.0)
+- `w3`: art S at (12.0, -5.6), game S at (0.0, 0.0)
+- `w4`: art S at (12.0, 5.6), game S at (0.0, 0.0)
 
 ## Tessaract Waybill (`tes-waybill`)
 
-- `w1`: art only, S at (10.0, 0.0); not in the game
-- `w2`: art only, S at (-10.0, 0.0); not in the game
+- `w1`: art S at (10.0, 0.0), game S at (0.0, 0.0)
+- `w2`: art S at (-10.0, 0.0), game S at (0.0, 0.0)
 
 ## Tessaract Manifest (`tessaract-spine`)
 
@@ -120,10 +124,15 @@ No weapon or PDC mounts in either.
 
 ## Union Blockade (`uni-blockade`)
 
-- `w1`: art only, M at (14.5, 0.0); not in the game
-- `w2`: art only, S at (4.0, -12.5); not in the game
-- `w3`: art only, S at (-3.0, -6.3); not in the game
-- `w4`: art only, S at (-10.0, 6.2); not in the game
+- `w1`: art M at (14.5, 0.0), game M at (0.0, 0.0)
+- `w2`: art S at (4.0, -12.5), game S at (0.0, 0.0)
+- `w3`: art S at (-3.0, -6.3), game S at (0.0, 0.0)
+- `w4`: art S at (-10.0, 6.2), game S at (0.0, 0.0)
+
+## Union Wildcat (`uni-wildcat`)
+
+- `w1`: art only, S at (11.5, -1.6); not in the game
+- `w2`: art only, S at (4.0, 3.6); not in the game
 
 ## Union Walkout (`union-frigate`)
 

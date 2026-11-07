@@ -1190,6 +1190,23 @@ export interface Rockfall {
  *
  * Single-player is simply a world with one pilot.
  */
+/** A start's path (docs/sol.md, "Where a new pilot starts"): a private pilot, or a power's service. */
+export type StartPath = 'private' | 'navy';
+/** One of the eight starts: a power that has ports and a path. */
+export type StartId = 'earth-private' | 'earth-navy' | 'mars-private' | 'mars-navy' | 'belt-private' | 'belt-navy' | 'venus-private' | 'venus-navy';
+
+/**
+ * A pilot's place in a power's service (Open Lanes step 3): the ECF, the
+ * MRN, the UDF rota or the Space Guard, at a rung. For now it records the
+ * start; duty, contracts and desertion come with law (step 5).
+ */
+export interface PilotLicence {
+  power: PowerId;
+  /** The service's short name, as shown: ECF, MRN, UDF rota, VSG. */
+  service: string;
+  rung: number;
+}
+
 export interface Pilot {
   /** Stable identity, chosen by the client and kept between sessions. */
   id: string;
@@ -1211,6 +1228,14 @@ export interface Pilot {
    * module and good ids never clash. Items stay where they were left.
    */
   storage: Record<string, Record<string, number>>;
+  /** The start this pilot chose on entering Sol (starts.ts). Absent for pilots from before starts, and in Calder and the Arena. */
+  start?: StartId;
+  /** Where this pilot wakes and claims a free starter: their start's home station. Absent: the world's home. */
+  home?: string;
+  /** Standing with each power, a number: 0 is a stranger. Starts set the first values; nothing else moves them yet. Absent is all 0. */
+  standing?: Partial<Record<PowerId, number>>;
+  /** The pilot's service, from a navy start. */
+  licence?: PilotLicence;
   /**
    * Logged off (docs/shared-world.md, decision 1): when, by tick. Absent
    * while the pilot is playing. A pilot away long enough has their ship

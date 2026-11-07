@@ -270,7 +270,7 @@ for s in F:
     if s["key"] == "vesk-vane": s["role"] = "watcher"; s["job"] = "Watcher; stealth raider and escort"
     if s["key"] == "vesk-shade": s["role"] = "striker"; s["job"] = "Striker; stealth raider"
 # Hulls the game added after the first eleven: their game id is their registry key (docs/ship-pipeline.md, "Step 2").
-IN_GAME = {"kes-citation", "ser-deimos", "ser-phobos", "ish-lakshmi", "uni-blockade", "tes-waybill", "bf-mule", "mer-skua", "bf-rime", "mer-dunlin"}
+IN_GAME = {"kes-citation", "ser-deimos", "ser-phobos", "ish-lakshmi", "uni-blockade", "tes-waybill", "bf-mule", "mer-skua", "bf-rime", "mer-dunlin", "uni-wildcat", "ish-sedna"}
 ships = {}
 for s in F:
     old = old_ships.get(s.get("art", ""), None)

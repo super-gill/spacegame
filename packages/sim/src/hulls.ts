@@ -263,6 +263,25 @@ const FLEET: Record<string, HullSpec> = {
     mounts: [...smallInternals('bf-rime', { core: 'S', engine: 'S' }), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC)],
     bonuses: [MINING_ROLE],
   },
+  'uni-wildcat': {
+    // The UDF rota's first ship (Open Lanes step 3, the Belt's UDF start): a stripped Kessari Notice, re-engined, two guns.
+    id: 'uni-wildcat', name: 'Union Wildcat', power: 'belt', manufacturer: 'unionDefence', role: 'combat', class: 'corvette',
+    sizeClass: 'S', price: 3800, mass: 5, structure: 230, radius: 0, outline: drawnOutline('uni-wildcat'),
+    maxSpeed: 370, maxTurnRate: 2.5, signature: 17, capacitor: 70, capacitorRecharge: 6,
+    mounts: [...smallInternals('uni-wildcat', { core: 'S', engine: 'M' }), high('w1', 'S', 0, 0), high('w2', 'S', 0, 0, FORWARD, BROAD_ARC)],
+    bonuses: [PROJECTILE_POWER],
+  },
+  'ish-sedna': {
+    // The Venusian Space Guard's first ship (Open Lanes step 3, the Venus VSG start): fast rescue and picket, one short rail.
+    id: 'ish-sedna', name: 'Ishtar Sedna', power: 'venus', manufacturer: 'commonwealth', role: 'combat', class: 'corvette',
+    sizeClass: 'S', price: 4400, mass: 5, structure: 240, radius: 0, outline: drawnOutline('ish-sedna'),
+    maxSpeed: 380, maxTurnRate: 2.5, signature: 17, capacitor: 100, capacitorRecharge: 8,
+    mounts: [...smallInternals('ish-sedna', { core: 'S', engine: 'M' }), high('w1', 'S', 0, 0)],
+    bonuses: [
+      { source: 'role', label: '+25% cargo from full-size pods: rescued pods ride home', stat: 'cargoCapacity', amount: 0.25, kind: 'cargoPod' },
+      SHIELD_POWER,
+    ],
+  },
   'mer-dunlin': {
     // The independents' prospector: one laser on the standard ring. The first miner anyone buys.
     id: 'mer-dunlin', name: 'Meridian Dunlin', power: null, manufacturer: 'meridian', role: 'civilian', class: 'prospector',

@@ -163,7 +163,10 @@ def sedna(civ=False):
         h.collar(-6, s * (w(-6) - 1.6), 1.5, s)
         h.nodes([(-10 + i * 4, s * (w(-10 + i * 4) - 2.6)) for i in range(5)], 5)
     h.dome(6, 0, 3.6, big=True)
-    h.rail(-13, 1, 0, 0.6)
+    # The short railgun is the mount, as on the Lakshmi: empty rails as hull, the gun at the muzzle.
+    h.empty_rail(-13, 1, 0, 0.6)
+    with h.mount("w1", "high", "S", 1, 0):
+        h.rail(-13, 1, 0, 0.6)
     h.dome(-9, 0, 1.8)
     h.window(13.5, w(13.5) * 0.8)
     h.stripe(-12, 10, 0.4, w, 0.5)

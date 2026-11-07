@@ -126,14 +126,14 @@ const OUTPOST_PADS: readonly ModuleSize[] = ['L', 'S', 'M', 'S', 'M'];
 /**
  * Ship marts by kind, with the first fleet (Open Lanes step 2, docs/ship-pipeline.md): each navy's
  * yard sells its own hulls first, the civil yards the independents' haulers and first miner, the
- * Belt's yard its cutters, hauler and patrol boat. The capitals keep Harbour's; Thetis adds the Lakshmi.
+ * Belt's yard its cutters, hauler, corvette and patrol boat. The capitals keep Harbour's; Thetis adds the Sedna and the Lakshmi.
  */
 const NAVAL_MART = ['kessari-raider', 'kessari-brig', 'union-frigate'];
 const EARTH_NAVAL_MART = ['kessari-citation', ...NAVAL_MART];
 const MARS_NAVAL_MART = ['seraphine-picket', 'seraphine-patrol', ...NAVAL_MART];
 const CIVIL_MART = ['meridian-starter', 'meridian-dunlin', 'meridian-hauler', 'tessaract-trader', 'kessari-raider'];
 const FREIGHT_MART = ['meridian-starter', 'tessaract-hauler', 'tessaract-trader'];
-const MINING_MART = ['rookrivet-prospector', 'beltforge-rime', 'beltforge-hauler', 'union-blockade', 'rookrivet-breacher', 'rookrivet-hulk'];
+const MINING_MART = ['rookrivet-prospector', 'beltforge-rime', 'beltforge-hauler', 'union-wildcat-rota', 'union-blockade', 'rookrivet-breacher', 'rookrivet-hulk'];
 
 type Market = Record<string, MarketEntry>;
 
@@ -245,7 +245,7 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
       runBy: 'The Venusian Assembly',
       holder: 'venus',
       rank: 'capital',
-      shipMart: [...capital.shipMart, 'ishtar-guard'],
+      shipMart: [...capital.shipMart, 'ishtar-sedna-vsg', 'ishtar-guard'],
     },
     {
       ...sized(capital, 450, CAPITAL_PADS),

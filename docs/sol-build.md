@@ -189,6 +189,17 @@ The last push of slice 2: Sol's traffic. NPC logic only; today's hulls stand in 
 
 **Checked:** 14 tests in `sol-traffic.test.ts` (a trader burns down the Belt Lane and docks; every NPC starts, no port short of pads (four traders and a patrol starting at Ceres had crowded out a miner, so start ports are spread); a VSG patrol burns its beat; all four navies patrol; every pirate's home reads Contested or Open; zones guarded only in Core or Held, all in Calder; a pirate hunts at an unguarded door but never a ship mid-burn; burning ships do not ram; remembered stats equal worked-out stats and follow cargo and fit; an old save drops the Ceres pirate with its ship and gains the traffic; the traffic rule's four cases). A 15-minute soak of all of Sol: every trader and patrol burned, arrived and docked, both port pirates found prey, no ship lost, none into a world, 2.6 ms a tick. In Chromium: 40 traffic messages in 40 seconds, the MRN patrol and a miner on the chart by name, a trader's burn drawn to Tycho Port, no page errors.
 
+## As built: Open Lanes step 3, the starts, push 1 (7 November 2026, Lead 9)
+
+The eight starts of `sol.md`, "Where a new pilot starts", agreed with Jason with two cuts: the two missing first ships were added rather than swapped (the Union Wildcat and the Ishtar Sedna, marked and built through the ship pipeline), and a navy start brings no duty, contracts or desertion yet (those come with law, step 5).
+
+- **The table** (`starts.ts`, `STARTS`): per start its power, path, home station, first ship (a loadout), standing and, in service, a licence; the lines the picker shows. Homes: Earth Orbital Exchange, ECF Yard L5, Republic Station Elysium, MRN Yard Phobos, Ceres Accord, Slagline, Lavinia Alpha Dock, Thetis Orbital. First ships: the Registry Tern for every private start; the Citation, Deimos, Wildcat and Sedna for the services.
+- **The pilot** (`types.ts`): `start`, `home`, `standing` (a number per power: 10 for a private start's own power, 25 for a service start's; every other power 0) and `licence` (`service`, `rung` 1). All optional, so no save change: a pilot from before starts has none and lives at the world's home as before.
+- **Home** (`pilotHome` in `pilots.ts`): a pilot arrives off their home, wakes there after losing their pod, and claims the free Tern there. The first ship of a service start is the pilot's and is never taken back; it is not issued again.
+- **Joining** (`joinPilot(world, pilotId, name, startId?)`): in Sol a new pilot takes the start chosen, or Earth, private when none came (an older client). Calder and the Arena are unchanged.
+- **Network** (additions only, protocol 3 unchanged): `welcome.needsStart` (the persistent world is Sol and this pilot is not in it yet), and `enter.start`. The server reads it with `readStartId`.
+- **Not yet:** the picker (push 2, after Jason's look at the mockup), Navy grade as a flag on the ship, cooperative and company standing (Tessaract, Lavinia, the Belt cooperatives), anything that moves standing.
+
 ## Decided (Jason, 7 November 2026)
 
 - **Burns route round a world in the way automatically**, the bend and its extra time shown on the chart before you burn (slice 2).

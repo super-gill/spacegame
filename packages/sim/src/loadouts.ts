@@ -432,6 +432,30 @@ export const LOADOUTS: Record<string, Loadout> = {
       u1: 'rookrivet-survey-s', u2: 'rookrivet-hopper-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s',
     },
   },
+  'union-wildcat-rota': {
+    // The UDF rota's issue: two guns on rounds, armour, an afterburner. Belt pattern: cheap and hard to kill.
+    id: 'union-wildcat-rota',
+    name: 'Union Wildcat, UDF rota',
+    hullId: 'uni-wildcat',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'union-lockout-s', w2: 'union-picket-s',
+      e1: 'slagline-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'meridian-shield-s', u2: 'slagline-kick-s', i2: 'rookrivet-armour-s', i3: 'rookrivet-armour-s',
+    },
+  },
+  'ishtar-sedna-vsg': {
+    // The Space Guard's issue: the short rail, a pod for what it carries home, a shield and armour.
+    id: 'ishtar-sedna-vsg',
+    name: 'Ishtar Sedna, Space Guard',
+    hullId: 'ish-sedna',
+    fit: {
+      n1: 'meridian-nav-s', r1: 'meridian-radar-s', t1: 'meridian-computer-s', f1: 'meridian-helm-s', x1: 'paragon-director-s', p1: 'meridian-podbay-s',
+      w1: 'commonwealth-retort-s',
+      e1: 'slagline-engine-s', c1: 'meridian-thrusters-s', c2: 'meridian-reactor-s',
+      u1: 'meridian-shield-s', i2: 'rookrivet-armour-s', b1: 'meridian-pod-s',
+    },
+  },
   'meridian-dunlin': {
     // The first miner anyone buys: one laser, an assay computer, a survey scanner, a small shield.
     id: 'meridian-dunlin',

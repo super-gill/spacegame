@@ -100,7 +100,7 @@ describe('Sol', () => {
   it('sells every hull of the first fleet somewhere, and flies each navy in its own hulls', () => {
     const w = createSolWorld();
     const sold = new Set(Object.values(w.stations).flatMap((st) => st.shipMart.map((id) => w.loadouts[id]!.hullId)));
-    for (const hull of ['kes-citation', 'ser-deimos', 'ser-phobos', 'ish-lakshmi', 'uni-blockade', 'tes-waybill', 'bf-mule', 'mer-skua', 'bf-rime', 'mer-dunlin']) {
+    for (const hull of ['kes-citation', 'ser-deimos', 'ser-phobos', 'ish-lakshmi', 'uni-blockade', 'tes-waybill', 'bf-mule', 'mer-skua', 'bf-rime', 'mer-dunlin', 'uni-wildcat', 'ish-sedna']) {
       expect(sold.has(hull), hull).toBe(true);
     }
     const navyHulls = (power: string) =>

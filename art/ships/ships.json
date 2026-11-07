@@ -6078,13 +6078,22 @@
   "ish-sedna": {
    "class": "corvette",
    "id": "ish-sedna",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Ishtar Fleet Works",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 1.0,
+     "y": 0.0
+    }
+   ],
    "name": "Ishtar Sedna",
    "outline": [
     [
@@ -14232,13 +14241,30 @@
   "uni-wildcat": {
    "class": "corvette",
    "id": "uni-wildcat",
-   "inGame": false,
+   "inGame": true,
    "liveries": [
     "base",
     "civ"
    ],
    "maker": "Union Defence Works",
-   "mounts": [],
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 11.5,
+     "y": -1.6
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 4.0,
+     "y": 3.6
+    }
+   ],
    "name": "Union Wildcat",
    "outline": [
     [

@@ -1,5 +1,5 @@
 import type { PilotCommand } from './commands.js';
-import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
+import type { Asteroid, Ship, ShipInput, StartId, World, WorldEvent } from './types.js';
 import type { TrafficContact } from './traffic.js';
 
 /**
@@ -57,7 +57,7 @@ export type ClientMessage =
   /** A pilot command (`PilotCommand`); `id` matches the server's reply. */
   | { t: 'command'; id: number; command: PilotCommand }
   /** Go into a world (the mode screen); leaves the one the connection was in. */
-  | { t: 'enter'; world: WorldId }
+  | { t: 'enter'; world: WorldId; /** A new pilot's start (starts.ts), when entering a world they are not yet in; ignored otherwise. */ start?: StartId }
   /** A ping, answered with a pong carrying the same `sent`, for the connection meter. */
   | { t: 'ping'; sent: number };
 
@@ -181,7 +181,7 @@ export type CommandReply = { ok: true; event: WorldEvent } | { ok: false; reason
 /** From the server to a client. */
 export type ServerMessage =
   /** Logged in: who you are and your key (only when the character was just created). No world yet: the client sends `enter`. */
-  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean; server: ServerKind }
+  | { t: 'welcome'; pilotId: string; name: string; key: string | null; admin: boolean; server: ServerKind; /** The persistent world is Sol and this pilot is not in it yet: show the start picker before entering. Older clients ignore it. */ needsStart?: boolean }
   /** In a world (after `enter`): which, and the whole of it as this pilot sees it. Updates follow. */
   | { t: 'entered'; world: WorldId; view: World }
   /** Login or creation refused, with why. */

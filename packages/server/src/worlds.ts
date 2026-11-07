@@ -20,7 +20,7 @@ import { Game, type WorldHooks } from './game.js';
  *
  * - **The persistent world** (`persistent`; Dev on the dev server, the
  *   Universe on the live one): loaded and saved. A new pilot
- *   gets a starter ship; one who logs off keeps their ship in space a
+ *   takes the start they chose (Sol's eight; starts.ts); one who logs off keeps their ship in space a
  *   while, then it is taken out until they return (away.ts).
  * - **The Arena** (`arena`): made fresh at start, never saved. A pilot
  *   comes in with no ship, at the arena setup; leaving clears their
@@ -29,7 +29,7 @@ import { Game, type WorldHooks } from './game.js';
  */
 
 const PERSISTENT: WorldHooks = {
-  join: (world, pilotId, name) => pilotReturned(joinPilot(world, pilotId, name), pilotId),
+  join: (world, pilotId, name, start) => pilotReturned(joinPilot(world, pilotId, name, start), pilotId),
   leave: (world, pilotId) => pilotLeft(world, pilotId),
   afterStep: (world) => stepAway(world),
 };

@@ -120,7 +120,10 @@ def wildcat(militia=True):
     B.patch(h, [(-9, 1.5), (-1, 1.2), (-0.5, 4.8), (-9.5, 5.2)], GUN)
     B.patch(h, [(10, 0.6), (14, 1.0), (13.5, 2.8), (9.8, 2.6)])
     for s in (-1, 1): B.engine(h, -15.5, s * 2.8, 2.2)
-    B.gunmount(h, 11.5, -1.6, 1.3); B.gunmount(h, 4, 3.6, 1.1, long=False)
+    for mid, x, y, r, long_ in (("w1", 11.5, -1.6, 1.3, True), ("w2", 4, 3.6, 1.1, False)):
+        h.f(rect(x - r, y - r, 2 * r, 2 * r, DARKG, stroke=BSEAM, sw=0.16, rx=0.2), mid=True)  # the bolted base stays: the socket
+        with h.mount(mid, "high", "S", x, y):
+            B.gunmount(h, x, y, r, long=long_)
     B.hazard(h, -8, -6.0, 6, 1.0); B.hazard(h, -8, 5.0, 6, 1.0)
     B.mark(h, -4, -3.4, 0.9)
     return h, R

@@ -10,7 +10,8 @@ import { screeAsteroids } from './asteroids.js';
 import { BELT_ID, BELT_PERIOD, BELT_RING_RADIUS, starterBodies } from './bodies.js';
 import { pirateHome, setOrbitsMoving } from './rails.js';
 import { HARBOUR_ID, LANTERN_ID, RIDGE_ID, RIDGE_PHASE, starterStations } from './stations.js';
-import type { Pilot, Ship, ShipInput, Spawner, World, WorldRules } from './types.js';
+import { DEFAULT_START, STARTS } from './starts.js';
+import type { Pilot, Ship, ShipInput, Spawner, StartId, World, WorldRules } from './types.js';
 import { WEAPONS } from './weapons.js';
 
 /** A blank input: nothing pressed. */
@@ -41,7 +42,7 @@ export function emptyInput(): ShipInput {
   };
 }
 
-export { homeStationId, STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
+export { homeStationId, pilotHome, STARTER_STATION_ID, STARTER_LOADOUT_ID, pilotShipId, starterShipId, respawnPilot } from './pilots.js';
 
 /** How far inward of Ridge Outpost, towards the star, the pirate's home is, units. */
 const PIRATE_HOME_INWARD = 1300;
@@ -207,17 +208,28 @@ export function createStarterWorld(): World {
  *   lost their escape pod they stay without a ship until they wake.
  * - A new pilot is created with a starter ship in space near the starter station.
  */
-export function joinPilot(world: World, pilotId: string, name: string): World {
+export function joinPilot(world: World, pilotId: string, name: string, startId?: StartId | null): World {
   const existing = world.pilots[pilotId];
   if (existing) {
-    // Returning pilot: only the display name may change.
+    // Returning pilot: only the display name may change; a start is chosen once.
     if (existing.name === name) return world;
     return { ...world, pilots: { ...world.pilots, [pilotId]: { ...existing, name } } };
   }
-  const pilot: Pilot = { id: pilotId, name, shipId: null, shipsIssued: 0, credits: STARTING_CREDITS, storage: {} };
-  // New pilots arrive in space just off Harbour, facing it, so the first
-  // thing they do is fly and dock.
-  return issueShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilotId, STARTER_LOADOUT_ID, homeStationId(world), true).world;
+  // In Sol a new pilot takes one of the eight starts (starts.ts); elsewhere (Calder, tests) the old single start.
+  const start = world.system === 'sol' ? STARTS[startId ?? DEFAULT_START] : null;
+  const pilot: Pilot = {
+    id: pilotId,
+    name,
+    shipId: null,
+    shipsIssued: 0,
+    credits: STARTING_CREDITS,
+    storage: {},
+    ...(start ? { start: start.id, home: start.home, standing: { ...start.standing }, ...(start.licence ? { licence: { ...start.licence } } : {}) } : {}),
+  };
+  // New pilots arrive in space just off their home, facing it, so the
+  // first thing they do is fly and dock.
+  const home = start && world.stations[start.home] ? start.home : homeStationId(world);
+  return issueShip({ ...world, pilots: { ...world.pilots, [pilotId]: pilot } }, pilotId, start?.loadoutId ?? STARTER_LOADOUT_ID, home, true).world;
 }
 
 /** The ship a pilot is currently flying, or null. */
