@@ -6,12 +6,13 @@ The one page for the lead. Started 7 November 2026 by the lore chat; kept curren
 
 1. This page.
 2. `hull-terms.md`: what every fleet word means in mechanics, and the fields and systems it implies.
-3. `hulls.md`: one row per hull, generated from the registry. The per-hull handover.
-4. `navy.md`: the navy as a system: security by influence, rungs, escalation, rules of engagement, wanted, stop and scan, task groups, each navy's operations, bases, sovereignty later.
-5. `t3-capabilities.md`: the special operations abilities specified against existing systems, with tunables.
-6. `fleet.md`: every builder and hull, grids, patterns, legacy, Belt lineage, weight bands, style and art direction, independents, Union pattern, the T3 line, five routes to a warship.
-7. `lore.md` (canon: setting, history, law, weapons, companies, pirates, names, decisions) and `races.md` (the power and company summary the code is built against).
-8. The ship registry page (Jason's artifact, Version 24 at the time of writing) for the art: 71 of 121 hulls drawn.
+3. `hulls.md`: one row and one entry (role, intention, description) per hull, generated from the registry. The per-hull handover.
+4. `materials.md`: the materials catalogue by source (rock, ice, gas), the exotics outside Sol, refining and alloys, and what each mining hull does. `industries.md`: the industries, who builds for each, the tier gap pass and who mines by power.
+5. `navy.md`: the navy as a system: security by influence, rungs, escalation, rules of engagement, wanted, stop and scan, task groups, each navy's operations, bases, sovereignty later.
+6. `t3-capabilities.md`: the special operations abilities specified against existing systems, with tunables.
+7. `fleet.md`: every builder and hull, grids, patterns, legacy, Belt lineage, weight bands, style and art direction, independents, Union pattern, the T3 line, five routes to a warship.
+8. `lore.md` (canon: setting, history, law, weapons, companies, pirates, names, decisions) and `races.md` (the power and company summary the code is built against).
+9. The ship registry page (Jason's artifact, Version 37 at the time of writing) for the art: 165 of 166 hulls drawn.
 
 Nothing in these is needed in code before milestone 7 (Law) except what is already built. They exist so the lead can build around the hulls and the navies without re-deriving them.
 
@@ -53,7 +54,7 @@ Security by influence (Core, Held, Contested, Open); five rungs with each power'
 - **Sovereignty.** Systems beyond Sol are a perpetual struggle between Earth, Mars and the Belt; navy pilots do it as their job, independents get paid around it; influence is dynamic so security levels change. Venus is not a claimant.
 - **Crew** as a system (costs and risks), with subcraft pilots as crew; and **fleets**: owned ships with hired captains supported by a command ship (`fleet.md` "Command ships").
 - **The pirate factions' mirror** of `navy.md` (what each flies, how it forms up, how it escalates): next lore write after the fleet.
-- **Industries** (`industries.md`) is the frame the civil fleet is checked against; its new hulls and kit are proposals until Jason confirms the names.
+- **Industries** (`industries.md`) is the frame the civil fleet is checked against; the gap-pass hulls are agreed and wait to be drawn. **Materials** (`materials.md`) defines what the mining ships do.
 - **Civilian yards' art and any last names**: Tessaract, Arcadia civil, Solace, Halden, Arbor, Belt Forge, Rook and Rivet, Meridian's birds, the drones, the Aurel. Each will be logged below as it lands; no rule changes expected from them.
 
 ## For the lead, when milestone 7 comes
@@ -74,6 +75,7 @@ The registry's hulls are generated SVG (a Python parts library per yard in the l
 
 ## Changes
 
+- 2026-11-07 (materials): new **`materials.md`**, the lead's reference. Three sources (rock, ice, gas) with their methods (cut and breach, saw, skim by depth band), which is what defines a mining hull: method, grade, hold, processing. Real minerals under real names (Jason): nickel-iron, copper, zinc, platinum, rare earths; water, ammonia and carbon ice; Venus's carbon dioxide, sulphur, nitrogen; hydrogen and helium-3 from the giants later. **Exotics only in other systems**: gate-glass stays in the catalogue, keeps its id, and is never mined in Sol; breaching in Sol finds platinum and rare-earth pockets, mechanic unchanged. Two stages of processing (raw to refined at refineries and command ships in the field at a worse yield; refined to maker alloy at the works), eight maker alloys named. A per-hull table of method, grade, hold and processing covering every mining, ice and gas hull including the eleven agreed additions. Display-name changes for the lead: `banded-ore` Copper, `black-ore` Zinc, `glintstone` Platinum; ids unchanged.
 - 2026-11-07 (who mines): agreed with Jason: Earth owns claims and buys the work (Belt cooperatives under licence, Corvane fleets); Mars mines itself in Arcadia hulls; the Belt in Belt Forge; Meridian sells the cheap first miner; Venus gas only. Builders differ by trade-off (yield, hold, armour, price). The gap-pass additions are agreed, plus Arcadia Miner Mk II and Mk I: eleven in all, listed in `industries.md`, to be added to `fleet.md` and drawn after the materials pass, which defines what the mining ships actually do.
 - 2026-11-07 (gap pass): **Tier gap pass** in `industries.md`: per industry, the T1 way in, the T2 ladder, the command ship and the T3, with a verdict. Complete: freight, security and bounty. Fine: passenger, crime, manufacturing, drones (two missing kinds). Gaps: no heavy cutting miner and no miner built outside the Belt; no T1 for gas, SAR or exploration; no light or T1 ice cutter; no heavy salvage tender; no collector drone or survey probe. Nine proposed additions listed for Jason to confirm (Meridian Dunlin, Corvane Pithead, Lavinia Breeze, Belt Forge Rime and the old Rime, Rook and Rivet Gantry, Arcadia Tender Mk 0, Halden Footnote, Arbor Tendril, Halden Probe). Also fixed in `hulls.md`: the Jackleg and Grab were wrongly shown as Navy only; they are civilian subcraft on the open market.
 - 2026-11-07 (command ships): Jason's clarification: **command ships are carriers**. The capital industrial hulls do not do the work; their wing does (subcraft, fighters, drones), and the capital is hangar, hold, processing, command suite, heavy defence and beacon. Fully effective flown alone; fleet bonuses later. `fleet.md` "Command ships" rewritten with a wing column and a data shape for the lead (`bays`, `hold`, `process`, `command`, `commandRadius`, `umbrella`, `beacon`). The Cyclone and Still redrawn as skimmer carriers (hangar decks where the intakes were, point defence added). **The Belt's carriers are industrial capitals refitted for war**: new hull Union General Strike (`uni-general-strike`), a Headframe with the hoppers plated into hangars, the furnaces capped, gun decks on the frames; Militia tag and beacon on shift, ore hauler off shift. Registry at 166 hulls, 165 drawn. Open: whether the Colossus (a T3 capital that works the rock itself) should follow the carrier rule, and the gate-glass question.

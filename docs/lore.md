@@ -423,13 +423,16 @@ A Collier is a Belt Forge hull full of Corvane parts. Belters fly it and grumble
 
 ### Ores
 
-| Ore | Grade | Used for |
+Real minerals under their real names from 7 November 2026; the full catalogue, the ice and gas materials, the exotics and the maker alloys are in `materials.md`, which is the authority. Belters keep their own words: copperband for the striped copper rock, blackjack for zinc ore, glint for platinum.
+
+| Material | Grade | Used for |
 | --- | --- | --- |
 | Nickel-iron | Common | Hull plate, frames, everything structural. Lantern Works eats it by the thousand tonnes. |
-| Copperband | Middling | Copper-striped rock: wiring, reactors and every electrical system |
-| Blackjack | Middling | Old miners' slang for zinc ore: zinc and carbon for armour composites and capacitor cells |
-| Glintstone | Valuable, big rocks only | Clear crystal: laser optics and sensor lenses. Cantor-Vell buys all it can. |
-| Gate-glass | Rare, from splinters and knots | No human can make it. Researchers want it, Novum needs it for gate-waking, and the Hollow Choir pays anything for it. |
+| Copper (copperband) | Middling | Wiring, reactors and every electrical system |
+| Zinc (blackjack) | Middling | Armour composites and capacitor cells |
+| Platinum (glint) | Valuable, big rocks only | Catalysts, sensor contacts, the best electronics; Cantor-Vell and Novum buy all they can |
+| Rare earths | Valuable, worse space | Magnets, drive coils, lasers, sensor arrays |
+| Gate-glass | Exotic, never in Sol | No human can make it. Found where a gate was shattered and in husks; researchers want it, Novum needs it for gate-waking, and the Hollow Choir pays anything for it. |
 
 Jason's direction: the ore catalogue grows, with rarer ores in rarer and more dangerous systems, and each maker blends its own alloys, which is where smelting, founding and player building begin. Alloy names and recipes are a future lore ask.
 
@@ -721,6 +724,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Materials.** Real minerals under their real names (nickel-iron, copper, zinc, platinum, rare earths; water, ammonia and carbon ice; Venus's carbon dioxide, sulphur and nitrogen; the giants' hydrogen and helium-3 later), with exotics such as gate-glass reserved for other systems; nothing exotic is mined in Sol. Breaching in Sol finds platinum and rare-earth pockets. Field refining at a worse yield than a station; maker alloys named now, recipes at the manufacturing milestone. Full catalogue in `materials.md`.
 - 2026-11-07: **Who mines, by power.** Earth builds no miners: it owns the claims (the Gate War ore rights) and buys the work from Belt cooperatives under licence and from Corvane's corporate fleets. Mars mines itself as a state, in Arcadia hulls: tough, slow, armoured, Martians first. The Belt mines in Belt Forge hulls: the best yield and range, fragile and unarmed. Meridian sells the cheap first miner to anyone. Venus is gas only. The difference between builders is a trade-off (yield, hold, armour, price), not plain efficiency. Agreed additions: Meridian Dunlin, Corvane Pithead, Arcadia Miner Mk II and Mk I, Lavinia Breeze, Belt Forge Rime and the old Rime, Rook and Rivet Gantry, Arcadia Tender Mk 0, Halden Footnote, Arbor Tendril, Halden Probe.
 - 2026-11-07: **Command ships are carriers.** The capital industrial hulls do not do the work; their wing of subcraft, fighters and drones does, and the capital stores, processes, defends and boosts. Fully effective flown alone as a carrier; the fleet bonuses come later. No tool on the hull (the Cyclone and Still lost their intakes). The Belt's military carriers are these same industrial capitals refitted for war by Union Defence Works (Union General Strike over a Headframe).
 - 2026-11-07: the Corvane Colossus is not a second gas refinery. The Still is Corvane's gas command ship; the Colossus, Corvane's civil T3 and the only T3 capital, is a strip-miner that swallows an asteroid whole and feeds it to a gate-glass crusher throat. One hull per role in the prototype line.
