@@ -85,7 +85,8 @@ Allowed everywhere, Sol included; it matters beyond Sol.
 The lore is `lore.md`, "Death and the Return". What it needs from the systems:
 
 - **Ship death** ejects the pod (Meridian Ark, `fleet.md`). A pod that survives flies home: no Return, no Fade, the ship and its cargo lost.
-- **Pods are mortal but rarely die**: rams and wreck damage after a fight, crashes, other pilots, rare pod-hunting NPCs, and **stranding**: a pod has a small tank and a few days of air, so a pod far from any station or Relay may run out before it is found. Stranding is the explorer's death.
+- **Pods are mortal but rarely die**: rams and wreck damage after a fight, crashes, other pilots, rare pod-hunting NPCs, and **stranding**: a pod has a small tank and a few days of air, so a pod far from any station or Relay may run out before it is found. Stranding is the explorer's death. And **massive impacts**: a ship that hits a world, a rock or another hull at burn speed loses its pod too (relativistic speeds; Jason). The rule for the systems is one line: **pod death = Return = Fade**, whatever causes it.
+- **For the lead, against what is built**: f26cc8d ("end a ship that hits a world at speed and recover the pod") follows the old canon, which said the pod is fished out. Under this rule a high-speed world impact is a pod death: a Return to the home station and Fade. A slow fall (below the lethal speed) can keep the current recovery.
 - **Pod death** is the Return: the pilot wakes at their home station's Registry clinic. Lost with the ship: cargo, and the ship's log (witness records, charts, survey data, evidence) except what already reached the Relay.
 - **Reach**: a Return works only where the Lattice reaches (Sol and gate-joined systems). The pilot's Fade narrows it further: from anywhere, to near a woken gate, to well-connected space, to Core only. A pod death outside the pilot's reach is final.
 - **The Fade** is a pilot value that only goes one way, except by Aurel retuning. The cost per Return is small early and climbs; the count is in the dozens. Visible on the Registry scan as a rough reading, never a precise number.
@@ -98,6 +99,7 @@ The lore is `lore.md`, "Death and the Return". What it needs from the systems:
 
 ## The other infrastructure
 
+- **Lanes are swept.** At burn speed any debris is lethal, so the Accord's lanes are corridors kept clear and marked by the Relay. Off a lane, a burn is a gamble with rocks.
 - **Approach control.** Every station runs an approach zone on its own transmitter. In Core and Held space: docking clearance, a speed limit inside the zone, transponder on. Breaking them is the cheapest crime and the commonest patrol stop (`navy.md`, "Stop and scan"). Belt stations ask nothing and say so.
 - **Tolls.** Earth charges at the lane ends in Core (the ECF Toll Station at the gate, Earth's ports on the Inner Lane). The tolls pay for the Accord's Relay in Sol. Running dark to dodge a toll is legal in the Belt and suspicious everywhere else.
 - **Supply.** Stations consume water, food, fuel and parts and post demand over the Relay. That is the economy's hook into freight, ice and gas without new systems; an off-Relay station's demand is only known when someone visits.

@@ -272,6 +272,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: **for the lead**: Jason's rule is pod death = Return = Fade, and at relativistic burn speeds a massive impact kills the pod. f26cc8d recovers the pod after a world impact at speed, which followed the old canon (now changed in `lore.md`): it should become a Return to the home station with Fade; a slow fall can keep the recovery. Death systems in `infrastructure.md`.
 - 2026-11-07, lore: death and the Return decided with Jason (`lore.md`; systems in `infrastructure.md`; pilot fields in `hull-terms.md`). Open for Jason and the lead: Ironman in the shared world or not, the Fade count and curve.
 - 2026-11-07, lore: new `docs/infrastructure.md`: the Relay, security as connectivity, witness and distress through the Relay, fuel and range, star scooping. Answers the lore side of the 4 November fuel note (Jason's design pass and the numbers still to come). `navy.md` security section reworded to match.
 - 2026-11-07, lead (Lead 8): server manager for Jason (`scripts/server.mjs`, `server.bat`, npm scripts `update`, `stop`, `restart`, `status`; docs/hosting.md, "Managing the server"). The server writes `server.pid` to its data folder and stops cleanly when `stop-request` appears there.
