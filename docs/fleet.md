@@ -291,8 +291,8 @@ Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Brea
 
 | Job | Maker | Subcraft | Who flies them |
 | --- | --- | --- | --- |
-| Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy) | The Charter Fleet; the Foil sold openly, so Belt militias and pirates too |
-| Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II | The Martian Navy only |
+| Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy); retired: Vantage Dirk, Vantage Cutlass | The Charter Fleet; the Foil sold Navy or civilian grade, so Belt militias and pirates too; the Sabre Navy only; the Dirk and Cutlass sold whole, Navy tag intact |
+| Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II; retired: Fighter Mk IV, Heavy Fighter Mk I | The Martian Navy; the Mk V civilian grade to Martians only; retired marks released once the replacement flies, Martian buyers first |
 | Combat | The clans | Vesk light raider, Vesk heavy raider | The clans, and whoever they sell to |
 | Mining | Belt Forge Collective | Belt Forge Jackleg (a jackleg drill) | Colliers, Winders, Headframes |
 | Mining | Corvane Heavy Industries | Corvane Navvy | Corvane Drays and Smelters |
@@ -344,6 +344,7 @@ Decided 7 November 2026. **Navy** is a tag on a hull, not a generation. A Navy-t
 - **Civilian-grade navy hulls.** Each naval yard sells its current corvette and patrol boat in two versions: Navy (behind the licence, with duties) and civilian (the same hull, the same mark, no Navy tag, open market, company livery). Frigate and above are built Navy only. A civilian-grade hull can be brought up to Navy grade later with the licence, so a pilot who starts in a civilian Warrant and joins the Charter Fleet keeps the ship. Mechanically: the same hull id with a grade flag, not a second hull.
 - **Retired navy hulls (surplus).** When a navy retires a mark, the old hulls go to the open market whole: Navy tag intact, mounts intact, no licence needed. They are still powerful and still expensive; what they lack is the current mark's refinements and the yard's support. This replaces the earlier idea of demilitarised surplus. The navy livery is painted over because the ship is out of service, and the lines show through.
 - **Legacy** stays what it was: an old civilian mark. Legacy is cheap; retired navy is not.
+- **Fighters follow the same rules.** The light fighter is the corvette of the bays: Navy or civilian grade (Vantage Foil, Arcadia Fighter Mk V). The heavy fighter is Navy only (Vantage Sabre, Arcadia Heavy Fighter Mk II). Each has a retired mark sold whole with the Navy tag: Vantage Dirk and Cutlass, Arcadia Fighter Mk IV and Heavy Fighter Mk I. Vantage names its craft for blades.
 
 | Navy | Civilian grade | Retired marks on the market |
 | --- | --- | --- |
