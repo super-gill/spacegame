@@ -47,6 +47,8 @@ Five rungs, each flown by the hulls in `fleet.md`. The rung reached depends on t
 
 Thinner farther out: Core has all five, Held has one to four, Contested one to three and slowly, Open none.
 
+Fighters carry the bulk of the weak response: rung 1 is fighters in the station's livery almost everywhere, and most pilots will shoot a station's fighters before they ever see a patrol boat. For the lead, when tuning: the weak response has to be beatable by a Tern with some skill, and losing it should cost the station, not the power.
+
 ## Escalation
 
 What is witnessed decides the rung; time and persistence climb it. A response ends when you leave the system, dock and pay, are caught, or die. Everything is ordinary beatable ships until rung 5.
@@ -104,7 +106,11 @@ The recipes the navy flies in. Navies buy civilian hulls as sold for everything 
 
 **Mars, the Martian Navy (Seraphine).** Disciplined and dutiful. Fewer patrols than Earth and every one of them means it: a Martian stop is a boarding, not a fine. Convoy escort is doctrine; Mars does not let its traders fly alone. The reserve is the best in known space and arrives in formation. Sells civilian grade to Martians only and releases retired marks only once the replacement is in service. Buys Arcadia hulls for everything that carries, in Navy pattern, and nothing from anyone else. Open about its special operations and still in rust.
 
-**Venus, the Coastguard (Ishtar, Solace).** Neutral, and the Mercy Clause binds it: rescue first, arrest second. A Venusian patrol answers a distress beacon from anyone, including the pilot who caused it, and treats the pod as the first priority at every rung. Thin on guns, the heaviest thing it admits to is a destroyer, and it sells search and rescue hulls and kit to every other navy. Checks you for injuries before it checks your hold. One hunter it cannot account for.
+**Venus, the Coastguard (Ishtar, Solace).** Neutral, and the Mercy Clause binds it: rescue first, arrest second. A Venusian patrol answers a distress beacon from anyone, including the pilot who caused it, and treats the pod as the first priority at every rung. Light on guns by choice, the heaviest thing it admits to is a destroyer, and it sells search and rescue hulls and kit to every other navy. Checks you for injuries before it checks your hold. One hunter it cannot account for.
+
+Not toothless. Venus's restraint is towards the other navies, not towards pirates or pilots. Inside its own volume and round its Havens the Coastguard climbs the ladder like anyone else: Hathors and a Stretcher, then a Lakshmi and a Sedna, then a Maat, then a Maxwell with an Aphrodite behind it, and for a pod killer the Hecate. The railguns are real and the regen mix makes a Coastguard hull hard to finish. The Hollow Choir, which preys on pods, is the faction Venus hunts hardest.
+
+*Territory.* In Sol, Venus holds Venus, its cloud cities, its orbit and its capital port, at Core security. Beyond Sol it takes no systems. Its territory is its stations: Havens (Solace's rescue stations) and free ports under the Ceres Accord, placed by treaty in Contested and Open systems because nobody else can hold them. Each is a Venusian security zone with Hathors and a Stretcher on the pads, a Lakshmi at the dock, and a response that goes no further than rung 3 against another navy and as far as it needs to against pirates. A Haven is where a system's wounded go, where pods come back, and where both sides of a sovereignty struggle can trade, so the power that burns one loses the Mercy Clause and everyone's goodwill. A Venusian system is a system with a Haven in it, not a system Venus owns, and the struggle for it happens around Venus rather than against it. Venus fights for its own volume, its Havens and its convoys (medical, liners, the SAR hulls it sells), and nowhere else by choice.
 
 **The Belt, the Union Militia (Union Defence Works).** Rotas: militia crews on shifts, in hulls that never retire, holding lanes rather than patrolling them. Weak and responsive, the old rule in its purest form: the Militia will defend you if the cooperative likes you, and it takes a cut from anyone it stops. Stops Earth toll boats on principle. No special operations drives; the clans supply watchers and strikers who burn in. Buys nothing: Belt Forge, Rook and Rivet and captured hulls do the carrying.
 
@@ -131,7 +137,7 @@ In order of dependency, each reusing what exists:
 
 ## Later: sovereignty
 
-Jason's thinking, 7 November, not yet designed: the systems beyond Sol end up a perpetual sovereignty struggle between the powers, and the security level above is the live read-out of it. The player interacts with it from wherever they stand: navy pilots find it is basically their job (patrols, escorts, responses, holding a system); independents get paid around it (transporting people and materials, collecting resources, exploring unexplored or enemy-held systems). Comes later. Two things to hold to now so nothing written contradicts it: influence is dynamic, so a system's level can change; and navy duties are sovereignty work, not errands.
+Jason's thinking, 7 November, not yet designed: the systems beyond Sol end up a perpetual sovereignty struggle between the powers, and the security level above is the live read-out of it. The player interacts with it from wherever they stand: navy pilots find it is basically their job (patrols, escorts, responses, holding a system); independents get paid around it (transporting people and materials, collecting resources, exploring unexplored or enemy-held systems). Comes later. Two things to hold to now so nothing written contradicts it: influence is dynamic, so a system's level can change; and navy duties are sovereignty work, not errands. Venus does not take part as a claimant: its Havens sit inside other powers' struggles and its influence is the ports (see "Each navy's operations").
 
 ## Open
 
