@@ -129,6 +129,10 @@ In order of dependency, each reusing what exists:
 7. **Wanted** from the record: bounty at rung 3, amnesty as a Registry fine, work-off as jobs that clear entries.
 8. **Inter-navy stance** per pair of powers (hostile, cool, neutral, allied), only used in Contested systems.
 
+## Later: sovereignty
+
+Jason's thinking, 7 November, not yet designed: the systems beyond Sol end up a perpetual sovereignty struggle between the powers, and the security level above is the live read-out of it. The player interacts with it from wherever they stand: navy pilots find it is basically their job (patrols, escorts, responses, holding a system); independents get paid around it (transporting people and materials, collecting resources, exploring unexplored or enemy-held systems). Comes later. Two things to hold to now so nothing written contradicts it: influence is dynamic, so a system's level can change; and navy duties are sovereignty work, not errands.
+
 ## Open
 
 - Contraband lists per power.
