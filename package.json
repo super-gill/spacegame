@@ -13,7 +13,11 @@
     "typecheck": "npm run typecheck --workspaces",
     "preview": "npm run preview --workspace=@spacegame/client",
     "audit": "vite-node scripts/audit.ts",
-    "start": "npm run start --workspace=@spacegame/server"
+    "start": "npm run start --workspace=@spacegame/server",
+    "stop": "node scripts/server.mjs stop",
+    "restart": "node scripts/server.mjs restart",
+    "update": "node scripts/server.mjs update",
+    "status": "node scripts/server.mjs status"
   },
   "engines": {
     "node": ">=20"

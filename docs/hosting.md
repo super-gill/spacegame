@@ -24,6 +24,24 @@ npm start
 
 To stop it, press Ctrl+C in its window. It tells everyone, saves, and stops.
 
+## Managing the server
+
+One script stops, updates and starts the server (`scripts/server.mjs`), so a new build is one command. From the repo folder:
+
+| Command | What it does |
+| --- | --- |
+| `npm run update`, or double-click `server.bat` | Stops the server if it is running, pulls the newest code, runs `npm install` and `npm run build`, then starts it in this window |
+| `npm stop` | Stops it cleanly from any other window: everyone is told, the world is saved |
+| `npm restart` | Stops it, then starts it in this window (no pull, no build) |
+| `npm run status` | Says whether it is running |
+| `npm start` | Starts it, as before |
+
+How stopping works: when the server starts it writes `server.pid` (its process id) to the data folder, and it watches that folder for a `stop-request` file. `npm stop` writes that file and waits; the server kicks everyone, saves and exits, and removes `server.pid`. Only if it is still running after 20 seconds is it forced, which can lose up to a minute of play (the world saves once a minute).
+
+Pulling needs git on your PATH. GitHub Desktop keeps its own git, so if `git` is not found the script says so and carries on without pulling: pull in GitHub Desktop first, then run `npm run update`. The pull is `git pull --ff-only`, so local changes in the repo stop it rather than being merged; nothing is built or started in that case.
+
+After an update that changed the game page, players press Ctrl+F5.
+
 ## Letting friends in over Tailscale
 
 Your PC is already a machine on your tailnet. The server listens on every network your PC has, so nothing in the game needs changing; friends just need to be able to reach your PC.

@@ -1,3 +1,5 @@
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { deflateRawSync } from 'node:zlib';
@@ -309,11 +311,38 @@ createInterface({ input: process.stdin }).on('line', consoleCommand);
 function shutDown(): void {
   for (const connection of connections) kick(connection, 'serverClosing');
   save();
+  clearPidFile();
   console.log('Saved. Goodbye.');
   process.exit(0);
 }
 process.on('SIGINT', shutDown);
 process.on('SIGTERM', shutDown);
+
+/*
+ * Stopping from outside (scripts/server.mjs, docs/hosting.md): the server
+ * writes its process id to `server.pid` in the data folder, and stops
+ * cleanly (kick, save, exit) when a `stop-request` file appears there.
+ * Killing the window would lose up to a minute of play, since the world
+ * saves once a minute; this works the same on Windows and elsewhere,
+ * where signals do not.
+ */
+const PID_FILE = join(DATA, 'server.pid');
+const STOP_FILE = join(DATA, 'stop-request');
+function clearPidFile(): void {
+  try {
+    if (existsSync(PID_FILE) && readFileSync(PID_FILE, 'utf8').trim() === String(process.pid)) unlinkSync(PID_FILE);
+  } catch {
+    // Best effort: a stale file is cleared by the next start.
+  }
+}
+if (existsSync(STOP_FILE)) unlinkSync(STOP_FILE);
+writeFileSync(PID_FILE, String(process.pid), 'utf8');
+setInterval(() => {
+  if (!existsSync(STOP_FILE)) return;
+  unlinkSync(STOP_FILE);
+  console.log('Stop requested.');
+  shutDown();
+}, 1000);
 
 /** The commit the server is running, printed at start so a stale server is easy to spot. "unknown" outside git. */
 function serverCommit(): string {

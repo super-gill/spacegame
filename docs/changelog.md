@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 ## [Unreleased]
 
 ### Added
+- **Server management:** `npm run update` (or double-click `server.bat`) stops the server, pulls, installs, builds and starts it; `npm stop` stops it cleanly from another window, saving first; `npm restart` and `npm run status` too (docs/hosting.md, "Managing the server").
 - **Sol.** The persistent world is Sol: the Sun, the planets, their moons and the big Belt rocks, at enormous sizes and compressed distances. Six ports to begin with: Earth Orbital Exchange, where new pilots start, Thetis Orbital at Venus, Republic Station Elysium at Mars, Ceres Accord Station with a rock field round Ceres, Slagline on Pallas and Titan Free Port. Ships and stations keep their real size; planets stay off the local view.
 - **The burn.** Pick a port on the board or the chart and press U: the ship turns, burns, flips at the midpoint and brakes, arriving at rest beside the port. Earth to Mars takes about three minutes. Weapons, locks and docking are off while burning. U again cancels, and you keep your speed; U with no target while coasting fast brakes you to a stop.
 - **The chart** (M): all of Sol, with local, inner, Belt and whole-system views. Click a port to plot the burn to it.
