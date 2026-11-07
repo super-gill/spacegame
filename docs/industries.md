@@ -1,0 +1,131 @@
+# Industries: what a pilot can do, and what serves it
+
+Written 7 November 2026 by the lore chat, from Jason's direction: the original list (commerce and logistics, mining, security and law enforcement, bounty hunting, salvage, exploration, piracy) was written against the old mechanics; this is the list against the setting and systems as they now stand, then a gap check of what hulls and capabilities the player has access to, by class, company and tier. The fleet additions it demands are in `fleet.md`; the per-hull table is `hulls.md`; terms are in `hull-terms.md`. Industries bleed into each other by design (`design.md`): a hull serves a job, a pilot does several.
+
+## The list
+
+| Industry | What the pilot does | Mechanics it rests on | Status of those mechanics |
+| --- | --- | --- | --- |
+| **1 Freight** | Moves goods: courier runs, hauling, bulk, ore | Cargo holds, trade goods, stations' markets, convoy escort | Built (trade); escorts with Law |
+| **2 Passenger transport** | Moves people: taxi, shuttle, ferry, liner | Passenger cabins as a module family, fares, routes | Planned (fleet.md "Passenger transport") |
+| **3 Mining** | Extracts from rock, ice and atmosphere; refines | Mining lasers and computers, ore, rock composition (9a); ice and gas as new resource kinds; on-board refining | Rock built (9a); ice, gas, refining not |
+| **4 Salvage and recovery** | Strips wrecks, recovers hulks, breaks ships, recovers pods | Salvage scanner, wreck objects, hulks, pod recovery | Planned (roadmap 9) |
+| **5 Search, rescue and repair** | Finds and pulls out the stranded, repairs in the field, carries a clinic | Distress beacons, pod pickup, repair kits, the Mercy Clause | Beacons designed; the rest with Law and industry |
+| **6 Exploration and survey** | Charts systems, scans, finds lanes, goes beyond the Shoals | Survey scanners, the map, undiscovered systems, the Shoals | With the map |
+| **7 Security** | Guards, escorts, enforces: station security, patrols, corporate security, mercenary escort | The rungs and task groups (`navy.md`), contracts | Law (7) |
+| **8 Bounty hunting** | Finds a wanted hull, tackles it, brings the hull or the pod in | Wanted on the hull id, bounties, civilian tackle, a cell | Law (7); tackle kit new |
+| **9 Military service** | Flies for a navy: duties, escorts, responses, special operations | Licence and duties, the Navy tag, T3 abilities | Law (7); T3 later |
+| **10 Crime** | Piracy, smuggling, fencing, hijack, toll evasion | Witnessed crime, the record, contraband, hidden holds, fences | Law (7); hidden holds new |
+| **11 Industry and manufacturing** | Refines, builds, repairs for sale; later builds ships | Refinery and factory ships, materials (`lore.md` "Mining and materials"), later shipbuilding | Roadmap 9 |
+| **12 Drone and subcraft operations** | Runs bays: combat, mining, salvage, rescue craft and drones | Bays, drone control, crew later | Drones built; bays with industry |
+| **13 Sovereignty work** (later) | Holds, contests or profits from systems beyond Sol | Influence, security levels, claims | Later (`navy.md` "Later: sovereignty") |
+
+Removed from the old list as an industry: **law enforcement** is NPC work the player meets (and does as 9); **piracy** is 10, emergent, not a career. Added since the old list: passenger transport, SAR, manufacturing, drone operations, sovereignty.
+
+## Civil capabilities needed, by industry
+
+What a hull or module has to be able to do for the industry to exist in play. Those marked **new** have no hull or kit yet.
+
+| Industry | Capabilities |
+| --- | --- |
+| Freight | Hold capacity by class; container racks; bulk and liquid holds (**liquid new**, for gas and water); PDC coverage on the big ones; convoy behaviour |
+| Passenger | Cabins by class; fare routes; a liner's security zone-like escort claim |
+| Mining | Rock: laser, mining computer, ore hold (built). **Ice**: an ice cutter and a water or volatiles hold (new resource kind). **Gas**: an atmospheric skimmer that works at the edge of a planet's air (planets are huge and never landable, so skimming is a depth game: deeper is richer and the hull limit is the death line), a gas hold (new). Refining on board: refinery and factory ships turning ore, ice and gas into materials |
+| Salvage | Salvage scanner, cutters and grabs, a wreck hold, towing a hulk, shipbreaking at a station or a Breaker |
+| SAR and repair | Pod pickup, a clinic module, repair kits and nanite or plate repair in the field, towing a cripple |
+| Exploration | Survey scanner, long-range tanks and a nav suite (not a jump drive: jumps are T3 only), charting that adds to the map |
+| Security | Guns, PDCs, escort contracts, the ability to hail and scan (civilian-grade scanner, **new**) |
+| Bounty hunting | **Civilian tackle** (a burn inhibitor and a lock holder below navy grade, new), a pod bay, **a cell** (new module), the Registry's bounty board |
+| Military | Navy-grade everything; T3 abilities (`t3-capabilities.md`) |
+| Crime | **Hidden holds** (scan-resistant, cost cargo space, new), transponder spoofing later, fences at pirate stations, boarding kit |
+| Manufacturing | Refinery and factory modules; later blueprints and a yard |
+| Drones and subcraft | Bays by size; the carrier classes |
+
+## Who builds what, by industry and power
+
+Companies lead; power adds flavour. Independents sell everywhere. Naval yards sell only to their navy.
+
+| Industry | Earth | Mars | Venus | The Belt | Independents |
+| --- | --- | --- | --- | --- | --- |
+| Freight | Tessaract (courier to superfreighter; tankers **new**) | Arcadia (courier to bulk; ice hauler **new**) | **Lavinia Atmospherics** (proposed, new: gas tankers) | Belt Forge (Pony, Mule, Adit; ice hauler **new**) | Meridian (Tern, Skua); Corvane (Dray) |
+| Passenger | Tessaract (Timetable, Passage) | Arcadia (Shuttle, Ferry) | a Venusian liner yard later | none | Meridian (Gull, Petrel, Fulmar) |
+| Mining: rock | none (Earth imports) | none | none | Belt Forge (Prospector, Sinker, Collier, Winder, Headframe) | Corvane (Smelter, Navvy) |
+| Mining: ice | none | Arcadia (polar ice: **Ice Hauler**, new) | none | Belt Forge (**Auger** ice miner, **Cistern** ice hauler, new) | Corvane (ice as plant feed) |
+| Mining: gas | Tessaract tankers carry it | none (imports) | **Lavinia Atmospherics** (skimmers S, M, L and a capital gas refinery, new) | none | Corvane (**Still**, a capital gas refinery, new) |
+| Salvage | none | none | none | Rook and Rivet (Shunt, Scrapper, Wrecker, Breaker); the Long Wake | none |
+| SAR and repair | none | Arcadia (Tug, Tender) | Solace (Respite, Haven, Sanctuary; Stretcher) | Rook and Rivet (Shunt as a tow) | Meridian tug **new** |
+| Exploration | none | none | Halden (Query, Inquiry, Expedition) | the Saro (Farwalker, Waystar) | none |
+| Security | Kessari (navy); Vantage | Seraphine (navy); Arcadia fighters | Ishtar (navy); Solace | Union pattern; the clans | Meridian (Kite, Harrier, Osprey); Corvane (Warden, Bulwark, Foreman) |
+| Bounty hunting | none | none | none | none | Meridian **Shrike** (new) |
+| Crime | retired Kessari hulls | stolen Seraphine hulls | Sedna '218s | Union pattern; Belt Forge **Burrow** (blockade runner, new) | Meridian hulls; hidden-hold modules (Rook and Rivet, new) |
+| Manufacturing | none | none | Lavinia (gas) | Belt Forge (Winder, Headframe) | Corvane (Smelter, Foreman, Still) |
+| Drones and subcraft | Vantage, Novum (drones) | Arcadia | Arbor (drones, Canopy); Solace | Belt Forge (Jackleg); Rook and Rivet (Grab); the clans | Corvane (Navvy) |
+
+Deliberate holes, which create trade: Earth mines nothing and imports everything; Mars has one of everything the state needs and no gas; Venus has gas and medicine and no rock; the Belt has rock, ice and salvage and no passenger hulls; independents fill what nobody else will.
+
+## Classes and sizes per industry
+
+Which weight bands each industry uses, so the lead knows what a civilian ladder looks like. Radius ranges are in `fleet.md` "Weight bands".
+
+| Industry | Light | Medium | Heavy | Super-heavy | Capital |
+| --- | --- | --- | --- | --- | --- |
+| Freight | courier | hauler | freighter, tanker | bulk freighter, liquid bulk | superfreighter |
+| Passenger | taxi, shuttle | ferry or bus | liner | cruise liner | |
+| Mining | prospector, skimmer S | miner, ice miner, skimmer M | barge, ice hauler, skimmer L | refinery ship | factory ship, gas refinery |
+| Salvage | salvage tender S | salvage tender M, tug | recovery tender | shipbreaker | |
+| SAR and repair | repair tender S | repair tender M | hospital ship | | |
+| Exploration | survey ship S | survey ship M | explorer | | |
+| Security (civil) | armed courier, gunboat | armed hauler, bounty hull | corporate escort | corporate cruiser, armed factory ship | |
+| Crime | blockade runner | | | | |
+
+## Tiers in civilian life
+
+- **T1 legacy**: an older civilian mark on the used market, cheap, the way in. One per hull new pilots and NPC traffic actually use (`fleet.md` "Legacy grid"). Civilian hulls have legacy marks; they have no retired navy marks (that is a navy thing).
+- **T2 production and pattern**: the current mark and its company or navy patterns (Deep-space, Convoy, Breaching, Deep, Navy, Field). Patterns carry long-range tanks, armour, PDCs, extra rigs: never a jump drive.
+- **T3 in civilian life**: the clans (Saro Farwalker, Waystar; Long Wake Trawl, Dredge) and, proposed, one **prototype** per civil company: a one-off at the top of company standing that is the best in the game at the company's job (Halden's Shoals ship, Belt Forge's deep-ice hull, Lavinia's deep skimmer, Tessaract's armoured superfreighter). Prototypes are hulls, not abilities; they carry no jump. Named when the civil yards are drawn.
+
+## The gap check: what the player can and cannot reach
+
+| Industry | Open market today | Gated | Missing |
+| --- | --- | --- | --- |
+| Freight | Every class from Meridian, Tessaract, Arcadia (Mars), Belt Forge (Belt) | Patterns by standing | Liquid and gas holds; tankers |
+| Passenger | Taxi to liner | | Belt and Venus passenger hulls (acceptable holes) |
+| Mining | Rock: Belt Forge and Corvane, open | Deep pattern | Ice and gas entirely: resource kinds, cutters, skimmers, holds, the depth game |
+| Salvage | Rook and Rivet, open | Long Wake (clan) | Nothing in hulls; the salvage system itself |
+| SAR and repair | Solace, Arcadia (Mars), Stretcher everywhere | Field pattern | An Earth or independent tug (Meridian) |
+| Exploration | Halden, open | Saro (clan) | Nothing in hulls; the map |
+| Security | Meridian and Corvane open at every class; civilian-grade corvettes and patrol boats; retired navy | Navy grade, patterns, Union pattern (Belt), clan | A civilian scanner for hail-and-scan contracts |
+| Bounty hunting | Nothing built for it | | The Shrike; civilian tackle; a cell; the bounty board |
+| Military | Civilian-grade corvette, patrol boat, light fighter | Everything else by licence; T3 at the top | Nothing in hulls; the systems |
+| Crime | Any hull | Union pattern | Hidden holds; a blockade runner; fences |
+| Manufacturing | Smelter, Winder, Headframe, Foreman | | The materials system; shipbuilding later |
+| Drones and subcraft | Combat light open; industrial open; carriers | Heavy combat subcraft Navy only | Nothing |
+
+So the fleet is complete for freight, passenger, rock mining, salvage, SAR, exploration, security and military, and has holes in exactly four places: **ice and gas** (an industry with no hulls), **bounty hunting** (an industry with no hull or kit), **crime's quiet half** (no hidden holds or runner), and two small logistic holes (tankers, an open-market tug). The additions below close them.
+
+## Additions this page asks for (recorded in `fleet.md`)
+
+| Hull or kit | Maker | Class, weight | Job | Tier |
+| --- | --- | --- | --- | --- |
+| Lavinia Zephyr | Lavinia Atmospherics (Venus, proposed) | Skimmer S, Light | Upper-air gas skimming | T2 |
+| Lavinia Gale | Lavinia Atmospherics | Skimmer M, Medium | Deeper skimming, bigger hold | T2 |
+| Lavinia Monsoon | Lavinia Atmospherics | Gas tanker, Heavy | Carries gas to the refineries | T2 |
+| Lavinia Cyclone | Lavinia Atmospherics | Gas refinery, Capital | Skims and refines on station; a carrier for skimmer subcraft | T2 |
+| Tessaract Tariff | Tessaract | Tanker, Heavy | Liquid and gas bulk for Earth | T2 |
+| Arcadia Ice Hauler Mk II | Arcadia | Ice hauler, Heavy | Polar ice to the Martian cities | T2 (Mk I legacy) |
+| Belt Forge Auger | Belt Forge | Ice miner, Medium | Cuts ice in the outer Belt | T2 |
+| Belt Forge Cistern | Belt Forge | Ice hauler, Heavy | Water is the Belt's money | T2 |
+| Corvane Still | Corvane | Gas refinery, Capital | Corvane's answer to the Cyclone, uglier | T2 |
+| Meridian Shrike | Meridian | Patrol boat, Medium | The bounty hunter's hull: civilian tackle, a pod bay, a cell | T2 |
+| Belt Forge Burrow | Belt Forge | Courier, Light | Blockade runner: fast, quiet, a hidden hold as standard | T2 |
+| Meridian Grebe | Meridian | Tug, Medium | The open-market tug | T2 |
+| Hidden hold module family | Rook and Rivet | Module | Scan-resistant hold, costs cargo space | kit |
+| Civilian tackle family | Paragon Arms | Module | Burn inhibitor and lock holder below navy grade | kit |
+| Cell module | Meridian | Module | Holds a captured pod's occupant for the bounty board | kit |
+| Civilian scanner | Novum | Module | Hail and scan for escort and security contracts | kit |
+
+Names are proposals in each yard's vocabulary (Lavinia Planitia is a Venusian lowland; the company is new because Venus had no civil yard; winds for its hulls). Jason to confirm or rename.
+
+## For the lead
+
+Industries map onto systems already on the roadmap; this page adds four things to design when industry comes: ice and gas as resource kinds with the skimming depth game; hidden holds and scan resistance; civilian tackle and the cell with the bounty board (Law); liquid holds. Nothing before milestone 7.

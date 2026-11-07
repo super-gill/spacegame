@@ -47,7 +47,7 @@ Travel between systems uses the Lattice: paired gates at the edge of each system
 | --- | --- |
 | Awake | Usable |
 | Asleep | Intact but dormant; can be woken |
-| Broken | Destroyed; the gap needs a jump drive |
+| Broken | Destroyed; the gap needs a long-range jump drive, which no human has built (the gate-born hop the navies hide is in-system only) |
 
 Known space is simply the part of the Lattice where humans have woken the gates. The Sol gate sits out past the outer moons, where a Belter prospector crew found it in year zero.
 
@@ -317,7 +317,7 @@ Pilots who work together register with the Ceres Registry as an **outfit**: a cr
 | High security | Sol and the Accord lanes | The home system and the gates woken early, well policed by whoever holds them |
 | Low security | The Marches | Gates still awake, but patrols pulled back during the Dimming to protect the core |
 | Null security | The Unclaimed | Woken by Novum-era prospectors, never covered by the Accord, no one's law |
-| Unknown space | The Dark | Sleeping or broken gates near the Unsung's cage. Reachable only by jump drive, or by waking gates that keep going back to sleep. |
+| Unknown space | The Dark | Sleeping or broken gates near the Unsung's cage. Reachable only by a long-range jump drive nobody has, or by waking gates that keep going back to sleep. |
 | Aurel space | Beyond the Shoals | Cut off since the Sundering |
 
 ## Why ships are built this way

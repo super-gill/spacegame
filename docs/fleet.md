@@ -6,7 +6,7 @@ Status column: **built** (in the catalogue today), **named** (a working hull exi
 
 ## The shape of it
 
-Fifteen companies build hulls. Four are naval yards and build only for their navy. Two are **independents**, companies with no flag that build civil and combat hulls alike and sell to anyone with a Registry licence (see "Independents"). The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
+Sixteen companies build hulls. Four are naval yards and build only for their navy. Two are **independents**, companies with no flag that build civil and combat hulls alike and sell to anyone with a Registry licence (see "Independents"). The rest build civilian hulls, and three of them overlap on couriers, haulers and freighters so that NPC traffic shows different hulls doing the same job.
 
 | Builder | Home | Builds | Hulls |
 | --- | --- | --- | --- |
@@ -18,6 +18,7 @@ Fifteen companies build hulls. Four are naval yards and build only for their nav
 | Ishtar Fleet Works | Venus, naval yard | The Coastguard | 5 |
 | Solace Medical | Venus | Support, repair, rescue | 4 |
 | Halden Institute | Venus | Survey and exploration | 3 |
+| Lavinia Atmospherics | Venus | Gas skimming and refining; Venus's civil yard (proposed 7 November, `industries.md`) | 4 |
 | Arbor Dynamics | Venus | Drones and a drone tender | 4 |
 | Vantage Aerospace | Luna (Earth) | Combat fighters, no hulls | 2 |
 | Union Defence Works | The Belt, refit shop | The Union pattern: Militia standards applied to rebuilt hulls | 7 |
@@ -45,7 +46,7 @@ Every hull by class and source. Names only. A blank cell is a deliberate gap: th
 | Battleship | Kessari Precedent | Seraphine Tharsis | | |
 | Carrier | Kessari Mandate | Seraphine Hellas | | |
 | Dreadnought | Kessari Charter | Seraphine Olympus | | |
-| Independents (no flag, no licence) | Meridian Kite (corvette), Harrier (patrol boat), Osprey (frigate); Corvane Warden (destroyer), Bulwark (cruiser), Foreman (armed factory ship) | | | |
+| Independents (no flag, no licence) | Meridian Kite (corvette), Harrier and Shrike (patrol boats), Osprey (frigate); Corvane Warden (destroyer), Bulwark (cruiser), Foreman (armed factory ship) | | | |
 | Special operations (T3) | Summons, Custody, Sentence | Noctis, Cerberus, Medusae | Hecate (hunter, unacknowledged) | Vesk Vane, Vesk Shade (clan; no drives) |
 
 Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civilian-grade, which is why it is the starter.
@@ -60,6 +61,8 @@ Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civ
 | Courier | Tessaract Docket | Arcadia Courier Mk IV | | Belt Forge Pony | Meridian Tern |
 | Hauler | Tessaract Waybill | Arcadia Hauler Mk III | | Belt Forge Mule | Meridian Skua |
 | Freighter | Tessaract Manifest | Arcadia Freighter Mk II | | Belt Forge Adit | |
+| Tanker | Tessaract Tariff | | Lavinia Monsoon (gas) | | |
+| Ice hauler | | Arcadia Ice Hauler Mk II | | Belt Forge Cistern | |
 | Bulk freighter | Tessaract Lading | Arcadia Bulk Freighter Mk I | | Corvane Dray (ore) | |
 | Superfreighter | Tessaract Consignment | | | | |
 | Ferry or bus | Tessaract Timetable | Arcadia Ferry Mk II | | | Meridian Fulmar |
@@ -68,8 +71,12 @@ Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civ
 | Miner | | | | Belt Forge Sinker | |
 | Barge | | | | Belt Forge Collier | |
 | Refinery ship | | | | Belt Forge Winder; Corvane Smelter | |
+| Ice miner | | | | Belt Forge Auger | |
+| Skimmer | | | Lavinia Zephyr (S), Gale (M) | | |
+| Gas refinery | | | Lavinia Cyclone | | Corvane Still |
+| Blockade runner | | | | Belt Forge Burrow | |
 | Factory ship | | | | Belt Forge Headframe | |
-| Tug | | Arcadia Tug Mk II | | Rook and Rivet Shunt | |
+| Tug | | Arcadia Tug Mk II | | Rook and Rivet Shunt | Meridian Grebe |
 | Salvage tender | | | | Rook and Rivet Scrapper (S), Wrecker (M) | |
 | Shipbreaker | | | | Rook and Rivet Breaker | |
 | Repair tender | | Arcadia Tender Mk I | Solace Respite (S), Haven (M) | | |
@@ -95,6 +102,8 @@ Independent. Plain, friendly words; hulls named for seabirds. The everyman build
 | Meridian Skua | Hauler | A small cargo hauler with a bit of bite | The first step up from a Tern for a trader | draft |
 | Meridian Kite | Corvette, armed courier | A courier with two guns and a point to make | The first ship an outfit buys that can shoot back | draft |
 | Meridian Harrier | Patrol boat, gunboat | The patrol hull for people who are not a navy | Every outfit's security starts with a pair of these | draft |
+| Meridian Shrike | Patrol boat, bounty hull | Civilian tackle, a pod bay and a cell | Brings them in, hull or pod | draft |
+| Meridian Grebe | Tug | The open-market tug | Pushes anything for a fee | draft |
 | Meridian Osprey | Frigate, armed hauler | Half hold, half launchers; the Q-ship | Looks like a Skua until it opens | draft |
 
 ## Tessaract Logistics
@@ -108,6 +117,7 @@ Freight paperwork. The oldest freight line in known space and the best transport
 | Tessaract Manifest | Freighter | Six-bay medium cargo | On half the contracts in Accord space | built |
 | Tessaract Lading | Bulk freighter | Large cargo on the long lanes | Slow, deep, and a pirate's dream if it is alone | draft |
 | Tessaract Consignment | Superfreighter | The biggest thing on the lanes | Moves a station's worth of goods; never travels without escort | draft |
+| Tessaract Tariff | Tanker | Liquid and gas bulk for Earth | Gas in, tolls out | draft |
 | Tessaract Timetable | Ferry | Scheduled passengers, medium | Earth's ferry; Meridian's Fulmar is the cheaper one | draft |
 | Tessaract Itinerary | Heavy bus | Short-route liner, a hundred seats | The Marches run: a hundred seats and a bar | draft |
 | Tessaract Passage | Liner | Long-route passengers in berths | Comfort, speed and a tempting target | draft |
@@ -158,6 +168,7 @@ Mars's state yard. It names hulls what they are and numbers the marks, because M
 | Arcadia Courier Mk IV | Courier | Documents and small parts between Martian ports | Faster than it looks, and it looks like a brick | draft |
 | Arcadia Hauler Mk III | Hauler | Small cargo | Every Martian colony has a hangar full of them | draft |
 | Arcadia Freighter Mk II | Freighter | Medium cargo | Armoured where a Tessaract hull is roomy | draft |
+| Arcadia Ice Hauler Mk II | Ice hauler | Polar ice to the Martian cities | Water is a state matter | draft |
 | Arcadia Bulk Freighter Mk I | Bulk freighter | Large cargo for the state | New, and already looks twenty years old | draft |
 | Arcadia Tug Mk II | Tug | Port work | Every Martian port has a dozen | draft |
 | Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
@@ -199,7 +210,7 @@ Venus's research body. Survey and exploration hulls full of instruments, and the
 | --- | --- | --- | --- | --- |
 | Halden Query | Survey ship (small) | Local survey and scanning | More sensor than ship | draft |
 | Halden Inquiry | Survey ship (medium) | System survey, gate study | What Novum expeditions borrow | draft |
-| Halden Expedition | Explorer (large) | Deep exploration, jump drive | Built for the Dark, and the Shoals one day | draft |
+| Halden Expedition | Explorer (large) | Deep exploration; built to take a long-range drive that does not yet exist | Built for the Dark, and the Shoals one day | draft |
 
 ## Arbor Dynamics
 
@@ -211,6 +222,18 @@ Venus's drone house. Drones are craft, not hulls, but Arbor builds one tender to
 | Arbor Bramble | Combat drone, heavy | Heavier, slower, hits harder | Behind standing | draft |
 | Arbor Shoot | Repair drone | Hull and shield repair | A Solace kit with wings | draft |
 | Arbor Canopy | Drone tender (medium) | Carries and controls drone swarms | A civilian hull that fights like a small carrier | draft |
+
+
+## Lavinia Atmospherics
+
+Proposed 7 November 2026 (`industries.md`): Venus had no civil yard, and gas is its native industry. Named for a Venusian lowland; hulls named for winds. Skimmers work the edge of a planet's air, where deeper is richer and the hull limit is the death line, because planets are never landable.
+
+| Hull | Class | Job | Character | Status |
+| --- | --- | --- | --- | --- |
+| Lavinia Zephyr | Skimmer (small) | Upper-air gas skimming | The first skimmer anyone flies | draft |
+| Lavinia Gale | Skimmer (medium) | Deeper skimming, a bigger hold | Comes back hot | draft |
+| Lavinia Monsoon | Gas tanker (heavy) | Carries gas to the refineries | Venus's freight, finally | draft |
+| Lavinia Cyclone | Gas refinery (capital) | Skims and refines on station; a carrier for skimmer subcraft | A city that breathes a planet | draft |
 
 ## Union Defence Works and the Union pattern
 
@@ -254,6 +277,9 @@ Old mining trades and tools. The best mining kit in known space and the hulls th
 | Belt Forge Mule | Hauler | Small ore and cargo hauler | A Belter's answer to the Waybill: uglier, tougher, cheaper | draft |
 | Belt Forge Adit | Freighter | Medium ore and cargo freighter | Named for a mine's entrance; a Belt freighter with teeth | draft |
 | Belt Forge Winder | Refinery ship (large) | Mobile ore processing | A winding engine for the whole field | draft |
+| Belt Forge Auger | Ice miner (medium) | Cuts ice in the outer Belt | Where the rock runs out, the ice begins | draft |
+| Belt Forge Cistern | Ice hauler (heavy) | Water to the habitats | Water is the Belt's money | draft |
+| Belt Forge Burrow | Courier, blockade runner | Fast, quiet, a hidden hold as standard | Nobody asks what a Burrow carries | draft |
 | Belt Forge Headframe | Factory ship (largest) | Mobile works: refining, repair, building | The frame over the shaft; the Belt's answer to a station | draft |
 
 Drones: Belt Forge Knocker (mining drone, built).
@@ -280,6 +306,7 @@ Independent: Earth money, Belt yards, Belt labour, nobody's flag. Heavy plant, a
 | Corvane Warden | Destroyer, corporate security | Escort for the ore convoys | Paid by the tonne it brings home | draft |
 | Corvane Bulwark | Cruiser, corporate security | A mining fleet's bodyguard | The biggest ship you can buy without a flag | draft |
 | Corvane Foreman | Factory ship, armed | A Smelter with a gun deck | Refines under fire and does not stop | draft |
+| Corvane Still | Gas refinery (capital) | Skims and refines at a gas giant | Corvane's answer to the Cyclone, uglier | draft |
 
 ## The clans
 
@@ -559,7 +586,7 @@ One earlier mark for each hull new pilots and NPC traffic actually use: small an
 
 ### Pattern grid
 
-A pattern is a specialised variant of a production hull with a different mount plan, never a new class. Behind standing with the maker or a navy licence. One or two per hull where a speciality makes sense; the rest have none.
+A pattern is a specialised variant of a production hull with a different mount plan, never a new class, and never a jump drive (jumps are T3, `t3-capabilities.md`). Behind standing with the maker or a navy licence. One or two per hull where a speciality makes sense; the rest have none.
 
 | Base hull | Pattern | What it is for |
 | --- | --- | --- |
@@ -575,10 +602,10 @@ A pattern is a specialised variant of a production hull with a different mount p
 | Union Blockade | Raider pattern | Afterburners, projectile guns, no shields worth the name; the Black Strike's dream |
 | Union Boycott | Picket pattern | PDCs and flak for the Militia's rotas |
 | Meridian Tern | Courier pattern | Faster, lighter, one less mount; Meridian's only pattern |
-| Tessaract Manifest | Deep-space pattern | Jump drive and armour for the Marches and beyond |
+| Tessaract Manifest | Deep-space pattern | Long-range tanks, a nav suite and armour for the Marches and beyond |
 | Tessaract Lading | Convoy pattern | PDCs and a tougher hull; sold to firms that lost a Lading |
 | Belt Forge Sinker | Breaching pattern | Two shotfirer rigs and a Sounder; the knot hunter |
-| Belt Forge Collier | Deep pattern | Jump drive and bunkers; mines where the patrols do not go |
+| Belt Forge Collier | Deep pattern | Long-range tanks and bunkers; mines where the patrols do not go |
 | Arcadia Freighter Mk II | Navy pattern | The Martian Navy's own supply ship; armoured, PDCs |
 | Solace Haven | Field pattern | Armour over comfort; flies with the Coastguard into the Marches |
 

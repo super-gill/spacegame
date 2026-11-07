@@ -53,6 +53,7 @@ Security by influence (Core, Held, Contested, Open); five rungs with each power'
 - **Sovereignty.** Systems beyond Sol are a perpetual struggle between Earth, Mars and the Belt; navy pilots do it as their job, independents get paid around it; influence is dynamic so security levels change. Venus is not a claimant.
 - **Crew** as a system (costs and risks), with subcraft pilots as crew.
 - **The pirate factions' mirror** of `navy.md` (what each flies, how it forms up, how it escalates): next lore write after the fleet.
+- **Industries** (`industries.md`) is the frame the civil fleet is checked against; its new hulls and kit are proposals until Jason confirms the names.
 - **Civilian yards' art and any last names**: Tessaract, Arcadia civil, Solace, Halden, Arbor, Belt Forge, Rook and Rivet, Meridian's birds, the drones, the Aurel. Each will be logged below as it lands; no rule changes expected from them.
 
 ## For the lead, when milestone 7 comes
@@ -69,4 +70,5 @@ In dependency order: standing and licences; the Navy tag bonus and the grade fla
 
 ## Changes
 
+- 2026-11-07 (later): **Industries.** New `industries.md`: the industries list rebuilt against the current setting and systems (freight, passenger, mining in rock, ice and gas, salvage, SAR and repair, exploration, security, bounty hunting, military service, crime, manufacturing, drones and subcraft, sovereignty later), the civil capabilities each needs, who builds what by power, classes per industry, tiers in civilian life (legacy, production and pattern, clan and a proposed company prototype as civil T3), and the gap check. Gaps found and filled in `fleet.md`: ice and gas (Lavinia Atmospherics proposed as Venus's civil yard: Zephyr, Gale, Monsoon, Cyclone; Tessaract Tariff; Arcadia Ice Hauler Mk II; Belt Forge Auger and Cistern; Corvane Still), bounty hunting (Meridian Shrike, civilian tackle, a cell), crime's quiet half (Belt Forge Burrow, hidden holds), an open-market tug (Meridian Grebe), a civilian scanner. Fixed: patterns no longer carry jump drives; the Shoals need a long-range drive nobody has, distinct from the T3 hop. Registry at 134 hulls, 71 drawn; `hulls.md` regenerated.
 - 2026-11-07: page created. Covers the Sol pivot (6 November) and everything decided on 7 November: Navy as a tag and grades; retired navy sold whole; the T3 line and its capabilities; navies as a system; Venus's teeth and territory; independents; the Belt's military as a rota and refit shop; fighters under the navy rules; Venus's fighters; the hull handover and terms. Registry at Version 24, 71 of 121 hulls drawn: all military lineups, the independents' combat hulls, the Grab.

@@ -42,6 +42,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `tes-waybill` |  | Tessaract Waybill | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
 | `tes-consignment` |  | Tessaract Consignment | Bulk, Superfreighter | T2 | production | none (civilian) |  | Capital | `Capital-Superfreighter` |  | yard or ship mart | no |
 | `tes-lading` |  | Tessaract Lading | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` | Convoy pattern: PDCs and a tougher hull; sold to firms that lost a Lading | yard or ship mart | no |
+| `tes-tariff` |  | Tessaract Tariff | Bulk, Tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Tanker` |  | yard or ship mart | no |
 | `tes-itinerary` |  | Tessaract Itinerary | Passenger, Heavy bus, short-route liner | T2 | production | none (civilian) |  | Heavy | `Heavy-Bus` |  | yard or ship mart | no |
 | `tes-passage` |  | Tessaract Passage | Passenger, Liner | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Liner` |  | yard or ship mart | no |
 | `tes-timetable` |  | Tessaract Timetable | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
@@ -86,6 +87,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `arc-freighter` |  | Arcadia Freighter Mk II | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Navy pattern: The Martian Navy's own supply ship; armoured, PDCs | yard or ship mart | no |
 | `arc-hauler` |  | Arcadia Hauler Mk III | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
 | `arc-bulk` |  | Arcadia Bulk Freighter Mk I | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` |  | yard or ship mart | no |
+| `arc-ice` |  | Arcadia Ice Hauler Mk II | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | no |
 | `arc-ferry` |  | Arcadia Ferry Mk II | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
 | `arc-tender` |  | Arcadia Tender Mk I | Service, Repair tender | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` |  | yard or ship mart | no |
 | `arc-tug` |  | Arcadia Tug Mk II | Service, Tug | T2 | production | none (civilian) |  | Medium | `Medium-Tug` |  | yard or ship mart | no |
@@ -132,6 +134,15 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `arb-shoot` |  | Arbor Shoot | Drone, Repair drone | T2 | production | none (civilian) |  | Drone | `Drone-Repair drone` |  | yard or ship mart | no |
 | `vae-light` |  | Arbor Thorn | Drone, Light combat drone | T2 | production | none (civilian) |  | Drone | `Drone-Light combat drone` |  | yard or ship mart | yes |
 
+## Lavinia Atmospherics (venus)
+
+| Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `lav-monsoon` |  | Lavinia Monsoon | Bulk, Gas tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Gas tanker` |  | yard or ship mart | no |
+| `lav-gale` |  | Lavinia Gale | Mining, Skimmer, medium | T2 | production | none (civilian) |  | Medium | `Medium-Skimmer` |  | yard or ship mart | no |
+| `lav-zephyr` |  | Lavinia Zephyr | Mining, Skimmer, small | T2 | production | none (civilian) |  | Light | `Light-Skimmer` |  | yard or ship mart | no |
+| `lav-cyclone` |  | Lavinia Cyclone | Industry, Gas refinery, capital | T2 | production | none (civilian) |  | Capital | `Capital-Gas refinery` |  | yard or ship mart | no |
+
 ## Union Defence Works (belt)
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
@@ -149,9 +160,12 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `bel-miner` |  | Belt Forge Jackleg | Subcraft, Mining subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Mining subcraft` |  | yard, licence only | yes |
+| `bf-burrow` |  | Belt Forge Burrow | Light civil, Courier, blockade runner | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
 | `bf-pony` |  | Belt Forge Pony | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
 | `bf-adit` |  | Belt Forge Adit | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` |  | yard or ship mart | no |
 | `bf-mule` |  | Belt Forge Mule | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
+| `bf-cistern` |  | Belt Forge Cistern | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | no |
+| `bf-auger` |  | Belt Forge Auger | Mining, Ice miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Ice miner` |  | yard or ship mart | no |
 | `rookrivet-hulk` | rookrivet-hulk | Belt Forge Collier | Mining, Barge | T2 | production | none (civilian) |  | Heavy | `Heavy-Barge` | Deep pattern: Jump drive and bunkers; mines where the patrols do not go | yard or ship mart | no |
 | `rookrivet-prospector` | rookrivet-prospector | Belt Forge Prospector | Mining, Prospector | T2 | production | none (civilian) |  | Light | `Light-Prospector` |  | yard or ship mart | no |
 | `rookrivet-breacher` | rookrivet-breacher | Belt Forge Sinker | Mining, Miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Miner` | Breaching pattern: Two shotfirer rigs and a Sounder; the knot hunter | yard or ship mart | no |
@@ -191,11 +205,13 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `mer-kite` |  | Meridian Kite | Corvette, Armed courier | T2 | production | none (independent, no licence) |  | Light | `Light-Corvette` |  | open market, anywhere | yes |
 | `tern` | meridian-courier | Meridian Tern | Corvette, The Registry-issue starter; a courier | T2 | production | none (independent, no licence) |  | Light | `Light-Corvette` | Courier pattern: Faster, lighter, one less mount; Meridian's only pattern | open market, anywhere | yes |
 | `mer-harrier` |  | Meridian Harrier | Patrol boat, Gunboat | T2 | production | none (independent, no licence) |  | Medium | `Medium-Patrol boat` |  | open market, anywhere | yes |
+| `mer-shrike` |  | Meridian Shrike | Patrol boat, Bounty hull | T2 | production | none (independent, no licence) |  | Medium | `Medium-Patrol boat` |  | open market, anywhere | no |
 | `mer-osprey` |  | Meridian Osprey | Frigate, Armed hauler, the Q-ship | T2 | production | none (independent, no licence) |  | Medium | `Medium-Frigate` |  | open market, anywhere | yes |
 | `mer-gull` |  | Meridian Gull | Light civil, Shuttle | T2 | production | none (independent, no licence) |  | Light | `Light-Shuttle` |  | open market, anywhere | no |
 | `mer-petrel` |  | Meridian Petrel | Light civil, Taxi | T2 | production | none (independent, no licence) |  | Light | `Light-Taxi` |  | open market, anywhere | no |
 | `mer-skua` |  | Meridian Skua | Cargo, Hauler | T2 | production | none (independent, no licence) |  | Medium | `Medium-Hauler` |  | open market, anywhere | no |
 | `mer-fulmar` |  | Meridian Fulmar | Passenger, Bus or ferry | T2 | production | none (independent, no licence) |  | Medium | `Medium-Bus or ferry` |  | open market, anywhere | no |
+| `mer-grebe` |  | Meridian Grebe | Service, Tug | T2 | production | none (independent, no licence) |  | Medium | `Medium-Tug` |  | open market, anywhere | no |
 
 ## Corvane Heavy Industries (indep)
 
@@ -207,6 +223,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `cor-dray` |  | Corvane Dray | Bulk, Bulk ore freighter | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Bulk ore freighter` |  | open market, anywhere | no |
 | `cor-foreman` |  | Corvane Foreman | Industry, Factory ship, armed | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Factory ship` |  | open market, anywhere | yes |
 | `cor-smelter` |  | Corvane Smelter | Industry, Refinery ship, large | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Refinery ship` |  | open market, anywhere | no |
+| `cor-still` |  | Corvane Still | Industry, Gas refinery, capital | T2 | production | none (independent, no licence) |  | Capital | `Capital-Gas refinery` |  | open market, anywhere | no |
 
 ## Aurel (aurel)
 
