@@ -149,6 +149,26 @@ Placement follows `sol.md`'s "Orbits" column. Round a world at a radius clear of
 
 **Checked:** 31 tests in `sol.test.ts` (eight new: all 31 names; runner, holder and rank; every market good and ship-mart loadout exists; the five lanes with every stop a port and none in Calder; a burn from the Exchange to every port planned, none ending within 500 units of a surface; flying in to the Shell; an old six-port save gaining the 25 at their design positions; Slagline out and in never below the port). In Chromium on a fresh server: the board lists 32 rows; Tycho Port's card reads LUNAR OLD MONEY with MARKET, OUTFITTING, SHIP MART; the burn there arrived in 69 seconds; the chart's four views read cleanly. No page errors.
 
+## As built: slice 2, push 3 (7 November 2026, Lead 9)
+
+**The Relay** (`sim/src/relay.ts`, from `infrastructure.md`): buoys that each hear ships within 1.5 million units (`RELAY_RANGE`) and talk to each other within 40 million (`RELAY_LINK_RANGE`, long tight-beam links, so a remote port's one buoy still reaches the net). The Accord laid them: a ring of three, 200,000 units out, round every port on a lane and every navy base; a chain along every lane, one per million units, so the lane's line is always heard by two; a single buoy at each other port; none at the clans' ports (Hilda Moot, Triton Moot), none past Saturn but along the Gate Lane. 298 buoys, one network. Design data like the lanes (`worldRelays`), not saved; when relays become targets (parked) they move into the world. Each buoy has `down`, and everything takes the buoys as an argument, so a cut buoy already changes the reading (tested).
+
+**Security from connectivity** (`relayNet`, then `securityAt(net, p)`): a live reading, never painted on.
+- **Open:** no buoy hears you, or the ones that do are cut off from any of the holder's bases.
+- **Contested:** off a lane, where two neighbouring ports near you (within 4 million units of you and of each other, `CLAIM_RANGE`) belong to different holders, or one belongs to nobody agreed. The Accord's peace holds on its lanes, so a lane is never contested; deep space between two powers' worlds is nobody's quarrel.
+- **Core:** two or more buoys hear you, and the holder has a base within a five-minute burn (`CORE_BURN_SECONDS`).
+- **Held:** covered and linked home, but thin (one buoy) or far from a base.
+
+Who holds a place: the Accord within a million units of a lane (`LANE_CORRIDOR`), else the nearest port's holder within `CLAIM_RANGE`. Bases are capital ports, navy yards and depots (a new rank: the ECF Toll Station and MRN Gate Station); the Accord's bases are all four powers'. Free ports are not bases (the Accord has no ships).
+
+What comes out, matching `sol.md`'s map without painting it: Core at the four capitals, the Inner and Ceres lanes, Ceres, the Earth and Venus neighbourhoods and the Gate Reach; Held at Bellows, the Boneyard, Vesta, Caloris, Eureka, Rimehold and Plume (one buoy each), along the Long and Gate lanes past Jupiter, and at Titan and Callisto (far from a base); Contested at Psyche Dig, the Ganymede Local and Haven Europa; Open at the moots, off the lanes and past Saturn. Off a lane the level never rises as you go out, and ends Open by 1.5 million units.
+
+**On the chart:** security shades it under everything: Core teal, Held in the holder's colour (Earth blue, Mars red, Venus green, the Belt rust; the Accord's and nobody's a muted teal), Contested amber, Open dark. It is sampled every 16 pixels and smoothed, and recomputed only when the view or the ports change (57 frames a second while zooming). Zoomed out a buoy's reach is smaller than a sample, so each port wears the mockup's dashed ring in its level's colour until its reach is 30 pixels across. The header says YOU ARE IN CORE · THE ACCORD; the burn plan has ARRIVE IN (Hilda Moot: OPEN · NOBODY HEARS). The key covers the levels.
+
+**Found on the way:** with a 5-million claim range the midpoint between Earth and Mars was Contested (both within range), and a 1.5-million lane corridor swallowed Jupiter's moons; disputes now need neighbouring ports, and the corridor is where two buoys still hear the line.
+
+**Checked:** 7 tests in `relay.test.ts` (the buoys' layout, none at the clans' ports or in Calder; every lane heard by two along its whole length; one network; `sol.md`'s map port by port; the level never rising off a lane; cutting the buoys at the Exchange makes it Open, leaving one makes it Held; Bellows cut off from the net goes Open). In Chromium on a fresh server: YOU ARE IN CORE · THE ACCORD at the Exchange; ARRIVE IN for Hilda Moot, Psyche Dig, Titan and Ceres read Open, Contested, Held and Core; no page errors.
+
 ## Decided (Jason, 7 November 2026)
 
 - **Burns route round a world in the way automatically**, the bend and its extra time shown on the chart before you burn (slice 2).

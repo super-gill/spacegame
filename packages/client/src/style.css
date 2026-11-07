@@ -2077,6 +2077,26 @@ button:hover {
   border-color: var(--ink-dim);
 }
 
+.chart-here {
+  margin-left: 16px;
+  margin-right: auto;
+  color: #9fd3c7;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+.chart-here[data-level='core'] {
+  color: #dffbf3;
+}
+
+.chart-here[data-level='contested'] {
+  color: #e0a458;
+}
+
+.chart-here[data-level='open'] {
+  color: #6a988f;
+}
+
 .chart-canvas {
   width: 100%;
   height: 100%;

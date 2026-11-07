@@ -1,4 +1,5 @@
-import { bodyStates, burnAcceleration, burnPlan, burnableBody, laneLegs, railTime, worldLanes, type BurnPlan, type Ship, type Station, type World } from '@spacegame/sim';
+import { bodyStates, burnAcceleration, burnPlan, burnableBody, laneLegs, railTime, relayNet, securityAt, worldLanes, RELAY_RANGE, type BurnPlan, type RelayNet, type SecurityReading, type Ship, type Station, type StationHolder, type World } from '@spacegame/sim';
+import { POWER_COLOUR } from '../render/ship-art.js';
 import type { PlotKind } from './plot-rows.js';
 
 /**
@@ -148,16 +149,96 @@ function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], marks: read
   }
 }
 
-/** The key, bottom left, as in the mockup. Security levels join it with the Relay. */
+/** Security's colours: Core teal, Held the holder's (the Accord's and nobody's a muted teal), Contested amber. Open is not drawn. */
+const CORE_RGB: readonly [number, number, number] = [159, 211, 199];
+const HELD_NEUTRAL_RGB: readonly [number, number, number] = [106, 152, 143];
+const CONTESTED_RGB: readonly [number, number, number] = [224, 164, 88];
+/** How strongly each level is shaded, 0 to 255. Faint: the chart is read over it. */
+const SHADE_ALPHA = { core: 34, held: 30, contested: 46 } as const;
+/** Ports wear level rings until a buoy's reach is this many pixels across; past that the shading shows it. */
+const RING_UNTIL_PX = 30;
+/** One shading sample per this many pixels, smoothed when drawn. */
+const SHADE_CELL = 16;
+
+function rgbOf(hex: string): [number, number, number] {
+  return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+}
+
+function holderRgb(holder: StationHolder | null): readonly [number, number, number] {
+  return holder && holder !== 'accord' && holder !== 'clans' ? rgbOf(POWER_COLOUR[holder]) : HELD_NEUTRAL_RGB;
+}
+
+/** The colour a reading is shown in. */
+function levelRgb(r: Pick<SecurityReading, 'level' | 'holder'>): readonly [number, number, number] {
+  return r.level === 'core' ? CORE_RGB : r.level === 'contested' ? CONTESTED_RGB : holderRgb(r.holder);
+}
+
+/** A small image, one pixel per cell, of the security across the view; drawn scaled up and smoothed. */
+function shadeImage(net: RelayNet, w: number, h: number, toWorld: (sx: number, sy: number) => { x: number; y: number }): HTMLCanvasElement {
+  const cols = Math.max(1, Math.ceil(w / SHADE_CELL));
+  const rows = Math.max(1, Math.ceil(h / SHADE_CELL));
+  const canvas = document.createElement('canvas');
+  canvas.width = cols;
+  canvas.height = rows;
+  const ctx = canvas.getContext('2d')!;
+  const image = ctx.createImageData(cols, rows);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const r = securityAt(net, toWorld((col + 0.5) * SHADE_CELL, (row + 0.5) * SHADE_CELL));
+      if (r.level === 'open') continue;
+      const rgb = levelRgb(r);
+      const i = (row * cols + col) * 4;
+      image.data[i] = rgb[0];
+      image.data[i + 1] = rgb[1];
+      image.data[i + 2] = rgb[2];
+      image.data[i + 3] = SHADE_ALPHA[r.level];
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  return canvas;
+}
+
+/** Names for whoever holds a place, for the screen. */
+const HOLDER_WORDS: Record<StationHolder, string> = { earth: 'EARTH', mars: 'MARS', venus: 'VENUS', belt: 'THE BELT', aurel: 'THE AUREL', accord: 'THE ACCORD', clans: 'THE CLANS' };
+
+/** "CORE · THE ACCORD", "HELD · MARS", "CONTESTED", "OPEN · NOBODY HEARS". */
+export function securityWords(r: SecurityReading): string {
+  if (r.level === 'open') return 'OPEN · NOBODY HEARS';
+  if (r.level === 'contested') return 'CONTESTED';
+  return `${r.level.toUpperCase()}${r.holder ? ` · ${HOLDER_WORDS[r.holder]}` : ''}`;
+}
+
+/** The key, bottom left, as in the mockup: the lanes, security, and the port marks. */
 function drawLegend(ctx: CanvasRenderingContext2D, h: number, lanes: boolean): void {
   if (!lanes) return;
   const y = h - 18;
+  // Each level as the ring a port wears.
+  const swatch = (x: number, rgb: readonly [number, number, number], _alpha: number, text: string): number => {
+    ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.18)`;
+    ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.8)`;
+    ctx.setLineDash([2, 3]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x + 6, y, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#9fd3c7';
+    ctx.fillText(text, x + 18, y);
+    return x + 18 + ctx.measureText(text).width + 22;
+  };
   ctx.fillStyle = LANE_COLOUR;
   ctx.fillRect(14, y - 3, 18, 6);
   ctx.fillStyle = '#9fd3c7';
   ctx.fillText('ACCORD LANE', 38, y);
+  let x = 38 + ctx.measureText('ACCORD LANE').width + 22;
+  x = swatch(x, CORE_RGB, 0.45, 'CORE');
+  x = swatch(x, rgbOf(POWER_COLOUR.mars), 0.45, 'HELD, IN ITS HOLDER\'S COLOUR');
+  x = swatch(x, CONTESTED_RGB, 0.5, 'CONTESTED');
+  ctx.fillStyle = '#6a988f';
+  ctx.fillText('UNSHADED · OPEN', x, y);
+  x += ctx.measureText('UNSHADED · OPEN').width + 30;
   // Port marks: a capital or free port, and any other port.
-  const x = 150;
   const diamond = (cx: number, d: number, colour: string): void => {
     ctx.fillStyle = colour;
     ctx.beginPath();
@@ -193,6 +274,12 @@ export class Chart {
   private readonly root = el('div', 'chart hidden');
   private readonly canvas = el('canvas', 'chart-canvas');
   private readonly plan = el('section', 'chart-plan');
+  /** Where you are, in the header: the security level and who holds it. */
+  private readonly here = el('span', 'chart-here');
+  /** The Relay, worked out once per set of port positions. */
+  private net: { stations: World['stations']; net: RelayNet } | null = null;
+  /** The shading, kept until the view or the ports change. */
+  private shade: { key: string; image: HTMLCanvasElement } | null = null;
   private readonly viewButtons = new Map<ViewId, HTMLButtonElement>();
   /** Half the chart's width in units, and where its centre is in the world; `follow` keeps the centre on your ship until you drag. */
   private halfWidth = 45_000_000;
@@ -210,7 +297,7 @@ export class Chart {
     this.root.setAttribute('role', 'dialog');
     this.root.setAttribute('aria-label', 'The chart');
     const head = el('div', 'chart-head');
-    head.append(el('span', 'chart-title', 'CHART · SOL · M'));
+    head.append(el('span', 'chart-title', 'CHART · SOL · M'), this.here);
     const views = el('div', 'chart-views');
     for (const v of VIEWS) {
       const b = el('button', 'chart-view', v.label);
@@ -370,6 +457,35 @@ export class Chart {
       ctx.stroke();
     }
 
+    // Security, under everything: what the Relay says about each place.
+    const net = this.relayNetFor(world);
+    if (net) {
+      const key = `${centre.x.toFixed(0)},${centre.y.toFixed(0)},${this.halfWidth.toFixed(0)},${w},${h},${net.nodes.length}`;
+      if (this.shade?.key !== key) this.shade = { key, image: shadeImage(net, w, h, (sx, sy) => ({ x: centre.x + (sx - w / 2) / scale, y: centre.y + (sy - h / 2) / scale })) };
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.shade.image, 0, 0, w, h);
+    }
+
+    // Each port's security as a dashed ring (the mockup's), while a buoy's reach is too small for the shading to show it.
+    if (net && RELAY_RANGE * scale < RING_UNTIL_PX) {
+      ctx.setLineDash([2, 4]);
+      ctx.lineWidth = 1;
+      for (const station of Object.values(world.stations)) {
+        const r = securityAt(net, station.position);
+        if (r.level === 'open') continue;
+        const at = toScreen(station.position);
+        if (at.x < -60 || at.y < -60 || at.x > w + 60 || at.y > h + 60) continue;
+        const rgb = levelRgb(r);
+        ctx.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.55)`;
+        ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.07)`;
+        ctx.beginPath();
+        ctx.arc(at.x, at.y, Math.max(RELAY_RANGE * scale, 11), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+
     // The Accord lanes: wide faint bands under everything else, as in the mockup.
     const labels: Label[] = [];
     ctx.strokeStyle = LANE_COLOUR;
@@ -461,6 +577,10 @@ export class Chart {
     }
     placeLabels(ctx, labels, marks, w, h);
     drawLegend(ctx, h, worldLanes(world).length > 0);
+    const reading = net && ship ? securityAt(net, ship.position) : null;
+    const hereText = reading ? `YOU ARE IN ${securityWords(reading)}` : '';
+    if (this.here.textContent !== hereText) this.here.textContent = hereText;
+    this.here.dataset['level'] = reading?.level ?? '';
 
     // You, and the route of a burn to the nav target: the line the ship will fly, bending round any world in the way.
     const plan = ship && targetId ? burnPlan(world, world.stations, ship.position, targetId, burnAcceleration(world, ship), time) : null;
@@ -511,6 +631,13 @@ export class Chart {
     this.renderPlan(world, ship, plan);
   }
 
+  /** The Relay for this world, rebuilt only when its ports have moved (the stations object is kept while nothing changes). */
+  private relayNetFor(world: World): RelayNet | null {
+    if (world.system !== 'sol') return null;
+    if (this.net?.stations !== world.stations) this.net = { stations: world.stations, net: relayNet(world) };
+    return this.net.net;
+  }
+
   /** The plan's parts, built once and updated in place, so BURN is never replaced under the pointer mid-click. */
   private planParts: { to: HTMLElement; grid: HTMLElement; values: HTMLElement[]; note: HTMLElement; go: HTMLButtonElement } | null = null;
 
@@ -518,7 +645,7 @@ export class Chart {
     if (!this.planParts) {
       const to = el('p', 'chart-plan-to');
       const grid = el('div', 'chart-plan-grid');
-      const values = ['DISTANCE', 'TIME', 'FLIP AT', 'PEAK', 'BURNS AT', 'ROUTE'].map((k) => {
+      const values = ['DISTANCE', 'TIME', 'FLIP AT', 'PEAK', 'BURNS AT', 'ROUTE', 'ARRIVE IN'].map((k) => {
         const value = el('span');
         grid.append(el('span', 'muted', k), value);
         return value;
@@ -546,7 +673,9 @@ export class Chart {
     set(parts.to, plan.target.kind === 'body' ? `${plan.target.name.toUpperCase()} · ABOVE THE WELL` : plan.target.name.toUpperCase());
     const passes = plan.route.bends.map((b) => world.bodies[b.bodyId]?.name.toUpperCase() ?? 'A WORLD');
     const route = passes.length === 0 ? 'STRAIGHT' : `ROUND ${passes.join(', ')} · +${minutesSeconds(plan.detourSeconds)}`;
-    const shown = [bigDistance(plan.distance), minutesSeconds(plan.seconds), minutesSeconds(plan.flipSeconds), `${Math.round(plan.peakSpeed).toLocaleString('en-GB')} u/s`, `${accel.toLocaleString('en-GB')} u/s²`, route];
+    const net = this.relayNetFor(world);
+    const arrive = net ? securityWords(securityAt(net, plan.route.points.at(-1) ?? plan.target.position)) : '--';
+    const shown = [bigDistance(plan.distance), minutesSeconds(plan.seconds), minutesSeconds(plan.flipSeconds), `${Math.round(plan.peakSpeed).toLocaleString('en-GB')} u/s`, `${accel.toLocaleString('en-GB')} u/s²`, route, arrive];
     parts.values.forEach((node, i) => set(node, shown[i]!));
     const tooClose = plan.distance < 20_000;
     set(parts.note, tooClose ? 'Close enough to fly there.' : plan.target.kind === 'body' ? 'Ends above the well, at rest with the world. Weapons, locks and docking are off while burning.' : 'Weapons, locks and docking are off while burning.');

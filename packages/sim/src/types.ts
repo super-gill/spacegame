@@ -1009,15 +1009,19 @@ export interface Station {
    * Security is worked out from this and the Relay (Sol slice 2).
    */
   holder?: StationHolder | null;
-  /** What kind of base it is for its holder: a capital port, an Accord free port, a navy's yard, or (absent) an ordinary port. */
+  /** What kind of base it is for its holder: a capital port, an Accord free port, a navy's yard or depot, or (absent) an ordinary port. */
   rank?: StationRank;
 }
 
 /** Who holds a station's space: a power, the Accord, or the clans. */
 export type StationHolder = PowerId | 'accord' | 'clans';
 
-/** A station's standing as a base (docs/navy.md, "Bases"). */
-export type StationRank = 'capital' | 'freePort' | 'navalYard';
+/**
+ * A station's standing as a base (docs/navy.md, "Bases"): a power's capital
+ * port, an Accord free port, a navy's yard, or a navy's depot (a patrol
+ * pair and fuel at a held system's main port, or the gate's stations).
+ */
+export type StationRank = 'capital' | 'freePort' | 'navalYard' | 'depot';
 
 /**
  * A landing pad on a station. Stations move but do not turn, so a pad's

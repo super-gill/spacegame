@@ -192,4 +192,23 @@ export { contactSize, identifies, runsDark, startsDark, CONTACT_RADIUS } from '.
 // Sol (docs/sol.md, docs/sol-build.md) and the plotted burn.
 export { createSolWorld, solBodies, solStations, solDistance, EARTH_ORBITAL_EXCHANGE_ID, CERES_ACCORD_ID, ELYSIUM_ID, THETIS_ORBITAL_ID, SLAGLINE_ID, TITAN_FREE_PORT_ID, SUN_ID, EARTH_ID } from './sol.js';
 export { SOL_LANES, worldLanes, laneLegs, type Lane } from './lanes.js';
+export {
+  worldRelays,
+  relayPosition,
+  relayNet,
+  securityAt,
+  isBase,
+  RELAY_RANGE,
+  RELAY_LINK_RANGE,
+  RELAY_LANE_SPACING,
+  RELAY_RING_COUNT,
+  RELAY_RING_RADIUS,
+  LANE_CORRIDOR,
+  CLAIM_RANGE,
+  CORE_BURN_SECONDS,
+  type RelayNode,
+  type RelayNet,
+  type SecurityLevel,
+  type SecurityReading,
+} from './relay.js';
 export { burnAcceleration, burnEndPoint, burnPlan, burnRoute, burnStatus, burnTarget, burnableBody, bendSpeed, stationTarget, bodyTarget, startBurn, cancelBurn, BURN_ACCELERATION_BY_CLASS, type BurnRefusal, type BurnPlan, type BurnRoute, type BurnStatus, type BurnTarget } from './burn.js';

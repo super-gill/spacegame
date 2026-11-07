@@ -431,11 +431,13 @@ export function solStations(bodies: Readonly<Record<string, Body>>): Record<stri
     port(ECF_TOLL_ID, 'ECF Toll Station', sunward(40, -0.35), 280, PORT_PADS, TOLL, {
       runBy: 'Kessari Orbital Defence',
       holder: 'earth',
+      rank: 'depot',
       outfitting: true,
     }),
     port(MRN_GATE_ID, 'MRN Gate Station', sunward(40, -0.3488), 280, PORT_PADS, TOLL, {
       runBy: 'The MRN (Mars)',
       holder: 'mars',
+      rank: 'depot',
       outfitting: true,
     }),
   ];
