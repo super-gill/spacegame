@@ -253,6 +253,18 @@ export const BURN_DONE_DISTANCE = 150;
 export const BURN_DONE_SPEED = 30;
 /** A burn steers round any body whose surface its line passes closer to than this many of the body's radii. */
 export const BURN_BODY_MARGIN = 1.4;
+/**
+ * Rounding a world, a ship holds the speed its drive can bend at that
+ * radius (v² = a·r), spending this share of its burn on the bend and
+ * keeping the rest to correct. Slice 2 (docs/sol-build.md).
+ */
+export const BURN_BEND_SHARE = 0.6;
+/** The pass round a world is drawn and flown as points this far apart along it, radians. */
+export const BURN_ARC_STEP = 0.15;
+/** A burning ship steers for the first point of its route at least this many seconds ahead, so it rounds a bend instead of chasing each point. */
+export const BURN_LOOKAHEAD_SECONDS = 0.75;
+/** A burn for a world ends this many times its gravity well's edge out from its centre: above the well, not in it. */
+export const BURN_WELL_CLEARANCE = 1.05;
 
 /**
  * Hitting a world (a planet, moon or big rock, not a belt rock) at this
@@ -261,6 +273,13 @@ export const BURN_BODY_MARGIN = 1.4;
  * pod. Units a second, into the surface.
  */
 export const FALL_FATAL_SPEED = 500;
+/**
+ * At this speed or more (a burn's speed, far beyond any thruster's) the
+ * pod does not survive the hit either: the pilot wakes at their home
+ * station with nothing (lore: "Death, pods and the Return"; the Fade is
+ * parked until after Open Lanes). Units a second, into the surface.
+ */
+export const FALL_POD_FATAL_SPEED = 2000;
 
 // The Arena world (arena.ts, docs/worlds.md).
 /** How far apart pilots' arenas are, and how far the first is from the system, units. */

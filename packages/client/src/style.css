@@ -2083,6 +2083,11 @@ button:hover {
   min-height: 0;
   border: 1px solid var(--faint);
   cursor: crosshair;
+  touch-action: none;
+}
+
+.chart-canvas.dragging {
+  cursor: grabbing;
 }
 
 .chart-plan {

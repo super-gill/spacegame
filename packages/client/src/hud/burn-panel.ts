@@ -1,4 +1,4 @@
-import { burnAcceleration, burnEndPoint, type Ship, type World } from '@spacegame/sim';
+import { burnAcceleration, burnStatus, burnTarget, railTime, type Ship, type World } from '@spacegame/sim';
 import { bigDistance, minutesSeconds } from './chart.js';
 
 /**
@@ -11,10 +11,9 @@ import { bigDistance, minutesSeconds } from './chart.js';
  * speed), the same banner says so and that U brakes: ordinary thrusters
  * take minutes to kill burn speeds, a braking burn about twenty seconds.
  *
- * The numbers are worked out from the ship as it is, the same way the
- * sim steers (burn.ts): it closes at the speed it could still brake from,
- * √(2ad), so before that speed it is still accelerating towards the flip,
- * and past it braking.
+ * The numbers come from `burnStatus` (burn.ts): the route the ship is
+ * steering by from where it is now, so a pass round a world shows in the
+ * time and the banner says which world it is rounding.
  */
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string): HTMLElementTagNameMap[K] {
@@ -24,22 +23,12 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, t
   return node;
 }
 
-/** Where a burn stands: speed, seconds to the flip (0 once braking), seconds to arrival, distance left. */
-export function burnProgress(world: World, ship: Ship): { speed: number; flipIn: number; arriveIn: number; left: number; braking: boolean } | null {
-  if (!ship.burn) return null;
-  const a = burnAcceleration(world, ship);
-  const station = ship.burn.targetId ? world.stations[ship.burn.targetId] : undefined;
-  const end = station ? burnEndPoint(station, ship.position) : ship.position;
-  const endVelocity = station?.velocity ?? { x: 0, y: 0 };
-  const left = Math.hypot(end.x - ship.position.x, end.y - ship.position.y);
-  const speed = Math.hypot(ship.velocity.x - endVelocity.x, ship.velocity.y - endVelocity.y);
-  if (a <= 0) return { speed, flipIn: 0, arriveIn: 0, left, braking: true };
-  // The top speed this burn will reach: accelerating from v over the rest, then braking, covers d when v_top² = a·d + v²/2.
-  const top = Math.sqrt(a * left + (speed * speed) / 2);
-  const braking = speed >= Math.sqrt(2 * a * left) * 0.97 || top <= speed;
-  if (braking) return { speed, flipIn: 0, arriveIn: speed / a, left, braking };
-  const flipIn = (top - speed) / a;
-  return { speed, flipIn, arriveIn: flipIn + top / a, left, braking };
+/** Where a burn stands: speed, seconds to the flip (0 once braking), seconds to arrival, distance left along the route, the world being passed. */
+export function burnProgress(world: World, ship: Ship): { speed: number; flipIn: number; arriveIn: number; left: number; braking: boolean; passing: string | null; to: string | null } | null {
+  const status = burnStatus(world, ship);
+  if (!status) return null;
+  const to = status.target ? (status.target.kind === 'body' ? `${status.target.name.toUpperCase()} · ABOVE THE WELL` : status.target.name.toUpperCase()) : null;
+  return { speed: status.speed, flipIn: status.flipSeconds, arriveIn: status.seconds, left: status.left, braking: status.braking, passing: status.passing, to };
 }
 
 /** Faster than this and not burning, the banner says you are coasting and how to stop. Units a second. */
@@ -77,7 +66,7 @@ export class BurnPanel {
     if (coasting && ship) {
       this.state.textContent = 'COASTING';
       this.to.textContent = '';
-      const target = coastingTarget ? world.stations[coastingTarget] : undefined;
+      const target = coastingTarget ? burnTarget(world, world.stations, coastingTarget, railTime(world.tick, world.dt)) : null;
       const brakeIn = speed / burnAcceleration(world, ship);
       this.numbers.replaceChildren(
         el('span', undefined, `${Math.round(speed).toLocaleString('en-GB')} u/s`),
@@ -89,8 +78,7 @@ export class BurnPanel {
     this.state.textContent = 'BURNING';
     this.note.textContent = 'WEAPONS, LOCKS AND DOCKING OFF · U TO CANCEL';
     if (!ship?.burn || !progress) return;
-    const station = ship.burn.targetId ? world.stations[ship.burn.targetId] : undefined;
-    this.to.textContent = station ? `→ ${station.name.toUpperCase()}` : 'BRAKING TO A STOP';
+    this.to.textContent = progress.to ? `→ ${progress.to}` : 'BRAKING TO A STOP';
     const elapsed = (world.tick - ship.burn.startTick) * world.dt;
     const total = elapsed + progress.arriveIn;
     const done = total > 0 ? Math.min(1, elapsed / total) : 1;
@@ -100,7 +88,7 @@ export class BurnPanel {
     this.flipMark.classList.toggle('passed', progress.braking);
     const parts = [
       `${Math.round(progress.speed).toLocaleString('en-GB')} u/s`,
-      progress.braking ? 'BRAKING' : `FLIP IN ${minutesSeconds(progress.flipIn)}`,
+      progress.passing ? `ROUNDING ${progress.passing.toUpperCase()}` : progress.braking ? 'BRAKING' : `FLIP IN ${minutesSeconds(progress.flipIn)}`,
       `ARRIVE IN ${minutesSeconds(progress.arriveIn)}`,
       `${bigDistance(progress.left)} TO GO`,
     ];

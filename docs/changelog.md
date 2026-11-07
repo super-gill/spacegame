@@ -4,6 +4,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+Sol slice 2, push 1: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed.
+
+### Added
+- **Burn for a world.** Click a planet or moon on the chart (M) and press U: the burn ends above its gravity well, at rest with it. The target card calls it a world; the plan says ABOVE THE WELL.
+- **The pass round a world.** A burn whose line crosses a world bends round it: a tangent in, an arc grazing its clearance, a tangent out. The ship slows for the pass to what its drive can bend at that radius and burns on after. The chart draws the route the ship will fly, rings the world it rounds, and the plan's ROUTE line says ROUND MARS and how much longer it takes than the straight line. The burn banner reads ROUNDING EARTH during the pass. Leaving Slagline, dug into Pallas, goes straight out first.
+
+- **The chart zooms and pans.** The wheel zooms about the pointer, dragging moves the chart; zoomed all the way out it locks on the Sun with all of Sol in view. LOCAL, INNER, BELT and ALL SOL remain as quick jumps.
+
+### Changed
+- Hitting a world at burn speed (2,000 u/s or more) loses the pod too: nothing gets away, and you wake at your home station with what you own elsewhere, as after losing a pod. Slower falls still end the ship and the nearest port recovers your pod.
+- The burn plan's times count the flips (about a second each).
+- The burn refusal for an unknown target reads "No such port or world."
+
 ## [0.18.0] - 2026-11-07
 
 Sol, the plotted burn and the chart; the Arena as a world of its own with a mode screen; the setting's Sol pivot in every name on screen; one-command server management. Played by Jason in both control modes.

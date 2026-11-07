@@ -343,10 +343,11 @@ export class TargetCard {
     const where = plotPosition(world, target.kind, target.id);
     const other = target.kind === 'ship' || target.kind === 'drone' ? world.ships[target.id] : undefined;
     const station = target.kind === 'station' ? world.stations[target.id] : undefined;
-    const stance = station ? 'station' : target.kind === 'cache' ? 'cache' : target.kind === 'rock' ? 'rock' : other?.contact ? 'unknown' : 'unlocked';
+    const body = target.kind === 'body' ? world.bodies[target.id] : undefined;
+    const stance = station ? 'station' : body ? 'station' : target.kind === 'cache' ? 'cache' : target.kind === 'rock' ? 'rock' : other?.contact ? 'unknown' : 'unlocked';
     setAttr(this.root, 'data-stance', stance);
-    setText(this.stance, station ? 'STATION' : target.kind === 'cache' ? 'CACHE' : target.kind === 'rock' ? 'ROCK' : other?.contact ? 'CONTACT' : 'NOT LOCKED');
-    setText(this.lockState, station ? 'BEACON ON' : target.kind === 'cache' || station ? '' : 'NOT LOCKED');
+    setText(this.stance, station ? 'STATION' : body ? 'WORLD' : target.kind === 'cache' ? 'CACHE' : target.kind === 'rock' ? 'ROCK' : other?.contact ? 'CONTACT' : 'NOT LOCKED');
+    setText(this.lockState, station ? 'BEACON ON' : target.kind === 'cache' || station || body ? '' : 'NOT LOCKED');
 
     const name = plotName(world, target.kind, target.id, '');
     if (other?.contact) {
@@ -359,6 +360,9 @@ export class TargetCard {
     } else if (station) {
       setText(this.name, station.name);
       setText(this.who, 'Broadcasting its beacon');
+    } else if (body) {
+      setText(this.name, body.name);
+      setText(this.who, `${body.kind === 'moon' ? 'Moon' : 'Planet'} · radius ${Math.round(body.radius).toLocaleString('en-GB')} u · a burn stops above its well (U)`);
     } else if (target.kind === 'rock') {
       const rock = world.asteroids.find((a) => a.id === target.id);
       setText(this.name, rock ? `Rock, radius ${Math.round(rock.radius)}` : 'Rock');
@@ -398,7 +402,7 @@ export class TargetCard {
       const free = station.pads.length - occupiedPads(station, world.ships).size;
       setText(this.cargo, `${services || 'NO SERVICES'} · PADS ${free} of ${station.pads.length} free`);
     }
-    setText(this.reads, target.kind === 'station' || target.kind === 'cache' ? 'Selected: also your nav target' : 'Not locked: radar only');
+    setText(this.reads, target.kind === 'station' || target.kind === 'cache' || target.kind === 'body' ? 'Selected: also your nav target' : 'Not locked: radar only');
   }
 
   /**

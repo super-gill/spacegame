@@ -77,7 +77,11 @@ export function destroyShips(world: World, killers: Record<string, string | null
     // were not aboard lose only the ship.
     const pilotId = aboard[ship.id];
     if (pilotId) {
-      if (isEscapePod(world, ship) || !shipStats(world, ship).escapePod) {
+      if (ship.podLost) {
+        // Into a world at burn speed: nothing gets away. The pilot wakes at home (the Return, without the Fade yet).
+        pilots[pilotId] = { ...pilots[pilotId]!, shipId: null };
+        events.push({ type: 'podLost', shipId: ship.id, pilotId, bodyId: ship.fellInto ?? '' });
+      } else if (isEscapePod(world, ship) || !shipStats(world, ship).escapePod) {
         pilots[pilotId] = { ...pilots[pilotId]!, shipId: null };
       } else {
         // A ship that fell into a world: the pod is picked up by the nearest port, not left to bounce off the surface.

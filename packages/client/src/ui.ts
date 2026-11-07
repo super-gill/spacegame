@@ -258,7 +258,11 @@ export class Ui {
         this.showToast(`You hit ${world?.bodies[e.bodyId]?.name ?? 'a world'} at ${Math.round(e.speed).toLocaleString('en-GB')} u/s. Your ship is gone.`, 4000);
         continue;
       }
-      // Only the pilot it belongs to is sent this (view.ts).
+      // Only the pilot it belongs to is sent these (view.ts).
+      if (e.type === 'podLost') {
+        this.showToast(`Nothing got away from ${world?.bodies[e.bodyId]?.name ?? 'the world'}. You wake at ${world ? world.stations[homeStationId(world)]?.name ?? 'home' : 'home'}.`, 6000);
+        continue;
+      }
       if (e.type === 'podRecovered') {
         this.showToast(`${world?.stations[e.stationId]?.name ?? 'The nearest port'} picked up your escape pod.`, 4000, 'info');
         continue;

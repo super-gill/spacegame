@@ -1,5 +1,5 @@
 import type { Ship, World } from '@spacegame/sim';
-import { asteroidStates, distance, isEmptyShip, normalise, shipPilot, shipStats, sub, type Vec2 } from '@spacegame/sim';
+import { asteroidStates, bodyState, distance, isEmptyShip, normalise, railTime, shipPilot, shipStats, sub, type Vec2 } from '@spacegame/sim';
 
 /**
  * The Plot's contents (docs/interface.md, section 3): one row for
@@ -13,7 +13,8 @@ import { asteroidStates, distance, isEmptyShip, normalise, shipPilot, shipStats,
  */
 
 /** What a row is. */
-export type PlotKind = 'ship' | 'station' | 'rock' | 'cache' | 'drone';
+/** `body` is a world picked on the chart as a burn target; the board has no rows for worlds. */
+export type PlotKind = 'ship' | 'station' | 'rock' | 'cache' | 'drone' | 'body';
 
 /** Whose it is, for its colour: hostile red, the Watch white, others neutral, stations bright, your own kit ink, unknown amber. */
 export type PlotSide = 'hostile' | 'watch' | 'neutral' | 'station' | 'own' | 'rock' | 'unknown';
@@ -270,6 +271,11 @@ export function plotPosition(world: World, kind: PlotKind, id: string): { positi
     const l = world.loot.find((x) => x.id === id);
     return l ? { position: l.position, velocity: l.velocity } : null;
   }
+  if (kind === 'body') {
+    if (!world.bodies[id]) return null;
+    const st = bodyState(world.bodies, id, railTime(world.tick, world.dt));
+    return { position: st.position, velocity: st.velocity };
+  }
   const i = world.asteroids.findIndex((a) => a.id === id);
   if (i < 0) return null;
   const s = asteroidStates(world.bodies, [world.asteroids[i]!], world.tick, world.dt)[0]!;
@@ -280,6 +286,7 @@ export function plotPosition(world: World, kind: PlotKind, id: string): { positi
 export function plotName(world: World, kind: PlotKind, id: string, pilotId: string): string {
   if (kind === 'station') return world.stations[id]?.name ?? 'Station';
   if (kind === 'rock') return 'Rock';
+  if (kind === 'body') return world.bodies[id]?.name ?? 'World';
   if (kind === 'cache') return world.loot.find((l) => l.id === id)?.cache?.ownerId === pilotId ? 'Your cache' : 'Cache';
   const ship = world.ships[id];
   if (!ship) return 'Nav target';

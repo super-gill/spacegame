@@ -896,6 +896,8 @@ export interface Ship {
   burn?: BurnState;
   /** Set the tick a ship hits a world too fast (`FALL_FATAL_SPEED`): it is lost with no wreck, and its pilot's pod is recovered at the nearest port. */
   fellInto?: string;
+  /** Set with `fellInto` when the hit was at burn speed (`FALL_POD_FATAL_SPEED`): the pod is lost too, and the pilot wakes at home with nothing. */
+  podLost?: boolean;
   /**
    * Mining lasers running this tick, for drawing: each beam's mount, how
    * long it reached, the rock it touched (null: none in range) and
@@ -1636,6 +1638,8 @@ export type WorldEvent =
   | { type: 'fellInto'; shipId: string; bodyId: string; speed: number }
   /** The nearest port picked up a pilot's escape pod after their ship fell into a world. */
   | { type: 'podRecovered'; shipId: string; pilotId: string; stationId: string }
+  /** A pilot's ship hit a world at burn speed (`FALL_POD_FATAL_SPEED`) and nothing got away: they wake at home. Sent to that pilot only. */
+  | { type: 'podLost'; shipId: string; pilotId: string; bodyId: string }
   /** Two ships collided. `speed` is the closing speed at impact, units/s. */
   | { type: 'rammed'; shipId: string; by: string; speed: number }
   /** A ship took damage (after resistances). `by` is the ship responsible, or null for a station hull. */

@@ -115,6 +115,22 @@ Alongside, small and separate: item 5 of the re-fit (hull identity cannot be fit
 
 **Not in slice 1:** lanes and security as data (the chart has no lanes yet), the other 28 stations, NPC burns, other players' plumes seen from afar, Sol's own names for the patrol and the toll boats' transponders (slice 4).
 
+## As built: slice 2, push 1 (7 November 2026, Lead 9)
+
+Slice 2 lands in pushes Jason can fly between. The first is the burn's second half: worlds as targets, the pass round a world made real, and the pod lost in a fall at burn speed.
+
+**Worlds as burn targets** (`burn.ts`, `burnTarget`): a burn's target is a port or a planet or moon (the big Belt rocks are moons here; the Sun and the belts are refused, `unknownTarget`). A burn for a world ends above its gravity well, `BURN_WELL_CLEARANCE` (1.05) times the well's edge out from its centre along the line from the ship, matched to the world's motion. On the chart, click a world (a ring marks it) and the plan says ABOVE THE WELL; the board has no rows for worlds. The target card calls it WORLD.
+
+**The pass round a world** (`burnRoute`): a route is the straight line unless it passes within 1.4 radii (`BURN_BODY_MARGIN`) of a world's centre; then it bends round on the side the line already favours: a tangent in to that clearance circle, an arc along it, a tangent out, and on (up to four worlds). Leaving a port dug into a rock (Slagline, inside Pallas's clearance) goes straight out to the circle first; arriving at one comes straight in. The ship cannot bend at burn speed, so each pass has a speed, √(a·r·0.6) (`bendSpeed`, `BURN_BEND_SHARE`): about 5,200 u/s round Mars, 7,100 round Earth, 25,000 round Jupiter. The guidance law brakes for the pass as it brakes for the end (the least speed it could still shed in time for anything ahead), allowing for the ground the flip covers before the brake bites (`BURN_FLIP_SECONDS`, fading out below 1,000 u/s so a stop finishes crisply). The chart draws the route as the line the ship will fly, with each pass's clearance as a faint dashed ring, and the plan's ROUTE line says ROUND MARS and how much longer than the straight line it takes (`BurnPlan.detourSeconds`). Rounding Earth on the way from Earth Orbital Exchange to Luna costs about ten seconds; the plan's time and the flown time now agree within a few seconds (64 against 66 to Luna). The burn banner reads ROUNDING EARTH during a pass; its numbers come from `burnStatus`, the same route from where the ship is now.
+
+**The chart zooms and pans** (Jason, 7 November: the scale buttons alone were annoying to use): the wheel zooms about the pointer, between 20,000 units and all of Sol; dragging pans; zoomed all the way out the chart locks on the Sun with Sol inside its border, and inside that the centre is kept where Sol still fills the chart. LOCAL, INNER, BELT and ALL SOL stay as quick jumps and light up when the zoom matches one; LOCAL follows your ship until you drag or zoom away from it. A press that moves less than four pixels is a click (a pick).
+
+**The pod does not survive a fall at burn speed** (`FALL_POD_FATAL_SPEED`, 2,000 u/s): the ship is lost with no wreck as before, and nothing gets away; the pilot is left with no ship, told so (`podLost`, sent to that pilot alone), and wakes at their home station as after losing a pod (`wake`). Below that speed and above 500 the pod is still recovered by the nearest port. This is the lore's Return (`infrastructure.md`, "Death, pods and the Return") without the Fade, which is parked until after Open Lanes.
+
+**Checked** in the sim: 23 tests in `sol.test.ts` (the route round Mars stays outside the clearance and on it, is longer and slower than the straight line, flown it never exceeds the pass speed by more than 15% and clears Mars by over 1.2 radii; Slagline's route out and in; a burn to Luna ends above its well at rest; the Sun refused; a 20,000 u/s fall loses the pod and the pilot wakes at Earth Orbital Exchange). Plan times now count the flips (about 1.3 s each).
+
+**Not in this push:** the other 25 stations and the lanes (push 2), the Relay and computed security (push 3), NPCs that burn (push 4).
+
 ## Decided (Jason, 7 November 2026)
 
 - **Burns route round a world in the way automatically**, the bend and its extra time shown on the chart before you burn (slice 2).

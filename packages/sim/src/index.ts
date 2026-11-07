@@ -191,4 +191,4 @@ export { contactSize, identifies, runsDark, startsDark, CONTACT_RADIUS } from '.
 
 // Sol (docs/sol.md, docs/sol-build.md) and the plotted burn.
 export { createSolWorld, solBodies, solStations, solDistance, EARTH_ORBITAL_EXCHANGE_ID, CERES_ACCORD_ID, ELYSIUM_ID, THETIS_ORBITAL_ID, SLAGLINE_ID, TITAN_FREE_PORT_ID, SUN_ID, EARTH_ID } from './sol.js';
-export { burnAcceleration, burnEndPoint, burnPlan, startBurn, cancelBurn, BURN_ACCELERATION_BY_CLASS, type BurnRefusal } from './burn.js';
+export { burnAcceleration, burnEndPoint, burnPlan, burnRoute, burnStatus, burnTarget, burnableBody, bendSpeed, stationTarget, bodyTarget, startBurn, cancelBurn, BURN_ACCELERATION_BY_CLASS, type BurnRefusal, type BurnPlan, type BurnRoute, type BurnStatus, type BurnTarget } from './burn.js';

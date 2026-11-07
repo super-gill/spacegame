@@ -10,7 +10,7 @@ import { CACHE_LIFETIME, ORE_LOOT_LIFETIME, cutRocks, dropCache, hopperAfterTile
 import { collideShips, collideWithStations, collideWithSurfaces, insideSurface, type Surface } from './collision.js';
 import { ridePad, tryDock, undock } from './docking.js';
 import { nextFlightMode } from './flight.js';
-import { DOCK_REPAIR_PER_SECOND, FALL_FATAL_SPEED } from './constants.js';
+import { DOCK_REPAIR_PER_SECOND, FALL_FATAL_SPEED, FALL_POD_FATAL_SPEED } from './constants.js';
 import { HOPPER_EJECT_SPEED, departShips, destroyShips, runSpawners, stepLoot, stepWrecks, sellNpcOre } from './lifecycle.js';
 import { stepLocks, weaponTarget } from './locks.js';
 import { isSwitchedOn } from './systems.js';
@@ -80,11 +80,15 @@ function restockNpc(ship: Ship, stats: ShipStats, world: Pick<World, 'goods'>): 
  * Pure: returns a new World and never mutates the one passed in. The client
  * calls this from a fixed-timestep accumulator; tests call it directly.
  */
-/** A hit on a world (not a belt rock) at `FALL_FATAL_SPEED` or more, from a tick's impacts: the end of the ship. */
-function fallInto(impacts: readonly WorldEvent[], world: World): { bodyId: string; event: WorldEvent } | null {
+/**
+ * A hit on a world (not a belt rock) at `FALL_FATAL_SPEED` or more, from a
+ * tick's impacts: the end of the ship. At `FALL_POD_FATAL_SPEED` the pod is
+ * lost with it (lifecycle.ts).
+ */
+function fallInto(impacts: readonly WorldEvent[], world: World): { bodyId: string; podLost: boolean; event: WorldEvent } | null {
   for (const e of impacts) {
     if (e.type === 'impacted' && world.bodies[e.bodyId] && e.speed >= FALL_FATAL_SPEED) {
-      return { bodyId: e.bodyId, event: { type: 'fellInto', shipId: e.shipId, bodyId: e.bodyId, speed: e.speed } };
+      return { bodyId: e.bodyId, podLost: e.speed >= FALL_POD_FATAL_SPEED, event: { type: 'fellInto', shipId: e.shipId, bodyId: e.bodyId, speed: e.speed } };
     }
   }
   return null;
@@ -142,7 +146,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
       const fall = fallInto(collideWithSurfaces(burned.ship, stats, surfaces).events, world);
       if (fall) {
         events.push(fall.event);
-        ships[id] = { ...burned.ship, structure: 0, fellInto: fall.bodyId };
+        ships[id] = { ...burned.ship, structure: 0, fellInto: fall.bodyId, podLost: fall.podLost };
         continue;
       }
       ships[id] = regenerateShield(rechargeCapacitor(burned.ship, stats, world.dt), stats, world.dt);
@@ -191,7 +195,7 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
     if (fall) {
       // Too fast into a world: the ship is gone (lifecycle.ts recovers the pod). No bounce, no damage to count.
       events.push(...hulls.events, fall.event);
-      ships[id] = { ...ground.ship, structure: 0, fellInto: fall.bodyId };
+      ships[id] = { ...ground.ship, structure: 0, fellInto: fall.bodyId, podLost: fall.podLost };
       continue;
     }
     const moved = { ship: ground.ship, events: [...hulls.events, ...ground.events], damage: [...hulls.damage, ...ground.damage] };

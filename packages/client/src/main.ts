@@ -208,7 +208,7 @@ const plot = new Plot(
 flightHud.onToggleColours = () => input.requestToggleColours();
 // The chart (M) and the burn (U): crossing Sol (docs/sol-build.md, slice 1).
 const chart = new Chart(document.body, {
-  pick: (stationId) => select({ kind: 'station', id: stationId }),
+  pick: (kind, id) => select({ kind, id }),
   burn: () => burnPressed(),
 });
 const burnPanel = new BurnPanel(hudLayer);
@@ -221,10 +221,10 @@ function burnPressed(): void {
   const mine = myShip(current);
   if (!mine) return;
   if (mine.burn) return send({ type: 'burnCancel' });
-  if (navTarget?.kind === 'station') return send({ type: 'burnStart', targetId: navTarget.id });
+  if (navTarget?.kind === 'station' || navTarget?.kind === 'body') return send({ type: 'burnStart', targetId: navTarget.id });
   const speed = Math.hypot(mine.velocity.x, mine.velocity.y);
   if (speed > 1000) return send({ type: 'burnStart', targetId: null });
-  ui.notify('Pick a port to burn for: on the board (P) or the chart (M).', 'warn');
+  ui.notify('Pick a port or a world to burn for: on the board (P) or the chart (M).', 'warn');
 }
 const holdPanel = new HoldPanel(windows.add('hold', 'Hold', 'I', { x: 16, y: 120 }), {
   jettison: (good) => input.requestJettison(good),
@@ -370,7 +370,7 @@ function refusalText(command: PilotCommand, reason: string): string | null {
           noShip: 'You have no ship.',
           notFlying: 'Undock first.',
           cannotBurn: 'This hull cannot burn.',
-          unknownStation: 'No such port.',
+          unknownTarget: 'No such port or world.',
           tooClose: 'Close enough to fly there.',
           notBurning: 'You are not burning.',
         };
@@ -911,7 +911,7 @@ function drawNavTarget(mine: Ship, target: NavTarget, alpha: number): void {
   const dist = distance(mine.position, now.position);
   const eta = arrivalSeconds(dist, closingSpeed(mine.position, mine.velocity, now.position, now.velocity));
   const ship = target.kind === 'ship' || target.kind === 'drone' ? current.ships[target.id] : undefined;
-  const radius = target.kind === 'station' ? (current.stations[target.id]?.radius ?? 40) : target.kind === 'rock' ? (current.asteroids.find((a) => a.id === target.id)?.radius ?? 20) : ship ? (ship.contact ? CONTACT_RADIUS[ship.contact] : (current.hulls[ship.hullId]?.radius ?? 16)) : 8;
+  const radius = target.kind === 'station' ? (current.stations[target.id]?.radius ?? 40) : target.kind === 'body' ? (current.bodies[target.id]?.radius ?? 1000) : target.kind === 'rock' ? (current.asteroids.find((a) => a.id === target.id)?.radius ?? 20) : ship ? (ship.contact ? CONTACT_RADIUS[ship.contact] : (current.hulls[ship.hullId]?.radius ?? 16)) : 8;
   const label = `${plotName(current, target.kind, target.id, me.id).toUpperCase()} · ${Math.round(dist).toLocaleString('en-GB')} u · ${clockWords(eta)}`;
   drawNavMarker(ctx!, camera, at, radius, label);
 }
@@ -1093,8 +1093,9 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   }
   if (mine && navTarget && mine.state === 'flying') drawNavTarget(mine, navTarget, alpha);
   ui.update(current, mine);
-  burnPanel.update(current, mine, navTarget?.kind === 'station' ? navTarget.id : null);
-  chart.update(current, mine, navTarget?.kind === 'station' ? navTarget.id : null);
+  const burnTargetId = navTarget?.kind === 'station' || navTarget?.kind === 'body' ? navTarget.id : null;
+  burnPanel.update(current, mine, burnTargetId);
+  chart.update(current, mine, burnTargetId);
   if (arenaSetup) {
     // Between fights: no ship and no arena running (a decided fight still shows for a moment).
     if (!mine && !current.pilots[me.id]?.arena) arenaSetup.show(arenaResult);
