@@ -93,7 +93,7 @@ class BeltParts:
         """The Union mark: a ring with a bar through it, the picket line. Cooperative disc when off shift."""
         if h.civ:
             h.f(circ(x, y, r, COOP2, stroke=BSEAM, sw=0.1)); h.f(circ(x, y, r * 0.35, BSEAM)); return
-        h.f(circ(x, y, r, "none", stroke=MARK, sw=r * 0.3)); h.f(line(x - r * 1.3, y, x + r * 1.3, y, stroke=MARK, sw=r * 0.3, extra='stroke-linecap="round"'))
+        h.f(circ(x, y, r, "none", stroke=MARK, sw=r * 0.3)); h.f(line(x - r * 1.3, y, x + r * 1.3, y, stroke=MARK, sw=r * 0.3))
 
     @staticmethod
     def overpaint(h, x, y, w, hh):
