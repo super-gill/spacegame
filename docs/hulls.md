@@ -40,12 +40,13 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `tes-docket` |  | Tessaract Docket | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
 | `tessaract-spine` | tessaract-spine | Tessaract Manifest | Cargo, Freighter, six bays | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` | Deep-space pattern: Jump drive and armour for the Marches and beyond | yard or ship mart | no |
 | `tes-waybill` |  | Tessaract Waybill | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
-| `tes-consignment` |  | Tessaract Consignment | Bulk, Superfreighter | T2 | production | none (civilian) |  | Capital | `Capital-Superfreighter` |  | yard or ship mart | no |
+| `tes-consignment` |  | Tessaract Consignment | Bulk, Superfreighter (convoy command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Superfreighter (convoy command ship)` |  | yard or ship mart | no |
 | `tes-lading` |  | Tessaract Lading | Bulk, Bulk freighter | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Bulk freighter` | Convoy pattern: PDCs and a tougher hull; sold to firms that lost a Lading | yard or ship mart | no |
 | `tes-tariff` |  | Tessaract Tariff | Bulk, Tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Tanker` |  | yard or ship mart | no |
 | `tes-itinerary` |  | Tessaract Itinerary | Passenger, Heavy bus, short-route liner | T2 | production | none (civilian) |  | Heavy | `Heavy-Bus` |  | yard or ship mart | no |
 | `tes-passage` |  | Tessaract Passage | Passenger, Liner | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Liner` |  | yard or ship mart | no |
 | `tes-timetable` |  | Tessaract Timetable | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
+| `tes-covenant` |  | Tessaract Covenant | Bulk, Prototype superfreighter | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Capital | `Capital-Prototype Superfreighter` |  | top of company standing, or story | no |
 
 ## Vantage Aerospace (earth)
 
@@ -91,6 +92,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `arc-ferry` |  | Arcadia Ferry Mk II | Passenger, Ferry | T2 | production | none (civilian) |  | Medium | `Medium-Ferry` |  | yard or ship mart | no |
 | `arc-tender` |  | Arcadia Tender Mk I | Service, Repair tender | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` |  | yard or ship mart | no |
 | `arc-tug` |  | Arcadia Tug Mk II | Service, Tug | T2 | production | none (civilian) |  | Medium | `Medium-Tug` |  | yard or ship mart | no |
+| `arc-mk0` |  | Arcadia Prototype Mk 0 | Bulk, Prototype bulk freighter | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Super-heavy | `Super-heavy-Prototype Bulk freighter` |  | top of company standing, or story | no |
 
 ## Ishtar Fleet Works (venus)
 
@@ -104,7 +106,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `ish-lakshmi` |  | Ishtar Lakshmi | Patrol boat, Coastguard patrol and rescue escort | T2 | production | Navy / civilian |  | Medium | `Medium-Patrol boat` | Lifeline pattern: Repair and shield transfer; a Solace kit built in | yard, Navy grade behind the licence; civilian grade open | yes |
 | `ish-maat` |  | Ishtar Maat | Frigate, Hybrid frigate | T2 | production | Navy only |  | Medium | `Medium-Frigate` | Longbow pattern: Railguns and nothing else; answers from farther than anyone | yard, licence only | yes |
 | `ish-maxwell` |  | Ishtar Maxwell | Destroyer, Hybrid destroyer | T2 | production | Navy only |  | Heavy | `Heavy-Destroyer` |  | yard, licence only | yes |
-| `ish-aphrodite` |  | Ishtar Aphrodite | Cruiser, Rescue cruiser and command ship | T2 | production | Navy only |  | Super-heavy | `Super-heavy-Cruiser` |  | yard, licence only | yes |
+| `ish-aphrodite` |  | Ishtar Aphrodite | Cruiser, Rescue cruiser and command ship | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | Navy only |  | Super-heavy | `Super-heavy-Cruiser` |  | yard, licence only | yes |
 | `ish-hecate` |  | Ishtar Hecate | Cruiser, Hunter | T3 | special operations, hunter: jumps onto a lock (gate-born drive), lands close, pins the target (burn, turn and capacitor penalties); survives until the fleet arrives; modest guns | Navy (top of the ladder) |  | Super-heavy | `Super-heavy-Hunter` |  | navy standing ladder, stolen, or story | yes |
 
 ## Solace Medical (venus)
@@ -115,15 +117,17 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `sol-haven` |  | Solace Haven | Service, Repair tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Repair tender` | Field pattern: Armour over comfort; flies with the Coastguard into the Marches | yard or ship mart | no |
 | `sol-refuge` |  | Solace Refuge | Service, Repair ship, heavy | T2 | production | none (civilian) |  | Heavy | `Heavy-Repair ship` |  | yard or ship mart | no |
 | `sol-respite` |  | Solace Respite | Service, Tender, small | T2 | production | none (civilian) |  | Light | `Light-Tender` |  | yard or ship mart | no |
-| `sol-sanctuary` |  | Solace Sanctuary | Service, Hospital ship, large | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Hospital ship` |  | yard or ship mart | no |
+| `sol-sanctuary` |  | Solace Sanctuary | Service, Hospital ship, large (SAR command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Hospital ship` |  | yard or ship mart | no |
+| `sol-grace` |  | Solace Grace | Service, Prototype hospital ship | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Super-heavy | `Super-heavy-Prototype Hospital ship` |  | top of company standing, or story | no |
 
 ## Halden Institute (venus)
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `hal-expedition` |  | Halden Expedition | Service, Explorer, large | T2 | production | none (civilian) |  | Heavy | `Heavy-Explorer` |  | yard or ship mart | no |
+| `hal-expedition` |  | Halden Expedition | Service, Explorer, large (exploration command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Heavy | `Heavy-Explorer` |  | yard or ship mart | no |
 | `hal-inquiry` |  | Halden Inquiry | Service, Survey ship, medium | T2 | production | none (civilian) |  | Medium | `Medium-Survey ship` |  | yard or ship mart | no |
 | `hal-query` |  | Halden Query | Service, Survey ship, small | T2 | production | none (civilian) |  | Light | `Light-Survey ship` |  | yard or ship mart | no |
+| `hal-threshold` |  | Halden Threshold | Service, Prototype explorer | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Explorer` |  | top of company standing, or story | no |
 
 ## Arbor Dynamics (venus)
 
@@ -133,6 +137,7 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `vae-heavy` |  | Arbor Bramble | Drone, Heavy combat drone | T2 | production | none (civilian) |  | Drone | `Drone-Heavy combat drone` |  | yard or ship mart | yes |
 | `arb-shoot` |  | Arbor Shoot | Drone, Repair drone | T2 | production | none (civilian) |  | Drone | `Drone-Repair drone` |  | yard or ship mart | no |
 | `vae-light` |  | Arbor Thorn | Drone, Light combat drone | T2 | production | none (civilian) |  | Drone | `Drone-Light combat drone` |  | yard or ship mart | yes |
+| `arb-grove` |  | Arbor Grove | Service, Prototype drone tender | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Capital | `Capital-Prototype Drone tender` |  | top of company standing, or story | no |
 
 ## Lavinia Atmospherics (venus)
 
@@ -141,7 +146,8 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `lav-monsoon` |  | Lavinia Monsoon | Bulk, Gas tanker | T2 | production | none (civilian) |  | Heavy | `Heavy-Gas tanker` |  | yard or ship mart | no |
 | `lav-gale` |  | Lavinia Gale | Mining, Skimmer, medium | T2 | production | none (civilian) |  | Medium | `Medium-Skimmer` |  | yard or ship mart | no |
 | `lav-zephyr` |  | Lavinia Zephyr | Mining, Skimmer, small | T2 | production | none (civilian) |  | Light | `Light-Skimmer` |  | yard or ship mart | no |
-| `lav-cyclone` |  | Lavinia Cyclone | Industry, Gas refinery, capital | T2 | production | none (civilian) |  | Capital | `Capital-Gas refinery` |  | yard or ship mart | no |
+| `lav-cyclone` |  | Lavinia Cyclone | Industry, Gas refinery, capital (gas command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Gas refinery` |  | yard or ship mart | no |
+| `lav-tempest` |  | Lavinia Tempest | Mining, Prototype skimmer | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Skimmer` |  | top of company standing, or story | no |
 
 ## Union Defence Works (belt)
 
@@ -169,19 +175,21 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | `rookrivet-hulk` | rookrivet-hulk | Belt Forge Collier | Mining, Barge | T2 | production | none (civilian) |  | Heavy | `Heavy-Barge` | Deep pattern: Jump drive and bunkers; mines where the patrols do not go | yard or ship mart | no |
 | `rookrivet-prospector` | rookrivet-prospector | Belt Forge Prospector | Mining, Prospector | T2 | production | none (civilian) |  | Light | `Light-Prospector` |  | yard or ship mart | no |
 | `rookrivet-breacher` | rookrivet-breacher | Belt Forge Sinker | Mining, Miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Miner` | Breaching pattern: Two shotfirer rigs and a Sounder; the knot hunter | yard or ship mart | no |
-| `bf-headframe` |  | Belt Forge Headframe | Industry, Factory ship, largest | T2 | production | none (civilian) |  | Capital | `Capital-Factory ship` |  | yard or ship mart | no |
+| `bf-headframe` |  | Belt Forge Headframe | Industry, Factory ship, largest (mining command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Factory ship` |  | yard or ship mart | no |
 | `bf-winder` |  | Belt Forge Winder | Industry, Refinery ship, large | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Refinery ship` |  | yard or ship mart | no |
 | `rookrivet-drone` | rookrivet-drone | Belt Forge Knocker | Drone, Mining drone | T2 | production | none (civilian) |  | Drone | `Drone-Mining drone` |  | yard or ship mart | no |
+| `bf-lodestar` |  | Belt Forge Lodestar | Industry, Prototype factory ship | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Capital | `Capital-Prototype Factory ship` |  | top of company standing, or story | no |
 
 ## Rook and Rivet (belt)
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `rr-grab` |  | Rook and Rivet Grab | Subcraft, Salvage subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Salvage subcraft` |  | yard, licence only | yes |
-| `rr-breaker` |  | Rook and Rivet Breaker | Industry, Shipbreaker, large | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Shipbreaker` |  | yard or ship mart | no |
+| `rr-breaker` |  | Rook and Rivet Breaker | Industry, Shipbreaker, large (salvage command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Shipbreaker` |  | yard or ship mart | no |
 | `rr-scrapper` |  | Rook and Rivet Scrapper | Service, Salvage tender, small | T2 | production | none (civilian) |  | Light | `Light-Salvage tender` |  | yard or ship mart | no |
 | `rr-shunt` |  | Rook and Rivet Shunt | Service, Tug | T2 | production | none (civilian) |  | Light | `Light-Tug` |  | yard or ship mart | no |
 | `rr-wrecker` |  | Rook and Rivet Wrecker | Service, Salvage tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Salvage tender` |  | yard or ship mart | no |
+| `rr-lazarus` |  | Rook and Rivet Lazarus | Service, Prototype recovery tender | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Recovery tender` |  | top of company standing, or story | no |
 
 ## The clans (belt)
 
@@ -219,11 +227,12 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `cor-miner` |  | Corvane Navvy | Subcraft, Mining subcraft | T2 | production | none (independent, no licence) |  | Subcraft | `Subcraft-Mining subcraft` |  | open market, anywhere | yes |
 | `cor-warden` |  | Corvane Warden | Destroyer, Corporate security escort | T2 | production | none (independent, no licence) |  | Heavy | `Heavy-Destroyer` |  | open market, anywhere | yes |
-| `cor-bulwark` |  | Corvane Bulwark | Cruiser, Corporate security, a mining fleet's bodyguard | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Cruiser` |  | open market, anywhere | yes |
+| `cor-bulwark` |  | Corvane Bulwark | Cruiser, Corporate security, a mining fleet's bodyguard (security command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (independent, no licence) |  | Super-heavy | `Super-heavy-Cruiser` |  | open market, anywhere | yes |
 | `cor-dray` |  | Corvane Dray | Bulk, Bulk ore freighter | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Bulk ore freighter` |  | open market, anywhere | no |
 | `cor-foreman` |  | Corvane Foreman | Industry, Factory ship, armed | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Factory ship` |  | open market, anywhere | yes |
 | `cor-smelter` |  | Corvane Smelter | Industry, Refinery ship, large | T2 | production | none (independent, no licence) |  | Super-heavy | `Super-heavy-Refinery ship` |  | open market, anywhere | no |
-| `cor-still` |  | Corvane Still | Industry, Gas refinery, capital | T2 | production | none (independent, no licence) |  | Capital | `Capital-Gas refinery` |  | open market, anywhere | no |
+| `cor-still` |  | Corvane Still | Industry, Gas refinery, capital (gas command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (independent, no licence) |  | Capital | `Capital-Gas refinery` |  | open market, anywhere | no |
+| `cor-colossus` |  | Corvane Colossus | Industry, Prototype gas refinery | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (independent, no licence) |  | Capital | `Capital-Prototype Gas refinery` |  | open market, anywhere | no |
 
 ## Aurel (aurel)
 

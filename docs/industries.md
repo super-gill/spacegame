@@ -126,6 +126,18 @@ So the fleet is complete for freight, passenger, rock mining, salvage, SAR, expl
 
 Names are proposals in each yard's vocabulary (Lavinia Planitia is a Venusian lowland; the company is new because Venus had no civil yard; winds for its hulls). Jason to confirm or rename.
 
+## Gas and ice on the mining loop
+
+Jason: reuse the current mining loop as much as possible; gas mining just has to be fun. The loop (`mining.md`) is survey, analyse, break, cut, collect. Mapped:
+
+- **Ice** is a rock. Ice bodies are rocks with an ice composition (water, volatiles) in the outer Belt and at the cold edges of systems; the same survey, analyse, break and cut, with an **ice cutter** as the laser's cold cousin (a laser melts ice and loses it; a cutter saws it) and canisters of ice as the loot. Nothing new in the loop; one new resource family, one new mount flavour, the Auger and the Cistern to carry it.
+- **Gas** keeps the loop and changes the rock. A gas giant's or Venus's upper air is divided into **bands** at depths: a band is the rock (seeded contents, a structure value that is its pressure), surveyed from above, analysed when locked, and **cut** by a skimmer's intake while the ship holds inside it. What makes it fun is the depth game: deeper bands are richer and hotter; a hull has a depth limit (its structure against the pressure) and a heat budget (the intake and the air heat it; radiators shed it); past the limit the hull takes damage and below the death line nothing comes back. Bands drift and storms move through them (a storm is a band that moves, with turbulence that pushes the ship), so a skim is a dive, a hold, and a climb out before the heat wins. Break has a gas version: a **charge** dropped into a band stirs a richer pocket up for a few seconds, at the cost of making the band violent. Collect is the intake itself (no canisters) into a gas hold, and the Cyclone or Still refines it. Pirates wait at the top of the dive, because a skimmer coming up is hot, slow and full.
+- **Rock** stays as built.
+
+## Bounty hunting, briefly
+
+Straightforward, with good examples to reference (EVE's bounties and kill rights, Elite's bounty and interdiction loop, Star Citizen's bounty tiers). Ours: the Registry's **bounty board** at every port lists wanted hulls with their last witnessed system and the price by rung; a hunter finds the hull (the board, the contacts list, informants at pirate ports for a cut), **tackles** it with civilian tackle (a burn inhibitor and a lock holder, below navy grade), and either disables and tows the hull in, or pops it and takes the pod into a **cell**; the Registry pays on delivery at a port of the power that posted it, more for the pod than the hull, and the record on the hull clears. Hunters are not navy: they have no rung behind them and no rules of engagement, which is why the Shrike exists and why bounty work is the independent's way into security.
+
 ## For the lead
 
 Industries map onto systems already on the roadmap; this page adds four things to design when industry comes: ice and gas as resource kinds with the skimming depth game; hidden holds and scan resistance; civilian tackle and the cell with the bounty board (Law); liquid holds. Nothing before milestone 7.

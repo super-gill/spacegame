@@ -559,7 +559,7 @@ For the lead, when wanted: a `generation` on each hull; a legacy hull is its own
 
 ### Legacy grid
 
-One earlier mark for each hull new pilots and NPC traffic actually use: small and medium classes and the working civilian jobs. Big ships have no legacy marks in circulation; navies scrap them or keep them.
+One earlier mark for each hull new pilots and NPC traffic actually use, and (Jason, 7 November) a variety of T1 and T2 at every size for civilian trade: so the freight ladder has a legacy mark from courier to bulk freighter. Only the capitals and the command ships have no legacy mark; navies scrap theirs or keep them.
 
 | Production hull | Legacy predecessor | Still around because |
 | --- | --- | --- |
@@ -583,6 +583,16 @@ One earlier mark for each hull new pilots and NPC traffic actually use: small an
 | Belt Forge Prospector | The old Prospector | Belters do not throw ships away |
 | Belt Forge Sinker | The old Sinker | Breaches like the new one, carries less |
 | Rook and Rivet Scrapper | The old Scrapper | Half of them are made of other Scrappers |
+| Tessaract Lading | Tessaract Bill | The bulk hull the Marches' ore moved in for a generation |
+| Tessaract Timetable | Tessaract Almanac | Slower, roomier, and the seats recline |
+| Arcadia Courier Mk IV | Arcadia Courier Mk III | Mars does not scrap |
+| Arcadia Shuttle Mk III | Arcadia Shuttle Mk II | Every Martian port's spare |
+| Arcadia Ice Hauler Mk II | Arcadia Ice Hauler Mk I | Still hauling |
+| Belt Forge Adit | The old Adit | Four bays, patched twice |
+| Belt Forge Collier | The old Collier | Carries less, breaks less |
+| Corvane Dray | The old Dray | Corvane sells them off when the furnaces no longer want them; the Black Strike buys |
+| Meridian Petrel | Meridian Shearwater | The taxi before the taxi |
+| Meridian Fulmar | Meridian Puffin | The commuter run's old bus |
 
 ### Pattern grid
 
@@ -621,6 +631,43 @@ Bespoke, rare, best at one thing. Standing with the clan, or a very rare sale. N
 | Saro Waystar | Survey ship | Charting: finds lanes nobody else can |
 | Long Wake Trawl | Recovery tender | Finding what everyone else gave up |
 | Long Wake Keel | Salvage tender | Bringing back whole what others bring back in pieces |
+
+## Command ships: the capital industrial hulls
+
+Jason's direction, 7 November 2026: the capital industrial ships are fleet support command ships for the later game, when the player is buying ships, hiring captains and supporting them with a large command ship that gives bonuses, defence and capability, particularly for operations in unsafe places. Every industry gets one. A command ship is a hull with a bay (subcraft and drones), a command suite (bonuses to the ships in its fleet), defence for the fleet (PDC coverage and a shield or armour umbrella in its radius), capability the small ships lack (refining, repair, a clinic, a cell block, a survey array), and a **fleet beacon**: a command ship is a jump target for its own fleet's T3 hulls and a rally point for everything else.
+
+| Industry | Command ship | Maker | What it gives the fleet |
+| --- | --- | --- | --- |
+| Rock mining | Belt Forge Headframe | Belt Forge | Mining yield and laser range for its fleet; on-board refining; mining subcraft and drone bays; ore transfer without docking |
+| Gas and ice | Lavinia Cyclone; Corvane Still | Lavinia; Corvane | Skimmer and ice-miner bonuses; gas and water refining; a heat sink that extends how deep its skimmers can go |
+| Freight | Tessaract Consignment (Convoy pattern) | Tessaract | Convoy cohesion: speed matching, PDC umbrella, cargo transfer, a market terminal that trades without docking |
+| Salvage | Rook and Rivet Breaker | Rook and Rivet | Salvage yield; on-board shipbreaking; hulk towing; the Grab's bay |
+| SAR and repair | Solace Sanctuary | Solace | Field repair and nanite resupply for the fleet; a hospital; pod recovery; the Mercy Clause's protection |
+| Exploration | Halden Expedition | Halden | Survey range and charting speed; long-range tanks for the fleet; a lab |
+| Security and bounty | Corvane Bulwark; later a Meridian command hull | Corvane; Meridian | Tackle range and lock speed for the fleet; a cell block; a bounty terminal |
+| Drones | Arbor Canopy (medium) and a capital Arbor hull later | Arbor | Drone control range and count |
+| Military | the carriers (Mandate, Hellas) and dreadnoughts | the naval yards | Fighters, fleet beacon, the navy's own command suite |
+
+For the lead, later: a **fleet** is a set of owned ships with hired captains (crew, costs and risks); a command ship applies its bonuses to fleet ships within its command radius; fleet ships follow, mine, haul or guard by order; the command ship's bay launches and recovers subcraft and drones; the beacon makes it a jump target. The bonuses are the reason to bring the big slow ship into the unsafe system, and its defence is the reason the fleet survives there. Each command ship also has a T3 prototype (below) at the top of its company's ladder.
+
+## Civil T3: prototypes
+
+Jason's direction, 7 November 2026: civil T3s follow the military shape. They are specialists, the best in the game at one civil job, below production at something else, never on the open market, and they may carry beyond-human tech to a degree: one gate-born or Lattice-derived component each, never a jump drive. One per civil company, at the top of company standing or a story.
+
+| Company | Prototype | Class | What it does that nothing else can | The Lattice in it |
+| --- | --- | --- | --- | --- |
+| Tessaract | Tessaract Covenant | Superfreighter | Carries a Consignment's load through Open space alone: a hold that survives the ship | A Lattice-laced hold frame that does not break when the hull does |
+| Arcadia | Arcadia Prototype Mk 0 | Bulk freighter | The state's answer to the Covenant: slower, armoured, and it refines in transit | Gate-glass heat exchangers |
+| Lavinia | Lavinia Tempest | Skimmer (heavy) | Skims below the death line and comes back | A Lattice heat sink that drinks a planet's air pressure |
+| Belt Forge | Belt Forge Lodestar | Factory ship | Finds and cuts gate-glass where survey scanners read nothing | A gate-glass resonator for a survey array |
+| Rook and Rivet | Rook and Rivet Lazarus | Recovery tender | Brings back a hulk nothing else can tow, and its crew | A Lattice tether that holds mass it should not |
+| Solace | Solace Grace | Hospital ship | Keeps a fleet alive under fire: repair and regen at a rate nothing human matches | Regen nanites grown on Lattice seed |
+| Halden | Halden Threshold | Explorer | Reads a broken gate; the first hull built to cross the Shoals, if a drive ever exists | Gate-glass sensors that see the lanes |
+| Arbor | Arbor Grove | Drone tender (capital) | Runs a drone swarm nothing else can control | A Lattice-derived control lattice, literally |
+| Corvane | Corvane Colossus | Gas refinery | Refines at a rate that makes a system's market move | Furnaces lined with gate-glass |
+| Meridian | none | | Meridian builds cheap; its prototype is the Tern, thirty years ago | |
+
+The clans' hulls (Saro Farwalker, Waystar; Long Wake Trawl, Dredge) are the Belt's civil T3s and stay as they are: no Lattice, just generations of knowing.
 
 ## Same job, different hulls
 
