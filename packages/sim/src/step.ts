@@ -1,4 +1,4 @@
-import { stepBurn } from './burn.js';
+import { burnRefusal, stepBurn } from './burn.js';
 import { thinkNpcs } from './ai/index.js';
 import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
 import { goodsFitting } from './goods.js';
@@ -130,6 +130,12 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   // 2. Per-ship. Sorted so results never depend on object insertion order.
   for (const id of Object.keys(world.ships).sort()) {
     let ship = world.ships[id]!;
+    // An NPC that asked for a burn starts it now, if it may (burn.ts), as a pilot's command would.
+    const wantsBurn = npc.burns[id];
+    if (wantsBurn && !ship.burn && burnRefusal(world, ship, wantsBurn) === null) {
+      ship = { ...ship, burn: { targetId: wantsBurn, startTick: world.tick } };
+      events.push({ type: 'burnStarted', shipId: id, targetId: wantsBurn });
+    }
     const crewed = aboard[id] !== undefined || world.npcs[id] !== undefined;
     const given = inputs[id] ?? npc.inputs[id] ?? (crewed ? emptyInput() : null);
     const input = given ?? emptyInput();

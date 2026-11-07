@@ -1,4 +1,4 @@
-import { bodyStates, burnAcceleration, burnPlan, burnableBody, laneLegs, railTime, relayNet, securityAt, worldLanes, RELAY_RANGE, type BurnPlan, type RelayNet, type SecurityReading, type Ship, type Station, type StationHolder, type World } from '@spacegame/sim';
+import { bodyStates, burnAcceleration, burnPlan, burnableBody, laneLegs, railTime, relayNet, securityAt, worldLanes, RELAY_RANGE, type BurnPlan, type RelayNet, type SecurityReading, type Ship, type Station, type StationHolder, type TrafficContact, type World } from '@spacegame/sim';
 import { POWER_COLOUR } from '../render/ship-art.js';
 import type { PlotKind } from './plot-rows.js';
 
@@ -81,6 +81,16 @@ export function minutesSeconds(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
+
+/** Traffic marks by role: traders and miners neutral, patrols white as in flight, pirates red, other pilots ink, unknown plumes amber. */
+const TRAFFIC_COLOUR: Record<TrafficContact['role'], string> = {
+  trader: '#9fd3c7',
+  miner: '#9fd3c7',
+  patrol: '#f2f5f7',
+  pirate: '#e05a4f',
+  pilot: '#dffbf3',
+  unknown: '#e0a458',
+};
 
 /** The lanes' bands, from the approved mockup. */
 const LANE_COLOUR = 'rgba(159, 211, 199, 0.16)';
@@ -259,6 +269,14 @@ function drawLegend(ctx: CanvasRenderingContext2D, h: number, lanes: boolean): v
   diamond(x + 190, 4, '#6a988f');
   ctx.fillStyle = '#9fd3c7';
   ctx.fillText('PORT', x + 202, y);
+  // Traffic: a ship the Relay or its transponder tells you about.
+  const tx = x + 250;
+  ctx.beginPath();
+  ctx.moveTo(tx + 6, y);
+  ctx.lineTo(tx - 3, y - 4);
+  ctx.lineTo(tx - 3, y + 4);
+  ctx.fill();
+  ctx.fillText('SHIP HEARD', tx + 12, y);
 }
 
 /** The point `share` (0 to 1) of the way along a plan's route by distance, for marking the flip. */
@@ -426,8 +444,12 @@ export class Chart {
     if (best) this.actions.pick(best.kind, best.id);
   }
 
-  /** Redraw: the world as this pilot sees it, their ship, and the nav target if it is a port or a world. */
-  update(world: World, ship: Ship | null, targetId: string | null): void {
+  /**
+   * Redraw: the world as this pilot sees it, their ship, the nav target if
+   * it is a port or a world, and the traffic the server last sent
+   * (`trafficAge` seconds ago, so marks move on between lists).
+   */
+  update(world: World, ship: Ship | null, targetId: string | null, traffic: readonly TrafficContact[] = [], trafficAge = 0): void {
     if (!this.open) return;
     this.selectedId = targetId;
     const dpr = window.devicePixelRatio || 1;
@@ -565,6 +587,45 @@ export class Chart {
       ctx.closePath();
       ctx.fill();
       labels.push({ text: station.name.toUpperCase(), x: at.x, y: at.y, r: d, style: 'port', colour: on ? '#dffbf3' : major ? '#9fd3c7' : '#6a988f', priority: on ? 0 : portPriority(station) });
+    }
+
+    // Traffic: ships the Relay, a transponder or a plume tells you about (traffic.ts). A burning ship's line runs to where it is going.
+    const age = Math.min(trafficAge, 3);
+    for (const t of traffic) {
+      const now = { x: t.position.x + t.velocity.x * age, y: t.position.y + t.velocity.y * age };
+      const at = toScreen(now);
+      const colour = TRAFFIC_COLOUR[t.role];
+      if (t.burningTo) {
+        const dest = world.stations[t.burningTo]?.position ?? (world.bodies[t.burningTo] ? bodyStates(world.bodies, time)[t.burningTo]?.position : undefined);
+        if (dest) {
+          const to = toScreen(dest);
+          ctx.strokeStyle = colour;
+          ctx.globalAlpha = 0.35;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 5]);
+          ctx.beginPath();
+          ctx.moveTo(at.x, at.y);
+          ctx.lineTo(to.x, to.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.globalAlpha = 1;
+        }
+      }
+      if (at.x < -20 || at.y < -20 || at.x > w + 20 || at.y > h + 20) continue;
+      // A small triangle pointing the way it moves.
+      const heading = Math.atan2(t.velocity.y, t.velocity.x);
+      const moving = Math.hypot(t.velocity.x, t.velocity.y) > 1;
+      ctx.fillStyle = colour;
+      ctx.beginPath();
+      if (moving) {
+        ctx.moveTo(at.x + Math.cos(heading) * 6, at.y + Math.sin(heading) * 6);
+        ctx.lineTo(at.x + Math.cos(heading + 2.5) * 4, at.y + Math.sin(heading + 2.5) * 4);
+        ctx.lineTo(at.x + Math.cos(heading - 2.5) * 4, at.y + Math.sin(heading - 2.5) * 4);
+      } else {
+        ctx.arc(at.x, at.y, 2.5, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      labels.push({ text: t.label ?? (t.burningTo ? 'PLUME · DARK' : 'CONTACT'), x: at.x, y: at.y, r: 4, style: 'port', colour, priority: 7 });
     }
 
     // Names, best first, each only where it does not cover one already placed.

@@ -6,7 +6,7 @@ import { deflateRawSync } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket } from 'ws';
-import { PROTOCOL_VERSION, WORLD_IDS, diffWorld, readCommand, readInput, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type ServerKind, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
+import { PROTOCOL_VERSION, WORLD_IDS, chartTraffic, diffWorld, readCommand, readInput, readWorldId, visibleEvents, visibleWorld, type ClientMessage, type KickReason, type ServerMessage, type ServerKind, type World, type WorldEvent, type WorldId } from '@spacegame/sim';
 import { Accounts, type Character } from './accounts.js';
 import { ServerStats } from './stats.js';
 import { Storage } from './storage.js';
@@ -193,6 +193,28 @@ function update(): void {
   }
 }
 
+/** How often each player's chart traffic goes out, ticks: about once a second (traffic.ts). */
+const TRAFFIC_EVERY_TICKS = 60;
+
+/**
+ * Send every player in a world with traffic (Sol) the ships their chart
+ * shows beyond their radar: through the Relay, in range of a transponder,
+ * or burning (traffic.ts). Separate from the per-tick update, and slow, so
+ * the chart can show Sol's traffic without every ship going to every
+ * player every tick.
+ */
+function sendTraffic(): void {
+  for (const connection of connections) {
+    if (!connection.character || !connection.worldId) continue;
+    const now = games[connection.worldId].current;
+    if (now.system !== 'sol' || connection.socket.bufferedAmount > MAX_BUFFERED_BYTES) continue;
+    const message: ServerMessage = { t: 'traffic', tick: now.tick, ships: chartTraffic(now, connection.character.pilotId) };
+    const text = JSON.stringify(message);
+    connection.socket.send(text);
+    stats.sent(performance.now(), text.length, connection.character.name);
+  }
+}
+
 // The tick loop: catch up on whole ticks, so the worlds run at their own pace whatever the timer does.
 const tickMs = games.persistent.current.dt * 1000;
 let due = performance.now();
@@ -207,6 +229,7 @@ setInterval(() => {
     stats.tick(started, performance.now() - started);
     ticks++;
     if (ticks % UPDATE_EVERY_TICKS === 0) update();
+    if (ticks % TRAFFIC_EVERY_TICKS === 0) sendTraffic();
     due += tickMs;
   }
 }, 4);

@@ -23,6 +23,8 @@ export interface NpcDecisions {
   events: WorldEvent[];
   /** NPC ships leaving the sector this tick. */
   departures: string[];
+  /** Burns NPCs want to start this tick: ship id to target id (burn.ts; step.ts checks and starts them). */
+  burns: Record<string, string>;
 }
 
 export function thinkNpcs(world: World): NpcDecisions {
@@ -30,6 +32,7 @@ export function thinkNpcs(world: World): NpcDecisions {
   const npcs: World['npcs'] = {};
   const events: WorldEvent[] = [];
   const departures: string[] = [];
+  const burns: Record<string, string> = {};
 
   for (const shipId of Object.keys(world.npcs).sort()) {
     const brain = world.npcs[shipId]!;
@@ -45,6 +48,7 @@ export function thinkNpcs(world: World): NpcDecisions {
       const t = thinkTrader(world, ship, stats, brain);
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
+      if (t.burn) burns[shipId] = t.burn;
     } else if (brain.kind === 'miner') {
       const t = thinkMiner(world, ship, stats, brain);
       inputs[shipId] = t.input;
@@ -62,6 +66,7 @@ export function thinkNpcs(world: World): NpcDecisions {
       inputs[shipId] = t.input;
       npcs[shipId] = t.brain;
       events.push(...t.events);
+      if (t.burn) burns[shipId] = t.burn;
     } else {
       const t = thinkPirate(world, ship, stats, brain);
       inputs[shipId] = t.input;
@@ -76,7 +81,7 @@ export function thinkNpcs(world: World): NpcDecisions {
     const stats = shipStats(world, ship);
     if (wantsCountermeasure(world, ship, stats)) inputs[shipId] = { ...inputs[shipId]!, launchCountermeasure: true };
   }
-  return { inputs, npcs, events, departures };
+  return { inputs, npcs, events, departures, burns };
 }
 
 export { PIRATE_TUNING, inSecurityZone } from './pirate.js';

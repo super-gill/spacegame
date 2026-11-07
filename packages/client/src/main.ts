@@ -41,6 +41,8 @@ import {
   sub,
   type Vec2,
   type World,
+  NAVY_NAMES,
+  type TrafficContact,
 } from '@spacegame/sim';
 import { Camera } from './camera.js';
 import { ControlsPanel } from './controls-panel.js';
@@ -814,7 +816,12 @@ function updated(changed: WorldUpdate, events: WorldEvent[], nowMs: number): voi
   }
 }
 
+/** The chart's traffic (traffic.ts): the last list the server sent, and when it came, so marks can move on between lists. */
+let traffic: { ships: TrafficContact[]; atMs: number } = { ships: [], atMs: 0 };
 link.listen({
+  traffic: (_tick, ships) => {
+    traffic = { ships, atMs: performance.now() };
+  },
   update: (_tick, changed, events) => updated(changed, events, performance.now()),
   outcome: (command, outcome) => received(command, outcome),
   latency: (ms) => meter.show(ms),
@@ -892,7 +899,8 @@ function shipStyle(world: World, ship: Ship, mine: Ship | null): ShipStyle {
   if (brain?.kind === 'miner') return { colour: COLOUR.neutral, label: 'MINER' };
   if (brain?.kind === 'drone') return { colour: ship.ownerId === me.id ? COLOUR.ink : COLOUR.inkDim, label: `DRONE ${(ship.droneId ?? '').toUpperCase()}` };
   // The Watch flies the pirates' hull, so it must read differently: Port Authority white.
-  if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: 'CALDER WATCH' };
+  // In Sol, a patrol says its navy (ECF, MRN, VSG, UDF).
+  if (brain?.kind === 'watch') return { colour: '#f2f5f7', label: brain.power ? `${NAVY_NAMES[brain.power]} PATROL` : 'CALDER WATCH' };
   if (isEmptyShip(world, ship)) {
     // Yours stand out from other pilots' parked ships.
     if (ship.ownerId === me.id) return { colour: COLOUR.ink, label: `YOUR ${shipName(world, ship).toUpperCase()} · EMPTY`, empty: true };
@@ -1095,7 +1103,7 @@ function render(alpha: number, frameSeconds: number, nowMs: number): void {
   ui.update(current, mine);
   const burnTargetId = navTarget?.kind === 'station' || navTarget?.kind === 'body' ? navTarget.id : null;
   burnPanel.update(current, mine, burnTargetId);
-  chart.update(current, mine, burnTargetId);
+  chart.update(current, mine, burnTargetId, traffic.ships, (performance.now() - traffic.atMs) / 1000);
   if (arenaSetup) {
     // Between fights: no ship and no arena running (a decided fight still shows for a moment).
     if (!mine && !current.pilots[me.id]?.arena) arenaSetup.show(arenaResult);

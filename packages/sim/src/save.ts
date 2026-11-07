@@ -962,10 +962,27 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   if (Object.keys(added).length > 0) Object.assign(stations, placeStations(world.bodies, added, world.tick, world.dt));
   // NPC spawners added since the save was made join it (miners, say); those it has keep their state.
   const known = new Set(world.spawners.map((sp) => sp.id));
-  const spawners = [...world.spawners, ...(sol ?? createStarterWorld()).spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];
+  const design = (sol ?? createStarterWorld()).spawners;
+  const fresh = design.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }));
+  let spawners = [...world.spawners, ...fresh];
+  let npcs = world.npcs;
+  if (sol) {
+    // Sol's NPCs are design data too: a spawner the design dropped goes, with its NPC if nobody is aboard
+    // (slice 2 moved the Ceres pirate out to contested space), and the rest take the design's template, keeping their state.
+    const byId = new Map(design.map((sp) => [sp.id, sp]));
+    const aboardIds = new Set(Object.values(world.pilots).map((p) => p.shipId));
+    npcs = { ...world.npcs };
+    for (const sp of spawners) {
+      if (byId.has(sp.id) || !sp.shipId || aboardIds.has(sp.shipId)) continue;
+      delete ships[sp.shipId];
+      delete npcs[sp.shipId];
+    }
+    spawners = spawners.filter((sp) => byId.has(sp.id)).map((sp) => ({ ...byId.get(sp.id)!, shipId: sp.shipId, timerTicks: sp.timerTicks, spawned: sp.spawned }));
+  }
   const loaded: World = {
       ...world,
       ships,
+      npcs,
       stations,
       spawners,
       projectiles,

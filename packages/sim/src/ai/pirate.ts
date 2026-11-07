@@ -1,5 +1,6 @@
 import { angleDelta } from '../angle.js';
 import { leadPoint } from '../combat.js';
+import { guardedStations } from '../relay.js';
 import { isEmptyShip, isEscapePod } from '../ownership.js';
 import type { ShipStats, PirateBrain, PirateMode, Ship, ShipInput, World, WorldEvent } from '../types.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle, type Vec2 } from '../vec2.js';
@@ -89,9 +90,13 @@ export interface PirateThought {
   depart?: boolean;
 }
 
-/** True if the point is inside any station's security zone, optionally widened by `margin`. */
+/**
+ * True if the point is inside a guarded station's security zone, optionally
+ * widened by `margin`. In Sol only ports in Core or Held space are guarded
+ * (relay.ts `guardedStations`); in Calder, all.
+ */
 export function inSecurityZone(world: World, point: Vec2, margin = 0): boolean {
-  return Object.values(world.stations).some((s) => distance(point, s.position) < s.securityRadius + margin);
+  return guardedStations(world).some((s) => distance(point, s.position) < s.securityRadius + margin);
 }
 
 /** Extra room pirates give a security zone's edge when routing round it, units. */
@@ -108,7 +113,7 @@ const ZONE_CRAWL = 40;
  */
 function keepOutOfZones(world: World, ship: Ship, stats: ShipStats, desired: Vec2): Vec2 {
   let nearest: { at: Vec2; room: number } | null = null;
-  for (const s of Object.values(world.stations)) {
+  for (const s of guardedStations(world)) {
     const room = distance(ship.position, s.position) - s.securityRadius - ZONE_MARGIN;
     if (!nearest || room < nearest.room) nearest = { at: s.position, room };
   }
@@ -124,7 +129,7 @@ function keepOutOfZones(world: World, ship: Ship, stats: ShipStats, desired: Vec
  * every station's security zone, which it will not cross.
  */
 function avoid(world: World, around: readonly Obstacle[]): Obstacle[] {
-  const zones = Object.values(world.stations).map((st) => ({ position: st.position, radius: st.securityRadius + ZONE_MARGIN }));
+  const zones = guardedStations(world).map((st) => ({ position: st.position, radius: st.securityRadius + ZONE_MARGIN }));
   return [...around, ...zones];
 }
 
@@ -141,6 +146,8 @@ function switchMode(brain: PirateBrain, mode: PirateMode, extra: Partial<PirateB
  */
 function worthHunting(world: World, ship: Ship): boolean {
   if (isEmptyShip(world, ship)) return false;
+  // A ship mid-burn is far too fast to catch: interceptors wait for it to arrive.
+  if (ship.burn) return false;
   return PIRATE_TUNING.huntPods || !isEscapePod(world, ship);
 }
 

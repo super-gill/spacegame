@@ -1418,6 +1418,8 @@ export interface TraderBrain {
  */
 export interface WatchBrain {
   kind: 'watch';
+  /** Whose navy it flies for (Sol). Absent: the Calder Watch. */
+  power?: PowerId;
   /** Station ids the beat runs past, in order. */
   beat: string[];
   /** Index into `beat` of the station it is heading for. */

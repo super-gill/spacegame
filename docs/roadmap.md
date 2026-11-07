@@ -34,7 +34,7 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 
 **The rule for new ideas:** anything not on this list goes, as one line, into the ideas inbox in `docs/coordination.md`, marked parked. The inbox is looked at between milestones of this list, not during one. If the lead thinks an idea should jump the queue, the lead says why and Jason decides.
 
-1. **Sol's world** (`docs/sol-build.md`, slice 2): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
+1. **Sol's world** (`docs/sol-build.md`, slice 2; **built** 7 November 2026, to release as 0.19.0 once Jason has flown it): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
 2. **The first fleet:** today's eleven hulls swapped for the lore's in-game set (`docs/hulls.md`), only the hulls the starts, the Sol traffic and the patrols need (about 15 to 20), with stock fits. Before the starts, which need them.
 3. **The eight starts** (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
 4. **The money loop across Sol:** trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.

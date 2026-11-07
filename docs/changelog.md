@@ -4,9 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-Sol slice 2, pushes 1 to 3: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes; the Accord's Relay and security worked out from it.
+Sol slice 2: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes; the Accord's Relay and security worked out from it; traffic that burns, patrols by navy, pirates where nobody answers, and ships on the chart.
 
 ### Added
+- **Traffic across Sol.** Traders burn along every lane and out to the far ports; each navy patrols its own space (ECF round Earth, VSG round Venus, the MRN on the Accord lanes, the UDF on the Belt Lane), labelled by navy; pirates wait at Psyche Dig, the Ganymede Local and Hilda Moot, where nobody answers a call.
+- **Ships on the chart.** A ship squawking its transponder shows on the chart, named, if a relay buoy hears it, or if you are within its transponder's own range; a ship running dark does not, unless it is burning, when its plume shows with no name. Burns are drawn to where they are going. In Open space, ships vanish from the chart.
 - **Security on the chart, worked out from the Relay.** The Accord's relay buoys ring the lane ports and navy bases, chain along the lanes and sit singly at other ports; none at the clans' moots or past Saturn but the Gate Lane. Where two buoys hear you and a base is a short burn away is Core; covered but thin or far is Held; where neighbouring holders quarrel (Psyche, Jupiter's moons) is Contested; where nobody hears is Open. The chart shades it with each buoy's reach as a faint circle (Core teal, Held in the holder's colour, Contested amber), rings each port in its level when zoomed out, says which you are in at the top, and the burn plan says what you arrive in.
 - **All of Sol's ports: 31 now, up from six.** Venus's Solace Station Mercy, Lavinia Alpha Dock and Halden Beta Regio Observatory; round Earth, the ECF and Tessaract yards at the Lagrange points, Tycho Port on Luna, Corvane Apollo Works and Rook and Rivet Shell Station; Corvane Caloris Foundry at Mercury; MRN Yard Phobos, State Yard Deimos and State Mine Eureka at Mars; in the Belt, Vesta Concession, Psyche Dig, Bellows, the Boneyard and Hilda Moot; out past Jupiter, Callisto Freight Depot, the Ganymede Local, VSG Haven Europa, Rimehold, Plume and Triton Moot; and the ECF Toll Station and MRN Gate Station at the Gate Reach. Each trades, outfits and sells ships by what it is: foundries pay best for ore, salvage ports for scrap, clinics sell medicine cheap, the far outposts pay dear for everything brought in. A port's card says who runs it. Existing worlds gain them on their next start.
 - **The Accord lanes on the chart:** the Inner, Ceres, Belt, Long and Gate lanes as wide bands between their ports, named, with a key.
@@ -16,6 +18,9 @@ Sol slice 2, pushes 1 to 3: worlds as burn targets, the pass round a world, the 
 - **The chart zooms and pans.** The wheel zooms about the pointer, dragging moves the chart; zoomed all the way out it locks on the Sun with all of Sol in view. LOCAL, INNER, BELT and ALL SOL remain as quick jumps.
 
 ### Changed
+- A port's protected zone holds only where security is Core or Held: at a Contested or Open port, pirates hunt up to the door. Pirates never chase a ship mid-burn, and the Ceres field's pirate has moved out to contested space.
+- A ship mid-burn no longer rams other ships; it still hits worlds.
+- The game runs faster with many ships about: a ship's performance is worked out once per change of fit or cargo instead of many times a tick.
 - The chart places names so they never overlap: worlds, capitals and free ports first, the rest as you zoom in. Capitals and free ports have a larger mark.
 - A burn to or from a port in low orbit or dug into a rock passes round the world at the port's height instead of climbing out first. Flying in to Rook and Rivet Shell Station no longer circles Earth.
 - Hitting a world at burn speed (2,000 u/s or more) loses the pod too: nothing gets away, and you wake at your home station with what you own elsewhere, as after losing a pod. Slower falls still end the ship and the nearest port recovers your pod.

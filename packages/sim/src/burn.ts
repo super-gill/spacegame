@@ -379,15 +379,26 @@ function pilotsShip(world: World, pilotId: string): Ship | null {
 export function startBurn(world: World, pilotId: string, targetId: string | null): CommandResult<BurnRefusal> {
   const ship = pilotsShip(world, pilotId);
   if (!ship) return { ok: false, world, reason: 'noShip' };
-  if (ship.state !== 'flying') return { ok: false, world, reason: 'notFlying' };
-  if (burnAcceleration(world, ship) <= 0) return { ok: false, world, reason: 'cannotBurn' };
-  if (targetId !== null) {
-    const target = burnTarget(world, world.stations, targetId, railTime(world.tick, world.dt));
-    if (!target) return { ok: false, world, reason: 'unknownTarget' };
-    if (distance(ship.position, burnEndPoint(target, ship.position)) < BURN_MIN_DISTANCE) return { ok: false, world, reason: 'tooClose' };
-  }
+  const refusal = burnRefusal(world, ship, targetId);
+  if (refusal) return { ok: false, world, reason: refusal };
   const burning: Ship = { ...ship, burn: { targetId, startTick: world.tick } };
   return { ok: true, world: { ...world, ships: { ...world.ships, [ship.id]: burning } }, event: { type: 'burnStarted', shipId: ship.id, targetId } };
+}
+
+/**
+ * Why `ship` cannot burn for `targetId` (null: a braking burn) right now,
+ * or null if it can. Pilots go through `startBurn`; NPCs ask for a burn in
+ * their decisions and step.ts checks it here.
+ */
+export function burnRefusal(world: World, ship: Ship, targetId: string | null): BurnRefusal | null {
+  if (ship.state !== 'flying') return 'notFlying';
+  if (burnAcceleration(world, ship) <= 0) return 'cannotBurn';
+  if (targetId !== null) {
+    const target = burnTarget(world, world.stations, targetId, railTime(world.tick, world.dt));
+    if (!target) return 'unknownTarget';
+    if (distance(ship.position, burnEndPoint(target, ship.position)) < BURN_MIN_DISTANCE) return 'tooClose';
+  }
+  return null;
 }
 
 /** Stop the drive. The ship keeps its speed and coasts. */

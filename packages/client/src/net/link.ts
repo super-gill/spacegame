@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type ServerKind, type WorldId, type WorldUpdate } from '@spacegame/sim';
+import { PROTOCOL_VERSION, type ClientMessage, type CommandReply, type KickReason, type LoginRefusal, type PilotCommand, type ServerMessage, type ShipInput, type World, type WorldEvent, type ServerKind, type WorldId, type WorldUpdate, type TrafficContact } from '@spacegame/sim';
 
 /**
  * The client's end of the connection to the server (docs/shared-world.md).
@@ -32,6 +32,8 @@ export interface LinkListener {
   latency(ms: number): void;
   /** The connection ended: kicked with a reason, or simply lost (null). */
   closed(reason: KickReason | null): void;
+  /** Ships the chart shows beyond radar, about once a second (Sol only). */
+  traffic?(tick: number, ships: TrafficContact[]): void;
 }
 
 /** How often to measure the round trip, ms. */
@@ -162,6 +164,9 @@ export class Link {
       }
       case 'pong':
         this.listener?.latency(performance.now() - message.sent);
+        return;
+      case 'traffic':
+        this.listener?.traffic?.(message.tick, message.ships);
         return;
       case 'kicked':
         this.kickedFor = message.reason;

@@ -1,5 +1,6 @@
 import type { PilotCommand } from './commands.js';
 import type { Asteroid, Ship, ShipInput, World, WorldEvent } from './types.js';
+import type { TrafficContact } from './traffic.js';
 
 /**
  * The messages between a client and the server (docs/shared-world.md).
@@ -190,6 +191,8 @@ export type ServerMessage =
   /** What a command did (the world change itself comes in the next update). */
   | { t: 'outcome'; id: number; outcome: CommandReply }
   | { t: 'pong'; sent: number }
+  /** Ships this pilot's chart shows beyond their radar (traffic.ts), about once a second. Sol only. Older clients ignore it. */
+  | { t: 'traffic'; tick: number; ships: TrafficContact[] }
   /** The server is closing this connection, and why. */
   | { t: 'kicked'; reason: KickReason };
 

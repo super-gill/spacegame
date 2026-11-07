@@ -5,11 +5,13 @@ import type { Ship, ShipInput, ShipStats, WatchBrain, World, WorldEvent } from '
 import { bodyPosition } from '../rails.js';
 import { add, distance, fromAngle, normalise, scale, sub, toAngle } from '../vec2.js';
 import { emptyInput } from '../world.js';
+import { farFrom } from './travel.js';
 import { arriveVelocity, attackRun, awayFromStation, canAfford, holdLock, mainGun, missileInputs, obstacles, flightOn, routeAround, steerSafely, travelVelocity } from './steer.js';
 
 /**
- * The Calder Watch: the port's own patrol (docs/lore.md, "Who flies in
- * Calder").
+ * A patrol: the Calder Watch in Calder (docs/lore.md, "Who flies in
+ * Calder"), and in Sol each power's navy on its own beat (`power`; sol.md,
+ * "The navies in Sol"), burning between stations that are far apart.
  *
  * - patrol: fly to a point just outside the next station's security zone
  *   on the side facing the next station on the beat, hold there a while,
@@ -57,6 +59,8 @@ export interface WatchThought {
   input: ShipInput;
   brain: WatchBrain;
   events: WorldEvent[];
+  /** A burn to ask for (ai/travel.ts): the next station on the beat is far. */
+  burn?: string;
 }
 
 /**
@@ -113,6 +117,9 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
     if (b.modeTicks * world.dt < WATCH_TUNING.launchSeconds) return { input: emptyInput(), brain: b, events };
     return { input: { ...emptyInput(), toggleDock: true }, brain: { ...b, mode: 'patrol', modeTicks: 0 }, events };
   }
+
+  // Burning between stations on its beat: the burn flies it, and it can neither lock nor fight until it arrives.
+  if (ship.burn) return { input: emptyInput(), brain: { ...b, mode: 'patrol', targetId: null, modeTicks: 0 }, events };
 
   const strongEnough = ship.structure >= stats.structure * WATCH_TUNING.breakOffFraction;
 
@@ -175,6 +182,8 @@ export function thinkWatch(world: World, ship: Ship, stats: ShipStats, brain: Wa
   const here = world.stations[b.beat[b.leg % b.beat.length] ?? ''];
   const next = world.stations[b.beat[(b.leg + 1) % b.beat.length] ?? ''];
   if (!here) return { input: { ...emptyInput(), ...tidy }, brain: b, events };
+  // A beat across Sol: the next station is a burn away (ai/travel.ts). Calder's beats are all near.
+  if (farFrom(ship, here)) return { input: { ...emptyInput(), ...tidy }, brain: { ...b, modeTicks: 0 }, events, burn: here.id };
   // Off a station orbiting a planet or moon, the beat point is on the far
   // side from the body (never inside it); otherwise it faces the next stop.
   const parentId = here.orbit?.parent;

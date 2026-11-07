@@ -133,8 +133,10 @@ export function collideShips(ships: Record<string, Ship>, statsFor: (ship: Ship)
   const out: Record<string, Ship> = { ...ships };
   const events: WorldEvent[] = [];
   const damage: Damage[] = [];
+  // A ship mid-burn passes others at thousands of units a second: at these scales a crossing is a near miss,
+  // and the lanes are swept (lore, infrastructure.md). It still hits worlds (step.ts).
   const ids = Object.keys(out)
-    .filter((id) => out[id]!.state === 'flying')
+    .filter((id) => out[id]!.state === 'flying' && !out[id]!.burn)
     .sort();
 
   for (let i = 0; i < ids.length; i++) {

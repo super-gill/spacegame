@@ -235,3 +235,41 @@ export function securityAt(net: RelayNet, p: Vec2): SecurityReading {
   if (hearing.length >= 2 && baseSeconds !== null && baseSeconds <= CORE_BURN_SECONDS) return { level: 'core', ...reading };
   return { level: 'held', ...reading };
 }
+
+/** The Relay by stations object: a world's stations only change object when one moves, so it stays valid until then. */
+const netCache = new WeakMap<object, RelayNet>();
+
+/** `relayNet(world)` with every buoy up, worked out once per set of port positions. */
+export function currentRelayNet(world: Pick<World, 'system' | 'stations' | 'bodies'>): RelayNet {
+  const cached = netCache.get(world.stations);
+  if (cached) return cached;
+  const net = relayNet(world);
+  netCache.set(world.stations, net);
+  return net;
+}
+
+/** Guarded stations, kept the same way. */
+const guardedCache = new WeakMap<object, Station[]>();
+
+/**
+ * The stations whose protected zone is answered (docs/sol-build.md, slice
+ * 2, push 4): in Sol, those whose place reads Core or Held; at a Contested
+ * or Open port nobody comes, so pirates work up to the door, which is
+ * where the lore puts its interceptors. In a system with no Relay
+ * (Calder), every station's zone holds, as it always has.
+ */
+export function guardedStations(world: Pick<World, 'system' | 'stations' | 'bodies'>): Station[] {
+  const cached = guardedCache.get(world.stations);
+  if (cached) return cached;
+  const all = Object.values(world.stations);
+  let guarded = all;
+  if (world.system === 'sol') {
+    const net = currentRelayNet(world);
+    guarded = all.filter((s) => {
+      const level = securityAt(net, s.position).level;
+      return level === 'core' || level === 'held';
+    });
+  }
+  guardedCache.set(world.stations, guarded);
+  return guarded;
+}

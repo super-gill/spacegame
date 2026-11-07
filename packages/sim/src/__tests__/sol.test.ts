@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bendSpeed, burnPlan, burnRoute, startBurn, cancelBurn, burnAcceleration } from '../burn.js';
+import { bendSpeed, burnPlan, startBurn, cancelBurn, burnAcceleration } from '../burn.js';
 import { BURN_BODY_MARGIN, FIXED_DT } from '../constants.js';
 import { applyCommand, readCommand } from '../commands.js';
 import { deserializeWorld, serializeWorld } from '../save.js';

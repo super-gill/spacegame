@@ -5,12 +5,14 @@ import { bodyPosition } from '../rails.js';
 import { add, distance, normalise, scale, sub } from '../vec2.js';
 import { emptyInput } from '../world.js';
 import { awayFromStation, obstacles, flightOn, routeAround, steerSafely, travelVelocity } from './steer.js';
+import { travelTo } from './travel.js';
 
 /**
  * Trader: flies a loop of stations, docking at each for a while.
  *
  * Docked: count down, then undock and head for the next station.
- * Flying: approach the destination's near side, match its velocity (it
+ * Far (Sol's ports are millions of units apart): clear the port and burn
+ * there (ai/travel.ts). Near: approach the destination's near side, match its velocity (it
  * moves on its orbit), and dock once inside dock range and below the
  * docking speed limit relative to it. A refused dock
  * just means trying again next tick.
@@ -79,6 +81,8 @@ export function defend(world: World, ship: Ship, input: ShipInput): ShipInput {
 export interface TraderThought {
   input: ShipInput;
   brain: TraderBrain;
+  /** A burn to ask for (ai/travel.ts): the next stop is far. */
+  burn?: string;
 }
 
 export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: TraderBrain): TraderThought {
@@ -97,13 +101,14 @@ export function thinkTrader(world: World, ship: Ship, stats: ShipStats, brain: T
 
   const leftId = brain.route[(brain.leg + brain.route.length - 1) % brain.route.length];
   const left = leftId ? world.stations[leftId] : undefined;
-  const flight = flyToStation(world, ship, stats, station, left);
+  // Near, it flies there; far (Sol), it burns (ai/travel.ts).
+  const flight = travelTo(world, ship, stats, station, left);
   if (flight.dock) {
     // Set the dwell now; if the dock is refused, the next tick tries again.
     const dwell = Math.round(TRADER_TUNING.dwellSeconds / world.dt);
     return { input: { ...emptyInput(), toggleDock: true }, brain: { ...brain, waitTicks: dwell } };
   }
-  return { input: defend(world, ship, flight.input), brain };
+  return { input: ship.burn ? flight.input : defend(world, ship, flight.input), brain, ...(flight.burn ? { burn: flight.burn } : {}) };
 }
 
 /**

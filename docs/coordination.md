@@ -170,6 +170,16 @@ Sol slice 2, push 1 contracts (on `main` from 7 November 2026; `docs/sol-build.m
 - **Pod death** (`constants.ts`, `types.ts`, `lifecycle.ts`): `FALL_POD_FATAL_SPEED` (2,000); `Ship.podLost` set with `fellInto` (transient, like it); event `podLost` (`shipId`, `pilotId`, `bodyId`), to that pilot only; the pilot is left with `shipId` null and wakes with `wake`.
 - **Client:** `PlotKind` gains `body` (a world picked on the chart; no board rows); `plotPosition` and `plotName` know it; the chart's `pick(kind, id)`.
 
+Sol slice 2, push 4 contracts (on `main` from 7 November 2026; `docs/sol-build.md`, "As built: slice 2, push 4"):
+
+- **NPC burns** (`ai/index.ts`, `burn.ts`, `ai/travel.ts`): `NpcDecisions.burns` (ship id to target id); the step starts each if `burnRefusal(world, ship, targetId)` is null, with `burnStarted`. `burnRefusal` is the one check pilots and NPCs share. `travelTo(world, ship, stats, station, left)` and `farFrom(ship, station)`, `FAR_FACTOR`. `TraderThought.burn`, `WatchThought.burn`.
+- **Patrols** (`types.ts`): `WatchBrain.power` (optional `PowerId`; absent is the Calder Watch).
+- **Guarded zones** (`relay.ts`): `guardedStations(world)`, cached per stations object; `inSecurityZone` and the pirates' zone avoidance use it. `currentRelayNet(world)`, the Relay with every buoy up, cached the same way.
+- **Collisions:** ships with `burn` set are left out of `collideShips`.
+- **Ship stats:** `shipStats` remembers its answer per fit and hold object (and hull and catalogues). **Callers must not change the stats object they get** (none do).
+- **Traffic** (`traffic.ts`): `TrafficContact` (`id`, `position`, `velocity`, `label` or null when dark, `role`, `power`, `burningTo`, `heard`: `relay`, `transponder`, `plume`), `chartTraffic(world, pilotId)`, `TRANSPONDER_RANGE`, `NAVY_NAMES`. Server message `traffic` (`tick`, `ships`), sent about once a second to players in a Sol world; older clients ignore it, so `PROTOCOL_VERSION` stays 3. Client: `LinkListener.traffic`, `Chart.update`'s `traffic` and `trafficAge`.
+- **Saves:** for Sol, spawners the design dropped go on load, with their NPC if nobody is aboard; kept spawners take the design's template and keep their state.
+
 Sol slice 2, push 3 contracts (on `main` from 7 November 2026; `docs/sol-build.md`, "As built: slice 2, push 3"):
 
 - **The Relay** (`relay.ts`): `RelayNode` (`id`, `anchor` on a station with an offset or on a lane leg at a fraction, `owner` `accord`, optional `down`), `worldRelays(world)` (design data, not saved; none for Calder), `relayPosition`, `relayNet(world, relays?)` giving a `RelayNet` (live buoys with places and networks, which holders each network reaches a base of, the lanes' legs, ports, bases), `isBase`. Tunables `RELAY_RANGE`, `RELAY_LINK_RANGE`, `RELAY_LANE_SPACING`, `RELAY_RING_COUNT`, `RELAY_RING_RADIUS`, `LANE_CORRIDOR`, `CLAIM_RANGE`, `CORE_BURN_SECONDS`.
@@ -301,6 +311,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 9): **built Sol slice 2, push 4, completing slice 2 and Open Lanes step 1** (`docs/sol-build.md`, "As built: slice 2, push 4"): NPCs that burn (traders on every lane and out to the far ports, patrols by navy), pirates at contested and open ports where zones are no longer guarded, no rams at burn speed, ship stats remembered (7.8 to 2.4 ms a tick), and traffic on the chart by Jason's transponder rule. Next: release 0.19.0 when Jason has flown it, then Open Lanes step 2, the first fleet.
 - 2026-11-07, lead (Lead 9): Jason flagged that lane-long Relay coverage will not survive moving planets; parked with moving planets as a tuning pass (ideas inbox), lore ask filed. Nothing changes now.
 - 2026-11-07, lead (Lead 9): the chart stuttered with security shading (Jason): the sampled shading recomputed about 2,000 readings on every pan. Replaced, at Jason's suggestion, by each buoy's reach as a translucent circle, one fill per colour, readings cached until the ports move. Dragging at 4x CPU slowdown went from 93 ms a frame with 200 ms hitches to 53 ms (49 ms with the chart closed).
 - 2026-11-07, lead (Lead 9): **built Sol slice 2, push 3** (`docs/sol-build.md`, "As built: slice 2, push 3"): the Accord's Relay (298 buoys as design data) and security computed from coverage, links home and the holder's bases, reading `sol.md`'s map without painting it; shown on the chart (shading, level rings when zoomed out, where you are, what you arrive in). Jason: the economy needs partial simulation, its own milestone; parked as such, step 4 keeps hand-tuned prices. Next: push 4, NPCs that burn.

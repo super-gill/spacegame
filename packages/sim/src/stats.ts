@@ -240,10 +240,31 @@ export function cargoMass(ship: Ship, goods: World['goods']): number {
 export function shipStats(cat: Catalogues, ship: Ship): ShipStats {
   const hull = cat.hulls[ship.hullId];
   if (!hull) throw new Error(`Unknown hull "${ship.hullId}" on ship "${ship.id}"`);
-  const stats = fitStats(cat, hull, ship.fit, cargoMass(ship, cat.goods));
+  const remembered = statsCache.get(ship.fit)?.get(ship.hold);
+  const afterburning = Boolean(ship.afterburning);
+  if (remembered && remembered.hull === hull && remembered.cat === cat.modules && remembered.goods === cat.goods && remembered.weapons === cat.weapons && remembered.afterburning === afterburning) return remembered.stats;
+  const base = fitStats(cat, hull, ship.fit, cargoMass(ship, cat.goods));
   // A burning afterburner is bright.
-  return ship.afterburning ? { ...stats, signature: stats.signature * (1 + AFTERBURNER_SIGNATURE_BLOOM) } : stats;
+  const stats = afterburning ? { ...base, signature: base.signature * (1 + AFTERBURNER_SIGNATURE_BLOOM) } : base;
+  let byHold = statsCache.get(ship.fit);
+  if (!byHold) {
+    byHold = new WeakMap();
+    statsCache.set(ship.fit, byHold);
+  }
+  byHold.set(ship.hold, { hull, cat: cat.modules, goods: cat.goods, weapons: cat.weapons, afterburning, stats });
+  return stats;
 }
+
+/**
+ * `shipStats` remembered by the ship's fit and hold objects (and the hull
+ * and catalogues it was worked out from). A ship is copied every tick, but
+ * its fit and hold are only replaced when they change, so a ship's stats
+ * are worked out once per change rather than many times a tick: it was
+ * most of the step's time once Sol had traffic (slice 2, push 4). The
+ * answer is identical, so the sim stays pure and deterministic. Callers
+ * share the returned object and must not change it (none do).
+ */
+const statsCache = new WeakMap<object, WeakMap<object, { hull: HullSpec; cat: Catalogues['modules']; goods: Catalogues['goods']; weapons: Catalogues['weapons']; afterburning: boolean; stats: ShipStats }>>();
 
 /** Signature a module adds to its hull's: its own figure, else the default for its kind and size. */
 export function moduleSignature(module: ModuleSpec): number {

@@ -6,7 +6,7 @@ import { runSpawners } from './lifecycle.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { pirateHome, setOrbitsMoving } from './rails.js';
+import { setOrbitsMoving } from './rails.js';
 import {
   CERES_ACCORD_ID,
   CERES_FIELD_ID,
@@ -16,6 +16,10 @@ import {
   CERES_STATION_PHASE,
   EARTH_ID,
   EARTH_ORBITAL_EXCHANGE_ID,
+  ELYSIUM_ID,
+  SLAGLINE_ID,
+  THETIS_ORBITAL_ID,
+  TITAN_FREE_PORT_ID,
   LUNA_ID,
   MARS_ID,
   PHOBOS_ID,
@@ -42,8 +46,21 @@ import {
   solDistance,
   solYear,
 } from './sol-layout.js';
-import { solStations } from './sol-ports.js';
-import type { Body, RockSite, Spawner, Station, World } from './types.js';
+import {
+  ECF_TOLL_ID,
+  ECF_YARD_L5_ID,
+  CALLISTO_DEPOT_ID,
+  GANYMEDE_LOCAL_ID,
+  HAVEN_EUROPA_ID,
+  HILDA_MOOT_ID,
+  PSYCHE_DIG_ID,
+  SOLACE_MERCY_ID,
+  STATE_YARD_DEIMOS_ID,
+  TESSARACT_L4_ID,
+  TYCHO_PORT_ID,
+  solStations,
+} from './sol-ports.js';
+import type { Body, PowerId, RockSite, Spawner, Station, World } from './types.js';
 
 export * from './sol-layout.js';
 export * from './sol-ports.js';
@@ -176,61 +193,116 @@ export function solBodies(): Record<string, Body> {
   return Object.fromEntries(bodies.map((b) => [b.id, b]));
 }
 
-/** How far inward of the Ceres field's ring the pirate lurks, on the miners' way home. */
-const PIRATE_HOME_INWARD = 1_300;
-
 /**
- * Sol's NPCs for slice 1, all round one port each, since only pilots can
- * burn yet: Earth's toll patrol flying round Earth Orbital Exchange, two
- * prospectors and a barge working the Ceres field and selling at the
- * Accord station, and a Black Strike raider lurking at the field's edge
- * for them. Traders come back in slice 2, when NPCs can burn.
+ * Sol's NPCs (docs/sol-build.md, slice 2, push 4). Today's hulls stand in
+ * until the first fleet (Open Lanes step 2) swaps the loadouts:
+ *
+ * - **Traders** burn along every Accord lane, and out to the contested
+ *   and open ports where the pirates are (Psyche Dig, Jupiter's moons,
+ *   Hilda Moot), so the danger has traffic to prey on.
+ * - **Patrols** by navy (sol.md, "The navies in Sol"): the MRN on the
+ *   Accord lanes, the UDF on the Belt Lane, the ECF round Earth, the VSG
+ *   round Venus. They burn between the stations on their beats.
+ * - **Miners** work the Ceres field as before.
+ * - **Pirates** wait outside contested and open ports, where the Relay says
+ *   nobody answers (relay.ts `guardedStations`): the Black Strike at the
+ *   Hildas' edge and round Jupiter, raiders at Psyche Dig. The Ceres field
+ *   is Core now, so its pirate has gone.
  */
-function solSpawners(stations: Readonly<Record<string, Station>>, bodies: Readonly<Record<string, Body>>): Spawner[] {
-  const exchange = stations[EARTH_ORBITAL_EXCHANGE_ID]!;
-  const ceres = stations[CERES_ACCORD_ID]!;
+function solSpawners(stations: Readonly<Record<string, Station>>): Spawner[] {
   const blank = { shipId: null, timerTicks: 0, spawned: 0 };
-  const homeOrbit = { parent: CERES_FIELD_ID, radius: CERES_FIELD_RADIUS - PIRATE_HOME_INWARD, period: CERES_FIELD_PERIOD, phase: CERES_STATION_PHASE + Math.PI, direction: 1 as const };
-  const pirateAt = pirateHome({ bodies, tick: 0, dt: FIXED_DT }, { x: 0, y: 0 }, homeOrbit);
+  const docked = (stationId: string): Pick<Spawner, 'position' | 'heading' | 'dockedAt'> => ({ position: { ...stations[stationId]!.position }, heading: 0, dockedAt: stationId });
+
   const miner = (id: string, loadoutId: string, waitSeconds: number, respawnSeconds: number): Spawner => ({
     id,
     loadoutId,
-    position: { ...ceres.position },
-    heading: 0,
-    dockedAt: ceres.id,
-    brain: { kind: 'miner', field: ceres.id, market: ceres.id, mode: 'docked', waitTicks: waitSeconds * 60, rockId: null, modeTicks: 0 },
+    ...docked(CERES_ACCORD_ID),
+    brain: { kind: 'miner', field: CERES_ACCORD_ID, market: CERES_ACCORD_ID, mode: 'docked', waitTicks: waitSeconds * 60, rockId: null, modeTicks: 0 },
     hold: {},
     respawnSeconds,
     ...blank,
   });
-  return [
-    {
-      id: 'patrol-earth',
-      loadoutId: 'calder-watch',
-      position: { ...exchange.position },
+
+  /** A trader on a loop of ports, starting docked at the first, waiting `waitSeconds` so they do not all leave at once. */
+  const trader = (id: string, route: string[], waitSeconds: number): Spawner => ({
+    id,
+    loadoutId: 'tessaract-trader',
+    ...docked(route[0]!),
+    brain: { kind: 'trader', route, leg: 0, waitTicks: Math.round(waitSeconds * 60) },
+    hold: { rounds: 4 },
+    respawnSeconds: 120,
+    ...blank,
+  });
+
+  /** A navy patrol on a beat of ports. */
+  const patrol = (id: string, power: PowerId, beat: string[]): Spawner => ({
+    id,
+    loadoutId: 'calder-watch',
+    ...docked(beat[0]!),
+    brain: { kind: 'watch', power, beat, leg: 0, mode: 'patrol', targetId: null, modeTicks: 0 },
+    hold: { rounds: 10 },
+    respawnSeconds: 90,
+    ...blank,
+  });
+
+  /**
+   * A pirate waiting by a port: its home rides the port's own orbit,
+   * `PIRATE_LURK` further out, so it stays at the door wherever the port is.
+   */
+  const pirate = (id: string, stationId: string, phase: number): Spawner => {
+    const st = stations[stationId]!;
+    const homeOrbit = { ...st.orbit!, radius: st.orbit!.radius + PIRATE_LURK, phase: st.orbit!.phase + phase };
+    const at = { x: st.position.x, y: st.position.y };
+    return {
+      id,
+      loadoutId: 'kessari-raider',
+      position: at,
       heading: 0,
-      dockedAt: exchange.id,
-      brain: { kind: 'watch', beat: [exchange.id, exchange.id], leg: 0, mode: 'patrol', targetId: null, modeTicks: 0 },
-      hold: { rounds: 10 },
-      respawnSeconds: 60,
+      dockedAt: null,
+      brain: { kind: 'pirate', home: at, homeOrbit, mode: 'prowl', targetId: null, modeTicks: 0, cooldownTicks: 0, patrolIndex: 0, provokedBy: null },
+      hold: {},
+      respawnSeconds: 120,
       ...blank,
-    },
+    };
+  };
+
+  return [
+    // Navies. The ECF's beat keeps its slice-one id so a running world's patrol carries on.
+    patrol('patrol-earth', 'earth', [EARTH_ORBITAL_EXCHANGE_ID, ECF_YARD_L5_ID]),
+    patrol('patrol-venus', 'venus', [THETIS_ORBITAL_ID, SOLACE_MERCY_ID]),
+    patrol('patrol-mars-inner', 'mars', [THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID, ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID]),
+    patrol('patrol-mars-ceres', 'mars', [ELYSIUM_ID, CERES_ACCORD_ID]),
+    patrol('patrol-belt', 'belt', [CERES_ACCORD_ID, SLAGLINE_ID]),
+
+    // Lane traffic. Start ports are spread so no port runs out of pads at the start (Ceres keeps room for its miners).
+    trader('trader-inner', [THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID, ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID], 5),
+    trader('trader-inner-2', [ELYSIUM_ID, EARTH_ORBITAL_EXCHANGE_ID, THETIS_ORBITAL_ID, EARTH_ORBITAL_EXCHANGE_ID], 25),
+    trader('trader-ceres', [ELYSIUM_ID, CERES_ACCORD_ID], 15),
+    trader('trader-belt', [CERES_ACCORD_ID, SLAGLINE_ID], 10),
+    trader('trader-long', [CALLISTO_DEPOT_ID, TITAN_FREE_PORT_ID, CALLISTO_DEPOT_ID, CERES_ACCORD_ID], 20),
+    trader('trader-gate', [TITAN_FREE_PORT_ID, ECF_TOLL_ID], 30),
+    // Local runs off the lanes, in held space.
+    trader('trader-earth', [EARTH_ORBITAL_EXCHANGE_ID, TYCHO_PORT_ID, TESSARACT_L4_ID], 12),
+    trader('trader-mars', [ELYSIUM_ID, STATE_YARD_DEIMOS_ID], 18),
+    // Out where nobody answers: the pirates' prey.
+    trader('trader-psyche', [PSYCHE_DIG_ID, CERES_ACCORD_ID], 8),
+    trader('trader-jupiter', [CALLISTO_DEPOT_ID, GANYMEDE_LOCAL_ID, HAVEN_EUROPA_ID], 14),
+    trader('trader-hilda', [HILDA_MOOT_ID, CERES_ACCORD_ID], 35),
+
+    // Miners at Ceres.
     miner('miner-ceres-prospector', 'rookrivet-prospector', 5, 90),
     miner('miner-ceres-prospector-2', 'rookrivet-prospector', 40, 90),
     miner('miner-ceres-barge', 'rookrivet-hulk', 20, 180),
-    {
-      id: 'pirate-ceres',
-      loadoutId: 'kessari-raider',
-      position: pirateAt,
-      heading: Math.PI,
-      dockedAt: null,
-      brain: { kind: 'pirate', home: pirateAt, homeOrbit, mode: 'prowl', targetId: null, modeTicks: 0, cooldownTicks: 0, patrolIndex: 0, provokedBy: null },
-      hold: {},
-      respawnSeconds: 45,
-      ...blank,
-    },
+
+    // Pirates where the lore puts them.
+    pirate('pirate-psyche', PSYCHE_DIG_ID, 0.15),
+    pirate('pirate-ganymede', GANYMEDE_LOCAL_ID, 0.05),
+    pirate('pirate-hilda', HILDA_MOOT_ID, 0.00002),
   ];
 }
+
+/** How far further out than its port a waiting pirate's home rides, units: close enough that its radar covers the port's approaches. */
+const PIRATE_LURK = 1_000;
 
 /** A new Sol world: no pilots yet; new pilots start at Earth Orbital Exchange. */
 export function createSolWorld(): World {
@@ -245,7 +317,7 @@ export function createSolWorld(): World {
     pilots: {},
     ships: {},
     npcs: {},
-    spawners: solSpawners(stations, bodies),
+    spawners: solSpawners(stations),
     rules: { ...DEFAULT_RULES },
     projectiles: [],
     munitions: [],
