@@ -133,6 +133,8 @@ Older pages and dated history say the Charter Fleet, the Martian Navy, the Coast
 | --- | --- | --- | --- |
 | **Ceres Accord Station** | Ceres | The Ceres Accord | The Accord's secretariat and the **Ceres Registry**: the free port at the centre of Sol, neutral by treaty, Core security from all four powers. Meridian's main dealership, every maker's modules, the Null Ledger's favourite backstreet |
 | **Slagline** | Pallas, dug in | The Belt's cooperatives | The Belt's capital port: the delegates' hall, Union Defence Works' refit shop, Slagline Motors. UDF rota office |
+| **Furrow** | Ceres, trailing orbit | The Belt's cooperatives | The Belt's first farm habitat: a spun cylinder of grain terraces and protein vats, built after the Strikes so that Earth could never again starve the Belt into a settlement. Feeds Ceres and Slagline; buys water and ammonia ice from the outer Belt |
+| **The Allotment** | Pallas, trailing Slagline | The Belt's cooperatives | The second farm: smaller, greens and vats for Slagline's own tables, run as a cooperative allotment with a plot per branch. Spills nothing to market in a bad year |
 | **Vesta Concession** | Vesta | Corvane, on Earth's ore rights | The inner Belt's foundry. Belt crews cut under Earth licence and resent every tonne |
 | **Psyche Dig** | Psyche | Nobody agrees | The platinum rock's only station, a Belt cooperative with a Corvane lease on half of it and a Earth Charter Fleet frigate parked off the other half |
 | **Bellows** | Hygiea | Belt Forge Collective | Belt Forge's home yard: the mining hulls, the ice cutters, the best mining kit in known space |
@@ -144,7 +146,7 @@ Older pages and dated history say the Charter Fleet, the Martian Navy, the Coast
 | Station | Orbits | Run by | What it is |
 | --- | --- | --- | --- |
 | **Callisto Freight Depot** | Callisto, outside Jupiter's radiation | Earth (Tessaract) | Earth's farthest Held port: water and fuel for the Long Lane. Named, like Earth's ports, in the language of contracts |
-| **The Ganymede Local** | Ganymede | A Belt cooperative, Earth claims the ground under it | The biggest settlement past the Belt, named like a union branch; contested in court and sometimes in orbit |
+| **The Ganymede Local** | Ganymede | A Belt cooperative, Earth claims the ground under it | The biggest settlement past the Belt, named like a union branch; contested in court and sometimes in orbit. Grows its own under reactor light in galleries cut into the ice: the only farm past the Belt, and the dearest food in Sol |
 | **VSG Haven Europa** | Europa | Solace Medical, under Venus | A Haven (Venusian security zone): rescue for anyone who strays into Jupiter's radiation. Named for Venus as the evening star |
 | **Titan Free Port** | Titan | The Ceres Accord | The outer free port: carbon, fuel, crews; the last full market before the Gate Lane |
 | **Rimehold** | Saturn's rings | Belt Forge, for the cooperatives | The ice-cutters' station on the rings |
@@ -185,12 +187,39 @@ What `materials.md` says is mined, and where in Sol it is. Rarity follows securi
 
 No exotic is mined in Sol (`materials.md`); breaching here finds platinum and rare-earth pockets. Gate-glass and the rest are through the gate.
 
+## Food, by place
+
+Where Sol eats from (lead's question, 7 November 2026). Food is the Belt's oldest weakness and Earth's quietest lever: the Strikes were settled when Earth stopped the grain ships, and the farm habitats are the Belt's answer. Farms have an appetite of their own, water and nitrogen (ammonia ice, Venus's air), which is how the ice loop reaches the dinner table.
+
+| Place | How it is grown | Exports | Imports |
+| --- | --- | --- | --- |
+| **Earth** | The ground. Most of Sol's food comes up the elevator to Earth Orbital Exchange, cheap and endless | Food to everywhere; the Long Lane's depots carry Earth grain out to Callisto and Titan | Nothing it needs |
+| **Mars** | Domes and buried greenhouses on the surface (the State Farms, Hellas first), state-run like everything else. Mars feeds itself by policy and exports nothing | None | Fertiliser (ammonia) from the Belt when the price is right |
+| **Venus** | Aerostat farms in the cloud cities: sunlight above the clouds, carbon dioxide and nitrogen from the air, water from imported ice. Self-sufficient with a small surplus of greens and pharmaceutical crops | A little food up the elevator at Thetis; medicine | Water ice |
+| **The Belt** | **Furrow** (Ceres) and **The Allotment** (Pallas): spun farm cylinders of grain terraces and protein vats, cooperative-run. Enough for Ceres and Pallas in a good year, not for the whole Belt | Food along the Belt Lane | Water ice from Hygiea, Rimehold and Plume; ammonia ice; Earth grain when Furrow falls short |
+| **Ceres Accord Station** | Buys from Furrow and from Earth; the free port eats whatever is cheapest that week | None | Food from both |
+| **The outer system** | **The Ganymede Local** grows under reactor light in galleries in the ice, the only farm past the Belt and the dearest food in Sol. Callisto and Titan import along the Long Lane | None | Earth grain by the depot run |
+| **The clans** | Vats on the moot hulks and whatever the moot trades for; a clan that eats badly in a bad year | None | Food from anyone, for ice and rare earths |
+
+For the economy: farms **consume** water and ammonia ice (and, at Venus, nothing imported but water) and **produce** food; Earth Orbital Exchange produces food from nothing (the ground); Mars produces and consumes its own; everyone else imports. A Belt strike or an Earth embargo is first felt at Furrow's bid for ice and then at every Belt table.
+
+### Goods names (confirmed for the lead, 7 November 2026)
+
+Plain words, as the existing `food`, `medicine` and `machinery` are. The maker alloys of `materials.md` (Charter steel, Patchplate, Lantern steel and the rest) are separate goods for the manufacturing milestone, not these.
+
+| Id | Display name | Made at | From |
+| --- | --- | --- | --- |
+| `food` | Food | Earth Orbital Exchange (the ground), Furrow, The Allotment, The Ganymede Local, Thetis Orbital (a little), Mars's State Farms (not for sale) | Water, ammonia ice |
+| `steel` | Steel | Corvane's foundries (Caloris, Apollo Works, Vesta Concession, Lantern Works), Bellows in small lots | Nickel-iron (`ore`) |
+| `electronics` | Electronics | Tycho Port (Novum Systems); Thetis Orbital (Venus's own line) | Copper, zinc, platinum, rare earths |
+| `consumer-goods` | Consumer goods | Earth Orbital Exchange above all; Republic Station Elysium and Thetis Orbital for their own; nothing in the Belt | Steel, electronics, food |
+
 ## Who owns what, in a paragraph each
 
 - **Earth** owns its world, Luna, the near-Earth space and the Lagrange yards (Core), Mercury's orbit (Held), the inner Belt's ore rights (Held, contested by the Belt in every negotiation), Callisto (Held, an island on the Long Lane), and the tolls at the gate. Earth builds no miners: its rock is worked by Corvane and by Belt crews under licence.
 - **Mars** owns its world, its moons and its Trojans (Core). It holds no outer territory, and does not need any: by the Accord, the MRN runs the patrols on every Accord lane in Sol except the Belt Lane, and the picket at the gate. Martian patrols are the commonest navy ship a pilot sees outside Earth's volume.
 - **Venus** owns its world, its orbit and its capital port (Core), and nothing else in Sol but its stations: Solace Station Mercy, Lavinia Alpha Dock, Halden Beta Regio Observatory, and VSG Haven Europa, a Venusian security zone in Jupiter's radiation because nobody else will run rescue there.
-- **The Belt** owns the middle and outer Belt from Pallas outward (Slagline Core, Hygiea Held), Ganymede (contested with Earth), Saturn's rings and Enceladus (Held). The clans hold the Hildas, Triton and the Kuiper dark in the only sense anything is held there.
+- **The Belt** owns the middle and outer Belt from Pallas outward (Slagline Core, Hygiea Held), the farm habitats Furrow and The Allotment, Ganymede (contested with Earth), Saturn's rings and Enceladus (Held). The clans hold the Hildas, Triton and the Kuiper dark in the only sense anything is held there.
 - **The Accord** owns Ceres and Titan as free ports, and nothing else; it has no ships.
 
 ## Where a new pilot starts
