@@ -220,6 +220,7 @@ Jason's ideas that are not scheduled yet. The lead triages them into the roadmap
 
 Settled design and process decisions, newest first. Each line: date, decision, who decided.
 
+- 2026-11-07: **0.18.0 released** before Sol slice 2, and **burns route round worlds automatically**, the route and its extra time shown on the chart first. Jason.
 - 2026-11-07: **The roadmap is Open Lanes, the functional game** (`roadmap.md`, "Plan from here"): Sol's world, the first fleet, the eight starts, the money loop, law lite, a release; everything else parked in the ideas inbox and looked at only between its steps. The lead holds the line. Jason.
 - 2026-11-07: **No Dev world.** The persistent world is the Universe (Sol); the mode screen has Universe and Arena. The live and dev server split is parked. **Planets and moons become burn targets** in Sol slice 2. Jason.
 - 2026-11-07: **No planet in the local view.** Ships and stations at real size and detail where you fly; bodies are places on the chart, on screen only where you have business with them (skimming, a dug-in station, too low). Physics local to the ship: orbits on rails, gravity only near a surface. Supersedes `sol.md`'s limb-fills-the-screen for the flight view (lore chat: please note in `sol.md`). `docs/sol-build.md`. Jason.
@@ -273,6 +274,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lead (Lead 8): **released 0.18.0** (Sol slice 1, the Arena and mode screen, the Sol pivot renames, the fall fix, the server manager). Next: Open Lanes step 1, Sol slice 2.
 - 2026-11-07, lead (Lead 8): merged `ws/lore` (`infrastructure.md`: security as connectivity, the Accord Relay Network, fuel, death and the Return; `navy.md` "Security by connectivity"). Taken into Open Lanes: relay nodes and computed security in Sol slice 2; distress and witness records through the Relay in law lite (a crime counts once a witness uploads it to a live relay in Core or Held space); a high-speed world impact kills the pod (the pilot wakes at home, the Return without the Fade). The rest parked in the ideas inbox.
 - 2026-11-07, lore: **for the lead**: Jason's rule is pod death = Return = Fade, and at relativistic burn speeds a massive impact kills the pod. f26cc8d recovers the pod after a world impact at speed, which followed the old canon (now changed in `lore.md`): it should become a Return to the home station with Fade; a slow fall can keep the recovery. Death systems in `infrastructure.md`.
 - 2026-11-07, lore: death and the Return decided with Jason (`lore.md`; systems in `infrastructure.md`; pilot fields in `hull-terms.md`). Open for Jason and the lead: Ironman in the shared world or not, the Fade count and curve.

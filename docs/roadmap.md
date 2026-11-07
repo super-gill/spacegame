@@ -43,7 +43,7 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 
 **Parked until after Open Lanes:** Arena Waves and To the death (worlds step 4); the live and dev server split (worlds step 5); moving planets and gravity assists; Sol's hazards and comets; T3 and the navy as a system (`navy.md`); the used market; command ships; industries beyond the five ores; crew; the rest of the 178 hulls; a browser smoke test.
 
-**Done on the way here** (on `main`, after 0.17.0): the Arena world, the mode screen and the arena setup with Skirmish (`docs/worlds.md`, "As built: step 3"); the Sol pivot's renames (`docs/lore-pivot-audit.md`); Sol slice 1 (`docs/sol-build.md`, "As built: slice 1"): Sol at scale, six ports, the plotted burn, the chart, falling into a world. Played by Jason, 7 November, in both control modes, without bugs.
+**Released as 0.18.0** (7 November 2026), done on the way here: the Arena world, the mode screen and the arena setup with Skirmish (`docs/worlds.md`, "As built: step 3"); the Sol pivot's renames (`docs/lore-pivot-audit.md`); Sol slice 1 (`docs/sol-build.md`, "As built: slice 1"): Sol at scale, six ports, the plotted burn, the chart, falling into a world. Played by Jason, 7 November, in both control modes, without bugs.
 
 **Earlier milestones, for the record:** 0.15.0 fitting costs and the arena; 0.16.0 the turret model; the shared world (each player sent only what they can see); drones; 0.17.0 the interface pass (arcs, warnings, the board, the selection window, reticles).
 

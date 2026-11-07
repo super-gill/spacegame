@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-07
+
+Sol, the plotted burn and the chart; the Arena as a world of its own with a mode screen; the setting's Sol pivot in every name on screen; one-command server management. Played by Jason in both control modes.
+
 ### Added
 - **Server management:** `npm run update` (or double-click `server.bat`) stops the server, pulls, installs, builds and starts it; `npm stop` stops it cleanly from another window, saving first; `npm restart` and `npm run status` too (docs/hosting.md, "Managing the server").
 - **Sol.** The persistent world is Sol: the Sun, the planets, their moons and the big Belt rocks, at enormous sizes and compressed distances. Six ports to begin with: Earth Orbital Exchange, where new pilots start, Thetis Orbital at Venus, Republic Station Elysium at Mars, Ceres Accord Station with a rock field round Ceres, Slagline on Pallas and Titan Free Port. Ships and stations keep their real size; planets stay off the local view.

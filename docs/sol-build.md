@@ -117,6 +117,8 @@ Alongside, small and separate: item 5 of the re-fit (hull identity cannot be fit
 
 ## Decided (Jason, 7 November 2026)
 
+- **Burns route round a world in the way automatically**, the bend and its extra time shown on the chart before you burn (slice 2).
+
 - **The local view shows ships and stations at their real size, and no planet** (Jason, after the first mockup): where a pilot flies, docks and fights, ship and station have actual size and detail; the body a station orbits is not on screen. Bodies are places: on the chart, and on screen only where a pilot has business with them (skimming a giant's or Venus's air, a station dug into a rock, falling too low), reached by navigating to them. This replaces `sol.md`'s "a planet's limb fills the screen" for the flight view; bodies stay enormous on the chart and in their own neighbourhoods.
 - **Physics stays local to the ship.** Orbits run on rails (planets too slowly to see in a sitting, stations round their worlds in hours); gravity bites only near a body's surface, steep enough that diving too low is fatal; between and around worlds bodies can be ignored.
 
