@@ -28,17 +28,24 @@ Version 1.0 is milestone 8 polished. Everything after that is content, plus the 
 
 The multiplayer rules in `docs/design.md` apply to every milestone from now on, so milestone 11 stays a transport change. In particular: no pausing the world, and saves (milestone 5) store the whole world with every pilot.
 
-## Plan from here (after 0.17.0)
+## Plan from here: Open Lanes, the functional game (agreed 7 November 2026)
 
-1. **0.15.0 released: fitting costs and the arena** (`docs/fitting.md`, "As built: step 4" and "The arena"). No damage cuts: big guns struggle against small ships by physics; point defence small only; turreted main guns; signature from kit; swarm fights in the lab; operators fight any fit against any other in the arena.
-2. **0.16.0 released: the turret model** (`docs/turrets.md`, "As built" steps 1 to 4): every main gun a turret firing at the selected lock, traverse by size, hardpoint arcs; spread with range and laser falloff; close-in weapon systems on medium ships and up replacing swivels (save 15); stock big ships refit against the balance targets; steering by mouse or keys offered in the Controls panel. Next: Jason to choose from the items below.
-3. **Shared world:** done on `main`: each player is sent only what their sensors can see (no other players' holds, credits or storage), your own shots drawn from your guns, and a dropped-updates bug fixed (`docs/shared-world.md`, "As built: only what you can see"). Still waiting: full prediction for your own ship, only if steering lags for friends.
-4. **Drones:** done on `main`: full manoeuvring and a planner fix (`docs/drones.md`); for Jason to try in the belt.
-5. Mining, later: NPC caches, the money tuned in play, heavier drones, more ships per size, an industrial command ship.
-6. **The interface pass** (6d, agreed 6 November, `docs/interface.md`): built on `main`: turret arcs and aim, audible warnings with messages, the board (then called the Plot) with the transponder and the nav target, the selection window, aim reticle styles. **Released as 0.17.0** (6 November 2026).
-7a. **The move to Sol** (the lore re-fit, 7 November, `docs/sol-build.md`): all of Sol as the persistent world, crossed by plotted burns. **Slice 1 built on `main`**: Sol's bodies and six ports, the burn (U), the chart (M), Calder kept as a backup. Next: slice 2 (all the stations, lanes and security, NPCs that burn), then the eight starts, the names that ship, materials and sites, hazards. Worlds step 4 waits behind it.
-7. **Worlds: Live and Dev servers, the Universe and the Arena** (agreed 6 November, `docs/worlds.md`): two servers (live on releases, dev on `main`), a mode screen after login, the Arena as its own unsaved world with ship, fit and scenario (Skirmish, Waves, To the death). Mockups approved; step 3 built (the Arena world, the mode screen, the arena setup with Skirmish). Next: Waves and To the death, then the two-server setup.
-8. Then law (7, with electronic warfare), then the map (8).
+Jason's aim: get to a **functional game**, then start proposing features on it; the lead holds the line on this order and parks detours (Jason: "reel me in when I go on a mad feature rant"). Open Lanes is done when a new pilot can play an evening without being told how: start somewhere in Sol, earn money, upgrade their ship, take risks, lose it and recover. It ends in a release.
+
+**The rule for new ideas:** anything not on this list goes, as one line, into the ideas inbox in `docs/coordination.md`, marked parked. The inbox is looked at between milestones of this list, not during one. If the lead thinks an idea should jump the queue, the lead says why and Jason decides.
+
+1. **Sol's world** (`docs/sol-build.md`, slice 2): all the stations, the lanes and security as data, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
+2. **The first fleet:** today's eleven hulls swapped for the lore's in-game set (`docs/hulls.md`), only the hulls the starts, the Sol traffic and the patrols need (about 15 to 20), with stock fits. Before the starts, which need them.
+3. **The eight starts** (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
+4. **The money loop across Sol:** trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.
+5. **Law, lite** (discussed with Jason first): patrols respond to crime witnessed in Core and Held space.
+6. **The release:** Open Lanes, the functional game.
+
+**Parked until after Open Lanes:** Arena Waves and To the death (worlds step 4); the live and dev server split (worlds step 5); moving planets and gravity assists; Sol's hazards and comets; T3 and the navy as a system (`navy.md`); the used market; command ships; industries beyond the five ores; crew; the rest of the 178 hulls; a browser smoke test.
+
+**Done on the way here** (on `main`, after 0.17.0): the Arena world, the mode screen and the arena setup with Skirmish (`docs/worlds.md`, "As built: step 3"); the Sol pivot's renames (`docs/lore-pivot-audit.md`); Sol slice 1 (`docs/sol-build.md`, "As built: slice 1"): Sol at scale, six ports, the plotted burn, the chart, falling into a world. Played by Jason, 7 November, in both control modes, without bugs.
+
+**Earlier milestones, for the record:** 0.15.0 fitting costs and the arena; 0.16.0 the turret model; the shared world (each player sent only what they can see); drones; 0.17.0 the interface pass (arcs, warnings, the board, the selection window, reticles).
 
 ## To check later (from playtests)
 
