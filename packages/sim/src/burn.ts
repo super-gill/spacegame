@@ -140,6 +140,9 @@ export function bendSpeed(accel: number, radius: number): number {
   return Math.sqrt(accel * radius * BURN_BEND_SHARE);
 }
 
+/** A pass never goes closer to a world's centre than this many of its radii, however low the ports it joins. */
+const BURN_SURFACE_MARGIN = 1.02;
+
 /** How long the flip takes: half a turn at `BURN_TURN_RATE`. A ship covers that much ground before its brake bites. */
 const BURN_FLIP_SECONDS = Math.PI / BURN_TURN_RATE;
 /** How much of the drive a ship counts on when braking into a bend; the rest goes on turning onto the arc. */
@@ -148,17 +151,11 @@ const BURN_BEND_BRAKE_SHARE = 0.7;
 const BURN_LEAD_FADE_FROM = 1000;
 const BURN_LEAD_FADE_TO = 4000;
 
-/** A unit vector at right angles to `v`, to its left. */
-function leftOf(v: Vec2): Vec2 {
-  const l = length(v);
-  return l > 0 ? { x: -v.y / l, y: v.x / l } : { x: 0, y: 1 };
-}
-
 function cross(a: Vec2, b: Vec2): number {
   return a.x * b.y - a.y * b.x;
 }
 
-/** The two points where tangents from `p` touch the circle (`centre`, `radius`); `p` must be outside it. */
+/** The two points where tangents from `p` touch the circle (`centre`, `radius`); from on or inside the circle, both are `p` pushed out onto it. */
 function tangentPoints(p: Vec2, centre: Vec2, radius: number): [Vec2, Vec2] {
   const toP = sub(p, centre);
   const d = length(toP);
@@ -169,10 +166,13 @@ function tangentPoints(p: Vec2, centre: Vec2, radius: number): [Vec2, Vec2] {
 }
 
 /**
- * The first body (nearest along the segment) whose clearance circle the
- * segment from `from` to `to` cuts, with the circle. A segment that only
- * starts or ends inside a circle counts too: that is how a ship leaves a
- * port dug into a rock, or arrives at one.
+ * The first body (nearest along the segment) whose clearance the segment
+ * from `from` to `to` cuts, with the circle to pass it on. The clearance is
+ * `BURN_BODY_MARGIN` radii, but never more than the nearer end's own
+ * distance from the centre: a pass never asks a ship to climb above where
+ * it already is or where it is going, so leaving or reaching a port in low
+ * orbit, or dug into a rock, is a pass at that height rather than a climb
+ * out and a dive back in. It never goes below `BURN_SURFACE_MARGIN` radii.
  */
 function firstObstruction(world: Pick<World, 'bodies'>, states: Record<string, RailState>, from: Vec2, to: Vec2, skip: string | null): { body: Body; centre: Vec2; radius: number } | null {
   const line = sub(to, from);
@@ -184,7 +184,7 @@ function firstObstruction(world: Pick<World, 'bodies'>, states: Record<string, R
     const body = world.bodies[id]!;
     if (body.radius <= 0) continue;
     const centre = states[id]!.position;
-    const radius = clearanceOf(body);
+    const radius = Math.max(body.radius * BURN_SURFACE_MARGIN, Math.min(clearanceOf(body), distance(from, centre) - 1, distance(to, centre) - 1));
     const t = Math.max(0, Math.min(1, ((centre.x - from.x) * line.x + (centre.y - from.y) * line.y) / (lineLength * lineLength)));
     const miss = distance(add(from, scale(line, t)), centre);
     if (miss >= radius) continue;
@@ -213,10 +213,8 @@ function angleAbout(centre: Vec2, p: Vec2): number {
  * The route from `from` to `end` round whatever is in the way, as the
  * points to pass through. Each world in the way is passed on the side the
  * straight line already favours: a tangent in to its clearance circle, an
- * arc along it, a tangent out. A start inside the clearance (leaving a
- * port dug into a rock) first goes straight out to the circle; an end
- * inside it (arriving at one) comes straight in from the circle. `accel`
- * sets the speed each pass is flown at.
+ * arc along it, a tangent out (`firstObstruction` says how wide the circle
+ * is). `accel` sets the speed each pass is flown at.
  */
 export function burnRoute(world: Pick<World, 'bodies'>, from: Vec2, end: Vec2, time: number, accel: number): BurnRoute {
   const states = bodyStates(world.bodies, time);
@@ -225,44 +223,26 @@ export function burnRoute(world: Pick<World, 'bodies'>, from: Vec2, end: Vec2, t
   let at = from;
   let along = 0;
   let skip: string | null = null;
+  const push = (p: Vec2): void => {
+    along += distance(at, p);
+    points.push(p);
+    at = p;
+  };
   // A few passes at most: Sol's worlds are far apart, and a loop here must never hang the sim.
   for (let pass = 0; pass < 4; pass++) {
     const hit = firstObstruction(world, states, at, end, skip);
     if (!hit) break;
     const { centre, radius } = hit;
-    const push = (p: Vec2): void => {
-      along += distance(at, p);
-      points.push(p);
-      at = p;
-    };
-
-    // In: from outside, the tangent on the side the straight line favours; from inside, straight out to the circle.
     const start = at;
     const dir = sub(end, start);
     const side = Math.sign(cross(dir, sub(centre, start))) || 1; // the centre is left (+) or right (−) of the line
-    let entry: Vec2;
-    if (distance(at, centre) < radius) {
-      const out = distance(at, centre) > 1 ? scale(sub(at, centre), 1 / distance(at, centre)) : leftOf(dir);
-      entry = add(centre, scale(out, radius));
-    } else {
-      const [a, b] = tangentPoints(start, centre, radius);
-      // Pass on the side away from the centre: the tangent point further from it across the line.
-      entry = -side * cross(dir, sub(a, start)) > -side * cross(dir, sub(b, start)) ? a : b;
-    }
+    // The tangent point on the far side of the centre from the line: the way past it. From on the circle, the point itself.
+    const awayFromCentre = (a: Vec2, b: Vec2): Vec2 => (-side * cross(dir, sub(a, start)) > -side * cross(dir, sub(b, start)) ? a : b);
+    const entry = awayFromCentre(...tangentPoints(start, centre, radius));
     if (distance(at, entry) > 1) push(entry);
     // The pass itself begins at the entry: the tangent in is flown like any straight run.
     const bendStart = along;
-
-    // Out: the tangent from the end on the same side, or straight in to the end when it lies inside.
-    let exit: Vec2;
-    if (distance(end, centre) < radius) {
-      const out = distance(end, centre) > 1 ? scale(sub(end, centre), 1 / distance(end, centre)) : leftOf(dir);
-      exit = add(centre, scale(out, radius));
-    } else {
-      const [a, b] = tangentPoints(end, centre, radius);
-      exit = -side * cross(dir, sub(a, start)) > -side * cross(dir, sub(b, start)) ? a : b;
-    }
-
+    const exit = awayFromCentre(...tangentPoints(end, centre, radius));
     // Round: the short way between the two, which is the way past the world.
     const sweep = angleDelta(angleAbout(centre, entry), angleAbout(centre, exit));
     for (const p of arcPoints(centre, radius, angleAbout(centre, entry), sweep)) push(p);

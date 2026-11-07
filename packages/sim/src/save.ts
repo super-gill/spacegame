@@ -14,7 +14,7 @@ import { defaultPads, defaultShipMart, HARBOUR_ID, starterStations } from './sta
 import type { MountType, Pilot, Ship, Spawner, Station, World } from './types.js';
 import { mountRefusal, weaponStatesFor } from './fitting.js';
 import { add, fromAngle, scale } from './vec2.js';
-import { setOrbitsMoving } from './rails.js';
+import { placeStations, railTime, setOrbitsMoving, withOrbitMoving } from './rails.js';
 import { createStarterWorld, DEFAULT_RULES } from './world.js';
 import { createSolWorld } from './sol.js';
 import { WEAPONS } from './weapons.js';
@@ -896,6 +896,24 @@ function looksLikeWorld(w: unknown): w is World {
   );
 }
 
+/**
+ * A saved station with its design data taken from the system's current
+ * version: market, ship mart, outfitting, who runs it, who holds it and
+ * its rank. Where it is and its pads stay as saved.
+ */
+function refreshStation(saved: Station, design: Station): Station {
+  const { runBy: _r, holder: _h, rank: _k, ...rest } = saved;
+  return {
+    ...rest,
+    market: { ...design.market },
+    shipMart: [...design.shipMart],
+    outfitting: design.outfitting,
+    ...(design.runBy !== undefined ? { runBy: design.runBy } : {}),
+    ...(design.holder !== undefined ? { holder: design.holder } : {}),
+    ...(design.rank !== undefined ? { rank: design.rank } : {}),
+  };
+}
+
 /** Read save-file text back into a world, migrating and checking it on the way. */
 export function deserializeWorld(text: string, migrations: Record<number, Migration> = MIGRATIONS): LoadResult {
   let parsed: unknown;
@@ -933,8 +951,15 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
   const sol = world.system === 'sol' ? createSolWorld() : null;
   const current = sol ? sol.stations : starterStations();
   const stations: Record<string, Station> = {};
-  // Ship mart stock too: what a starter station sells is design data.
-  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? { ...st, market: { ...current[id]!.market }, shipMart: [...current[id]!.shipMart], outfitting: current[id]!.outfitting } : st;
+  // Ship mart stock too, and who runs and holds it: what a station is, is design data.
+  for (const [id, st] of Object.entries(world.stations)) stations[id] = current[id] ? refreshStation(st, current[id]!) : st;
+  // Ports the system has gained since the save (Sol slice 2 added 25) join it where their orbits put them now.
+  const added: Record<string, Station> = {};
+  // A save running with orbits on (an admin rule) sets the newcomers moving too, from where they stand.
+  const moving = world.rules?.orbits === true;
+  const now = railTime(world.tick, world.dt);
+  for (const [id, st] of Object.entries(current)) if (!stations[id]) added[id] = st.orbit ? { ...st, orbit: withOrbitMoving(st.orbit, moving, now) } : st;
+  if (Object.keys(added).length > 0) Object.assign(stations, placeStations(world.bodies, added, world.tick, world.dt));
   // NPC spawners added since the save was made join it (miners, say); those it has keep their state.
   const known = new Set(world.spawners.map((sp) => sp.id));
   const spawners = [...world.spawners, ...(sol ?? createStarterWorld()).spawners.filter((sp) => !known.has(sp.id)).map((sp) => ({ ...sp, shipId: null, timerTicks: Math.round(10 / world.dt), spawned: 0 }))];

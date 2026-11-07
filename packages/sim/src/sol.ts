@@ -6,17 +6,55 @@ import { runSpawners } from './lifecycle.js';
 import { LOADOUTS } from './loadouts.js';
 import { MANUFACTURERS } from './manufacturers.js';
 import { MODULES } from './modules.js';
-import { pirateHome, placeStations, setOrbitsMoving } from './rails.js';
-import { harbourStation, lanternWorks, padRing, ridgeOutpost } from './stations.js';
-import type { Body, Orbit, RockSite, Spawner, Station, World } from './types.js';
+import { pirateHome, setOrbitsMoving } from './rails.js';
+import {
+  CERES_ACCORD_ID,
+  CERES_FIELD_ID,
+  CERES_FIELD_PERIOD,
+  CERES_FIELD_RADIUS,
+  CERES_ID,
+  CERES_STATION_PHASE,
+  EARTH_ID,
+  EARTH_ORBITAL_EXCHANGE_ID,
+  LUNA_ID,
+  MARS_ID,
+  PHOBOS_ID,
+  DEIMOS_ID,
+  IO_ID,
+  EUROPA_ID,
+  GANYMEDE_ID,
+  CALLISTO_ID,
+  ENCELADUS_ID,
+  TITAN_ID,
+  TRITON_ID,
+  JUPITER_ID,
+  SATURN_ID,
+  NEPTUNE_ID,
+  URANUS_ID,
+  MERCURY_ID,
+  VENUS_ID,
+  VESTA_ID,
+  PALLAS_ID,
+  PSYCHE_ID,
+  HYGIEA_ID,
+  SUN_ID,
+  gm,
+  solDistance,
+  solYear,
+} from './sol-layout.js';
+import { solStations } from './sol-ports.js';
+import type { Body, RockSite, Spawner, Station, World } from './types.js';
+
+export * from './sol-layout.js';
+export * from './sol-ports.js';
 import { WEAPONS } from './weapons.js';
 import { DEFAULT_RULES } from './world.js';
 
 /**
  * Sol, the first build (docs/sol.md for what it is, docs/sol-build.md for
  * the numbers): the Sun, the planets in order, the moons and big rocks
- * that matter in play, and slice 1's six ports (the four capitals and
- * the two Accord free ports). Content, not engine.
+ * that matter in play, its 31 ports (sol-ports.ts) and the Accord's lanes
+ * (lanes.ts). Content, not engine. Ids and scale live in sol-layout.ts.
  *
  * Scale: bodies are enormous and distances compressed. A planet's
  * distance from the Sun is 30 million units × AU^0.6, so the inner system
@@ -31,53 +69,11 @@ import { DEFAULT_RULES } from './world.js';
  * a few hundred units a second round the Sun would carry its ports away
  * from the ships flying round them.
  *
- * Still to come (docs/sol-build.md, "Slices"): the other 28 stations,
- * lanes and security as data, NPC traffic that burns along the lanes
- * (today's traders run between Calder's stations and wait for it), the
- * eight starts, more rock sites, and the hazards.
+ * Still to come (docs/sol-build.md, "Slices"): the Relay and security
+ * computed from it, NPC traffic that burns along the lanes (today's
+ * traders run between Calder's stations and wait for it), the eight
+ * starts, more rock sites, and the hazards.
  */
-
-/** Distance from the Sun for a real distance in AU: 30 million units × AU^0.6. */
-export function solDistance(au: number): number {
-  return Math.round(30_000_000 * au ** 0.6);
-}
-
-/** A planet's year, seconds, real time: Earth's is a week, the rest by Kepler. Only matters with orbits running. */
-function solYear(au: number): number {
-  return Math.round(604_800 * au ** 1.5);
-}
-
-/** Gravity's strength for a body of `radius` whose surface pull is `surface` units/s². */
-function gm(radius: number, surface: number): number {
-  return surface * radius * radius;
-}
-
-export const SUN_ID = 'body-sol-sun';
-export const MERCURY_ID = 'body-sol-mercury';
-export const VENUS_ID = 'body-sol-venus';
-export const EARTH_ID = 'body-sol-earth';
-export const LUNA_ID = 'body-sol-luna';
-export const MARS_ID = 'body-sol-mars';
-export const PHOBOS_ID = 'body-sol-phobos';
-export const DEIMOS_ID = 'body-sol-deimos';
-export const VESTA_ID = 'body-sol-vesta';
-export const CERES_ID = 'body-sol-ceres';
-export const PALLAS_ID = 'body-sol-pallas';
-export const PSYCHE_ID = 'body-sol-psyche';
-export const HYGIEA_ID = 'body-sol-hygiea';
-export const JUPITER_ID = 'body-sol-jupiter';
-export const IO_ID = 'body-sol-io';
-export const EUROPA_ID = 'body-sol-europa';
-export const GANYMEDE_ID = 'body-sol-ganymede';
-export const CALLISTO_ID = 'body-sol-callisto';
-export const SATURN_ID = 'body-sol-saturn';
-export const ENCELADUS_ID = 'body-sol-enceladus';
-export const TITAN_ID = 'body-sol-titan';
-export const URANUS_ID = 'body-sol-uranus';
-export const NEPTUNE_ID = 'body-sol-neptune';
-export const TRITON_ID = 'body-sol-triton';
-/** The field round Ceres: the belt body Ceres Accord Station's rocks ride. */
-export const CERES_FIELD_ID = 'body-sol-ceres-field';
 
 /**
  * Something orbiting the Sun: real distance in AU, the angle it stands at
@@ -128,10 +124,6 @@ const MOONS: readonly { id: string; name: string; parent: string; distance: numb
 /** Gravity reaches this many radii out from a world: steep near the surface, nothing between worlds. */
 const WELL_RADII = 2.5;
 
-/** The field round Ceres: a ring 16,000 units from its centre, Ceres Accord Station on it. */
-const CERES_FIELD_RADIUS = 16_000;
-const CERES_FIELD_PERIOD = 5_400;
-const CERES_STATION_PHASE = 0.6;
 export const SOL_ROCK_SITE: RockSite = {
   beltId: CERES_FIELD_ID,
   stationId: 'station-ceres-accord',
@@ -182,81 +174,6 @@ export function solBodies(): Record<string, Body> {
     ring: { radius: CERES_FIELD_RADIUS, width: CALDER_SITE.ringWidth },
   });
   return Object.fromEntries(bodies.map((b) => [b.id, b]));
-}
-
-export const EARTH_ORBITAL_EXCHANGE_ID = 'station-earth-orbital-exchange';
-export const THETIS_ORBITAL_ID = 'station-thetis-orbital';
-export const ELYSIUM_ID = 'station-republic-elysium';
-export const CERES_ACCORD_ID = 'station-ceres-accord';
-export const SLAGLINE_ID = 'station-slagline';
-export const TITAN_FREE_PORT_ID = 'station-titan-free-port';
-
-/** A station orbit round a body: the period comes from the body's gravity, as Calder's do. */
-function orbitRound(bodies: Readonly<Record<string, Body>>, parent: string, radius: number, phase: number): Orbit {
-  const body = bodies[parent]!;
-  return { parent, radius, period: Math.round(2 * Math.PI * Math.sqrt(radius ** 3 / Math.max(body.gravity, 1))), phase, direction: 1 };
-}
-
-/** A station sized for its role: pads round its rim, dock range and protected zone scaled with it. */
-function sized(station: Station, radius: number, padSizes: Parameters<typeof padRing>[1]): Station {
-  return { ...station, radius, dockRange: radius + 150, securityRadius: Math.max(station.securityRadius, radius * 6), pads: padRing(radius, padSizes) };
-}
-
-/** A capital port's pads: plenty, every size, large ones spread round. */
-const CAPITAL_PADS: Parameters<typeof padRing>[1] = ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'M', 'L', 'S', 'M', 'S', 'L', 'M', 'S', 'M'];
-
-/**
- * Slice 1's ports, built from Calder's three station types so markets,
- * pads and services carry over: the capitals trade and outfit like
- * Harbour did, Ceres Accord Station buys ore like Ridge did, and Slagline
- * is the Belt's works like Lantern. Names are `sol.md`'s, one each.
- */
-export function solStations(bodies: Readonly<Record<string, Body>>): Record<string, Station> {
-  const capital = harbourStation();
-  const stations: Station[] = [
-    {
-      ...sized(capital, 500, CAPITAL_PADS),
-      id: EARTH_ORBITAL_EXCHANGE_ID,
-      name: 'Earth Orbital Exchange',
-      orbit: orbitRound(bodies, EARTH_ID, 110_000, -Math.PI / 2),
-    },
-    {
-      ...sized(capital, 450, CAPITAL_PADS),
-      id: THETIS_ORBITAL_ID,
-      name: 'Thetis Orbital',
-      orbit: orbitRound(bodies, VENUS_ID, 120_000, Math.PI / 3),
-    },
-    {
-      ...sized(capital, 450, CAPITAL_PADS),
-      id: ELYSIUM_ID,
-      name: 'Republic Station Elysium',
-      orbit: orbitRound(bodies, MARS_ID, 140_000, Math.PI),
-    },
-    {
-      ...sized(ridgeOutpost(), 300, ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'M']),
-      id: CERES_ACCORD_ID,
-      name: 'Ceres Accord Station',
-      // The Accord's free port refits too: the Belt's miners should not have to burn to Earth for a new laser.
-      outfitting: true,
-      orbit: { parent: CERES_FIELD_ID, radius: CERES_FIELD_RADIUS, period: CERES_FIELD_PERIOD, phase: CERES_STATION_PHASE, direction: 1 },
-    },
-    {
-      ...sized(lanternWorks(), 220, ['L', 'S', 'M', 'S', 'L', 'M']),
-      id: SLAGLINE_ID,
-      name: 'Slagline',
-      // Dug into Pallas: a door in a cliff, just off the surface.
-      orbit: orbitRound(bodies, PALLAS_ID, 5_600, 0.8),
-    },
-    {
-      ...sized(capital, 350, ['L', 'S', 'M', 'S', 'L', 'M', 'S', 'M']),
-      id: TITAN_FREE_PORT_ID,
-      name: 'Titan Free Port',
-      orbit: orbitRound(bodies, TITAN_ID, 45_000, 0),
-      // A free port trades and refits but sells no ships.
-      shipMart: [],
-    },
-  ];
-  return placeStations(bodies, Object.fromEntries(stations.map((s) => [s.id, s])), 0, FIXED_DT);
 }
 
 /** How far inward of the Ceres field's ring the pirate lurks, on the miners' way home. */

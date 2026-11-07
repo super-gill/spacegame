@@ -1001,7 +1001,23 @@ export interface Station {
   pads: Pad[];
   /** Loadout ids this station's ship mart sells, unlimited for now. Empty: no ship mart. */
   shipMart: string[];
+  /** Who runs it, in words, for the screen (docs/sol.md's "Run by"). Absent on Calder's stations. */
+  runBy?: string;
+  /**
+   * Who holds the space it is in (docs/sol.md, "Bodies, inside out"):
+   * a power, the Ceres Accord, the clans, or null where nobody agrees.
+   * Security is worked out from this and the Relay (Sol slice 2).
+   */
+  holder?: StationHolder | null;
+  /** What kind of base it is for its holder: a capital port, an Accord free port, a navy's yard, or (absent) an ordinary port. */
+  rank?: StationRank;
 }
+
+/** Who holds a station's space: a power, the Accord, or the clans. */
+export type StationHolder = PowerId | 'accord' | 'clans';
+
+/** A station's standing as a base (docs/navy.md, "Bases"). */
+export type StationRank = 'capital' | 'freePort' | 'navalYard';
 
 /**
  * A landing pad on a station. Stations move but do not turn, so a pad's

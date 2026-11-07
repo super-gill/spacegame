@@ -1,4 +1,4 @@
-import { bodyStates, burnAcceleration, burnPlan, burnableBody, railTime, type BurnPlan, type Ship, type World } from '@spacegame/sim';
+import { bodyStates, burnAcceleration, burnPlan, burnableBody, laneLegs, railTime, worldLanes, type BurnPlan, type Ship, type Station, type World } from '@spacegame/sim';
 import type { PlotKind } from './plot-rows.js';
 
 /**
@@ -16,8 +16,13 @@ import type { PlotKind } from './plot-rows.js';
  * move about. LOCAL, INNER, BELT and ALL SOL remain as quick jumps; LOCAL
  * follows your ship until you drag away. Bodies are drawn at least a few
  * pixels across so every world can be found, and at their true size when
- * that is larger. The lanes and security shading in the mockup come later
- * in slice 2.
+ * that is larger. The Accord lanes are drawn as the mockup's wide, faint
+ * bands between their ports, named once each. With 31 ports, names are
+ * placed by priority and skipped where they would overlap one already
+ * placed: the nav target first, then capitals and free ports, worlds,
+ * navy yards, other ports, moons, and the lanes' own names last; zoom in
+ * and the rest appear. Security shading comes with the Relay (slice 2,
+ * push 3).
  */
 
 type ViewId = 'local' | 'inner' | 'belt' | 'all';
@@ -74,6 +79,101 @@ export function bigDistance(units: number): string {
 export function minutesSeconds(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/** The lanes' bands, from the approved mockup. */
+const LANE_COLOUR = 'rgba(159, 211, 199, 0.16)';
+const LANE_WIDTH = 14;
+const LANE_LABEL_COLOUR = 'rgba(159, 211, 199, 0.55)';
+
+/**
+ * A name to place on the chart beside a mark at (`x`, `y`) of size `r`:
+ * lower `priority` is placed first. `style` says where it may go:
+ * beside a world (right, then left) or a port (above right, below right,
+ * above left).
+ */
+interface Label {
+  text: string;
+  x: number;
+  y: number;
+  r: number;
+  style: 'world' | 'port' | 'free';
+  colour: string;
+  priority: number;
+}
+
+/** Something drawn that names must not cover: a centre and a half-size, in pixels. */
+interface Mark {
+  x: number;
+  y: number;
+  r: number;
+}
+
+/** How early a port's name is placed: the worlds come first (priority 1), capitals and free ports next, navy yards, then the rest. */
+function portPriority(station: Pick<Station, 'rank'>): number {
+  if (station.rank === 'capital' || station.rank === 'freePort') return 2;
+  if (station.rank === 'navalYard') return 3;
+  return 4;
+}
+
+/** Where a label of `width` may go, best first: the left edge of its text and its middle line. */
+function spots(label: Label, width: number): { x: number; y: number }[] {
+  const { x, y, r } = label;
+  if (label.style === 'world') return [{ x: x + r + 5, y }, { x: x - r - 5 - width, y }, { x: x - width / 2, y: y - r - 10 }, { x: x - width / 2, y: y + r + 10 }];
+  if (label.style === 'port') return [{ x: x + 10, y: y - 14 }, { x: x + 10, y: y + 14 }, { x: x - 10 - width, y: y - 14 }, { x: x - 10 - width, y: y + 14 }];
+  return [{ x, y }];
+}
+
+/**
+ * Draw `labels` best first, each at the first of its spots that lies
+ * inside the chart and clear of every name already drawn; a name with no
+ * such spot is left off. A crowded place shows its most important names,
+ * and zooming in shows the rest.
+ */
+function placeLabels(ctx: CanvasRenderingContext2D, labels: Label[], marks: readonly Mark[], w: number, h: number): void {
+  // The marks themselves (worlds, ports, you) are in the way from the start: a name never covers one.
+  const placed: { x0: number; y0: number; x1: number; y1: number }[] = marks.map((m) => ({ x0: m.x - m.r, y0: m.y - m.r, x1: m.x + m.r, y1: m.y + m.r }));
+  const pad = 3;
+  for (const label of labels.slice().sort((a, b) => a.priority - b.priority)) {
+    const width = ctx.measureText(label.text).width;
+    for (const spot of spots(label, width)) {
+      const box = { x0: spot.x - pad, y0: spot.y - 7 - pad, x1: spot.x + width + pad, y1: spot.y + 7 + pad };
+      if (box.x0 < 0 || box.y0 < 0 || box.x1 > w || box.y1 > h) continue;
+      if (placed.some((p) => box.x0 < p.x1 && box.x1 > p.x0 && box.y0 < p.y1 && box.y1 > p.y0)) continue;
+      placed.push(box);
+      ctx.fillStyle = label.colour;
+      ctx.fillText(label.text, spot.x, spot.y);
+      break;
+    }
+  }
+}
+
+/** The key, bottom left, as in the mockup. Security levels join it with the Relay. */
+function drawLegend(ctx: CanvasRenderingContext2D, h: number, lanes: boolean): void {
+  if (!lanes) return;
+  const y = h - 18;
+  ctx.fillStyle = LANE_COLOUR;
+  ctx.fillRect(14, y - 3, 18, 6);
+  ctx.fillStyle = '#9fd3c7';
+  ctx.fillText('ACCORD LANE', 38, y);
+  // Port marks: a capital or free port, and any other port.
+  const x = 150;
+  const diamond = (cx: number, d: number, colour: string): void => {
+    ctx.fillStyle = colour;
+    ctx.beginPath();
+    ctx.moveTo(cx, y - d);
+    ctx.lineTo(cx + d, y);
+    ctx.lineTo(cx, y + d);
+    ctx.lineTo(cx - d, y);
+    ctx.closePath();
+    ctx.fill();
+  };
+  diamond(x, 6, '#9fd3c7');
+  ctx.fillStyle = '#9fd3c7';
+  ctx.fillText('CAPITAL OR FREE PORT', x + 12, y);
+  diamond(x + 190, 4, '#6a988f');
+  ctx.fillStyle = '#9fd3c7';
+  ctx.fillText('PORT', x + 202, y);
 }
 
 /** The point `share` (0 to 1) of the way along a plan's route by distance, for marking the flip. */
@@ -270,6 +370,30 @@ export class Chart {
       ctx.stroke();
     }
 
+    // The Accord lanes: wide faint bands under everything else, as in the mockup.
+    const labels: Label[] = [];
+    ctx.strokeStyle = LANE_COLOUR;
+    ctx.lineWidth = LANE_WIDTH;
+    ctx.lineCap = 'round';
+    for (const lane of worldLanes(world)) {
+      const legs = laneLegs(lane, world.stations);
+      if (legs.length === 0) continue;
+      ctx.beginPath();
+      for (const leg of legs) {
+        const a = toScreen(leg.from);
+        const b = toScreen(leg.to);
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+      }
+      ctx.stroke();
+      // Its name once, at the middle of its longest leg on screen, if that leg is long enough to carry it.
+      const longest = legs.map((leg) => ({ a: toScreen(leg.from), b: toScreen(leg.to) })).sort((m, n) => Math.hypot(n.b.x - n.a.x, n.b.y - n.a.y) - Math.hypot(m.b.x - m.a.x, m.b.y - m.a.y))[0]!;
+      if (Math.hypot(longest.b.x - longest.a.x, longest.b.y - longest.a.y) > 140) {
+        labels.push({ text: lane.name.toUpperCase(), x: (longest.a.x + longest.b.x) / 2 + 10, y: (longest.a.y + longest.b.y) / 2, r: 0, style: 'free', colour: LANE_LABEL_COLOUR, priority: 6 });
+      }
+    }
+    ctx.lineCap = 'butt';
+
     // Bodies: at least a few pixels, true size when bigger; names on worlds and the big rocks. Planets and moons can be picked.
     ctx.font = '11px "IBM Plex Mono", ui-monospace, monospace';
     ctx.textBaseline = 'middle';
@@ -296,12 +420,7 @@ export class Chart {
         ctx.arc(at.x, at.y, r + 4, 0, Math.PI * 2);
         ctx.stroke();
       }
-      // Moons crowd their planets far out: name them only when there is room.
-      const parentAt = body.orbit && body.kind === 'moon' && world.bodies[body.orbit.parent]?.kind === 'planet' ? toScreen(states[body.orbit.parent]!) : null;
-      if (on || !parentAt || Math.hypot(parentAt.x - at.x, parentAt.y - at.y) > 40) {
-        ctx.fillStyle = on ? '#dffbf3' : '#6a988f';
-        ctx.fillText(body.name.toUpperCase(), at.x + r + 5, at.y);
-      }
+      labels.push({ text: body.name.toUpperCase(), x: at.x, y: at.y, r, style: 'world', colour: on ? '#dffbf3' : '#6a988f', priority: on ? 0 : body.kind === 'star' || body.kind === 'planet' ? 1 : 5 });
     }
 
     // Ports: small diamonds, named; the nav target bright.
@@ -311,17 +430,37 @@ export class Chart {
       if (at.x < -50 || at.y < -50 || at.x > w + 50 || at.y > h + 50) continue;
       this.drawn.push({ kind: 'station', id: station.id, ...at, r: 8 });
       const on = station.id === this.selectedId;
-      ctx.fillStyle = on ? '#dffbf3' : '#9fd3c7';
+      // Capitals and free ports a size up, so the places that matter most read at a glance.
+      const major = station.rank === 'capital' || station.rank === 'freePort';
+      const d = major ? 6 : 4;
+      ctx.fillStyle = on ? '#dffbf3' : major ? '#9fd3c7' : '#6a988f';
       ctx.beginPath();
-      ctx.moveTo(at.x, at.y - 5);
-      ctx.lineTo(at.x + 5, at.y);
-      ctx.lineTo(at.x, at.y + 5);
-      ctx.lineTo(at.x - 5, at.y);
+      ctx.moveTo(at.x, at.y - d);
+      ctx.lineTo(at.x + d, at.y);
+      ctx.lineTo(at.x, at.y + d);
+      ctx.lineTo(at.x - d, at.y);
       ctx.closePath();
       ctx.fill();
-      ctx.fillStyle = on ? '#dffbf3' : '#9fd3c7';
-      ctx.fillText(station.name.toUpperCase(), at.x + 9, at.y - 12);
+      labels.push({ text: station.name.toUpperCase(), x: at.x, y: at.y, r: d, style: 'port', colour: on ? '#dffbf3' : major ? '#9fd3c7' : '#6a988f', priority: on ? 0 : portPriority(station) });
     }
+
+    // Names, best first, each only where it does not cover one already placed.
+    // What a name must not cover: the planets and the Sun, capitals and free ports, and you. Small ports and moons may sit under text.
+    const marks: Mark[] = [];
+    for (const m of this.drawn) {
+      if (m.kind === 'station') {
+        const st = world.stations[m.id];
+        if (st && (st.rank === 'capital' || st.rank === 'freePort')) marks.push({ x: m.x, y: m.y, r: 6 });
+      } else if (world.bodies[m.id]?.kind === 'planet') marks.push({ x: m.x, y: m.y, r: m.r });
+    }
+    // The star sits at the origin and cannot be picked, so it is not among the drawn marks.
+    if (Object.values(world.bodies).some((b) => b.kind === 'star')) marks.push({ x: sun.x, y: sun.y, r: 6 });
+    if (ship) {
+      const me = toScreen(ship.position);
+      marks.push({ x: me.x, y: me.y, r: 7 }, { x: me.x + 24, y: me.y + 12, r: 7 });
+    }
+    placeLabels(ctx, labels, marks, w, h);
+    drawLegend(ctx, h, worldLanes(world).length > 0);
 
     // You, and the route of a burn to the nav target: the line the ship will fly, bending round any world in the way.
     const plan = ship && targetId ? burnPlan(world, world.stations, ship.position, targetId, burnAcceleration(world, ship), time) : null;

@@ -14,16 +14,32 @@ import {
   PALLAS_ID,
   SLAGLINE_ID,
   SUN_ID,
+  THETIS_ORBITAL_ID,
+  TITAN_FREE_PORT_ID,
+  BELLOWS_ID,
+  PSYCHE_DIG_ID,
+  SHELL_STATION_ID,
   createSolWorld,
   solDistance,
 } from '../sol.js';
 import { stepWorld } from '../step.js';
+import { laneLegs, worldLanes } from '../lanes.js';
 import { bodyStates, railTime } from '../rails.js';
 import type { World } from '../types.js';
 import { distance, length } from '../vec2.js';
-import { joinPilot, pilotShip } from '../world.js';
+import { createStarterWorld, joinPilot, pilotShip } from '../world.js';
 
 /** Sol, slices 1 and 2 (docs/sol-build.md): the layout, the ports, and crossing between them, and to worlds, with a burn. */
+
+/** Every station sol.md names, in its tables' order. */
+const SOL_MD_PORTS = [
+  'Thetis Orbital', 'Solace Station Mercy', 'Lavinia Alpha Dock', 'Halden Beta Regio Observatory',
+  'Earth Orbital Exchange', 'ECF Yard L5', 'Tessaract Freight Yard L4', 'Tycho Port', 'Corvane Apollo Works', 'Rook and Rivet Shell Station',
+  'Corvane Caloris Foundry',
+  'Republic Station Elysium', 'MRN Yard Phobos', 'State Yard Deimos', 'State Mine Eureka',
+  'Ceres Accord Station', 'Slagline', 'Vesta Concession', 'Psyche Dig', 'Bellows', 'The Boneyard', 'Hilda Moot',
+  'Callisto Freight Depot', 'The Ganymede Local', 'VSG Haven Europa', 'Titan Free Port', 'Rimehold', 'Plume', 'Triton Moot', 'ECF Toll Station', 'MRN Gate Station',
+];
 
 /** Sol with one pilot, undocked and flying beside Earth Orbital Exchange, and nothing else moving. */
 function soloInSol(): World {
@@ -55,11 +71,9 @@ describe('Sol', () => {
     expect(distance(at[EARTH_ID]!.position, at[SUN_ID]!.position)).toBeCloseTo(30_000_000, -3);
   });
 
-  it('has the six slice-one ports, each well clear of its world, and starts pilots at Earth Orbital Exchange', () => {
+  it('has all 31 of sol.md\'s ports, each clear of its world, and starts pilots at Earth Orbital Exchange', () => {
     const w = createSolWorld();
-    expect(Object.values(w.stations).map((s) => s.name).sort()).toEqual(
-      ['Ceres Accord Station', 'Earth Orbital Exchange', 'Republic Station Elysium', 'Slagline', 'Thetis Orbital', 'Titan Free Port'],
-    );
+    expect(Object.values(w.stations).map((s) => s.name).sort()).toEqual(SOL_MD_PORTS.slice().sort());
     const at = bodyStates(w.bodies, railTime(0, w.dt));
     for (const station of Object.values(w.stations)) {
       for (const body of Object.values(w.bodies)) {
@@ -91,6 +105,90 @@ describe('Sol', () => {
     expect(loaded.world.system).toBe('sol');
     expect(Object.keys(loaded.world.stations).sort()).toEqual(Object.keys(w.stations).sort());
     expect(loaded.world.spawners.map((s) => s.id).sort()).toEqual(w.spawners.map((s) => s.id).sort());
+  });
+});
+
+describe('Sol\'s ports and lanes', () => {
+  it('says who runs and holds every port, with a rank for the capitals, free ports and navy yards', () => {
+    const w = createSolWorld();
+    for (const s of Object.values(w.stations)) {
+      expect(s.runBy, s.name).toBeTruthy();
+      expect(s.holder, s.name).not.toBeUndefined();
+    }
+    const ranked = (rank: string): string[] => Object.values(w.stations).filter((s) => s.rank === rank).map((s) => s.name).sort();
+    expect(ranked('capital')).toEqual(['Earth Orbital Exchange', 'Republic Station Elysium', 'Slagline', 'Thetis Orbital']);
+    expect(ranked('freePort')).toEqual(['Ceres Accord Station', 'Titan Free Port']);
+    expect(ranked('navalYard')).toEqual(['ECF Yard L5', 'MRN Yard Phobos']);
+    expect(Object.values(w.stations).filter((s) => s.rank === 'capital').map((s) => s.holder).sort()).toEqual(['belt', 'earth', 'mars', 'venus']);
+    expect(w.stations[PSYCHE_DIG_ID]!.holder).toBeNull();
+  });
+
+  it('trades only goods that exist and sells only ships that exist', () => {
+    const w = createSolWorld();
+    for (const s of Object.values(w.stations)) {
+      for (const good of Object.keys(s.market)) expect(w.goods[good], `${s.name} trades ${good}`).toBeDefined();
+      for (const loadout of s.shipMart) expect(w.loadouts[loadout], `${s.name} sells ${loadout}`).toBeDefined();
+    }
+  });
+
+  it('has the five Accord lanes, every stop a port; Calder has none', () => {
+    const w = createSolWorld();
+    expect(worldLanes(w).map((l) => l.name)).toEqual(['The Inner Lane', 'The Ceres Lane', 'The Belt Lane', 'The Long Lane', 'The Gate Lane']);
+    for (const lane of worldLanes(w)) {
+      for (const stop of lane.stops) expect(w.stations[stop], `${lane.name} stops at ${stop}`).toBeDefined();
+      expect(laneLegs(lane, w.stations)).toHaveLength(lane.stops.length - 1);
+    }
+    expect(worldLanes(createStarterWorld())).toEqual([]);
+  });
+
+  it('can burn from Earth Orbital Exchange to every other port, never ending inside a world', () => {
+    const w = soloInSol();
+    const from = pilotShip(w, 'ana')!.position;
+    const at = bodyStates(w.bodies, railTime(0, w.dt));
+    for (const s of Object.values(w.stations)) {
+      if (s.id === EARTH_ORBITAL_EXCHANGE_ID) continue;
+      const plan = burnPlan(w, w.stations, from, s.id, 1000, 0)!;
+      expect(plan, s.name).not.toBeNull();
+      expect(plan.distance, s.name).toBeGreaterThan(20_000);
+      const end = plan.route.points.at(-1)!;
+      for (const body of Object.values(w.bodies)) {
+        if (body.radius > 0) expect(distance(end, at[body.id]!.position), `${s.name}'s burn ends clear of ${body.name}`).toBeGreaterThan(body.radius + 500);
+      }
+    }
+  });
+
+  it('flies in to a port in low orbit (the Shell) from above, without touching Earth', () => {
+    const started = startBurn(soloInSol(), 'ana', SHELL_STATION_ID);
+    if (!started.ok) throw new Error(started.reason);
+    const shipId = pilotShip(started.world, 'ana')!.id;
+    const earth = bodyStates(started.world.bodies, railTime(0, started.world.dt))[EARTH_ID]!.position;
+    let lowest = Infinity;
+    const arrived = run(started.world, 120, (s) => {
+      const ship = s.ships[shipId];
+      if (ship) lowest = Math.min(lowest, distance(ship.position, earth));
+      return !ship?.burn;
+    });
+    const ship = arrived.ships[shipId]!;
+    expect(ship).toBeDefined();
+    expect(ship.burn).toBeUndefined();
+    expect(lowest).toBeGreaterThan(started.world.bodies[EARTH_ID]!.radius + 5_000);
+    const shell = arrived.stations[SHELL_STATION_ID]!;
+    expect(distance(ship.position, shell.position)).toBeLessThan(shell.dockRange + 1_000);
+  });
+
+  it('gives a save made before slice 2 its new ports, where the design puts them, and refreshes who runs the old ones', () => {
+    const w = createSolWorld();
+    const sixOnly = Object.fromEntries(
+      [EARTH_ORBITAL_EXCHANGE_ID, THETIS_ORBITAL_ID, ELYSIUM_ID, CERES_ACCORD_ID, SLAGLINE_ID, TITAN_FREE_PORT_ID].map((id) => {
+        const { runBy: _r, holder: _h, rank: _k, ...old } = w.stations[id]!;
+        return [id, old];
+      }),
+    );
+    const loaded = deserializeWorld(serializeWorld({ ...w, stations: sixOnly }, 'then'));
+    if (!loaded.ok) throw new Error(loaded.reason);
+    expect(Object.keys(loaded.world.stations).sort()).toEqual(Object.keys(w.stations).sort());
+    expect(loaded.world.stations[BELLOWS_ID]!.position).toEqual(w.stations[BELLOWS_ID]!.position);
+    expect(loaded.world.stations[EARTH_ORBITAL_EXCHANGE_ID]).toMatchObject({ runBy: 'The Board', holder: 'earth', rank: 'capital' });
   });
 });
 
@@ -166,36 +264,39 @@ describe('the burn', () => {
     if (!started.ok) throw new Error(started.reason);
     const clearance = world.bodies[MARS_ID]!.radius * BURN_BODY_MARGIN;
     let closest = Infinity;
-    let fastestNearMars = 0;
+    let speedThere = 0;
     run(started.world, 60, (s) => {
       const ship = s.ships[shipId]!;
       const d = distance(ship.position, mars);
-      closest = Math.min(closest, d);
-      // On the pass itself (the tangent in runs close to the circle for a while, still shedding speed).
-      if (d < clearance * 1.005) fastestNearMars = Math.max(fastestNearMars, length(ship.velocity));
+      if (d < closest) {
+        closest = d;
+        speedThere = length(ship.velocity);
+      }
       return false;
     });
-    // Past the surface by a wide margin, and never at a speed the drive could not bend at that radius.
+    // Past the surface by a wide margin, and at the low point no faster than the drive can bend at that radius.
     expect(closest).toBeGreaterThan(world.bodies[MARS_ID]!.radius * 1.2);
-    expect(fastestNearMars).toBeLessThan(bendSpeed(1000, clearance) * 1.1);
+    expect(speedThere).toBeLessThan(bendSpeed(1000, clearance) * 1.05);
   });
 
-  it('leaves a port dug into a rock by going straight out first', () => {
+  it('leaves and reaches a port dug into a rock without diving below it', () => {
     const w = soloInSol();
-    const shipId = pilotShip(w, 'ana')!.id;
     const slagline = w.stations[SLAGLINE_ID]!;
     const pallas = bodyStates(w.bodies, railTime(0, w.dt))[PALLAS_ID]!.position;
     // Slagline sits inside the clearance a route keeps from Pallas.
     expect(distance(slagline.position, pallas)).toBeLessThan(w.bodies[PALLAS_ID]!.radius * BURN_BODY_MARGIN);
-    const placed = { ...w, ships: { ...w.ships, [shipId]: { ...w.ships[shipId]!, position: { x: slagline.position.x, y: slagline.position.y - 700 } } } };
-    const plan = burnPlan(placed, placed.stations, placed.ships[shipId]!.position, CERES_ACCORD_ID, 1000, 0)!;
-    // Pallas first (Ceres may be in the way further on: the Accord station sits on its far side from here).
-    expect(plan.route.bends[0]!.bodyId).toBe(PALLAS_ID);
-    // Out to the circle first, then on; and the route back in ends inside the circle at the port.
-    expect(distance(plan.route.points[0]!, pallas)).toBeCloseTo(w.bodies[PALLAS_ID]!.radius * BURN_BODY_MARGIN, 0);
-    const back = burnPlan(placed, placed.stations, placed.stations[CERES_ACCORD_ID]!.position, SLAGLINE_ID, 1000, 0)!;
-    expect(back.route.bends.at(-1)!.bodyId).toBe(PALLAS_ID);
-    expect(distance(back.route.points.at(-1)!, slagline.position)).toBeLessThan(slagline.dockRange + 600);
+    // Out: from just off the port, every point of the route at least as high as the ship starts, or as the port.
+    const start = { x: slagline.position.x, y: slagline.position.y - 700 };
+    const out = burnPlan(w, w.stations, start, CERES_ACCORD_ID, 1000, 0)!;
+    const startHeight = Math.min(distance(start, pallas), distance(slagline.position, pallas));
+    for (const p of out.route.points) expect(distance(p, pallas)).toBeGreaterThan(startHeight - 2);
+    // In: the route ends beside the port and never goes below it on the way.
+    const back = burnPlan(w, w.stations, w.stations[CERES_ACCORD_ID]!.position, SLAGLINE_ID, 1000, 0)!;
+    const end = back.route.points.at(-1)!;
+    expect(distance(end, slagline.position)).toBeLessThan(slagline.dockRange + 600);
+    for (const p of back.route.points) expect(distance(p, pallas)).toBeGreaterThan(Math.min(distance(end, pallas), w.bodies[PALLAS_ID]!.radius * BURN_BODY_MARGIN) - 2);
+    // Never closer than BURN_SURFACE_MARGIN radii either way.
+    for (const p of [...out.route.points, ...back.route.points]) expect(distance(p, pallas)).toBeGreaterThan(w.bodies[PALLAS_ID]!.radius);
   });
 
   it('burns for a world and stops above its well, matched to it', () => {

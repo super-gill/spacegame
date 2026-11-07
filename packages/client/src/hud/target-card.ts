@@ -359,7 +359,7 @@ export class TargetCard {
       setText(this.who, `${name.toUpperCase()} · squawking · lock it for more`);
     } else if (station) {
       setText(this.name, station.name);
-      setText(this.who, 'Broadcasting its beacon');
+      setText(this.who, station.runBy ? `${station.runBy.toUpperCase()} · beacon on` : 'Broadcasting its beacon');
     } else if (body) {
       setText(this.name, body.name);
       setText(this.who, `${body.kind === 'moon' ? 'Moon' : 'Planet'} · radius ${Math.round(body.radius).toLocaleString('en-GB')} u · a burn stops above its well (U)`);

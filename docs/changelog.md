@@ -4,15 +4,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
-Sol slice 2, push 1: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed.
+Sol slice 2, pushes 1 and 2: worlds as burn targets, the pass round a world, the pod lost in a fall at burn speed; all 31 of Sol's ports and the five Accord lanes.
 
 ### Added
+- **All of Sol's ports: 31 now, up from six.** Venus's Solace Station Mercy, Lavinia Alpha Dock and Halden Beta Regio Observatory; round Earth, the ECF and Tessaract yards at the Lagrange points, Tycho Port on Luna, Corvane Apollo Works and Rook and Rivet Shell Station; Corvane Caloris Foundry at Mercury; MRN Yard Phobos, State Yard Deimos and State Mine Eureka at Mars; in the Belt, Vesta Concession, Psyche Dig, Bellows, the Boneyard and Hilda Moot; out past Jupiter, Callisto Freight Depot, the Ganymede Local, VSG Haven Europa, Rimehold, Plume and Triton Moot; and the ECF Toll Station and MRN Gate Station at the Gate Reach. Each trades, outfits and sells ships by what it is: foundries pay best for ore, salvage ports for scrap, clinics sell medicine cheap, the far outposts pay dear for everything brought in. A port's card says who runs it. Existing worlds gain them on their next start.
+- **The Accord lanes on the chart:** the Inner, Ceres, Belt, Long and Gate lanes as wide bands between their ports, named, with a key.
 - **Burn for a world.** Click a planet or moon on the chart (M) and press U: the burn ends above its gravity well, at rest with it. The target card calls it a world; the plan says ABOVE THE WELL.
 - **The pass round a world.** A burn whose line crosses a world bends round it: a tangent in, an arc grazing its clearance, a tangent out. The ship slows for the pass to what its drive can bend at that radius and burns on after. The chart draws the route the ship will fly, rings the world it rounds, and the plan's ROUTE line says ROUND MARS and how much longer it takes than the straight line. The burn banner reads ROUNDING EARTH during the pass. Leaving Slagline, dug into Pallas, goes straight out first.
 
 - **The chart zooms and pans.** The wheel zooms about the pointer, dragging moves the chart; zoomed all the way out it locks on the Sun with all of Sol in view. LOCAL, INNER, BELT and ALL SOL remain as quick jumps.
 
 ### Changed
+- The chart places names so they never overlap: worlds, capitals and free ports first, the rest as you zoom in. Capitals and free ports have a larger mark.
+- A burn to or from a port in low orbit or dug into a rock passes round the world at the port's height instead of climbing out first. Flying in to Rook and Rivet Shell Station no longer circles Earth.
 - Hitting a world at burn speed (2,000 u/s or more) loses the pod too: nothing gets away, and you wake at your home station with what you own elsewhere, as after losing a pod. Slower falls still end the ship and the nearest port recovers your pod.
 - The burn plan's times count the flips (about a second each).
 - The burn refusal for an unknown target reads "No such port or world."
