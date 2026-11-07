@@ -293,14 +293,15 @@ Capital-class industrial ships (the Headframe, the Winder, the Smelter, the Brea
 | --- | --- | --- | --- |
 | Combat | Vantage Aerospace (Luna) | Vantage Foil (light), Vantage Sabre (heavy); retired: Vantage Dirk, Vantage Cutlass | The Charter Fleet; the Foil sold Navy or civilian grade, so Belt militias and pirates too; the Sabre Navy only; the Dirk and Cutlass sold whole, Navy tag intact |
 | Combat | Arcadia Works (Mars) | Arcadia Fighter Mk V (light), Arcadia Heavy Fighter Mk II; retired: Fighter Mk IV, Heavy Fighter Mk I | The Martian Navy; the Mk V civilian grade to Martians only; retired marks released once the replacement flies, Martian buyers first |
+| Combat | Ishtar Fleet Works (Venus) | Ishtar Hathor (light, hybrid); retired: Hathor '221 | The Coastguard; Navy or civilian grade; the '221 sold with the gun pulled |
 | Combat | The clans | Vesk light raider, Vesk heavy raider | The clans, and whoever they sell to |
 | Mining | Belt Forge Collective | Belt Forge Jackleg (a jackleg drill) | Colliers, Winders, Headframes |
 | Mining | Corvane Heavy Industries | Corvane Navvy | Corvane Drays and Smelters |
 | Salvage | Rook and Rivet | Rook and Rivet Grab | Wreckers and Breakers |
 | Salvage | The clans | Long Wake Dredge | The Long Wake's tenders |
-| Rescue and repair | Solace Medical | Solace Stretcher | Havens, Sanctuaries, the Coastguard |
+| Search and rescue | Solace Medical (Venus) | Solace Stretcher (heavy SAR fighter) | Every navy, under the Mercy Clause; Havens, Sanctuaries, the Coastguard. Drawn generic on purpose so it looks right in anyone's bay |
 
-Venus flies no fighters; a Venusian carrier is a drone carrier, and the Coastguard's crewed subcraft are rescue craft.
+Venus flies one light fighter and no heavy combat fighter; its heavy is the Stretcher, a SAR craft, and a Venusian carrier is a drone carrier.
 
 ### Drones by job and maker
 

@@ -39,7 +39,7 @@ Five rungs, each flown by the hulls in `fleet.md`. The rung reached depends on t
 
 | Rung | What it is | Earth | Mars | Venus | The Belt |
 | --- | --- | --- | --- | --- | --- |
-| 1 **Station security** | The station's own PDCs and a pair of security craft, holder's livery; never leaves its zone | Vantage Foils, civilian grade | Arcadia Fighter Mk V | Solace Stretcher escorting Foils bought from Earth | Militia Foil refits |
+| 1 **Station security** | The station's own PDCs and a pair of security craft, holder's livery; never leaves its zone | Vantage Foils, civilian grade | Arcadia Fighter Mk V | Ishtar Hathors with a Solace Stretcher | Militia Foil refits |
 | 2 **The patrol** | The local law: a pair on a beat between the ports, answering beacons | Two Kessari Warrants (Toll pattern on the gate beat) | Two Seraphine Phobos | A Lakshmi and a Sedna | A Union Blockade and a Wildcat |
 | 3 **The reserve** | A frigate or destroyer group that burns from the nearest major port | An Injunction with two Citations | A Resolve and a Constancy | A Maat | A Boycott and two Wildcats |
 | 4 **The navy** | A cruiser group: the power has decided to end it | A Statute, a Verdict, escorts and a Mandate's fighters | A Valles and two Constancies | A Maxwell and an Aphrodite (rescue first, even now) | A Solidarity and a Walkout |
