@@ -45,6 +45,7 @@ Every hull by class and source. Names only. A blank cell is a deliberate gap: th
 | Battleship | Kessari Precedent | Seraphine Tharsis | | |
 | Carrier | Kessari Mandate | Seraphine Hellas | | |
 | Dreadnought | Kessari Charter | Seraphine Olympus | | |
+| Special operations (T3) | Summons, Custody, Sentence | Noctis, Cerberus, Medusae | Hecate (hunter, unacknowledged) | Vesk Vane, Vesk Shade (clan; no drives) |
 
 Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civilian-grade, which is why it is the starter.
 
@@ -121,6 +122,9 @@ Legal and enforcement terms. Earth's naval yard: the Charter Fleet and the toll 
 | Kessari Precedent | Battleship | The Charter Fleet's heaviest line ship | Earth has never lost one and intends to keep it that way | draft |
 | Kessari Mandate | Carrier | Drone and fighter carrier | Launches the contract and lets it do the work | draft |
 | Kessari Charter | Dreadnought | The Charter Fleet's flagship | Named for the document everything else is built on | draft |
+| Kessari Summons | Frigate, special operations (watcher) | Finds and marks the target | You never see the one that found you | draft |
+| Kessari Custody | Cruiser, special operations (hunter) | Jumps onto the mark and pins | Grabs and calls for backup | draft |
+| Kessari Sentence | Battleship, special operations (striker) | Jumps in behind the hunter and ends it | Committed the moment it lands | draft |
 
 ## Seraphine Naval Yards
 
@@ -135,6 +139,9 @@ Martian places for the big ships, Martian virtues for the small. Builds the Mart
 | Seraphine Valles | Cruiser | Line cruiser | The Navy's workhorse heavy | draft |
 | Seraphine Tharsis | Battleship | Line battleship | The best big ship in known space, and Mars knows it | draft |
 | Seraphine Hellas | Carrier | Fighter carrier | Squadrons, not drones: Martian pilots fly | draft |
+| Seraphine Noctis | Frigate, special operations (watcher) | Finds and marks the target | Named for the labyrinth of night; cold, quiet, always there | draft |
+| Seraphine Cerberus | Cruiser, special operations (hunter) | Jumps onto the mark and pins | The dog that holds | draft |
+| Seraphine Medusae | Battleship, special operations (striker) | Jumps in behind the hunter and ends it | Elite crews, no armour to speak of, no second pass | draft |
 | Seraphine Olympus | Dreadnought | Flagship | One exists. It has never fired in anger. | draft |
 
 ## Arcadia Works
@@ -167,6 +174,7 @@ Venus highlands for the hulls (its guns are replies). Builds the Coastguard: res
 | Ishtar Maat | Frigate | Hybrid frigate | Answers from range | draft |
 | Ishtar Maxwell | Destroyer | Hybrid destroyer | The heaviest thing Venus will admit to owning | draft |
 | Ishtar Aphrodite | Cruiser | Rescue cruiser and command ship | A hospital with railguns | draft |
+| Ishtar Hecate | Cruiser, special operations (hunter) | Jumps onto a mark and pins | The one Venus cannot account for; nobody has seen it twice | draft |
 
 ## Solace Medical
 
@@ -255,7 +263,8 @@ The Belt's ship-born clans build a few hulls each, over generations, and no two 
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
-| Vesk Vane | Corvette | Stealth raider and escort | Black hull, red vanes, cold-coasts better than anything | draft |
+| Vesk Vane | Corvette, special operations (watcher) | Stealth raider and escort; the clans' watcher | Black hull, red vanes, cold-coasts better than anything | draft |
+| Vesk Shade | Frigate, special operations (striker) | Stealth raider; the clans' striker, burns in because the clans have no drives | A stealth raider with a destroyer's teeth | draft |
 | Saro Farwalker | Explorer (large) | Long-range exploration | The hull that crossed the Shoals | draft |
 | Long Wake Trawl | Recovery tender (heavy) | Deep-space recovery | Trailing cables and nets; finds what everyone else gave up | draft |
 
@@ -349,6 +358,46 @@ For the lead: a `navy` tag on hull entries; a `grade` on owned ships (civilian o
 
 On the registry: a civilian-grade hull is a livery toggle on the production hull's page, not its own entry, because it is the same design on the same date. Retired navy hulls and legacy marks are their own entries, because they are different designs.
 
+## Special operations: the T3 line
+
+Decided 7 November 2026. Special operations vessels are a navy's advanced offensive capability: a hull built around exactly one capability, the best in the game at that one job, and below a production hull at something else. Never a generalist, never a pattern of an existing hull, never on the open market. Stealth is the line's theme rather than a hull of its own: dark unregistered liveries, cold running, off the board when dark.
+
+### The hunting doctrine
+
+Three ships, one job: find a target, land on it, hold it, kill it or hold it until the fleet arrives.
+
+| Role | Class | Capability | What it costs | The tell on the hull |
+| --- | --- | --- | --- | --- |
+| **Watcher** | Frigate (corvette for the clans) | Fast and agile despite its size, cold-running, thin as paper. Finds the target, shadows it off the board, holds a lock. Its lock is a jump target. | Does no real damage; dies to anything that catches it | More engine and sensor than hull; exposed structure; no plate |
+| **Hunter** | Cruiser | The brick. Jumps onto a lock, lands at close range and pins: cuts the target's burn, slows its turn, drags its capacitor. Survives long enough for the fleet to arrive, and is why the fleet knows where to arrive. | Slow, modest guns, long jump cooldown, no shields for a few seconds after landing | Heavy plate round a drive ring that is not human; projector arrays where the guns should be |
+| **Striker** | Battleship (frigate for the clans) | Stripped down and bristling. Jumps in behind the hunter and dumps alpha far above its class. Flown in packs by elite crews. | Low defences; with the cooldown it is committed once it lands: it kills or it dies there | A hull built around its weapons, little armour, the drive ring |
+
+### Jumping
+
+- A **jump** is a short in-system hop without a gate, from a standing start to a point at close range. It needs a **jump target**: a watcher's lock on a ship, a friendly fleet beacon, or a station beacon. No target, no jump. Jumps never cross systems; the gates keep that.
+- The drive is **gate-born**: built round salvaged Lattice material from the Shoals and the Dimming, barely understood. Single digits exist per power. It is banned under the Ceres Accord's Open Lanes clause, so every navy denies having one, and the Accord's lawyers hate the hunter's pin as much as the drive.
+- Arriving is loud: a flash on the board, a capacitor dump, a few seconds without shields. A long cooldown before the next jump, so a jump is a commitment.
+- The clans have no drives unless stolen. A clan hunting pack burns in behind its watcher.
+
+### How navy NPCs use it
+
+A hunting group is what a power sends after a wanted ship, a dark ship that will not stop, or a pirate it has decided to finish. The watcher arrives first and may never be seen. The hunter lands on the target. The strikers land behind it. The regular patrol arrives last, by burn, to clean up. A lone hunter is a story beat (it grabbed you and called for backup); a full group is the game saying you have gone too far. A pilot meets the doctrine from both ends: as prey when their standing goes bad, and as crew at the top of a navy's standing ladder.
+
+### Who fields what
+
+| Power | Watcher | Hunter | Striker | Style |
+| --- | --- | --- | --- | --- |
+| Earth, the Charter Fleet | Kessari Summons | Kessari Custody | Kessari Sentence | Grey legal fictions; the quiet contracts; never acknowledged |
+| Mars, the Martian Navy | Seraphine Noctis | Seraphine Cerberus | Seraphine Medusae | Open about it and still in rust; Mars arrives |
+| Venus, the Coastguard | | Ishtar Hecate | | One hull nobody can account for; Venus sells SAR to everyone instead |
+| The Belt, the clans | Vesk Vane | | Vesk Shade | No drives; burns in; the clans' stealth is the best there is |
+
+Venus's search and rescue is a product line, not special operations: Solace Medical's rescue hulls and kit are sold to every navy under the Mercy Clause, and the Coastguard flies the best of them.
+
+How a pilot gets one: the top of a navy's standing ladder, with duties that match; stolen; or a one-off story. Owned ships are never taken back, so a deserter in a T3 is a deserter everyone is looking for.
+
+For the lead, when wanted: a `role` on T3 hulls (watcher, hunter, striker); a lock as a jump target, fleet and station beacons; a jump with a target, a cooldown, a capacitor dump and a shield gap on arrival; the pin as a hull ability (burn, turn and capacitor penalties on the target while the hunter holds it); the hunting group as an NPC task group spawned by standing and wanted state. None of this is needed until T3 hulls exist in the game.
+
 ## Belt hulls: rebuilt, with their own bonuses
 
 Decided 6 November 2026. The Belt's combat and transport hulls are stolen, captured or copied hulls rebuilt into something new: Belt shapes grown over the original, Belt bonuses (projectile guns, speed, spare mounts) and a Belt name. They are new ships in their own right. They come last in the art order because they are drawn over their sources.
@@ -418,17 +467,18 @@ Civilian hulls by job and band, with the gaps filled on 6 November (Tessaract It
 
 The ship registry page shows every hull's rating as a tag.
 
-## Generations: legacy, production, pattern and clan
+## Generations: T1, T2 and T3
 
-Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots; the generations are where the real variety comes from. Jason's own shorthand is T1 for the older marks and T2 for the current ones; the EVE column below is only a loose analogue and the generation names are the canon:
+Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots; the generations are where the real variety comes from. Jason's tiers (7 November): T1 is the older marks, T2 the current ones and their patterns, T3 special operations and the clans. The tier is the price band and the rarity; the generation is what the hull is:
 
-| Tier | EVE analogue | What it is | Where you get it | Price and quality |
+| Tier | Generation | What it is | Where you get it | Price and quality |
 | --- | --- | --- | --- | --- |
-| **Legacy** | Cheap T1 bought second-hand | An earlier civilian mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
-| **Retired navy (surplus)** | Older T1 warships | A navy mark the navy has replaced, sold whole with the Navy tag intact | The open market, where that navy releases them (see "Navy grade, civilian grade and retired navy hulls") | Expensive and strong; older mounts and no yard support; the livery painted over |
-| **Production** | T1 | The current mark | Ship marts and the maker's own yards | The catalogue price and the catalogue stats |
-| **Pattern** | T2 | A specialised variant of a production hull, built to a navy's or a company's pattern | Standing with the maker, or a navy licence | Expensive, better at one thing, often worse at another |
-| **Clan** | T3 | A bespoke hull built by a Belt clan over generations | Standing with the clan, or a very rare sale | Rare, the best at one thing, and no two alike |
+| **T1** | Legacy | An earlier civilian mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
+| **T1** | Retired navy (surplus) | A navy mark the navy has replaced, sold whole with the Navy tag intact | The open market, where that navy releases them (see "Navy grade, civilian grade and retired navy hulls") | Expensive and strong; older mounts and no yard support; the livery painted over |
+| **T2** | Production | The current mark, Navy or civilian grade | Ship marts and the maker's own yards; Navy grade behind the licence | The catalogue price and the catalogue stats |
+| **T2** | Pattern | A specialised variant of a production hull, built to a navy's or a company's pattern | Standing with the maker, or a navy licence | Expensive, better at one thing, often worse at another |
+| **T3** | Special operations | A hull built around one capability of the hunting doctrine (watcher, hunter, striker); see "Special operations: the T3 line" | The top of a navy's standing ladder, with duties; stolen; a story | Rare, the best in the game at its one job, and below a production hull at something else |
+| **T3** | Clan | A bespoke hull built by a Belt clan over generations; the Belt's special operations | Standing with the clan, or a very rare sale | Rare, the best at one thing, and no two alike |
 
 For the lead, when wanted: a `generation` on each hull; a legacy hull is its own hull entry (its own mounts and stats) that points at the production hull it preceded; a pattern hull is a hull entry that points at its base; a used market at ship marts stocks legacy hulls at a discount with a little variance; legacy hulls appear in NPC traffic in proportion to how far from the core a system sits, so the Marches fly old ships and Sol flies new ones.
 
