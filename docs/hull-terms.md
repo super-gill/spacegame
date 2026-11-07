@@ -14,6 +14,14 @@ Written 7 November 2026 for the lead. Every term the fleet uses, what it is in t
 
 **Mark.** A version of a hull in the fiction: Mk II, '218, "the old Pony". A new mark is a new hull entry; the old one keeps flying (see legacy and retired navy). Suggests nothing beyond a separate hull entry with a `base` pointer.
 
+**Fitting model.** Unchanged from `fitting.md` (approved 5 November): every hull can fit anything its slots take, and odd builds are legitimate if they pay their costs. A hull is three things, and the fleet lore maps onto them:
+
+1. **Fitting constraints**: slot counts and sizes, core system sizes, and the frame (mass, structure, speed, turn, capacitor, signature). The weight band, the builder's trade-off (Corvane heavy and armoured, Belt Forge light and far-ranging, Meridian cheap and slight), the Navy and Militia tags (better frame stats) and patterns (frame variants) all live here.
+2. **Role bonuses**: a few percentages for full-size modules of the kinds the role wants. Nudges, never requirements. The "grades" in `materials.md` (laser L1 to L3, saw S1 to S3, intake D1 to D3) are the size of the hull's tool slots with the role bonus at full size.
+3. **Built-in role equipment**: what a role gets that cannot be fitted elsewhere or fitted out. Few, and each one is the hull's identity: a mining hull's unusually large ore hold, a hopper, a skimmer's heat-rated hull, a carrier's hangar bays and wing control, a command ship's command suite and fleet beacon, the Shrike's cell block, a T3's capability (lock, gate-born jump, pin), a prototype's one Lattice component.
+
+**Hull identity cannot be fitted out** (Jason, 7 November): the fitting freedom is real, but a pilot never removes the built-in equipment, and the frame keeps a hull honest (a capital's turn and mass are why it never works the site). **Stock fits** are fixed per hull: they are what NPCs fly, so traffic stays readable, and what the art draws. Subcraft, drones and pods are bay products with fixed fits.
+
 ## Tiers and generations
 
 **Tier.** The price band and rarity of a hull: **T1** cheap or old, **T2** current, **T3** rare and the best at one thing. A tier contains two generations each. Mechanically: a price multiplier and where the hull appears (used market, ship mart, standing reward). Suggests `tier` (1, 2, 3).

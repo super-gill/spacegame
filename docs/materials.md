@@ -95,9 +95,9 @@ Two stages. Raw sells; refined sells for more and takes less hold; alloy is what
 
 ## What each mining hull does
 
-Method, grade, hold and processing per hull, including the eleven hulls agreed in the gap pass. Grades: laser L1 to L3 and saw S1 to S3 against the rock's hardness or the ice's density; intake D1 to D3 against the band (D1 upper, D2 cloud, D3 below the death line). Holds are relative within the industry; numbers are the lead's.
+Stock fit, tool slots, role bonus and built-in equipment per hull, including the eleven hulls agreed in the gap pass. This sits inside the fitting model of `fitting.md` and `hull-terms.md`: any hull can fit anything its slots take; the role bonus nudges; the built-in hold, hopper, heat rating, bays and processing are the hull's identity and never fitted out. **Tool slot** grades are the size of the hull's tool slots with the role bonus at full size: laser and saw 1 to 3 are small, medium and large against the rock's hardness or the ice's density; intake D1 to D3 is the hull's heat rating against the band (D1 upper, D2 cloud, D3 below the death line), which is built in, not fitted. Holds are relative within the industry; numbers are the lead's.
 
-| Hull | Builder | Method | Grade | Hold | Processing | Role in a wing or fleet |
+| Hull | Builder | Stock method | Tool slot and role bonus | Built-in hold | Built-in processing | Role in a wing or fleet |
 | --- | --- | --- | --- | --- | --- | --- |
 | Meridian Dunlin (new) | Meridian | Cut | L1 | Small | None | The first miner anyone buys; outgrown fast |
 | Belt Forge Prospector | Belt Forge | Cut; survey | L1, the best scanner at its size | Small | None | Finds the rock, picks the easy ones, scouts for the fleet |
