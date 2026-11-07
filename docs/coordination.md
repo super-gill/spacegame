@@ -260,6 +260,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: transponder line formalised (`lore.md` "What a transponder says"): prefixes by service and flag, navy hull numbers, Registry numbers; owned-ship fields in `hull-terms.md`.
 - 2026-11-07, lore: **ship art source added to the repo** at `art/` (Jason: it lived only in the lore chat's session). Not game code: nothing in `packages/` imports it. `art/registry/` is the Python generator for the registry page and `docs/hulls.md`; `art/sol-chart/` the Sol Chart page; `art/README.md` documents building, checking and adding hulls. This is the lore branch's first non-doc commit, by Jason's decision; the lead decides where the rasterise step lives. Generator output (`art/registry/out/`, screenshots) is ignored.
 - 2026-11-07, lore: art pass 5 (the twelve gap-pass entries; 177 of 178 drawn); stern radiator slashes removed fleet-wide; art rules gathered in `fleet.md`; Sol Chart page published. `hulls.md` regenerated.
 - 2026-11-07, lore: one name per station (Jason), each in its runner's official style; the full list is in `sol.md`.

@@ -302,6 +302,43 @@ Under Witness Law a dark ship's log entry is just a contact, not a name, unless 
 
 Pirates: the Black Strike and the Cutloose always run dark; the Null Ledger spoofs; the Hollow Choir runs dark and, hailed, answers with song; the Aurel have no transponder to show, and nobody has ever read one.
 
+#### What a transponder says
+
+Decided 7 November 2026 (Jason: transponders get formal names). A squawking ship broadcasts one formal line, and that line is what a lock, a hail, a log entry and a witness record show:
+
+`[prefix] [ship name] ([hull number]) · [hull] · [Registry number]`
+
+For example `MRNS Diligent (P-031) · Seraphine Phobos · CR-M 004117`, or `EMS Lantern Run · Tessaract Manifest · CR-E 381022`.
+
+**Prefix.** Set by the service a ship sails in, or else by its flag:
+
+| Prefix | Spoken | Who carries it |
+| --- | --- | --- |
+| ECFS | Earth Charter Fleet Ship | Navy-grade ships of the ECF, and contracted pilots while under contract |
+| MRNS | Martian Republic Navy Ship | Navy-grade ships of the MRN |
+| VSGS | Venusian Space Guard Ship | Navy-grade ships of the VSG |
+| UDFS | Union Defence Force Ship | Any Belt ship on UDF rota, for the length of the shift; it goes back to BCV off shift |
+| VMS | Venusian Mercy Ship | Any Solace hull flying under the Mercy Clause, whoever owns it: the prefix is the protection. Shooting a VMS is the crime every power hunts |
+| EMS | Earth Merchant Ship | Civilian ships under the Earth flag |
+| MCS | Martian Civil Ship | Civilian ships under the Martian flag |
+| VCS | Venusian Civil Ship | Civilian ships under the Venusian flag |
+| BCV | Belt Cooperative Vessel | Civilian ships under the Belt flag; the cooperative's name rides in the Registry entry |
+| ARS | Accord Registered Ship | Ships registered at Ceres or Titan with no power's flag; independents' favourite, everyone's foreigner |
+
+**Flag.** A civilian ship flies its owner's origin by default. An Accord flag (ARS) is open to anyone who registers at a free port; it is treated as foreign everywhere, which is the point for some.
+
+**Hull number.** Navy and UDF ships carry one: a class letter and a number. K corvette, P patrol boat, F frigate, D destroyer, C cruiser, B battleship, V carrier, X dreadnought. Special operations hulls broadcast as auxiliaries (A, a tender or a survey ship) when they squawk at all, which is rarely. Civilian ships have no hull number.
+
+**Ship name.** A pilot names their own ship. Navies name theirs by theme: the ECF for Earth's cities and founding houses, the MRN for virtues and Martian places, the VSG for stars and rescues, the UDF for strikes, picket lines and the cooperatives' dead.
+
+**Registry number.** `CR-` (the Ceres Registry), the flag letter (E, M, V, B, or A for the Accord), and six digits. It never changes for the life of the hull, whatever the hull is renamed or reflagged; it is how wanted follows the hull.
+
+**Pods.** An Ark broadcasts `ARK · from [prefix] [ship name] · [Registry number]`: the pod is named for the ship it came from.
+
+**Stations.** A station's beacon broadcasts its one name (`sol.md`), nothing else.
+
+A dark ship shows only `CONTACT · [weight band]` until it is locked and identified, when the hull's Registry entry is read from its hull, not its transponder. A spoofed transponder broadcasts a false line; a lock reads the true hull, which is how spoofers are caught.
+
 ### The board
 
 The sortable list of every contact round a ship is **the board**. Pilots check the board and put a contact on the board.
@@ -726,6 +763,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Transponders get formal names** (Jason). A squawking ship broadcasts `[prefix] [name] ([hull number]) · [hull] · [Registry number]`. Prefixes: ECFS, MRNS, VSGS, UDFS (on rota only), VMS (any Mercy Clause hull: the prefix is the protection), and by flag EMS, MCS, VCS, BCV, ARS (Accord). Navy hull numbers by class letter; special operations squawk as auxiliaries. Registry number `CR-` plus flag letter plus six digits, for the life of the hull. Details under "The transponder".
 - 2026-11-07: **One name per station** (Jason): a single actual name in game, on the board, in comms and in dialogue, to prevent confusion. Each is in its runner's official style: Earth corporate and legal (Earth Orbital Exchange, ECF Yard L5), Mars state and military (Republic Station Elysium, MRN Yard Phobos), Venus civic (Thetis Orbital, VSG Haven Europa), companies by company, place and function, the Accord plain (Ceres Accord Station); the Belt and the clans keep their informal names because that is their official style (Slagline, Bellows, Hilda Moot). Full list in `sol.md`.
 - 2026-11-07: **Navy names** (Jason): the **Earth Charter Fleet (ECF)**, the **Martian Republic Navy (MRN)**, the **Venusian Space Guard (VSG)** and the **Union Defence Force (UDF)**, replacing the working names Charter Fleet, Martian Navy, Coastguard and Union Militia (and the proposed Vigil and Lifeline, which also clashed with a Cantor-Vell armour, a Meridian module and a Lakshmi pattern). Belters do not call themselves a militia: the Militia tag is now the UDF tag, the Militia rota the UDF rota, and a shift is still "the Rota". Formal, acronym-led names, the way a state prints them on a hull.
 - 2026-11-07: **Sol: all of it, enormous bodies, named stations and navies.** The first build is all of Sol (Jason); the in-game layout comes from gameplay. Bodies are enormous: a planet's limb fills the screen, stations are specks against their worlds, rendering scale separate from distance. Venus is a start (eight starts). Stations take their runner's naming flavour (Earth contracts and law, Mars places and virtues, Venus highlands and the evening star, the Belt mining and strike words). Navies: the Charter Fleet and the Union Militia stand; proposed for Mars the Vigil and for Venus the Lifeline. Station renames: Surety (Callisto), Vesper Haven (Europa), the Ganymede Local, Titan Free Port, Beta Regio Observatory, Fortitude (the gate; Picket clashed with the Union Picket gun).

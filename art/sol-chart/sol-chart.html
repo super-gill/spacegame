@@ -104,7 +104,8 @@ td b { font-family: var(--display); font-weight: 600; font-size: 14px; }
 
   <section class="section" aria-labelledby="h-navies">
     <h2 id="h-navies">The navies in Sol</h2>
-    <div class="tablebox"><table id="navies"><thead><tr><th>Power</th><th>Navy</th><th>In the street</th><th>Home</th><th>Where</th></tr></thead><tbody></tbody></table></div>
+    <p class="note">A squawking ship broadcasts one line: prefix, name, hull number for navy ships, hull, Registry number. For example <code>MRNS Diligent (P-031) · Seraphine Phobos · CR-M 004117</code>. Civilian prefixes follow the flag: EMS, MCS, VCS, BCV, ARS; any Mercy Clause hull is VMS.</p>
+    <div class="tablebox"><table id="navies"><thead><tr><th>Power</th><th>Navy</th><th>In the street</th><th>Ship prefix</th><th>Home</th><th>Where</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <p class="note">Source: <code>docs/sol.md</code> on the lore branch, 7 November 2026. Scale, layout and travel times are the lead's.</p>
@@ -214,10 +215,10 @@ const LANES = [
 ];
 
 const NAVIES = [
-  ['Earth', 'Earth Charter Fleet (ECF)', 'the Charter', 'ECF Yard L5', 'Earth\'s volume, the toll ends of every lane, the ECF Toll Station; mostly contracted pilots'],
-  ['Mars', 'Martian Republic Navy (MRN)', 'the Navy', 'MRN Yard Phobos', 'Mars\'s volume, the Accord lanes Sol-wide, the MRN Gate Station'],
-  ['Venus', 'Venusian Space Guard (VSG)', 'the Guard', 'Thetis Orbital', 'Venus\'s volume and VSG Haven Europa; rescue first, never the first to fire'],
-  ['The Belt', 'Union Defence Force (UDF)', 'the Rota', 'Slagline', 'The Belt Lane, Pallas, Hygiea and the Belt\'s Held stations; cooperatives on shift'],
+  ['Earth', 'Earth Charter Fleet (ECF)', 'the Charter', 'ECFS', 'ECF Yard L5', 'Earth\'s volume, the toll ends of every lane, the ECF Toll Station; mostly contracted pilots'],
+  ['Mars', 'Martian Republic Navy (MRN)', 'the Navy', 'MRNS', 'MRN Yard Phobos', 'Mars\'s volume, the Accord lanes Sol-wide, the MRN Gate Station'],
+  ['Venus', 'Venusian Space Guard (VSG)', 'the Guard', 'VSGS', 'Thetis Orbital', 'Venus\'s volume and VSG Haven Europa; rescue first, never the first to fire'],
+  ['The Belt', 'Union Defence Force (UDF)', 'the Rota', 'UDFS, on rota', 'Slagline', 'The Belt Lane, Pallas, Hygiea and the Belt\'s Held stations; cooperatives on shift'],
 ];
 
 // Security bands along the strip: [from AU, to AU, level]
@@ -313,5 +314,5 @@ select(BODIES.some((b) => b.id === start) ? start : 'ceres');
 const tb = (id, rows, f) => { document.querySelector(`#${id} tbody`).innerHTML = rows.map(f).join(''); };
 tb('starts', STARTS, (r) => `<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[4])}</td></tr>`);
 tb('lanes', LANES, (r) => `<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${pill(r[2])}</td><td>${esc(r[3])}</td></tr>`);
-tb('navies', NAVIES, (r) => `<tr><td>${esc(r[0])}</td><td><b>${esc(r[1])}</b></td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[4])}</td></tr>`);
+tb('navies', NAVIES, (r) => `<tr><td>${esc(r[0])}</td><td><b>${esc(r[1])}</b></td><td>${esc(r[2])}</td><td><code>${esc(r[3])}</code></td><td>${esc(r[4])}</td><td>${esc(r[5])}</td></tr>`);
 </script>

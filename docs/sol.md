@@ -83,12 +83,12 @@ Every station has **one name**, used on the board, in comms and in dialogue alik
 
 ### The navies in Sol
 
-| Power | Navy | Called in the street | Home | In Sol |
-| --- | --- | --- | --- | --- |
-| Earth | **The Earth Charter Fleet (ECF)** | the Charter, the ECF | ECF Yard L5 | Earth's volume, the toll ends of every lane, ECF Toll Station; mostly contracted pilots |
-| Mars | **The Martian Republic Navy (MRN)** | the Navy, the MRN | MRN Yard Phobos | Mars's volume, the Accord lanes Sol-wide, MRN Gate Station at the gate. Doctrinal and militant: a state navy of a parliament and a general staff |
-| Venus | **The Venusian Space Guard (VSG)** | the Guard | Thetis Orbital | Venus's volume and VSG Haven Europa. A guard, not a force: rescue first, arrest second, never the first to fire |
-| The Belt | **The Union Defence Force (UDF)** | the Rota (a shift), the UDF | Slagline | The Belt Lane, Pallas, Hygiea, the Belt's Held stations; cooperatives on shift |
+| Power | Navy | Called in the street | Ship prefix | Home | In Sol |
+| --- | --- | --- | --- | --- | --- |
+| Earth | **The Earth Charter Fleet (ECF)** | the Charter, the ECF | ECFS | ECF Yard L5 | Earth's volume, the toll ends of every lane, ECF Toll Station; mostly contracted pilots |
+| Mars | **The Martian Republic Navy (MRN)** | the Navy, the MRN | MRNS | MRN Yard Phobos | Mars's volume, the Accord lanes Sol-wide, MRN Gate Station at the gate. Doctrinal and militant: a state navy of a parliament and a general staff |
+| Venus | **The Venusian Space Guard (VSG)** | the Guard | VSGS | Thetis Orbital | Venus's volume and VSG Haven Europa. A guard, not a force: rescue first, arrest second, never the first to fire |
+| The Belt | **The Union Defence Force (UDF)** | the Rota (a shift), the UDF | UDFS, on rota | Slagline | The Belt Lane, Pallas, Hygiea, the Belt's Held stations; cooperatives on shift |
 
 Older pages and dated history say the Charter Fleet, the Martian Navy, the Coastguard and the Union Militia; those are the same forces under their old working names. Fitted out by Union Defence Works, crewed by cooperatives on shift: the UDF tag is the Belt's Navy tag.
 
