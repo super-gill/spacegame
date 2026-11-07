@@ -1,0 +1,13295 @@
+{
+ "hulls": {
+  "arb-canopy": {
+   "class": "service",
+   "id": "arb-canopy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Canopy",
+   "outline": [
+    [
+     24.0,
+     -0.0
+    ],
+    [
+     23.0,
+     2.33
+    ],
+    [
+     20.0,
+     4.33
+    ],
+    [
+     16.0,
+     6.02
+    ],
+    [
+     11.0,
+     7.62
+    ],
+    [
+     5.0,
+     9.08
+    ],
+    [
+     0.0,
+     10.0
+    ],
+    [
+     -11.0,
+     10.93
+    ],
+    [
+     -15.0,
+     10.93
+    ],
+    [
+     -18.61,
+     10.39
+    ],
+    [
+     -21.11,
+     9.41
+    ],
+    [
+     -22.0,
+     8.2
+    ],
+    [
+     -24.0,
+     -0.0
+    ],
+    [
+     -22.0,
+     -8.2
+    ],
+    [
+     -21.11,
+     -9.41
+    ],
+    [
+     -18.61,
+     -10.39
+    ],
+    [
+     -15.0,
+     -10.93
+    ],
+    [
+     -11.0,
+     -10.93
+    ],
+    [
+     0.0,
+     -10.0
+    ],
+    [
+     5.0,
+     -9.08
+    ],
+    [
+     11.0,
+     -7.62
+    ],
+    [
+     16.0,
+     -6.02
+    ],
+    [
+     20.0,
+     -4.33
+    ],
+    [
+     23.0,
+     -2.33
+    ]
+   ],
+   "power": "venus",
+   "radius": 26.0,
+   "registryKey": "arb-canopy"
+  },
+  "arb-grove": {
+   "class": "service",
+   "id": "arb-grove",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Grove",
+   "outline": [
+    [
+     60.0,
+     -0.0
+    ],
+    [
+     57.5,
+     6.07
+    ],
+    [
+     50.0,
+     11.25
+    ],
+    [
+     40.0,
+     15.65
+    ],
+    [
+     30.0,
+     19.06
+    ],
+    [
+     20.0,
+     21.85
+    ],
+    [
+     0.0,
+     26.0
+    ],
+    [
+     -7.5,
+     25.93
+    ],
+    [
+     -42.78,
+     24.87
+    ],
+    [
+     -49.6,
+     23.91
+    ],
+    [
+     -54.32,
+     22.17
+    ],
+    [
+     -56.0,
+     20.0
+    ],
+    [
+     -60.0,
+     -0.0
+    ],
+    [
+     -56.0,
+     -20.0
+    ],
+    [
+     -54.32,
+     -22.17
+    ],
+    [
+     -49.6,
+     -23.91
+    ],
+    [
+     -42.78,
+     -24.87
+    ],
+    [
+     -7.5,
+     -25.93
+    ],
+    [
+     0.0,
+     -26.0
+    ],
+    [
+     20.0,
+     -21.85
+    ],
+    [
+     30.0,
+     -19.06
+    ],
+    [
+     40.0,
+     -15.65
+    ],
+    [
+     50.0,
+     -11.25
+    ],
+    [
+     57.5,
+     -6.07
+    ]
+   ],
+   "power": "venus",
+   "radius": 64.8,
+   "registryKey": "arb-grove"
+  },
+  "arb-shoot": {
+   "class": "drone",
+   "id": "arb-shoot",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Shoot",
+   "outline": [
+    [
+     3.0,
+     -1.7
+    ],
+    [
+     3.0,
+     1.7
+    ],
+    [
+     2.5,
+     2.2
+    ],
+    [
+     -2.5,
+     2.2
+    ],
+    [
+     -3.0,
+     1.7
+    ],
+    [
+     -3.0,
+     -1.7
+    ],
+    [
+     -2.5,
+     -2.2
+    ],
+    [
+     2.5,
+     -2.2
+    ]
+   ],
+   "power": "venus",
+   "radius": 7.0,
+   "registryKey": "arb-shoot"
+  },
+  "arb-tendril": {
+   "class": "drone",
+   "id": "arb-tendril",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Tendril",
+   "outline": [
+    [
+     3.0,
+     0.0
+    ],
+    [
+     2.82,
+     1.03
+    ],
+    [
+     2.3,
+     1.93
+    ],
+    [
+     1.5,
+     2.6
+    ],
+    [
+     0.52,
+     2.95
+    ],
+    [
+     -0.52,
+     2.95
+    ],
+    [
+     -1.5,
+     2.6
+    ],
+    [
+     -2.3,
+     1.93
+    ],
+    [
+     -2.82,
+     1.03
+    ],
+    [
+     -3.0,
+     0.0
+    ],
+    [
+     -2.82,
+     -1.03
+    ],
+    [
+     -2.3,
+     -1.93
+    ],
+    [
+     -1.5,
+     -2.6
+    ],
+    [
+     -0.52,
+     -2.95
+    ],
+    [
+     0.52,
+     -2.95
+    ],
+    [
+     1.5,
+     -2.6
+    ],
+    [
+     2.3,
+     -1.93
+    ],
+    [
+     2.82,
+     -1.03
+    ]
+   ],
+   "power": "venus",
+   "radius": 6.0,
+   "registryKey": "arb-tendril"
+  },
+  "arc-bulk": {
+   "class": "bulk",
+   "id": "arc-bulk",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Bulk Freighter Mk I",
+   "outline": [
+    [
+     62.0,
+     -9.0
+    ],
+    [
+     62.0,
+     9.0
+    ],
+    [
+     54.0,
+     17.0
+    ],
+    [
+     -50.0,
+     17.0
+    ],
+    [
+     -58.0,
+     13.0
+    ],
+    [
+     -62.0,
+     9.0
+    ],
+    [
+     -62.0,
+     -9.0
+    ],
+    [
+     -58.0,
+     -13.0
+    ],
+    [
+     -50.0,
+     -17.0
+    ],
+    [
+     54.0,
+     -17.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 66.96,
+   "registryKey": "arc-bulk"
+  },
+  "arc-courier": {
+   "class": "light",
+   "id": "arc-courier",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Courier Mk IV",
+   "outline": [
+    [
+     15.0,
+     -3.0
+    ],
+    [
+     15.0,
+     3.0
+    ],
+    [
+     13.0,
+     5.0
+    ],
+    [
+     -11.0,
+     5.0
+    ],
+    [
+     -14.0,
+     4.0
+    ],
+    [
+     -15.0,
+     3.0
+    ],
+    [
+     -15.0,
+     -3.0
+    ],
+    [
+     -14.0,
+     -4.0
+    ],
+    [
+     -11.0,
+     -5.0
+    ],
+    [
+     13.0,
+     -5.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 16.5,
+   "registryKey": "arc-courier"
+  },
+  "arc-courier-mk3": {
+   "class": "light",
+   "id": "arc-courier-mk3",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Courier Mk III",
+   "outline": [
+    [
+     15.0,
+     -3.0
+    ],
+    [
+     15.0,
+     3.0
+    ],
+    [
+     13.0,
+     5.0
+    ],
+    [
+     -11.0,
+     5.0
+    ],
+    [
+     -14.0,
+     4.0
+    ],
+    [
+     -15.0,
+     3.0
+    ],
+    [
+     -15.0,
+     -3.0
+    ],
+    [
+     -14.0,
+     -4.0
+    ],
+    [
+     -11.0,
+     -5.0
+    ],
+    [
+     13.0,
+     -5.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 16.5,
+   "registryKey": "arc-courier-mk3"
+  },
+  "arc-ferry": {
+   "class": "passenger",
+   "id": "arc-ferry",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Ferry Mk II",
+   "outline": [
+    [
+     28.0,
+     -5.0
+    ],
+    [
+     28.0,
+     5.0
+    ],
+    [
+     24.0,
+     8.5
+    ],
+    [
+     -22.0,
+     8.5
+    ],
+    [
+     -26.0,
+     7.0
+    ],
+    [
+     -28.0,
+     5.0
+    ],
+    [
+     -28.0,
+     -5.0
+    ],
+    [
+     -26.0,
+     -7.0
+    ],
+    [
+     -22.0,
+     -8.5
+    ],
+    [
+     24.0,
+     -8.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 30.24,
+   "registryKey": "arc-ferry"
+  },
+  "arc-freighter": {
+   "class": "cargo",
+   "id": "arc-freighter",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Freighter Mk II",
+   "outline": [
+    [
+     40.0,
+     -6.0
+    ],
+    [
+     40.0,
+     6.0
+    ],
+    [
+     35.0,
+     11.0
+    ],
+    [
+     -32.0,
+     11.0
+    ],
+    [
+     -37.0,
+     9.0
+    ],
+    [
+     -40.0,
+     6.0
+    ],
+    [
+     -40.0,
+     -6.0
+    ],
+    [
+     -37.0,
+     -9.0
+    ],
+    [
+     -32.0,
+     -11.0
+    ],
+    [
+     35.0,
+     -11.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 43.2,
+   "registryKey": "arc-freighter"
+  },
+  "arc-freighter-mk1": {
+   "class": "cargo",
+   "id": "arc-freighter-mk1",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Freighter Mk I",
+   "outline": [
+    [
+     40.0,
+     -6.0
+    ],
+    [
+     40.0,
+     6.0
+    ],
+    [
+     35.0,
+     11.0
+    ],
+    [
+     -32.0,
+     11.0
+    ],
+    [
+     -37.0,
+     9.0
+    ],
+    [
+     -40.0,
+     6.0
+    ],
+    [
+     -40.0,
+     -6.0
+    ],
+    [
+     -37.0,
+     -9.0
+    ],
+    [
+     -32.0,
+     -11.0
+    ],
+    [
+     35.0,
+     -11.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 43.2,
+   "registryKey": "arc-freighter-mk1"
+  },
+  "arc-hauler": {
+   "class": "cargo",
+   "id": "arc-hauler",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Hauler Mk III",
+   "outline": [
+    [
+     24.0,
+     -4.5
+    ],
+    [
+     24.0,
+     4.5
+    ],
+    [
+     21.0,
+     7.5
+    ],
+    [
+     -18.0,
+     7.5
+    ],
+    [
+     -22.0,
+     6.0
+    ],
+    [
+     -24.0,
+     4.5
+    ],
+    [
+     -24.0,
+     -4.5
+    ],
+    [
+     -22.0,
+     -6.0
+    ],
+    [
+     -18.0,
+     -7.5
+    ],
+    [
+     21.0,
+     -7.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 26.0,
+   "registryKey": "arc-hauler"
+  },
+  "arc-hauler-mk2": {
+   "class": "cargo",
+   "id": "arc-hauler-mk2",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Hauler Mk II",
+   "outline": [
+    [
+     24.0,
+     -4.5
+    ],
+    [
+     24.0,
+     4.5
+    ],
+    [
+     21.0,
+     7.5
+    ],
+    [
+     -18.0,
+     7.5
+    ],
+    [
+     -22.0,
+     6.0
+    ],
+    [
+     -24.0,
+     4.5
+    ],
+    [
+     -24.0,
+     -4.5
+    ],
+    [
+     -22.0,
+     -6.0
+    ],
+    [
+     -18.0,
+     -7.5
+    ],
+    [
+     21.0,
+     -7.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 26.0,
+   "registryKey": "arc-hauler-mk2"
+  },
+  "arc-ice": {
+   "class": "bulk",
+   "id": "arc-ice",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Ice Hauler Mk II",
+   "outline": [
+    [
+     52.0,
+     -6.0
+    ],
+    [
+     52.0,
+     6.0
+    ],
+    [
+     46.0,
+     12.0
+    ],
+    [
+     40.0,
+     12.0
+    ],
+    [
+     -48.0,
+     8.0
+    ],
+    [
+     -52.0,
+     6.0
+    ],
+    [
+     -52.0,
+     -6.0
+    ],
+    [
+     -48.0,
+     -8.0
+    ],
+    [
+     40.0,
+     -12.0
+    ],
+    [
+     46.0,
+     -12.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 56.16,
+   "registryKey": "arc-ice"
+  },
+  "arc-ice-mk1": {
+   "class": "bulk",
+   "id": "arc-ice-mk1",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Ice Hauler Mk I",
+   "outline": [
+    [
+     52.0,
+     -6.0
+    ],
+    [
+     52.0,
+     6.0
+    ],
+    [
+     46.0,
+     12.0
+    ],
+    [
+     40.0,
+     12.0
+    ],
+    [
+     -48.0,
+     8.0
+    ],
+    [
+     -52.0,
+     6.0
+    ],
+    [
+     -52.0,
+     -6.0
+    ],
+    [
+     -48.0,
+     -8.0
+    ],
+    [
+     40.0,
+     -12.0
+    ],
+    [
+     46.0,
+     -12.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 56.16,
+   "registryKey": "arc-ice-mk1"
+  },
+  "arc-miner": {
+   "class": "mining",
+   "id": "arc-miner",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Miner Mk II",
+   "outline": [
+    [
+     22.0,
+     -4.5
+    ],
+    [
+     22.0,
+     4.5
+    ],
+    [
+     18.0,
+     8.0
+    ],
+    [
+     -18.0,
+     8.0
+    ],
+    [
+     -22.0,
+     5.5
+    ],
+    [
+     -22.0,
+     -5.5
+    ],
+    [
+     -18.0,
+     -8.0
+    ],
+    [
+     18.0,
+     -8.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 26.0,
+   "registryKey": "arc-miner"
+  },
+  "arc-miner-mk1": {
+   "class": "mining",
+   "id": "arc-miner-mk1",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Miner Mk I",
+   "outline": [
+    [
+     22.0,
+     -4.5
+    ],
+    [
+     22.0,
+     4.5
+    ],
+    [
+     18.0,
+     8.0
+    ],
+    [
+     -18.0,
+     8.0
+    ],
+    [
+     -22.0,
+     5.5
+    ],
+    [
+     -22.0,
+     -5.5
+    ],
+    [
+     -18.0,
+     -8.0
+    ],
+    [
+     18.0,
+     -8.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 26.0,
+   "registryKey": "arc-miner-mk1"
+  },
+  "arc-mk0": {
+   "class": "bulk",
+   "id": "arc-mk0",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Prototype Mk 0",
+   "outline": [
+    [
+     50.0,
+     -8.0
+    ],
+    [
+     50.0,
+     8.0
+    ],
+    [
+     42.0,
+     17.0
+    ],
+    [
+     -42.0,
+     17.0
+    ],
+    [
+     -50.0,
+     11.0
+    ],
+    [
+     -50.0,
+     -11.0
+    ],
+    [
+     -42.0,
+     -17.0
+    ],
+    [
+     42.0,
+     -17.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 56.0,
+   "registryKey": "arc-mk0"
+  },
+  "arc-shuttle": {
+   "class": "light",
+   "id": "arc-shuttle",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Shuttle Mk III",
+   "outline": [
+    [
+     12.0,
+     -3.4
+    ],
+    [
+     12.0,
+     3.4
+    ],
+    [
+     10.0,
+     4.6
+    ],
+    [
+     -9.0,
+     4.6
+    ],
+    [
+     -11.0,
+     3.6
+    ],
+    [
+     -12.0,
+     2.6
+    ],
+    [
+     -12.0,
+     -2.6
+    ],
+    [
+     -11.0,
+     -3.6
+    ],
+    [
+     -9.0,
+     -4.6
+    ],
+    [
+     10.0,
+     -4.6
+    ]
+   ],
+   "power": "mars",
+   "radius": 13.5,
+   "registryKey": "arc-shuttle"
+  },
+  "arc-shuttle-mk2": {
+   "class": "light",
+   "id": "arc-shuttle-mk2",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Shuttle Mk II",
+   "outline": [
+    [
+     12.0,
+     -3.4
+    ],
+    [
+     12.0,
+     3.4
+    ],
+    [
+     10.0,
+     4.6
+    ],
+    [
+     -9.0,
+     4.6
+    ],
+    [
+     -11.0,
+     3.6
+    ],
+    [
+     -12.0,
+     2.6
+    ],
+    [
+     -12.0,
+     -2.6
+    ],
+    [
+     -11.0,
+     -3.6
+    ],
+    [
+     -9.0,
+     -4.6
+    ],
+    [
+     10.0,
+     -4.6
+    ]
+   ],
+   "power": "mars",
+   "radius": 13.5,
+   "registryKey": "arc-shuttle-mk2"
+  },
+  "arc-tender": {
+   "class": "service",
+   "id": "arc-tender",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Tender Mk I",
+   "outline": [
+    [
+     34.0,
+     -6.0
+    ],
+    [
+     34.0,
+     6.0
+    ],
+    [
+     30.0,
+     10.0
+    ],
+    [
+     -28.0,
+     10.0
+    ],
+    [
+     -32.0,
+     8.0
+    ],
+    [
+     -34.0,
+     6.0
+    ],
+    [
+     -34.0,
+     -6.0
+    ],
+    [
+     -32.0,
+     -8.0
+    ],
+    [
+     -28.0,
+     -10.0
+    ],
+    [
+     30.0,
+     -10.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 36.72,
+   "registryKey": "arc-tender"
+  },
+  "arc-tender-mk0": {
+   "class": "service",
+   "id": "arc-tender-mk0",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Tender Mk 0",
+   "outline": [
+    [
+     30.0,
+     -5.5
+    ],
+    [
+     30.0,
+     5.5
+    ],
+    [
+     26.0,
+     9.0
+    ],
+    [
+     -24.0,
+     9.0
+    ],
+    [
+     -30.0,
+     6.5
+    ],
+    [
+     -30.0,
+     -6.5
+    ],
+    [
+     -24.0,
+     -9.0
+    ],
+    [
+     26.0,
+     -9.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 32.4,
+   "registryKey": "arc-tender-mk0"
+  },
+  "arc-tug": {
+   "class": "service",
+   "id": "arc-tug",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Tug Mk II",
+   "outline": [
+    [
+     10.0,
+     -5.0
+    ],
+    [
+     10.0,
+     5.0
+    ],
+    [
+     8.0,
+     6.5
+    ],
+    [
+     -10.0,
+     6.5
+    ],
+    [
+     -12.0,
+     5.0
+    ],
+    [
+     -12.0,
+     -5.0
+    ],
+    [
+     -10.0,
+     -6.5
+    ],
+    [
+     8.0,
+     -6.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 15.0,
+   "registryKey": "arc-tug"
+  },
+  "aurel-canticle": {
+   "class": "voice",
+   "id": "aurel-canticle",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Canticle",
+   "outline": [
+    [
+     52.0,
+     0.0
+    ],
+    [
+     13.05,
+     14.74
+    ],
+    [
+     -29.12,
+     13.26
+    ],
+    [
+     -72.86,
+     7.0
+    ],
+    [
+     -74.0,
+     5.86
+    ],
+    [
+     -76.0,
+     0.36
+    ],
+    [
+     -76.0,
+     -0.36
+    ],
+    [
+     -74.0,
+     -5.86
+    ],
+    [
+     -72.86,
+     -7.0
+    ],
+    [
+     -29.12,
+     -13.26
+    ],
+    [
+     13.05,
+     -14.74
+    ]
+   ],
+   "power": "aurel",
+   "radius": 84.0,
+   "registryKey": "aurel-canticle"
+  },
+  "aurel-fermata": {
+   "class": "voice",
+   "id": "aurel-fermata",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Fermata",
+   "outline": [
+    [
+     22.0,
+     0.0
+    ],
+    [
+     11.31,
+     10.76
+    ],
+    [
+     -9.22,
+     11.84
+    ],
+    [
+     -32.09,
+     4.0
+    ],
+    [
+     -33.0,
+     3.09
+    ],
+    [
+     -33.0,
+     -3.09
+    ],
+    [
+     -32.09,
+     -4.0
+    ],
+    [
+     -9.22,
+     -11.84
+    ],
+    [
+     11.31,
+     -10.76
+    ]
+   ],
+   "power": "aurel",
+   "radius": 36.3,
+   "registryKey": "aurel-fermata"
+  },
+  "aurel-hush": {
+   "class": "voice",
+   "id": "aurel-hush",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Hush",
+   "outline": [
+    [
+     -22.0,
+     -5.0
+    ],
+    [
+     -22.0,
+     5.0
+    ],
+    [
+     -36.0,
+     6.0
+    ],
+    [
+     -48.22,
+     6.6
+    ],
+    [
+     -54.78,
+     6.6
+    ],
+    [
+     -56.0,
+     5.38
+    ],
+    [
+     -56.0,
+     -5.38
+    ],
+    [
+     -54.78,
+     -6.6
+    ],
+    [
+     -48.22,
+     -6.6
+    ],
+    [
+     -36.0,
+     -6.0
+    ]
+   ],
+   "power": "aurel",
+   "radius": 61.6,
+   "registryKey": "aurel-hush"
+  },
+  "aurel-husk": {
+   "class": "voice",
+   "id": "aurel-husk",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel husk",
+   "outline": [
+    [
+     44.82,
+     3.44
+    ],
+    [
+     42.72,
+     4.47
+    ],
+    [
+     -18.95,
+     17.59
+    ],
+    [
+     -33.15,
+     15.34
+    ],
+    [
+     -40.86,
+     6.74
+    ],
+    [
+     -41.98,
+     5.44
+    ],
+    [
+     -41.78,
+     -5.24
+    ],
+    [
+     -41.73,
+     -6.01
+    ],
+    [
+     -32.59,
+     -15.71
+    ],
+    [
+     -18.24,
+     -16.6
+    ],
+    [
+     41.4,
+     -4.14
+    ],
+    [
+     43.44,
+     -3.0
+    ]
+   ],
+   "power": "aurel",
+   "radius": 49.3,
+   "registryKey": "aurel-husk"
+  },
+  "aurel-lament": {
+   "class": "voice",
+   "id": "aurel-lament",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Lament",
+   "outline": [
+    [
+     44.0,
+     -4.5
+    ],
+    [
+     44.0,
+     4.5
+    ],
+    [
+     41.84,
+     5.4
+    ],
+    [
+     -19.01,
+     17.39
+    ],
+    [
+     -33.25,
+     15.39
+    ],
+    [
+     -42.0,
+     5.88
+    ],
+    [
+     -42.0,
+     -5.88
+    ],
+    [
+     -33.25,
+     -15.39
+    ],
+    [
+     -19.01,
+     -17.39
+    ],
+    [
+     41.84,
+     -5.4
+    ]
+   ],
+   "power": "aurel",
+   "radius": 48.4,
+   "registryKey": "aurel-lament"
+  },
+  "aurel-note": {
+   "class": "voice",
+   "id": "aurel-note",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Note",
+   "outline": [
+    [
+     13.0,
+     0.0
+    ],
+    [
+     2.6,
+     5.5
+    ],
+    [
+     -13.0,
+     5.5
+    ],
+    [
+     -13.0,
+     -5.5
+    ],
+    [
+     2.6,
+     -5.5
+    ]
+   ],
+   "power": "aurel",
+   "radius": 20.0,
+   "registryKey": "aurel-note"
+  },
+  "aurel-refrain": {
+   "class": "voice",
+   "id": "aurel-refrain",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Refrain",
+   "outline": [
+    [
+     -6.0,
+     -4.0
+    ],
+    [
+     -6.0,
+     4.0
+    ],
+    [
+     -20.0,
+     5.0
+    ],
+    [
+     -36.06,
+     5.4
+    ],
+    [
+     -40.94,
+     5.4
+    ],
+    [
+     -42.0,
+     4.34
+    ],
+    [
+     -42.0,
+     -4.34
+    ],
+    [
+     -40.94,
+     -5.4
+    ],
+    [
+     -36.06,
+     -5.4
+    ],
+    [
+     -20.0,
+     -5.0
+    ]
+   ],
+   "power": "aurel",
+   "radius": 46.2,
+   "registryKey": "aurel-refrain"
+  },
+  "aurel-tacet": {
+   "class": "voice",
+   "id": "aurel-tacet",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Tacet",
+   "outline": [
+    [
+     26.0,
+     0.0
+    ],
+    [
+     16.0,
+     4.0
+    ],
+    [
+     0.0,
+     6.0
+    ],
+    [
+     -17.0,
+     6.0
+    ],
+    [
+     -36.94,
+     4.9
+    ],
+    [
+     -38.0,
+     3.84
+    ],
+    [
+     -38.0,
+     -3.84
+    ],
+    [
+     -36.94,
+     -4.9
+    ],
+    [
+     -17.0,
+     -6.0
+    ],
+    [
+     0.0,
+     -6.0
+    ],
+    [
+     16.0,
+     -4.0
+    ]
+   ],
+   "power": "aurel",
+   "radius": 42.0,
+   "registryKey": "aurel-tacet"
+  },
+  "aurel-threnody": {
+   "class": "voice",
+   "id": "aurel-threnody",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Threnody",
+   "outline": [
+    [
+     74.0,
+     0.0
+    ],
+    [
+     18.87,
+     35.81
+    ],
+    [
+     -1.2,
+     45.26
+    ],
+    [
+     -12.39,
+     48.87
+    ],
+    [
+     -34.39,
+     53.87
+    ],
+    [
+     -56.19,
+     51.81
+    ],
+    [
+     -71.64,
+     49.64
+    ],
+    [
+     -100.0,
+     18.48
+    ],
+    [
+     -100.0,
+     -18.48
+    ],
+    [
+     -71.64,
+     -49.64
+    ],
+    [
+     -56.19,
+     -51.81
+    ],
+    [
+     -34.39,
+     -53.87
+    ],
+    [
+     -12.39,
+     -48.87
+    ],
+    [
+     -1.2,
+     -45.26
+    ],
+    [
+     18.87,
+     -35.81
+    ]
+   ],
+   "power": "aurel",
+   "radius": 112.0,
+   "registryKey": "aurel-threnody"
+  },
+  "aurel-threnody-open": {
+   "class": "voice",
+   "id": "aurel-threnody-open",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Aurel",
+   "mounts": [],
+   "name": "Aurel Threnody, wing loosed",
+   "outline": [
+    [
+     126.99,
+     25.45
+    ],
+    [
+     106.97,
+     71.51
+    ],
+    [
+     72.95,
+     88.83
+    ],
+    [
+     62.11,
+     93.41
+    ],
+    [
+     26.11,
+     102.91
+    ],
+    [
+     10.57,
+     101.55
+    ],
+    [
+     -98.48,
+     20.0
+    ],
+    [
+     -100.0,
+     18.48
+    ],
+    [
+     -100.0,
+     -18.48
+    ],
+    [
+     -98.48,
+     -20.0
+    ],
+    [
+     2.65,
+     -97.98
+    ],
+    [
+     38.57,
+     -101.55
+    ],
+    [
+     54.11,
+     -102.91
+    ],
+    [
+     64.95,
+     -98.33
+    ],
+    [
+     124.98,
+     -48.48
+    ]
+   ],
+   "power": "aurel",
+   "radius": 150.0,
+   "registryKey": "aurel-threnody-open"
+  },
+  "bel-heavy": {
+   "class": "craft",
+   "id": "bel-heavy",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Vantage Cutlass, UDF refit",
+   "outline": [
+    [
+     8.4,
+     -1.0
+    ],
+    [
+     8.4,
+     1.0
+    ],
+    [
+     7.0,
+     1.9
+    ],
+    [
+     -2.0,
+     5.4
+    ],
+    [
+     -4.6,
+     5.4
+    ],
+    [
+     -8.0,
+     2.6
+    ],
+    [
+     -8.6,
+     2.0
+    ],
+    [
+     -8.6,
+     -2.0
+    ],
+    [
+     -8.0,
+     -2.6
+    ],
+    [
+     -4.6,
+     -5.4
+    ],
+    [
+     -2.0,
+     -5.4
+    ],
+    [
+     7.0,
+     -1.9
+    ]
+   ],
+   "power": "belt",
+   "radius": 9.8,
+   "registryKey": "bel-heavy"
+  },
+  "bel-light": {
+   "class": "craft",
+   "id": "bel-light",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Vantage Dirk, UDF refit",
+   "outline": [
+    [
+     5.6,
+     -0.7
+    ],
+    [
+     5.6,
+     0.7
+    ],
+    [
+     4.6,
+     1.3
+    ],
+    [
+     -0.6,
+     3.2
+    ],
+    [
+     -3.4,
+     3.2
+    ],
+    [
+     -6.0,
+     2.2
+    ],
+    [
+     -6.4,
+     1.8
+    ],
+    [
+     -6.4,
+     -1.8
+    ],
+    [
+     -6.0,
+     -2.2
+    ],
+    [
+     -3.4,
+     -3.2
+    ],
+    [
+     -0.6,
+     -3.2
+    ],
+    [
+     4.6,
+     -1.3
+    ]
+   ],
+   "power": "belt",
+   "radius": 7.0,
+   "registryKey": "bel-light"
+  },
+  "bel-miner": {
+   "class": "craft",
+   "id": "bel-miner",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Jackleg",
+   "outline": [
+    [
+     7.6,
+     0.0
+    ],
+    [
+     6.4,
+     2.6
+    ],
+    [
+     4.6,
+     4.0
+    ],
+    [
+     -6.4,
+     3.6
+    ],
+    [
+     -6.4,
+     -3.6
+    ],
+    [
+     4.6,
+     -4.0
+    ],
+    [
+     6.4,
+     -2.6
+    ]
+   ],
+   "power": "belt",
+   "radius": 8.48,
+   "registryKey": "bel-miner"
+  },
+  "bf-adit": {
+   "class": "cargo",
+   "id": "bf-adit",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Adit",
+   "outline": [
+    [
+     34.0,
+     -5.4
+    ],
+    [
+     34.0,
+     5.4
+    ],
+    [
+     32.4,
+     7.0
+    ],
+    [
+     15.6,
+     7.0
+    ],
+    [
+     14.0,
+     5.4
+    ],
+    [
+     14.0,
+     -5.4
+    ],
+    [
+     15.6,
+     -7.0
+    ],
+    [
+     32.4,
+     -7.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 40.0,
+   "registryKey": "bf-adit"
+  },
+  "bf-adit-old": {
+   "class": "cargo",
+   "id": "bf-adit-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Adit",
+   "outline": [
+    [
+     34.0,
+     -5.4
+    ],
+    [
+     34.0,
+     5.4
+    ],
+    [
+     32.4,
+     7.0
+    ],
+    [
+     15.6,
+     7.0
+    ],
+    [
+     14.0,
+     5.4
+    ],
+    [
+     14.0,
+     -5.4
+    ],
+    [
+     15.6,
+     -7.0
+    ],
+    [
+     32.4,
+     -7.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 40.0,
+   "registryKey": "bf-adit-old"
+  },
+  "bf-auger": {
+   "class": "mining",
+   "id": "bf-auger",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Auger",
+   "outline": [
+    [
+     10.0,
+     -3.6
+    ],
+    [
+     10.0,
+     3.6
+    ],
+    [
+     8.6,
+     5.0
+    ],
+    [
+     -2.6,
+     5.0
+    ],
+    [
+     -4.0,
+     3.6
+    ],
+    [
+     -4.0,
+     -3.6
+    ],
+    [
+     -2.6,
+     -5.0
+    ],
+    [
+     8.6,
+     -5.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 25.0,
+   "registryKey": "bf-auger"
+  },
+  "bf-burrow": {
+   "class": "light",
+   "id": "bf-burrow",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Burrow",
+   "outline": [
+    [
+     15.0,
+     -2.0
+    ],
+    [
+     15.0,
+     2.0
+    ],
+    [
+     12.0,
+     4.0
+    ],
+    [
+     -10.0,
+     4.4
+    ],
+    [
+     -14.0,
+     3.4
+    ],
+    [
+     -15.0,
+     2.4
+    ],
+    [
+     -15.0,
+     -2.4
+    ],
+    [
+     -14.0,
+     -3.4
+    ],
+    [
+     -10.0,
+     -4.4
+    ],
+    [
+     12.0,
+     -4.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 17.0,
+   "registryKey": "bf-burrow"
+  },
+  "bf-cistern": {
+   "class": "bulk",
+   "id": "bf-cistern",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Cistern",
+   "outline": [
+    [
+     36.0,
+     -5.4
+    ],
+    [
+     36.0,
+     5.4
+    ],
+    [
+     34.4,
+     7.0
+    ],
+    [
+     23.6,
+     7.0
+    ],
+    [
+     22.0,
+     5.4
+    ],
+    [
+     22.0,
+     -5.4
+    ],
+    [
+     23.6,
+     -7.0
+    ],
+    [
+     34.4,
+     -7.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 40.0,
+   "registryKey": "bf-cistern"
+  },
+  "bf-headframe": {
+   "class": "industry",
+   "id": "bf-headframe",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Headframe",
+   "outline": [
+    [
+     90.0,
+     -11.0
+    ],
+    [
+     90.0,
+     11.0
+    ],
+    [
+     87.0,
+     14.0
+    ],
+    [
+     36.0,
+     24.0
+    ],
+    [
+     -46.0,
+     24.0
+    ],
+    [
+     -50.0,
+     20.0
+    ],
+    [
+     -50.0,
+     -20.0
+    ],
+    [
+     -46.0,
+     -24.0
+    ],
+    [
+     36.0,
+     -24.0
+    ],
+    [
+     87.0,
+     -14.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 126.0,
+   "registryKey": "bf-headframe"
+  },
+  "bf-lodestar": {
+   "class": "industry",
+   "id": "bf-lodestar",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Lodestar",
+   "outline": [
+    [
+     60.0,
+     -9.0
+    ],
+    [
+     60.0,
+     9.0
+    ],
+    [
+     4.0,
+     19.0
+    ],
+    [
+     -18.0,
+     19.0
+    ],
+    [
+     -49.7,
+     16.8
+    ],
+    [
+     -65.74,
+     13.23
+    ],
+    [
+     -66.28,
+     11.23
+    ],
+    [
+     -66.42,
+     10.0
+    ],
+    [
+     -66.42,
+     -10.0
+    ],
+    [
+     -66.28,
+     -11.23
+    ],
+    [
+     -65.74,
+     -13.23
+    ],
+    [
+     -50.0,
+     -16.5
+    ],
+    [
+     -18.0,
+     -19.0
+    ],
+    [
+     4.0,
+     -19.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 66.0,
+   "registryKey": "bf-lodestar"
+  },
+  "bf-mule": {
+   "class": "cargo",
+   "id": "bf-mule",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Mule",
+   "outline": [
+    [
+     12.0,
+     -3.2
+    ],
+    [
+     12.0,
+     3.2
+    ],
+    [
+     10.8,
+     4.4
+    ],
+    [
+     -0.8,
+     4.4
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     -0.8,
+     -4.4
+    ],
+    [
+     10.8,
+     -4.4
+    ]
+   ],
+   "power": "belt",
+   "radius": 24.0,
+   "registryKey": "bf-mule"
+  },
+  "bf-mule-old": {
+   "class": "cargo",
+   "id": "bf-mule-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Mule",
+   "outline": [
+    [
+     12.0,
+     -3.2
+    ],
+    [
+     12.0,
+     3.2
+    ],
+    [
+     10.8,
+     4.4
+    ],
+    [
+     -0.8,
+     4.4
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     -0.8,
+     -4.4
+    ],
+    [
+     10.8,
+     -4.4
+    ]
+   ],
+   "power": "belt",
+   "radius": 24.0,
+   "registryKey": "bf-mule-old"
+  },
+  "bf-pony": {
+   "class": "light",
+   "id": "bf-pony",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Pony",
+   "outline": [
+    [
+     8.0,
+     -2.6
+    ],
+    [
+     8.0,
+     2.6
+    ],
+    [
+     7.0,
+     3.6
+    ],
+    [
+     -3.0,
+     3.6
+    ],
+    [
+     -4.0,
+     2.6
+    ],
+    [
+     -4.0,
+     -2.6
+    ],
+    [
+     -3.0,
+     -3.6
+    ],
+    [
+     7.0,
+     -3.6
+    ]
+   ],
+   "power": "belt",
+   "radius": 15.0,
+   "registryKey": "bf-pony"
+  },
+  "bf-pony-old": {
+   "class": "light",
+   "id": "bf-pony-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Pony",
+   "outline": [
+    [
+     8.0,
+     -2.6
+    ],
+    [
+     8.0,
+     2.6
+    ],
+    [
+     7.0,
+     3.6
+    ],
+    [
+     -3.0,
+     3.6
+    ],
+    [
+     -4.0,
+     2.6
+    ],
+    [
+     -4.0,
+     -2.6
+    ],
+    [
+     -3.0,
+     -3.6
+    ],
+    [
+     7.0,
+     -3.6
+    ]
+   ],
+   "power": "belt",
+   "radius": 15.0,
+   "registryKey": "bf-pony-old"
+  },
+  "bf-rime": {
+   "class": "mining",
+   "id": "bf-rime",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Rime",
+   "outline": [
+    [
+     7.0,
+     -2.2
+    ],
+    [
+     7.0,
+     2.2
+    ],
+    [
+     6.0,
+     3.2
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -3.0,
+     2.2
+    ],
+    [
+     -3.0,
+     -2.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     6.0,
+     -3.2
+    ]
+   ],
+   "power": "belt",
+   "radius": 14.0,
+   "registryKey": "bf-rime"
+  },
+  "bf-rime-old": {
+   "class": "mining",
+   "id": "bf-rime-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Rime",
+   "outline": [
+    [
+     7.0,
+     -2.2
+    ],
+    [
+     7.0,
+     2.2
+    ],
+    [
+     6.0,
+     3.2
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -3.0,
+     2.2
+    ],
+    [
+     -3.0,
+     -2.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     6.0,
+     -3.2
+    ]
+   ],
+   "power": "belt",
+   "radius": 14.0,
+   "registryKey": "bf-rime-old"
+  },
+  "bf-winder": {
+   "class": "industry",
+   "id": "bf-winder",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Winder",
+   "outline": [
+    [
+     46.0,
+     -6.4
+    ],
+    [
+     46.0,
+     6.4
+    ],
+    [
+     44.4,
+     8.0
+    ],
+    [
+     19.6,
+     12.0
+    ],
+    [
+     -11.6,
+     12.0
+    ],
+    [
+     -14.0,
+     9.6
+    ],
+    [
+     -14.0,
+     -9.6
+    ],
+    [
+     -11.6,
+     -12.0
+    ],
+    [
+     19.6,
+     -12.0
+    ],
+    [
+     44.4,
+     -8.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 64.0,
+   "registryKey": "bf-winder"
+  },
+  "carrier": {
+   "class": "carrier",
+   "id": "carrier",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Hellas",
+   "outline": [
+    [
+     146.0,
+     -24.0
+    ],
+    [
+     146.0,
+     24.0
+    ],
+    [
+     120.0,
+     48.0
+    ],
+    [
+     60.0,
+     68.0
+    ],
+    [
+     -40.0,
+     70.0
+    ],
+    [
+     -100.0,
+     60.0
+    ],
+    [
+     -146.0,
+     36.0
+    ],
+    [
+     -146.0,
+     -36.0
+    ],
+    [
+     -100.0,
+     -60.0
+    ],
+    [
+     -40.0,
+     -70.0
+    ],
+    [
+     60.0,
+     -68.0
+    ],
+    [
+     120.0,
+     -48.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 157.68,
+   "registryKey": "carrier"
+  },
+  "cor-bulwark": {
+   "class": "cruiser",
+   "id": "cor-bulwark",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Bulwark",
+   "outline": [
+    [
+     66.0,
+     -15.0
+    ],
+    [
+     66.0,
+     15.0
+    ],
+    [
+     65.76,
+     16.81
+    ],
+    [
+     65.06,
+     18.5
+    ],
+    [
+     63.95,
+     19.95
+    ],
+    [
+     60.81,
+     21.76
+    ],
+    [
+     59.0,
+     22.0
+    ],
+    [
+     -59.0,
+     22.0
+    ],
+    [
+     -60.81,
+     21.76
+    ],
+    [
+     -63.95,
+     19.95
+    ],
+    [
+     -65.06,
+     18.5
+    ],
+    [
+     -65.76,
+     16.81
+    ],
+    [
+     -66.0,
+     15.0
+    ],
+    [
+     -66.0,
+     -15.0
+    ],
+    [
+     -65.76,
+     -16.81
+    ],
+    [
+     -65.06,
+     -18.5
+    ],
+    [
+     -63.95,
+     -19.95
+    ],
+    [
+     -60.81,
+     -21.76
+    ],
+    [
+     -59.0,
+     -22.0
+    ],
+    [
+     59.0,
+     -22.0
+    ],
+    [
+     60.81,
+     -21.76
+    ],
+    [
+     63.95,
+     -19.95
+    ],
+    [
+     65.06,
+     -18.5
+    ],
+    [
+     65.76,
+     -16.81
+    ]
+   ],
+   "power": "indep",
+   "radius": 72.0,
+   "registryKey": "cor-bulwark"
+  },
+  "cor-colossus": {
+   "class": "industry",
+   "id": "cor-colossus",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Colossus",
+   "outline": [
+    [
+     90.0,
+     -28.0
+    ],
+    [
+     90.0,
+     28.0
+    ],
+    [
+     84.0,
+     30.0
+    ],
+    [
+     28.0,
+     32.0
+    ],
+    [
+     -58.0,
+     32.0
+    ],
+    [
+     -74.0,
+     22.0
+    ],
+    [
+     -74.0,
+     -22.0
+    ],
+    [
+     -58.0,
+     -32.0
+    ],
+    [
+     28.0,
+     -32.0
+    ],
+    [
+     84.0,
+     -30.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 97.2,
+   "registryKey": "cor-colossus"
+  },
+  "cor-dray": {
+   "class": "bulk",
+   "id": "cor-dray",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Dray",
+   "outline": [
+    [
+     42.0,
+     -9.0
+    ],
+    [
+     42.0,
+     9.0
+    ],
+    [
+     34.0,
+     15.0
+    ],
+    [
+     -32.0,
+     15.0
+    ],
+    [
+     -42.0,
+     11.0
+    ],
+    [
+     -42.0,
+     -11.0
+    ],
+    [
+     -32.0,
+     -15.0
+    ],
+    [
+     34.0,
+     -15.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 46.0,
+   "registryKey": "cor-dray"
+  },
+  "cor-dray-old": {
+   "class": "bulk",
+   "id": "cor-dray-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "The old Dray",
+   "outline": [
+    [
+     36.0,
+     -9.0
+    ],
+    [
+     36.0,
+     9.0
+    ],
+    [
+     28.0,
+     15.0
+    ],
+    [
+     -26.0,
+     15.0
+    ],
+    [
+     -36.0,
+     11.0
+    ],
+    [
+     -36.0,
+     -11.0
+    ],
+    [
+     -26.0,
+     -15.0
+    ],
+    [
+     28.0,
+     -15.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 40.0,
+   "registryKey": "cor-dray-old"
+  },
+  "cor-foreman": {
+   "class": "industry",
+   "id": "cor-foreman",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Foreman",
+   "outline": [
+    [
+     70.0,
+     -18.0
+    ],
+    [
+     70.0,
+     18.0
+    ],
+    [
+     69.8,
+     19.55
+    ],
+    [
+     69.2,
+     21.0
+    ],
+    [
+     67.0,
+     23.2
+    ],
+    [
+     65.55,
+     23.8
+    ],
+    [
+     64.0,
+     24.0
+    ],
+    [
+     -64.0,
+     24.0
+    ],
+    [
+     -65.55,
+     23.8
+    ],
+    [
+     -67.0,
+     23.2
+    ],
+    [
+     -69.2,
+     21.0
+    ],
+    [
+     -69.8,
+     19.55
+    ],
+    [
+     -70.0,
+     18.0
+    ],
+    [
+     -70.0,
+     -18.0
+    ],
+    [
+     -69.8,
+     -19.55
+    ],
+    [
+     -69.2,
+     -21.0
+    ],
+    [
+     -67.0,
+     -23.2
+    ],
+    [
+     -65.55,
+     -23.8
+    ],
+    [
+     -64.0,
+     -24.0
+    ],
+    [
+     64.0,
+     -24.0
+    ],
+    [
+     65.55,
+     -23.8
+    ],
+    [
+     67.0,
+     -23.2
+    ],
+    [
+     69.2,
+     -21.0
+    ],
+    [
+     69.8,
+     -19.55
+    ]
+   ],
+   "power": "indep",
+   "radius": 76.0,
+   "registryKey": "cor-foreman"
+  },
+  "cor-miner": {
+   "class": "craft",
+   "id": "cor-miner",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Navvy",
+   "outline": [
+    [
+     4.6,
+     0.0
+    ],
+    [
+     3.8,
+     2.0
+    ],
+    [
+     1.6,
+     4.0
+    ],
+    [
+     -5.4,
+     4.0
+    ],
+    [
+     -5.6,
+     0.0
+    ],
+    [
+     -5.4,
+     -4.0
+    ],
+    [
+     1.6,
+     -4.0
+    ],
+    [
+     3.8,
+     -2.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 6.89,
+   "registryKey": "cor-miner"
+  },
+  "cor-pithead": {
+   "class": "mining",
+   "id": "cor-pithead",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Pithead",
+   "outline": [
+    [
+     36.0,
+     -8.0
+    ],
+    [
+     36.0,
+     8.0
+    ],
+    [
+     30.0,
+     13.0
+    ],
+    [
+     -30.0,
+     13.0
+    ],
+    [
+     -36.0,
+     9.0
+    ],
+    [
+     -36.0,
+     -9.0
+    ],
+    [
+     -30.0,
+     -13.0
+    ],
+    [
+     30.0,
+     -13.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 40.0,
+   "registryKey": "cor-pithead"
+  },
+  "cor-smelter": {
+   "class": "industry",
+   "id": "cor-smelter",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Smelter",
+   "outline": [
+    [
+     46.0,
+     -12.0
+    ],
+    [
+     46.0,
+     12.0
+    ],
+    [
+     38.0,
+     19.0
+    ],
+    [
+     -36.0,
+     19.0
+    ],
+    [
+     -46.0,
+     13.0
+    ],
+    [
+     -46.0,
+     -13.0
+    ],
+    [
+     -36.0,
+     -19.0
+    ],
+    [
+     38.0,
+     -19.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 52.0,
+   "registryKey": "cor-smelter"
+  },
+  "cor-still": {
+   "class": "industry",
+   "id": "cor-still",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Still",
+   "outline": [
+    [
+     66.0,
+     -16.0
+    ],
+    [
+     66.0,
+     16.0
+    ],
+    [
+     56.0,
+     28.0
+    ],
+    [
+     -50.0,
+     28.0
+    ],
+    [
+     -66.0,
+     20.0
+    ],
+    [
+     -66.0,
+     -20.0
+    ],
+    [
+     -50.0,
+     -28.0
+    ],
+    [
+     56.0,
+     -28.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 78.0,
+   "registryKey": "cor-still"
+  },
+  "cor-warden": {
+   "class": "destroyer",
+   "id": "cor-warden",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Corvane Heavy Industries",
+   "mounts": [],
+   "name": "Corvane Warden",
+   "outline": [
+    [
+     42.0,
+     -7.0
+    ],
+    [
+     42.0,
+     7.0
+    ],
+    [
+     41.83,
+     8.29
+    ],
+    [
+     40.54,
+     10.54
+    ],
+    [
+     39.5,
+     11.33
+    ],
+    [
+     38.29,
+     11.83
+    ],
+    [
+     37.0,
+     12.0
+    ],
+    [
+     -37.0,
+     12.0
+    ],
+    [
+     -38.29,
+     11.83
+    ],
+    [
+     -39.5,
+     11.33
+    ],
+    [
+     -40.54,
+     10.54
+    ],
+    [
+     -41.83,
+     8.29
+    ],
+    [
+     -42.0,
+     7.0
+    ],
+    [
+     -42.0,
+     -7.0
+    ],
+    [
+     -41.83,
+     -8.29
+    ],
+    [
+     -40.54,
+     -10.54
+    ],
+    [
+     -39.5,
+     -11.33
+    ],
+    [
+     -38.29,
+     -11.83
+    ],
+    [
+     -37.0,
+     -12.0
+    ],
+    [
+     37.0,
+     -12.0
+    ],
+    [
+     38.29,
+     -11.83
+    ],
+    [
+     39.5,
+     -11.33
+    ],
+    [
+     40.54,
+     -10.54
+    ],
+    [
+     41.83,
+     -8.29
+    ]
+   ],
+   "power": "indep",
+   "radius": 46.0,
+   "registryKey": "cor-warden"
+  },
+  "dri-heavy": {
+   "class": "craft",
+   "id": "dri-heavy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Vesk heavy raider",
+   "outline": [
+    [
+     8.8,
+     0.0
+    ],
+    [
+     3.4,
+     3.0
+    ],
+    [
+     -6.4,
+     5.3
+    ],
+    [
+     -7.6,
+     5.0
+    ],
+    [
+     -7.6,
+     -5.0
+    ],
+    [
+     -6.4,
+     -5.3
+    ],
+    [
+     3.4,
+     -3.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 9.54,
+   "registryKey": "dri-heavy"
+  },
+  "dri-light": {
+   "class": "craft",
+   "id": "dri-light",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Vesk light raider",
+   "outline": [
+    [
+     6.6,
+     0.0
+    ],
+    [
+     2.0,
+     2.4
+    ],
+    [
+     -4.6,
+     3.9
+    ],
+    [
+     -5.6,
+     3.6
+    ],
+    [
+     -5.6,
+     -3.6
+    ],
+    [
+     -4.6,
+     -3.9
+    ],
+    [
+     2.0,
+     -2.4
+    ]
+   ],
+   "power": "belt",
+   "radius": 6.89,
+   "registryKey": "dri-light"
+  },
+  "dri-miner": {
+   "class": "craft",
+   "id": "dri-miner",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Long Wake Dredge",
+   "outline": [
+    [
+     8.4,
+     0.0
+    ],
+    [
+     7.4,
+     1.7
+    ],
+    [
+     3.8,
+     2.1
+    ],
+    [
+     -3.4,
+     2.6
+    ],
+    [
+     -6.8,
+     2.6
+    ],
+    [
+     -7.0,
+     0.0
+    ],
+    [
+     -6.8,
+     -2.6
+    ],
+    [
+     -3.4,
+     -2.6
+    ],
+    [
+     3.8,
+     -2.1
+    ],
+    [
+     7.4,
+     -1.7
+    ]
+   ],
+   "power": "belt",
+   "radius": 9.01,
+   "registryKey": "dri-miner"
+  },
+  "escape-pod": {
+   "class": "pod",
+   "id": "escape-pod",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Ark",
+   "outline": [
+    [
+     9.0,
+     0.0
+    ],
+    [
+     5.0,
+     5.0
+    ],
+    [
+     -6.0,
+     5.0
+    ],
+    [
+     -8.0,
+     3.0
+    ],
+    [
+     -8.0,
+     -3.0
+    ],
+    [
+     -6.0,
+     -5.0
+    ],
+    [
+     5.0,
+     -5.0
+    ]
+   ],
+   "power": "indep",
+   "radius": 9.54,
+   "registryKey": "escape-pod"
+  },
+  "hal-expedition": {
+   "class": "service",
+   "id": "hal-expedition",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Expedition",
+   "outline": [
+    [
+     50.0,
+     -0.0
+    ],
+    [
+     47.92,
+     4.81
+    ],
+    [
+     43.75,
+     7.79
+    ],
+    [
+     35.42,
+     11.5
+    ],
+    [
+     27.08,
+     14.25
+    ],
+    [
+     12.5,
+     17.83
+    ],
+    [
+     0.0,
+     20.0
+    ],
+    [
+     -6.25,
+     19.94
+    ],
+    [
+     -34.34,
+     19.29
+    ],
+    [
+     -40.35,
+     18.44
+    ],
+    [
+     -44.51,
+     16.91
+    ],
+    [
+     -46.0,
+     15.0
+    ],
+    [
+     -50.0,
+     -0.0
+    ],
+    [
+     -46.0,
+     -15.0
+    ],
+    [
+     -44.51,
+     -16.91
+    ],
+    [
+     -40.35,
+     -18.44
+    ],
+    [
+     -34.34,
+     -19.29
+    ],
+    [
+     -6.25,
+     -19.94
+    ],
+    [
+     0.0,
+     -20.0
+    ],
+    [
+     12.5,
+     -17.83
+    ],
+    [
+     27.08,
+     -14.25
+    ],
+    [
+     35.42,
+     -11.5
+    ],
+    [
+     43.75,
+     -7.79
+    ],
+    [
+     47.92,
+     -4.81
+    ]
+   ],
+   "power": "venus",
+   "radius": 54.0,
+   "registryKey": "hal-expedition"
+  },
+  "hal-footnote": {
+   "class": "service",
+   "id": "hal-footnote",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Footnote",
+   "outline": [
+    [
+     12.0,
+     -0.0
+    ],
+    [
+     11.5,
+     1.31
+    ],
+    [
+     10.0,
+     2.39
+    ],
+    [
+     7.5,
+     3.45
+    ],
+    [
+     6.0,
+     3.93
+    ],
+    [
+     3.5,
+     4.57
+    ],
+    [
+     1.5,
+     4.96
+    ],
+    [
+     -4.89,
+     5.96
+    ],
+    [
+     -7.11,
+     5.96
+    ],
+    [
+     -9.12,
+     5.63
+    ],
+    [
+     -10.5,
+     5.04
+    ],
+    [
+     -11.0,
+     4.3
+    ],
+    [
+     -12.0,
+     -0.0
+    ],
+    [
+     -11.0,
+     -4.3
+    ],
+    [
+     -10.5,
+     -5.04
+    ],
+    [
+     -9.12,
+     -5.63
+    ],
+    [
+     -7.11,
+     -5.96
+    ],
+    [
+     -4.89,
+     -5.96
+    ],
+    [
+     1.5,
+     -4.96
+    ],
+    [
+     3.5,
+     -4.57
+    ],
+    [
+     7.5,
+     -3.45
+    ],
+    [
+     9.5,
+     -2.64
+    ],
+    [
+     10.5,
+     -2.1
+    ],
+    [
+     11.5,
+     -1.31
+    ]
+   ],
+   "power": "venus",
+   "radius": 13.0,
+   "registryKey": "hal-footnote"
+  },
+  "hal-heavy": {
+   "class": "craft",
+   "id": "hal-heavy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Heavy Fighter Mk II",
+   "outline": [
+    [
+     9.5,
+     -1.4
+    ],
+    [
+     9.5,
+     1.4
+    ],
+    [
+     7.0,
+     3.2
+    ],
+    [
+     1.0,
+     4.4
+    ],
+    [
+     -6.0,
+     4.4
+    ],
+    [
+     -8.0,
+     3.0
+    ],
+    [
+     -8.0,
+     -3.0
+    ],
+    [
+     -6.0,
+     -4.4
+    ],
+    [
+     1.0,
+     -4.4
+    ],
+    [
+     7.0,
+     -3.2
+    ]
+   ],
+   "power": "mars",
+   "radius": 10.5,
+   "registryKey": "hal-heavy"
+  },
+  "hal-heavy-mk1": {
+   "class": "craft",
+   "id": "hal-heavy-mk1",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Heavy Fighter Mk I",
+   "outline": [
+    [
+     8.4,
+     -1.8
+    ],
+    [
+     8.4,
+     1.8
+    ],
+    [
+     6.6,
+     3.6
+    ],
+    [
+     -5.4,
+     3.8
+    ],
+    [
+     -7.0,
+     2.6
+    ],
+    [
+     -7.0,
+     -2.6
+    ],
+    [
+     -5.4,
+     -3.8
+    ],
+    [
+     6.6,
+     -3.6
+    ]
+   ],
+   "power": "mars",
+   "radius": 9.4,
+   "registryKey": "hal-heavy-mk1"
+  },
+  "hal-inquiry": {
+   "class": "service",
+   "id": "hal-inquiry",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Inquiry",
+   "outline": [
+    [
+     23.0,
+     -0.0
+    ],
+    [
+     22.04,
+     2.39
+    ],
+    [
+     19.17,
+     4.37
+    ],
+    [
+     15.33,
+     5.98
+    ],
+    [
+     9.58,
+     7.69
+    ],
+    [
+     5.75,
+     8.54
+    ],
+    [
+     0.0,
+     9.5
+    ],
+    [
+     -10.0,
+     10.53
+    ],
+    [
+     -14.0,
+     10.53
+    ],
+    [
+     -17.61,
+     9.99
+    ],
+    [
+     -20.11,
+     9.01
+    ],
+    [
+     -21.0,
+     7.8
+    ],
+    [
+     -23.0,
+     -0.0
+    ],
+    [
+     -21.0,
+     -7.8
+    ],
+    [
+     -20.11,
+     -9.01
+    ],
+    [
+     -17.61,
+     -9.99
+    ],
+    [
+     -14.0,
+     -10.53
+    ],
+    [
+     -10.0,
+     -10.53
+    ],
+    [
+     0.0,
+     -9.5
+    ],
+    [
+     5.75,
+     -8.54
+    ],
+    [
+     9.58,
+     -7.69
+    ],
+    [
+     15.33,
+     -5.98
+    ],
+    [
+     19.17,
+     -4.37
+    ],
+    [
+     22.04,
+     -2.39
+    ]
+   ],
+   "power": "venus",
+   "radius": 25.0,
+   "registryKey": "hal-inquiry"
+  },
+  "hal-light": {
+   "class": "craft",
+   "id": "hal-light",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Fighter Mk V",
+   "outline": [
+    [
+     7.0,
+     -0.8
+    ],
+    [
+     7.0,
+     0.8
+    ],
+    [
+     5.0,
+     2.2
+    ],
+    [
+     0.5,
+     3.2
+    ],
+    [
+     -4.5,
+     3.2
+    ],
+    [
+     -6.0,
+     2.0
+    ],
+    [
+     -6.0,
+     -2.0
+    ],
+    [
+     -4.5,
+     -3.2
+    ],
+    [
+     0.5,
+     -3.2
+    ],
+    [
+     5.0,
+     -2.2
+    ]
+   ],
+   "power": "mars",
+   "radius": 8.0,
+   "registryKey": "hal-light"
+  },
+  "hal-light-mk4": {
+   "class": "craft",
+   "id": "hal-light-mk4",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arcadia Works",
+   "mounts": [],
+   "name": "Arcadia Fighter Mk IV",
+   "outline": [
+    [
+     6.2,
+     -1.0
+    ],
+    [
+     6.2,
+     1.0
+    ],
+    [
+     4.4,
+     2.4
+    ],
+    [
+     -0.5,
+     3.0
+    ],
+    [
+     -4.8,
+     3.0
+    ],
+    [
+     -5.6,
+     2.0
+    ],
+    [
+     -5.6,
+     -2.0
+    ],
+    [
+     -4.8,
+     -3.0
+    ],
+    [
+     -0.5,
+     -3.0
+    ],
+    [
+     4.4,
+     -2.4
+    ]
+   ],
+   "power": "mars",
+   "radius": 7.2,
+   "registryKey": "hal-light-mk4"
+  },
+  "hal-probe": {
+   "class": "drone",
+   "id": "hal-probe",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Probe",
+   "outline": [
+    [
+     3.0,
+     -0.6
+    ],
+    [
+     3.0,
+     0.6
+    ],
+    [
+     -3.4,
+     0.9
+    ],
+    [
+     -3.4,
+     -0.9
+    ]
+   ],
+   "power": "venus",
+   "radius": 6.0,
+   "registryKey": "hal-probe"
+  },
+  "hal-query": {
+   "class": "service",
+   "id": "hal-query",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Query",
+   "outline": [
+    [
+     14.0,
+     -0.0
+    ],
+    [
+     13.42,
+     1.51
+    ],
+    [
+     12.25,
+     2.43
+    ],
+    [
+     9.92,
+     3.55
+    ],
+    [
+     8.17,
+     4.18
+    ],
+    [
+     5.25,
+     5.0
+    ],
+    [
+     2.33,
+     5.62
+    ],
+    [
+     -4.4,
+     6.8
+    ],
+    [
+     -8.34,
+     6.95
+    ],
+    [
+     -11.69,
+     6.25
+    ],
+    [
+     -12.41,
+     5.87
+    ],
+    [
+     -13.0,
+     5.0
+    ],
+    [
+     -14.0,
+     -0.0
+    ],
+    [
+     -13.0,
+     -5.0
+    ],
+    [
+     -12.41,
+     -5.87
+    ],
+    [
+     -11.69,
+     -6.25
+    ],
+    [
+     -8.34,
+     -6.95
+    ],
+    [
+     -4.4,
+     -6.8
+    ],
+    [
+     2.33,
+     -5.62
+    ],
+    [
+     5.25,
+     -5.0
+    ],
+    [
+     8.17,
+     -4.18
+    ],
+    [
+     9.92,
+     -3.55
+    ],
+    [
+     12.25,
+     -2.43
+    ],
+    [
+     13.42,
+     -1.51
+    ]
+   ],
+   "power": "venus",
+   "radius": 16.0,
+   "registryKey": "hal-query"
+  },
+  "hal-threshold": {
+   "class": "service",
+   "id": "hal-threshold",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Halden Institute",
+   "mounts": [],
+   "name": "Halden Threshold",
+   "outline": [
+    [
+     27.0,
+     -0.0
+    ],
+    [
+     25.88,
+     2.77
+    ],
+    [
+     22.5,
+     5.06
+    ],
+    [
+     18.0,
+     6.92
+    ],
+    [
+     10.12,
+     9.17
+    ],
+    [
+     4.5,
+     10.3
+    ],
+    [
+     0.0,
+     11.0
+    ],
+    [
+     -12.77,
+     11.92
+    ],
+    [
+     -15.0,
+     12.0
+    ],
+    [
+     -19.34,
+     11.7
+    ],
+    [
+     -22.82,
+     10.87
+    ],
+    [
+     -24.75,
+     9.67
+    ],
+    [
+     -27.0,
+     -0.0
+    ],
+    [
+     -24.75,
+     -9.67
+    ],
+    [
+     -22.82,
+     -10.87
+    ],
+    [
+     -19.34,
+     -11.7
+    ],
+    [
+     -15.0,
+     -12.0
+    ],
+    [
+     -12.77,
+     -11.92
+    ],
+    [
+     0.0,
+     -11.0
+    ],
+    [
+     4.5,
+     -10.3
+    ],
+    [
+     10.12,
+     -9.17
+    ],
+    [
+     18.0,
+     -6.92
+    ],
+    [
+     22.5,
+     -5.06
+    ],
+    [
+     25.88,
+     -2.77
+    ]
+   ],
+   "power": "venus",
+   "radius": 29.16,
+   "registryKey": "hal-threshold"
+  },
+  "ish-aphrodite": {
+   "class": "cruiser",
+   "id": "ish-aphrodite",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Aphrodite",
+   "outline": [
+    [
+     65.0,
+     -0.0
+    ],
+    [
+     62.29,
+     6.78
+    ],
+    [
+     56.88,
+     11.07
+    ],
+    [
+     46.04,
+     16.59
+    ],
+    [
+     35.21,
+     20.79
+    ],
+    [
+     24.38,
+     24.25
+    ],
+    [
+     13.54,
+     27.11
+    ],
+    [
+     0.0,
+     30.0
+    ],
+    [
+     -21.67,
+     29.09
+    ],
+    [
+     -49.81,
+     25.96
+    ],
+    [
+     -58.22,
+     23.39
+    ],
+    [
+     -60.0,
+     21.0
+    ],
+    [
+     -65.0,
+     -0.0
+    ],
+    [
+     -60.0,
+     -21.0
+    ],
+    [
+     -58.22,
+     -23.39
+    ],
+    [
+     -49.81,
+     -25.96
+    ],
+    [
+     -21.67,
+     -29.09
+    ],
+    [
+     0.0,
+     -30.0
+    ],
+    [
+     13.54,
+     -27.11
+    ],
+    [
+     24.38,
+     -24.25
+    ],
+    [
+     35.21,
+     -20.79
+    ],
+    [
+     46.04,
+     -16.59
+    ],
+    [
+     56.88,
+     -11.07
+    ],
+    [
+     62.29,
+     -6.78
+    ]
+   ],
+   "power": "venus",
+   "radius": 70.2,
+   "registryKey": "ish-aphrodite"
+  },
+  "ish-hathor": {
+   "class": "craft",
+   "id": "ish-hathor",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Hathor",
+   "outline": [
+    [
+     7.0,
+     -0.0
+    ],
+    [
+     6.71,
+     0.7
+    ],
+    [
+     5.83,
+     1.3
+    ],
+    [
+     4.67,
+     1.81
+    ],
+    [
+     3.79,
+     2.11
+    ],
+    [
+     1.75,
+     2.66
+    ],
+    [
+     -2.2,
+     3.5
+    ],
+    [
+     -3.5,
+     3.6
+    ],
+    [
+     -4.8,
+     3.5
+    ],
+    [
+     -5.85,
+     3.22
+    ],
+    [
+     -6.2,
+     3.03
+    ],
+    [
+     -6.5,
+     2.6
+    ],
+    [
+     -7.0,
+     -0.0
+    ],
+    [
+     -6.5,
+     -2.6
+    ],
+    [
+     -6.2,
+     -3.03
+    ],
+    [
+     -5.85,
+     -3.22
+    ],
+    [
+     -4.8,
+     -3.5
+    ],
+    [
+     -3.5,
+     -3.6
+    ],
+    [
+     -2.2,
+     -3.5
+    ],
+    [
+     1.75,
+     -2.66
+    ],
+    [
+     3.79,
+     -2.11
+    ],
+    [
+     4.67,
+     -1.81
+    ],
+    [
+     5.83,
+     -1.3
+    ],
+    [
+     6.71,
+     -0.7
+    ]
+   ],
+   "power": "venus",
+   "radius": 7.8,
+   "registryKey": "ish-hathor"
+  },
+  "ish-hathor-221": {
+   "class": "craft",
+   "id": "ish-hathor-221",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Hathor '221",
+   "outline": [
+    [
+     6.4,
+     -1.0
+    ],
+    [
+     6.4,
+     1.0
+    ],
+    [
+     5.2,
+     2.2
+    ],
+    [
+     1.0,
+     3.0
+    ],
+    [
+     -2.84,
+     3.18
+    ],
+    [
+     -3.45,
+     3.2
+    ],
+    [
+     -4.06,
+     3.18
+    ],
+    [
+     -4.64,
+     3.11
+    ],
+    [
+     -5.16,
+     3.0
+    ],
+    [
+     -5.6,
+     2.86
+    ],
+    [
+     -5.93,
+     2.69
+    ],
+    [
+     -6.13,
+     2.5
+    ],
+    [
+     -6.2,
+     2.3
+    ],
+    [
+     -6.2,
+     -2.3
+    ],
+    [
+     -6.13,
+     -2.5
+    ],
+    [
+     -5.93,
+     -2.69
+    ],
+    [
+     -5.6,
+     -2.86
+    ],
+    [
+     -5.16,
+     -3.0
+    ],
+    [
+     -4.64,
+     -3.11
+    ],
+    [
+     -4.06,
+     -3.18
+    ],
+    [
+     -3.45,
+     -3.2
+    ],
+    [
+     -2.84,
+     -3.18
+    ],
+    [
+     1.0,
+     -3.0
+    ],
+    [
+     5.2,
+     -2.2
+    ]
+   ],
+   "power": "venus",
+   "radius": 7.4,
+   "registryKey": "ish-hathor-221"
+  },
+  "ish-hecate": {
+   "class": "cruiser",
+   "id": "ish-hecate",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Hecate",
+   "outline": [
+    [
+     60.0,
+     -0.0
+    ],
+    [
+     57.5,
+     6.07
+    ],
+    [
+     50.0,
+     11.25
+    ],
+    [
+     40.0,
+     15.65
+    ],
+    [
+     30.0,
+     19.06
+    ],
+    [
+     20.0,
+     21.85
+    ],
+    [
+     0.0,
+     26.0
+    ],
+    [
+     -7.5,
+     25.93
+    ],
+    [
+     -22.5,
+     24.94
+    ],
+    [
+     -46.94,
+     22.0
+    ],
+    [
+     -54.42,
+     19.67
+    ],
+    [
+     -56.0,
+     17.5
+    ],
+    [
+     -60.0,
+     -0.0
+    ],
+    [
+     -56.0,
+     -17.5
+    ],
+    [
+     -54.42,
+     -19.67
+    ],
+    [
+     -46.94,
+     -22.0
+    ],
+    [
+     -22.5,
+     -24.94
+    ],
+    [
+     -15.0,
+     -25.61
+    ],
+    [
+     0.0,
+     -26.0
+    ],
+    [
+     20.0,
+     -21.85
+    ],
+    [
+     30.0,
+     -19.06
+    ],
+    [
+     40.0,
+     -15.65
+    ],
+    [
+     50.0,
+     -11.25
+    ],
+    [
+     57.5,
+     -6.07
+    ]
+   ],
+   "power": "venus",
+   "radius": 64.8,
+   "registryKey": "ish-hecate"
+  },
+  "ish-lakshmi": {
+   "class": "patrol",
+   "id": "ish-lakshmi",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Lakshmi",
+   "outline": [
+    [
+     24.0,
+     -0.0
+    ],
+    [
+     23.0,
+     2.22
+    ],
+    [
+     20.0,
+     4.11
+    ],
+    [
+     16.0,
+     5.72
+    ],
+    [
+     11.0,
+     7.24
+    ],
+    [
+     7.0,
+     8.21
+    ],
+    [
+     0.0,
+     9.5
+    ],
+    [
+     -11.0,
+     10.73
+    ],
+    [
+     -15.0,
+     10.73
+    ],
+    [
+     -18.61,
+     10.19
+    ],
+    [
+     -21.11,
+     9.21
+    ],
+    [
+     -22.0,
+     8.0
+    ],
+    [
+     -24.0,
+     -0.0
+    ],
+    [
+     -22.0,
+     -8.0
+    ],
+    [
+     -21.11,
+     -9.21
+    ],
+    [
+     -18.61,
+     -10.19
+    ],
+    [
+     -15.0,
+     -10.73
+    ],
+    [
+     -11.0,
+     -10.73
+    ],
+    [
+     0.0,
+     -9.5
+    ],
+    [
+     7.0,
+     -8.21
+    ],
+    [
+     11.0,
+     -7.24
+    ],
+    [
+     16.0,
+     -5.72
+    ],
+    [
+     20.0,
+     -4.11
+    ],
+    [
+     23.0,
+     -2.22
+    ]
+   ],
+   "power": "venus",
+   "radius": 26.0,
+   "registryKey": "ish-lakshmi"
+  },
+  "ish-lakshmi-205": {
+   "class": "patrol",
+   "id": "ish-lakshmi-205",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Lakshmi '205",
+   "outline": [
+    [
+     23.0,
+     -3.2
+    ],
+    [
+     23.0,
+     3.2
+    ],
+    [
+     19.5,
+     6.8
+    ],
+    [
+     8.0,
+     8.5
+    ],
+    [
+     -12.22,
+     9.53
+    ],
+    [
+     -14.0,
+     9.6
+    ],
+    [
+     -15.78,
+     9.53
+    ],
+    [
+     -17.47,
+     9.34
+    ],
+    [
+     -18.99,
+     9.03
+    ],
+    [
+     -20.25,
+     8.62
+    ],
+    [
+     -21.21,
+     8.13
+    ],
+    [
+     -21.8,
+     7.58
+    ],
+    [
+     -23.0,
+     4.5
+    ],
+    [
+     -23.0,
+     -4.5
+    ],
+    [
+     -21.8,
+     -7.58
+    ],
+    [
+     -21.21,
+     -8.13
+    ],
+    [
+     -20.25,
+     -8.62
+    ],
+    [
+     -18.99,
+     -9.03
+    ],
+    [
+     -17.47,
+     -9.34
+    ],
+    [
+     -15.78,
+     -9.53
+    ],
+    [
+     -14.0,
+     -9.6
+    ],
+    [
+     -12.22,
+     -9.53
+    ],
+    [
+     8.0,
+     -8.5
+    ],
+    [
+     19.5,
+     -6.8
+    ]
+   ],
+   "power": "venus",
+   "radius": 25.0,
+   "registryKey": "ish-lakshmi-205"
+  },
+  "ish-maat": {
+   "class": "frigate",
+   "id": "ish-maat",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Maat",
+   "outline": [
+    [
+     33.0,
+     -0.0
+    ],
+    [
+     31.62,
+     2.26
+    ],
+    [
+     30.25,
+     3.08
+    ],
+    [
+     24.75,
+     5.21
+    ],
+    [
+     19.25,
+     6.78
+    ],
+    [
+     8.25,
+     9.18
+    ],
+    [
+     0.0,
+     10.5
+    ],
+    [
+     -16.55,
+     11.52
+    ],
+    [
+     -21.45,
+     11.52
+    ],
+    [
+     -25.86,
+     10.95
+    ],
+    [
+     -28.91,
+     9.9
+    ],
+    [
+     -30.0,
+     8.6
+    ],
+    [
+     -33.0,
+     -0.0
+    ],
+    [
+     -30.0,
+     -8.6
+    ],
+    [
+     -28.91,
+     -9.9
+    ],
+    [
+     -25.86,
+     -10.95
+    ],
+    [
+     -21.45,
+     -11.52
+    ],
+    [
+     -16.55,
+     -11.52
+    ],
+    [
+     0.0,
+     -10.5
+    ],
+    [
+     8.25,
+     -9.18
+    ],
+    [
+     19.25,
+     -6.78
+    ],
+    [
+     24.75,
+     -5.21
+    ],
+    [
+     30.25,
+     -3.08
+    ],
+    [
+     31.62,
+     -2.26
+    ]
+   ],
+   "power": "venus",
+   "radius": 35.64,
+   "registryKey": "ish-maat"
+  },
+  "ish-maxwell": {
+   "class": "destroyer",
+   "id": "ish-maxwell",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Maxwell",
+   "outline": [
+    [
+     42.0,
+     -0.0
+    ],
+    [
+     40.25,
+     3.97
+    ],
+    [
+     36.75,
+     6.44
+    ],
+    [
+     29.75,
+     9.59
+    ],
+    [
+     22.75,
+     11.95
+    ],
+    [
+     17.5,
+     13.42
+    ],
+    [
+     7.0,
+     15.78
+    ],
+    [
+     0.0,
+     17.0
+    ],
+    [
+     -25.0,
+     17.3
+    ],
+    [
+     -33.11,
+     16.47
+    ],
+    [
+     -37.67,
+     14.35
+    ],
+    [
+     -40.25,
+     6.43
+    ],
+    [
+     -42.0,
+     -0.0
+    ],
+    [
+     -40.25,
+     -6.43
+    ],
+    [
+     -37.67,
+     -14.35
+    ],
+    [
+     -33.11,
+     -16.47
+    ],
+    [
+     -25.0,
+     -17.3
+    ],
+    [
+     0.0,
+     -17.0
+    ],
+    [
+     7.0,
+     -15.78
+    ],
+    [
+     17.5,
+     -13.42
+    ],
+    [
+     22.75,
+     -11.95
+    ],
+    [
+     29.75,
+     -9.59
+    ],
+    [
+     36.75,
+     -6.44
+    ],
+    [
+     40.25,
+     -3.97
+    ]
+   ],
+   "power": "venus",
+   "radius": 45.36,
+   "registryKey": "ish-maxwell"
+  },
+  "ish-sedna": {
+   "class": "corvette",
+   "id": "ish-sedna",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Sedna",
+   "outline": [
+    [
+     16.0,
+     -0.0
+    ],
+    [
+     15.33,
+     1.52
+    ],
+    [
+     14.0,
+     2.46
+    ],
+    [
+     11.33,
+     3.67
+    ],
+    [
+     8.67,
+     4.57
+    ],
+    [
+     4.67,
+     5.62
+    ],
+    [
+     -4.96,
+     7.67
+    ],
+    [
+     -8.0,
+     7.9
+    ],
+    [
+     -9.56,
+     7.84
+    ],
+    [
+     -12.36,
+     7.4
+    ],
+    [
+     -14.31,
+     6.6
+    ],
+    [
+     -15.0,
+     5.6
+    ],
+    [
+     -16.0,
+     -0.0
+    ],
+    [
+     -15.0,
+     -5.6
+    ],
+    [
+     -14.31,
+     -6.6
+    ],
+    [
+     -12.36,
+     -7.4
+    ],
+    [
+     -9.56,
+     -7.84
+    ],
+    [
+     -8.0,
+     -7.9
+    ],
+    [
+     -4.96,
+     -7.67
+    ],
+    [
+     4.67,
+     -5.62
+    ],
+    [
+     8.67,
+     -4.57
+    ],
+    [
+     11.33,
+     -3.67
+    ],
+    [
+     14.0,
+     -2.46
+    ],
+    [
+     15.33,
+     -1.52
+    ]
+   ],
+   "power": "venus",
+   "radius": 18.0,
+   "registryKey": "ish-sedna"
+  },
+  "ish-sedna-218": {
+   "class": "corvette",
+   "id": "ish-sedna-218",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Ishtar Fleet Works",
+   "mounts": [],
+   "name": "Ishtar Sedna '218",
+   "outline": [
+    [
+     15.0,
+     -2.4
+    ],
+    [
+     15.0,
+     2.4
+    ],
+    [
+     12.5,
+     4.8
+    ],
+    [
+     4.0,
+     6.0
+    ],
+    [
+     -7.66,
+     6.75
+    ],
+    [
+     -9.0,
+     6.8
+    ],
+    [
+     -10.34,
+     6.75
+    ],
+    [
+     -11.6,
+     6.6
+    ],
+    [
+     -12.74,
+     6.36
+    ],
+    [
+     -13.69,
+     6.05
+    ],
+    [
+     -14.41,
+     5.67
+    ],
+    [
+     -14.85,
+     5.25
+    ],
+    [
+     -15.0,
+     4.8
+    ],
+    [
+     -15.0,
+     -4.8
+    ],
+    [
+     -14.85,
+     -5.25
+    ],
+    [
+     -14.41,
+     -5.67
+    ],
+    [
+     -13.69,
+     -6.05
+    ],
+    [
+     -12.74,
+     -6.36
+    ],
+    [
+     -11.6,
+     -6.6
+    ],
+    [
+     -10.34,
+     -6.75
+    ],
+    [
+     -9.0,
+     -6.8
+    ],
+    [
+     -7.66,
+     -6.75
+    ],
+    [
+     4.0,
+     -6.0
+    ],
+    [
+     12.5,
+     -4.8
+    ]
+   ],
+   "power": "venus",
+   "radius": 17.0,
+   "registryKey": "ish-sedna-218"
+  },
+  "kes-charter": {
+   "class": "dreadnought",
+   "id": "kes-charter",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Charter",
+   "outline": [
+    [
+     188.0,
+     -16.0
+    ],
+    [
+     188.0,
+     16.0
+    ],
+    [
+     164.0,
+     36.0
+    ],
+    [
+     60.0,
+     80.0
+    ],
+    [
+     -110.0,
+     80.0
+    ],
+    [
+     -130.0,
+     68.0
+    ],
+    [
+     -188.0,
+     18.0
+    ],
+    [
+     -188.0,
+     -18.0
+    ],
+    [
+     -130.0,
+     -68.0
+    ],
+    [
+     -110.0,
+     -80.0
+    ],
+    [
+     60.0,
+     -80.0
+    ],
+    [
+     164.0,
+     -36.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 203.04,
+   "registryKey": "kes-charter"
+  },
+  "kes-citation": {
+   "class": "corvette",
+   "id": "kes-citation",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Citation",
+   "outline": [
+    [
+     17.0,
+     -2.6
+    ],
+    [
+     17.0,
+     2.6
+    ],
+    [
+     14.5,
+     3.8
+    ],
+    [
+     -3.5,
+     7.2
+    ],
+    [
+     -15.0,
+     7.2
+    ],
+    [
+     -17.5,
+     5.6
+    ],
+    [
+     -17.5,
+     -5.6
+    ],
+    [
+     -15.0,
+     -7.2
+    ],
+    [
+     -3.5,
+     -7.2
+    ],
+    [
+     14.5,
+     -3.8
+    ]
+   ],
+   "power": "earth",
+   "radius": 18.9,
+   "registryKey": "kes-citation"
+  },
+  "kes-custody": {
+   "class": "cruiser",
+   "id": "kes-custody",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Custody",
+   "outline": [
+    [
+     66.0,
+     -16.0
+    ],
+    [
+     66.0,
+     16.0
+    ],
+    [
+     56.0,
+     24.0
+    ],
+    [
+     30.0,
+     28.0
+    ],
+    [
+     -30.0,
+     28.0
+    ],
+    [
+     -50.0,
+     24.0
+    ],
+    [
+     -62.0,
+     16.0
+    ],
+    [
+     -66.0,
+     12.0
+    ],
+    [
+     -66.0,
+     -12.0
+    ],
+    [
+     -62.0,
+     -16.0
+    ],
+    [
+     -50.0,
+     -24.0
+    ],
+    [
+     -30.0,
+     -28.0
+    ],
+    [
+     30.0,
+     -28.0
+    ],
+    [
+     56.0,
+     -24.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 71.28,
+   "registryKey": "kes-custody"
+  },
+  "kes-decree": {
+   "class": "frigate",
+   "id": "kes-decree",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Decree",
+   "outline": [
+    [
+     32.0,
+     -5.0
+    ],
+    [
+     32.0,
+     5.0
+    ],
+    [
+     27.0,
+     9.0
+    ],
+    [
+     18.0,
+     13.0
+    ],
+    [
+     -20.0,
+     13.0
+    ],
+    [
+     -30.0,
+     10.0
+    ],
+    [
+     -32.0,
+     7.0
+    ],
+    [
+     -32.0,
+     -7.0
+    ],
+    [
+     -30.0,
+     -10.0
+    ],
+    [
+     -20.0,
+     -13.0
+    ],
+    [
+     18.0,
+     -13.0
+    ],
+    [
+     27.0,
+     -9.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 34.56,
+   "registryKey": "kes-decree"
+  },
+  "kes-heavy": {
+   "class": "craft",
+   "id": "kes-heavy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Vantage Aerospace",
+   "mounts": [],
+   "name": "Vantage Sabre",
+   "outline": [
+    [
+     10.0,
+     -0.8
+    ],
+    [
+     10.0,
+     0.8
+    ],
+    [
+     9.0,
+     1.5
+    ],
+    [
+     -1.4,
+     5.6
+    ],
+    [
+     -5.4,
+     5.6
+    ],
+    [
+     -8.8,
+     3.6
+    ],
+    [
+     -9.6,
+     2.8
+    ],
+    [
+     -9.6,
+     -2.8
+    ],
+    [
+     -8.8,
+     -3.6
+    ],
+    [
+     -5.4,
+     -5.6
+    ],
+    [
+     -1.4,
+     -5.6
+    ],
+    [
+     9.0,
+     -1.5
+    ]
+   ],
+   "power": "earth",
+   "radius": 11.6,
+   "registryKey": "kes-heavy"
+  },
+  "kes-light": {
+   "class": "craft",
+   "id": "kes-light",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Vantage Aerospace",
+   "mounts": [],
+   "name": "Vantage Foil",
+   "outline": [
+    [
+     7.2,
+     -0.55
+    ],
+    [
+     7.2,
+     0.55
+    ],
+    [
+     6.4,
+     1.0
+    ],
+    [
+     -0.6,
+     3.6
+    ],
+    [
+     -3.4,
+     3.6
+    ],
+    [
+     -6.4,
+     2.3
+    ],
+    [
+     -7.0,
+     1.7
+    ],
+    [
+     -7.0,
+     -1.7
+    ],
+    [
+     -6.4,
+     -2.3
+    ],
+    [
+     -3.4,
+     -3.6
+    ],
+    [
+     -0.6,
+     -3.6
+    ],
+    [
+     6.4,
+     -1.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 8.4,
+   "registryKey": "kes-light"
+  },
+  "kes-mandate": {
+   "class": "carrier",
+   "id": "kes-mandate",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Mandate",
+   "outline": [
+    [
+     148.0,
+     -22.0
+    ],
+    [
+     148.0,
+     22.0
+    ],
+    [
+     128.0,
+     40.0
+    ],
+    [
+     60.0,
+     66.0
+    ],
+    [
+     -90.0,
+     66.0
+    ],
+    [
+     -120.0,
+     56.0
+    ],
+    [
+     -140.0,
+     40.0
+    ],
+    [
+     -148.0,
+     28.0
+    ],
+    [
+     -148.0,
+     -28.0
+    ],
+    [
+     -140.0,
+     -40.0
+    ],
+    [
+     -120.0,
+     -56.0
+    ],
+    [
+     -90.0,
+     -66.0
+    ],
+    [
+     60.0,
+     -66.0
+    ],
+    [
+     128.0,
+     -40.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 159.84,
+   "registryKey": "kes-mandate"
+  },
+  "kes-notice": {
+   "class": "corvette",
+   "id": "kes-notice",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Notice",
+   "outline": [
+    [
+     15.0,
+     -2.4
+    ],
+    [
+     15.0,
+     2.4
+    ],
+    [
+     13.0,
+     4.6
+    ],
+    [
+     4.0,
+     5.8
+    ],
+    [
+     -10.0,
+     5.8
+    ],
+    [
+     -15.5,
+     4.2
+    ],
+    [
+     -15.5,
+     -4.2
+    ],
+    [
+     -10.0,
+     -5.8
+    ],
+    [
+     4.0,
+     -5.8
+    ],
+    [
+     13.0,
+     -4.6
+    ]
+   ],
+   "power": "earth",
+   "radius": 17.0,
+   "registryKey": "kes-notice"
+  },
+  "kes-precedent": {
+   "class": "battleship",
+   "id": "kes-precedent",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Precedent",
+   "outline": [
+    [
+     100.0,
+     -9.0
+    ],
+    [
+     100.0,
+     9.0
+    ],
+    [
+     86.0,
+     24.0
+    ],
+    [
+     70.0,
+     30.0
+    ],
+    [
+     -20.0,
+     43.0
+    ],
+    [
+     -62.0,
+     43.0
+    ],
+    [
+     -88.0,
+     32.0
+    ],
+    [
+     -96.0,
+     22.0
+    ],
+    [
+     -100.0,
+     14.0
+    ],
+    [
+     -100.0,
+     -14.0
+    ],
+    [
+     -96.0,
+     -22.0
+    ],
+    [
+     -88.0,
+     -32.0
+    ],
+    [
+     -62.0,
+     -43.0
+    ],
+    [
+     -20.0,
+     -43.0
+    ],
+    [
+     70.0,
+     -30.0
+    ],
+    [
+     86.0,
+     -24.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 108.0,
+   "registryKey": "kes-precedent"
+  },
+  "kes-ruling": {
+   "class": "destroyer",
+   "id": "kes-ruling",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Ruling",
+   "outline": [
+    [
+     40.0,
+     -6.0
+    ],
+    [
+     40.0,
+     6.0
+    ],
+    [
+     33.0,
+     12.0
+    ],
+    [
+     14.0,
+     17.0
+    ],
+    [
+     -24.0,
+     17.0
+    ],
+    [
+     -37.0,
+     13.0
+    ],
+    [
+     -40.0,
+     9.0
+    ],
+    [
+     -40.0,
+     -9.0
+    ],
+    [
+     -37.0,
+     -13.0
+    ],
+    [
+     -24.0,
+     -17.0
+    ],
+    [
+     14.0,
+     -17.0
+    ],
+    [
+     33.0,
+     -12.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 43.2,
+   "registryKey": "kes-ruling"
+  },
+  "kes-sentence": {
+   "class": "battleship",
+   "id": "kes-sentence",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Sentence",
+   "outline": [
+    [
+     96.0,
+     -8.0
+    ],
+    [
+     96.0,
+     8.0
+    ],
+    [
+     58.0,
+     40.0
+    ],
+    [
+     -56.0,
+     40.0
+    ],
+    [
+     -96.0,
+     12.0
+    ],
+    [
+     -96.0,
+     -12.0
+    ],
+    [
+     -56.0,
+     -40.0
+    ],
+    [
+     58.0,
+     -40.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 103.68,
+   "registryKey": "kes-sentence"
+  },
+  "kes-statute": {
+   "class": "cruiser",
+   "id": "kes-statute",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Statute",
+   "outline": [
+    [
+     70.0,
+     -7.0
+    ],
+    [
+     70.0,
+     7.0
+    ],
+    [
+     54.0,
+     22.0
+    ],
+    [
+     -18.0,
+     31.0
+    ],
+    [
+     -62.0,
+     31.0
+    ],
+    [
+     -70.0,
+     20.0
+    ],
+    [
+     -70.0,
+     -20.0
+    ],
+    [
+     -62.0,
+     -31.0
+    ],
+    [
+     -18.0,
+     -31.0
+    ],
+    [
+     54.0,
+     -22.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 75.6,
+   "registryKey": "kes-statute"
+  },
+  "kes-summons": {
+   "class": "frigate",
+   "id": "kes-summons",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Summons",
+   "outline": [
+    [
+     36.0,
+     -2.5
+    ],
+    [
+     36.0,
+     2.5
+    ],
+    [
+     32.0,
+     6.0
+    ],
+    [
+     18.0,
+     7.0
+    ],
+    [
+     -30.5,
+     7.5
+    ],
+    [
+     -35.5,
+     7.5
+    ],
+    [
+     -37.0,
+     6.0
+    ],
+    [
+     -37.0,
+     -6.0
+    ],
+    [
+     -35.5,
+     -7.5
+    ],
+    [
+     -30.5,
+     -7.5
+    ],
+    [
+     18.0,
+     -7.0
+    ],
+    [
+     32.0,
+     -6.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 39.96,
+   "registryKey": "kes-summons"
+  },
+  "kes-verdict": {
+   "class": "destroyer",
+   "id": "kes-verdict",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Verdict",
+   "outline": [
+    [
+     43.0,
+     -4.5
+    ],
+    [
+     43.0,
+     4.5
+    ],
+    [
+     37.0,
+     9.5
+    ],
+    [
+     8.0,
+     19.5
+    ],
+    [
+     -26.0,
+     19.5
+    ],
+    [
+     -39.0,
+     14.0
+    ],
+    [
+     -43.0,
+     9.0
+    ],
+    [
+     -43.0,
+     -9.0
+    ],
+    [
+     -39.0,
+     -14.0
+    ],
+    [
+     -26.0,
+     -19.5
+    ],
+    [
+     8.0,
+     -19.5
+    ],
+    [
+     37.0,
+     -9.5
+    ]
+   ],
+   "power": "earth",
+   "radius": 46.44,
+   "registryKey": "kes-verdict"
+  },
+  "kes-writ": {
+   "class": "patrol",
+   "id": "kes-writ",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Writ",
+   "outline": [
+    [
+     23.0,
+     -4.0
+    ],
+    [
+     23.0,
+     4.0
+    ],
+    [
+     20.0,
+     8.0
+    ],
+    [
+     -19.0,
+     8.0
+    ],
+    [
+     -23.0,
+     6.4
+    ],
+    [
+     -23.0,
+     -6.4
+    ],
+    [
+     -19.0,
+     -8.0
+    ],
+    [
+     20.0,
+     -8.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 25.0,
+   "registryKey": "kes-writ"
+  },
+  "kessari-brig": {
+   "class": "frigate",
+   "id": "kessari-brig",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Injunction",
+   "outline": [
+    [
+     34.0,
+     -3.4
+    ],
+    [
+     34.0,
+     3.4
+    ],
+    [
+     12.0,
+     17.5
+    ],
+    [
+     -24.0,
+     17.5
+    ],
+    [
+     -27.0,
+     15.0
+    ],
+    [
+     -34.0,
+     3.2
+    ],
+    [
+     -34.0,
+     -3.2
+    ],
+    [
+     -27.0,
+     -15.0
+    ],
+    [
+     -24.0,
+     -17.5
+    ],
+    [
+     12.0,
+     -17.5
+    ]
+   ],
+   "power": "earth",
+   "radius": 36.72,
+   "registryKey": "kessari-brig"
+  },
+  "kessari-wedge": {
+   "class": "patrol",
+   "id": "kessari-wedge",
+   "inGame": true,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Kessari Orbital Defence",
+   "mounts": [],
+   "name": "Kessari Warrant",
+   "outline": [
+    [
+     24.0,
+     -4.0
+    ],
+    [
+     24.0,
+     4.0
+    ],
+    [
+     6.8,
+     11.0
+    ],
+    [
+     -18.2,
+     11.0
+    ],
+    [
+     -22.6,
+     7.5
+    ],
+    [
+     -24.0,
+     5.1
+    ],
+    [
+     -24.0,
+     -5.1
+    ],
+    [
+     -22.6,
+     -7.5
+    ],
+    [
+     -18.2,
+     -11.0
+    ],
+    [
+     6.8,
+     -11.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 26.4,
+   "registryKey": "warrant"
+  },
+  "lav-breeze": {
+   "class": "mining",
+   "id": "lav-breeze",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Breeze",
+   "outline": [
+    [
+     13.0,
+     -0.0
+    ],
+    [
+     12.46,
+     1.56
+    ],
+    [
+     11.38,
+     2.49
+    ],
+    [
+     8.67,
+     3.81
+    ],
+    [
+     5.96,
+     4.67
+    ],
+    [
+     2.17,
+     5.48
+    ],
+    [
+     -4.83,
+     6.51
+    ],
+    [
+     -7.0,
+     6.7
+    ],
+    [
+     -8.11,
+     6.65
+    ],
+    [
+     -10.12,
+     6.29
+    ],
+    [
+     -11.5,
+     5.62
+    ],
+    [
+     -12.0,
+     4.8
+    ],
+    [
+     -13.0,
+     -0.0
+    ],
+    [
+     -12.0,
+     -4.8
+    ],
+    [
+     -11.5,
+     -5.62
+    ],
+    [
+     -10.12,
+     -6.29
+    ],
+    [
+     -8.11,
+     -6.65
+    ],
+    [
+     -7.0,
+     -6.7
+    ],
+    [
+     -4.83,
+     -6.51
+    ],
+    [
+     2.17,
+     -5.48
+    ],
+    [
+     5.96,
+     -4.67
+    ],
+    [
+     8.67,
+     -3.81
+    ],
+    [
+     11.38,
+     -2.49
+    ],
+    [
+     12.46,
+     -1.56
+    ]
+   ],
+   "power": "venus",
+   "radius": 15.0,
+   "registryKey": "lav-breeze"
+  },
+  "lav-cyclone": {
+   "class": "industry",
+   "id": "lav-cyclone",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Cyclone",
+   "outline": [
+    [
+     56.0,
+     -0.0
+    ],
+    [
+     55.17,
+     2.7
+    ],
+    [
+     54.33,
+     3.62
+    ],
+    [
+     53.5,
+     4.3
+    ],
+    [
+     51.83,
+     5.36
+    ],
+    [
+     50.17,
+     6.2
+    ],
+    [
+     47.67,
+     7.22
+    ],
+    [
+     44.33,
+     8.29
+    ],
+    [
+     -46.0,
+     34.0
+    ],
+    [
+     -50.0,
+     34.0
+    ],
+    [
+     -70.0,
+     26.0
+    ],
+    [
+     -71.82,
+     22.07
+    ],
+    [
+     -72.0,
+     21.0
+    ],
+    [
+     -72.0,
+     -21.0
+    ],
+    [
+     -71.82,
+     -22.07
+    ],
+    [
+     -70.0,
+     -26.0
+    ],
+    [
+     -50.0,
+     -34.0
+    ],
+    [
+     -46.0,
+     -34.0
+    ],
+    [
+     44.33,
+     -8.29
+    ],
+    [
+     47.67,
+     -7.22
+    ],
+    [
+     50.17,
+     -6.2
+    ],
+    [
+     51.83,
+     -5.36
+    ],
+    [
+     53.5,
+     -4.3
+    ],
+    [
+     55.17,
+     -2.7
+    ]
+   ],
+   "power": "venus",
+   "radius": 77.76,
+   "registryKey": "lav-cyclone"
+  },
+  "lav-gale": {
+   "class": "mining",
+   "id": "lav-gale",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Gale",
+   "outline": [
+    [
+     24.0,
+     -0.0
+    ],
+    [
+     23.0,
+     2.7
+    ],
+    [
+     21.0,
+     4.3
+    ],
+    [
+     17.0,
+     6.2
+    ],
+    [
+     12.0,
+     7.79
+    ],
+    [
+     8.0,
+     8.73
+    ],
+    [
+     0.0,
+     10.0
+    ],
+    [
+     -11.0,
+     10.93
+    ],
+    [
+     -15.0,
+     10.93
+    ],
+    [
+     -18.61,
+     10.39
+    ],
+    [
+     -21.11,
+     9.41
+    ],
+    [
+     -22.0,
+     8.2
+    ],
+    [
+     -24.0,
+     -0.0
+    ],
+    [
+     -22.0,
+     -8.2
+    ],
+    [
+     -21.11,
+     -9.41
+    ],
+    [
+     -18.61,
+     -10.39
+    ],
+    [
+     -15.0,
+     -10.93
+    ],
+    [
+     -11.0,
+     -10.93
+    ],
+    [
+     0.0,
+     -10.0
+    ],
+    [
+     8.0,
+     -8.73
+    ],
+    [
+     12.0,
+     -7.79
+    ],
+    [
+     17.0,
+     -6.2
+    ],
+    [
+     21.0,
+     -4.3
+    ],
+    [
+     23.0,
+     -2.7
+    ]
+   ],
+   "power": "venus",
+   "radius": 26.0,
+   "registryKey": "lav-gale"
+  },
+  "lav-monsoon": {
+   "class": "bulk",
+   "id": "lav-monsoon",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Monsoon",
+   "outline": [
+    [
+     45.0,
+     -0.0
+    ],
+    [
+     44.46,
+     1.52
+    ],
+    [
+     43.38,
+     2.46
+    ],
+    [
+     41.21,
+     3.67
+    ],
+    [
+     39.04,
+     4.57
+    ],
+    [
+     36.88,
+     5.3
+    ],
+    [
+     34.71,
+     5.9
+    ],
+    [
+     32.0,
+     6.5
+    ],
+    [
+     -40.5,
+     15.0
+    ],
+    [
+     -44.0,
+     15.0
+    ],
+    [
+     -45.5,
+     12.89
+    ],
+    [
+     -45.87,
+     12.21
+    ],
+    [
+     -46.0,
+     11.5
+    ],
+    [
+     -46.0,
+     -11.5
+    ],
+    [
+     -45.5,
+     -12.89
+    ],
+    [
+     -44.0,
+     -15.0
+    ],
+    [
+     -40.5,
+     -15.0
+    ],
+    [
+     32.0,
+     -6.5
+    ],
+    [
+     34.71,
+     -5.9
+    ],
+    [
+     36.88,
+     -5.3
+    ],
+    [
+     39.04,
+     -4.57
+    ],
+    [
+     41.21,
+     -3.67
+    ],
+    [
+     43.38,
+     -2.46
+    ],
+    [
+     44.46,
+     -1.52
+    ]
+   ],
+   "power": "venus",
+   "radius": 49.68,
+   "registryKey": "lav-monsoon"
+  },
+  "lav-tempest": {
+   "class": "mining",
+   "id": "lav-tempest",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Tempest",
+   "outline": [
+    [
+     28.0,
+     -0.0
+    ],
+    [
+     26.83,
+     3.24
+    ],
+    [
+     23.33,
+     5.84
+    ],
+    [
+     18.67,
+     7.88
+    ],
+    [
+     15.17,
+     9.02
+    ],
+    [
+     10.5,
+     10.22
+    ],
+    [
+     4.67,
+     11.34
+    ],
+    [
+     0.0,
+     12.0
+    ],
+    [
+     -13.77,
+     12.72
+    ],
+    [
+     -18.23,
+     12.72
+    ],
+    [
+     -23.82,
+     11.6
+    ],
+    [
+     -26.0,
+     9.6
+    ],
+    [
+     -28.0,
+     -0.0
+    ],
+    [
+     -26.0,
+     -9.6
+    ],
+    [
+     -23.82,
+     -11.6
+    ],
+    [
+     -18.23,
+     -12.72
+    ],
+    [
+     -13.77,
+     -12.72
+    ],
+    [
+     0.0,
+     -12.0
+    ],
+    [
+     4.67,
+     -11.34
+    ],
+    [
+     10.5,
+     -10.22
+    ],
+    [
+     15.17,
+     -9.02
+    ],
+    [
+     18.67,
+     -7.88
+    ],
+    [
+     23.33,
+     -5.84
+    ],
+    [
+     26.83,
+     -3.24
+    ]
+   ],
+   "power": "venus",
+   "radius": 31.0,
+   "registryKey": "lav-tempest"
+  },
+  "lav-zephyr": {
+   "class": "mining",
+   "id": "lav-zephyr",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Lavinia Atmospherics",
+   "mounts": [],
+   "name": "Lavinia Zephyr",
+   "outline": [
+    [
+     15.0,
+     -0.0
+    ],
+    [
+     14.38,
+     1.75
+    ],
+    [
+     12.5,
+     3.16
+    ],
+    [
+     11.25,
+     3.77
+    ],
+    [
+     8.75,
+     4.69
+    ],
+    [
+     6.25,
+     5.39
+    ],
+    [
+     1.88,
+     6.24
+    ],
+    [
+     -5.4,
+     7.38
+    ],
+    [
+     -8.0,
+     7.6
+    ],
+    [
+     -10.6,
+     7.38
+    ],
+    [
+     -12.69,
+     6.77
+    ],
+    [
+     -13.85,
+     5.89
+    ],
+    [
+     -15.0,
+     -0.0
+    ],
+    [
+     -13.85,
+     -5.89
+    ],
+    [
+     -12.69,
+     -6.77
+    ],
+    [
+     -10.6,
+     -7.38
+    ],
+    [
+     -8.0,
+     -7.6
+    ],
+    [
+     -5.4,
+     -7.38
+    ],
+    [
+     1.88,
+     -6.24
+    ],
+    [
+     6.25,
+     -5.39
+    ],
+    [
+     8.75,
+     -4.69
+    ],
+    [
+     11.25,
+     -3.77
+    ],
+    [
+     12.5,
+     -3.16
+    ],
+    [
+     14.38,
+     -1.75
+    ]
+   ],
+   "power": "venus",
+   "radius": 17.0,
+   "registryKey": "lav-zephyr"
+  },
+  "lw-keel": {
+   "class": "service",
+   "id": "lw-keel",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Long Wake Keel",
+   "outline": [
+    [
+     34.0,
+     -6.0
+    ],
+    [
+     34.0,
+     6.0
+    ],
+    [
+     28.0,
+     11.0
+    ],
+    [
+     -24.0,
+     12.0
+    ],
+    [
+     -30.0,
+     9.0
+    ],
+    [
+     -34.0,
+     6.0
+    ],
+    [
+     -34.0,
+     -6.0
+    ],
+    [
+     -30.0,
+     -9.0
+    ],
+    [
+     -24.0,
+     -12.0
+    ],
+    [
+     28.0,
+     -11.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 38.0,
+   "registryKey": "lw-keel"
+  },
+  "lw-trawl": {
+   "class": "service",
+   "id": "lw-trawl",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Long Wake Trawl",
+   "outline": [
+    [
+     40.0,
+     -8.0
+    ],
+    [
+     40.0,
+     8.0
+    ],
+    [
+     32.0,
+     14.0
+    ],
+    [
+     -20.0,
+     15.0
+    ],
+    [
+     -32.0,
+     11.0
+    ],
+    [
+     -40.0,
+     8.0
+    ],
+    [
+     -40.0,
+     -8.0
+    ],
+    [
+     -32.0,
+     -11.0
+    ],
+    [
+     -20.0,
+     -15.0
+    ],
+    [
+     32.0,
+     -14.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 72.0,
+   "registryKey": "lw-trawl"
+  },
+  "mer-auk": {
+   "class": "light",
+   "id": "mer-auk",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Auk",
+   "outline": [
+    [
+     12.0,
+     -1.7
+    ],
+    [
+     12.0,
+     1.7
+    ],
+    [
+     11.9,
+     2.42
+    ],
+    [
+     11.62,
+     3.1
+    ],
+    [
+     11.18,
+     3.68
+    ],
+    [
+     10.6,
+     4.12
+    ],
+    [
+     9.2,
+     4.5
+    ],
+    [
+     -7.2,
+     4.5
+    ],
+    [
+     -8.6,
+     4.12
+    ],
+    [
+     -9.18,
+     3.68
+    ],
+    [
+     -9.62,
+     3.1
+    ],
+    [
+     -9.9,
+     2.42
+    ],
+    [
+     -10.0,
+     1.7
+    ],
+    [
+     -10.0,
+     -1.7
+    ],
+    [
+     -9.9,
+     -2.42
+    ],
+    [
+     -9.62,
+     -3.1
+    ],
+    [
+     -9.18,
+     -3.68
+    ],
+    [
+     -8.6,
+     -4.12
+    ],
+    [
+     -7.2,
+     -4.5
+    ],
+    [
+     9.2,
+     -4.5
+    ],
+    [
+     10.6,
+     -4.12
+    ],
+    [
+     11.18,
+     -3.68
+    ],
+    [
+     11.62,
+     -3.1
+    ],
+    [
+     11.9,
+     -2.42
+    ]
+   ],
+   "power": "indep",
+   "radius": 14.0,
+   "registryKey": "mer-auk"
+  },
+  "mer-dunlin": {
+   "class": "mining",
+   "id": "mer-dunlin",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Dunlin",
+   "outline": [
+    [
+     12.0,
+     -1.7
+    ],
+    [
+     12.0,
+     1.7
+    ],
+    [
+     11.9,
+     2.42
+    ],
+    [
+     11.62,
+     3.1
+    ],
+    [
+     11.18,
+     3.68
+    ],
+    [
+     10.6,
+     4.12
+    ],
+    [
+     9.2,
+     4.5
+    ],
+    [
+     -8.2,
+     4.5
+    ],
+    [
+     -9.6,
+     4.12
+    ],
+    [
+     -10.18,
+     3.68
+    ],
+    [
+     -10.62,
+     3.1
+    ],
+    [
+     -10.9,
+     2.42
+    ],
+    [
+     -11.0,
+     1.7
+    ],
+    [
+     -11.0,
+     -1.7
+    ],
+    [
+     -10.9,
+     -2.42
+    ],
+    [
+     -10.62,
+     -3.1
+    ],
+    [
+     -10.18,
+     -3.68
+    ],
+    [
+     -9.6,
+     -4.12
+    ],
+    [
+     -8.2,
+     -4.5
+    ],
+    [
+     9.2,
+     -4.5
+    ],
+    [
+     10.6,
+     -4.12
+    ],
+    [
+     11.18,
+     -3.68
+    ],
+    [
+     11.62,
+     -3.1
+    ],
+    [
+     11.9,
+     -2.42
+    ]
+   ],
+   "power": "indep",
+   "radius": 14.0,
+   "registryKey": "mer-dunlin"
+  },
+  "mer-fulmar": {
+   "class": "passenger",
+   "id": "mer-fulmar",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Fulmar",
+   "outline": [
+    [
+     19.0,
+     -2.0
+    ],
+    [
+     19.0,
+     2.0
+    ],
+    [
+     18.86,
+     3.04
+    ],
+    [
+     18.46,
+     4.0
+    ],
+    [
+     17.83,
+     4.83
+    ],
+    [
+     16.04,
+     5.86
+    ],
+    [
+     15.0,
+     6.0
+    ],
+    [
+     -15.0,
+     6.0
+    ],
+    [
+     -16.04,
+     5.86
+    ],
+    [
+     -17.83,
+     4.83
+    ],
+    [
+     -18.46,
+     4.0
+    ],
+    [
+     -18.86,
+     3.04
+    ],
+    [
+     -19.0,
+     2.0
+    ],
+    [
+     -19.0,
+     -2.0
+    ],
+    [
+     -18.86,
+     -3.04
+    ],
+    [
+     -18.46,
+     -4.0
+    ],
+    [
+     -17.83,
+     -4.83
+    ],
+    [
+     -16.04,
+     -5.86
+    ],
+    [
+     -15.0,
+     -6.0
+    ],
+    [
+     15.0,
+     -6.0
+    ],
+    [
+     16.04,
+     -5.86
+    ],
+    [
+     17.83,
+     -4.83
+    ],
+    [
+     18.46,
+     -4.0
+    ],
+    [
+     18.86,
+     -3.04
+    ]
+   ],
+   "power": "indep",
+   "radius": 22.0,
+   "registryKey": "mer-fulmar"
+  },
+  "mer-gannet": {
+   "class": "cargo",
+   "id": "mer-gannet",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Gannet",
+   "outline": [
+    [
+     20.0,
+     -3.0
+    ],
+    [
+     20.0,
+     3.0
+    ],
+    [
+     19.88,
+     3.91
+    ],
+    [
+     19.53,
+     4.75
+    ],
+    [
+     18.25,
+     6.03
+    ],
+    [
+     17.41,
+     6.38
+    ],
+    [
+     16.5,
+     6.5
+    ],
+    [
+     -16.5,
+     6.5
+    ],
+    [
+     -17.41,
+     6.38
+    ],
+    [
+     -18.25,
+     6.03
+    ],
+    [
+     -19.53,
+     4.75
+    ],
+    [
+     -19.88,
+     3.91
+    ],
+    [
+     -20.0,
+     3.0
+    ],
+    [
+     -20.0,
+     -3.0
+    ],
+    [
+     -19.88,
+     -3.91
+    ],
+    [
+     -19.53,
+     -4.75
+    ],
+    [
+     -18.25,
+     -6.03
+    ],
+    [
+     -17.41,
+     -6.38
+    ],
+    [
+     -16.5,
+     -6.5
+    ],
+    [
+     16.5,
+     -6.5
+    ],
+    [
+     17.41,
+     -6.38
+    ],
+    [
+     18.25,
+     -6.03
+    ],
+    [
+     19.53,
+     -4.75
+    ],
+    [
+     19.88,
+     -3.91
+    ]
+   ],
+   "power": "indep",
+   "radius": 23.0,
+   "registryKey": "mer-gannet"
+  },
+  "mer-grebe": {
+   "class": "service",
+   "id": "mer-grebe",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Grebe",
+   "outline": [
+    [
+     12.0,
+     -3.0
+    ],
+    [
+     12.0,
+     3.0
+    ],
+    [
+     11.86,
+     4.04
+    ],
+    [
+     11.46,
+     5.0
+    ],
+    [
+     10.83,
+     5.83
+    ],
+    [
+     9.04,
+     6.86
+    ],
+    [
+     8.0,
+     7.0
+    ],
+    [
+     -10.0,
+     7.0
+    ],
+    [
+     -11.04,
+     6.86
+    ],
+    [
+     -12.83,
+     5.83
+    ],
+    [
+     -13.46,
+     5.0
+    ],
+    [
+     -13.86,
+     4.04
+    ],
+    [
+     -14.0,
+     3.0
+    ],
+    [
+     -14.0,
+     -3.0
+    ],
+    [
+     -13.86,
+     -4.04
+    ],
+    [
+     -13.46,
+     -5.0
+    ],
+    [
+     -12.83,
+     -5.83
+    ],
+    [
+     -11.04,
+     -6.86
+    ],
+    [
+     -10.0,
+     -7.0
+    ],
+    [
+     8.0,
+     -7.0
+    ],
+    [
+     9.04,
+     -6.86
+    ],
+    [
+     10.83,
+     -5.83
+    ],
+    [
+     11.46,
+     -5.0
+    ],
+    [
+     11.86,
+     -4.04
+    ]
+   ],
+   "power": "indep",
+   "radius": 17.0,
+   "registryKey": "mer-grebe"
+  },
+  "mer-gull": {
+   "class": "light",
+   "id": "mer-gull",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Gull",
+   "outline": [
+    [
+     12.0,
+     -1.7
+    ],
+    [
+     12.0,
+     1.7
+    ],
+    [
+     11.9,
+     2.42
+    ],
+    [
+     11.62,
+     3.1
+    ],
+    [
+     11.18,
+     3.68
+    ],
+    [
+     10.6,
+     4.12
+    ],
+    [
+     9.2,
+     4.5
+    ],
+    [
+     -7.2,
+     4.5
+    ],
+    [
+     -8.6,
+     4.12
+    ],
+    [
+     -9.18,
+     3.68
+    ],
+    [
+     -9.62,
+     3.1
+    ],
+    [
+     -9.9,
+     2.42
+    ],
+    [
+     -10.0,
+     1.7
+    ],
+    [
+     -10.0,
+     -1.7
+    ],
+    [
+     -9.9,
+     -2.42
+    ],
+    [
+     -9.62,
+     -3.1
+    ],
+    [
+     -9.18,
+     -3.68
+    ],
+    [
+     -8.6,
+     -4.12
+    ],
+    [
+     -7.2,
+     -4.5
+    ],
+    [
+     9.2,
+     -4.5
+    ],
+    [
+     10.6,
+     -4.12
+    ],
+    [
+     11.18,
+     -3.68
+    ],
+    [
+     11.62,
+     -3.1
+    ],
+    [
+     11.9,
+     -2.42
+    ]
+   ],
+   "power": "indep",
+   "radius": 14.0,
+   "registryKey": "mer-gull"
+  },
+  "mer-harrier": {
+   "class": "patrol",
+   "id": "mer-harrier",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Harrier",
+   "outline": [
+    [
+     24.0,
+     -3.5
+    ],
+    [
+     24.0,
+     3.5
+    ],
+    [
+     23.85,
+     4.66
+    ],
+    [
+     23.4,
+     5.75
+    ],
+    [
+     21.75,
+     7.4
+    ],
+    [
+     20.66,
+     7.85
+    ],
+    [
+     19.5,
+     8.0
+    ],
+    [
+     -17.5,
+     8.0
+    ],
+    [
+     -18.66,
+     7.85
+    ],
+    [
+     -19.75,
+     7.4
+    ],
+    [
+     -21.4,
+     5.75
+    ],
+    [
+     -21.85,
+     4.66
+    ],
+    [
+     -22.0,
+     3.5
+    ],
+    [
+     -22.0,
+     -3.5
+    ],
+    [
+     -21.85,
+     -4.66
+    ],
+    [
+     -21.4,
+     -5.75
+    ],
+    [
+     -19.75,
+     -7.4
+    ],
+    [
+     -18.66,
+     -7.85
+    ],
+    [
+     -17.5,
+     -8.0
+    ],
+    [
+     19.5,
+     -8.0
+    ],
+    [
+     20.66,
+     -7.85
+    ],
+    [
+     21.75,
+     -7.4
+    ],
+    [
+     23.4,
+     -5.75
+    ],
+    [
+     23.85,
+     -4.66
+    ]
+   ],
+   "power": "indep",
+   "radius": 27.0,
+   "registryKey": "mer-harrier"
+  },
+  "mer-kite": {
+   "class": "corvette",
+   "id": "mer-kite",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Kite",
+   "outline": [
+    [
+     17.0,
+     -2.0
+    ],
+    [
+     17.0,
+     2.0
+    ],
+    [
+     16.88,
+     2.91
+    ],
+    [
+     16.53,
+     3.75
+    ],
+    [
+     15.25,
+     5.03
+    ],
+    [
+     14.41,
+     5.38
+    ],
+    [
+     13.5,
+     5.5
+    ],
+    [
+     -11.5,
+     5.5
+    ],
+    [
+     -12.41,
+     5.38
+    ],
+    [
+     -13.25,
+     5.03
+    ],
+    [
+     -14.53,
+     3.75
+    ],
+    [
+     -14.88,
+     2.91
+    ],
+    [
+     -15.0,
+     2.0
+    ],
+    [
+     -15.0,
+     -2.0
+    ],
+    [
+     -14.88,
+     -2.91
+    ],
+    [
+     -14.53,
+     -3.75
+    ],
+    [
+     -13.25,
+     -5.03
+    ],
+    [
+     -12.41,
+     -5.38
+    ],
+    [
+     -11.5,
+     -5.5
+    ],
+    [
+     13.5,
+     -5.5
+    ],
+    [
+     14.41,
+     -5.38
+    ],
+    [
+     15.25,
+     -5.03
+    ],
+    [
+     16.53,
+     -3.75
+    ],
+    [
+     16.88,
+     -2.91
+    ]
+   ],
+   "power": "indep",
+   "radius": 19.0,
+   "registryKey": "mer-kite"
+  },
+  "mer-knot": {
+   "class": "corvette",
+   "id": "mer-knot",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Knot",
+   "outline": [
+    [
+     11.0,
+     -1.4
+    ],
+    [
+     11.0,
+     1.4
+    ],
+    [
+     10.65,
+     2.7
+    ],
+    [
+     10.24,
+     3.24
+    ],
+    [
+     9.7,
+     3.65
+    ],
+    [
+     9.07,
+     3.91
+    ],
+    [
+     8.4,
+     4.0
+    ],
+    [
+     -6.4,
+     4.0
+    ],
+    [
+     -7.07,
+     3.91
+    ],
+    [
+     -7.7,
+     3.65
+    ],
+    [
+     -8.24,
+     3.24
+    ],
+    [
+     -8.65,
+     2.7
+    ],
+    [
+     -9.0,
+     1.4
+    ],
+    [
+     -9.0,
+     -1.4
+    ],
+    [
+     -8.65,
+     -2.7
+    ],
+    [
+     -8.24,
+     -3.24
+    ],
+    [
+     -7.7,
+     -3.65
+    ],
+    [
+     -7.07,
+     -3.91
+    ],
+    [
+     -6.4,
+     -4.0
+    ],
+    [
+     8.4,
+     -4.0
+    ],
+    [
+     9.07,
+     -3.91
+    ],
+    [
+     9.7,
+     -3.65
+    ],
+    [
+     10.24,
+     -3.24
+    ],
+    [
+     10.65,
+     -2.7
+    ]
+   ],
+   "power": "indep",
+   "radius": 13.0,
+   "registryKey": "mer-knot"
+  },
+  "mer-osprey": {
+   "class": "frigate",
+   "id": "mer-osprey",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Osprey",
+   "outline": [
+    [
+     34.0,
+     -5.5
+    ],
+    [
+     34.0,
+     5.5
+    ],
+    [
+     33.81,
+     6.92
+    ],
+    [
+     33.26,
+     8.25
+    ],
+    [
+     32.39,
+     9.39
+    ],
+    [
+     31.25,
+     10.26
+    ],
+    [
+     29.92,
+     10.81
+    ],
+    [
+     28.5,
+     11.0
+    ],
+    [
+     -26.5,
+     11.0
+    ],
+    [
+     -27.92,
+     10.81
+    ],
+    [
+     -29.25,
+     10.26
+    ],
+    [
+     -30.39,
+     9.39
+    ],
+    [
+     -31.26,
+     8.25
+    ],
+    [
+     -32.0,
+     5.5
+    ],
+    [
+     -32.0,
+     -5.5
+    ],
+    [
+     -31.26,
+     -8.25
+    ],
+    [
+     -30.39,
+     -9.39
+    ],
+    [
+     -29.25,
+     -10.26
+    ],
+    [
+     -26.5,
+     -11.0
+    ],
+    [
+     28.5,
+     -11.0
+    ],
+    [
+     31.25,
+     -10.26
+    ],
+    [
+     32.39,
+     -9.39
+    ],
+    [
+     33.26,
+     -8.25
+    ],
+    [
+     33.81,
+     -6.92
+    ]
+   ],
+   "power": "indep",
+   "radius": 37.0,
+   "registryKey": "mer-osprey"
+  },
+  "mer-petrel": {
+   "class": "light",
+   "id": "mer-petrel",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Petrel",
+   "outline": [
+    [
+     13.0,
+     -1.0
+    ],
+    [
+     13.0,
+     1.0
+    ],
+    [
+     12.91,
+     1.67
+    ],
+    [
+     12.65,
+     2.3
+    ],
+    [
+     12.24,
+     2.84
+    ],
+    [
+     11.7,
+     3.25
+    ],
+    [
+     10.4,
+     3.6
+    ],
+    [
+     -8.4,
+     3.6
+    ],
+    [
+     -9.7,
+     3.25
+    ],
+    [
+     -10.24,
+     2.84
+    ],
+    [
+     -10.65,
+     2.3
+    ],
+    [
+     -10.91,
+     1.67
+    ],
+    [
+     -11.0,
+     1.0
+    ],
+    [
+     -11.0,
+     -1.0
+    ],
+    [
+     -10.91,
+     -1.67
+    ],
+    [
+     -10.65,
+     -2.3
+    ],
+    [
+     -10.24,
+     -2.84
+    ],
+    [
+     -9.7,
+     -3.25
+    ],
+    [
+     -8.4,
+     -3.6
+    ],
+    [
+     10.4,
+     -3.6
+    ],
+    [
+     11.7,
+     -3.25
+    ],
+    [
+     12.24,
+     -2.84
+    ],
+    [
+     12.65,
+     -2.3
+    ],
+    [
+     12.91,
+     -1.67
+    ]
+   ],
+   "power": "indep",
+   "radius": 15.0,
+   "registryKey": "mer-petrel"
+  },
+  "mer-puffin": {
+   "class": "passenger",
+   "id": "mer-puffin",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Puffin",
+   "outline": [
+    [
+     19.0,
+     -2.0
+    ],
+    [
+     19.0,
+     2.0
+    ],
+    [
+     18.86,
+     3.04
+    ],
+    [
+     18.46,
+     4.0
+    ],
+    [
+     17.83,
+     4.83
+    ],
+    [
+     16.04,
+     5.86
+    ],
+    [
+     15.0,
+     6.0
+    ],
+    [
+     -15.0,
+     6.0
+    ],
+    [
+     -16.04,
+     5.86
+    ],
+    [
+     -17.83,
+     4.83
+    ],
+    [
+     -18.46,
+     4.0
+    ],
+    [
+     -18.86,
+     3.04
+    ],
+    [
+     -19.0,
+     2.0
+    ],
+    [
+     -19.0,
+     -2.0
+    ],
+    [
+     -18.86,
+     -3.04
+    ],
+    [
+     -18.46,
+     -4.0
+    ],
+    [
+     -17.83,
+     -4.83
+    ],
+    [
+     -16.04,
+     -5.86
+    ],
+    [
+     -15.0,
+     -6.0
+    ],
+    [
+     15.0,
+     -6.0
+    ],
+    [
+     16.04,
+     -5.86
+    ],
+    [
+     17.83,
+     -4.83
+    ],
+    [
+     18.46,
+     -4.0
+    ],
+    [
+     18.86,
+     -3.04
+    ]
+   ],
+   "power": "indep",
+   "radius": 22.0,
+   "registryKey": "mer-puffin"
+  },
+  "mer-shearwater": {
+   "class": "light",
+   "id": "mer-shearwater",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Shearwater",
+   "outline": [
+    [
+     13.0,
+     -1.0
+    ],
+    [
+     13.0,
+     1.0
+    ],
+    [
+     12.91,
+     1.67
+    ],
+    [
+     12.65,
+     2.3
+    ],
+    [
+     12.24,
+     2.84
+    ],
+    [
+     11.7,
+     3.25
+    ],
+    [
+     10.4,
+     3.6
+    ],
+    [
+     -8.4,
+     3.6
+    ],
+    [
+     -9.7,
+     3.25
+    ],
+    [
+     -10.24,
+     2.84
+    ],
+    [
+     -10.65,
+     2.3
+    ],
+    [
+     -10.91,
+     1.67
+    ],
+    [
+     -11.0,
+     1.0
+    ],
+    [
+     -11.0,
+     -1.0
+    ],
+    [
+     -10.91,
+     -1.67
+    ],
+    [
+     -10.65,
+     -2.3
+    ],
+    [
+     -10.24,
+     -2.84
+    ],
+    [
+     -9.7,
+     -3.25
+    ],
+    [
+     -8.4,
+     -3.6
+    ],
+    [
+     10.4,
+     -3.6
+    ],
+    [
+     11.7,
+     -3.25
+    ],
+    [
+     12.24,
+     -2.84
+    ],
+    [
+     12.65,
+     -2.3
+    ],
+    [
+     12.91,
+     -1.67
+    ]
+   ],
+   "power": "indep",
+   "radius": 15.0,
+   "registryKey": "mer-shearwater"
+  },
+  "mer-shrike": {
+   "class": "patrol",
+   "id": "mer-shrike",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Shrike",
+   "outline": [
+    [
+     24.0,
+     -3.5
+    ],
+    [
+     24.0,
+     3.5
+    ],
+    [
+     23.85,
+     4.66
+    ],
+    [
+     23.4,
+     5.75
+    ],
+    [
+     21.75,
+     7.4
+    ],
+    [
+     20.66,
+     7.85
+    ],
+    [
+     19.5,
+     8.0
+    ],
+    [
+     -17.5,
+     8.0
+    ],
+    [
+     -18.66,
+     7.85
+    ],
+    [
+     -19.75,
+     7.4
+    ],
+    [
+     -21.4,
+     5.75
+    ],
+    [
+     -21.85,
+     4.66
+    ],
+    [
+     -22.0,
+     3.5
+    ],
+    [
+     -22.0,
+     -3.5
+    ],
+    [
+     -21.85,
+     -4.66
+    ],
+    [
+     -21.4,
+     -5.75
+    ],
+    [
+     -19.75,
+     -7.4
+    ],
+    [
+     -18.66,
+     -7.85
+    ],
+    [
+     -17.5,
+     -8.0
+    ],
+    [
+     19.5,
+     -8.0
+    ],
+    [
+     20.66,
+     -7.85
+    ],
+    [
+     21.75,
+     -7.4
+    ],
+    [
+     23.4,
+     -5.75
+    ],
+    [
+     23.85,
+     -4.66
+    ]
+   ],
+   "power": "indep",
+   "radius": 27.0,
+   "registryKey": "mer-shrike"
+  },
+  "mer-skua": {
+   "class": "cargo",
+   "id": "mer-skua",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [],
+   "name": "Meridian Skua",
+   "outline": [
+    [
+     18.0,
+     -3.0
+    ],
+    [
+     18.0,
+     3.0
+    ],
+    [
+     17.88,
+     3.91
+    ],
+    [
+     17.53,
+     4.75
+    ],
+    [
+     16.25,
+     6.03
+    ],
+    [
+     15.41,
+     6.38
+    ],
+    [
+     14.5,
+     6.5
+    ],
+    [
+     -14.5,
+     6.5
+    ],
+    [
+     -15.41,
+     6.38
+    ],
+    [
+     -16.25,
+     6.03
+    ],
+    [
+     -17.53,
+     4.75
+    ],
+    [
+     -17.88,
+     3.91
+    ],
+    [
+     -18.0,
+     3.0
+    ],
+    [
+     -18.0,
+     -3.0
+    ],
+    [
+     -17.88,
+     -3.91
+    ],
+    [
+     -17.53,
+     -4.75
+    ],
+    [
+     -16.25,
+     -6.03
+    ],
+    [
+     -15.41,
+     -6.38
+    ],
+    [
+     -14.5,
+     -6.5
+    ],
+    [
+     14.5,
+     -6.5
+    ],
+    [
+     15.41,
+     -6.38
+    ],
+    [
+     16.25,
+     -6.03
+    ],
+    [
+     17.53,
+     -4.75
+    ],
+    [
+     17.88,
+     -3.91
+    ]
+   ],
+   "power": "indep",
+   "radius": 21.0,
+   "registryKey": "mer-skua"
+  },
+  "meridian-courier": {
+   "class": "corvette",
+   "id": "meridian-courier",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Meridian Yards",
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "S",
+     "type": "high",
+     "x": 15.2,
+     "y": 0.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "S",
+     "type": "high",
+     "x": 6.3,
+     "y": -7.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w3",
+     "size": "S",
+     "type": "high",
+     "x": 6.3,
+     "y": 7.0
+    }
+   ],
+   "name": "Meridian Tern",
+   "outline": [
+    [
+     18.0,
+     0.0
+    ],
+    [
+     17.51,
+     1.62
+    ],
+    [
+     16.8,
+     3.1
+    ],
+    [
+     15.9,
+     4.41
+    ],
+    [
+     13.56,
+     6.53
+    ],
+    [
+     10.64,
+     7.86
+    ],
+    [
+     9.0,
+     8.2
+    ],
+    [
+     -11.0,
+     9.6
+    ],
+    [
+     -13.26,
+     9.24
+    ],
+    [
+     -14.81,
+     8.3
+    ],
+    [
+     -15.71,
+     6.98
+    ],
+    [
+     -16.0,
+     5.5
+    ],
+    [
+     -16.0,
+     -5.5
+    ],
+    [
+     -15.71,
+     -6.98
+    ],
+    [
+     -14.81,
+     -8.3
+    ],
+    [
+     -13.26,
+     -9.24
+    ],
+    [
+     -11.0,
+     -9.6
+    ],
+    [
+     9.0,
+     -8.2
+    ],
+    [
+     10.64,
+     -7.86
+    ],
+    [
+     12.16,
+     -7.3
+    ],
+    [
+     13.56,
+     -6.53
+    ],
+    [
+     15.9,
+     -4.41
+    ],
+    [
+     16.8,
+     -3.1
+    ],
+    [
+     17.51,
+     -1.62
+    ]
+   ],
+   "power": "indep",
+   "radius": 19.08,
+   "registryKey": "tern"
+  },
+  "rookrivet-breacher": {
+   "class": "mining",
+   "id": "rookrivet-breacher",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Sinker",
+   "outline": [
+    [
+     10.0,
+     -3.6
+    ],
+    [
+     10.0,
+     3.6
+    ],
+    [
+     8.6,
+     5.0
+    ],
+    [
+     -4.6,
+     5.0
+    ],
+    [
+     -6.0,
+     3.6
+    ],
+    [
+     -6.0,
+     -3.6
+    ],
+    [
+     -4.6,
+     -5.0
+    ],
+    [
+     8.6,
+     -5.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 24.0,
+   "registryKey": "rookrivet-breacher"
+  },
+  "rookrivet-breacher-old": {
+   "class": "mining",
+   "id": "rookrivet-breacher-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Sinker",
+   "outline": [
+    [
+     10.0,
+     -3.6
+    ],
+    [
+     10.0,
+     3.6
+    ],
+    [
+     8.6,
+     5.0
+    ],
+    [
+     -4.6,
+     5.0
+    ],
+    [
+     -6.0,
+     3.6
+    ],
+    [
+     -6.0,
+     -3.6
+    ],
+    [
+     -4.6,
+     -5.0
+    ],
+    [
+     8.6,
+     -5.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 24.0,
+   "registryKey": "rookrivet-breacher-old"
+  },
+  "rookrivet-drone": {
+   "class": "drone",
+   "id": "rookrivet-drone",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Knocker",
+   "outline": [
+    [
+     3.2,
+     -0.8
+    ],
+    [
+     3.2,
+     0.8
+    ],
+    [
+     0.8,
+     3.0
+    ],
+    [
+     -0.8,
+     3.0
+    ],
+    [
+     -3.2,
+     0.8
+    ],
+    [
+     -3.2,
+     -0.8
+    ],
+    [
+     -0.8,
+     -3.0
+    ],
+    [
+     0.8,
+     -3.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 7.0,
+   "registryKey": "rookrivet-drone"
+  },
+  "rookrivet-hulk": {
+   "class": "mining",
+   "id": "rookrivet-hulk",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Collier",
+   "outline": [
+    [
+     42.0,
+     -5.9
+    ],
+    [
+     42.0,
+     5.9
+    ],
+    [
+     40.4,
+     7.5
+    ],
+    [
+     31.6,
+     7.5
+    ],
+    [
+     30.0,
+     5.9
+    ],
+    [
+     30.0,
+     -5.9
+    ],
+    [
+     31.6,
+     -7.5
+    ],
+    [
+     40.4,
+     -7.5
+    ]
+   ],
+   "power": "belt",
+   "radius": 50.0,
+   "registryKey": "rookrivet-hulk"
+  },
+  "rookrivet-hulk-old": {
+   "class": "mining",
+   "id": "rookrivet-hulk-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Collier",
+   "outline": [
+    [
+     42.0,
+     -5.9
+    ],
+    [
+     42.0,
+     5.9
+    ],
+    [
+     40.4,
+     7.5
+    ],
+    [
+     31.6,
+     7.5
+    ],
+    [
+     30.0,
+     5.9
+    ],
+    [
+     30.0,
+     -5.9
+    ],
+    [
+     31.6,
+     -7.5
+    ],
+    [
+     40.4,
+     -7.5
+    ]
+   ],
+   "power": "belt",
+   "radius": 50.0,
+   "registryKey": "rookrivet-hulk-old"
+  },
+  "rookrivet-prospector": {
+   "class": "mining",
+   "id": "rookrivet-prospector",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "Belt Forge Prospector",
+   "outline": [
+    [
+     7.0,
+     -2.2
+    ],
+    [
+     7.0,
+     2.2
+    ],
+    [
+     6.0,
+     3.2
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -3.0,
+     2.2
+    ],
+    [
+     -3.0,
+     -2.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     6.0,
+     -3.2
+    ]
+   ],
+   "power": "belt",
+   "radius": 14.0,
+   "registryKey": "rookrivet-prospector"
+  },
+  "rookrivet-prospector-old": {
+   "class": "mining",
+   "id": "rookrivet-prospector-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Belt Forge Collective",
+   "mounts": [],
+   "name": "The old Prospector",
+   "outline": [
+    [
+     7.0,
+     -2.2
+    ],
+    [
+     7.0,
+     2.2
+    ],
+    [
+     6.0,
+     3.2
+    ],
+    [
+     -2.0,
+     3.2
+    ],
+    [
+     -3.0,
+     2.2
+    ],
+    [
+     -3.0,
+     -2.2
+    ],
+    [
+     -2.0,
+     -3.2
+    ],
+    [
+     6.0,
+     -3.2
+    ]
+   ],
+   "power": "belt",
+   "radius": 14.0,
+   "registryKey": "rookrivet-prospector-old"
+  },
+  "rr-breaker": {
+   "class": "industry",
+   "id": "rr-breaker",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Breaker",
+   "outline": [
+    [
+     96.0,
+     -13.0
+    ],
+    [
+     96.0,
+     13.0
+    ],
+    [
+     93.0,
+     16.0
+    ],
+    [
+     63.0,
+     16.0
+    ],
+    [
+     60.0,
+     13.0
+    ],
+    [
+     60.0,
+     -13.0
+    ],
+    [
+     63.0,
+     -16.0
+    ],
+    [
+     93.0,
+     -16.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 103.68,
+   "registryKey": "rr-breaker"
+  },
+  "rr-gantry": {
+   "class": "service",
+   "id": "rr-gantry",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Gantry",
+   "outline": [
+    [
+     30.0,
+     -8.6
+    ],
+    [
+     30.0,
+     8.6
+    ],
+    [
+     28.6,
+     10.0
+    ],
+    [
+     23.4,
+     10.0
+    ],
+    [
+     22.0,
+     8.6
+    ],
+    [
+     22.0,
+     -8.6
+    ],
+    [
+     23.4,
+     -10.0
+    ],
+    [
+     28.6,
+     -10.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 57.24,
+   "registryKey": "rr-gantry"
+  },
+  "rr-grab": {
+   "class": "craft",
+   "id": "rr-grab",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Grab",
+   "outline": [
+    [
+     3.5,
+     -1.4
+    ],
+    [
+     3.5,
+     1.4
+    ],
+    [
+     2.7,
+     2.2
+    ],
+    [
+     -0.7,
+     2.2
+    ],
+    [
+     -1.5,
+     1.4
+    ],
+    [
+     -1.5,
+     -1.4
+    ],
+    [
+     -0.7,
+     -2.2
+    ],
+    [
+     2.7,
+     -2.2
+    ]
+   ],
+   "power": "belt",
+   "radius": 12.5,
+   "registryKey": "rr-grab"
+  },
+  "rr-lazarus": {
+   "class": "service",
+   "id": "rr-lazarus",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Lazarus",
+   "outline": [
+    [
+     26.0,
+     -7.0
+    ],
+    [
+     26.0,
+     7.0
+    ],
+    [
+     23.0,
+     10.0
+    ],
+    [
+     -23.0,
+     10.0
+    ],
+    [
+     -26.0,
+     7.0
+    ],
+    [
+     -26.0,
+     -7.0
+    ],
+    [
+     -23.0,
+     -10.0
+    ],
+    [
+     23.0,
+     -10.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 36.0,
+   "registryKey": "rr-lazarus"
+  },
+  "rr-scrapper": {
+   "class": "service",
+   "id": "rr-scrapper",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Scrapper",
+   "outline": [
+    [
+     7.0,
+     -2.4
+    ],
+    [
+     7.0,
+     2.4
+    ],
+    [
+     6.0,
+     3.4
+    ],
+    [
+     -1.0,
+     3.4
+    ],
+    [
+     -2.0,
+     2.4
+    ],
+    [
+     -2.0,
+     -2.4
+    ],
+    [
+     -1.0,
+     -3.4
+    ],
+    [
+     6.0,
+     -3.4
+    ]
+   ],
+   "power": "belt",
+   "radius": 15.0,
+   "registryKey": "rr-scrapper"
+  },
+  "rr-scrapper-old": {
+   "class": "service",
+   "id": "rr-scrapper-old",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "The old Scrapper",
+   "outline": [
+    [
+     7.0,
+     -2.4
+    ],
+    [
+     7.0,
+     2.4
+    ],
+    [
+     6.0,
+     3.4
+    ],
+    [
+     -1.0,
+     3.4
+    ],
+    [
+     -2.0,
+     2.4
+    ],
+    [
+     -2.0,
+     -2.4
+    ],
+    [
+     -1.0,
+     -3.4
+    ],
+    [
+     6.0,
+     -3.4
+    ]
+   ],
+   "power": "belt",
+   "radius": 15.0,
+   "registryKey": "rr-scrapper-old"
+  },
+  "rr-shunt": {
+   "class": "service",
+   "id": "rr-shunt",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Shunt",
+   "outline": [
+    [
+     7.0,
+     -4.6
+    ],
+    [
+     7.0,
+     4.6
+    ],
+    [
+     5.6,
+     6.0
+    ],
+    [
+     -7.6,
+     6.0
+    ],
+    [
+     -9.0,
+     4.6
+    ],
+    [
+     -9.0,
+     -4.6
+    ],
+    [
+     -7.6,
+     -6.0
+    ],
+    [
+     5.6,
+     -6.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 14.0,
+   "registryKey": "rr-shunt"
+  },
+  "rr-wrecker": {
+   "class": "service",
+   "id": "rr-wrecker",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Rook and Rivet",
+   "mounts": [],
+   "name": "Rook and Rivet Wrecker",
+   "outline": [
+    [
+     20.0,
+     -6.4
+    ],
+    [
+     20.0,
+     6.4
+    ],
+    [
+     18.4,
+     8.0
+    ],
+    [
+     3.6,
+     8.0
+    ],
+    [
+     2.0,
+     6.4
+    ],
+    [
+     2.0,
+     -6.4
+    ],
+    [
+     3.6,
+     -8.0
+    ],
+    [
+     18.4,
+     -8.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 36.0,
+   "registryKey": "rr-wrecker"
+  },
+  "saro-farwalker": {
+   "class": "service",
+   "id": "saro-farwalker",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Saro Farwalker",
+   "outline": [
+    [
+     60.0,
+     -6.0
+    ],
+    [
+     60.0,
+     6.0
+    ],
+    [
+     50.0,
+     14.0
+    ],
+    [
+     20.0,
+     17.0
+    ],
+    [
+     -40.0,
+     17.0
+    ],
+    [
+     -52.0,
+     12.0
+    ],
+    [
+     -60.0,
+     8.0
+    ],
+    [
+     -60.0,
+     -8.0
+    ],
+    [
+     -52.0,
+     -12.0
+    ],
+    [
+     -40.0,
+     -17.0
+    ],
+    [
+     20.0,
+     -17.0
+    ],
+    [
+     50.0,
+     -14.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 64.8,
+   "registryKey": "saro-farwalker"
+  },
+  "saro-waystar": {
+   "class": "service",
+   "id": "saro-waystar",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Saro Waystar",
+   "outline": [
+    [
+     32.0,
+     -3.0
+    ],
+    [
+     32.0,
+     3.0
+    ],
+    [
+     26.0,
+     7.0
+    ],
+    [
+     -20.0,
+     8.0
+    ],
+    [
+     -28.0,
+     6.0
+    ],
+    [
+     -32.0,
+     4.0
+    ],
+    [
+     -32.0,
+     -4.0
+    ],
+    [
+     -28.0,
+     -6.0
+    ],
+    [
+     -20.0,
+     -8.0
+    ],
+    [
+     26.0,
+     -7.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 34.56,
+   "registryKey": "saro-waystar"
+  },
+  "ser-cerberus": {
+   "class": "cruiser",
+   "id": "ser-cerberus",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Cerberus",
+   "outline": [
+    [
+     74.0,
+     -5.0
+    ],
+    [
+     74.0,
+     5.0
+    ],
+    [
+     66.0,
+     14.0
+    ],
+    [
+     54.0,
+     22.0
+    ],
+    [
+     24.0,
+     28.0
+    ],
+    [
+     -30.0,
+     28.0
+    ],
+    [
+     -50.0,
+     22.0
+    ],
+    [
+     -64.0,
+     16.0
+    ],
+    [
+     -64.0,
+     -16.0
+    ],
+    [
+     -50.0,
+     -22.0
+    ],
+    [
+     -30.0,
+     -28.0
+    ],
+    [
+     24.0,
+     -28.0
+    ],
+    [
+     54.0,
+     -22.0
+    ],
+    [
+     66.0,
+     -14.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 79.92,
+   "registryKey": "ser-cerberus"
+  },
+  "ser-constancy": {
+   "class": "destroyer",
+   "id": "ser-constancy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Constancy",
+   "outline": [
+    [
+     38.0,
+     -10.0
+    ],
+    [
+     38.0,
+     10.0
+    ],
+    [
+     30.0,
+     18.0
+    ],
+    [
+     10.0,
+     22.0
+    ],
+    [
+     -22.0,
+     22.0
+    ],
+    [
+     -38.0,
+     16.0
+    ],
+    [
+     -38.0,
+     -16.0
+    ],
+    [
+     -22.0,
+     -22.0
+    ],
+    [
+     10.0,
+     -22.0
+    ],
+    [
+     30.0,
+     -18.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 41.04,
+   "registryKey": "ser-constancy"
+  },
+  "ser-deimos": {
+   "class": "corvette",
+   "id": "ser-deimos",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Deimos",
+   "outline": [
+    [
+     15.0,
+     -3.0
+    ],
+    [
+     15.0,
+     3.0
+    ],
+    [
+     12.5,
+     5.2
+    ],
+    [
+     4.0,
+     6.2
+    ],
+    [
+     -9.0,
+     6.2
+    ],
+    [
+     -15.0,
+     4.6
+    ],
+    [
+     -15.0,
+     -4.6
+    ],
+    [
+     -9.0,
+     -6.2
+    ],
+    [
+     4.0,
+     -6.2
+    ],
+    [
+     12.5,
+     -5.2
+    ]
+   ],
+   "power": "mars",
+   "radius": 16.5,
+   "registryKey": "ser-deimos"
+  },
+  "ser-deimos-mk1": {
+   "class": "corvette",
+   "id": "ser-deimos-mk1",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Deimos Mk I",
+   "outline": [
+    [
+     14.0,
+     -3.4
+    ],
+    [
+     14.0,
+     3.4
+    ],
+    [
+     12.0,
+     5.4
+    ],
+    [
+     -10.0,
+     5.4
+    ],
+    [
+     -14.5,
+     4.0
+    ],
+    [
+     -14.5,
+     -4.0
+    ],
+    [
+     -10.0,
+     -5.4
+    ],
+    [
+     12.0,
+     -5.4
+    ]
+   ],
+   "power": "mars",
+   "radius": 16.0,
+   "registryKey": "ser-deimos-mk1"
+  },
+  "ser-medusae": {
+   "class": "battleship",
+   "id": "ser-medusae",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Medusae",
+   "outline": [
+    [
+     94.0,
+     -8.0
+    ],
+    [
+     94.0,
+     8.0
+    ],
+    [
+     84.0,
+     16.0
+    ],
+    [
+     52.0,
+     30.0
+    ],
+    [
+     -50.0,
+     30.0
+    ],
+    [
+     -94.0,
+     12.0
+    ],
+    [
+     -94.0,
+     -12.0
+    ],
+    [
+     -50.0,
+     -30.0
+    ],
+    [
+     52.0,
+     -30.0
+    ],
+    [
+     84.0,
+     -16.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 101.52,
+   "registryKey": "ser-medusae"
+  },
+  "ser-noctis": {
+   "class": "frigate",
+   "id": "ser-noctis",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Noctis",
+   "outline": [
+    [
+     36.0,
+     -2.8
+    ],
+    [
+     36.0,
+     2.8
+    ],
+    [
+     22.0,
+     15.5
+    ],
+    [
+     -6.0,
+     15.5
+    ],
+    [
+     -36.0,
+     4.0
+    ],
+    [
+     -36.0,
+     -4.0
+    ],
+    [
+     -6.0,
+     -15.5
+    ],
+    [
+     22.0,
+     -15.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 38.88,
+   "registryKey": "ser-noctis"
+  },
+  "ser-olympus": {
+   "class": "dreadnought",
+   "id": "ser-olympus",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Olympus",
+   "outline": [
+    [
+     186.0,
+     -30.0
+    ],
+    [
+     186.0,
+     30.0
+    ],
+    [
+     150.0,
+     62.0
+    ],
+    [
+     60.0,
+     84.0
+    ],
+    [
+     -80.0,
+     84.0
+    ],
+    [
+     -150.0,
+     62.0
+    ],
+    [
+     -186.0,
+     46.0
+    ],
+    [
+     -186.0,
+     -46.0
+    ],
+    [
+     -150.0,
+     -62.0
+    ],
+    [
+     -80.0,
+     -84.0
+    ],
+    [
+     60.0,
+     -84.0
+    ],
+    [
+     150.0,
+     -62.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 200.88,
+   "registryKey": "ser-olympus"
+  },
+  "ser-phobos": {
+   "class": "patrol",
+   "id": "ser-phobos",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Phobos",
+   "outline": [
+    [
+     24.0,
+     -4.5
+    ],
+    [
+     24.0,
+     4.5
+    ],
+    [
+     20.0,
+     8.5
+    ],
+    [
+     -18.0,
+     8.5
+    ],
+    [
+     -24.0,
+     6.5
+    ],
+    [
+     -24.0,
+     -6.5
+    ],
+    [
+     -18.0,
+     -8.5
+    ],
+    [
+     20.0,
+     -8.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 26.0,
+   "registryKey": "ser-phobos"
+  },
+  "ser-phobos-mk2": {
+   "class": "patrol",
+   "id": "ser-phobos-mk2",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Phobos Mk II",
+   "outline": [
+    [
+     22.0,
+     -5.0
+    ],
+    [
+     22.0,
+     5.0
+    ],
+    [
+     19.0,
+     7.8
+    ],
+    [
+     -18.0,
+     7.8
+    ],
+    [
+     -22.0,
+     6.0
+    ],
+    [
+     -22.0,
+     -6.0
+    ],
+    [
+     -18.0,
+     -7.8
+    ],
+    [
+     19.0,
+     -7.8
+    ]
+   ],
+   "power": "mars",
+   "radius": 24.0,
+   "registryKey": "ser-phobos-mk2"
+  },
+  "ser-resolve": {
+   "class": "frigate",
+   "id": "ser-resolve",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Resolve",
+   "outline": [
+    [
+     34.0,
+     -5.0
+    ],
+    [
+     34.0,
+     5.0
+    ],
+    [
+     29.0,
+     8.5
+    ],
+    [
+     -20.0,
+     8.5
+    ],
+    [
+     -34.0,
+     7.0
+    ],
+    [
+     -34.0,
+     -7.0
+    ],
+    [
+     -20.0,
+     -8.5
+    ],
+    [
+     29.0,
+     -8.5
+    ]
+   ],
+   "power": "mars",
+   "radius": 36.72,
+   "registryKey": "ser-resolve"
+  },
+  "ser-tharsis": {
+   "class": "battleship",
+   "id": "ser-tharsis",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Tharsis",
+   "outline": [
+    [
+     100.0,
+     -14.0
+    ],
+    [
+     100.0,
+     14.0
+    ],
+    [
+     88.0,
+     26.0
+    ],
+    [
+     50.0,
+     36.0
+    ],
+    [
+     -40.0,
+     38.0
+    ],
+    [
+     -74.0,
+     30.0
+    ],
+    [
+     -100.0,
+     22.0
+    ],
+    [
+     -100.0,
+     -22.0
+    ],
+    [
+     -74.0,
+     -30.0
+    ],
+    [
+     -40.0,
+     -38.0
+    ],
+    [
+     50.0,
+     -36.0
+    ],
+    [
+     88.0,
+     -26.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 108.0,
+   "registryKey": "ser-tharsis"
+  },
+  "ser-valles": {
+   "class": "cruiser",
+   "id": "ser-valles",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Seraphine Naval Yards",
+   "mounts": [],
+   "name": "Seraphine Valles",
+   "outline": [
+    [
+     70.0,
+     -12.0
+    ],
+    [
+     70.0,
+     12.0
+    ],
+    [
+     62.0,
+     20.0
+    ],
+    [
+     40.0,
+     24.0
+    ],
+    [
+     -40.0,
+     24.0
+    ],
+    [
+     -58.0,
+     20.0
+    ],
+    [
+     -70.0,
+     16.0
+    ],
+    [
+     -70.0,
+     -16.0
+    ],
+    [
+     -58.0,
+     -20.0
+    ],
+    [
+     -40.0,
+     -24.0
+    ],
+    [
+     40.0,
+     -24.0
+    ],
+    [
+     62.0,
+     -20.0
+    ]
+   ],
+   "power": "mars",
+   "radius": 75.6,
+   "registryKey": "ser-valles"
+  },
+  "sol-grace": {
+   "class": "service",
+   "id": "sol-grace",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Grace",
+   "outline": [
+    [
+     40.0,
+     -0.0
+    ],
+    [
+     38.33,
+     3.97
+    ],
+    [
+     35.0,
+     6.44
+    ],
+    [
+     28.33,
+     9.59
+    ],
+    [
+     21.67,
+     11.95
+    ],
+    [
+     16.67,
+     13.42
+    ],
+    [
+     6.67,
+     15.78
+    ],
+    [
+     0.0,
+     17.0
+    ],
+    [
+     -25.0,
+     17.1
+    ],
+    [
+     -30.21,
+     16.74
+    ],
+    [
+     -34.38,
+     15.74
+    ],
+    [
+     -37.0,
+     13.5
+    ],
+    [
+     -40.0,
+     -0.0
+    ],
+    [
+     -37.0,
+     -13.5
+    ],
+    [
+     -34.38,
+     -15.74
+    ],
+    [
+     -30.21,
+     -16.74
+    ],
+    [
+     -25.0,
+     -17.1
+    ],
+    [
+     0.0,
+     -17.0
+    ],
+    [
+     6.67,
+     -15.78
+    ],
+    [
+     16.67,
+     -13.42
+    ],
+    [
+     21.67,
+     -11.95
+    ],
+    [
+     28.33,
+     -9.59
+    ],
+    [
+     35.0,
+     -6.44
+    ],
+    [
+     38.33,
+     -3.97
+    ]
+   ],
+   "power": "venus",
+   "radius": 43.2,
+   "registryKey": "sol-grace"
+  },
+  "sol-haven": {
+   "class": "service",
+   "id": "sol-haven",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Haven",
+   "outline": [
+    [
+     23.0,
+     -0.0
+    ],
+    [
+     22.04,
+     2.33
+    ],
+    [
+     19.17,
+     4.33
+    ],
+    [
+     13.42,
+     6.71
+    ],
+    [
+     10.54,
+     7.62
+    ],
+    [
+     4.79,
+     9.08
+    ],
+    [
+     0.0,
+     10.0
+    ],
+    [
+     -10.0,
+     10.93
+    ],
+    [
+     -14.0,
+     10.93
+    ],
+    [
+     -17.61,
+     10.39
+    ],
+    [
+     -20.11,
+     9.41
+    ],
+    [
+     -21.0,
+     8.2
+    ],
+    [
+     -23.0,
+     -0.0
+    ],
+    [
+     -21.0,
+     -8.2
+    ],
+    [
+     -20.11,
+     -9.41
+    ],
+    [
+     -17.61,
+     -10.39
+    ],
+    [
+     -14.0,
+     -10.93
+    ],
+    [
+     -10.0,
+     -10.93
+    ],
+    [
+     0.0,
+     -10.0
+    ],
+    [
+     4.79,
+     -9.08
+    ],
+    [
+     10.54,
+     -7.62
+    ],
+    [
+     13.42,
+     -6.71
+    ],
+    [
+     19.17,
+     -4.33
+    ],
+    [
+     22.04,
+     -2.33
+    ]
+   ],
+   "power": "venus",
+   "radius": 25.0,
+   "registryKey": "sol-haven"
+  },
+  "sol-refuge": {
+   "class": "service",
+   "id": "sol-refuge",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Refuge",
+   "outline": [
+    [
+     38.0,
+     -0.0
+    ],
+    [
+     36.42,
+     3.97
+    ],
+    [
+     33.25,
+     6.44
+    ],
+    [
+     30.08,
+     8.17
+    ],
+    [
+     23.75,
+     10.83
+    ],
+    [
+     17.42,
+     12.95
+    ],
+    [
+     11.08,
+     14.69
+    ],
+    [
+     0.0,
+     17.0
+    ],
+    [
+     -23.0,
+     17.1
+    ],
+    [
+     -28.21,
+     16.74
+    ],
+    [
+     -32.38,
+     15.74
+    ],
+    [
+     -35.0,
+     13.5
+    ],
+    [
+     -38.0,
+     -0.0
+    ],
+    [
+     -35.0,
+     -13.5
+    ],
+    [
+     -32.38,
+     -15.74
+    ],
+    [
+     -28.21,
+     -16.74
+    ],
+    [
+     -23.0,
+     -17.1
+    ],
+    [
+     0.0,
+     -17.0
+    ],
+    [
+     11.08,
+     -14.69
+    ],
+    [
+     17.42,
+     -12.95
+    ],
+    [
+     23.75,
+     -10.83
+    ],
+    [
+     30.08,
+     -8.17
+    ],
+    [
+     33.25,
+     -6.44
+    ],
+    [
+     36.42,
+     -3.97
+    ]
+   ],
+   "power": "venus",
+   "radius": 41.04,
+   "registryKey": "sol-refuge"
+  },
+  "sol-respite": {
+   "class": "service",
+   "id": "sol-respite",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Respite",
+   "outline": [
+    [
+     15.0,
+     -0.0
+    ],
+    [
+     14.38,
+     1.52
+    ],
+    [
+     11.88,
+     3.12
+    ],
+    [
+     9.38,
+     4.14
+    ],
+    [
+     4.38,
+     5.62
+    ],
+    [
+     1.25,
+     6.28
+    ],
+    [
+     -4.68,
+     7.38
+    ],
+    [
+     -7.5,
+     7.6
+    ],
+    [
+     -10.32,
+     7.38
+    ],
+    [
+     -12.58,
+     6.77
+    ],
+    [
+     -13.84,
+     5.89
+    ],
+    [
+     -14.0,
+     5.4
+    ],
+    [
+     -15.0,
+     -0.0
+    ],
+    [
+     -14.0,
+     -5.4
+    ],
+    [
+     -13.84,
+     -5.89
+    ],
+    [
+     -12.58,
+     -6.77
+    ],
+    [
+     -10.32,
+     -7.38
+    ],
+    [
+     -7.5,
+     -7.6
+    ],
+    [
+     -4.68,
+     -7.38
+    ],
+    [
+     1.25,
+     -6.28
+    ],
+    [
+     4.38,
+     -5.62
+    ],
+    [
+     9.38,
+     -4.14
+    ],
+    [
+     11.88,
+     -3.12
+    ],
+    [
+     14.38,
+     -1.52
+    ]
+   ],
+   "power": "venus",
+   "radius": 17.0,
+   "registryKey": "sol-respite"
+  },
+  "sol-sanctuary": {
+   "class": "service",
+   "id": "sol-sanctuary",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Sanctuary",
+   "outline": [
+    [
+     70.0,
+     -0.0
+    ],
+    [
+     67.08,
+     7.24
+    ],
+    [
+     58.33,
+     13.5
+    ],
+    [
+     52.5,
+     16.4
+    ],
+    [
+     40.83,
+     21.14
+    ],
+    [
+     29.17,
+     25.0
+    ],
+    [
+     17.5,
+     28.21
+    ],
+    [
+     0.0,
+     32.0
+    ],
+    [
+     -20.42,
+     31.3
+    ],
+    [
+     -55.24,
+     27.96
+    ],
+    [
+     -64.12,
+     25.39
+    ],
+    [
+     -66.0,
+     23.0
+    ],
+    [
+     -70.0,
+     -0.0
+    ],
+    [
+     -66.0,
+     -23.0
+    ],
+    [
+     -64.12,
+     -25.39
+    ],
+    [
+     -55.24,
+     -27.96
+    ],
+    [
+     -20.42,
+     -31.3
+    ],
+    [
+     0.0,
+     -32.0
+    ],
+    [
+     17.5,
+     -28.21
+    ],
+    [
+     29.17,
+     -25.0
+    ],
+    [
+     40.83,
+     -21.14
+    ],
+    [
+     52.5,
+     -16.4
+    ],
+    [
+     58.33,
+     -13.5
+    ],
+    [
+     67.08,
+     -7.24
+    ]
+   ],
+   "power": "venus",
+   "radius": 75.6,
+   "registryKey": "sol-sanctuary"
+  },
+  "sol-stretcher": {
+   "class": "craft",
+   "id": "sol-stretcher",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Solace Medical",
+   "mounts": [],
+   "name": "Solace Stretcher",
+   "outline": [
+    [
+     8.0,
+     -2.4
+    ],
+    [
+     8.0,
+     2.4
+    ],
+    [
+     6.2,
+     4.2
+    ],
+    [
+     -5.7,
+     4.2
+    ],
+    [
+     -7.5,
+     2.4
+    ],
+    [
+     -7.5,
+     -2.4
+    ],
+    [
+     -5.7,
+     -4.2
+    ],
+    [
+     6.2,
+     -4.2
+    ]
+   ],
+   "power": "venus",
+   "radius": 11.5,
+   "registryKey": "sol-stretcher"
+  },
+  "tes-almanac": {
+   "class": "passenger",
+   "id": "tes-almanac",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Almanac",
+   "outline": [
+    [
+     28.0,
+     -4.5
+    ],
+    [
+     28.0,
+     4.5
+    ],
+    [
+     22.0,
+     9.0
+    ],
+    [
+     -20.0,
+     9.0
+    ],
+    [
+     -26.0,
+     7.0
+    ],
+    [
+     -28.0,
+     5.0
+    ],
+    [
+     -28.0,
+     -5.0
+    ],
+    [
+     -26.0,
+     -7.0
+    ],
+    [
+     -20.0,
+     -9.0
+    ],
+    [
+     22.0,
+     -9.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 30.24,
+   "registryKey": "tes-almanac"
+  },
+  "tes-bill": {
+   "class": "bulk",
+   "id": "tes-bill",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Bill",
+   "outline": [
+    [
+     60.0,
+     -7.0
+    ],
+    [
+     60.0,
+     7.0
+    ],
+    [
+     52.0,
+     15.0
+    ],
+    [
+     44.0,
+     17.0
+    ],
+    [
+     -48.0,
+     17.0
+    ],
+    [
+     -56.0,
+     13.0
+    ],
+    [
+     -60.0,
+     9.0
+    ],
+    [
+     -60.0,
+     -9.0
+    ],
+    [
+     -56.0,
+     -13.0
+    ],
+    [
+     -48.0,
+     -17.0
+    ],
+    [
+     44.0,
+     -17.0
+    ],
+    [
+     52.0,
+     -15.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 64.8,
+   "registryKey": "tes-bill"
+  },
+  "tes-consignment": {
+   "class": "bulk",
+   "id": "tes-consignment",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Consignment",
+   "outline": [
+    [
+     110.0,
+     -12.0
+    ],
+    [
+     110.0,
+     12.0
+    ],
+    [
+     98.0,
+     24.0
+    ],
+    [
+     86.0,
+     28.0
+    ],
+    [
+     -90.0,
+     28.0
+    ],
+    [
+     -104.0,
+     20.0
+    ],
+    [
+     -110.0,
+     14.0
+    ],
+    [
+     -110.0,
+     -14.0
+    ],
+    [
+     -104.0,
+     -20.0
+    ],
+    [
+     -90.0,
+     -28.0
+    ],
+    [
+     86.0,
+     -28.0
+    ],
+    [
+     98.0,
+     -24.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 118.8,
+   "registryKey": "tes-consignment"
+  },
+  "tes-covenant": {
+   "class": "bulk",
+   "id": "tes-covenant",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Covenant",
+   "outline": [
+    [
+     66.0,
+     -9.0
+    ],
+    [
+     66.0,
+     9.0
+    ],
+    [
+     54.0,
+     22.0
+    ],
+    [
+     -54.0,
+     22.0
+    ],
+    [
+     -66.0,
+     12.0
+    ],
+    [
+     -66.0,
+     -12.0
+    ],
+    [
+     -54.0,
+     -22.0
+    ],
+    [
+     54.0,
+     -22.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 72.0,
+   "registryKey": "tes-covenant"
+  },
+  "tes-docket": {
+   "class": "light",
+   "id": "tes-docket",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Docket",
+   "outline": [
+    [
+     16.0,
+     -2.2
+    ],
+    [
+     16.0,
+     2.2
+    ],
+    [
+     13.0,
+     4.4
+    ],
+    [
+     -8.0,
+     5.0
+    ],
+    [
+     -13.0,
+     4.0
+    ],
+    [
+     -15.0,
+     2.6
+    ],
+    [
+     -15.0,
+     -2.6
+    ],
+    [
+     -13.0,
+     -4.0
+    ],
+    [
+     -8.0,
+     -5.0
+    ],
+    [
+     13.0,
+     -4.4
+    ]
+   ],
+   "power": "earth",
+   "radius": 17.5,
+   "registryKey": "tes-docket"
+  },
+  "tes-invoice": {
+   "class": "cargo",
+   "id": "tes-invoice",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Invoice",
+   "outline": [
+    [
+     24.0,
+     -3.0
+    ],
+    [
+     24.0,
+     3.0
+    ],
+    [
+     20.0,
+     6.5
+    ],
+    [
+     -16.0,
+     6.5
+    ],
+    [
+     -21.0,
+     5.2
+    ],
+    [
+     -24.0,
+     3.6
+    ],
+    [
+     -24.0,
+     -3.6
+    ],
+    [
+     -21.0,
+     -5.2
+    ],
+    [
+     -16.0,
+     -6.5
+    ],
+    [
+     20.0,
+     -6.5
+    ]
+   ],
+   "power": "earth",
+   "radius": 26.0,
+   "registryKey": "tes-invoice"
+  },
+  "tes-itinerary": {
+   "class": "passenger",
+   "id": "tes-itinerary",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Itinerary",
+   "outline": [
+    [
+     44.0,
+     -6.0
+    ],
+    [
+     44.0,
+     6.0
+    ],
+    [
+     36.0,
+     12.0
+    ],
+    [
+     -32.0,
+     12.0
+    ],
+    [
+     -40.0,
+     9.0
+    ],
+    [
+     -44.0,
+     6.0
+    ],
+    [
+     -44.0,
+     -6.0
+    ],
+    [
+     -40.0,
+     -9.0
+    ],
+    [
+     -32.0,
+     -12.0
+    ],
+    [
+     36.0,
+     -12.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 47.52,
+   "registryKey": "tes-itinerary"
+  },
+  "tes-lading": {
+   "class": "bulk",
+   "id": "tes-lading",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Lading",
+   "outline": [
+    [
+     60.0,
+     -7.0
+    ],
+    [
+     60.0,
+     7.0
+    ],
+    [
+     52.0,
+     15.0
+    ],
+    [
+     44.0,
+     17.0
+    ],
+    [
+     -48.0,
+     17.0
+    ],
+    [
+     -56.0,
+     13.0
+    ],
+    [
+     -60.0,
+     9.0
+    ],
+    [
+     -60.0,
+     -9.0
+    ],
+    [
+     -56.0,
+     -13.0
+    ],
+    [
+     -48.0,
+     -17.0
+    ],
+    [
+     44.0,
+     -17.0
+    ],
+    [
+     52.0,
+     -15.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 64.8,
+   "registryKey": "tes-lading"
+  },
+  "tes-ledger": {
+   "class": "cargo",
+   "id": "tes-ledger",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Ledger",
+   "outline": [
+    [
+     40.0,
+     -4.0
+    ],
+    [
+     40.0,
+     4.0
+    ],
+    [
+     34.0,
+     9.0
+    ],
+    [
+     28.0,
+     9.0
+    ],
+    [
+     -36.0,
+     7.5
+    ],
+    [
+     -40.0,
+     5.0
+    ],
+    [
+     -40.0,
+     -5.0
+    ],
+    [
+     -36.0,
+     -7.5
+    ],
+    [
+     28.0,
+     -9.0
+    ],
+    [
+     34.0,
+     -9.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 43.2,
+   "registryKey": "tes-ledger"
+  },
+  "tes-memo": {
+   "class": "light",
+   "id": "tes-memo",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Memo",
+   "outline": [
+    [
+     16.0,
+     -2.2
+    ],
+    [
+     16.0,
+     2.2
+    ],
+    [
+     13.0,
+     4.4
+    ],
+    [
+     -8.0,
+     5.0
+    ],
+    [
+     -13.0,
+     4.0
+    ],
+    [
+     -15.0,
+     2.6
+    ],
+    [
+     -15.0,
+     -2.6
+    ],
+    [
+     -13.0,
+     -4.0
+    ],
+    [
+     -8.0,
+     -5.0
+    ],
+    [
+     13.0,
+     -4.4
+    ]
+   ],
+   "power": "earth",
+   "radius": 17.5,
+   "registryKey": "tes-memo"
+  },
+  "tes-passage": {
+   "class": "passenger",
+   "id": "tes-passage",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Passage",
+   "outline": [
+    [
+     80.0,
+     -8.0
+    ],
+    [
+     80.0,
+     8.0
+    ],
+    [
+     68.0,
+     18.0
+    ],
+    [
+     -60.0,
+     18.0
+    ],
+    [
+     -72.0,
+     13.0
+    ],
+    [
+     -80.0,
+     9.0
+    ],
+    [
+     -80.0,
+     -9.0
+    ],
+    [
+     -72.0,
+     -13.0
+    ],
+    [
+     -60.0,
+     -18.0
+    ],
+    [
+     68.0,
+     -18.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 86.4,
+   "registryKey": "tes-passage"
+  },
+  "tes-tariff": {
+   "class": "bulk",
+   "id": "tes-tariff",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Tariff",
+   "outline": [
+    [
+     52.0,
+     -5.0
+    ],
+    [
+     52.0,
+     5.0
+    ],
+    [
+     46.0,
+     11.0
+    ],
+    [
+     40.0,
+     11.0
+    ],
+    [
+     -48.0,
+     9.0
+    ],
+    [
+     -52.0,
+     6.0
+    ],
+    [
+     -52.0,
+     -6.0
+    ],
+    [
+     -48.0,
+     -9.0
+    ],
+    [
+     40.0,
+     -11.0
+    ],
+    [
+     46.0,
+     -11.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 56.16,
+   "registryKey": "tes-tariff"
+  },
+  "tes-timetable": {
+   "class": "passenger",
+   "id": "tes-timetable",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Timetable",
+   "outline": [
+    [
+     28.0,
+     -4.5
+    ],
+    [
+     28.0,
+     4.5
+    ],
+    [
+     22.0,
+     9.0
+    ],
+    [
+     -20.0,
+     9.0
+    ],
+    [
+     -26.0,
+     7.0
+    ],
+    [
+     -28.0,
+     5.0
+    ],
+    [
+     -28.0,
+     -5.0
+    ],
+    [
+     -26.0,
+     -7.0
+    ],
+    [
+     -20.0,
+     -9.0
+    ],
+    [
+     22.0,
+     -9.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 30.24,
+   "registryKey": "tes-timetable"
+  },
+  "tes-waybill": {
+   "class": "cargo",
+   "id": "tes-waybill",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Waybill",
+   "outline": [
+    [
+     24.0,
+     -3.0
+    ],
+    [
+     24.0,
+     3.0
+    ],
+    [
+     20.0,
+     6.5
+    ],
+    [
+     -16.0,
+     6.5
+    ],
+    [
+     -21.0,
+     5.2
+    ],
+    [
+     -24.0,
+     3.6
+    ],
+    [
+     -24.0,
+     -3.6
+    ],
+    [
+     -21.0,
+     -5.2
+    ],
+    [
+     -16.0,
+     -6.5
+    ],
+    [
+     20.0,
+     -6.5
+    ]
+   ],
+   "power": "earth",
+   "radius": 26.0,
+   "registryKey": "tes-waybill"
+  },
+  "tessaract-spine": {
+   "class": "cargo",
+   "id": "tessaract-spine",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Tessaract Logistics",
+   "mounts": [],
+   "name": "Tessaract Manifest",
+   "outline": [
+    [
+     40.0,
+     -4.0
+    ],
+    [
+     40.0,
+     4.0
+    ],
+    [
+     34.0,
+     9.0
+    ],
+    [
+     28.0,
+     9.0
+    ],
+    [
+     -36.0,
+     7.5
+    ],
+    [
+     -40.0,
+     5.0
+    ],
+    [
+     -40.0,
+     -5.0
+    ],
+    [
+     -36.0,
+     -7.5
+    ],
+    [
+     28.0,
+     -9.0
+    ],
+    [
+     34.0,
+     -9.0
+    ]
+   ],
+   "power": "earth",
+   "radius": 43.2,
+   "registryKey": "tessaract-spine"
+  },
+  "uni-blockade": {
+   "class": "patrol",
+   "id": "uni-blockade",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Union Blockade",
+   "outline": [
+    [
+     23.0,
+     -4.0
+    ],
+    [
+     23.0,
+     4.0
+    ],
+    [
+     20.0,
+     8.0
+    ],
+    [
+     -19.0,
+     8.0
+    ],
+    [
+     -23.0,
+     6.4
+    ],
+    [
+     -23.0,
+     -6.4
+    ],
+    [
+     -19.0,
+     -8.0
+    ],
+    [
+     20.0,
+     -8.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 25.0,
+   "registryKey": "uni-blockade"
+  },
+  "uni-boycott": {
+   "class": "frigate",
+   "id": "uni-boycott",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Union Boycott",
+   "outline": [
+    [
+     32.0,
+     -5.0
+    ],
+    [
+     32.0,
+     5.0
+    ],
+    [
+     27.0,
+     9.0
+    ],
+    [
+     18.0,
+     13.0
+    ],
+    [
+     -20.0,
+     13.0
+    ],
+    [
+     -30.0,
+     10.0
+    ],
+    [
+     -32.0,
+     7.0
+    ],
+    [
+     -32.0,
+     -7.0
+    ],
+    [
+     -30.0,
+     -10.0
+    ],
+    [
+     -20.0,
+     -13.0
+    ],
+    [
+     18.0,
+     -13.0
+    ],
+    [
+     27.0,
+     -9.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 34.56,
+   "registryKey": "uni-boycott"
+  },
+  "uni-general-strike": {
+   "class": "carrier",
+   "id": "uni-general-strike",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Union General Strike",
+   "outline": [
+    [
+     90.0,
+     -11.0
+    ],
+    [
+     90.0,
+     11.0
+    ],
+    [
+     87.0,
+     14.0
+    ],
+    [
+     36.0,
+     24.0
+    ],
+    [
+     -46.0,
+     24.0
+    ],
+    [
+     -50.0,
+     20.0
+    ],
+    [
+     -50.0,
+     -20.0
+    ],
+    [
+     -46.0,
+     -24.0
+    ],
+    [
+     36.0,
+     -24.0
+    ],
+    [
+     87.0,
+     -14.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 126.0,
+   "registryKey": "uni-general-strike"
+  },
+  "uni-solidarity": {
+   "class": "cruiser",
+   "id": "uni-solidarity",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Union Solidarity",
+   "outline": [
+    [
+     70.0,
+     -7.0
+    ],
+    [
+     70.0,
+     7.0
+    ],
+    [
+     54.0,
+     22.0
+    ],
+    [
+     -18.0,
+     31.0
+    ],
+    [
+     -62.0,
+     31.0
+    ],
+    [
+     -70.0,
+     20.0
+    ],
+    [
+     -70.0,
+     -20.0
+    ],
+    [
+     -62.0,
+     -31.0
+    ],
+    [
+     -18.0,
+     -31.0
+    ],
+    [
+     54.0,
+     -22.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 75.6,
+   "registryKey": "uni-solidarity"
+  },
+  "uni-wildcat": {
+   "class": "corvette",
+   "id": "uni-wildcat",
+   "inGame": false,
+   "liveries": [
+    "base",
+    "civ"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [],
+   "name": "Union Wildcat",
+   "outline": [
+    [
+     15.0,
+     -2.4
+    ],
+    [
+     15.0,
+     2.4
+    ],
+    [
+     13.0,
+     4.6
+    ],
+    [
+     4.0,
+     5.8
+    ],
+    [
+     -10.0,
+     5.8
+    ],
+    [
+     -15.5,
+     4.2
+    ],
+    [
+     -15.5,
+     -4.2
+    ],
+    [
+     -10.0,
+     -5.8
+    ],
+    [
+     4.0,
+     -5.8
+    ],
+    [
+     13.0,
+     -4.6
+    ]
+   ],
+   "power": "belt",
+   "radius": 17.0,
+   "registryKey": "uni-wildcat"
+  },
+  "union-frigate": {
+   "class": "destroyer",
+   "id": "union-frigate",
+   "inGame": true,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Union Defence Works",
+   "mounts": [
+    {
+     "facing": 0.0,
+     "id": "w1",
+     "size": "L",
+     "type": "high",
+     "x": 37.5,
+     "y": -6.0
+    },
+    {
+     "facing": 0.0,
+     "id": "w2",
+     "size": "L",
+     "type": "high",
+     "x": 37.5,
+     "y": 6.0
+    },
+    {
+     "facing": -1.571,
+     "id": "w3",
+     "size": "M",
+     "type": "high",
+     "x": 0.0,
+     "y": -17.0
+    },
+    {
+     "facing": 1.571,
+     "id": "w4",
+     "size": "M",
+     "type": "high",
+     "x": 0.0,
+     "y": 17.0
+    },
+    {
+     "facing": 3.142,
+     "id": "w5",
+     "size": "M",
+     "type": "high",
+     "x": -33.0,
+     "y": -14.5
+    },
+    {
+     "facing": 3.142,
+     "id": "w6",
+     "size": "M",
+     "type": "high",
+     "x": -33.0,
+     "y": 14.5
+    }
+   ],
+   "name": "Union Walkout",
+   "outline": [
+    [
+     42.0,
+     0.0
+    ],
+    [
+     34.0,
+     12.0
+    ],
+    [
+     12.0,
+     18.0
+    ],
+    [
+     -26.0,
+     18.0
+    ],
+    [
+     -40.0,
+     12.0
+    ],
+    [
+     -40.0,
+     -12.0
+    ],
+    [
+     -26.0,
+     -18.0
+    ],
+    [
+     12.0,
+     -18.0
+    ],
+    [
+     34.0,
+     -12.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 44.52,
+   "registryKey": "walkout"
+  },
+  "uns-fermata": {
+   "class": "voice",
+   "id": "uns-fermata",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The Unsung",
+   "mounts": [],
+   "name": "Unsung Fermata",
+   "outline": [
+    [
+     22.1,
+     0.13
+    ],
+    [
+     12.02,
+     11.17
+    ],
+    [
+     11.25,
+     11.84
+    ],
+    [
+     -9.26,
+     10.46
+    ],
+    [
+     -32.04,
+     4.83
+    ],
+    [
+     -33.04,
+     4.01
+    ],
+    [
+     -33.1,
+     3.44
+    ],
+    [
+     -33.32,
+     -2.41
+    ],
+    [
+     -33.23,
+     -2.97
+    ],
+    [
+     -32.17,
+     -3.72
+    ],
+    [
+     -9.44,
+     -11.92
+    ],
+    [
+     11.11,
+     -11.26
+    ]
+   ],
+   "power": "aurel",
+   "radius": 36.66,
+   "registryKey": "uns-fermata"
+  },
+  "uns-hush": {
+   "class": "voice",
+   "id": "uns-hush",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The Unsung",
+   "mounts": [],
+   "name": "Unsung Hush",
+   "outline": [
+    [
+     -22.42,
+     -3.17
+    ],
+    [
+     -23.61,
+     6.76
+    ],
+    [
+     -48.94,
+     6.71
+    ],
+    [
+     -55.44,
+     5.71
+    ],
+    [
+     -56.45,
+     4.32
+    ],
+    [
+     -56.99,
+     -4.74
+    ],
+    [
+     -56.91,
+     -5.5
+    ],
+    [
+     -55.57,
+     -6.57
+    ],
+    [
+     -36.2,
+     -5.83
+    ]
+   ],
+   "power": "aurel",
+   "radius": 62.7,
+   "registryKey": "uns-hush"
+  },
+  "uns-lament": {
+   "class": "voice",
+   "id": "uns-lament",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The Unsung",
+   "mounts": [],
+   "name": "Unsung Lament",
+   "outline": [
+    [
+     44.54,
+     4.55
+    ],
+    [
+     42.33,
+     5.32
+    ],
+    [
+     -18.95,
+     16.85
+    ],
+    [
+     -33.29,
+     15.76
+    ],
+    [
+     -41.27,
+     7.41
+    ],
+    [
+     -42.41,
+     6.12
+    ],
+    [
+     -41.96,
+     -5.41
+    ],
+    [
+     -41.88,
+     -6.18
+    ],
+    [
+     -33.29,
+     -15.38
+    ],
+    [
+     -18.96,
+     -16.59
+    ],
+    [
+     41.28,
+     -5.96
+    ],
+    [
+     43.38,
+     -4.93
+    ]
+   ],
+   "power": "aurel",
+   "radius": 48.99,
+   "registryKey": "uns-lament"
+  },
+  "uns-note": {
+   "class": "voice",
+   "id": "uns-note",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The Unsung",
+   "mounts": [],
+   "name": "Unsung Note",
+   "outline": [
+    [
+     12.72,
+     0.95
+    ],
+    [
+     2.01,
+     5.82
+    ],
+    [
+     -13.56,
+     4.88
+    ],
+    [
+     -12.9,
+     -6.1
+    ],
+    [
+     2.67,
+     -5.16
+    ]
+   ],
+   "power": "aurel",
+   "radius": 20.0,
+   "registryKey": "uns-note"
+  },
+  "uns-threnody": {
+   "class": "voice",
+   "id": "uns-threnody",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The Unsung",
+   "mounts": [],
+   "name": "Unsung Threnody",
+   "outline": [
+    [
+     73.4,
+     -2.87
+    ],
+    [
+     37.4,
+     26.47
+    ],
+    [
+     19.88,
+     37.64
+    ],
+    [
+     -11.81,
+     48.45
+    ],
+    [
+     -35.81,
+     52.83
+    ],
+    [
+     -57.43,
+     50.36
+    ],
+    [
+     -72.81,
+     47.78
+    ],
+    [
+     -98.62,
+     21.13
+    ],
+    [
+     -100.01,
+     19.49
+    ],
+    [
+     -101.24,
+     -18.01
+    ],
+    [
+     -99.96,
+     -19.73
+    ],
+    [
+     -70.46,
+     -51.23
+    ],
+    [
+     -54.92,
+     -52.67
+    ],
+    [
+     -33.56,
+     -52.96
+    ],
+    [
+     -2.25,
+     -47.81
+    ],
+    [
+     35.96,
+     -25.63
+    ]
+   ],
+   "power": "aurel",
+   "radius": 112.0,
+   "registryKey": "uns-threnody"
+  },
+  "vae-heavy": {
+   "class": "drone",
+   "id": "vae-heavy",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Bramble",
+   "outline": [
+    [
+     7.8,
+     0.0
+    ],
+    [
+     -6.4,
+     6.7
+    ],
+    [
+     -7.0,
+     0.0
+    ],
+    [
+     -6.4,
+     -6.7
+    ]
+   ],
+   "power": "venus",
+   "radius": 8.48,
+   "registryKey": "vae-heavy"
+  },
+  "vae-light": {
+   "class": "drone",
+   "id": "vae-light",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Arbor Dynamics",
+   "mounts": [],
+   "name": "Arbor Thorn",
+   "outline": [
+    [
+     7.0,
+     0.0
+    ],
+    [
+     -4.6,
+     4.5
+    ],
+    [
+     -4.6,
+     -4.5
+    ]
+   ],
+   "power": "venus",
+   "radius": 6.36,
+   "registryKey": "vae-light"
+  },
+  "van-cutlass": {
+   "class": "craft",
+   "id": "van-cutlass",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Vantage Aerospace",
+   "mounts": [],
+   "name": "Vantage Cutlass",
+   "outline": [
+    [
+     8.4,
+     -1.0
+    ],
+    [
+     8.4,
+     1.0
+    ],
+    [
+     7.0,
+     1.9
+    ],
+    [
+     -2.0,
+     5.4
+    ],
+    [
+     -4.6,
+     5.4
+    ],
+    [
+     -8.0,
+     2.6
+    ],
+    [
+     -8.6,
+     2.0
+    ],
+    [
+     -8.6,
+     -2.0
+    ],
+    [
+     -8.0,
+     -2.6
+    ],
+    [
+     -4.6,
+     -5.4
+    ],
+    [
+     -2.0,
+     -5.4
+    ],
+    [
+     7.0,
+     -1.9
+    ]
+   ],
+   "power": "earth",
+   "radius": 9.8,
+   "registryKey": "van-cutlass"
+  },
+  "van-dirk": {
+   "class": "craft",
+   "id": "van-dirk",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "Vantage Aerospace",
+   "mounts": [],
+   "name": "Vantage Dirk",
+   "outline": [
+    [
+     5.6,
+     -0.7
+    ],
+    [
+     5.6,
+     0.7
+    ],
+    [
+     4.6,
+     1.3
+    ],
+    [
+     -0.6,
+     3.2
+    ],
+    [
+     -3.4,
+     3.2
+    ],
+    [
+     -6.0,
+     2.2
+    ],
+    [
+     -6.4,
+     1.8
+    ],
+    [
+     -6.4,
+     -1.8
+    ],
+    [
+     -6.0,
+     -2.2
+    ],
+    [
+     -3.4,
+     -3.2
+    ],
+    [
+     -0.6,
+     -3.2
+    ],
+    [
+     4.6,
+     -1.3
+    ]
+   ],
+   "power": "earth",
+   "radius": 7.0,
+   "registryKey": "van-dirk"
+  },
+  "vesk-shade": {
+   "class": "frigate",
+   "id": "vesk-shade",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Vesk Shade",
+   "outline": [
+    [
+     34.0,
+     -2.6
+    ],
+    [
+     34.0,
+     2.6
+    ],
+    [
+     27.0,
+     6.0
+    ],
+    [
+     8.0,
+     7.5
+    ],
+    [
+     -20.0,
+     7.5
+    ],
+    [
+     -32.0,
+     5.5
+    ],
+    [
+     -32.0,
+     -5.5
+    ],
+    [
+     -20.0,
+     -7.5
+    ],
+    [
+     8.0,
+     -7.5
+    ],
+    [
+     27.0,
+     -6.0
+    ]
+   ],
+   "power": "belt",
+   "radius": 36.72,
+   "registryKey": "vesk-shade"
+  },
+  "vesk-vane": {
+   "class": "corvette",
+   "id": "vesk-vane",
+   "inGame": false,
+   "liveries": [
+    "base"
+   ],
+   "maker": "The clans",
+   "mounts": [],
+   "name": "Vesk Vane",
+   "outline": [
+    [
+     16.0,
+     -1.6
+    ],
+    [
+     16.0,
+     1.6
+    ],
+    [
+     12.0,
+     3.8
+    ],
+    [
+     2.0,
+     4.6
+    ],
+    [
+     -9.0,
+     4.6
+    ],
+    [
+     -15.0,
+     3.2
+    ],
+    [
+     -15.0,
+     -3.2
+    ],
+    [
+     -9.0,
+     -4.6
+    ],
+    [
+     2.0,
+     -4.6
+    ],
+    [
+     12.0,
+     -3.8
+    ]
+   ],
+   "power": "belt",
+   "radius": 18.0,
+   "registryKey": "vesk-vane"
+  }
+ },
+ "note": "Written by art/registry/export.py; never edit by hand (docs/ship-pipeline.md)."
+}

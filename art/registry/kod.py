@@ -47,6 +47,30 @@ def sym_pts(top):
     return top + list(reversed(mirror(top)))
 
 
+def mount_attrs(mid, kind, size, x, y, facing=0.0, arc=None):
+    """The attributes that mark an SVG group as a mount (docs/ship-pipeline.md): the game reads them through
+    export.py, and the bare picture leaves the group out, so a fitted weapon is drawn there instead."""
+    a = f'data-mount="{mid}" data-type="{kind}" data-size="{size}" data-x="{x:.2f}" data-y="{y:.2f}" data-facing="{facing:.3f}"'
+    return a + (f' data-arc="{arc:.3f}"' if arc is not None else "")
+
+
+class Mount:
+    """`with h.mount(...)`: everything drawn inside is one mount's weapon, wrapped in a marked group."""
+    def __init__(self, hull, mid, kind, size, x, y, facing, arc):
+        self.h, self.attrs = hull, mount_attrs(mid, kind, size, x, y, facing, arc)
+
+    def __enter__(self):
+        self.start = (len(self.h.full), len(self.h.mid))
+        return self.h
+
+    def __exit__(self, *exc):
+        for layer, start in ((self.h.full, self.start[0]), (self.h.mid, self.start[1])):
+            inside = layer[start:]
+            del layer[start:]
+            if inside: layer.append(f'<g {self.attrs}>{"".join(inside)}</g>')
+        return False
+
+
 class Hull:
     def __init__(self, key, u, cell, civ=False):
         self.key, self.u, self.cell, self.civ = key, u, cell, civ
@@ -80,6 +104,12 @@ class Hull:
                 yy += self.cell * 1.3
             g.append("</g>")
             self.full += g
+
+    def mount(self, mid, kind, size, x, y, facing=0.0, arc=None):
+        """Mark what is drawn inside as a mount: `with h.mount("w1", "high", "M", 14, 0): h.gun(14, 0)`.
+        `kind` is the game's mount type (`high` for a weapon, `ciws` for a PDC), `size` S to XL, `facing`
+        and `arc` in radians. Do not insert at the front of a layer inside one (engine glows): draw those outside."""
+        return Mount(self, mid, kind, size, x, y, facing, arc)
 
     def f(self, svg, mid=False):
         self.full.append(svg)

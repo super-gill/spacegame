@@ -1,0 +1,122 @@
+{
+ "artillery-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "artillery-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "artillery-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "autocannon-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "autocannon-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "autocannon-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "beam-laser-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "beam-laser-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "beam-laser-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "blaster-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "blaster-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "blaster-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "ciws-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "dispenser-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "dispenser-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "mining-laser-drone-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "mining-laser-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "mining-laser-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "mining-turret-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "missile-launcher-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "missile-launcher-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "missile-launcher-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "pulse-laser-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "pulse-laser-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "pulse-laser-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "railgun-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "railgun-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ },
+ "railgun-s": {
+  "barrel": 4.5,
+  "frame": 5.4
+ },
+ "torpedo-tube-l": {
+  "barrel": 9.0,
+  "frame": 10.8
+ },
+ "torpedo-tube-m": {
+  "barrel": 6.75,
+  "frame": 8.1
+ }
+}

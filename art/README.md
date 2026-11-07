@@ -12,6 +12,8 @@ Source for the game's ship art and the Sol chart. Added 7 November 2026 by the l
 | `registry/belt.py` | Union Defence Works rebuilds (redrawn over the source hull), the clan hulls, the Grab |
 | `registry/indep.py` | Meridian Yards and Corvane Heavy Industries combat hulls |
 | `registry/civil.py`, `beltciv.py`, `venciv.py`, `pass4.py`, `pass5.py` | The civil yards: Tessaract and Arcadia; Belt Forge and Rook and Rivet; Solace, Halden, Arbor, Lavinia and the clans' civil hulls; Meridian, Corvane industry, the prototypes, drones and the Aurel; the gap-pass hulls |
+| `registry/export.py`, `registry/turrets.py` | Stage 1 of the ship pipeline: writes `art/ships/` for the game (below); the turret and launcher pictures |
+| `ships/` | What the game reads: geometry, bare hull SVGs, turrets, the mounts report. Written by `export.py`, committed |
 | `registry/fitting.py` | Derives each hull's built-in equipment, role bonuses and frame notes (the fitting model in `docs/hull-terms.md`) |
 | `registry/base/registry-base.html` | The page shell the generator fills (layout, styles, viewer script) |
 | `registry/shot.js`, `shot-panel.js` | Playwright screenshots of hulls and of the detail panel, for checking art |
@@ -34,6 +36,27 @@ python3 build.py base/registry-base.html out/registry.html ../../docs/hulls.md
 - Argument 1: the page shell. Argument 2: the page to write. Argument 3 (optional): where to write the hull handover.
 - Prints `<n> ships; <m> drawn; <size> KB`.
 - `out/` is ignored by git. Never edit `docs/hulls.md` by hand; change the data or the art and rebuild.
+
+## Export for the game (stage 1 of the ship pipeline)
+
+From `art/registry/`, after any change to a hull's art:
+
+```
+python3 export.py
+```
+
+- Builds the registry into a temporary page and writes `art/ships/`: `ships.json` (each hull's outline, size, the mounts its picture marks, liveries, keyed by the game id where it has one), `svg/<id>-<livery>.svg` (the **bare** hull: marked mounts left out), `turrets/` and `turrets.json` (the weapon pictures, from `turrets.py`), and `report.md` (each game hull's mounts in the art against the game's).
+- Prints `<n> hulls (... in the game, ... with marked mounts), ...`, or fails and writes nothing (no outline, a mount outside the hull, an SVG that does not parse, a hull exported before and now missing).
+- **Commit `art/ships/` with the art change.** The game's build turns the SVGs into sprites (stage 2); nobody edits `art/ships/` by hand.
+
+### Marking a mount
+
+A weapon or PDC drawn on a hull is a **mount**: the game draws whatever is fitted there instead, turning a turret to aim. Mark it so the export records it and leaves it out of the bare picture:
+
+- In Python: draw it inside `with h.mount("w1", "high", "M", x, y, facing):` (`kod.py`). `high` is a weapon, `ciws` a PDC; the size is the game's (S, M, L, XL); the id matches the game's mount (`w1`, `w2`, `d1`; see `art/ships/report.md`).
+- In hand-written SVG (`base/registry-base.html`): put `data-mount="w1" data-type="high" data-size="M" data-x="..." data-y="..." data-facing="..."` on the group that draws it.
+
+A hull only needs its mounts marked when it goes into the game; `report.md` says which mounts each game hull still lacks.
 
 ## Check the art
 

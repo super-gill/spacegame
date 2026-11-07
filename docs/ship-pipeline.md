@@ -53,6 +53,20 @@ One per gun the game has, by its weapon id without the size (`autocannon`, `arti
 
 A hull with no outline, no mounts it should have, a mount outside its outline, a listed livery with no SVG, a key that changed or vanished, or an SVG that does not parse. (Every drawing parses as of 7 November: seven hulls, the UDF rebuilds and two Belt clan ships, gave `stroke-linecap` twice through one helper call in `belt.py`; Lead 9 fixed it.)
 
+## Stage 1 as built (7 November 2026, Lead 9)
+
+`art/registry/export.py`, run as `python3 export.py`. Differences from the plan above, found on the way:
+
+- **It reads the art as SVG**, from a temporary build of the registry, not from the Python objects: some hulls are hand-written in `base/registry-base.html` (the Tern, the Walkout, the Ark), and every hull ends up as SVG however it was made.
+- **A mount is a marked group**, not something the drawing helpers record on their own: only four hulls draw guns through `Hull.gun` and `Hull.pdc`; every yard paints its guns its own way. So a gun is wrapped where it is drawn, `with h.mount("w1", "high", "M", x, y, facing):` in Python (`kod.py`), or the same `data-mount` attributes on a hand-written group. The export records each marked group and leaves it out of the bare picture. **Mounts are marked hull by hull as hulls go into the game**; outlines, sizes and bare pictures come out for every hull without any marking.
+- **Keys:** `ships.json` is keyed by the game id where the registry has one (its `id`: the Tern is `meridian-courier`, the Warrant `kessari-wedge`, the Walkout `union-frigate`), else by the registry key; each entry keeps `registryKey`.
+- **Outlines are convex** (the silhouette's convex hull, at most 24 points): good for hit shapes and the radar; concave detail stays in the picture. A hull with an empty silhouette (the Belt Forge Lodestar's builder declares no body) takes its outline from the full drawing's solid shapes.
+- **Glows stay in the bare picture:** `build.py` already drops their blur, and they read as engines idling.
+- **Turrets are a first pass** (`turrets.py`): 30 pictures, one per gun and size the game has, in the registry's turret style with a family look (twin barrels for autocannons, a long one for artillery, a lens for lasers, rails, launcher boxes). The lore chat owns them and should restyle freely, keeping ids, pivot and nose.
+- **`report.md`**: for every game hull, its mounts in the art against `hulls.ts`. The art was redrawn after the game's mounts were set against stand-in outlines, so most game hulls do not match yet (the Warrant's art has two guns where the game has four mounts): settling them is step 2, with Jason, hull by hull.
+
+First run: 192 hulls (11 in the game), 208 bare pictures (16 hulls have a civilian livery), 30 turrets, 4.7 MB of SVG; every picture renders with `resvg` (all 208 in 16 seconds). Marked so far: the Tern (`w1` to `w3`) and the Walkout (`w1` to `w6`; its PDCs are not drawn), both hand-written, both matching the game within a unit.
+
 ## Stage 2: what the sprite build writes
 
 `scripts/ships.mjs` (Node), run by `npm run ships` and before the client's build. For every SVG in `art/ships/`, PNGs with transparency in `packages/client/public/ships/<key>/<livery>-<size>.png` and `packages/client/public/ships/turrets/<gun>-<size>.png`, plus `packages/client/public/ships/sprites.json` with each file's pixel size and the pixel that is the origin. Separate files, not atlases: the game loads a hull's pictures the first time it is seen.
