@@ -1,3 +1,4 @@
+import { lotPrice, moveStock, stockOf, stockPrices } from './economy.js';
 import { droneRoom, nextDroneId } from './drones.js';
 import { shipStats } from './stats.js';
 import type { GoodSpec, MarketEntry, Ship, ShipStats, World, WorldEvent } from './types.js';
@@ -5,10 +6,11 @@ import type { GoodSpec, MarketEntry, Ship, ShipStats, World, WorldEvent } from '
 /**
  * Trade: cargo, prices, and buying and selling while docked.
  *
- * Prices are read through a PriceSource, never straight from station data,
- * so the scripted tables used now can later be replaced by a real supply
- * and demand sim (milestone 10) without touching the trade rules or the
- * market screen.
+ * Prices are read through a PriceSource, never straight from station data.
+ * The default is `stockPrices` (economy.ts): a port's price follows its
+ * stock, a lot is priced unit by unit, and every trade moves the stock.
+ * Where a world keeps no stock (Calder, the Arena), that is the design
+ * prices, as before.
  *
  * Buying and selling are pilot commands, like respawning: a person asks
  * once, the sim checks and applies it. Over a network they become
@@ -98,7 +100,8 @@ export type TradeRefusal =
   | 'credits' // not enough credits
   | 'space' // not enough cargo space
   | 'droneBay' // a drone, and the drone bays are full (drones never go in cargo)
-  | 'notHeld'; // selling more than is aboard
+  | 'notHeld' // selling more than is aboard
+  | 'stock'; // the port has fewer to sell, or is full and will take no more
 
 export type TradeResult =
   | { ok: true; world: World; event: WorldEvent }
@@ -113,14 +116,33 @@ function dockedShip(world: World, pilotId: string): { ship: Ship; stationId: str
   return { ship, stationId: ship.dockedAt };
 }
 
-/** Largest quantity of a good the pilot could buy right now (0 if none). */
-export function maxBuyable(world: World, pilotId: string, goodId: string, prices: PriceSource = scriptedPrices): number {
+/** What a lot costs or fetches: unit by unit against stock with the stock prices, a flat unit price with any other source. */
+function lot(world: World, stationId: string, goodId: string, quantity: number, side: 'buy' | 'sell', prices: PriceSource): number | null {
+  if (prices === stockPrices) return lotPrice(world, stationId, goodId, quantity, side);
+  const q = prices.quote(world, stationId, goodId);
+  const unit = side === 'buy' ? q?.ask : q?.bid;
+  return unit == null ? null : unit * quantity;
+}
+
+/** Largest quantity of a good the pilot could buy right now (0 if none): what they can afford, carry, and the port has. */
+export function maxBuyable(world: World, pilotId: string, goodId: string, prices: PriceSource = stockPrices): number {
   const d = dockedShip(world, pilotId);
   if (typeof d === 'string') return 0;
-  const ask = prices.quote(world, d.stationId, goodId)?.ask;
   const pilot = world.pilots[pilotId];
+  const ask = prices.quote(world, d.stationId, goodId)?.ask;
   if (ask == null || ask <= 0 || !pilot) return 0;
-  return Math.min(Math.floor(pilot.credits / ask), roomFor(world, d.ship, goodId));
+  const room = roomFor(world, d.ship, goodId);
+  const held = prices === stockPrices ? stockOf(world, d.stationId, goodId) : null;
+  // Prices only rise as a lot grows, so the largest affordable lot is found by halving.
+  let lo = 0;
+  let hi = Math.min(room, held == null ? Math.floor(pilot.credits / ask) : Math.floor(held));
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    const cost = lot(world, d.stationId, goodId, mid, 'buy', prices);
+    if (cost != null && cost <= pilot.credits) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
 }
 
 /** Room for more of a good: drones go to the drone bay, everything else to the hold. */
@@ -129,15 +151,17 @@ function roomFor(world: World, ship: Ship, goodId: string): number {
 }
 
 /** Buy `quantity` units of a good from the station the pilot is docked at. All or nothing. */
-export function buyGood(world: World, pilotId: string, goodId: string, quantity: number, prices: PriceSource = scriptedPrices): TradeResult {
+export function buyGood(world: World, pilotId: string, goodId: string, quantity: number, prices: PriceSource = stockPrices): TradeResult {
   if (!Number.isInteger(quantity) || quantity <= 0) return { ok: false, world, reason: 'badQuantity' };
   const d = dockedShip(world, pilotId);
   if (typeof d === 'string') return { ok: false, world, reason: d };
   const ask = prices.quote(world, d.stationId, goodId)?.ask;
   if (ask == null) return { ok: false, world, reason: 'notTraded' };
+  // Priced unit by unit as the port's stock falls; null when the port has fewer than that to sell.
+  const cost = lot(world, d.stationId, goodId, quantity, 'buy', prices);
+  if (cost == null) return { ok: false, world, reason: 'stock' };
 
   const pilot = world.pilots[pilotId]!;
-  const cost = ask * quantity;
   if (cost > pilot.credits) return { ok: false, world, reason: 'credits' };
   if (quantity > roomFor(world, d.ship, goodId)) return { ok: false, world, reason: world.goods[goodId]?.drone ? 'droneBay' : 'space' };
 
@@ -153,19 +177,20 @@ export function buyGood(world: World, pilotId: string, goodId: string, quantity:
   } else {
     bought = { ...d.ship, hold: { ...d.ship.hold, [goodId]: (d.ship.hold[goodId] ?? 0) + quantity } };
   }
+  const traded: World = {
+    ...world,
+    pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits - cost } },
+    ships: { ...world.ships, [d.ship.id]: bought },
+  };
   return {
     ok: true,
-    world: {
-      ...world,
-      pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits - cost } },
-      ships: { ...world.ships, [d.ship.id]: bought },
-    },
-    event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: ask, side: 'buy' },
+    world: moveStock(traded, d.stationId, goodId, -quantity),
+    event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: Math.round((cost / quantity) * 100) / 100, side: 'buy' },
   };
 }
 
 /** Sell `quantity` units of a good to the station the pilot is docked at. All or nothing. */
-export function sellGood(world: World, pilotId: string, goodId: string, quantity: number, prices: PriceSource = scriptedPrices): TradeResult {
+export function sellGood(world: World, pilotId: string, goodId: string, quantity: number, prices: PriceSource = stockPrices): TradeResult {
   if (!Number.isInteger(quantity) || quantity <= 0) return { ok: false, world, reason: 'badQuantity' };
   const d = dockedShip(world, pilotId);
   if (typeof d === 'string') return { ok: false, world, reason: d };
@@ -178,6 +203,9 @@ export function sellGood(world: World, pilotId: string, goodId: string, quantity
   const held = drone ? bay.length : (d.ship.hold[goodId] ?? 0);
   if (quantity > held) return { ok: false, world, reason: 'notHeld' };
 
+  // Priced unit by unit as the port's stock rises; null when the port is full and stops buying.
+  const takings = lot(world, d.stationId, goodId, quantity, 'sell', prices);
+  if (takings == null) return { ok: false, world, reason: 'stock' };
   const pilot = world.pilots[pilotId]!;
   let sold: Ship;
   if (drone) {
@@ -189,13 +217,14 @@ export function sellGood(world: World, pilotId: string, goodId: string, quantity
     else hold[goodId] = held - quantity;
     sold = { ...d.ship, hold };
   }
+  const traded: World = {
+    ...world,
+    pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits + takings } },
+    ships: { ...world.ships, [d.ship.id]: sold },
+  };
   return {
     ok: true,
-    world: {
-      ...world,
-      pilots: { ...world.pilots, [pilotId]: { ...pilot, credits: pilot.credits + bid * quantity } },
-      ships: { ...world.ships, [d.ship.id]: sold },
-    },
-    event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: bid, side: 'sell' },
+    world: moveStock(traded, d.stationId, goodId, quantity),
+    event: { type: 'traded', shipId: d.ship.id, good: goodId, quantity, unitPrice: Math.round((takings / quantity) * 100) / 100, side: 'sell' },
   };
 }

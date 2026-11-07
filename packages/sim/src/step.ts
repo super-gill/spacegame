@@ -1,4 +1,5 @@
 import { burnRefusal, stepBurn } from './burn.js';
+import { stepEconomy } from './economy.js';
 import { thinkNpcs } from './ai/index.js';
 import { applyDamage, shieldCovers, fireWeapons, loadedGoodOf, rechargeCapacitor, regenerateShield, stepProjectiles, type BeamShot, type Damage } from './combat.js';
 import { goodsFitting } from './goods.js';
@@ -495,6 +496,8 @@ export function stepWorld(world: World, inputs: Readonly<Record<string, ShipInpu
   next = runSpawners(next);
   // The belt tops itself up.
   next = { ...next, ...stepRockfall(next) };
+  // Ports make and use what they trade (economy.ts).
+  next = stepEconomy(next);
 
   return { ...next, events };
 }

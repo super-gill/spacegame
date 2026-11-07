@@ -1575,6 +1575,12 @@ export interface World {
   homeStationId?: string;
   /** The rock site; absent means Calder's Scree. */
   rockSite?: RockSite;
+  /**
+   * Each port's stock of each trade good, by station id then good id
+   * (economy.ts): prices follow it. Absent (Calder, the Arena) means
+   * design prices, as before the economy.
+   */
+  stock?: Record<string, Record<string, number>>;
   /** Mechanics under trial (see `WorldRules`). */
   rules: WorldRules;
   /** Monotonic tick counter. */

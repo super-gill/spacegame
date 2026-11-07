@@ -333,6 +333,7 @@ const REFUSALS: Record<TradeRefusal, string> = {
   space: 'Not enough cargo space.',
   droneBay: 'Your drone bays are full: fit another bay to carry more drones.',
   notHeld: 'You do not have that many.',
+  stock: 'The port has fewer than that to sell, or is full and will take no more.',
 };
 
 const HANGAR_REFUSALS: Record<HangarRefusal, string> = {

@@ -1,3 +1,4 @@
+import { startingStock } from './economy.js';
 import { CALDER_SITE, screeAsteroids } from './asteroids.js';
 import { FIXED_DT } from './constants.js';
 import { GOODS } from './goods.js';
@@ -326,6 +327,7 @@ export function createSolWorld(): World {
     system: 'sol',
     homeStationId: EARTH_ORBITAL_EXCHANGE_ID,
     rockSite: SOL_ROCK_SITE,
+    stock: startingStock(stations, GOODS),
     tick: 0,
     dt: FIXED_DT,
     pilots: {},

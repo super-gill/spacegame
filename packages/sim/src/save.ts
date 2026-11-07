@@ -1,3 +1,4 @@
+import { settleStock } from './economy.js';
 import { GOODS } from './goods.js';
 import { HULLS } from './hulls.js';
 import { LOADOUTS } from './loadouts.js';
@@ -992,6 +993,8 @@ export function deserializeWorld(text: string, migrations: Record<number, Migrat
       munitions: Array.isArray(world.munitions) ? world.munitions : [],
       decoys: Array.isArray(world.decoys) ? world.decoys : [],
       asteroids,
+      // Sol keeps stock (economy.ts): as saved, with any port or good it lacks at equilibrium. A Sol save from before the economy starts every port there.
+      ...(world.system === 'sol' ? { stock: settleStock(world.stock, stations, GOODS) } : {}),
       hulls: { ...HULLS },
       modules: { ...MODULES },
       loadouts: { ...LOADOUTS },

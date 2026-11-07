@@ -1,4 +1,4 @@
-import { holdUse, maxBuyable, scriptedPrices, shipStats, type World } from '@spacegame/sim';
+import { holdUse, lotPrice, maxBuyable, shipStats, stockOf, stockPrices, type World } from '@spacegame/sim';
 
 /**
  * Station market, shown inside the docked panel.
@@ -40,7 +40,7 @@ export class MarketPanel {
     const station = ship?.dockedAt ? world.stations[ship.dockedAt] : undefined;
     if (!pilot || !ship || !station) return;
 
-    const signature = JSON.stringify([station.id, pilot.credits, ship.hold, ship.fit, station.market]);
+    const signature = JSON.stringify([station.id, pilot.credits, ship.hold, ship.fit, station.market, world.stock?.[station.id]]);
     if (signature === this.signature) return;
     this.signature = signature;
 
@@ -58,13 +58,15 @@ export class MarketPanel {
 
     const table = el('table');
     const head = el('tr');
-    for (const h of ['Good', 'Buy at', 'Sell at', 'Aboard', '']) head.append(el('th', undefined, h));
+    for (const h of ['Good', 'Buy at', 'Sell at', 'Stock', 'Aboard', '']) head.append(el('th', undefined, h));
     table.append(head);
 
     // Goods the station trades, plus anything aboard it does not (so you can see it, if not sell it).
     const goods = new Set([...Object.keys(station.market), ...Object.keys(ship.hold)]);
     for (const id of [...goods].sort((a, b) => (world.goods[a]?.name ?? a).localeCompare(world.goods[b]?.name ?? b))) {
-      const quote = scriptedPrices.quote(world, station.id, id);
+      const quote = stockPrices.quote(world, station.id, id);
+      // Kit (ammunition, drones) has no stock: the port always has it.
+      const stock = stockOf(world, station.id, id);
       // Drones are counted in the drone bay, not the hold.
       const drone = world.goods[id]?.drone;
       const aboard = drone ? (ship.droneBay ?? []).filter((d) => d.loadoutId === drone.loadoutId).length : (ship.hold[id] ?? 0);
@@ -74,13 +76,14 @@ export class MarketPanel {
         el('td', undefined, world.goods[id]?.name ?? id),
         el('td', 'num', quote?.ask != null ? String(quote.ask) : '-'),
         el('td', 'num', quote?.bid != null ? String(quote.bid) : '-'),
+        el('td', 'num', stock == null ? '' : String(Math.floor(stock))),
         el('td', 'num', aboard ? String(aboard) : ''),
       );
 
       const actions = el('td', 'actions');
       // Why Buy is greyed: money first, then room (a drone bay for drones, the hold for the rest).
       const ask = quote?.ask;
-      const buyWhy = ask == null ? 'Not sold here.' : pilot.credits < ask ? `Not enough credits: ${ask.toLocaleString('en-GB')} each, you have ${pilot.credits.toLocaleString('en-GB')}.` : drone ? 'No room in your drone bays.' : 'No room in the hold for this.';
+      const buyWhy = ask == null ? (stock != null && stock < 1 ? 'Sold out here.' : 'Not sold here.') : pilot.credits < ask ? `Not enough credits: ${ask.toLocaleString('en-GB')} each, you have ${pilot.credits.toLocaleString('en-GB')}.` : drone ? 'No room in your drone bays.' : 'No room in the hold for this.';
       const button = (label: string, request: TradeRequest, enabled: boolean, why = ''): void => {
         const b = el('button', undefined, label);
         b.type = 'button';
@@ -92,7 +95,9 @@ export class MarketPanel {
       button('Buy 1', { side: 'buy', good: id, quantity: 1 }, canBuy >= 1, buyWhy);
       button(`Buy max${canBuy > 1 ? ` (${canBuy})` : ''}`, { side: 'buy', good: id, quantity: Math.max(1, canBuy) }, canBuy >= 1, buyWhy);
       button('Sell 1', { side: 'sell', good: id, quantity: 1 }, quote?.bid != null && aboard >= 1);
-      button('Sell all', { side: 'sell', good: id, quantity: Math.max(1, aboard) }, quote?.bid != null && aboard >= 1);
+      // Selling a lot pushes the price down as it goes: say what the whole lot fetches.
+      const all = aboard >= 1 ? lotPrice(world, station.id, id, aboard, 'sell') : null;
+      button(`Sell all${all != null && aboard > 1 ? ` (${all.toLocaleString('en-GB')} cr)` : ''}`, { side: 'sell', good: id, quantity: Math.max(1, aboard) }, quote?.bid != null && aboard >= 1, all == null && aboard >= 1 && quote?.bid != null ? 'The port cannot take that many.' : '');
       row.append(actions);
       table.append(row);
     }

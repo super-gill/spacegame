@@ -37,7 +37,7 @@ Jason's aim: get to a **functional game**, then start proposing features on it; 
 1. **Sol's world** (`docs/sol-build.md`, slice 2; **done, released as 0.19.0**, 7 November 2026): all the stations, the lanes, the Accord Relay with security computed from its coverage, NPCs that burn (traders back, patrols, pirates where the lore puts them), planets and moons as burn targets, detours drawn and flown as a pass round the world.
 2. **The first fleet** (`docs/ship-pipeline.md`, "Step 2"; **done, released as 0.20.0**, 7 November 2026): today's eleven hulls swapped for the lore's in-game set (`docs/hulls.md`), only the hulls the starts, the Sol traffic and the patrols need (about 15 to 20), with stock fits. Before the starts, which need them.
 3. **The eight starts** (`docs/sol-build.md`, "As built: Open Lanes step 3"; **done, released as 0.21.0**, 7 November 2026) (`docs/sol.md`, "Where a new pilot starts"): power and path, home station, first ship, starting standing as a number per power.
-4. **The money loop across Sol:** trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.
+4. **The money loop across Sol** (`docs/economy.md`; in progress, push 1 built): trade between ports with prices that make routes worth flying, mining at a few sites (`docs/materials.md`, only the goods needed), bounties on pirates.
 5. **Law, lite** (discussed with Jason first): patrols respond to crime witnessed in Core and Held space, which under `infrastructure.md` means a witness record uploaded to a live relay there; distress calls reach only through the Relay.
 6. **The release:** Open Lanes, the functional game.
 

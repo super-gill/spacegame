@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+### Added
+
+- **Supply and demand** (`docs/economy.md`): every port in Sol holds stock of what it trades. Prices follow stock: scarce is dear, glutted is cheap, and a big lot is priced unit by unit, so dumping a hold at one port pays less and less. Ports make and use goods, drifting back to normal over about half an hour. The market shows each good's stock. Ammunition, missiles, countermeasures and drones keep fixed prices.
+
 ## [0.21.0] - 2026-11-07
 
 Open Lanes step 3, the eight starts (`docs/sol-build.md`, "As built: Open Lanes step 3"): choose a power and a path; your start sets your home, first ship, standing and licence.

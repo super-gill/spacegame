@@ -10,6 +10,7 @@ export * from './types.js';
 export * from './vec2.js';
 export * from './angle.js';
 export * from './constants.js';
+export { stockPrices, stockOf, lotPrice, equilibriumStock, isTradeGood, stepEconomy, ELASTICITY, RECOVERY_SECONDS, EQUILIBRIUM } from './economy.js';
 export { STARTS, START_STANDING, DEFAULT_START, readStartId, type StartSpec } from './starts.js';
 export { HULLS, HULL_CLASS_NAMES } from './hulls.js';
 export { MODULES } from './modules.js';
