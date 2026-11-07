@@ -4,6 +4,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are 0.x
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-07
+
+Open Lanes step 2, the first fleet (`docs/ship-pipeline.md`, `docs/ship-standards.md`): ships drawn from their artwork, hull shapes from the art, and ten new hulls.
+
 ### Added
 
 - **Ship art in flight**: every ship in the game is drawn from its artwork, with turrets on top that turn to aim.
