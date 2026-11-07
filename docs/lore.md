@@ -253,7 +253,7 @@ A pilot can win the first fight and still lose to what follows. How fast each st
 
 ### Navies
 
-Each power has a navy with dedicated hulls from its naval yard. Navy hulls sit behind standing and a licence; licence holders owe duties that grow with access; an owned ship is never taken back, and a pilot who walks away from their duty is treated as a deserter by that power. Patrol boats and corvettes are sold civilian-grade; everything above is licence-only.
+Each power has a navy with dedicated hulls from its naval yard. Navy hulls sit behind standing and a licence; licence holders owe duties that grow with access; an owned ship is never taken back, and a pilot who walks away from their duty is treated as a deserter by that power. Each naval yard sells its current corvette and patrol boat in two grades: Navy (licence and duties; a **Navy** tag that means better stats) and civilian (the same hull without the tag, on the open market). Frigate and above are built Navy only. Retired navy marks are sold whole on the open market with the Navy tag intact, powerful and expensive, no licence needed; details in `fleet.md` under "Navy grade, civilian grade and retired navy hulls".
 
 | Power | Navy | Yard | Form of service | A pilot who walks away |
 | --- | --- | --- | --- | --- |
@@ -721,6 +721,7 @@ Not yet in the catalogue: Seraphine Naval Yards (Mars), Solace Medical, Arbor Dy
 
 Lore decisions by Jason, newest first. Decisions from before 6 November that name retired peoples (Halcyon, Vael, Oru, Drifters) or the age-of-sail words are superseded by the pivot where they conflict and stand otherwise.
 
+- 2026-11-07: **Navy is a tag, not a generation.** Current corvettes and patrol boats come Navy grade (licence) or civilian grade (same hull, no tag, open market); frigate and above Navy only. Retired navy marks (Notice, Writ, Decree, Ruling, Deimos Mk I, Phobos Mk II, Sedna '218, Lakshmi '205) sell whole on the open market, Navy tag intact, still powerful and expensive; demilitarised surplus is retired. Mars sells civilian grade to Martians only and releases retired marks once the replacement is in service. On the registry, civilian grade is a livery toggle; retired marks and legacy are their own entries with their own art.
 - 2026-11-06: **The Sol pivot.** Humanity grew up in Sol. Four powers: Earth (with Luna), Mars, Venus, the Belt. The Belt found the gate; a short Gate War; the Ceres Accord brokered by Venus. The Lattice and the Aurel kept; the Oru, Halcyon, Vael and Drifters as peoples retired. Makers are companies with a home power and one or two specialities. EVE-style system collection, current physics, burn, flip, burn travel with interception, no in-system FTL for now. Expanse-age language throughout; slang, not a language. Planets are huge and not landable.
 - 2026-11-06: Names are humanised; Kessari survives as Earth's trading bloc, so Kessari Orbital Defence keeps its name. The contacts list is the board. Cantor-Vell's guns take Martian military names (Volley, Enfilade, Cordon). Commonwealth Fleet Works becomes Ishtar Fleet Works. The calendar is years since the gate woke (GW). The Aurel stay a horizon for now.
 - 2026-11-06: Crew is a direction, not part of the pivot: a system, never a people sim; costs and risks only.

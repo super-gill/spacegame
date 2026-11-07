@@ -328,18 +328,26 @@ Decided 6 November 2026. The company is the leading voice in a ship's design; th
 
 Legacy hulls keep their original shape and colours, worn. Surplus hulls (below) have the navy livery painted over, with the lines still showing through. Pirates kitbash on top of all of it.
 
-## Surplus: the low-tier military
+## Navy grade, civilian grade and retired navy hulls
 
-Decommissioned navy hulls sold off and demilitarised: navy-grade mounts pulled, livery painted over, a civilian registry. Surplus is the fighting ship of individuals, mercenary outfits and pirates, and the way a frigate or destroyer reaches private hands without a licence. It sits beside legacy in the used market: legacy is an old civilian mark, surplus is an old navy one.
+Decided 7 November 2026. **Navy** is a tag on a hull, not a generation. A Navy-tagged hull has better stats than the same hull without the tag (how much better is the lead's call). The tag is what a licence buys; it is not a different ship.
 
-| Navy | Attitude to surplus | What reaches the market |
+- **Civilian-grade navy hulls.** Each naval yard sells its current corvette and patrol boat in two versions: Navy (behind the licence, with duties) and civilian (the same hull, the same mark, no Navy tag, open market, company livery). Frigate and above are built Navy only. A civilian-grade hull can be brought up to Navy grade later with the licence, so a pilot who starts in a civilian Warrant and joins the Charter Fleet keeps the ship. Mechanically: the same hull id with a grade flag, not a second hull.
+- **Retired navy hulls (surplus).** When a navy retires a mark, the old hulls go to the open market whole: Navy tag intact, mounts intact, no licence needed. They are still powerful and still expensive; what they lack is the current mark's refinements and the yard's support. This replaces the earlier idea of demilitarised surplus. The navy livery is painted over because the ship is out of service, and the lines show through.
+- **Legacy** stays what it was: an old civilian mark. Legacy is cheap; retired navy is not.
+
+| Navy | Civilian grade | Retired marks on the market |
 | --- | --- | --- |
-| Earth, the Charter Fleet | Sells everything, by contract | Kessari Notice, Writ, Decree and Ruling: the backbone of the Marches |
-| Mars, the Martian Navy | Sells nothing; scraps or mothballs | Martian surplus exists only as stolen or salvaged, and the Navy wants it back |
-| Venus, the Coastguard | Sells with the guns removed | Ishtar Sedna '218 and Lakshmi '205, unarmed and cheap |
-| The Belt, the Union Militia | Never retires anything | Militia hulls rotate down to the cooperatives and never leave the Belt |
+| Earth, the Charter Fleet | Citation and Warrant, sold openly | Kessari Notice, Writ, Decree and Ruling, sold by contract: the backbone of the Marches |
+| Mars, the Martian Navy | Deimos and Phobos, sold to Martian citizens only | Deimos Mk I and Phobos Mk II, released once the replacement mark is in service, Martian buyers first; the Navy still wants stolen current hulls back |
+| Venus, the Coastguard | Sedna and Lakshmi, sold openly | Sedna '218 and Lakshmi '205, sold with the Coastguard's guns removed but the Navy tag intact; fit your own |
+| The Belt, the Union Militia | Wildcat and Blockade, sold openly | None; the Militia never retires anything, old hulls rotate down to the cooperatives and never leave the Belt |
 
-For the lead: surplus is a generation like legacy (its own hull entry pointing at its navy base), with navy-grade hardpoints removed or downgraded and a civilian price.
+Retired navy hulls go up to destroyer (the Ruling) where a navy retires that big; nobody sells a retired cruiser. The Mars exception above resolves an earlier contradiction: Mars does sell, but only its own retired marks and its own citizens first.
+
+For the lead: a `navy` tag on hull entries; a `grade` on owned ships (civilian or navy) for the four corvette and patrol hulls; a retired navy hull is its own hull entry (its own mounts and stats) pointing at the mark that replaced it, Navy tag set, open-market price.
+
+On the registry: a civilian-grade hull is a livery toggle on the production hull's page, not its own entry, because it is the same design on the same date. Retired navy hulls and legacy marks are their own entries, because they are different designs.
 
 ## Belt hulls: rebuilt, with their own bonuses
 
@@ -412,12 +420,12 @@ The ship registry page shows every hull's rating as a tag.
 
 ## Generations: legacy, production, pattern and clan
 
-Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots; the generations are where the real variety comes from. Mapped onto EVE's tiers:
+Jason's direction (6 November): older hulls that are out of production fill a used market, cheaper, and are the way in for new pilots; the generations are where the real variety comes from. Jason's own shorthand is T1 for the older marks and T2 for the current ones; the EVE column below is only a loose analogue and the generation names are the canon:
 
 | Tier | EVE analogue | What it is | Where you get it | Price and quality |
 | --- | --- | --- | --- | --- |
 | **Legacy** | Cheap T1 bought second-hand | An earlier civilian mark, no longer built. Companies stopped making it; crews never stopped flying it. | The used market at any ship mart, pirate fences, salvage | Cheap, fewer slots or weaker stats, every one a little different (wear, repairs, kitbash) |
-| **Surplus** | Cheap T1 warships | A decommissioned navy hull, demilitarised and sold off | The used market, where that navy sells at all | Cheap for a warship; navy-grade mounts pulled; the livery painted over |
+| **Retired navy (surplus)** | Older T1 warships | A navy mark the navy has replaced, sold whole with the Navy tag intact | The open market, where that navy releases them (see "Navy grade, civilian grade and retired navy hulls") | Expensive and strong; older mounts and no yard support; the livery painted over |
 | **Production** | T1 | The current mark | Ship marts and the maker's own yards | The catalogue price and the catalogue stats |
 | **Pattern** | T2 | A specialised variant of a production hull, built to a navy's or a company's pattern | Standing with the maker, or a navy licence | Expensive, better at one thing, often worse at another |
 | **Clan** | T3 | A bespoke hull built by a Belt clan over generations | Standing with the clan, or a very rare sale | Rare, the best at one thing, and no two alike |

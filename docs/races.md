@@ -41,7 +41,7 @@ Its own industry, separate from cargo: taxis and shuttles (Meridian), buses and 
 ## Decisions
 
 - **Pilots** pick an origin (Earth, Mars, Venus, the Belt) and a background (navy reservist, miner, hauler, more later) at character creation and start in their origin's home system. Origin is standing and a start, not bonuses; background is a starting ship and employer, and locks nothing.
-- **Navy ships** need standing and a licence with the power, and come with duties that grow with access. Owned ships are never taken back; a pilot who abandons their duty becomes a deserter to that power. Patrol boats and corvettes are sold civilian-grade; everything above is licence-only.
+- **Navy ships** need standing and a licence with the power, and come with duties that grow with access. Owned ships are never taken back; a pilot who abandons their duty becomes a deserter to that power. Current corvettes and patrol boats come Navy grade (licence) or civilian grade (same hull, no Navy tag, open market; Mars sells to Martians only); frigate and above Navy only. Retired navy marks sell whole on the open market with the Navy tag intact. **Navy** is a stat tag, not a generation.
 - **Company standing** grows by working with a maker and unlocks discounts and special hulls and modules. It is never lost for flying a rival's ships.
 - **The Aurel** have no companies. Each ship is a sealed one-off. They live beyond the Shoals. Not obtainable by normal means to begin with.
 - **Support and repair** is Venus-only (the Mercy Clause makes Venus sell to everyone).
