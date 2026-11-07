@@ -1,0 +1,318 @@
+<title>Sol Chart</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a navigator's chart. A log-distance strip of Sol from the Sun to the gate across the top, a detail panel for the selected body, then the starts, lanes and resources as reference tables. Single dark look by choice: it is a chart of space. */
+:root {
+  color-scheme: dark;
+  --bg: #070b10; --panel: #0d141c; --line: #1e2a36; --ink: #d8e2ea; --dim: #7f93a4; --faint: #3a4a58;
+  --earth: #5b8fc7; --mars: #c9654a; --venus: #d9c07a; --belt: #c8642e; --accord: #a9c4d6; --clans: #8aa06c; --none: #5c6670;
+  --core: #1b3a2c; --held: #18303d; --contested: #3d2a16; --open: #2a1a1f;
+  --core-ink: #6fd3a8; --held-ink: #8fd6ff; --contested-ink: #e8a54a; --open-ink: #e07b7b;
+  --lane: #e8c547;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--mono); font-size: 13px; line-height: 1.55; margin: 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; display: flex; flex-direction: column; gap: 28px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 5vw, 46px); line-height: 1; margin: 0; letter-spacing: 0.01em; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 0; letter-spacing: 0.02em; }
+h3 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin: 0; font-weight: 600; }
+p { margin: 0; max-width: 72ch; }
+.lede { color: var(--dim); }
+.chart { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; overflow-x: auto; }
+.chart svg { display: block; min-width: 1120px; width: 100%; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 11px; color: var(--dim); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+.card { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.kv { display: grid; grid-template-columns: 9em 1fr; gap: 4px 12px; }
+.kv dt { color: var(--dim); }
+.kv dd { margin: 0; }
+.pill { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+.pill.core { background: var(--core); color: var(--core-ink); } .pill.held { background: var(--held); color: var(--held-ink); }
+.pill.contested { background: var(--contested); color: var(--contested-ink); } .pill.open { background: var(--open); color: var(--open-ink); }
+.list { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; grid-template-columns: 4px 1fr; gap: 10px; }
+.list li .bar { border-radius: 2px; }
+.list b { font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+.list .who { color: var(--dim); font-size: 11px; }
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 12px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--dim); font-weight: 600; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; background: #0a1118; }
+tr:last-child td { border-bottom: 0; }
+td b { font-family: var(--display); font-weight: 600; font-size: 14px; }
+.body-hit { cursor: pointer; }
+.body-hit:focus { outline: none; }
+.body-hit:focus-visible circle.ring, .body-hit.sel circle.ring { stroke: var(--ink); stroke-width: 1.5; }
+.section { display: flex; flex-direction: column; gap: 12px; }
+.note { font-size: 11px; color: var(--dim); }
+@media (prefers-reduced-motion: no-preference) { .body-hit circle.ring { transition: stroke 0.15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Ceres Registry chart · Sol · about 240 GW</div>
+    <h1>Sol Chart</h1>
+    <p class="lede">The home system as the lore has it: who holds what, how safe it is, where the stations, lanes and resources are, and where a new pilot starts. Distance runs outward from the Sun to the gate on a log scale, stretched where the Belt crowds; bodies are drawn for recognition, not to scale. In game they are enormous and the layout comes from play.</p>
+  </header>
+
+  <section class="section" aria-labelledby="h-chart">
+    <h2 id="h-chart" hidden>Chart</h2>
+    <div class="chart"><svg id="chart" viewBox="0 0 1400 430" role="img" aria-label="Sol on a log-distance strip, bodies coloured by holder over bands of security"></svg></div>
+    <div class="legend" aria-label="Legend">
+      <span><i class="dot" style="background:var(--earth)"></i>Earth</span>
+      <span><i class="dot" style="background:var(--mars)"></i>Mars</span>
+      <span><i class="dot" style="background:var(--venus)"></i>Venus</span>
+      <span><i class="dot" style="background:var(--belt)"></i>The Belt</span>
+      <span><i class="dot" style="background:var(--accord)"></i>The Accord</span>
+      <span><i class="dot" style="background:var(--clans)"></i>The clans</span>
+      <span><i class="dot" style="background:var(--none)"></i>Nobody</span>
+      <span><i class="sw" style="background:var(--core)"></i>Core</span>
+      <span><i class="sw" style="background:var(--held)"></i>Held</span>
+      <span><i class="sw" style="background:var(--contested)"></i>Contested</span>
+      <span><i class="sw" style="background:var(--open)"></i>Open</span>
+      <span><i class="sw" style="background:var(--lane);height:3px"></i>Accord lane</span>
+    </div>
+  </section>
+
+  <section class="grid2" aria-label="Selected body">
+    <div class="card" id="detail"></div>
+    <div class="card"><h3>Stations here</h3><ul class="list" id="stations"></ul><h3>Resources and hazards here</h3><ul class="list" id="resources"></ul></div>
+  </section>
+
+  <section class="section" aria-labelledby="h-starts">
+    <h2 id="h-starts">Where a new pilot starts</h2>
+    <p class="note">A power and a path. The first ship is the pilot's and never taken back; a navy path owes duty, and walking away is desertion.</p>
+    <div class="tablebox"><table id="starts"><thead><tr><th>Start</th><th>Home</th><th>First ship</th><th>Standing</th><th>First work nearby</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="section" aria-labelledby="h-lanes">
+    <h2 id="h-lanes">The Accord lanes</h2>
+    <p class="note">Earth takes the tolls, the MRN runs the patrols, the UDF patrols its own lane. Off a lane, security drops a level.</p>
+    <div class="tablebox"><table id="lanes"><thead><tr><th>Lane</th><th>Between</th><th>Security</th><th>Notes</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="section" aria-labelledby="h-navies">
+    <h2 id="h-navies">The navies in Sol</h2>
+    <p class="note">A squawking ship broadcasts one line: prefix, name, hull number for navy ships, hull, Registry number. For example <code>MRNS Diligent (P-031) · Seraphine Phobos · CR-M 004117</code>. Civilian prefixes follow the flag: EMS, MCS, VCS, BCV, ARS; any Mercy Clause hull is VMS.</p>
+    <div class="tablebox"><table id="navies"><thead><tr><th>Power</th><th>Navy</th><th>In the street</th><th>Ship prefix</th><th>Home</th><th>Where</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <p class="note">Source: <code>docs/sol.md</code> on the lore branch, 7 November 2026. Scale, layout and travel times are the lead's.</p>
+</div>
+
+<script>
+const C = { earth: 'var(--earth)', mars: 'var(--mars)', venus: 'var(--venus)', belt: 'var(--belt)', accord: 'var(--accord)', clans: 'var(--clans)', none: 'var(--none)' };
+const SEC = { core: ['var(--core)', 'Core'], held: ['var(--held)', 'Held'], contested: ['var(--contested)', 'Contested'], open: ['var(--open)', 'Open'] };
+
+// Bodies and regions. au is real distance from the Sun, for order only; r is drawing size.
+const BODIES = [
+  { id: 'mercury', name: 'Mercury', au: 0.39, r: 7, holder: 'earth', sec: 'held', what: 'Solar foundries in orbit; the glare and the heat are a hazard.' },
+  { id: 'venus', name: 'Venus', au: 0.72, r: 15, holder: 'venus', sec: 'core', what: 'The cloud cities offscreen; the capital port and skimming in the upper air.' },
+  { id: 'earth', name: 'Earth and Luna', au: 1.0, r: 16, holder: 'earth', sec: 'core', what: 'The capital port, the shipyards at the Lagrange points, the Shell (orbital debris) and the Near Field (near-Earth rocks).', moon: true },
+  { id: 'mars', name: 'Mars', au: 1.52, r: 11, holder: 'mars', sec: 'core', what: 'The capital port, the naval and state yards on Phobos and Deimos, the Eureka Trojans at Mars L5.', moon: true },
+  { id: 'vesta', name: 'Inner Belt (Vesta)', au: 2.36, r: 6, holder: 'earth', sec: 'held', what: 'Rock leased to Corvane on Earth\'s ore rights, worked by Belt crews under Earth licence. Contested by the Belt in every negotiation.', belt: true },
+  { id: 'ceres', name: 'Ceres', row: 1, au: 2.77, r: 7, holder: 'accord', sec: 'core', what: 'The Accord\'s free port and the Ceres Registry: neutral by treaty, Core though it sits in the Belt.', belt: true },
+  { id: 'pallas', name: 'Pallas', row: 2, dx: 20, au: 2.79, r: 6, holder: 'belt', sec: 'core', what: 'Slagline, the Belt\'s capital port, dug into the rock. The delegates\' hall and Union Defence Works.', belt: true },
+  { id: 'psyche', name: 'Psyche', row: 3, dx: 16, au: 2.92, r: 6, holder: 'none', sec: 'contested', what: 'The great metal rock: platinum and nickel-iron in quantity. Everyone works it, uneasily.', belt: true, disputed: true },
+  { id: 'hygiea', name: 'Outer Belt (Hygiea)', au: 3.14, r: 6, holder: 'belt', sec: 'held', what: 'Carbon rock and ice; Belt Forge\'s home yard; the Boneyard.', belt: true },
+  { id: 'hildas', name: 'The Hildas', row: 1, au: 4.0, r: 5, holder: 'clans', sec: 'open', what: 'Clan waters, and nobody else\'s. Rare earths in the big rocks.', belt: true },
+  { id: 'jupiter', name: 'Jupiter', au: 5.2, r: 34, holder: 'earth', sec: 'held', what: 'Radiation belts, the Galilean moons, no skimming (the well is too deep). Earth holds Callisto; the Belt holds Ganymede; Venus runs rescue at Europa.', moon: true },
+  { id: 'trojans', name: 'Jupiter Trojans', above: true, dx: 22, au: 5.6, r: 5, holder: 'none', sec: 'open', what: 'Dark icy rock by the million at Jupiter\'s L4 and L5; the Black Strike\'s country.', belt: true, dy: -1 },
+  { id: 'saturn', name: 'Saturn', au: 9.5, r: 30, holder: 'accord', sec: 'held', what: 'The rings (the purest ice in Sol), Titan\'s free port, Enceladus\'s plumes; skimming later. Held round Titan, Open elsewhere.', ring: true, moon: true },
+  { id: 'centaurs', name: 'The Centaurs', row: 1, au: 14, r: 4, holder: 'none', sec: 'open', what: 'Icy wanderers between the giants.', belt: true },
+  { id: 'uranus', name: 'Uranus', au: 19.2, r: 21, holder: 'none', sec: 'open', what: 'Helium-3 skimming later (the easiest giant); dark carbon rings.' },
+  { id: 'neptune', name: 'Neptune and Triton', au: 30.1, r: 20, holder: 'clans', sec: 'open', what: 'Triton Moot, the clans\' far port; the last stop before the Kuiper dark.', moon: true },
+  { id: 'kuiper', name: 'The Kuiper Belt', row: 3, au: 36, r: 5, holder: 'none', sec: 'open', what: 'Ice, comets and the Cutloose.', belt: true },
+  { id: 'gate', name: 'The Gate Reach', above: true, au: 42, r: 13, holder: 'earth', sec: 'core', what: 'The Sol gate, the most guarded place in the system: Earth\'s toll station and the MRN\'s gate station. The Gate War field lies round it.', gate: true },
+];
+
+const STATIONS = {
+  mercury: [['Corvane Caloris Foundry', 'Corvane', 'belt', 'A solar smelter: buys ore from anywhere, sells metal cheap. Ships come in hot and leave fast.']],
+  venus: [['Thetis Orbital', 'The Venusian Assembly', 'venus', 'Capital port, top of the cloud cities\' elevator. VSG home; Ishtar Fleet Works; cheap medicine and chemicals.'],
+          ['Solace Station Mercy', 'Solace Medical', 'venus', 'Solace\'s yard and hospital, seat of the Mercy Clause. Every navy\'s support hulls are bought here.'],
+          ['Lavinia Alpha Dock', 'Lavinia Atmospherics', 'venus', 'The skimmer port over the cloud tops: Lavinia\'s yard, the gas market, every skimmer pilot\'s first dive.'],
+          ['Halden Beta Regio Observatory', 'The Halden Institute', 'venus', 'Research and survey at the Sun-Venus L1 point; Arbor Dynamics\' drone works next door.']],
+  earth: [['Earth Orbital Exchange', 'The Board', 'earth', 'Capital port at geostationary: the Exchange, the courts, Tessaract\'s headquarters, the richest market in known space.'],
+          ['ECF Yard L5', 'Kessari Orbital Defence', 'earth', 'Earth\'s naval yard and the Earth Charter Fleet\'s reserve. Licence holders only past the outer ring.'],
+          ['Tessaract Freight Yard L4', 'Tessaract Logistics', 'earth', 'The freight yard: haulers to superfreighters, Earth\'s ship mart for trade.'],
+          ['Tycho Port', 'Lunar old money', 'earth', 'Luna: Novum Systems and Vantage Aerospace, electronics and fighters.'],
+          ['Corvane Apollo Works', 'Corvane', 'earth', 'The foundry for the Near Field\'s rock, worked by Corvane crews and Belt contractors.'],
+          ['Rook and Rivet Shell Station', 'Rook and Rivet, under Earth licence', 'earth', 'The debris contractor\'s salvage port in low orbit.']],
+  mars: [['Republic Station Elysium', 'The Martian parliament', 'mars', 'Capital port: the market, the Registry office, the top of the elevator.'],
+         ['MRN Yard Phobos', 'Seraphine Naval Yards', 'mars', 'The MRN\'s home and naval yard. Licence holders only past the dock.'],
+         ['State Yard Deimos', 'Arcadia Works', 'mars', 'The state\'s civil yard; Martians first at the ship mart.'],
+         ['State Mine Eureka', 'Arcadia Works', 'mars', 'The state\'s mining station over the Mars L5 Trojans.']],
+  vesta: [['Vesta Concession', 'Corvane, on Earth\'s ore rights', 'earth', 'The inner Belt\'s foundry. Belt crews cut under Earth licence and resent every tonne.']],
+  ceres: [['Ceres Accord Station', 'The Ceres Accord', 'accord', 'The Accord\'s secretariat and the Ceres Registry; Meridian\'s main dealership; every maker\'s modules; the Null Ledger\'s favourite backstreet.']],
+  pallas: [['Slagline', 'The Belt\'s cooperatives', 'belt', 'The Belt\'s capital port: the delegates\' hall, Union Defence Works\' refit shop, Slagline Motors, the UDF rota office.']],
+  psyche: [['Psyche Dig', 'Nobody agrees', 'none', 'A Belt cooperative with a Corvane lease on half of it and an ECF frigate parked off the other half.']],
+  hygiea: [['Bellows', 'Belt Forge Collective', 'belt', 'Belt Forge\'s home yard: mining hulls, ice cutters, the best mining kit in known space.'],
+           ['The Boneyard', 'Rook and Rivet', 'belt', 'The breaking yard: where hulls become Patchplate; the salvage market of Sol.']],
+  hildas: [['Hilda Moot', 'The clans', 'clans', 'Hulks lashed together; the Vesk, Saro and Long Wake trade here, outsiders by invitation.']],
+  jupiter: [['Callisto Freight Depot', 'Earth (Tessaract)', 'earth', 'Earth\'s farthest Held port, outside the radiation: water and fuel for the Long Lane.'],
+            ['The Ganymede Local', 'A Belt cooperative', 'belt', 'The biggest settlement past the Belt; Earth claims the ground under it.'],
+            ['VSG Haven Europa', 'Solace Medical, under Venus', 'venus', 'A Venusian security zone in Jupiter\'s radiation: rescue for anyone who strays in.']],
+  trojans: [],
+  saturn: [['Titan Free Port', 'The Ceres Accord', 'accord', 'The outer free port: carbon, fuel, crews; the last full market before the Gate Lane.'],
+           ['Rimehold', 'Belt Forge, for the cooperatives', 'belt', 'The ice-cutters\' station on the rings.'],
+           ['Plume', 'A Belt cooperative', 'belt', 'Water harvested from Enceladus\'s south-pole plumes.']],
+  centaurs: [], uranus: [], kuiper: [],
+  neptune: [['Triton Moot', 'The clans', 'clans', 'The clans\' far port.']],
+  gate: [['ECF Toll Station', 'Kessari Orbital Defence', 'earth', 'Earth collects at the door out.'],
+         ['MRN Gate Station', 'The MRN', 'mars', 'Mars watches the door out.']],
+};
+
+const RES = {
+  mercury: [['Heat', 'No mining from orbit; the foundry buys ore.', 'held']],
+  venus: [['Gas', 'Carbon dioxide and nitrogen in the upper band, sulphur in the cloud bands, the death line below. The Venus start\'s first dive.', 'core']],
+  earth: [['Rock: the Near Field', 'Nickel-iron, a little copper; small rocks, low yield. The Earth start\'s first field.', 'core'],
+          ['Salvage: the Shell', 'Centuries of dead satellites and stages; cheap salvage.', 'core']],
+  mars: [['Rock: the Eureka Trojans', 'Nickel-iron, zinc; the state field. The Mars start\'s first field.', 'core']],
+  vesta: [['Rock', 'Nickel-iron, copper, zinc; platinum in the big metal rocks.', 'held']],
+  ceres: [['Rock: the middle Belt', 'Nickel-iron, copper, zinc; ordinary and endless. The Belt start\'s first field.', 'core']],
+  pallas: [['Rock', 'The middle Belt, as round Ceres.', 'core']],
+  psyche: [['Rock', 'Platinum and nickel-iron in quantity: a metal world.', 'contested']],
+  hygiea: [['Rock and ice', 'Carbon rock, water ice, ammonia ice.', 'held'], ['Salvage', 'Strike-era wrecks, scattered and unmarked.', 'held']],
+  hildas: [['Rock and ice', 'Rare earths in the big rocks; ice.', 'open']],
+  jupiter: [['Hazard', 'Radiation that strips shields; Io\'s sulphur torus. No mining inside.', 'open']],
+  trojans: [['Rock and ice', 'Dark rock, carbon and ammonia ice, rare earths; huge and empty.', 'open'], ['Salvage', 'Strike-era wrecks.', 'open']],
+  saturn: [['Ice: the rings', 'Water ice, the purest in Sol.', 'held'], ['Ice: Enceladus', 'Water from the plumes.', 'held'], ['Gas, later', 'Hydrogen at the top, helium-3 deep.', 'open']],
+  centaurs: [['Ice', 'Carbon and methane ice in loose wanderers.', 'open']],
+  uranus: [['Gas, later', 'Helium-3, the easiest giant to skim.', 'open'], ['Ice', 'Dark carbon rings.', 'open']],
+  neptune: [['Ice', 'Triton and the edge of the Kuiper dark.', 'open']],
+  kuiper: [['Ice', 'Water, ammonia, carbon and methane ice; comets.', 'open'], ['Events: comets', 'A comet through the inner system is an ice rush: every crew in Sol races to it.', 'open']],
+  gate: [['Salvage: the Gate War field', 'Wrecks from 6 to 9 GW: old Earth and Mars hulls, Belter ships. Licensed salvage only.', 'core']],
+};
+
+const STARTS = [
+  ['Earth, private', 'Earth Orbital Exchange', 'Meridian Tern', 'Earth, Tessaract', 'Freight round Earth, Luna and the Lagrange yards; salvage in the Shell; the Near Field with a Dunlin from Tycho'],
+  ['Earth, ECF', 'ECF Yard L5', 'Kessari Citation, Navy grade, under contract', 'Earth, ECF licence at the first rung', 'Toll and patrol contracts on the Inner Lane; breaking the contract is breach, then desertion'],
+  ['Mars, private', 'Republic Station Elysium', 'Meridian Tern', 'Mars', 'Freight round Mars and its moons; the Eureka Trojans with an Arcadia Miner Mk I'],
+  ['Mars, MRN', 'MRN Yard Phobos', 'Seraphine Deimos, Navy grade', 'Mars, MRN licence at the first rung', 'Pickets and lane patrols; the strictest duty and the strictest desertion rule'],
+  ['Venus, private', 'Lavinia Alpha Dock', 'Meridian Tern; a Lavinia Breeze is cheap on the floor', 'Venus, Lavinia', 'The first dive in Venus\'s upper air; chemical and medical freight'],
+  ['Venus, VSG', 'Thetis Orbital', 'Ishtar Sedna, Navy grade', 'Venus, VSG licence at the first rung', 'Rescue: pods, distress beacons, escorts. The guns come second'],
+  ['The Belt, private', 'Ceres Accord Station', 'Meridian Tern', 'The Belt, one cooperative', 'The middle Belt with an old Prospector; Belt freight; the Belt Lane'],
+  ['The Belt, UDF', 'Slagline', 'Union Wildcat', 'The Belt, a cooperative, UDF rota at the first rung', 'Rota shifts on the Belt Lane: the UDF tag on shift, cooperative work off it'],
+];
+
+const LANES = [
+  ['The Inner Lane', 'Thetis Orbital, Earth Orbital Exchange, Republic Station Elysium', 'core', 'The busiest lane in known space', ['venus', 'earth', 'mars']],
+  ['The Ceres Lane', 'Republic Station Elysium to Ceres Accord Station', 'core', 'Where Mars meets the Belt', ['mars', 'ceres']],
+  ['The Belt Lane', 'Ceres Accord Station to Slagline', 'core', 'Patrolled by the UDF, not the MRN; the Belt wrote it into the Accord', ['ceres', 'pallas']],
+  ['The Long Lane', 'Ceres Accord Station, Callisto Freight Depot, Titan Free Port', 'held', 'Thin past Jupiter', ['ceres', 'jupiter', 'saturn']],
+  ['The Gate Lane', 'Titan Free Port to the Gate Reach', 'held', 'Long and empty; MRN patrol; Core at the end', ['saturn', 'gate']],
+];
+
+const NAVIES = [
+  ['Earth', 'Earth Charter Fleet (ECF)', 'the Charter', 'ECFS', 'ECF Yard L5', 'Earth\'s volume, the toll ends of every lane, the ECF Toll Station; mostly contracted pilots'],
+  ['Mars', 'Martian Republic Navy (MRN)', 'the Navy', 'MRNS', 'MRN Yard Phobos', 'Mars\'s volume, the Accord lanes Sol-wide, the MRN Gate Station'],
+  ['Venus', 'Venusian Space Guard (VSG)', 'the Guard', 'VSGS', 'Thetis Orbital', 'Venus\'s volume and VSG Haven Europa; rescue first, never the first to fire'],
+  ['The Belt', 'Union Defence Force (UDF)', 'the Rota', 'UDFS, on rota', 'Slagline', 'The Belt Lane, Pallas, Hygiea and the Belt\'s Held stations; cooperatives on shift'],
+];
+
+// Security bands along the strip: [from AU, to AU, level]
+const BANDS = [[0.3, 0.55, 'held'], [0.55, 1.75, 'core'], [1.75, 2.62, 'held'], [2.62, 2.85, 'core'], [2.85, 3.0, 'contested'], [3.0, 3.6, 'held'], [3.6, 4.6, 'open'], [4.6, 5.45, 'held'], [5.45, 7.5, 'open'], [7.5, 11.5, 'held'], [11.5, 39, 'open'], [39, 48, 'core']];
+
+const svg = document.getElementById('chart');
+const NS = 'http://www.w3.org/2000/svg';
+const AXIS = 250, X1 = 1350;
+// Piecewise log scale: ordered by distance, stretched where the Belt crowds.
+const KNOTS = [[0.3, 80], [0.39, 120], [0.72, 215], [1.0, 295], [1.52, 385], [2.2, 460], [3.3, 720], [4.0, 790], [5.2, 880], [6.3, 960], [9.5, 1050], [14, 1110], [19.2, 1170], [30.1, 1240], [36, 1280], [48, 1350]];
+const x = (au) => { for (let i = 0; i < KNOTS.length - 1; i++) { const [a, pa] = KNOTS[i], [b, pb] = KNOTS[i + 1]; if (au <= b) return pa + (Math.log(au / a) / Math.log(b / a)) * (pb - pa); } return X1; };
+const el = (tag, attrs, parent = svg) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+
+// bands
+for (const [a, b, lvl] of BANDS) el('rect', { x: x(a), y: 60, width: x(b) - x(a), height: 300, fill: SEC[lvl][0], opacity: 0.55 });
+for (const [a, b, lvl] of BANDS) { const t = el('text', { x: (x(a) + x(b)) / 2, y: 76, 'text-anchor': 'middle', 'font-size': 9.5, 'letter-spacing': '0.12em', fill: `var(--${lvl}-ink)`, 'font-family': 'var(--mono)' }); if (x(b) - x(a) > 34) t.textContent = SEC[lvl][1].toUpperCase(); }
+
+// sun
+el('circle', { cx: 18, cy: AXIS, r: 70, fill: '#f2c46a', opacity: 0.18 });
+el('circle', { cx: 18, cy: AXIS, r: 42, fill: '#f6d27a' });
+el('text', { x: 24, y: AXIS + 62, fill: 'var(--dim)', 'font-size': 10, 'font-family': 'var(--mono)' }).textContent = 'SUN';
+
+// axis and AU ticks
+el('line', { x1: 70, y1: AXIS, x2: X1 + 20, y2: AXIS, stroke: 'var(--faint)', 'stroke-width': 1 });
+for (const au of [0.5, 1, 2, 3, 5, 10, 20, 30, 40]) {
+  el('line', { x1: x(au), y1: 360, x2: x(au), y2: 366, stroke: 'var(--faint)' });
+  el('text', { x: x(au), y: 380, 'text-anchor': 'middle', fill: 'var(--dim)', 'font-size': 10, 'font-family': 'var(--mono)' }).textContent = au + ' AU';
+}
+el('text', { x: X1, y: 404, 'text-anchor': 'end', fill: 'var(--dim)', 'font-size': 10, 'font-family': 'var(--mono)' }).textContent = 'Distance from the Sun: log scale, stretched through the Belt. Bodies not to scale.';
+
+// belt scatter
+const rnd = (() => { let s = 7; return () => (s = (s * 9301 + 49297) % 233280) / 233280; })();
+for (const [a, b, n] of [[2.1, 3.3, 140], [3.8, 4.2, 30], [5.0, 6.0, 40], [30, 48, 70]]) {
+  for (let i = 0; i < n; i++) { const au = a + rnd() * (b - a); el('circle', { cx: x(au), cy: AXIS + (rnd() - 0.5) * 120, r: 0.6 + rnd() * 1.1, fill: '#8a96a2', opacity: 0.45 }); }
+}
+
+// lanes: arcs above the axis between hubs
+const pos = Object.fromEntries(BODIES.map((b) => [b.id, x(b.au) + (b.dx || 0)]));
+LANES.forEach(([name, , lvl, , hops], i) => {
+  for (let k = 0; k < hops.length - 1; k++) {
+    const a = pos[hops[k]], b = pos[hops[k + 1]], h = 26 + Math.min(80, (b - a) * 0.35) + i * 4;
+    el('path', { d: `M ${a} ${AXIS - 22} Q ${(a + b) / 2} ${AXIS - 22 - h} ${b} ${AXIS - 22}`, fill: 'none', stroke: 'var(--lane)', 'stroke-width': lvl === 'core' ? 2 : 1.2, 'stroke-dasharray': lvl === 'core' ? '' : '5 4', opacity: 0.85 });
+  }
+  const a = pos[hops[0]], b = pos[hops[hops.length - 1]];
+  el('text', { x: (a + b) / 2, y: AXIS - 28 - (26 + Math.min(80, (pos[hops[1]] - a) * 0.35) + i * 4) * 0.5 - 6, 'text-anchor': 'middle', fill: 'var(--lane)', 'font-size': 9.5, 'font-family': 'var(--mono)' }).textContent = name.replace('The ', '');
+});
+
+// bodies
+const hits = {};
+BODIES.forEach((b) => {
+  const g = el('g', { class: 'body-hit', tabindex: 0, role: 'button', 'aria-label': b.name });
+  const cx = x(b.au) + (b.dx || 0), cy = AXIS + (b.dy || 0) * 18;
+  if (b.ring) el('ellipse', { cx, cy, rx: b.r * 1.6, ry: b.r * 0.45, fill: 'none', stroke: '#cfd8df', 'stroke-width': 3, opacity: 0.5 }, g);
+  if (b.gate) {
+    el('circle', { cx, cy, r: b.r, fill: 'none', stroke: '#cfefff', 'stroke-width': 4, 'stroke-dasharray': '7 3' }, g);
+    el('circle', { cx, cy, r: b.r * 0.55, fill: '#9fe8ff', opacity: 0.25 }, g);
+  } else if (b.belt) {
+    el('circle', { cx, cy, r: b.r, fill: C[b.holder], stroke: '#05080b', 'stroke-width': 1.5 }, g);
+    if (b.disputed) { el('circle', { cx, cy, r: b.r, fill: 'none', stroke: 'var(--earth)', 'stroke-width': 2, 'stroke-dasharray': '3 3' }, g); el('circle', { cx, cy, r: b.r - 2, fill: 'var(--belt)' }, g); }
+  } else {
+    el('circle', { cx, cy, r: b.r, fill: C[b.holder], stroke: '#05080b', 'stroke-width': 1.5 }, g);
+    el('circle', { cx: cx - b.r * 0.3, cy: cy - b.r * 0.3, r: b.r * 0.55, fill: '#ffffff', opacity: 0.12 }, g);
+  }
+  if (b.moon) el('circle', { cx: cx + b.r + 5, cy: cy - b.r * 0.6, r: Math.max(2, b.r * 0.18), fill: '#b8c2ca' }, g);
+  el('circle', { class: 'ring', cx, cy, r: (b.ring ? b.r * 1.6 : b.r) + 5, fill: 'transparent', stroke: 'transparent' }, g);
+  const row = b.row || 0, base = cy + b.r + 4;
+  const ty = b.above ? cy - b.r - 10 : base + 12 + row * 15;
+  if (row > 0) el('line', { x1: cx, y1: base, x2: cx, y2: ty - 10, stroke: 'var(--faint)', 'stroke-width': 1 }, g);
+  el('text', { x: cx, y: ty, 'text-anchor': 'middle', fill: 'var(--ink)', 'font-size': 10.5, 'font-family': 'var(--mono)' }, g).textContent = b.name.replace(' and Luna', '').replace(' and Triton', '');
+  g.addEventListener('click', () => select(b.id));
+  g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(b.id); } });
+  hits[b.id] = g;
+});
+
+const HOLDER = { earth: 'Earth', mars: 'Mars', venus: 'Venus', belt: 'The Belt', accord: 'The Accord', clans: 'The clans', none: 'Nobody' };
+function pill(lvl) { return `<span class="pill ${lvl}">${SEC[lvl][1]}</span>`; }
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+function select(id) {
+  const b = BODIES.find((q) => q.id === id);
+  Object.values(hits).forEach((g) => g.classList.remove('sel')); hits[id].classList.add('sel');
+  document.getElementById('detail').innerHTML = `<h3>Selected</h3><h2>${esc(b.name)}</h2>
+    <dl class="kv"><dt>Distance</dt><dd>${b.au} AU</dd><dt>Held by</dt><dd><i class="dot" style="background:${C[b.holder]}"></i> ${HOLDER[b.holder]}${b.disputed ? ' (disputed: Earth claims, the Belt works)' : ''}</dd><dt>Security</dt><dd>${pill(b.sec)}</dd></dl>
+    <p>${esc(b.what)}</p>`;
+  const st = STATIONS[id] || [];
+  document.getElementById('stations').innerHTML = st.length ? st.map(([n, who, c, what]) => `<li><span class="bar" style="background:${C[c]}"></span><div><b>${esc(n)}</b><div class="who">${esc(who)}</div><div>${esc(what)}</div></div></li>`).join('') : '<li><span class="bar" style="background:var(--faint)"></span><div class="who">No station. Pirate docks, if any, are on no chart.</div></li>';
+  const rs = RES[id] || [];
+  document.getElementById('resources').innerHTML = rs.map(([k, what, lvl]) => `<li><span class="bar" style="background:var(--${lvl}-ink)"></span><div><b>${esc(k)}</b> ${pill(lvl)}<div>${esc(what)}</div></div></li>`).join('');
+  try { localStorage.setItem('sol-sel', id); } catch (e) {}
+}
+let start = 'ceres'; try { start = localStorage.getItem('sol-sel') || 'ceres'; } catch (e) {}
+select(BODIES.some((b) => b.id === start) ? start : 'ceres');
+
+const tb = (id, rows, f) => { document.querySelector(`#${id} tbody`).innerHTML = rows.map(f).join(''); };
+tb('starts', STARTS, (r) => `<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[4])}</td></tr>`);
+tb('lanes', LANES, (r) => `<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${pill(r[2])}</td><td>${esc(r[3])}</td></tr>`);
+tb('navies', NAVIES, (r) => `<tr><td>${esc(r[0])}</td><td><b>${esc(r[1])}</b></td><td>${esc(r[2])}</td><td><code>${esc(r[3])}</code></td><td>${esc(r[4])}</td><td>${esc(r[5])}</td></tr>`);
+</script>

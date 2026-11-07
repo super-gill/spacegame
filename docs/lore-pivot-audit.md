@@ -26,6 +26,7 @@ Written by the lore chat on 6 November 2026, after the Sol pivot (`lore.md`, "De
 | Commonwealth Fleet Works | Ishtar Fleet Works | `manufacturers.ts` (id `commonwealth` stays), `weapons.md` |
 | Covenant Standard | Luna Standard | lore only |
 | Meridian Arm, Pale Reach | known space, beyond the Shoals | `roadmap.md` line 99 |
+| Charter Fleet, Martian Navy, Coastguard, Union Militia (and militia for the Belt's forces) | Earth Charter Fleet (ECF), Martian Republic Navy (MRN), Venusian Space Guard (VSG), Union Defence Force (UDF); the Militia tag is the UDF tag (added 7 November) | `fitting.md`, `turrets.md` ("militia fit", "militia issue"), any NPC faction or dialogue string |
 
 ## Docs, by file
 

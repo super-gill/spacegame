@@ -4,3 +4,8 @@ dist/
 .DS_Store
 .vite/
 packages/server/data/
+
+# art generator output
+art/registry/out/
+art/**/*.png
+art/**/__pycache__/

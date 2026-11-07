@@ -1,0 +1,64 @@
+# Ship and chart art
+
+Source for the game's ship art and the Sol chart. Added 7 November 2026 by the lore chat at Jason's request, because until then this source lived only in that chat's session. It is not game code: nothing in `packages/` imports it, and the game does not build it. It produces the ship registry page, the hull handover (`docs/hulls.md`) and, when ship art goes into the client, the SVG the build rasterises.
+
+## What is here
+
+| Path | What it is |
+| --- | --- |
+| `registry/build.py` | The generator. Reads the registry data (every hull: builder, class, job, tier, patterns, marks), draws every hull from the parts libraries, writes the registry page and, optionally, `docs/hulls.md` |
+| `registry/kod.py` | The shared `Hull` class (bodies, modules, layered detail levels, symbols) and the Kessari Orbital Defence hulls |
+| `registry/vantage.py`, `mars.py`, `venus.py`, `specops.py`, `older.py` | The navies: Vantage fighters, Seraphine and Arcadia (Mars), Ishtar and Solace (Venus), the special operations (T3) hulls, the retired navy marks |
+| `registry/belt.py` | Union Defence Works rebuilds (redrawn over the source hull), the clan hulls, the Grab |
+| `registry/indep.py` | Meridian Yards and Corvane Heavy Industries combat hulls |
+| `registry/civil.py`, `beltciv.py`, `venciv.py`, `pass4.py`, `pass5.py` | The civil yards: Tessaract and Arcadia; Belt Forge and Rook and Rivet; Solace, Halden, Arbor, Lavinia and the clans' civil hulls; Meridian, Corvane industry, the prototypes, drones and the Aurel; the gap-pass hulls |
+| `registry/fitting.py` | Derives each hull's built-in equipment, role bonuses and frame notes (the fitting model in `docs/hull-terms.md`) |
+| `registry/base/registry-base.html` | The page shell the generator fills (layout, styles, viewer script) |
+| `registry/shot.js`, `shot-panel.js` | Playwright screenshots of hulls and of the detail panel, for checking art |
+| `sol-chart/sol-chart.html` | The Sol Chart page: a hand-written page drawn from `docs/sol.md` |
+| `sol-chart/shot.js` | Playwright screenshot of the Sol Chart at desktop and phone width |
+
+## Requirements
+
+- Python 3.10 or later, standard library only.
+- For screenshots only: Node 18 or later and Playwright with Chromium (`npm i -D playwright`, then `npx playwright install chromium`; the lore chat's container has them preinstalled).
+
+## Build the registry and the hull handover
+
+From `art/registry/`:
+
+```
+python3 build.py base/registry-base.html out/registry.html ../../docs/hulls.md
+```
+
+- Argument 1: the page shell. Argument 2: the page to write. Argument 3 (optional): where to write the hull handover.
+- Prints `<n> ships; <m> drawn; <size> KB`.
+- `out/` is ignored by git. Never edit `docs/hulls.md` by hand; change the data or the art and rebuild.
+
+## Check the art
+
+From `art/registry/`, after a build (the scripts read `registry.html` from the current folder, so run them inside `out/` or copy the page next to them):
+
+```
+cd out && node ../shot.js warrant kes-citation    # writes shot-<key>.png of each hull's stage
+cd out && node ../shot-panel.js lav-cyclone       # writes fit-<key>.png of the detail panel; prints page errors
+```
+
+## How a hull is drawn
+
+- Nose points `+x`. Units are world units; one unit is one screen pixel at zoom 1.
+- A builder function per hull returns a `Hull` (or a subclass per yard) and a nominal radius. `all_art()` in each module returns `(defs, symbols, meta)`; `build.py` merges them.
+- Each hull is emitted as four SVG symbols: `full` (all detail), `mid` (fewer details, for chips and lineups), `sil` (silhouette) and `rim` (outline). The page draws `mid` wherever many hulls show at once.
+- Layering rules: bodies make the silhouette and the grid; fittings go on top; nacelles go under the hull; company bands are painted straight after the hull plate, under every fitting.
+- The art rules (no basic shapes, nothing floats, no stern slashes, drones as machines, capitals carry no tool) are in `docs/fleet.md`, "Art direction".
+
+## Adding or changing a hull
+
+1. Add or change its `add(...)` line in `build.py` (key, builder, class column, name, job, character; legacy marks, patterns and base hull as keywords). Keys are catalogue ids where the game has one and never change.
+2. Draw it in the module for its yard, add its note to that module's `NOTES`, and list it in that module's `all_art()`.
+3. Build, screenshot, check nothing floats and nothing crops (set `h.ymax` or `h.xmin` when fittings extend past the bodies).
+4. Rebuild `docs/hulls.md` with the third argument and commit both.
+
+## Into the game, later
+
+`docs/lore-handover.md`, "Ship art as an asset pipeline": keep this SVG as the source of truth and rasterise at build time to sprites at the client's zoom levels, packed into atlases. Never parse or filter SVG at runtime. Where that build step lives is the lead's call.
