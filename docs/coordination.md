@@ -254,6 +254,7 @@ Settled design and process decisions, newest first. Each line: date, decision, w
 
 ## Log
 
+- 2026-11-07, lore: `fleet.md` updated with the eleven gap-pass hulls and the carrier, materials and drone decisions; stale rows fixed. `hulls.md` regenerated (178 hulls, 165 drawn). New registry keys: `mer-dunlin`, `cor-pithead`, `arc-miner`, `arc-miner-mk1`, `arc-tender-mk0`, `lav-breeze`, `bf-rime`, `bf-rime-old`, `rr-gantry`, `hal-footnote`, `arb-tendril`, `hal-probe`. No catalogue ids changed.
 - 2026-11-07, lore: new `docs/materials.md` (real minerals, ice and gas materials, exotics outside Sol only, refining stages, maker alloys, per-hull method and grade). For the lead: new good ids listed there; display names for `banded-ore`, `black-ore`, `glintstone` change to Copper, Zinc, Platinum; `gate-glass` keeps its id and drops out of Sol's rock tables. Breaching in Sol targets platinum and rare earths; mechanic unchanged.
 - 2026-11-07, lore: who mines by power recorded (`lore.md` decision, `industries.md`); eleven gap-pass hulls agreed, to follow the materials pass.
 - 2026-11-07, lore: tier gap pass per industry in `industries.md` with nine proposed hulls awaiting Jason; `hulls.md` grade fix for the Jackleg and Grab (civilian, open market, not Navy only).

@@ -67,17 +67,18 @@ Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civ
 | Superfreighter | Tessaract Consignment | | | | |
 | Ferry or bus | Tessaract Timetable | Arcadia Ferry Mk II | | | Meridian Fulmar |
 | Liner | Tessaract Passage | | | | |
-| Prospector | | | | Belt Forge Prospector | |
-| Miner | | | | Belt Forge Sinker | |
+| Prospector | | | | Belt Forge Prospector | Meridian Dunlin |
+| Miner | | Arcadia Miner Mk II | | Belt Forge Sinker | |
+| Heavy miner | | | | | Corvane Pithead |
 | Barge | | | | Belt Forge Collier | |
 | Refinery ship | | | | Belt Forge Winder; Corvane Smelter | |
-| Ice miner | | | | Belt Forge Auger | |
+| Ice miner | | | | Belt Forge Rime (S), Auger (M) | |
 | Skimmer | | | Lavinia Zephyr (S), Gale (M) | | |
-| Gas refinery | | | Lavinia Cyclone | | Corvane Still |
+| Skimmer carrier | | | Lavinia Cyclone | | Corvane Still |
 | Blockade runner | | | | Belt Forge Burrow | |
-| Factory ship | | | | Belt Forge Headframe | |
+| Mining carrier | | | | Belt Forge Headframe | |
 | Tug | | Arcadia Tug Mk II | | Rook and Rivet Shunt | Meridian Grebe |
-| Salvage tender | | | | Rook and Rivet Scrapper (S), Wrecker (M) | |
+| Salvage tender | | | | Rook and Rivet Scrapper (S), Wrecker (M), Gantry (L) | |
 | Shipbreaker | | | | Rook and Rivet Breaker | |
 | Repair tender | | Arcadia Tender Mk I | Solace Respite (S), Haven (M) | | |
 | Hospital ship | | | Solace Sanctuary | | |
@@ -86,7 +87,7 @@ Meridian builds no warships. The Meridian Tern is a corvette-class hull sold civ
 | Recovery tender | | | | Long Wake Trawl (clan) | |
 | Drone tender | | | Arbor Canopy | | |
 
-Reading the gaps: Earth builds no mining, salvage or support hulls. Mars builds every civilian job the state needs and nothing the state does not. Venus builds no cargo hulls at all. The Belt builds no passenger hulls and nothing above a cruiser. Those gaps are the trade.
+Reading the gaps: Earth builds no mining, salvage or support hulls; it owns the claims and buys the work from Belt cooperatives and Corvane (`industries.md`, "Who mines, by power"). Mars builds every civilian job the state needs and nothing the state does not, its own miners included. Venus builds no cargo hulls at all. The Belt builds no passenger hulls and nothing above a cruiser. Those gaps are the trade.
 
 ## Meridian Yards
 
@@ -100,6 +101,7 @@ Independent. Plain, friendly words; hulls named for seabirds. The everyman build
 | Meridian Petrel | Taxi | A fast few-seat passenger runner | What a pilot flies when the fare is in a hurry | draft |
 | Meridian Fulmar | Bus or ferry | Scheduled passenger routes, medium | The commuter run between a world's port and its moon | draft |
 | Meridian Skua | Hauler | A small cargo hauler with a bit of bite | The first step up from a Tern for a trader | draft |
+| Meridian Dunlin | Prospector | A Gull box with a light laser on the standard ring and a small ore hold; cut, L1 | The first miner anyone buys, sold everywhere; outgrown fast | draft |
 | Meridian Kite | Corvette, armed courier | A courier with two guns and a point to make | The first ship an outfit buys that can shoot back | draft |
 | Meridian Harrier | Patrol boat, gunboat | The patrol hull for people who are not a navy | Every outfit's security starts with a pair of these | draft |
 | Meridian Shrike | Patrol boat, bounty hull | Civilian tackle, a pod bay and a cell | Brings them in, hull or pod | draft |
@@ -169,6 +171,7 @@ Mars's state yard. It names hulls what they are and numbers the marks, because M
 | Arcadia Hauler Mk III | Hauler | Small cargo | Every Martian colony has a hangar full of them | draft |
 | Arcadia Freighter Mk II | Freighter | Medium cargo | Armoured where a Tessaract hull is roomy | draft |
 | Arcadia Ice Hauler Mk II | Ice hauler | Polar ice to the Martian cities | Water is a state matter | draft |
+| Arcadia Miner Mk II | Miner (medium) | The state's own cutter: armoured, slow, a small hold for its size; cut, L2 | Mars never contracts its supply out | draft |
 | Arcadia Bulk Freighter Mk I | Bulk freighter | Large cargo for the state | New, and already looks twenty years old | draft |
 | Arcadia Tug Mk II | Tug | Port work | Every Martian port has a dozen | draft |
 | Arcadia Ferry Mk II | Ferry | Scheduled passengers, no cabins worth the name | Seats, straps and a schedule kept to the second | draft |
@@ -210,30 +213,35 @@ Venus's research body. Survey and exploration hulls full of instruments, and the
 | --- | --- | --- | --- | --- |
 | Halden Query | Survey ship (small) | Local survey and scanning | More sensor than ship | draft |
 | Halden Inquiry | Survey ship (medium) | System survey, gate study | What Novum expeditions borrow | draft |
-| Halden Expedition | Explorer (large) | Deep exploration; built to take a long-range drive that does not yet exist | Built for the Dark, and the Shoals one day | draft |
+| Halden Expedition | Explorer (large) | Exploration command ship: carries the survey wing (probes, a Query), stores and analyses; built to take a long-range drive that does not yet exist | Built for the Dark, and the Shoals one day | draft |
+
+Drones: Halden Probe (a one-shot survey drone launched from a bay; the Expedition's wing). Legacy: Halden Footnote (the survey hull before the Query; see the legacy grid).
 
 ## Arbor Dynamics
 
-Venus's drone house. Drones are craft, not hulls, but Arbor builds one tender to carry them.
+Venus's drone house. Drones are craft, not hulls, but Arbor builds one tender to carry them. Drones are pure machines (Jason, 7 November): a frame round a tool, sensor or weapon with thrusters where they fit, never fighter-shaped.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Arbor Thorn | Combat drone, light | The drone a drone bay launches in a fight | Sold openly | draft |
 | Arbor Bramble | Combat drone, heavy | Heavier, slower, hits harder | Behind standing | draft |
-| Arbor Shoot | Repair drone | Hull and shield repair | A Solace kit with wings | draft |
+| Arbor Shoot | Repair drone | Hull and shield repair | A Solace repair kit on a thruster frame: a machine, no cockpit, no wings | draft |
+| Arbor Tendril | Collector drone | Gathers cut ore, ice blocks and loose salvage for the mother ship | The drone every mining wing assumes | draft |
 | Arbor Canopy | Drone tender (medium) | Carries and controls drone swarms | A civilian hull that fights like a small carrier | draft |
 
 
 ## Lavinia Atmospherics
 
-Proposed 7 November 2026 (`industries.md`): Venus had no civil yard, and gas is its native industry. Named for a Venusian lowland; hulls named for winds. Skimmers work the edge of a planet's air, where deeper is richer and the hull limit is the death line, because planets are never landable.
+Agreed 7 November 2026 (`industries.md`): Venus had no civil yard, and gas is its native industry. Named for a Venusian lowland; hulls named for winds. Skimmers work the edge of a planet's air, where deeper is richer and the hull limit is the death line, because planets are never landable.
 
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Lavinia Zephyr | Skimmer (small) | Upper-air gas skimming | The first skimmer anyone flies | draft |
 | Lavinia Gale | Skimmer (medium) | Deeper skimming, a bigger hold | Comes back hot | draft |
 | Lavinia Monsoon | Gas tanker (heavy) | Carries gas to the refineries | Venus's freight, finally | draft |
-| Lavinia Cyclone | Gas refinery (capital) | Skims and refines on station; a carrier for skimmer subcraft | A city that breathes a planet | draft |
+| Lavinia Cyclone | Skimmer carrier (capital) | Gas command ship: its wing of skimmers works the bands; it stores, refines, defends and commands, and never skims itself | A city that breathes a planet through its children | draft |
+
+Legacy: Lavinia Breeze (the skimmer before the Zephyr, shallow only; see the legacy grid). Skim grades (D1 upper band, D2 cloud bands, D3 below the death line) are in `materials.md`.
 
 ## Union Defence Works and the Union pattern
 
@@ -278,10 +286,11 @@ Old mining trades and tools. The best mining kit in known space and the hulls th
 | Belt Forge Mule | Hauler | Small ore and cargo hauler | A Belter's answer to the Waybill: uglier, tougher, cheaper | draft |
 | Belt Forge Adit | Freighter | Medium ore and cargo freighter | Named for a mine's entrance; a Belt freighter with teeth | draft |
 | Belt Forge Winder | Refinery ship (large) | Mobile ore processing | A winding engine for the whole field | draft |
-| Belt Forge Auger | Ice miner (medium) | Cuts ice in the outer Belt | Where the rock runs out, the ice begins | draft |
+| Belt Forge Rime | Ice cutter (light) | A Prospector frame with an ice saw in place of the laser; saw, S1 | The first ice anyone cuts | draft |
+| Belt Forge Auger | Ice miner (medium) | Cuts ice in the outer Belt; saw, S2 | Where the rock runs out, the ice begins | draft |
 | Belt Forge Cistern | Ice hauler (heavy) | Water to the habitats | Water is the Belt's money | draft |
 | Belt Forge Burrow | Courier, blockade runner | Fast, quiet, a hidden hold as standard | Nobody asks what a Burrow carries | draft |
-| Belt Forge Headframe | Factory ship (largest) | Mobile works: refining, repair, building | The frame over the shaft; the Belt's answer to a station | draft |
+| Belt Forge Headframe | Mining carrier (capital) | Mining command ship: carries the mining wing (Jacklegs, Knockers, Tendrils), refines in the field, transfers ore without docking; never cuts rock itself | The frame over the shaft; the Belt's answer to a station | draft |
 
 Drones: Belt Forge Knocker (mining drone, built).
 
@@ -294,6 +303,7 @@ Salvager's shop talk. The Belt's salvage firm: tugs, tenders and shipbreakers, a
 | Rook and Rivet Shunt | Tug | Towing and pushing | Moves anything, slowly | draft |
 | Rook and Rivet Scrapper | Salvage tender (small) | Wreck stripping | Cuts, grabs, leaves | draft |
 | Rook and Rivet Wrecker | Salvage tender (medium) | Recovery and heavy salvage | Takes the wreck, not the parts | draft |
+| Rook and Rivet Gantry | Salvage tender (heavy) | A frame with two cranes, a hull cradle and a Grab bay | The step between taking parts and taking ships | draft |
 | Rook and Rivet Breaker | Shipbreaker (large) | Breaks hulls down to plate | Where ships go to become Patchplate | draft |
 
 ## Corvane Heavy Industries
@@ -303,11 +313,12 @@ Independent: Earth money, Belt yards, Belt labour, nobody's flag. Heavy plant, a
 | Hull | Class | Job | Character | Status |
 | --- | --- | --- | --- | --- |
 | Corvane Dray | Bulk freighter (ore) | Heavy ore haulage to the foundries | The ore truck the Black Strike hunts hardest | draft |
+| Corvane Pithead | Miner (heavy) | Two heavy lasers, breach kit, a sorting hopper, guns; cut and breach, L3 | Earth's mining, done by the nearest thing Earth has to a mining navy | draft |
 | Corvane Smelter | Refinery ship (large) | Mobile smelting | A piece of Lantern Works that flies | draft |
 | Corvane Warden | Destroyer, corporate security | Escort for the ore convoys | Paid by the tonne it brings home | draft |
 | Corvane Bulwark | Cruiser, corporate security | A mining fleet's bodyguard | The biggest ship you can buy without a flag | draft |
 | Corvane Foreman | Factory ship, armed | A Smelter with a gun deck | Refines under fire and does not stop | draft |
-| Corvane Still | Gas refinery (capital) | Skims and refines at a gas giant | Corvane's answer to the Cyclone, uglier | draft |
+| Corvane Still | Skimmer carrier (capital) | Gas command ship: its wing skims, it stores, refines, defends and commands | Corvane's answer to the Cyclone, uglier | draft |
 
 ## The clans
 
@@ -361,7 +372,9 @@ Venus flies one light fighter and no heavy combat fighter; its heavy is the Stre
 | --- | --- | --- |
 | Combat | Arbor Dynamics | Arbor Thorn (light, sold openly), Arbor Bramble (heavy, behind standing) |
 | Repair | Arbor Dynamics | Arbor Shoot |
-| Mining | Belt Forge Collective | Belt Forge Knocker |
+| Mining | Belt Forge Collective | Belt Forge Knocker (cuts) |
+| Collecting | Arbor Dynamics | Arbor Tendril (gathers canisters, ice blocks, salvage) |
+| Survey | Halden Institute | Halden Probe (one-shot) |
 
 Vantage Aerospace is a new company (Luna, founded in the Gate War to arm Earth's first carriers), named for the fencing term and naming its craft for blades. It builds no hulls.
 
@@ -526,8 +539,9 @@ Civilian hulls by job and band, with the gaps filled on 6 November (Tessaract It
 | --- | --- | --- | --- | --- | --- |
 | Cargo | Docket, Pony, Arcadia Courier | Waybill, Mule, Skua, Arcadia Hauler | Manifest, Adit, Arcadia Freighter | Lading, Dray, Arcadia Bulk Freighter | Consignment |
 | Passengers | Gull, Petrel, Arcadia Shuttle | Timetable, Fulmar, Arcadia Ferry | Tessaract Itinerary (heavy bus) | Passage | later: colony ship, cruise liner |
-| Mining | Prospector | Sinker | Collier | Winder, Smelter | Headframe |
-| Salvage and towing | Shunt, Scrapper | Wrecker, Keel, Arcadia Tug | Long Wake Trawl | Breaker | later: a mobile breaking yard |
+| Mining | Prospector, Dunlin | Sinker, Arcadia Miner | Pithead, Collier | Winder, Smelter | Headframe |
+| Ice and gas | Rime, Zephyr | Auger, Gale | Cistern, Monsoon, Arcadia Ice Hauler, Tariff | | Cyclone, Still |
+| Salvage and towing | Shunt, Scrapper | Wrecker, Keel, Arcadia Tug, Grebe | Gantry, Long Wake Trawl | Breaker | later: a mobile breaking yard |
 | Support | Respite | Haven, Arcadia Tender | Solace Refuge (repair ship) | Sanctuary | later: mobile dock |
 | Survey and exploration | Query | Inquiry, Waystar | Expedition, Farwalker | | |
 | Drone tender | | Canopy | | | |
@@ -560,7 +574,7 @@ For the lead, when wanted: a `generation` on each hull; a legacy hull is its own
 
 ### Legacy grid
 
-One earlier mark for each hull new pilots and NPC traffic actually use, and (Jason, 7 November) a variety of T1 and T2 at every size for civilian trade: so the freight ladder has a legacy mark from courier to bulk freighter. Only the capitals and the command ships have no legacy mark; navies scrap theirs or keep them.
+One earlier mark for each hull new pilots and NPC traffic actually use, and (Jason, 7 November) a variety of T1 and T2 at every size for civilian trade: so the freight ladder has a legacy mark from courier to bulk freighter. Only the capitals and the command ships have no legacy mark; navies scrap theirs or keep them. The tier gap pass (`industries.md`) added T1 ways into mining for Mars, gas, ice, SAR and exploration.
 
 | Production hull | Legacy predecessor | Still around because |
 | --- | --- | --- |
@@ -594,6 +608,11 @@ One earlier mark for each hull new pilots and NPC traffic actually use, and (Jas
 | Corvane Dray | The old Dray | Corvane sells them off when the furnaces no longer want them; the Black Strike buys |
 | Meridian Petrel | Meridian Shearwater | The taxi before the taxi |
 | Meridian Fulmar | Meridian Puffin | The commuter run's old bus |
+| Arcadia Miner Mk II | Arcadia Miner Mk I | Mars does not scrap; the colonies cut with these |
+| Arcadia Tender Mk I | Arcadia Tender Mk 0 | The only used repair hull anyone can buy; Solace's marks do not age |
+| Lavinia Zephyr | Lavinia Breeze | Shallow only, comes back hot; every skimmer pilot's first |
+| Belt Forge Rime | The old Rime | A saw on a frame; there is not much to wear out |
+| Halden Query | Halden Footnote | One dish, no lab; the prospector's cheap scanner |
 
 ### Pattern grid
 
@@ -669,7 +688,7 @@ Jason's direction, 7 November 2026: civil T3s follow the military shape. They ar
 | Tessaract | Tessaract Covenant | Superfreighter | Carries a Consignment's load through Open space alone: a hold that survives the ship | A Lattice-laced hold frame that does not break when the hull does |
 | Arcadia | Arcadia Prototype Mk 0 | Bulk freighter | The state's answer to the Covenant: slower, armoured, and it refines in transit | Gate-glass heat exchangers |
 | Lavinia | Lavinia Tempest | Skimmer (heavy) | Skims below the death line and comes back | A Lattice heat sink that drinks a planet's air pressure |
-| Belt Forge | Belt Forge Lodestar | Factory ship | Finds and cuts gate-glass where survey scanners read nothing | A gate-glass resonator for a survey array |
+| Belt Forge | Belt Forge Lodestar | Mining carrier | Its wing finds and cuts pockets survey scanners read as empty: platinum and rare earths in Sol, gate-glass in the systems that have it | A gate-glass resonator for a survey array |
 | Rook and Rivet | Rook and Rivet Lazarus | Recovery tender | Brings back a hulk nothing else can tow, and its crew | A Lattice tether that holds mass it should not |
 | Solace | Solace Grace | Hospital ship | Keeps a fleet alive under fire: repair and regen at a rate nothing human matches | Regen nanites grown on Lattice seed |
 | Halden | Halden Threshold | Explorer | Reads a broken gate; the first hull built to cross the Shoals, if a drive ever exists | Gate-glass sensors that see the lanes |
@@ -694,13 +713,15 @@ Where NPC traffic should vary. Gaps are deliberate; they are the trade between p
 | Frigate | Kessari Injunction | Seraphine Resolve | Ishtar Maat | Union Boycott | |
 | Destroyer | Kessari Verdict | Seraphine Constancy | Ishtar Maxwell | Union Walkout | |
 | Cruiser and up | Kessari Statute, Precedent, Mandate | Seraphine Valles, Tharsis, Hellas, Olympus | Ishtar Aphrodite | Union Solidarity | |
-| Mining | | | | Belt Forge Prospector, Sinker, Collier | |
+| Mining | | Arcadia Miner | | Belt Forge Prospector, Sinker, Collier, Headframe | Meridian Dunlin; Corvane Pithead |
+| Ice | | | | Belt Forge Rime, Auger | |
+| Gas | | | Lavinia Zephyr, Gale, Cyclone | | Corvane Still |
 | Refining | | | | Belt Forge Winder, Corvane Smelter | |
-| Salvage and towing | | | | Rook and Rivet Shunt, Scrapper, Wrecker, Breaker | |
+| Salvage and towing | | Arcadia Tug | | Rook and Rivet Shunt, Scrapper, Wrecker, Gantry, Breaker | Meridian Grebe |
 | Support | | Arcadia Tender | Solace Respite, Haven, Sanctuary | | |
 | Survey and exploration | | | Halden Query, Inquiry, Expedition | Saro Farwalker | |
 
-Mars builds civilian hulls through one state yard, one per job, which is a statement about Mars. Venus builds no cargo hulls. Earth builds no mining or salvage hulls. The Belt builds no passenger hulls. Every one of those gaps is a reason to cross a border.
+Mars builds civilian hulls through one state yard, one per job, which is a statement about Mars. Venus builds no cargo hulls. Earth builds no mining or salvage hulls; it buys the work. The Belt builds no passenger hulls. Every one of those gaps is a reason to cross a border.
 
 ## Open
 
@@ -708,4 +729,6 @@ Mars builds civilian hulls through one state yard, one per job, which is a state
 - [ ] Jason: the grid: anything wrong, missing or too many; which gaps should stay gaps.
 - [ ] Jason: the generations model and the three grids (legacy, pattern, clan); which legacy and pattern hulls the first used market and the first standing rewards should carry.
 - [ ] Lead: which of these the next build slice needs; everything marked draft waits for a milestone that wants it.
-- [ ] Lore: the drones list and the Arena ask, after this.
+- [ ] Lore: the Arena ask.
+- [ ] Jason: the Corvane Colossus (a T3 capital that works the rock itself) against the carrier rule for command ships.
+- [ ] Art: draw the eleven gap-pass hulls (Dunlin, Pithead, Arcadia Miner Mk II and Mk I, Breeze, Rime and the old Rime, Gantry, Tender Mk 0, Footnote, Tendril, Probe).
