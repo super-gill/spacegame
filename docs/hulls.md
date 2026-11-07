@@ -175,18 +175,24 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `bf-pony-old` |  | The old Pony | Light civil, Courier, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Pony | Light | `Light-Courier` |  | used market, cheap | yes |
+| `bf-adit-old` |  | The old Adit | Cargo, Freighter, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Adit | Heavy | `Heavy-Freighter` |  | used market, cheap | yes |
+| `bf-mule-old` |  | The old Mule | Cargo, Hauler, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Mule | Medium | `Medium-Hauler` |  | used market, cheap | yes |
+| `rookrivet-hulk-old` |  | The old Collier | Mining, Barge, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Collier | Heavy | `Heavy-Barge` |  | used market, cheap | yes |
+| `rookrivet-prospector-old` |  | The old Prospector | Mining, Prospector, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Prospector | Light | `Light-Prospector` |  | used market, cheap | yes |
+| `rookrivet-breacher-old` |  | The old Sinker | Mining, Miner, legacy | T1 | legacy | none (old civilian mark) | Belt Forge Sinker | Medium | `Medium-Miner` |  | used market, cheap | yes |
 | `bel-miner` |  | Belt Forge Jackleg | Subcraft, Mining subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Mining subcraft` |  | yard, licence only | yes |
-| `bf-burrow` |  | Belt Forge Burrow | Light civil, Courier, blockade runner | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
-| `bf-pony` |  | Belt Forge Pony | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | no |
-| `bf-adit` |  | Belt Forge Adit | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` |  | yard or ship mart | no |
-| `bf-mule` |  | Belt Forge Mule | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | no |
-| `bf-cistern` |  | Belt Forge Cistern | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | no |
-| `bf-auger` |  | Belt Forge Auger | Mining, Ice miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Ice miner` |  | yard or ship mart | no |
-| `rookrivet-hulk` | rookrivet-hulk | Belt Forge Collier | Mining, Barge | T2 | production | none (civilian) |  | Heavy | `Heavy-Barge` | Deep pattern: Jump drive and bunkers; mines where the patrols do not go | yard or ship mart | no |
-| `rookrivet-prospector` | rookrivet-prospector | Belt Forge Prospector | Mining, Prospector | T2 | production | none (civilian) |  | Light | `Light-Prospector` |  | yard or ship mart | no |
-| `rookrivet-breacher` | rookrivet-breacher | Belt Forge Sinker | Mining, Miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Miner` | Breaching pattern: Two shotfirer rigs and a Sounder; the knot hunter | yard or ship mart | no |
-| `bf-headframe` |  | Belt Forge Headframe | Industry, Factory ship, largest (mining command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Factory ship` |  | yard or ship mart | no |
-| `bf-winder` |  | Belt Forge Winder | Industry, Refinery ship, large | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Refinery ship` |  | yard or ship mart | no |
+| `bf-burrow` |  | Belt Forge Burrow | Light civil, Courier, blockade runner | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
+| `bf-pony` |  | Belt Forge Pony | Light civil, Courier | T2 | production | none (civilian) |  | Light | `Light-Courier` |  | yard or ship mart | yes |
+| `bf-adit` |  | Belt Forge Adit | Cargo, Freighter | T2 | production | none (civilian) |  | Heavy | `Heavy-Freighter` |  | yard or ship mart | yes |
+| `bf-mule` |  | Belt Forge Mule | Cargo, Hauler | T2 | production | none (civilian) |  | Medium | `Medium-Hauler` |  | yard or ship mart | yes |
+| `bf-cistern` |  | Belt Forge Cistern | Bulk, Ice hauler | T2 | production | none (civilian) |  | Heavy | `Heavy-Ice hauler` |  | yard or ship mart | yes |
+| `bf-auger` |  | Belt Forge Auger | Mining, Ice miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Ice miner` |  | yard or ship mart | yes |
+| `rookrivet-hulk` | rookrivet-hulk | Belt Forge Collier | Mining, Barge | T2 | production | none (civilian) |  | Heavy | `Heavy-Barge` | Deep pattern: Jump drive and bunkers; mines where the patrols do not go | yard or ship mart | yes |
+| `rookrivet-prospector` | rookrivet-prospector | Belt Forge Prospector | Mining, Prospector | T2 | production | none (civilian) |  | Light | `Light-Prospector` |  | yard or ship mart | yes |
+| `rookrivet-breacher` | rookrivet-breacher | Belt Forge Sinker | Mining, Miner, medium | T2 | production | none (civilian) |  | Medium | `Medium-Miner` | Breaching pattern: Two shotfirer rigs and a Sounder; the knot hunter | yard or ship mart | yes |
+| `bf-headframe` |  | Belt Forge Headframe | Industry, Factory ship, largest (mining command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Capital | `Capital-Factory ship` |  | yard or ship mart | yes |
+| `bf-winder` |  | Belt Forge Winder | Industry, Refinery ship, large | T2 | production | none (civilian) |  | Super-heavy | `Super-heavy-Refinery ship` |  | yard or ship mart | yes |
 | `rookrivet-drone` | rookrivet-drone | Belt Forge Knocker | Drone, Mining drone | T2 | production | none (civilian) |  | Drone | `Drone-Mining drone` |  | yard or ship mart | no |
 | `bf-lodestar` |  | Belt Forge Lodestar | Industry, Prototype factory ship | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Capital | `Capital-Prototype Factory ship` |  | top of company standing, or story | no |
 
@@ -194,11 +200,12 @@ Columns: key is the catalogue id where one exists (`id` column) or the registry 
 
 | Key | Id | Hull | Class | Tier | Generation / role | Grades | Base | Weight | Tag | Patterns | Route | Drawn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `rr-scrapper-old` |  | The old Scrapper | Service, Salvage tender, legacy | T1 | legacy | none (old civilian mark) | Rook and Rivet Scrapper | Light | `Light-Salvage tender` |  | used market, cheap | yes |
 | `rr-grab` |  | Rook and Rivet Grab | Subcraft, Salvage subcraft | T2 | production | Navy only |  | Subcraft | `Subcraft-Salvage subcraft` |  | yard, licence only | yes |
-| `rr-breaker` |  | Rook and Rivet Breaker | Industry, Shipbreaker, large (salvage command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Shipbreaker` |  | yard or ship mart | no |
-| `rr-scrapper` |  | Rook and Rivet Scrapper | Service, Salvage tender, small | T2 | production | none (civilian) |  | Light | `Light-Salvage tender` |  | yard or ship mart | no |
-| `rr-shunt` |  | Rook and Rivet Shunt | Service, Tug | T2 | production | none (civilian) |  | Light | `Light-Tug` |  | yard or ship mart | no |
-| `rr-wrecker` |  | Rook and Rivet Wrecker | Service, Salvage tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Salvage tender` |  | yard or ship mart | no |
+| `rr-breaker` |  | Rook and Rivet Breaker | Industry, Shipbreaker, large (salvage command ship) | T2 | production; command ship (fleet bonuses, bay, defence umbrella, fleet beacon) | none (civilian) |  | Super-heavy | `Super-heavy-Shipbreaker` |  | yard or ship mart | yes |
+| `rr-scrapper` |  | Rook and Rivet Scrapper | Service, Salvage tender, small | T2 | production | none (civilian) |  | Light | `Light-Salvage tender` |  | yard or ship mart | yes |
+| `rr-shunt` |  | Rook and Rivet Shunt | Service, Tug | T2 | production | none (civilian) |  | Light | `Light-Tug` |  | yard or ship mart | yes |
+| `rr-wrecker` |  | Rook and Rivet Wrecker | Service, Salvage tender, medium | T2 | production | none (civilian) |  | Medium | `Medium-Salvage tender` |  | yard or ship mart | yes |
 | `rr-lazarus` |  | Rook and Rivet Lazarus | Service, Prototype recovery tender | T3 | prototype: a civil specialist with one Lattice-derived component; see fleet.md "Civil T3: prototypes" | none (top of company standing) |  | Heavy | `Heavy-Prototype Recovery tender` |  | top of company standing, or story | no |
 
 ## The clans (belt)
