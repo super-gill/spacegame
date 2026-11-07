@@ -15,7 +15,7 @@ The one page for the lead. Started 7 November 2026 by the lore chat; kept curren
 9. `lore.md` (canon: setting, history, law, weapons, companies, pirates, names, decisions) and `races.md` (the power and company summary the code is built against).
 10. The ship registry page (Jason's artifact, Version 40 at the time of writing) for the art and the per-hull fitting: 165 of 178 hulls drawn.
 
-Nothing in these is needed in code before milestone 7 (Law) except what is already built. They exist so the lead can build around the hulls and the navies without re-deriving them.
+Needed for the re-fit now: `lore-pivot-audit.md` (the renames), `sol.md` (the map, the stations and the starts), the display names in `materials.md`, and the in-game hulls' entries in `hulls.md`. Everything else waits for the milestone that wants it (law and navies at milestone 7, industry at 9); it exists so the lead can build around the hulls and the navies without re-deriving them.
 
 ## The setting, settled
 
